@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bolt", "bolt\bolt.csproj", "{0F60EF6D-5C08-4E8F-8872-7549F604C58F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bolt.editor", "bolt.editor\bolt.editor.csproj", "{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit", "udpkit\udpkit.csproj", "{66A5F183-3065-4A77-A109-779D7984990F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{393330A3-A797-4F41-AA8C-903CF38D8DB0}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Build.fsx = ..\..\Build.fsx
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F60EF6D-5C08-4E8F-8872-7549F604C58F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F60EF6D-5C08-4E8F-8872-7549F604C58F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F60EF6D-5C08-4E8F-8872-7549F604C58F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F60EF6D-5C08-4E8F-8872-7549F604C58F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66A5F183-3065-4A77-A109-779D7984990F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66A5F183-3065-4A77-A109-779D7984990F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66A5F183-3065-4A77-A109-779D7984990F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66A5F183-3065-4A77-A109-779D7984990F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = bolt\bolt.csproj
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 95238504, guid: a6c37f8d9bde2ac45bf14bc232ed017c, type: 3}
+  m_Name: BoltRuntimeSettings
+  m_EditorClassIdentifier: 
+  _prefabs:
+  - {fileID: 100000, guid: 1a74a9a6c6b98e143b3da787e6fc52f7, type: 2}
+  - {fileID: 100068, guid: 2edbce016c854e54a918477009d12aca, type: 2}
+  - {fileID: 100000, guid: 2124ab6dc334d5d43a0bce838392bb4a, type: 2}
+  - {fileID: 100000, guid: c6f7493a98e5f0e44b087b4fbe6818eb, type: 2}
+  - {fileID: 100032, guid: 0e7ee4df08df88c4880f43398f9ad2c2, type: 2}
+  - {fileID: 100102, guid: 6f909c3edc0470b47ba8fe549f4ca977, type: 2}
+  - {fileID: 100102, guid: cb85761c21278dc42b8af0c82ba2af6d, type: 2}
+  _config:
+    framesPerSecond: 60
+    clientSendRate: 3
+    clientDejitterDelay: 6
+    clientDejitterDelayMin: 3
+    clientDejitterDelayMax: 9
+    serverSendRate: 3
+    serverDejitterDelay: 6
+    serverDejitterDelayMin: 0
+    serverDejitterDelayMax: 12
+    serverConnectionLimit: 64
+    commandDejitterDelay: 3
+    commandQueueSize: 60
+    commandDelayAllowed: 12
+    commandRedundancy: 6
+    commandPingMultiplier: 1.25
+    simulatedLoss: 0
+    simulatedPingMean: 0
+    simulatedPingJitter: 0
+    simulatedRandomFunction: 0
+  debugClientCount: 1
+  debugStartPort: 64782
+  debugStartMapName: 
+  debugEditorMode: 1

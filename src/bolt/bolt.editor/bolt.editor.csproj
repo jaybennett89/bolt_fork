@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>bolt.editor</RootNamespace>
+    <AssemblyName>bolt.editor</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;BOLT_EDITOR</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEditor" Condition=" '$(OS)' == 'Unix' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor" Condition=" '$(OS)' != 'Unix' ">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Condition=" '$(OS)' != 'Unix' ">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="BoltScenesWindow.cs" />
+    <Compile Include="BoltSettingsWindow.cs" />
+    <Compile Include="BoltConnectionsWindow.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileCommands.cs" />
+    <Compile Include="Editors\BoltAssetEditorGUI.cs" />
+    <Compile Include="Editors\BoltCommandAssetEditor.cs" />
+    <Compile Include="Editors\BoltConfigAssetEditor.cs" />
+    <Compile Include="Editors\BoltEventAssetEditor.cs" />
+    <Compile Include="BoltMainThreadInvoker.cs" />
+    <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
+    <Compile Include="Editors\BoltMecanimAssetEditor.cs" />
+    <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />
+    <Compile Include="Editors\BoltStateAssetEditor.cs" />
+    <Compile Include="BoltUserAssemblyCompiler.cs" />
+    <Compile Include="BoltEditorUtils.cs" />
+    <Compile Include="Editors\BoltEntityEditor.cs" />
+    <Compile Include="BoltMenuItems.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileEvents.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileMecanim.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileNetwork.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompilePrefabs.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileStates.cs" />
+    <Compile Include="Compiler\BoltCompiler.cs" />
+    <Compile Include="Compiler\BoltCompilerOperation.cs" />
+    <Compile Include="BoltReflectionUtils.cs" />
+    <Compile Include="Compiler\BoltSourceFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\bolt\bolt.csproj">
+      <Project>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</Project>
+      <Name>bolt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\udpkit\udpkit.csproj">
+      <Project>{66A5F183-3065-4A77-A109-779D7984990F}</Project>
+      <Name>udpkit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\BoltNetwork.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Compiler\BoltCompiler.CompileMaps.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\libudpkit_android.so" />
+    <EmbeddedResource Include="Resources\libudpkit_ios.a" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TutorialAssets.unitypackage" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\BoltEntity Gizmo.png" />
+    <EmbeddedResource Include="Resources\BoltEntity Icon.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

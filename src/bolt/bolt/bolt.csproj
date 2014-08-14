@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>bolt</RootNamespace>
+    <AssemblyName>bolt</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_DLL;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;BOLT_SERVER; BOLT_CLIENT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Condition=" '$(OS)' != 'Unix' ">
+      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="animator\BoltMecanimFloat.cs" />
+    <Compile Include="animator\BoltMecanimAnimator.cs" />
+    <Compile Include="animator\BoltMecanimBoolean.cs" />
+    <Compile Include="animator\BoltMecanimFrame.cs" />
+    <Compile Include="animator\BoltMecanimInteger.cs" />
+    <Compile Include="animator\BoltMecanimTrigger.cs" />
+    <Compile Include="assets\BoltCommandAsset.cs" />
+    <Compile Include="assets\BoltMecanimAsset.cs" />
+    <Compile Include="assets\BoltAssetEnums.cs" />
+    <Compile Include="assets\BoltAssetPropertyGroup.cs" />
+    <Compile Include="assets\BoltCompilableAsset.cs" />
+    <Compile Include="assets\BoltEventAsset.cs" />
+    <Compile Include="assets\BoltAssetProperty.cs" />
+    <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="BoltCallbacksGenerated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BoltCallbacksGenerated.tt</DependentUpon>
+    </Compile>
+    <Compile Include="BoltConfig.cs" />
+    <Compile Include="BoltFactory.cs" />
+    <Compile Include="BoltGlobalBehaviour.cs" />
+    <Compile Include="BoltGUI.cs" />
+    <Compile Include="BoltObjectPool.cs" />
+    <Compile Include="BoltOrigin.cs" />
+    <Compile Include="collections\BoltIterator.cs" />
+    <Compile Include="collections\STuple.cs" />
+    <Compile Include="docs\BoltDocsClientOnly.cs" />
+    <Compile Include="docs\BoltDocsControllerOnly.cs" />
+    <Compile Include="docs\BoltDocsOwnerOnly.cs" />
+    <Compile Include="docs\BoltDocsProxyOnly.cs" />
+    <Compile Include="docs\BoltDocsServerOnly.cs" />
+    <Compile Include="entity\BoltEntityCallbacks.cs" />
+    <Compile Include="entity\BoltEntityPersistanceMode.cs" />
+    <Compile Include="entity\BoltEntityUpdateInfo.cs" />
+    <Compile Include="event\IBoltEventProperty.cs" />
+    <Compile Include="event\internal\BoltEventLoadMapDone.cs" />
+    <Compile Include="hitbox\BoltHitboxWorldSnapshotPool.cs" />
+    <Compile Include="hitbox\BoltPhysics.cs" />
+    <Compile Include="BoltSingletonPrefab.cs" />
+    <Compile Include="BoltConsoleCommand.cs" />
+    <Compile Include="BoltMapLoadOp.cs" />
+    <Compile Include="BoltMapLoader.cs" />
+    <Compile Include="BoltFloatCompression.cs" />
+    <Compile Include="BoltNetworkInterface.cs" />
+    <Compile Include="hitbox\BoltHitbox.cs" />
+    <Compile Include="hitbox\BoltHitboxBodySnapshot.cs" />
+    <Compile Include="hitbox\BoltHitboxShape.cs" />
+    <Compile Include="hitbox\BoltHitboxBody.cs" />
+    <Compile Include="hitbox\BoltHitboxType.cs" />
+    <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
+    <Compile Include="hitbox\BoltPhysicsHits.cs" />
+    <Compile Include="state\BoltStateFactory.cs" />
+    <Compile Include="state\Transform\BoltStateTransform.cs" />
+    <Compile Include="utils\Bits.cs" />
+    <Compile Include="BoltChannel.cs" />
+    <Compile Include="BoltConnection.cs" />
+    <Compile Include="BoltConsole.cs" />
+    <Compile Include="BoltException.cs" />
+    <Compile Include="BoltExecutionOrder.cs" />
+    <Compile Include="BoltLog.cs" />
+    <Compile Include="BoltRuntimeSettings.cs" />
+    <Compile Include="BoltCore.cs" />
+    <Compile Include="BoltObject.cs" />
+    <Compile Include="BoltPacket.cs" />
+    <Compile Include="BoltPacketPool.cs" />
+    <Compile Include="BoltPoll.cs" />
+    <Compile Include="BoltSend.cs" />
+    <Compile Include="BoltSerializer.cs" />
+    <Compile Include="BoltFrameInterpolator.cs" />
+    <Compile Include="collections\BoltListNode.cs" />
+    <Compile Include="command\BoltCommand.cs" />
+    <Compile Include="command\BoltCommandChannel.cs" />
+    <Compile Include="command\BoltCommandFactory.cs" />
+    <Compile Include="entity\BoltEntityBehaviour.cs" />
+    <Compile Include="entity\BoltEntity.cs" />
+    <Compile Include="entity\BoltEntitySerializer.cs" />
+    <Compile Include="entity\BoltEntityChannel.cs" />
+    <Compile Include="entity\BoltEntityProxy.cs" />
+    <Compile Include="entity\BoltEntitySerializerState.cs" />
+    <Compile Include="event\BoltEvent.cs" />
+    <Compile Include="event\BoltEventChannel.cs" />
+    <Compile Include="event\BoltEventDispatcher.cs" />
+    <Compile Include="event\BoltEventEnums.cs" />
+    <Compile Include="event\BoltEventFactory.cs" />
+    <Compile Include="event\BoltEventInterface.cs" />
+    <Compile Include="event\BoltEventReliable.cs" />
+    <Compile Include="event\internal\BoltEventLoadMap.cs" />
+    <Compile Include="event\BoltEventReceiver.cs" />
+    <Compile Include="event\internal\BoltEventInternalServerReceiver.cs" />
+    <Compile Include="event\internal\BoltEventInternalClientReceiver.cs" />
+    <Compile Include="state\BoltStateFrame.cs" />
+    <Compile Include="state\BoltStateProperty.cs" />
+    <Compile Include="state\Transform\BoltStateTransformInterpolatedSnapshots.cs" />
+    <Compile Include="state\BoltState.cs" />
+    <Compile Include="state\Transform\BoltStateTransformDeadReckoning.cs" />
+    <Compile Include="utils\Assert.cs" />
+    <Compile Include="BoltUtils.cs" />
+    <Compile Include="collections\BoltDoubleList.cs" />
+    <Compile Include="BoltExtensions.cs" />
+    <Compile Include="BoltIdPool.cs" />
+    <Compile Include="collections\BoltSingleList.cs" />
+    <Compile Include="BoltMath.cs" />
+    <Compile Include="BoltRecvBuffer.cs" />
+    <Compile Include="collections\BoltRingBuffer.cs" />
+    <Compile Include="BoltSendBuffer.cs" />
+    <Compile Include="BoltSequenceGenerator.cs" />
+    <Compile Include="utils\BitUtils.cs" />
+    <Compile Include="utils\BoltRuntimeReflection.cs" />
+    <Compile Include="utils\UdpStreamExt.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BoltCallbacksGenerated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BoltCallbacksGenerated.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\udpkit\udpkit.csproj">
+      <Project>{66A5F183-3065-4A77-A109-779D7984990F}</Project>
+      <Name>udpkit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
