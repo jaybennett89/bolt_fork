@@ -339,7 +339,7 @@ public static partial class BoltNetwork {
     BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
     foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
-      if (asm.FullName.StartsWith("Assembly-CSharp")) {
+      if (asm.GetName().Name == "Assembly-CSharp") {
         return (UdpIPv4Address) asm.GetType("BoltNetworkUtils").GetMethod("FindBroadcastAddress", flags).Invoke(null, new object[0]);
       }
     }
