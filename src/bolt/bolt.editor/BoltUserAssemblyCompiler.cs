@@ -298,8 +298,8 @@ class BoltUserAssemblyCompiler {
     Debug.Log("BoltCompiler: Success!");
 
     EditorPrefs.SetInt("BOLT_UNCOMPILED_COUNT", 0);
-    EditorPrefs.SetBool(BoltSettingsWindow.COMPILE_SETTING, false);
-    EditorWindow.GetWindow<BoltSettingsWindow>().Repaint();
+    EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, false);
+    EditorWindow.GetWindow<BoltScenesWindow>().Repaint();
   }
 
   static void ClearCompileFlag<T> (IEnumerable<T> assets) where T : BoltCompilableAsset {

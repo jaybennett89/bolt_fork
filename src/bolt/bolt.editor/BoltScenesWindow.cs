@@ -334,70 +334,6 @@ end tell'";
     GUILayout.EndHorizontal();
   }
 
-  //void Scenes (Rect r) {
-  //  BoltAssetEditorGUI.Header("Scenes");
-  //  BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
-
-  //  const int OFFSET = 2;
-  //  const int HEIGHT = 25;
-
-  //  var scenes = EditorBuildSettings.scenes.Where(x => x.enabled).ToArray();
-
-  //  int y = 0;
-  //  int viewHeight = (OFFSET + HEIGHT) * 5;
-  //  int totalHeight = (OFFSET + HEIGHT) * scenes.Length;
-
-  //  s = GUI.BeginScrollView(new Rect(0, 0, r.width, viewHeight + OFFSET), s, new Rect(0, 0, r.width - 20, totalHeight), false, true);
-
-  //  for (int i = 0; i < scenes.Length; ++i) {
-  //    y += OFFSET;
-
-  //    var scene = scenes[i];
-  //    var sceneName = Path.GetFileNameWithoutExtension(scene.path);
-  //    var isCurrent = EditorApplication.currentScene == scene.path;
-
-  //    GUILayout.BeginArea(new Rect(0, y, r.width - 15, HEIGHT));
-  //    GUIStyle mapStyle = isCurrent ? (GUIStyle) "MeTransOnLeft" : (GUIStyle) "MeTransOffLeft";
-
-  //    HeaderBlock(mapStyle, Color.white, () => {
-  //      GUIStyle style = new GUIStyle(GUI.skin.label);
-  //      style.fontStyle = FontStyle.Bold;
-  //      style.normal.textColor = COLOR(251, 247, 234);
-
-  //      GUILayout.Label(i + ". " + sceneName, style, GUILayout.MinWidth(100));
-
-  //      if (GUILayout.Button("Edit", EditorStyles.miniButton, GUILayout.Width(50))) {
-  //        EditorApplication.OpenScene(scene.path);
-  //      }
-
-  //      if (BoltEditorUtils.hasPro) {
-  //        if (GUILayout.Button("Start", EditorStyles.miniButton, GUILayout.Width(50))) {
-  //          EditorApplication.SaveCurrentSceneIfUserWantsTo();
-  //          settings.debugStartMapName = sceneName;
-
-  //          // save asset
-  //          EditorUtility.SetDirty(settings);
-  //          AssetDatabase.SaveAssets();
-
-  //          // set stage
-  //          SetStage(STAGE_COMPILE_BOLT);
-  //        }
-  //      }
-  //    });
-
-  //    GUILayout.EndArea();
-
-  //    y += HEIGHT;
-  //  }
-
-  //  GUI.EndScrollView(true);
-
-  //  GUILayout.BeginArea(new Rect(-1, viewHeight + OFFSET + OFFSET, r.width + 1, 100));
-
-  //  GUILayout.EndArea();
-
-  //}
-
   void Settings_ServerPort () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
@@ -492,5 +428,10 @@ end tell'";
     BoltAssetEditorGUI.Header("Scenes");
     GUILayout.Space(1);
     Scenes();
+    
+    if (GUI.changed) {
+      EditorUtility.SetDirty(BoltRuntimeSettings.instance);
+      AssetDatabase.SaveAssets();
+    }
   }
 }
