@@ -152,7 +152,7 @@ public static class BoltAssetEditorGUI {
 
       asset.compile = true;
 
-      EditorPrefs.SetBool(BoltSettingsWindow.COMPILE_SETTING, true);
+      EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, true);
       EditorUtility.SetDirty(asset);
     }
 
