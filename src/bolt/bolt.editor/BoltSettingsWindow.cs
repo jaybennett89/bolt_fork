@@ -9,7 +9,6 @@ using UnityEngine;
 using Process = System.Diagnostics.Process;
 
 public class BoltSettingsWindow : EditorWindow {
-
   float _lastRepaint;
 
   void OnEnable () {
@@ -22,31 +21,6 @@ public class BoltSettingsWindow : EditorWindow {
       _lastRepaint = Time.realtimeSinceStartup;
       Repaint();
     }
-  }
-
-  int _selectedTab = 0;
-  STuple<string, Action<Rect>>[] _tabs;
-
-  void Toolbar (Rect r) {
-    GUILayout.BeginHorizontal();
-
-    for (int i = 0; i < _tabs.Length; ++i) {
-      GUIContent content;
-
-      if (i == _selectedTab) {
-        content = new GUIContent(_tabs[i].item0, BoltAssetEditorGUI.Icon("BoltActiveTab"));
-      }
-      else {
-        content = new GUIContent(_tabs[i].item0, BoltAssetEditorGUI.Icon("BoltEmptyIcon"));
-      }
-
-      if (GUILayout.Button(content, new GUIStyle("toolbarbutton"))) {
-        _selectedTab = i;
-      }
-    }
-
-    GUILayout.EndHorizontal();
-    _selectedTab = Mathf.Clamp(_selectedTab, 0, _tabs.Length - 1);
   }
 
   void Footer () {
@@ -138,5 +112,10 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
     Footer();
     GUILayout.EndArea();
+
+    if (GUI.changed) {
+      EditorUtility.SetDirty(BoltRuntimeSettings.instance);
+      AssetDatabase.SaveAssets();
+    }
   }
 }
