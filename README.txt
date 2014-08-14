@@ -1,5 +1,5 @@
 Bolt - Networking Middleware For Games
-Copyright (C) 2012-2014 Fredrik Holmström
+Copyright (C) 2012-2014 Fredrik HolmstrÃ¶m
  
 This notice may not be removed or altered.
 
