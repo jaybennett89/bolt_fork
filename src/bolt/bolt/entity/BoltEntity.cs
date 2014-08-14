@@ -466,8 +466,14 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _commands.Clear();
     _commandSequence = 0;
 
-    // call to user code
+    // call to user code, from generic to specialized
     BoltCallbacksBase.ControlOfEntityGainedInvoke(this);
+
+    foreach (BoltEntityBehaviourBase sp in _entityBehaviours) {
+      sp.ControlGained();
+    }
+
+    _serializer.ControlGained();
   }
 
   internal void ReleaseControlInternal () {
@@ -480,8 +486,14 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _flags &= ~BoltEntity.FLAG_IS_CONTROLLING;
     _commands.Clear();
     _commandSequence = 0;
+    
+    // call to user code (reverse order from control gained)
+    _serializer.ControlLost();
 
-    // call to user code
+    foreach (BoltEntityBehaviourBase sp in _entityBehaviours) {
+      sp.ControlLost();
+    }
+
     BoltCallbacksBase.ControlOfEntityLostInvoke(this);
   }
 

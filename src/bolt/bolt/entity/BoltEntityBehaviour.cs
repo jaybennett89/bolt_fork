@@ -88,6 +88,9 @@ public abstract class BoltEntityBehaviourBase : MonoBehaviour {
   /// </summary>
   public virtual void SimulateController () { }
 
+  public virtual void ControlGained () { }
+  public virtual void ControlLost () { }
+
   /// <summary>
   /// Called for executing one command on the owner and controller
   /// </summary>
