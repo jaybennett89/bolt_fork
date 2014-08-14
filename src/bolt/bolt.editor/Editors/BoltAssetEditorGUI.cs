@@ -15,18 +15,41 @@ public static class BoltAssetEditorGUI {
   public static readonly Color darkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
-  public static
-  void Header (string text) {
-    GUIStyle style;
-    style = new GUIStyle((GUIStyle) "TL SelectionBarPreview");
-    style.normal.textColor = Color.white;
-    style.contentOffset = new Vector2(0, 5);
+  public static void Header (string icon, string text) {
 
-    GUILayout.Space(4);
-    GUILayout.Label(text, style);
+    GUILayout.Space(2);
+    GUI.color = new Color(.15f, .15f, .15f);
+    GUIStyle bg = new GUIStyle();
+    bg.normal.background = EditorGUIUtility.whiteTexture;
+    bg.padding = new RectOffset(0, 0, 2, 2);
+    GUILayout.BeginHorizontal(bg);
+    GUI.color = Color.white;
+
+    DrawIcon(icon, new RectOffset(6, 0, 0, 0));
+    
+    GUIStyle label;
+    label = new GUIStyle(EditorStyles.label);
+    label.fontStyle = FontStyle.Bold;
+    label.alignment = TextAnchor.UpperLeft;
+    label.contentOffset = new Vector2(0, 0);
+    GUILayout.Label(text, label, GUILayout.ExpandWidth(false));
+
+    GUILayout.EndHorizontal();
     GUILayout.Space(4);
   }
+  
+  static void DrawIcon (string name) {
+    DrawIcon(name, new RectOffset());
+  }
 
+  static void DrawIcon (string name, RectOffset offset) {
+    GUIStyle s;
+
+    s = new GUIStyle(GUIStyle.none);
+    s.margin = offset;
+
+    GUILayout.Box(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
+  }
 
   public static GUIStyle BoxStyle (int n) {
     GUIStyle s = new GUIStyle("flow node " + n);

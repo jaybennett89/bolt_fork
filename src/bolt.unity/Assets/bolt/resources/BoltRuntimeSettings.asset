@@ -23,8 +23,8 @@ MonoBehaviour:
     framesPerSecond: 60
     clientSendRate: 3
     clientDejitterDelay: 6
-    clientDejitterDelayMin: 3
-    clientDejitterDelayMax: 9
+    clientDejitterDelayMin: 0
+    clientDejitterDelayMax: 12
     serverSendRate: 3
     serverDejitterDelay: 6
     serverDejitterDelayMin: 0
@@ -40,6 +40,6 @@ MonoBehaviour:
     simulatedPingJitter: 0
     simulatedRandomFunction: 0
   debugClientCount: 1
-  debugStartPort: 64782
+  debugStartPort: 55671
   debugStartMapName: 
   debugEditorMode: 1

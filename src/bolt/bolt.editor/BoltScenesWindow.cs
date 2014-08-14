@@ -421,11 +421,11 @@ end tell'";
     GUILayout.Space(2);
 
     if (BoltEditorUtils.hasPro) {
-      BoltAssetEditorGUI.Header("Debug Start Settings");
+      BoltAssetEditorGUI.Header("play", "Debug Start Settings");
       Settings();
     }
 
-    BoltAssetEditorGUI.Header("Scenes");
+    BoltAssetEditorGUI.Header("scenes", "Scenes");
     GUILayout.Space(1);
     Scenes();
     

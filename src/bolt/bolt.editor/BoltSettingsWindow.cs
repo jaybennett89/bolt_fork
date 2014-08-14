@@ -103,10 +103,10 @@ public class BoltSettingsWindow : EditorWindow {
   void OnGUI () {
     GUILayout.Space(2);
 
-    BoltAssetEditorGUI.Header("Network Settings");
+    BoltAssetEditorGUI.Header("network", "Network Settings");
     Network();
 
-    BoltAssetEditorGUI.Header("Latency Simulation");
+    BoltAssetEditorGUI.Header("latency", "Latency Simulation");
     Simulation();
 
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
