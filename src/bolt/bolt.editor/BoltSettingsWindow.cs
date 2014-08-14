@@ -89,6 +89,11 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.serverDejitterDelay = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");
       settings._config.serverDejitterDelayMax = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
     });
+
+    settings._config.clientSendRate = settings._config.serverSendRate;
+    settings._config.clientDejitterDelay = settings._config.serverDejitterDelay;
+    settings._config.clientDejitterDelayMin = settings._config.serverDejitterDelayMin;
+    settings._config.clientDejitterDelayMax = settings._config.serverDejitterDelayMax;
   }
 
   void Simulation () {
