@@ -1,0 +1,35 @@
+# Ignore everything
+/*
+
+# Allow these things
+
+# root files
+!.gitignore
+!*.txt
+!*.bat
+!*.fsx
+!*.sh
+
+# main src
+!/src/
+/src/*
+
+# bolt sub folder
+!/src/bolt/
+
+# bolt unity sub folder
+!/src/bolt.unity/
+/src/bolt.unity/*
+!/src/bolt.unity/Assets/
+!/src/bolt.unity/ProjectSettings/
+src/bolt/udpkit.native/android/build
+
+.DS_Store
+bin
+obj
+armeabi
+*.mdb
+*.mdb.meta
+*.db
+*.userprefs
+*.suo
