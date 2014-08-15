@@ -153,7 +153,7 @@ public static partial class BoltNetwork {
   }
 
   public static void Accept (UdpEndPoint ep) {
-    BoltCore.Accept(ep);
+    BoltCore.AcceptConnection(ep);
   }
 
   /// <summary>
