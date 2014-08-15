@@ -66,22 +66,21 @@ Target "BuildBolt" (fun _ ->
 )
 
 Target "InstallAndroidNative" (fun _ ->
-  mkdir "./src/bolt.unity/Assets/Plugins/Android"
-  CopyFile "./src/bolt.unity/Assets/Plugins/Android" (buildDir + "/libudpkit_android.so")
+  //mkdir "./src/bolt.unity/Assets/Plugins/Android"
+  //CopyFile "./src/bolt.unity/Assets/Plugins/Android" (buildDir + "/libudpkit_android.so")
+  ()
 )
 
 Target "InstallIOSNative" (fun _ ->
-  mkdir "./src/bolt.unity/Assets/Plugins/iOS"
-  CopyFile "./src/bolt.unity/Assets/Plugins/iOS" (buildDir + "/libudpkit_ios.a")
+  //mkdir "./src/bolt.unity/Assets/Plugins/iOS"
+  //CopyFile "./src/bolt.unity/Assets/Plugins/iOS" (buildDir + "/libudpkit_ios.a")
+  ()
 )
 
 Target "InstallBolt" (fun _ ->
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies" (buildDir + "/bolt.dll")
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies/editor/" (buildDir + "/bolt.editor.dll")
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.dll")
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.managed.dll") 
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.android.dll")
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.ios.dll")
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->
@@ -104,9 +103,6 @@ Target "InstallBoltDebugFiles" (fun _ ->
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies" (buildDir + "/bolt.dll.mdb")
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies/editor/" (buildDir + "/bolt.editor.dll.mdb")
   CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.dll.mdb")
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.managed.dll.mdb") 
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.android.dll.mdb")
-  //CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.platform.ios.dll.mdb")
 )
 
 "Clean"
