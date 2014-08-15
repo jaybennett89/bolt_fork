@@ -228,6 +228,12 @@ static class BoltEditorUtils {
     Selection.activeObject = asset;
   }
 
+  public static void InstallAsset (string file, Func<byte[]> data) {
+    if (!File.Exists(file)) {
+      InstallAsset(file, data());
+    }
+  }
+
   public static void InstallAsset (string file, byte[] data) {
     string path = Path.GetDirectoryName(file);
 
