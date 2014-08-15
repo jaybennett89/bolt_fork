@@ -439,6 +439,20 @@ internal static class BoltCore {
 
     _udpSocket.Accept(endpoint);
   }
+  
+  public static void RefuseConnection (UdpEndPoint endpoint) {
+    if (!isServer) {
+      BoltLog.Error("RefuseConnection: can only be called on the server");
+      return;
+    }
+
+    if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
+      BoltLog.Warning("RefuseConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      return;
+    }
+
+    _udpSocket.Refuse(endpoint);
+  }
 
   internal static void LoadMapInternal (BoltMapLoadOp loadOp) {
     foreach (BoltEntity entity in entities) {

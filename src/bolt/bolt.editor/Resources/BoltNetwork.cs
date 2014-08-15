@@ -155,6 +155,10 @@ public static partial class BoltNetwork {
   public static void Accept (UdpEndPoint ep) {
     BoltCore.AcceptConnection(ep);
   }
+  
+  public static void Refuse (UdpEndPoint ep) {
+    BoltCore.RefuseConnection(ep);
+  }
 
   /// <summary>
   /// Instantiate a prefab by name and attach it to bolt
