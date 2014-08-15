@@ -169,6 +169,10 @@ public static partial class BoltNetwork {
     return Instantiate(BoltCore.FindPrefab(prefab.ToString()));
   }
 
+  public static BoltEntity Instantiate (string prefab) {
+    return Instantiate(BoltCore.FindPrefab(prefab));
+  }
+
   public static void Destroy (BoltEntity entity) {
     BoltCore.Destroy(entity);
   }
