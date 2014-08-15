@@ -1,4 +1,4 @@
-﻿#if !UNITY_EDITOR && !UNITY_PRO_LICENSE && !UNITY_STANDALONE && !UNITY_WEBPLAYER
+﻿#if UNITY_ANDROID || UNITY_IPHONE
 using System;
 using System.Security;
 using System.Runtime.InteropServices;
