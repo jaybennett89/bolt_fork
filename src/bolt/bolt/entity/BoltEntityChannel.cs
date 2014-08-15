@@ -453,6 +453,7 @@ partial class BoltEntityChannel : BoltChannel {
           proxy.connection = connection;
           proxy.networkId = networkId;
           proxy.entity = ((GameObject) GameObject.Instantiate(prefab, spawnAt, Quaternion.identity)).GetComponent<BoltEntity>();
+          proxy.entity.enabled = true; // this allows the entity to be disabled in the prefab.
 
           _incommingProxiesByNetworkId[networkId] = proxy;
           _incommingProxiesByEntityId[proxy.entity.boltId] = proxy;

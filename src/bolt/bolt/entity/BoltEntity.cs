@@ -723,7 +723,8 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _id = ++_idCounter;
     _updateRate = Mathf.Max(1, _updateRate);
 
-    foreach (BoltEntityBehaviourBase behaviour in GetComponentsInChildren<BoltEntityBehaviourBase>()) {
+    // passing the parameter to GetComponentsInChildren as true makes sure we get disabled behaviours also
+    foreach (BoltEntityBehaviourBase behaviour in GetComponentsInChildren<BoltEntityBehaviourBase>(true)) { 
       if ((behaviour is BoltEntitySerializer) == false) {
         _entityBehaviours.Add(behaviour);
       }
