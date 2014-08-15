@@ -64,6 +64,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltAssetProperty.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="BoltApplicationVersion.cs" />
     <Compile Include="BoltCallbacks.cs" />
     <Compile Include="BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>

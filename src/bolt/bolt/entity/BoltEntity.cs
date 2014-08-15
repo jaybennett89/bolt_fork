@@ -172,21 +172,21 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get { return _sceneObject; }
     internal set { _sceneObject = value; }
   }
-
-  public bool isOriginal {
+  
+  public bool hasAuthority {
     get { return ReferenceEquals(_source, null); }
-  }
-
-  public bool isClone {
-    get { return isOriginal == false; }
-  }
-
-  public bool isDummy {
-    get { return isClone && !hasControl; }
   }
 
   public bool hasControl {
     get { return _flags & FLAG_IS_CONTROLLING; }
+  }
+
+  public bool spawnedRemotely {
+    get { return ReferenceEquals(_source, null) == false; }
+  }
+
+  public bool isDummy {
+    get { return spawnedRemotely && !hasControl; }
   }
 
   /// <summary>
