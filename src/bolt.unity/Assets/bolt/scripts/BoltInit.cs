@@ -7,15 +7,15 @@ public class BoltInit : MonoBehaviour {
   enum State {
     SelectMode,
     SelectMap,
+    EnterServerIp,
     StartServer,
     StartClient,
     Started,
   }
 
   State state;
+
   string map;
-  
-  [SerializeField]
   string serverAddress = "127.0.0.1";
 
   [SerializeField]
@@ -31,11 +31,25 @@ public class BoltInit : MonoBehaviour {
     switch (state) {
       case State.SelectMode: State_SelectMode(); break;
       case State.SelectMap: State_SelectMap(); break;
+      case State.EnterServerIp: State_EnterServerIp(); break;
       case State.StartClient: State_StartClient(); break;
       case State.StartServer: State_StartServer(); break;
     }
 
     GUILayout.EndArea();
+  }
+
+  private void State_EnterServerIp () {
+    GUILayout.BeginHorizontal();
+
+    GUILayout.Label("Server IP: ");
+    serverAddress = GUILayout.TextField(serverAddress);
+
+    if (GUILayout.Button("Connect")) {
+      state = State.StartClient;
+    }
+
+    GUILayout.EndHorizontal();
   }
 
 
@@ -44,7 +58,7 @@ public class BoltInit : MonoBehaviour {
       state = State.SelectMap;
     }
     if (ExpandButton("Client")) {
-      state = State.StartClient;
+      state = State.EnterServerIp;
     }
   }
 
@@ -70,7 +84,7 @@ public class BoltInit : MonoBehaviour {
   }
 
   void State_StartServer () {
-    BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort) serverPort));
+    BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort) serverPort));
     BoltNetwork.LoadMap(map);
     state = State.Started;
   }
