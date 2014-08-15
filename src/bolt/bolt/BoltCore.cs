@@ -222,9 +222,13 @@ internal static class BoltCore {
     prefab.GetComponent<BoltEntity>()._sceneObject = false;
 
     GameObject go = (GameObject) GameObject.Instantiate(prefab);
-    BoltEntity be = go.GetComponent<BoltEntity>();
+    BoltEntity be;
 
+    // force enabled
+    be = go.GetComponent<BoltEntity>();
+    be.enabled = true;
     be.Attach(source, flags);
+
     return be;
   }
 
@@ -420,6 +424,20 @@ internal static class BoltCore {
           break;
       }
     }
+  }
+
+  public static void AcceptConnection (UdpEndPoint endpoint) {
+    if (!isServer) {
+      BoltLog.Error("AcceptConnection: can only be called on the server");
+      return;
+    }
+
+    if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
+      BoltLog.Warning("AcceptConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      return;
+    }
+
+    _udpSocket.Accept(endpoint);
   }
 
   internal static void LoadMapInternal (BoltMapLoadOp loadOp) {
@@ -715,7 +733,7 @@ internal static class BoltCore {
 #endif
       AllowImplicitAccept = mode == BoltNetworkModes.Client,
       AllowIncommingConnections = mode == BoltNetworkModes.Server,
-      AutoAcceptIncommingConnections = mode == BoltNetworkModes.Server,
+      AutoAcceptIncommingConnections = (mode == BoltNetworkModes.Server) && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto),
       PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f),
       PacketSize = 1024,
       SimulatedLoss = Mathf.Clamp01(config.simulatedLoss),

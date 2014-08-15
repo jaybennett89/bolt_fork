@@ -58,6 +58,10 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.serverConnectionLimit = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
     });
 
+    BoltAssetEditorGUI.Label("Accept Mode", () => {
+      settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode) EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
+    });
+
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
       settings._config.serverDejitterDelayMin = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min");
       settings._config.serverDejitterDelay = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");

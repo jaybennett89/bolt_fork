@@ -152,6 +152,10 @@ public static partial class BoltNetwork {
     BoltCore.Detach(entity);
   }
 
+  public static void Accept (UdpEndPoint ep) {
+    BoltCore.Accept(ep);
+  }
+
   /// <summary>
   /// Instantiate a prefab by name and attach it to bolt
   /// </summary>
