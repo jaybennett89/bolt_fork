@@ -8,7 +8,7 @@ public static class BoltNetworkUtils {
   }
 
   public static UdpPlatform CreateUdpPlatform () {
-#if UNITY_ANDROID || UNITY_IPHONE
+#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
     return new UdpPlatformMobile();
 #else
     return new UdpPlatformManaged();

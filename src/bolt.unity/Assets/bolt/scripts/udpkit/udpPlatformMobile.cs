@@ -1,4 +1,4 @@
-﻿#if UNITY_ANDROID || UNITY_IPHONE
+﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
 using System;
 using System.Security;
 using System.Runtime.InteropServices;
