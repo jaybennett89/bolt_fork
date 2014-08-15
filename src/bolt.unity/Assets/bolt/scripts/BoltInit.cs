@@ -22,7 +22,11 @@ public class BoltInit : MonoBehaviour {
   int serverPort = 40000;
 
   void OnGUI () {
-    GUILayout.BeginArea(new Rect(10, 10, Screen.width - 20, Screen.height - 20));
+    Rect tex = new Rect(10, 10, 140, 75);
+    Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
+    
+    GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
+    GUILayout.BeginArea(area);
 
     switch (state) {
       case State.SelectMode: State_SelectMode(); break;
@@ -47,15 +51,17 @@ public class BoltInit : MonoBehaviour {
   void State_SelectMap () {
     foreach (string value in Enum.GetNames(typeof(BoltMapNames))) {
       GUI.color = (map == value) ? Color.green : Color.white;
+
       if (ExpandButton(value)) {
         map = value;
       }
+
       GUI.color = Color.white;
     }
 
     if (ExpandButton("Start Server")) {
       if (string.IsNullOrEmpty(map)) {
-        Debug.LogError("Select a map first");
+        Debug.LogWarning("Select a map first");
       }
       else {
         state = State.StartServer;
