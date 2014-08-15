@@ -6,6 +6,11 @@ public enum BoltRandomFunction {
   SystemRandom
 }
 
+public enum BoltConnectionAcceptMode {
+  Auto,
+  Manual,
+}
+
 [Serializable]
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
@@ -20,6 +25,7 @@ public sealed class BoltConfig {
   public int serverDejitterDelayMin;
   public int serverDejitterDelayMax;
   public int serverConnectionLimit;
+  public BoltConnectionAcceptMode serverConnectionAcceptMode = BoltConnectionAcceptMode.Auto;
 
   public int commandDejitterDelay;
   public int commandQueueSize;
