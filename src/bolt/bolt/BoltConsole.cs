@@ -110,6 +110,14 @@ public class BoltConsole : MonoBehaviour {
 
   void Awake () {
     writable = true;
+
+    switch (Application.platform) {
+      case RuntimePlatform.Android:
+      case RuntimePlatform.IPhonePlayer:
+        fontSize *= 2;
+        lineHeight *= 2;
+        break;
+    }
   }
 
   void OnGUI () {

@@ -7,31 +7,49 @@ public class BoltInit : MonoBehaviour {
   enum State {
     SelectMode,
     SelectMap,
+    EnterServerIp,
     StartServer,
     StartClient,
     Started,
   }
 
   State state;
+
   string map;
-  
-  [SerializeField]
   string serverAddress = "127.0.0.1";
 
   [SerializeField]
   int serverPort = 40000;
 
   void OnGUI () {
-    GUILayout.BeginArea(new Rect(10, 10, Screen.width - 20, Screen.height - 20));
+    Rect tex = new Rect(10, 10, 140, 75);
+    Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
+    
+    GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
+    GUILayout.BeginArea(area);
 
     switch (state) {
       case State.SelectMode: State_SelectMode(); break;
       case State.SelectMap: State_SelectMap(); break;
+      case State.EnterServerIp: State_EnterServerIp(); break;
       case State.StartClient: State_StartClient(); break;
       case State.StartServer: State_StartServer(); break;
     }
 
     GUILayout.EndArea();
+  }
+
+  private void State_EnterServerIp () {
+    GUILayout.BeginHorizontal();
+
+    GUILayout.Label("Server IP: ");
+    serverAddress = GUILayout.TextField(serverAddress);
+
+    if (GUILayout.Button("Connect")) {
+      state = State.StartClient;
+    }
+
+    GUILayout.EndHorizontal();
   }
 
 
@@ -40,22 +58,24 @@ public class BoltInit : MonoBehaviour {
       state = State.SelectMap;
     }
     if (ExpandButton("Client")) {
-      state = State.StartClient;
+      state = State.EnterServerIp;
     }
   }
 
   void State_SelectMap () {
     foreach (string value in Enum.GetNames(typeof(BoltMapNames))) {
       GUI.color = (map == value) ? Color.green : Color.white;
+
       if (ExpandButton(value)) {
         map = value;
       }
+
       GUI.color = Color.white;
     }
 
     if (ExpandButton("Start Server")) {
       if (string.IsNullOrEmpty(map)) {
-        Debug.LogError("Select a map first");
+        Debug.LogWarning("Select a map first");
       }
       else {
         state = State.StartServer;
@@ -64,7 +84,7 @@ public class BoltInit : MonoBehaviour {
   }
 
   void State_StartServer () {
-    BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort) serverPort));
+    BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort) serverPort));
     BoltNetwork.LoadMap(map);
     state = State.Started;
   }

@@ -3,13 +3,13 @@ using UdpKit;
 using UnityEngine;
 
 public static class BoltNetworkUtils {
-  public static Action Combine(this Action self, Action action) {
-	return (Action) Delegate.Combine (self, action);
+  public static Action Combine (this Action self, Action action) {
+    return (Action) Delegate.Combine(self, action);
   }
 
   public static UdpPlatform CreateUdpPlatform () {
-#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_PRO_LICENSE && !UNITY_EDITOR
-	return new UdpPlatformMobile();
+#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+    return new UdpPlatformMobile();
 #else
     return new UdpPlatformManaged();
 #endif
@@ -20,7 +20,7 @@ public static class BoltNetworkUtils {
 #if UNITY_ANDROID && !UNITY_EDITOR
       Android.AcquireMulticastLock();
       return Android.GetBroadcastAddress();
-#elif UNITY_IPHONE && !UNITY_PRO_LICENSE && !UNITY_EDITOR
+#elif UNITY_IPHONE && !UNITY_EDITOR
       return UdpPlatformMobile.FindBroadcastAddress_IOS();
 #else
       return UdpPlatformManaged.FindBroadcastAddress();

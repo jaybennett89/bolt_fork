@@ -4,11 +4,6 @@ using UnityEditor;
 using UnityEngine;
 
 public static class BoltMenuItems {
-  //[MenuItem("Assets/Create/Bolt/Configuration")]
-  //public static void NewConfigAsset () {
-  //  BoltEditorUtils.CreateAsset<BoltConfigAsset>("BoltConfig");
-  //}
-
   [MenuItem("Assets/Create/Bolt/State")]
   public static void NewStateAsset () {
     BoltEditorUtils.CreateAsset<BoltStateAsset>("BoltState");
@@ -62,12 +57,6 @@ public static class BoltMenuItems {
   public static void InstallGizmos () {
     BoltEditorUtils.InstallAsset("Assets/Gizmos/BoltEntity Icon.png", BoltEditorUtils.GetResourceBytes("bolt.editor.Resources.BoltEntity Icon.png"));
     BoltEditorUtils.InstallAsset("Assets/Gizmos/BoltEntity Gizmo.png", BoltEditorUtils.GetResourceBytes("bolt.editor.Resources.BoltEntity Gizmo.png"));
-  }
-
-  [MenuItem("Bolt/Install Mobile Free Support")]
-  public static void InstallFreeSupport () {
-    BoltEditorUtils.InstallAsset("Assets/Plugins/Android/libudpkit_android.so", BoltEditorUtils.GetResourceBytes("bolt.editor.Resources.libudpkit_android.so"));
-    BoltEditorUtils.InstallAsset("Assets/Plugins/iOS/libudpkit_ios.a", BoltEditorUtils.GetResourceBytes("bolt.editor.Resources.libudpkit_ios.a"));
   }
 
   [MenuItem("Bolt/Install Tutorial Assets")]
