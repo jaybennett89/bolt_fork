@@ -21,7 +21,7 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
   }
 
   public BoltGlobalBehaviourAttribute (BoltNetworkModes mode)
-    : this(mode, null) {
+    : this(mode, new string[0]) {
   }
 
   public BoltGlobalBehaviourAttribute (params string[] maps)
