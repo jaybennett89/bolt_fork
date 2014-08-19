@@ -14,7 +14,19 @@ static class BoltRuntimeReflection {
       }
     }
 
-    throw new BoltException("this should not happen");
+    throw new BoltException("Could not find type 'BoltNetworkUtils'");
+  }
+
+  static public byte[] GetUserAssemblyHash () {
+    BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+
+    foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
+      if (asm.GetName().Name == "Assembly-CSharp") {
+        return (byte[]) asm.GetType("BoltUserAssemblyHash").GetField("value", flags).GetValue(null);
+      }
+    }
+
+    throw new BoltException("Could not find type 'BoltUserAssemblyHash'");
   }
 
   static public List<STuple<BoltGlobalBehaviourAttribute, Type>> FindGlobalObjectTypes () {
