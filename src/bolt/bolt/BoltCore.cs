@@ -203,8 +203,7 @@ internal static class BoltCore {
 
     if (entity) {
       Destroy(entity);
-    }
-    else {
+    } else {
       BoltLog.Error("Can only destroy gameobjects with an BoltEntity component through BoltNetwork.Destroy");
     }
   }
@@ -335,8 +334,7 @@ internal static class BoltCore {
   public static void EnableLanBroadcast (UdpEndPoint endpoint) {
     if (endpoint.Address == UdpIPv4Address.Any || endpoint.Port == 0) {
       BoltLog.Error("incorrect broadcast endpoint: {0}", endpoint);
-    }
-    else {
+    } else {
       _udpSocket.EnableLanBroadcast(endpoint, isServer);
     }
   }
@@ -439,7 +437,7 @@ internal static class BoltCore {
 
     _udpSocket.Accept(endpoint);
   }
-  
+
   public static void RefuseConnection (UdpEndPoint endpoint) {
     if (!isServer) {
       BoltLog.Error("RefuseConnection: can only be called on the server");
@@ -498,8 +496,7 @@ internal static class BoltCore {
           if (proxy.entity) {
             if (proxy.entity.IsControlledBy(proxy.connection)) {
               proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.controllerMask);
-            }
-            else {
+            } else {
               proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.proxyMask);
             }
           }
@@ -541,8 +538,7 @@ internal static class BoltCore {
       while (entityIter.Next(out entity)) {
         if (entity.boltIsOwner) {
           entity.SimulateStep();
-        }
-        else {
+        } else {
           if (entity.boltIsControlling) {
             entity.SimulateStep();
           }
@@ -561,8 +557,7 @@ internal static class BoltCore {
     if (isServer) {
       if (_loadedMapTarget.isValid) {
         cn.LoadMapOnClient(_loadedMapTarget);
-      }
-      else {
+      } else {
         BoltLog.Warning("{0} connected without server having a map loading or loaded", cn);
       }
     }
@@ -637,9 +632,11 @@ internal static class BoltCore {
   }
 
   static internal void UpdateActiveGlobalBehaviours (string map) {
-#if DEBUG
-    CreateGlobalBehaviour(typeof(BoltConsole));
-#endif
+    if (_config.autoCreateConsole) {
+      CreateGlobalBehaviour(typeof(BoltConsole));
+    } else {
+      DeleteGlobalBehaviour(typeof(BoltConsole));
+    }
 
     CreateGlobalBehaviour(typeof(BoltPoll));
     CreateGlobalBehaviour(typeof(BoltSend));
@@ -648,8 +645,7 @@ internal static class BoltCore {
     if (isServer) {
       CreateGlobalBehaviour(typeof(BoltEventServerReceiver));
       DeleteGlobalBehaviour(typeof(BoltEventClientReceiver));
-    }
-    else {
+    } else {
       DeleteGlobalBehaviour(typeof(BoltEventServerReceiver));
       CreateGlobalBehaviour(typeof(BoltEventClientReceiver));
     }
@@ -661,12 +657,10 @@ internal static class BoltCore {
 
         if (anyMap || matchesMap) {
           CreateGlobalBehaviour(pair.item1);
-        }
-        else {
+        } else {
           DeleteGlobalBehaviour(pair.item1);
         }
-      }
-      else {
+      } else {
         DeleteGlobalBehaviour(pair.item1);
       }
     }

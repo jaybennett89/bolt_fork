@@ -104,6 +104,15 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUILayout.EndVertical();
   }
 
+  void Miscellaneous () {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+    EditorGUILayout.BeginVertical();
+    BoltAssetEditorGUI.Label("Auto Create Console", () => {
+      settings._config.autoCreateConsole = EditorGUILayout.Toggle(settings._config.autoCreateConsole);
+    });
+    EditorGUILayout.EndVertical();
+  }
+
   void OnGUI () {
     GUILayout.Space(2);
 
@@ -112,6 +121,9 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Header("latency", "Latency Simulation");
     Simulation();
+
+    BoltAssetEditorGUI.Header("settings", "Miscellaneous");
+    Miscellaneous();
 
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
     Footer();

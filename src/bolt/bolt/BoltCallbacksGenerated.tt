@@ -5,6 +5,10 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #><#
+
+Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
+cbs.Add("MapLoadLocalBegin", new[] { "string", "map", "BoltConnection", "connection" });
+
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("MapLoadBegin", "string"));
 callbacks.Add(Tuple.Create<string, string>("MapLoadDone", "string"));
