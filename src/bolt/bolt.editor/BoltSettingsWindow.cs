@@ -135,8 +135,15 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Label("Application Hash", () => {
 
+      byte[] hash = null;
 
+      try {
+        hash = BoltRuntimeReflection.GetUserAssemblyHash();
+      } catch {
+        hash = new byte[] { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
+      }
 
+      GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x)).ToArray()));
     });
 
     EditorGUILayout.EndVertical();
