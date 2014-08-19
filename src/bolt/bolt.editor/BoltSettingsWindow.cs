@@ -110,6 +110,35 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Label("Auto Create Console", () => {
       settings._config.autoCreateConsole = EditorGUILayout.Toggle(settings._config.autoCreateConsole);
     });
+
+    if (settings._config.applicationVersion == null) {
+      settings._config.applicationVersion = new BoltApplicationVersion(Guid.NewGuid(), 0, 0, 0, 0);
+      Save();
+    }
+
+    BoltAssetEditorGUI.Label("Application GUID", () => {
+      settings._config.applicationVersion.guid = new Guid(EditorGUILayout.TextField(settings._config.applicationVersion.guid.ToString()));
+    });
+
+    BoltAssetEditorGUI.Label("Application Version", () => {
+      GUIStyle dotStyle = new GUIStyle(EditorStyles.boldLabel);
+      dotStyle.contentOffset = new Vector2(0, -3);
+
+      settings._config.applicationVersion.major = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.major, "major");
+      GUILayout.Label(".", dotStyle);
+      settings._config.applicationVersion.minor = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.minor, "minor");
+      GUILayout.Label(".", dotStyle);
+      settings._config.applicationVersion.patch = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.patch, "patch");
+      GUILayout.Label(".", dotStyle);
+      settings._config.applicationVersion.build = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.build, "build");
+    });
+
+    BoltAssetEditorGUI.Label("Application Hash", () => {
+
+
+
+    });
+
     EditorGUILayout.EndVertical();
   }
 
@@ -130,8 +159,12 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.EndArea();
 
     if (GUI.changed) {
-      EditorUtility.SetDirty(BoltRuntimeSettings.instance);
-      AssetDatabase.SaveAssets();
+      Save();
     }
+  }
+
+  void Save () {
+    EditorUtility.SetDirty(BoltRuntimeSettings.instance);
+    AssetDatabase.SaveAssets();
   }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
+using UnityEngine;
 
-public struct BoltApplicationVersion {
-  public readonly Guid guid;
-  public readonly int major;
-  public readonly int minor;
-  public readonly int patch;
-  public readonly int build;
+[Serializable]
+public class BoltApplicationVersion {
+  public Guid guid;
+  public int major;
+  public int minor;
+  public int patch;
+  public int build;
 
   public string guidString {
     get {
@@ -53,5 +55,9 @@ public struct BoltApplicationVersion {
 
   public override string ToString () {
     return string.Format("[App Guid={0} Version={1}]", guid, versionString);
+  }
+
+  internal BoltApplicationVersion Clone () {
+    return new BoltApplicationVersion(guid, major, minor, patch, build);
   }
 }
