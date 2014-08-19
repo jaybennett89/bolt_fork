@@ -190,14 +190,14 @@ public static partial class BoltNetwork {
     BoltCore.LoadMap(map);
   }
 
-  /// <summary>
-  /// Load a map asset by name
-  /// </summary>
-  /// <param name="map">Map to load</param>
-  [BoltDocsServerOnly]
-  public static void LoadMap (BoltMapNames map) {
-    LoadMap(map.ToString());
-  }
+  ///// <summary>
+  ///// Load a map asset by name
+  ///// </summary>
+  ///// <param name="map">Map to load</param>
+  //[BoltDocsServerOnly]
+  //public static void LoadMap (BoltMapNames map) {
+  //  LoadMap(map.ToString());
+  //}
 
   /// <summary>
   /// Connect to a server

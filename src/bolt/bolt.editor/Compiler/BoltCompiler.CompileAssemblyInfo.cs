@@ -12,8 +12,8 @@ partial class BoltCompiler {
       file.EmitLine();
       file.EmitLine("[assembly: AssemblyTitle(\"bolt.user\")]");
       file.EmitLine("[assembly: Guid(\"bd29ff3d-20fc-49ac-8303-459b4d662c04\")]");
-      file.EmitLine("[assembly: AssemblyVersion(\"0.2.1.4\")]");
-      file.EmitLine("[assembly: AssemblyFileVersion(\"0.2.1.4\")]");
+      file.EmitLine("[assembly: AssemblyVersion(\"0.2.1.5\")]");
+      file.EmitLine("[assembly: AssemblyFileVersion(\"0.2.1.5\")]");
     }
   }
 }

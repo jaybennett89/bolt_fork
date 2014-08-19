@@ -136,7 +136,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// in BoltEntity.boltSource
   /// </summary>
   /// 
-  [Obsolete("Use BoltEntity.isClone instead")]
+  [Obsolete("Use BoltEntity.hasAuthority instead")]
   public bool boltIsProxy {
     get { return _flags & FLAG_IS_PROXY; }
   }
@@ -144,7 +144,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// Returns true if we spawned this entity, false if it's from a remote connection
   /// </summary>
-  [Obsolete("Use BoltEntity.isOriginal instead")]
+  [Obsolete("Use BoltEntity.spawnedRemotely instead")]
   public bool boltIsOwner {
     get { return ReferenceEquals(_source, null); }
   }

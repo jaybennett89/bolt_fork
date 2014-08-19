@@ -66,7 +66,7 @@
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltApplicationVersion.cs" />
     <Compile Include="BoltCallbacks.cs" />
-    <Compile Include="BoltCallbacksGenerated.cs">
+    <Compile Include="BoltCallbacksGenerated1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>BoltCallbacksGenerated.tt</DependentUpon>
@@ -167,7 +167,7 @@
   <ItemGroup>
     <None Include="BoltCallbacksGenerated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltCallbacksGenerated.cs</LastGenOutput>
+      <LastGenOutput>BoltCallbacksGenerated1.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

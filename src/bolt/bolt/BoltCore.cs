@@ -439,7 +439,7 @@ internal static class BoltCore {
 
     _udpSocket.Accept(endpoint);
   }
-  
+
   public static void RefuseConnection (UdpEndPoint endpoint) {
     if (!isServer) {
       BoltLog.Error("RefuseConnection: can only be called on the server");
