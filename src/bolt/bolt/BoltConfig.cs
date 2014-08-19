@@ -14,6 +14,7 @@ public enum BoltConnectionAcceptMode {
 [Serializable]
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
+  public bool autoCreateConsole = true;
 
   public int clientSendRate;
   public int clientDejitterDelay;
