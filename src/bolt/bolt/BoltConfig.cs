@@ -15,7 +15,7 @@ public enum BoltConnectionAcceptMode {
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public bool autoCreateConsole = true;
-  public BoltApplicationVersion applicationVersion = new BoltApplicationVersion(Guid.NewGuid(), 0, 0, 0, 0);
+  public BoltApplicationVersion applicationVersion;
 
   public int clientSendRate;
   public int clientDejitterDelay;

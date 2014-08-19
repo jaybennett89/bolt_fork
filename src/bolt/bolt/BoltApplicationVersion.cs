@@ -2,8 +2,8 @@
 using UnityEngine;
 
 [Serializable]
-public class BoltApplicationVersion {
-  public Guid guid;
+public sealed class BoltApplicationVersion {
+  public byte[] guid;
   public int major;
   public int minor;
   public int patch;
@@ -21,7 +21,12 @@ public class BoltApplicationVersion {
     }
   }
 
-  public BoltApplicationVersion (Guid guid, int major) {
+  public BoltApplicationVersion ()
+    : this(Guid.NewGuid().ToByteArray(), 0) {
+
+  }
+
+  public BoltApplicationVersion (byte[] guid, int major) {
     this.guid = guid;
     this.major = major;
     this.minor = 0;
@@ -29,7 +34,7 @@ public class BoltApplicationVersion {
     this.build = 0;
   }
 
-  public BoltApplicationVersion (Guid guid, int major, int minor) {
+  public BoltApplicationVersion (byte[] guid, int major, int minor) {
     this.guid = guid;
     this.major = major;
     this.minor = minor;
@@ -37,7 +42,7 @@ public class BoltApplicationVersion {
     this.build = 0;
   }
 
-  public BoltApplicationVersion (Guid guid, int major, int minor, int patch) {
+  public BoltApplicationVersion (byte[] guid, int major, int minor, int patch) {
     this.guid = guid;
     this.major = major;
     this.minor = minor;
@@ -45,7 +50,7 @@ public class BoltApplicationVersion {
     this.build = 0;
   }
 
-  public BoltApplicationVersion (Guid guid, int major, int minor, int patch, int build) {
+  public BoltApplicationVersion (byte[] guid, int major, int minor, int patch, int build) {
     this.guid = guid;
     this.major = major;
     this.minor = minor;
@@ -58,6 +63,8 @@ public class BoltApplicationVersion {
   }
 
   internal BoltApplicationVersion Clone () {
-    return new BoltApplicationVersion(guid, major, minor, patch, build);
+    byte[] guidCopy = new byte[guid.Length];
+    Array.Copy(guid, 0, guidCopy, 0, guid.Length);
+    return new BoltApplicationVersion(guidCopy, major, minor, patch, build);
   }
 }

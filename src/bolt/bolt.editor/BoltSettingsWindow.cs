@@ -112,12 +112,21 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     if (settings._config.applicationVersion == null) {
-      settings._config.applicationVersion = new BoltApplicationVersion(Guid.NewGuid(), 0, 0, 0, 0);
+      settings._config.applicationVersion = new BoltApplicationVersion(Guid.NewGuid().ToByteArray(), 0, 0, 0, 0);
       Save();
     }
 
     BoltAssetEditorGUI.Label("Application GUID", () => {
-      settings._config.applicationVersion.guid = new Guid(EditorGUILayout.TextField(settings._config.applicationVersion.guid.ToString()));
+      Guid g;
+      g = new Guid(settings._config.applicationVersion.guid);
+      g = new Guid(EditorGUILayout.TextField(g.ToString().ToUpperInvariant()));
+
+      settings._config.applicationVersion.guid = g.ToByteArray();
+
+      if (GUILayout.Button("Generate", EditorStyles.miniButton)) {
+        settings._config.applicationVersion.guid = Guid.NewGuid().ToByteArray();
+        Save();
+      }
     });
 
     BoltAssetEditorGUI.Label("Application Version", () => {
@@ -143,7 +152,7 @@ public class BoltSettingsWindow : EditorWindow {
         hash = new byte[] { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
       }
 
-      GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x)).ToArray()));
+      GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x).ToUpperInvariant()).ToArray()));
     });
 
     EditorGUILayout.EndVertical();
