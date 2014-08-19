@@ -38,11 +38,11 @@ public static class BoltAssetEditorGUI {
     GUILayout.Space(4);
   }
   
-  static void DrawIcon (string name) {
+  public static void DrawIcon (string name) {
     DrawIcon(name, new RectOffset());
   }
 
-  static void DrawIcon (string name, RectOffset offset) {
+  public static void DrawIcon (string name, RectOffset offset) {
     GUIStyle s;
 
     s = new GUIStyle(GUIStyle.none);

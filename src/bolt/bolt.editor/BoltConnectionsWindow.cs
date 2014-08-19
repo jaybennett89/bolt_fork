@@ -23,7 +23,7 @@ public class BoltConnectionsWindow : EditorWindow {
   }
 
   void OnEnable () {
-    title = name = "Connections";
+    title = name = "Bolt Remotes";
     _lastRepaint = 0f;
     _scrollPosition = Vector2.zero;
   }
@@ -47,16 +47,39 @@ public class BoltConnectionsWindow : EditorWindow {
   }
 
   void Connections () {
-    BoltGUI.Table<BoltConnection>(BoltCore.connections, new BoltGUI.TableStyle { labelStyle = boldLabel },
-      BoltGUI.Column<BoltConnection>("Address", c => {
-        var address = c.udpConnection.RemoteEndPoint.ToString();
-        GUILayout.Label(address, GUI.skin.label);
-      }),
-      BoltGUI.Column<BoltConnection>("Ping (ms)", c => Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f)),
-      BoltGUI.Column<BoltConnection>("OUT (kb/s)", c => (c.bitsPerSecondOut >> 3) / 1000f),
-      BoltGUI.Column<BoltConnection>("IN (kb/s)", c => (c.bitsPerSecondIn >> 3) / 1000f),
-      BoltGUI.Column<BoltConnection>("", c => ConnectionButtons(c))
-    );
+    GUILayout.Space(2);
+
+    BoltAssetEditorGUI.Header("network", "Connections");
+
+    GUIStyle sceneStyle = "TE NodeBox";
+    sceneStyle.padding = new RectOffset(5, 5, 5, 5);
+
+    foreach (var c in BoltCore.connections) {
+      GUILayout.BeginHorizontal(sceneStyle);
+
+
+      GUILayout.Label(c.udpConnection.RemoteEndPoint.ToString(), GUI.skin.label, GUILayout.Width(150));
+      
+      BoltAssetEditorGUI.DrawIcon("rtt");
+      GUILayout.Label(Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f).ToString() + " ms");
+
+      BoltAssetEditorGUI.DrawIcon("download");
+      GUILayout.Label(((c.bitsPerSecondIn >> 3) / 1000f).ToString() + " kb/s");
+
+      BoltAssetEditorGUI.DrawIcon("upload");
+      GUILayout.Label(((c.bitsPerSecondOut >> 3) / 1000f).ToString() + " kb/s");
+
+      GUILayout.EndHorizontal();
+    }
+
+
+    //BoltGUI.Table<BoltConnection>(BoltCore.connections, new BoltGUI.TableStyle { labelStyle = boldLabel, tableStyle = sceneStyle },
+    //  BoltGUI.Column<BoltConnection>("Address", c => GUILayout.Label(c.udpConnection.RemoteEndPoint.ToString(), GUI.skin.label)),
+    //  BoltGUI.Column<BoltConnection>("Ping (ms)", c => Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f)),
+    //  BoltGUI.Column<BoltConnection>("OUT (kb/s)", c => (c.bitsPerSecondOut >> 3) / 1000f),
+    //  BoltGUI.Column<BoltConnection>("IN (kb/s)", c => (c.bitsPerSecondIn >> 3) / 1000f),
+    //  BoltGUI.Column<BoltConnection>("", c => ConnectionButtons(c))
+    //);
   }
 
   void ConnectionButtons (BoltConnection c) {

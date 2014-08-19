@@ -69,11 +69,11 @@ public static class BoltMenuItems {
     AssetDatabase.ImportPackage("Temp/TutorialAssets.unitypackage", false);
   }
 
-  [MenuItem("Window/Bolt Connections")]
+  [MenuItem("Window/Bolt Remotes")]
   public static void OpenInfoPanel () {
     BoltConnectionsWindow window = EditorWindow.GetWindow<BoltConnectionsWindow>();
-    window.title = "Connections";
-    window.name = "Connections";
+    window.title = "Bolt Remotes";
+    window.name = "Bolt Remotes";
     window.Show();
   }
 
