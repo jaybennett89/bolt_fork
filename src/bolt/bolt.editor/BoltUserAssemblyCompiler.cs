@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Process = System.Diagnostics.Process;
@@ -99,16 +100,16 @@ class BoltUserAssemblyCompiler {
 
   static string assemblyReferencesList {
     get {
-	  List<string> assemblies = new List<string>();
-	assemblies.Add(unityengineAssemblyPath);
-	assemblies.Add(boltAssemblyPath);
-	assemblies.Add(udpkitAssemblyPath);
+      List<string> assemblies = new List<string>();
+      assemblies.Add(unityengineAssemblyPath);
+      assemblies.Add(boltAssemblyPath);
+      assemblies.Add(udpkitAssemblyPath);
 
-	if (File.Exists(udpkitAndroidAssemblyPath)) assemblies.Add(udpkitAndroidAssemblyPath);
-	if (File.Exists(udpkitIOSAssemblyPath)) assemblies.Add(udpkitIOSAssemblyPath);
-	if (File.Exists(udpkitManagedAssemblyPath)) assemblies.Add(udpkitManagedAssemblyPath);
+      if (File.Exists(udpkitAndroidAssemblyPath)) assemblies.Add(udpkitAndroidAssemblyPath);
+      if (File.Exists(udpkitIOSAssemblyPath)) assemblies.Add(udpkitIOSAssemblyPath);
+      if (File.Exists(udpkitManagedAssemblyPath)) assemblies.Add(udpkitManagedAssemblyPath);
 
-	return string.Join(" ", assemblies.Select(x => "-reference:\"" + x + "\"").ToArray());
+      return string.Join(" ", assemblies.Select(x => "-reference:\"" + x + "\"").ToArray());
     }
   }
 
@@ -130,8 +131,7 @@ class BoltUserAssemblyCompiler {
     get {
       if (isOSX) {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
-      }
-      else {
+      } else {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
       }
     }
@@ -141,8 +141,7 @@ class BoltUserAssemblyCompiler {
     get {
       if (isOSX) {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/Managed/UnityEngine.dll");
-      }
-      else {
+      } else {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Managed/UnityEngine.dll");
       }
     }
@@ -152,8 +151,7 @@ class BoltUserAssemblyCompiler {
     get {
       if (isOSX) {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/bin/mono");
-      }
-      else {
+      } else {
         return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/bin/mono.exe");
       }
     }
@@ -177,8 +175,7 @@ class BoltUserAssemblyCompiler {
 
           id += 1;
 
-        }
-        else {
+        } else {
           entity = null;
           EditorUtility.UnloadUnusedAssets();
         }
@@ -276,7 +273,7 @@ class BoltUserAssemblyCompiler {
 
     p.Exited += (s, ea) => {
       BoltMainThreadInvoker.Invoke(() => {
-        if (p.ExitCode == 0) { CompilationDone(op, true); }
+        if (p.ExitCode == 0) { CompilationDone(op); }
       });
     };
 
@@ -285,10 +282,10 @@ class BoltUserAssemblyCompiler {
     p.BeginOutputReadLine();
   }
 
-  static void CompilationDone (BoltCompilerOperation op, bool importAssembly) {
-    if (importAssembly) {
-      AssetDatabase.ImportAsset(boltUserAssemblyAsset, ImportAssetOptions.ForceUpdate);
-    }
+  static void CompilationDone (BoltCompilerOperation op) {
+    AssetDatabase.ImportAsset(boltUserAssemblyAsset, ImportAssetOptions.ForceUpdate);
+
+    UpdateUserAssemblyHash();
 
     ClearCompileFlag(op.events);
     ClearCompileFlag(op.states);
@@ -299,8 +296,27 @@ class BoltUserAssemblyCompiler {
 
     EditorPrefs.SetInt("BOLT_UNCOMPILED_COUNT", 0);
     EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, false);
+  }
 
-    //EditorWindow.GetWindow<BoltScenesWindow>().Repaint();
+  static void UpdateUserAssemblyHash () {
+    byte[] assembly = File.ReadAllBytes(boltAssemblyPath);
+    System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+    byte[] hashBytes = md5.ComputeHash(assembly);
+
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine("public static class BoltUserAssemblyHash {");
+    sb.Append("  public static readonly byte[] value = new byte[] { ");
+
+    for (int i = 0; i < hashBytes.Length; ++i) {
+      sb.AppendFormat("0x{0:x2}, ", hashBytes[i]);
+    }
+
+    sb.Append(" };");
+    sb.AppendLine();
+    sb.AppendLine("}");
+
+    File.WriteAllText("Assets/bolt/scripts/BoltUserAssemblyHash.cs", sb.ToString());
+    AssetDatabase.ImportAsset("Assets/bolt/scripts/BoltUserAssemblyHash.cs", ImportAssetOptions.ForceUpdate);
   }
 
   static void ClearCompileFlag<T> (IEnumerable<T> assets) where T : BoltCompilableAsset {
@@ -320,8 +336,7 @@ class BoltUserAssemblyCompiler {
     if (e.Data != null) {
       if (e.Data.Contains(": warning") && !e.Data.Contains(": error")) {
         Debug.LogWarning(e.Data);
-      }
-      else {
+      } else {
         Debug.LogError(e.Data);
       }
     }

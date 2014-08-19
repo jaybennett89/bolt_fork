@@ -29,9 +29,9 @@ partial class BoltCompiler {
 
     // create prefabs enumeration
     using (BoltSourceFile file = new BoltSourceFile(op.prefabsFilePath)) {
-      file.EmitScope("public enum BoltPrefabs", () => {
+      file.EmitScope("public static class BoltPrefabs", () => {
         foreach (BoltPrefab prefab in op.prefabs) {
-          file.EmitLine("{0} = {1},", prefab.name, prefab.id);
+          file.EmitLine("public static readonly string {0} = \"{0}\";", prefab.name, prefab.id);
         }
       });
     }

@@ -160,15 +160,6 @@ public static partial class BoltNetwork {
     BoltCore.RefuseConnection(ep);
   }
 
-  /// <summary>
-  /// Instantiate a prefab by name and attach it to bolt
-  /// </summary>
-  /// <param name="prefab">Name of the prefab to instantiate</param>
-  /// <returns>The entity instance of the instantiated prefab</returns>
-  public static BoltEntity Instantiate (BoltPrefabs prefab) {
-    return Instantiate(BoltCore.FindPrefab(prefab.ToString()));
-  }
-
   public static BoltEntity Instantiate (string prefab) {
     return Instantiate(BoltCore.FindPrefab(prefab));
   }

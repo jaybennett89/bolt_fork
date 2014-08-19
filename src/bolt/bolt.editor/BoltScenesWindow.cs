@@ -115,8 +115,7 @@ public class BoltScenesWindow : EditorWindow {
 
       if (result.Length == 0) {
         EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_START_PLAYERS);
-      }
-      else {
+      } else {
         EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
       }
     } catch {
@@ -212,8 +211,7 @@ end tell'";
     try {
       if (BoltEditorUtils.hasPro == false) {
         LoadAndStartScene(false);
-      }
-      else {
+      } else {
         switch (BoltRuntimeSettings.instance.debugEditorMode) {
           case BoltEditorStartMode.Client:
           case BoltEditorStartMode.Server:
@@ -294,8 +292,7 @@ end tell'";
       SetStage(STAGE_COMPILE_BOLT_WAIT);
       BoltUserAssemblyCompiler.Run();
 
-    }
-    else {
+    } else {
       SetStage(STAGE_COMPILE_PLAYER);
     }
   }
@@ -399,15 +396,16 @@ end tell'";
           BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
           if (GUILayout.Button("Start", EditorStyles.miniButton, GUILayout.Width(50))) {
-            EditorApplication.SaveCurrentSceneIfUserWantsTo();
-            settings.debugStartMapName = sceneName;
+            if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
+              settings.debugStartMapName = sceneName;
 
-            // save asset
-            EditorUtility.SetDirty(settings);
-            AssetDatabase.SaveAssets();
+              // save asset
+              EditorUtility.SetDirty(settings);
+              AssetDatabase.SaveAssets();
 
-            // set stage
-            SetStage(STAGE_COMPILE_BOLT);
+              // set stage
+              SetStage(STAGE_COMPILE_BOLT);
+            }
           }
         }
 
@@ -428,7 +426,7 @@ end tell'";
     BoltAssetEditorGUI.Header("scenes", "Scenes");
     GUILayout.Space(1);
     Scenes();
-    
+
     if (GUI.changed) {
       EditorUtility.SetDirty(BoltRuntimeSettings.instance);
       AssetDatabase.SaveAssets();

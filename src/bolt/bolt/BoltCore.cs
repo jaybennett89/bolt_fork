@@ -20,6 +20,7 @@ internal static class BoltCore {
   static internal BoltMapLoadOp _loadedMapTarget;
 
   static internal int _frame = 0;
+  static internal byte[] _userAssemblyHash = null;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
   static internal IBoltNetwork _autogen = null;
   static internal BoltConfig _config = null;
@@ -58,9 +59,11 @@ internal static class BoltCore {
   }
 
   public static string loadedMap {
-    get {
-      return _loadedMap.map;
-    }
+    get { return _loadedMap.map; }
+  }
+
+  public static byte[] userAssemblyHash {
+    get { return _userAssemblyHash; }
   }
 
   public static BoltConfig networkConfig {
@@ -703,6 +706,7 @@ internal static class BoltCore {
     Shutdown();
 
     // locate global object types
+    _userAssemblyHash = BoltRuntimeReflection.GetUserAssemblyHash();
     _globalBehaviours = BoltRuntimeReflection.FindGlobalObjectTypes();
     _globalBehaviourObject = new GameObject("Bolt");
 
