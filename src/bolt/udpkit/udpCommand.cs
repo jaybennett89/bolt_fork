@@ -5,5 +5,7 @@
         Refused = 6,
         Disconnected = 8,
         Ping = 10,
+        Refused_HandshakeSize = 12,
+        Refused_HandshakeValue = 14
     }
 }

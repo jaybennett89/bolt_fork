@@ -206,7 +206,7 @@
     internal void OnEventConnectionOption (UdpEvent ev) {
       switch (ev.Option) {
         case UdpConnectionOption.AlwaysSendMtu:
-          alwaysSendMtu = ev.OptionIntValue == 1;
+          alwaysSendMtu = ev.intVal == 1;
           break;
       }
     }
@@ -249,12 +249,29 @@
         UdpCommandType cmd = (UdpCommandType) buffer.ReadByte(8);
 
         switch (cmd) {
-          case UdpCommandType.Connect: OnCommandConnect(buffer); break;
-          case UdpCommandType.Accepted: OnCommandAccepted(buffer); break;
-          case UdpCommandType.Refused: OnCommandRefused(buffer); break;
-          case UdpCommandType.Disconnected: OnCommandDisconnected(buffer); break;
-          case UdpCommandType.Ping: OnCommandPing(buffer); break;
-          default: ConnectionError(UdpConnectionError.IncorrectCommand); break;
+          case UdpCommandType.Connect:
+            OnCommandConnect(buffer); break;
+
+          case UdpCommandType.Accepted:
+            OnCommandAccepted(buffer); break;
+
+          case UdpCommandType.Refused:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED); break;
+
+          case UdpCommandType.Refused_HandshakeSize:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED_SIZE); break;
+
+          case UdpCommandType.Refused_HandshakeValue:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED_VALUE); break;
+
+          case UdpCommandType.Disconnected:
+            OnCommandDisconnected(buffer); break;
+
+          case UdpCommandType.Ping:
+            OnCommandPing(buffer); break;
+
+          default:
+            ConnectionError(UdpConnectionError.IncorrectCommand); break;
         }
       }
     }
@@ -490,10 +507,12 @@
       }
     }
 
-    void OnCommandRefused (UdpStream buffer) {
+    void OnCommandRefused (UdpStream buffer, int eventType) {
       if (IsClient) {
+        int failedIndex = buffer.ReadInt();
+
         if (CheckState(UdpConnectionState.Connecting)) {
-          socket.Raise(UdpEvent.PUBLIC_CONNECT_REFUSED, endpoint);
+          socket.Raise(eventType, endpoint, failedIndex);
 
           // destroy this connection on next timeout check
           ChangeState(UdpConnectionState.Destroy);

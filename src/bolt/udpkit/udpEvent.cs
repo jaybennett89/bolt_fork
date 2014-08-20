@@ -16,6 +16,8 @@ namespace UdpKit {
     ConnectRequest = UdpEvent.PUBLIC_CONNECT_REQUEST,
     ConnectFailed = UdpEvent.PUBLIC_CONNECT_FAILED,
     ConnectRefused = UdpEvent.PUBLIC_CONNECT_REFUSED,
+    HandshakeFailedOnSize = UdpEvent.PUBLIC_CONNECT_REFUSED_SIZE,
+    HandshakeFailedOnValue = UdpEvent.PUBLIC_CONNECT_REFUSED_VALUE,
     Connected = UdpEvent.PUBLIC_CONNECTED,
     Disconnected = UdpEvent.PUBLIC_DISCONNECTED,
     ObjectSendFailed = UdpEvent.PUBLIC_OBJECT_SEND_FAILED,
@@ -52,7 +54,11 @@ namespace UdpKit {
 
     internal const int PUBLIC_CONNECT_REQUEST = 2;
     internal const int PUBLIC_CONNECT_FAILED = 4;
+
     internal const int PUBLIC_CONNECT_REFUSED = 6;
+    internal const int PUBLIC_CONNECT_REFUSED_SIZE = 28;
+    internal const int PUBLIC_CONNECT_REFUSED_VALUE = 30;
+
     internal const int PUBLIC_CONNECTED = 8;
     internal const int PUBLIC_DISCONNECTED = 10;
     internal const int PUBLIC_OBJECT_SEND_FAILED = 12;
@@ -77,10 +83,10 @@ namespace UdpKit {
     UdpSendFailReason failReason;
 
     [FieldOffset(8)]
-    internal int OptionIntValue;
+    internal int intVal;
 
     [FieldOffset(8)]
-    internal float OptionFloatValue;
+    internal float floatVal;
 
     [FieldOffset(16)]
     UdpEventReferenceObjects Refs;
