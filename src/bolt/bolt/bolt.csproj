@@ -78,7 +78,6 @@
     <Compile Include="BoltGUI.cs" />
     <Compile Include="BoltObjectPool.cs" />
     <Compile Include="BoltOrigin.cs" />
-    <Compile Include="BoltPlatform.cs" />
     <Compile Include="collections\BoltIterator.cs" />
     <Compile Include="collections\STuple.cs" />
     <Compile Include="docs\BoltDocsClientOnly.cs" />
