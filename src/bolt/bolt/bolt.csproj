@@ -74,6 +74,7 @@
     <Compile Include="BoltConfig.cs" />
     <Compile Include="BoltFactory.cs" />
     <Compile Include="BoltGlobalBehaviour.cs" />
+    <Compile Include="BoltGlobalEntityId.cs" />
     <Compile Include="BoltGUI.cs" />
     <Compile Include="BoltObjectPool.cs" />
     <Compile Include="BoltOrigin.cs" />
