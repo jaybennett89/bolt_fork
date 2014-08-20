@@ -15,7 +15,7 @@ public enum BoltConnectionAcceptMode {
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public bool autoCreateConsole = true;
-  public BoltApplicationVersion applicationVersion;
+  public byte[] applicationGuid;
 
   public int clientSendRate;
   public int clientDejitterDelay;
@@ -68,8 +68,6 @@ public sealed class BoltConfig {
   }
 
   internal BoltConfig Clone () {
-    BoltConfig config = (BoltConfig) MemberwiseClone();
-    config.applicationVersion = config.applicationVersion.Clone();
-    return config;
+    return (BoltConfig) MemberwiseClone();
   }
 }

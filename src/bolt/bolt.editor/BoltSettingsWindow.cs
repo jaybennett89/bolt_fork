@@ -111,39 +111,38 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.autoCreateConsole = EditorGUILayout.Toggle(settings._config.autoCreateConsole);
     });
 
-    if (settings._config.applicationVersion == null) {
-      settings._config.applicationVersion = new BoltApplicationVersion(Guid.NewGuid().ToByteArray(), 0, 0, 0, 0);
+    if (settings._config.applicationGuid == null) {
+      settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
       Save();
     }
 
     BoltAssetEditorGUI.Label("Application GUID", () => {
       Guid g;
-      g = new Guid(settings._config.applicationVersion.guid);
+      g = new Guid(settings._config.applicationGuid);
       g = new Guid(EditorGUILayout.TextField(g.ToString().ToUpperInvariant()));
 
-      settings._config.applicationVersion.guid = g.ToByteArray();
+      settings._config.applicationGuid = g.ToByteArray();
 
       if (GUILayout.Button("Generate", EditorStyles.miniButton)) {
-        settings._config.applicationVersion.guid = Guid.NewGuid().ToByteArray();
+        settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
         Save();
       }
     });
 
-    BoltAssetEditorGUI.Label("Application Version", () => {
-      GUIStyle dotStyle = new GUIStyle(EditorStyles.boldLabel);
-      dotStyle.contentOffset = new Vector2(0, -3);
+    //BoltAssetEditorGUI.Label("Application Version", () => {
+    //  GUIStyle dotStyle = new GUIStyle(EditorStyles.boldLabel);
+    //  dotStyle.contentOffset = new Vector2(0, -3);
 
-      settings._config.applicationVersion.major = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.major, "major");
-      GUILayout.Label(".", dotStyle);
-      settings._config.applicationVersion.minor = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.minor, "minor");
-      GUILayout.Label(".", dotStyle);
-      settings._config.applicationVersion.patch = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.patch, "patch");
-      GUILayout.Label(".", dotStyle);
-      settings._config.applicationVersion.build = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.build, "build");
-    });
+    //  settings._config.applicationVersion.major = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.major, "major");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.minor = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.minor, "minor");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.patch = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.patch, "patch");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.build = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.build, "build");
+    //});
 
-    BoltAssetEditorGUI.Label("Application Hash", () => {
-
+    BoltAssetEditorGUI.Label("Assembly Hash", () => {
       byte[] hash = null;
 
       try {
