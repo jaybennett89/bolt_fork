@@ -27,11 +27,11 @@ end tell'";
 
     if (string.IsNullOrEmpty(BoltRuntimeSettings.instance.debugStartMapName) == false) {
       if (BoltDebugStartSettings.startServer) {
-        BoltNetwork.StartServer(_serverEndPoint, new BoltConfig());
+        BoltNetwork.StartServer(_serverEndPoint, BoltRuntimeSettings.instance.GetConfigCopy());
         BoltNetwork.LoadMap(BoltRuntimeSettings.instance.debugStartMapName);
       }
       else if (BoltDebugStartSettings.startClient) {
-        BoltNetwork.StartClient(_clientEndPoint, new BoltConfig());
+        BoltNetwork.StartClient(_clientEndPoint, BoltRuntimeSettings.instance.GetConfigCopy());
         BoltNetwork.Connect(_serverEndPoint);
       }
 

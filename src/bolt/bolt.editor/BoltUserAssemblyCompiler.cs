@@ -299,7 +299,7 @@ class BoltUserAssemblyCompiler {
   }
 
   static void UpdateUserAssemblyHash () {
-    byte[] assembly = File.ReadAllBytes(boltAssemblyPath);
+    byte[] assembly = File.ReadAllBytes(boltUserAssemblyPath);
     System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
     byte[] hashBytes = md5.ComputeHash(assembly);
 
@@ -311,7 +311,7 @@ class BoltUserAssemblyCompiler {
       sb.AppendFormat("0x{0:x2}, ", hashBytes[i]);
     }
 
-    sb.Append(" };");
+    sb.Append("};");
     sb.AppendLine();
     sb.AppendLine("}");
 

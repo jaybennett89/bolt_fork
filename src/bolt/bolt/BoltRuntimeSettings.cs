@@ -43,6 +43,10 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
+  public BoltConfig GetConfigCopy () {
+    return _config.Clone();
+  }
+
   internal static GameObject[] prefabs {
     get {
       if (!instance)

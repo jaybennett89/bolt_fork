@@ -122,6 +122,10 @@ internal static class BoltCore {
     get { return hasSocket && _mode == BoltNetworkModes.Server; }
   }
 
+  public static byte[] GetUserAssemblyHash () {
+    return BoltRuntimeReflection.GetUserAssemblyHash();
+  }
+
   internal static int localSendRate {
     get {
       switch (_mode) {
@@ -731,6 +735,11 @@ internal static class BoltCore {
     _autogen = autogen;
     _autogen.Setup();
 
+    // 
+    var handshakeData = new UdpHandshakeData[2];
+    handshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    handshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
+
     // setup configuration
     UdpConfig udpConfig = new UdpConfig {
       ConnectionLimit = mode == BoltNetworkModes.Server ? config.serverConnectionLimit : 0,
@@ -743,6 +752,7 @@ internal static class BoltCore {
       ConnectRequestAttempts = 10,
       ConnectRequestTimeout = 1000,
 #endif
+
       AllowImplicitAccept = mode == BoltNetworkModes.Client,
       AllowIncommingConnections = mode == BoltNetworkModes.Server,
       AutoAcceptIncommingConnections = (mode == BoltNetworkModes.Server) && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto),
@@ -752,6 +762,7 @@ internal static class BoltCore {
       SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1)),
       SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1)),
       UseAvailableEventEvent = false,
+      HandshakeData = handshakeData
     };
 
 #if DEBUG

@@ -198,7 +198,7 @@
 
       if (CheckState(UdpConnectionState.Connected)) {
         if (sendTime + socket.Config.PingTimeout < now || recvSinceLastSend >= socket.Config.RecvWithoutAckLimit) {
-          SendCommand(UdpCommandType.Ping);
+          SendSimpleCommand(UdpCommandType.Ping);
         }
       }
     }
@@ -206,7 +206,7 @@
     internal void OnEventConnectionOption (UdpEvent ev) {
       switch (ev.Option) {
         case UdpConnectionOption.AlwaysSendMtu:
-          alwaysSendMtu = ev.OptionIntValue == 1;
+          alwaysSendMtu = ev.intVal == 1;
           break;
       }
     }
@@ -249,12 +249,29 @@
         UdpCommandType cmd = (UdpCommandType) buffer.ReadByte(8);
 
         switch (cmd) {
-          case UdpCommandType.Connect: OnCommandConnect(buffer); break;
-          case UdpCommandType.Accepted: OnCommandAccepted(buffer); break;
-          case UdpCommandType.Refused: OnCommandRefused(buffer); break;
-          case UdpCommandType.Disconnected: OnCommandDisconnected(buffer); break;
-          case UdpCommandType.Ping: OnCommandPing(buffer); break;
-          default: ConnectionError(UdpConnectionError.IncorrectCommand); break;
+          case UdpCommandType.Connect:
+            OnCommandConnect(buffer); break;
+
+          case UdpCommandType.Accepted:
+            OnCommandAccepted(buffer); break;
+
+          case UdpCommandType.Refused:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED); break;
+
+          case UdpCommandType.Refused_HandshakeSize:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED_SIZE); break;
+
+          case UdpCommandType.Refused_HandshakeValue:
+            OnCommandRefused(buffer, UdpEvent.PUBLIC_CONNECT_REFUSED_VALUE); break;
+
+          case UdpCommandType.Disconnected:
+            OnCommandDisconnected(buffer); break;
+
+          case UdpCommandType.Ping:
+            OnCommandPing(buffer); break;
+
+          default:
+            ConnectionError(UdpConnectionError.IncorrectCommand); break;
         }
       }
     }
@@ -310,25 +327,42 @@
       }
     }
 
-    internal void SendCommand (UdpCommandType cmd) {
+    internal void SendSimpleCommand (UdpCommandType cmd) {
       if (CheckCanSend(true) == UdpSendFailReason.None) {
         UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
         stream.WriteByte((byte) cmd, 8);
 
-        UdpHeader header = MakeHeader(false);
-        header.Pack(stream, socket);
-
-        UdpHandle handle = MakeHandle(ref header);
-        handle.Object = null;
-
-        if (SendStream(stream, handle, false)) {
-          // track stats
-          stats.PacketSent((uint) stream.Ptr >> 3);
-          socket.Statistics.PacketSent((uint) stream.Ptr >> 3);
-
-        } else {
-          // should we do something here?????
+        for (int i = 0; i < socket.Config.HandshakeData.Length; ++i) {
+          stream.WriteByteArray(socket.Config.HandshakeData[i].Data);
         }
+
+        WriteCommandHeaderAndSend(stream, socket);
+      }
+    }
+
+    internal void SendConnectCommand () {
+      if (CheckCanSend(true) == UdpSendFailReason.None) {
+        UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
+        stream.WriteByte((byte) UdpCommandType.Connect, 8);
+
+        WriteCommandHeaderAndSend(stream, socket);
+      }
+    }
+
+    void WriteCommandHeaderAndSend (UdpStream stream, UdpSocket socket) {
+      UdpHeader header = MakeHeader(false);
+      header.Pack(stream, socket);
+
+      UdpHandle handle = MakeHandle(ref header);
+      handle.Object = null;
+
+      if (SendStream(stream, handle, false)) {
+        // track stats
+        stats.PacketSent((uint) stream.Ptr >> 3);
+        socket.Statistics.PacketSent((uint) stream.Ptr >> 3);
+
+      } else {
+        // should we do something here?????
       }
     }
 
@@ -449,7 +483,7 @@
         UdpLog.Info("connected to {0} ({1})", endpoint.ToString(), mode);
 
         if (IsServer) {
-          SendCommand(UdpCommandType.Accepted);
+          SendSimpleCommand(UdpCommandType.Accepted);
         }
 
         socket.Raise(UdpEvent.PUBLIC_CONNECTED, this);
@@ -473,7 +507,7 @@
     void OnCommandConnect (UdpStream buffer) {
       if (IsServer) {
         if (CheckState(UdpConnectionState.Connected)) {
-          SendCommand(UdpCommandType.Accepted);
+          SendSimpleCommand(UdpCommandType.Accepted);
         }
       } else {
         ConnectionError(UdpConnectionError.IncorrectCommand);
@@ -490,10 +524,25 @@
       }
     }
 
-    void OnCommandRefused (UdpStream buffer) {
+    void OnCommandRefused (UdpStream buffer, int eventType) {
       if (IsClient) {
+        int failedDataIndex = buffer.ReadInt();
+        int failedDataLength = buffer.ReadInt();
+        byte[] failedData = null;
+
+        if (failedDataLength > 0) {
+          failedData = new byte[failedDataLength];
+          buffer.ReadByteArray(failedData);
+        }
+
         if (CheckState(UdpConnectionState.Connecting)) {
-          socket.Raise(UdpEvent.PUBLIC_CONNECT_REFUSED, endpoint);
+          UdpEvent evt = new UdpEvent();
+          evt.Type = eventType;
+          evt.EndPoint = endpoint;
+          evt.Object0 = failedDataIndex;
+          evt.Object1 = failedData;
+
+          socket.Raise(evt);
 
           // destroy this connection on next timeout check
           ChangeState(UdpConnectionState.Destroy);
@@ -549,7 +598,7 @@
           UdpLog.Info("retrying connection to {0}", endpoint.ToString());
         }
 
-        SendCommand(UdpCommandType.Connect);
+        SendSimpleCommand(UdpCommandType.Connect);
 
         connectTimeout = socket.GetCurrentTime() + socket.Config.ConnectRequestTimeout;
         connectAttempts += 1u;

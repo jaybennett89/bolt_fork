@@ -117,6 +117,11 @@
     /// </summary>
     public UdpNoise NoiseFunction = null;
 
+    /// <summary>
+    /// Data which must match when handshaking
+    /// </summary>
+    public UdpHandshakeData[] HandshakeData = new UdpHandshakeData[0];
+
     internal UdpConfig Duplicate () {
       return (UdpConfig) MemberwiseClone();
     }

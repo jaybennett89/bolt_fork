@@ -107,9 +107,58 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     EditorGUILayout.BeginVertical();
+
     BoltAssetEditorGUI.Label("Auto Create Console", () => {
       settings._config.autoCreateConsole = EditorGUILayout.Toggle(settings._config.autoCreateConsole);
     });
+    
+    BoltAssetEditorGUI.Label("Unique Entity Ids", () => {
+      settings._config.useUniqueIds = EditorGUILayout.Toggle(settings._config.useUniqueIds);
+    });
+
+    if (settings._config.applicationGuid == null) {
+      settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
+      Save();
+    }
+
+    BoltAssetEditorGUI.Label("Application GUID", () => {
+      Guid g;
+      g = new Guid(settings._config.applicationGuid);
+      g = new Guid(EditorGUILayout.TextField(g.ToString().ToUpperInvariant()));
+
+      settings._config.applicationGuid = g.ToByteArray();
+
+      if (GUILayout.Button("Generate", EditorStyles.miniButton)) {
+        settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
+        Save();
+      }
+    });
+
+    //BoltAssetEditorGUI.Label("Application Version", () => {
+    //  GUIStyle dotStyle = new GUIStyle(EditorStyles.boldLabel);
+    //  dotStyle.contentOffset = new Vector2(0, -3);
+
+    //  settings._config.applicationVersion.major = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.major, "major");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.minor = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.minor, "minor");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.patch = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.patch, "patch");
+    //  GUILayout.Label(".", dotStyle);
+    //  settings._config.applicationVersion.build = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.build, "build");
+    //});
+
+    BoltAssetEditorGUI.Label("Assembly Hash", () => {
+      byte[] hash = null;
+
+      try {
+        hash = BoltRuntimeReflection.GetUserAssemblyHash();
+      } catch {
+        hash = new byte[] { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
+      }
+
+      GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x).ToUpperInvariant()).ToArray()));
+    });
+
     EditorGUILayout.EndVertical();
   }
 
@@ -130,8 +179,12 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.EndArea();
 
     if (GUI.changed) {
-      EditorUtility.SetDirty(BoltRuntimeSettings.instance);
-      AssetDatabase.SaveAssets();
+      Save();
     }
+  }
+
+  void Save () {
+    EditorUtility.SetDirty(BoltRuntimeSettings.instance);
+    AssetDatabase.SaveAssets();
   }
 }
