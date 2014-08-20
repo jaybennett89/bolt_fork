@@ -107,8 +107,13 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     EditorGUILayout.BeginVertical();
+
     BoltAssetEditorGUI.Label("Auto Create Console", () => {
       settings._config.autoCreateConsole = EditorGUILayout.Toggle(settings._config.autoCreateConsole);
+    });
+    
+    BoltAssetEditorGUI.Label("Unique Entity Ids", () => {
+      settings._config.useUniqueIds = EditorGUILayout.Toggle(settings._config.useUniqueIds);
     });
 
     if (settings._config.applicationGuid == null) {
