@@ -43,6 +43,8 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   internal Bits _mask;
   internal Bits _flags;
+  internal BoltUniqueId _uniqueId;
+
   internal bool _teleportFlip;
   internal ushort _commandSequence = 0;
   internal Transform _origin;

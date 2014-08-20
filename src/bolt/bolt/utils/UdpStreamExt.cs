@@ -493,6 +493,17 @@ public static class UdpStreamExtensions {
     }
   }
 
+  public static void WriteUniqueId (this UdpStream stream, BoltUniqueId id) {
+    stream.WriteUInt(id.peer.id);
+    stream.WriteUInt(id.obj.id);
+  }
+
+  public static BoltUniqueId ReadUniqueId (this UdpStream stream) {
+    uint peerId = stream.ReadUInt();
+    uint objId = stream.ReadUInt();
+    return new BoltUniqueId(new BoltPeerId(peerId), new BoltObjectId(peerId));
+  }
+
   public static void WriteStopMarker (this UdpStream stream) {
     if (stream.CanWrite()) {
       stream.WriteBool(false);

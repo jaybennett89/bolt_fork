@@ -15,7 +15,7 @@ public enum BoltConnectionAcceptMode {
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public bool autoCreateConsole = true;
-  public bool useUniqueIds = false;
+  public bool globalUniqueIds = false;
   public byte[] applicationGuid;
 
   public int clientSendRate;

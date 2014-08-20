@@ -459,6 +459,22 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint);
   }
 
+  public static BoltEntity FindEntity (BoltUniqueId id) {
+    if (_config.globalUniqueIds == false) {
+      throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
+    }
+
+    var it = _entities.GetIterator();
+
+    while (it.Next()) {
+      if (it.val._uniqueId == id) {
+        return it.val;
+      }
+    }
+
+    return null;
+  }
+
   internal static void LoadMapInternal (BoltMapLoadOp loadOp) {
     foreach (BoltEntity entity in entities) {
       // destroy entities which we are in control of and which are not labelled as proxies
