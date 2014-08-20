@@ -9,7 +9,14 @@
     }
   }
 
-  enum UdpHandshakeResult {
+  struct UdpHandshakeResult {
+    public UdpHandshakeResultType type;
+    public int failDataIndex;
+    public int failBufferOffset;
+    public int failBufferLength;
+  }
+
+  enum UdpHandshakeResultType {
     Success,
     InvalidSize,
     InvalidValue

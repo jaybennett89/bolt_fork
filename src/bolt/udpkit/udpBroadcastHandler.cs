@@ -15,9 +15,9 @@ namespace UdpKit {
       }
 
       internal void ReadData (uint now) {
-        if (broadcastSession) {
-          return;
-        }
+        //if (broadcastSession) {
+        //return;
+        //}
 
         int bytes;
         UdpEndPoint remote;
@@ -31,6 +31,7 @@ namespace UdpKit {
 
           if (guid != socket.sessionHandler.Id) {
             UdpSession session = new UdpSession();
+            session.ServerId = guid;
             session.LastUpdate = now;
             session.EndPoint = new UdpEndPoint(remote.Address, port);
             session.ServerName = name;
@@ -38,10 +39,9 @@ namespace UdpKit {
             session.Source = "LAN";
 
             socket.sessionHandler.UpdateSession(session);
-
-            // reset stream
-            stream = socket.GetReadStream();
           }
+
+          stream = socket.GetReadStream();
         }
       }
 

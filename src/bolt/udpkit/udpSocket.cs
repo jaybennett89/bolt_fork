@@ -359,7 +359,7 @@ namespace UdpKit {
       ev.EndPoint = endpoint;
       Raise(ev);
     }
-    
+
     internal void Raise (int eventType, UdpEndPoint endpoint, int intVal) {
       UdpEvent ev = new UdpEvent();
       ev.Type = eventType;
@@ -485,7 +485,7 @@ namespace UdpKit {
       return platform.PlatformPrecisionTime;
     }
 
-    void Raise (UdpEvent ev) {
+    internal void Raise (UdpEvent ev) {
       if (ev.IsInternal) {
         lock (eventQueueIn) {
           eventQueueIn.Enqueue(ev);
@@ -501,22 +501,29 @@ namespace UdpKit {
       }
     }
 
-    void SendRefusedCommand (UdpEndPoint endpoint) {
-      SendRefusedCommand(endpoint, UdpHandshakeResult.Success, -1);
-    }
-
-    void SendRefusedCommand (UdpEndPoint endpoint, UdpHandshakeResult result, int handshakeDataIndex) {
+    void SendRefusedCommand (UdpEndPoint endpoint, UdpHandshakeResult handshake) {
       UdpCommandType type;
 
-      switch (result) {
-        case UdpHandshakeResult.InvalidSize: type = UdpCommandType.Refused_HandshakeSize; break;
-        case UdpHandshakeResult.InvalidValue: type = UdpCommandType.Refused_HandshakeValue; break;
-        default: type = UdpCommandType.Refused; break;
+      switch (handshake.type) {
+        case UdpHandshakeResultType.InvalidSize:
+          type = UdpCommandType.Refused_HandshakeSize; break;
+
+        case UdpHandshakeResultType.InvalidValue:
+          type = UdpCommandType.Refused_HandshakeValue; break;
+
+        default:
+          type = UdpCommandType.Refused; break;
       }
 
       UdpStream stream = GetWriteStream(Config.PacketSize << 3, HeaderBitSize);
       stream.WriteByte((byte) type, 8);
-      stream.WriteInt(handshakeDataIndex);
+      stream.WriteInt(handshake.failDataIndex);
+      stream.WriteInt(handshake.failBufferLength);
+
+      if (handshake.failBufferLength > 0) {
+        UdpAssert.Assert(handshake.type == UdpHandshakeResultType.InvalidValue);
+        stream.WriteByteArray(handshakeBuffer, handshake.failBufferOffset, handshake.failBufferLength);
+      }
 
       UdpHeader header = new UdpHeader();
       header.IsObject = false;
@@ -579,7 +586,10 @@ namespace UdpKit {
     void NetworkLoop () {
       bool created = false;
       bool started = false;
+
+#if CLOUD
       bool virtualStarted = false;
+#endif
 
       while (state == UdpSocketState.Created || state == UdpSocketState.Running) {
 #if DEBUG
@@ -827,7 +837,7 @@ namespace UdpKit {
 
           // if we are connected, disconnect 
           else if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-            ev.Connection.SendCommand(UdpCommandType.Disconnected);
+            ev.Connection.SendSimpleCommand(UdpCommandType.Disconnected);
             ev.Connection.ChangeState(UdpConnectionState.Disconnected);
           }
         }
@@ -842,13 +852,13 @@ namespace UdpKit {
 
     void OnEventRefuse (UdpEvent ev) {
       if (pendingConnections.Remove(ev.EndPoint)) {
-        SendRefusedCommand(ev.EndPoint);
+        SendRefusedCommand(ev.EndPoint, new UdpHandshakeResult());
       }
     }
 
     void OnEventDisconect (UdpEvent ev) {
       if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-        ev.Connection.SendCommand(UdpCommandType.Disconnected);
+        ev.Connection.SendSimpleCommand(UdpCommandType.Disconnected);
         ev.Connection.ChangeState(UdpConnectionState.Disconnected);
       }
     }
@@ -857,7 +867,7 @@ namespace UdpKit {
       if (ChangeState(UdpSocketState.Running, UdpSocketState.Shutdown)) {
         for (int i = 0; i < connList.Count; ++i) {
           UdpConnection cn = connList[i];
-          cn.SendCommand(UdpCommandType.Disconnected);
+          cn.SendSimpleCommand(UdpCommandType.Disconnected);
           cn.ChangeState(UdpConnectionState.Disconnected);
         }
 
@@ -1025,11 +1035,10 @@ namespace UdpKit {
         buffer.Ptr = HeaderBitSize;
 
         if (buffer.ReadByte(8) == (byte) UdpCommandType.Connect) {
-          int failedIndex = 0;
-          UdpHandshakeResult result = VerifyHandshake(buffer, out failedIndex);
+          UdpHandshakeResult handshake = VerifyHandshake(buffer);
 
-          switch (result) {
-            case UdpHandshakeResult.Success:
+          switch (handshake.type) {
+            case UdpHandshakeResultType.Success:
               if (Config.AllowIncommingConnections && ((connLookup.Count + pendingConnections.Count) < Config.ConnectionLimit || Config.ConnectionLimit == -1)) {
                 if (Config.AutoAcceptIncommingConnections) {
                   AcceptConnection(ep);
@@ -1039,58 +1048,70 @@ namespace UdpKit {
                   }
                 }
               } else {
-                SendRefusedCommand(ep);
+                SendRefusedCommand(ep, new UdpHandshakeResult());
               }
               break;
 
-            case UdpHandshakeResult.InvalidSize:
-              SendRefusedCommand(ep, UdpHandshakeResult.InvalidSize, -1);
+            case UdpHandshakeResultType.InvalidSize:
+              SendRefusedCommand(ep, handshake);
               break;
 
-            case UdpHandshakeResult.InvalidValue:
-              SendRefusedCommand(ep, UdpHandshakeResult.InvalidValue, -1);
+            case UdpHandshakeResultType.InvalidValue:
+              SendRefusedCommand(ep, handshake);
               break;
           }
-
         }
       }
     }
 
-    UdpHandshakeResult VerifyHandshake (UdpStream buffer, out int failedIndex) {
+    UdpHandshakeResult VerifyHandshake (UdpStream buffer) {
+      UdpLog.Info("performing handshake ...");
+
+      UdpHandshakeResult result = new UdpHandshakeResult();
       UdpAssert.Assert(handshakeBuffer.Length == handshakeSize);
 
       if (handshakeSize == 0 && buffer.Done) {
-        failedIndex = -1;
-        return UdpHandshakeResult.Success;
+        UdpLog.Info("handshake done (none)");
+        result.type = UdpHandshakeResultType.Success;
+        return result;
       }
 
       buffer.ReadByteArray(handshakeBuffer, 0, handshakeSize);
 
       if (buffer.Overflowing) {
-        failedIndex = -1;
-        return UdpHandshakeResult.InvalidSize;
+        UdpLog.Info("handshake failed (size - overflow)");
+        result.type = UdpHandshakeResultType.InvalidSize;
+        return result;
       }
 
       if (buffer.Done == false) {
-        failedIndex = -1;
-        return UdpHandshakeResult.InvalidSize;
+        UdpLog.Info("handshake failed (size - too large)");
+        result.type = UdpHandshakeResultType.InvalidSize;
+        return result;
       }
 
       int handshakeBufferOffset = 0;
 
       for (int i = 0; i < Config.HandshakeData.Length; ++i) {
+        int startBufferOffset = handshakeBufferOffset;
+
         for (int k = 0; k < Config.HandshakeData[i].Data.Length; ++k) {
           if (Config.HandshakeData[i].Data[k] != handshakeBuffer[handshakeBufferOffset]) {
-            failedIndex = i;
-            return UdpHandshakeResult.InvalidValue;
+            UdpLog.Info("handshake failed (value - {0})", Config.HandshakeData[i].Name);
+            result.type = UdpHandshakeResultType.InvalidValue;
+            result.failDataIndex = i;
+            result.failBufferOffset = startBufferOffset;
+            result.failBufferLength = Config.HandshakeData[i].Data.Length;
+            return result;
           }
 
           ++handshakeBufferOffset;
         }
       }
-
-      failedIndex = -1;
-      return UdpHandshakeResult.Success;
+      
+      UdpLog.Info("handshake success (value)");
+      result.type = UdpHandshakeResultType.Success;
+      return result;
     }
 
 #if CLOUD
