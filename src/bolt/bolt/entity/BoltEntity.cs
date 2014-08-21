@@ -20,7 +20,6 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   static uint _idCounter = 0;
 
-  uint _id;
   bool _attached;
 
   [SerializeField]
@@ -40,7 +39,8 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   [SerializeField]
   internal bool _clientPredicted = true;
-
+  
+  internal uint _id;
   internal Bits _mask;
   internal Bits _flags;
   internal BoltUniqueId _uniqueId;
@@ -95,15 +95,6 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// Id of this entity, this value is an ever increasing sequence
-  /// is guaranteed to be uqniue for every entity up until 2^32 entities
-  /// have spawned.
-  /// </summary>
-  public uint boltId {
-    get { return _id; }
-  }
-
-  /// <summary>
   /// How often this entity should be considered for packing by Bolt. 
   /// 1 means every packet, 2 means every other packet, etc.
   /// </summary>
@@ -118,11 +109,19 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get {
       if (boltIsOwner) {
         return _updateRate * BoltCore.localSendRate;
-      }
-      else {
+      } else {
         return _updateRate * BoltCore.remoteSendRate;
       }
     }
+  }
+
+  [Obsolete("This property is not used anyomre and always returns -1, use BoltEntity.uniqueId instead.")]
+  public int boltId {
+    get { return -1; }
+  }
+
+  public BoltUniqueId uniqueId {
+    get { return _uniqueId; }
   }
 
   /// <summary>
@@ -174,7 +173,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get { return _sceneObject; }
     internal set { _sceneObject = value; }
   }
-  
+
   public bool hasAuthority {
     get { return ReferenceEquals(_source, null); }
   }
@@ -201,12 +200,10 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get {
       if (ReferenceEquals(boltSource, null)) {
         return BoltCore._frame;
-      }
-      else {
+      } else {
         if (boltIsControlling && _clientPredicted) {
           return boltSource.remoteFrameLatest;
-        }
-        else {
+        } else {
           return boltSource.remoteFrame;
         }
       }
@@ -296,8 +293,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       _remoteController = cn;
       _remoteController._entityChannel.ForceSync(this);
 
-    }
-    else {
+    } else {
       BoltLog.Error("couldn't create {0} on {1}, control not given", this, cn);
     }
   }
@@ -459,7 +455,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   }
 
   public override string ToString () {
-    return string.Format("[Entity id={0} gameobject={1}]", boltId, gameObject.name);
+    return string.Format("[Entity id={0} gameobject={1}]", _id, gameObject.name);
   }
 
   internal void TakeControlInternal () {
@@ -488,7 +484,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _flags &= ~BoltEntity.FLAG_IS_CONTROLLING;
     _commands.Clear();
     _commandSequence = 0;
-    
+
     // call to user code (reverse order from control gained)
     _serializer.ControlLost();
 
@@ -514,8 +510,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       foreach (BoltEntityBehaviourBase sp in _entityBehaviours) {
         sp.SimulateProxy();
       }
-    }
-    else {
+    } else {
       Assert.True(boltIsOwner);
 
       _serializer.SimulateOwner();
@@ -726,7 +721,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _updateRate = Mathf.Max(1, _updateRate);
 
     // passing the parameter to GetComponentsInChildren as true makes sure we get disabled behaviours also
-    foreach (BoltEntityBehaviourBase behaviour in GetComponentsInChildren<BoltEntityBehaviourBase>(true)) { 
+    foreach (BoltEntityBehaviourBase behaviour in GetComponentsInChildren<BoltEntityBehaviourBase>(true)) {
       if ((behaviour is BoltEntitySerializer) == false) {
         _entityBehaviours.Add(behaviour);
       }

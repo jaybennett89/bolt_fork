@@ -45,7 +45,7 @@ partial class BoltEntityChannel : BoltChannel {
   public void ForceSync (BoltEntity en) {
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(en.boltId, out proxy)) {
+    if (_outgoingProxiesByEntityId.TryGetValue(en._id, out proxy)) {
       if (en.IsControlledBy(connection)) {
         proxy.mask = en.boltSerializer.controllerMask;
       } else {
@@ -59,7 +59,7 @@ partial class BoltEntityChannel : BoltChannel {
   public void SetIdle (BoltEntity entity, bool idle) {
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) {
+    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) {
       if (idle) {
         proxy.flags |= BoltEntityProxy.FLAG_IDLE;
       } else {
@@ -71,18 +71,18 @@ partial class BoltEntityChannel : BoltChannel {
   public uint GetNetworkId (BoltEntity entity) {
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) { return proxy.networkId; }
-    if (_incommingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) { return proxy.networkId; }
+    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return proxy.networkId; }
+    if (_incommingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return proxy.networkId; }
 
     return uint.MaxValue;
   }
 
   public bool ExistsOnRemote (BoltEntity entity) {
-    if (_incommingProxiesByEntityId.ContainsKey(entity.boltId)) { return true; }
+    if (_incommingProxiesByEntityId.ContainsKey(entity._id)) { return true; }
 
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) {
+    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) {
       const uint FLAGS =
         BoltEntityProxy.FLAG_CREATE |
         BoltEntityProxy.FLAG_CREATE_IN_PROGRESS |
@@ -96,17 +96,17 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   public bool MightExistOnRemote (BoltEntity entity) {
-    return _incommingProxiesByEntityId.ContainsKey(entity.boltId) || _outgoingProxiesByEntityId.ContainsKey(entity.boltId);
+    return _incommingProxiesByEntityId.ContainsKey(entity._id) || _outgoingProxiesByEntityId.ContainsKey(entity._id);
   }
 
   public void DestroyOnRemote (BoltEntity entity, BoltEntityDestroyMode mode) {
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) {
+    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) {
       // if this entity is being destroyed locally
       if (mode == BoltEntityDestroyMode.LocalDestroy) {
         // we should clear it from our entity id lookup table
-        _outgoingProxiesByEntityId.Remove(entity.boltId);
+        _outgoingProxiesByEntityId.Remove(entity._id);
 
         // and also null the entity on the proxy
         proxy.entity = null;
@@ -128,8 +128,8 @@ partial class BoltEntityChannel : BoltChannel {
   public bool CreateOnRemote (BoltEntity entity) {
     BoltEntityProxy proxy;
 
-    if (_incommingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) { return true; }
-    if (_outgoingProxiesByEntityId.TryGetValue(entity.boltId, out proxy)) { return true; }
+    if (_incommingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return true; }
+    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return true; }
 
     uint id;
 
@@ -146,7 +146,7 @@ partial class BoltEntityChannel : BoltChannel {
     proxy.mask = uint.MaxValue;
 
     _outgoingProxiesByNetworkId[proxy.networkId] = proxy;
-    _outgoingProxiesByEntityId[entity.boltId] = proxy;
+    _outgoingProxiesByEntityId[entity._id] = proxy;
 
     //BoltLog.Debug("created {0} on {1}", proxy, connection);
     return true;
@@ -349,7 +349,7 @@ partial class BoltEntityChannel : BoltChannel {
   public uint GetSkippedUpdates (BoltEntity en) {
     BoltEntityProxy proxy;
 
-    if (_outgoingProxiesByEntityId.TryGetValue(en.boltId, out proxy)) {
+    if (_outgoingProxiesByEntityId.TryGetValue(en._id, out proxy)) {
       return proxy.skipped;
     }
 
@@ -456,7 +456,7 @@ partial class BoltEntityChannel : BoltChannel {
           proxy.entity.enabled = true; // this allows the entity to be disabled in the prefab.
 
           _incommingProxiesByNetworkId[networkId] = proxy;
-          _incommingProxiesByEntityId[proxy.entity.boltId] = proxy;
+          _incommingProxiesByEntityId[proxy.entity._id] = proxy;
 
           proxy.entity.Attach(connection, BoltEntity.FLAG_IS_PROXY);
 
@@ -514,7 +514,7 @@ partial class BoltEntityChannel : BoltChannel {
   void DestroyIncommingProxy (BoltEntityProxy proxy) {
     Assert.NotNull(proxy.entity);
 
-    _incommingProxiesByEntityId.Remove(proxy.entity.boltId);
+    _incommingProxiesByEntityId.Remove(proxy.entity._id);
     _incommingProxiesByNetworkId[proxy.networkId] = null;
 
     // debugggggggg!

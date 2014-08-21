@@ -19,6 +19,7 @@ internal static class BoltCore {
   static internal BoltMapLoadOp _loadedMap;
   static internal BoltMapLoadOp _loadedMapTarget;
 
+  static internal uint _uid;
   static internal int _frame = 0;
   static internal byte[] _userAssemblyHash = null;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
@@ -210,7 +211,7 @@ internal static class BoltCore {
   }
 
   public static BoltEntity Attach (BoltEntity entity) {
-    entity.Attach(null, Bits.zero);
+    entity.Attach(null,  Bits.zero);
     return entity;
   }
 
@@ -564,6 +565,9 @@ internal static class BoltCore {
   }
 
   static void HandleConnected (UdpConnection udp) {
+    _uid = udp.uid;
+
+    BoltLog.Debug("connected as connection uid {0}", udp.uid);
     BoltConnection cn = new BoltConnection(udp);
 
     // put on connection list
@@ -708,6 +712,9 @@ internal static class BoltCore {
   }
 
   static void Initialize (BoltNetworkModes mode, UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
+    var isServer = mode == BoltNetworkModes.Server;
+    var isClient = mode == BoltNetworkModes.Client;
+
     // close any existing socket
     Shutdown();
 
@@ -780,15 +787,21 @@ internal static class BoltCore {
     _udpConfig.ConnectRequestTimeout = 1000;
 #endif
 
-    _udpConfig.ConnectionLimit = mode == BoltNetworkModes.Server ? config.serverConnectionLimit : 0;
-    _udpConfig.AllowIncommingConnections = mode == BoltNetworkModes.Server;
-    _udpConfig.AutoAcceptIncommingConnections = (mode == BoltNetworkModes.Server) && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
+    _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
+    _udpConfig.AllowIncommingConnections = isServer;
+    _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketSize = 1024;
     _udpConfig.UseAvailableEventEvent = false;
     _udpConfig.HandshakeData = new UdpHandshakeData[2];
     _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
     _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
+
+    if (isServer) {
+      _uid = 1;
+    } else {
+      _uid = 0;
+    }
 
     // create and start socket
     _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);

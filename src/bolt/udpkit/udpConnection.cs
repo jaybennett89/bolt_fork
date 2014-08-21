@@ -109,6 +109,13 @@
       get { return stats; }
     }
 
+    /// <summary>
+    /// Unique id for this connection
+    /// </summary>
+    public uint uid {
+      get { return id; }
+    }
+
     int mtu;
     float networkRtt = 0.1f;
     float aliasedRtt = 0.1f;
