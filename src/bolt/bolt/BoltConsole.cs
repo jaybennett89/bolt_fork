@@ -8,6 +8,7 @@ using UnityEngine;
 /// Renders a toggleable console at the top of the screen
 /// </summary>
 public class BoltConsole : MonoBehaviour {
+  [Obsolete("This property is not used anymore")]
   public static bool writable {
     get;
     set;
@@ -34,10 +35,6 @@ public class BoltConsole : MonoBehaviour {
   /// <param name="line">Text to write</param>
   /// <param name="color">Color of the text</param>
   public static void Write (string line, Color color) {
-    if (!writable) {
-      return;
-    }
-
     lock (_lock) {
       if (line.Contains("\r") || line.Contains("\n")) {
         foreach (string l in Regex.Split(line, "[\r\n]+")) {

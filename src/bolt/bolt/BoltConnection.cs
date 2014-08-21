@@ -161,7 +161,7 @@ public class BoltConnection : BoltObject {
   /// </summary>
   /// <param name="event">The event to raise</param>
   public void Raise (IBoltEvent @event) {
-    _eventChannel.Queue((BoltEvent) @event);
+    _eventChannel.Queue((BoltEventBase) @event);
   }
 
   ///// <summary>

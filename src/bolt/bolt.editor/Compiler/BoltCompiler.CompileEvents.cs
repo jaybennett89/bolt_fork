@@ -51,6 +51,10 @@ partial class BoltCompiler {
     using (BoltSourceFile file = new BoltSourceFile(op.eventFilePath)) {
       EmitFileHeader(file);
 
+      file.EmitScope("public abstract class BoltEvent : BoltEventBase", () => {
+        file.EmitLine("protected BoltEvent(ushort id, bool entity, BoltEventDeliveryMode mode) : base(id, entity, mode) { }");
+      });
+
       file.EmitScope("public abstract class BoltCallbacks : BoltCallbacksBase {0}", GetInterfaces(op.events, true), () => {
         EmitOnEventMethods(file, op.events, true);
       });
@@ -100,8 +104,7 @@ partial class BoltCompiler {
           file.EmitScope("public override void Pack (UdpStream stream, BoltConnection cn)", () => {
             if (evnt.id == ushort.MaxValue) {
               file.EmitLine("throw new NotSupportedException();");
-            }
-            else {
+            } else {
               foreach (BoltAssetProperty p in evnt.properties) {
                 EmitWrite(file, p, p.backingFieldName, "cn");
               }
@@ -112,8 +115,7 @@ partial class BoltCompiler {
           file.EmitScope("public override void Read (UdpStream stream, BoltConnection cn)", () => {
             if (evnt.id == ushort.MaxValue) {
               file.EmitLine("throw new NotSupportedException();");
-            }
-            else {
+            } else {
               foreach (BoltAssetProperty p in evnt.properties) {
                 EmitRead(file, p, p.backingFieldName, "cn");
               }
@@ -192,8 +194,7 @@ partial class BoltCompiler {
                 file.EmitScope("if (ReferenceEquals(_entity._source, cn))", () => {
                   if ((evnt.entityTarget & BoltAssetEventEntityTarget.Owner) == BoltAssetEventEntityTarget.Owner) {
                     file.EmitLine("return true;");
-                  }
-                  else if ((evnt.entityTarget & BoltAssetEventEntityTarget.Controller) == BoltAssetEventEntityTarget.Controller) {
+                  } else if ((evnt.entityTarget & BoltAssetEventEntityTarget.Controller) == BoltAssetEventEntityTarget.Controller) {
                     file.EmitLine("return true;");
                   }
                 });
@@ -250,8 +251,7 @@ partial class BoltCompiler {
             file.EmitScope("if (_entity.boltIsOwner)", () => {
               if ((evnt.entityTarget & BoltAssetEventEntityTarget.Owner) == BoltAssetEventEntityTarget.Owner) {
                 file.EmitLine("return true;");
-              }
-              else {
+              } else {
                 if ((evnt.entityTarget & BoltAssetEventEntityTarget.Controller) == BoltAssetEventEntityTarget.Controller) {
                   file.EmitLine("return _entity.boltIsControlling;");
                 }

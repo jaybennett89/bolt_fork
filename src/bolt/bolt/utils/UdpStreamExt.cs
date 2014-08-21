@@ -7,7 +7,7 @@ public static class UdpStreamExtensions {
       int length = Mathf.Min(array.Length, maxLength);
 
       if (length < array.Length) {
-        BoltLog.Warning("Only sendig {0}/{1} bytes from byte array", length, array.Length);
+        BoltLog.Warn("Only sendig {0}/{1} bytes from byte array", length, array.Length);
       }
 
       stream.WriteUShort((ushort) length);

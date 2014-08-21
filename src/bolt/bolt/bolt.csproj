@@ -75,6 +75,8 @@
     <Compile Include="BoltGlobalBehaviour.cs" />
     <Compile Include="BoltId.cs" />
     <Compile Include="BoltGUI.cs" />
+    <Compile Include="BoltLog2.cs" />
+    <Compile Include="BoltNetwork.cs" />
     <Compile Include="BoltObjectPool.cs" />
     <Compile Include="BoltOrigin.cs" />
     <Compile Include="collections\BoltIterator.cs" />
@@ -112,9 +114,8 @@
     <Compile Include="BoltConsole.cs" />
     <Compile Include="BoltException.cs" />
     <Compile Include="BoltExecutionOrder.cs" />
-    <Compile Include="BoltLog.cs" />
     <Compile Include="BoltRuntimeSettings.cs" />
-    <Compile Include="BoltCore.cs" />
+    <Compile Include="BoltNetworkÍnternal.cs" />
     <Compile Include="BoltObject.cs" />
     <Compile Include="BoltPacket.cs" />
     <Compile Include="BoltPacketPool.cs" />

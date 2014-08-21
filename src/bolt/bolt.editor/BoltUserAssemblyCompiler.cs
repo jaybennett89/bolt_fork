@@ -203,7 +203,7 @@ class BoltUserAssemblyCompiler {
       op.assemblyInfoFilePath = assemblyInfoFile;
 
       // events config
-      op.eventIdOffset = BoltEvent.USER_START_ID;
+      op.eventIdOffset = BoltEventBase.USER_START_ID;
       op.eventFilePath = eventsFile;
       op.events = BoltEditorUtils.FindAssets<BoltEventAsset>().ToList();
 

@@ -389,7 +389,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="event">The event to raise</param>
   public void Raise (IBoltEvent @event) {
-    BoltEvent evnt = (BoltEvent) @event;
+    BoltEventBase evnt = (BoltEventBase) @event;
 
     if (evnt._isEntityEvent == false) {
       throw new BoltException("you can't send global events to entities"); ;
@@ -400,7 +400,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     }
 
     evnt._entity = this;
-    BoltEvent.Invoke(evnt);
+    BoltEventBase.Invoke(evnt);
   }
 
   /// <summary>
@@ -598,7 +598,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     }
 
     if (!_serializer) {
-      BoltLog.Warning("no entity serializer specified for '{0}', trying to find one...", gameObject.name);
+      BoltLog.Warn("no entity serializer specified for '{0}', trying to find one...", gameObject.name);
       _serializer = GetComponentInChildren<BoltEntitySerializer>();
 
       if (!_serializer) {
@@ -790,7 +790,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   void OnDestroy () {
     if (_attached) {
-      BoltLog.Warning("{0} is being destroyed or disabled without being detached, forcing detach", this);
+      BoltLog.Warn("{0} is being destroyed or disabled without being detached, forcing detach", this);
 
       // force detach here
       Detach();

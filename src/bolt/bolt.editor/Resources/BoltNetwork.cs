@@ -7,7 +7,6 @@ using System.Security;
 using UdpKit;
 using UnityEngine;
 
-
 /// <summary>
 /// Holds global methods and properties for starting and s
 /// topping bolt, instantiating prefabs and other utils

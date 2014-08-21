@@ -2,7 +2,7 @@
 
 class BoltEventReliable : BoltObject, IBoltSequenced, IDisposable {
   public uint sequence { get; set; }
-  public BoltEvent evnt { get; set; }
+  public BoltEventBase evnt { get; set; }
 
   public void Dispose () {
     sequence = 0;

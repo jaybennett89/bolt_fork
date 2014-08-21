@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UdpKit;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 [InitializeOnLoad]
 public class BoltConnectionsWindow : EditorWindow {
-
   GUIStyle 
     boldLabel,
     detailsLabel;
@@ -56,10 +51,8 @@ public class BoltConnectionsWindow : EditorWindow {
 
     foreach (var c in BoltCore.connections) {
       GUILayout.BeginHorizontal(sceneStyle);
-
-
       GUILayout.Label(c.udpConnection.RemoteEndPoint.ToString(), GUI.skin.label, GUILayout.Width(150));
-      
+
       BoltAssetEditorGUI.DrawIcon("rtt");
       GUILayout.Label(Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f).ToString() + " ms");
 
@@ -71,15 +64,6 @@ public class BoltConnectionsWindow : EditorWindow {
 
       GUILayout.EndHorizontal();
     }
-
-
-    //BoltGUI.Table<BoltConnection>(BoltCore.connections, new BoltGUI.TableStyle { labelStyle = boldLabel, tableStyle = sceneStyle },
-    //  BoltGUI.Column<BoltConnection>("Address", c => GUILayout.Label(c.udpConnection.RemoteEndPoint.ToString(), GUI.skin.label)),
-    //  BoltGUI.Column<BoltConnection>("Ping (ms)", c => Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f)),
-    //  BoltGUI.Column<BoltConnection>("OUT (kb/s)", c => (c.bitsPerSecondOut >> 3) / 1000f),
-    //  BoltGUI.Column<BoltConnection>("IN (kb/s)", c => (c.bitsPerSecondIn >> 3) / 1000f),
-    //  BoltGUI.Column<BoltConnection>("", c => ConnectionButtons(c))
-    //);
   }
 
   void ConnectionButtons (BoltConnection c) {

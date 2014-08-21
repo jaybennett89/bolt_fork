@@ -38,12 +38,6 @@ partial class BoltCallbacksBase {
    
   public virtual void ServerLoadedMap(BoltConnection arg) { }
    
-  public virtual void StartBegin() { }
-   
-  public virtual void StartDone() { }
-   
-  public virtual void ShutdownBegin() { }
-   
 
    
   internal static void MapLoadBeginInvoke(string arg) { 
@@ -145,24 +139,6 @@ partial class BoltCallbacksBase {
   internal static void ServerLoadedMapInvoke(BoltConnection arg) { 
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ServerLoadedMap(arg);
-    }
-  }
-   
-  internal static void StartBeginInvoke() { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.StartBegin();
-    }
-  }
-   
-  internal static void StartDoneInvoke() { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.StartDone();
-    }
-  }
-   
-  internal static void ShutdownBeginInvoke() { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.ShutdownBegin();
     }
   }
    

@@ -11,12 +11,21 @@ public enum BoltConnectionAcceptMode {
   Manual,
 }
 
+public enum BoltConfigLogTargets {
+  Unity = 1,
+  Console = 2,
+  File = 4,
+  SystemOut = 8
+}
+
 [Serializable]
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public bool autoCreateConsole = true;
+  public bool logToConsole = true;
   public bool globalUniqueIds = false;
   public byte[] applicationGuid;
+  public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
   public int clientSendRate;
   public int clientDejitterDelay;

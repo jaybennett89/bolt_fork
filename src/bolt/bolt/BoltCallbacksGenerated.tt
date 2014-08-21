@@ -27,9 +27,6 @@ callbacks.Add(Tuple.Create<string, string>("ControlOfEntityGained", "BoltEntity"
 callbacks.Add(Tuple.Create<string, string>("ControlOfEntityLost", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("ClientLoadedMap", "BoltConnection"));
 callbacks.Add(Tuple.Create<string, string>("ServerLoadedMap", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("StartBegin", null));
-callbacks.Add(Tuple.Create<string, string>("StartDone", null));
-callbacks.Add(Tuple.Create<string, string>("ShutdownBegin", null));
 #>
 using UdpKit;
 using UnityEngine;

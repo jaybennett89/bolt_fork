@@ -5,7 +5,7 @@ using UnityEngine;
 class BoltEventDispatcher {
   internal List<MonoBehaviour> _targets = new List<MonoBehaviour>();
 
-  public void Dispatch (BoltEvent evnt, IBoltEventFactory handler) {
+  public void Dispatch (BoltEventBase evnt, IBoltEventFactory handler) {
     for (int i = 0; i < _targets.Count; ++i) {
       MonoBehaviour mb = _targets[i];
 
@@ -43,7 +43,7 @@ class BoltEventDispatcher {
   public void Register (MonoBehaviour behaviour) {
 #if DEBUG
     if (_targets.Contains(behaviour)) {
-      BoltLog.Warning("behaviour already registered for this dispatcher");
+      BoltLog.Warn("behaviour already registered for this dispatcher");
       return;
     }
 #endif

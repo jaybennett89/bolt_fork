@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using UdpKit;
 using UnityEngine;
-using Rand = System.Random;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 public enum BoltNetworkModes {
@@ -16,6 +15,7 @@ public enum BoltNetworkModes {
 
 internal static class BoltCore {
   static UdpSocket _udpSocket;
+  static Assembly _unityAssembly;
   static internal BoltMapLoadOp _loadedMap;
   static internal BoltMapLoadOp _loadedMapTarget;
 
@@ -23,8 +23,10 @@ internal static class BoltCore {
   static internal byte[] _userAssemblyHash = null;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
   static internal IBoltNetwork _autogen = null;
+
   static internal BoltConfig _config = null;
-  static internal BoltConfig _configCopy = null;
+  static internal UdpConfig _udpConfig = null;
+
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal BoltDoubleList<BoltEntityProxy> _proxies = new BoltDoubleList<BoltEntityProxy>();
   static internal BoltDoubleList<BoltEntity> _entities = new BoltDoubleList<BoltEntity>();
@@ -50,10 +52,6 @@ internal static class BoltCore {
   public static Func<Transform, int> resolveTransformId = BoltOrigin.ResolveTransformId;
   public static Action ShutdownComplete;
 
-  public static UdpConfig udpConfig {
-    get { return _udpSocket.ConfigCopy; }
-  }
-
   public static GameObject[] prefabs {
     get { return BoltRuntimeSettings.prefabs; }
   }
@@ -64,10 +62,6 @@ internal static class BoltCore {
 
   public static byte[] userAssemblyHash {
     get { return _userAssemblyHash; }
-  }
-
-  public static BoltConfig networkConfig {
-    get { return _configCopy; }
   }
 
   public static IEnumerable<BoltEntity> entities {
@@ -260,8 +254,6 @@ internal static class BoltCore {
       BoltLog.Info("shutting down");
 
       try {
-        BoltCallbacksBase.ShutdownBeginInvoke();
-
         // 
         _mode = BoltNetworkModes.None;
 
@@ -291,6 +283,7 @@ internal static class BoltCore {
         _udpSocket = null;
 
         BoltFactory.UnregisterAll();
+        BoltLog.RemoveAll();
 
       } finally {
         if (ShutdownComplete != null) {
@@ -318,15 +311,15 @@ internal static class BoltCore {
   }
 
   public static void Raise (IBoltEvent evnt) {
-    BoltEvent.Invoke((BoltEvent) evnt);
+    BoltEventBase.Invoke((BoltEventBase) evnt);
   }
 
   public static void Raise (IBoltEvent evnt, IEnumerable connections) {
-    BoltEvent.Invoke((BoltEvent) evnt, connections);
+    BoltEventBase.Invoke((BoltEventBase) evnt, connections);
   }
 
   public static void Raise (IBoltEvent evnt, params BoltConnection[] connections) {
-    BoltEvent.Invoke((BoltEvent) evnt, connections);
+    BoltEventBase.Invoke((BoltEventBase) evnt, connections);
   }
 
   public static void SetSessionData (string serverName, string userData) {
@@ -438,7 +431,7 @@ internal static class BoltCore {
     }
 
     if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
-      BoltLog.Warning("AcceptConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      BoltLog.Warn("AcceptConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
       return;
     }
 
@@ -452,7 +445,7 @@ internal static class BoltCore {
     }
 
     if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
-      BoltLog.Warning("RefuseConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      BoltLog.Warn("RefuseConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
       return;
     }
 
@@ -581,7 +574,7 @@ internal static class BoltCore {
       if (_loadedMapTarget.isValid) {
         cn.LoadMapOnClient(_loadedMapTarget);
       } else {
-        BoltLog.Warning("{0} connected without server having a map loading or loaded", cn);
+        BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
     }
 
@@ -655,7 +648,8 @@ internal static class BoltCore {
   }
 
   static internal void UpdateActiveGlobalBehaviours (string map) {
-    if (_config.autoCreateConsole) {
+    var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
+    if (useConsole) {
       CreateGlobalBehaviour(typeof(BoltConsole));
     } else {
       DeleteGlobalBehaviour(typeof(BoltConsole));
@@ -695,7 +689,7 @@ internal static class BoltCore {
       var shouldCreate = !component;
 
       if (shouldCreate) {
-        BoltLog.Debug("Creating Global {0}", t);
+        BoltLog.Debug("creating '{0}'", t);
         _globalBehaviourObject.AddComponent(t);
       }
     }
@@ -707,40 +701,54 @@ internal static class BoltCore {
       var shouldDelete = !!component;
 
       if (shouldDelete) {
-        BoltLog.Debug("Deleting Global {0}", t);
+        BoltLog.Debug("deleting '{0}'", t);
         Component.Destroy(component);
       }
     }
   }
 
   static void Initialize (BoltNetworkModes mode, UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
-    Time.fixedDeltaTime = 1f / (float) config.framesPerSecond;
+    // close any existing socket
+    Shutdown();
 
-    // :)
-    BoltLog.Debug("bolt starting at {0} fps / {1} frametime", config.framesPerSecond, Time.fixedDeltaTime);
+    // init loggers
+    var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
+    var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
+    var consoleLog = (config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
+    var systemOutLog = (config.logTargets & BoltConfigLogTargets.SystemOut) == BoltConfigLogTargets.SystemOut;
+
+    if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
+    if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
+    if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
+    if (fileLog) { BoltLog.Add(new BoltLog.File()); }
+
+    // set config
+    _config = config;
+
+    // set frametime
+    Time.fixedDeltaTime = 1f / (float) config.framesPerSecond;
 
     // set udpkits log writer
     UdpLog.SetWriter(UdpLogWriter);
 
-    // close any existing socket
-    Shutdown();
+    // :)
+    BoltLog.Debug("bolt starting at {0} fps / {1} frametime", config.framesPerSecond, Time.fixedDeltaTime);
 
     // locate global object types
     _userAssemblyHash = BoltRuntimeReflection.GetUserAssemblyHash();
+
+    // create the gflobal 'Bolt' unity object
+    if (_globalBehaviourObject) {
+      GameObject.Destroy(_globalBehaviourObject);
+    }
+
     _globalBehaviours = BoltRuntimeReflection.FindGlobalObjectTypes();
     _globalBehaviourObject = new GameObject("Bolt");
 
     GameObject.DontDestroyOnLoad(_globalBehaviourObject);
 
-    // callback
-    BoltCallbacksBase.StartBeginInvoke();
-
-    // setup config
-    _config = config;
-    _configCopy = _config.Clone();
-
     // unregister all handlers
-    BoltFactory.UnregisterAll();
+    Assert.True(BoltFactory.IsEmpty);
 
     // register our handlers
     BoltFactory.Register(new LoadMapFactory());
@@ -751,60 +759,54 @@ internal static class BoltCore {
     _autogen = autogen;
     _autogen.Setup();
 
-    // 
-    var handshakeData = new UdpHandshakeData[2];
-    handshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    handshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
-
-    // setup configuration
-    UdpConfig udpConfig = new UdpConfig {
-      ConnectionLimit = mode == BoltNetworkModes.Server ? config.serverConnectionLimit : 0,
+    // setup udpkit configuration
 #if DEBUG
-      ConnectionTimeout = 600000,
-      ConnectRequestAttempts = 100,
-      ConnectRequestTimeout = 1000,
-#else
-      ConnectionTimeout = 5000,
-      ConnectRequestAttempts = 10,
-      ConnectRequestTimeout = 1000,
-#endif
+    _udpConfig = new UdpConfig();
+    _udpConfig.ConnectionTimeout = 600000;
+    _udpConfig.ConnectRequestAttempts = 100;
+    _udpConfig.ConnectRequestTimeout = 1000;
 
-      AllowImplicitAccept = mode == BoltNetworkModes.Client,
-      AllowIncommingConnections = mode == BoltNetworkModes.Server,
-      AutoAcceptIncommingConnections = (mode == BoltNetworkModes.Server) && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto),
-      PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f),
-      PacketSize = 1024,
-      SimulatedLoss = Mathf.Clamp01(config.simulatedLoss),
-      SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1)),
-      SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1)),
-      UseAvailableEventEvent = false,
-      HandshakeData = handshakeData
-    };
+    _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
+    _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
+    _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
 
-#if DEBUG
     switch (config.simulatedRandomFunction) {
-      case BoltRandomFunction.PerlinNoise:
-        float x = UnityEngine.Random.value;
-        Stopwatch sw = Stopwatch.StartNew();
-        udpConfig.NoiseFunction = () => Mathf.PerlinNoise(x, (float) sw.Elapsed.TotalSeconds);
-        break;
-
-      case BoltRandomFunction.SystemRandom:
-        Rand rnd = new Rand();
-        udpConfig.NoiseFunction = () => (float) rnd.NextDouble();
-        break;
+      case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
+      case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
     }
+#else
+    _udpConfig.ConnectionTimeout = 5000;
+    _udpConfig.ConnectRequestAttempts = 10;
+    _udpConfig.ConnectRequestTimeout = 1000;
 #endif
+
+    _udpConfig.ConnectionLimit = mode == BoltNetworkModes.Server ? config.serverConnectionLimit : 0;
+    _udpConfig.AllowIncommingConnections = mode == BoltNetworkModes.Server;
+    _udpConfig.AutoAcceptIncommingConnections = (mode == BoltNetworkModes.Server) && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
+    _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
+    _udpConfig.PacketSize = 1024;
+    _udpConfig.UseAvailableEventEvent = false;
+    _udpConfig.HandshakeData = new UdpHandshakeData[2];
+    _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
 
     // create and start socket
-    _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), udpConfig);
+    _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(null);
+  }
 
-    // call out to user
-    BoltCallbacksBase.StartDoneInvoke();
+  static UdpNoise CreatePerlinNoise () {
+    var x = UnityEngine.Random.value;
+    var s = Stopwatch.StartNew();
+    return () => Mathf.PerlinNoise(x, (float) s.Elapsed.TotalSeconds);
+  }
+
+  static UdpNoise CreateRandomNoise () {
+    var r = new System.Random();
+    return () => (float) r.NextDouble();
   }
 
   static void UdpLogWriter (uint level, string message) {
@@ -822,7 +824,7 @@ internal static class BoltCore {
         break;
 
       case UdpLog.WARN:
-        BoltLog.Warning(message);
+        BoltLog.Warn(message);
         break;
 
       case UdpLog.ERROR:

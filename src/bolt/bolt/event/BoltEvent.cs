@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UdpKit;
 
-internal abstract class BoltEventS2C : BoltEvent {
+internal abstract class BoltEventS2C : BoltEventBase {
   protected internal BoltEventS2C (ushort id)
     : base(id, false, BoltEventDeliveryMode.Reliable) {
   }
@@ -18,7 +18,7 @@ internal abstract class BoltEventS2C : BoltEvent {
   }
 }
 
-internal abstract class BoltEventC2S : BoltEvent {
+internal abstract class BoltEventC2S : BoltEventBase {
   protected internal BoltEventC2S (ushort id)
     : base(id, false, BoltEventDeliveryMode.Reliable) {
   }
@@ -33,7 +33,7 @@ internal abstract class BoltEventC2S : BoltEvent {
   }
 }
 
-internal abstract class BoltEventANY : BoltEvent {
+internal abstract class BoltEventANY : BoltEventBase {
   protected internal BoltEventANY (ushort id)
     : base(id, false, BoltEventDeliveryMode.Reliable) {
   }
@@ -51,7 +51,7 @@ internal abstract class BoltEventANY : BoltEvent {
 /// <summary>
 /// Base class for all events
 /// </summary>
-public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
+public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
   internal const int USER_START_ID = 16;
   internal const int RELIABLE_WINDOW_BITS = 6;
   internal const int RELIABLE_SEQUENCE_BITS = 8;
@@ -68,7 +68,7 @@ public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
   internal BoltConnection _connection;
   internal BoltEventDeliveryMode _deliveryMode;
 
-  protected internal BoltEvent (ushort id, bool entity, BoltEventDeliveryMode mode) {
+  protected internal BoltEventBase (ushort id, bool entity, BoltEventDeliveryMode mode) {
     _id = id;
     _isEntityEvent = entity;
     _deliveryMode = mode;
@@ -94,8 +94,8 @@ public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
   /// </summary>
   public abstract void Free ();
 
-  public virtual BoltEvent Clone () {
-    return (BoltEvent) MemberwiseClone();
+  public virtual BoltEventBase Clone () {
+    return (BoltEventBase) MemberwiseClone();
   }
 
   /// <summary>
@@ -148,11 +148,11 @@ public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
     _refCount += 1;
   }
 
-  internal static void Invoke (BoltEvent evnt) {
+  internal static void Invoke (BoltEventBase evnt) {
     Invoke(evnt, BoltCore._connections.GetIterator());
   }
 
-  internal static void Invoke (BoltEvent evnt, BoltIterator<BoltConnection> connections) {
+  internal static void Invoke (BoltEventBase evnt, BoltIterator<BoltConnection> connections) {
     Assert.True(evnt._refCount > 0);
 
     if (evnt.FilterInvoke()) {
@@ -167,7 +167,7 @@ public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
     evnt.Dispose();
   }
 
-  internal static void Invoke (BoltEvent evnt, IEnumerable connections) {
+  internal static void Invoke (BoltEventBase evnt, IEnumerable connections) {
     Assert.True(evnt._refCount > 0);
 
     if (evnt.FilterInvoke()) {
@@ -182,7 +182,7 @@ public abstract class BoltEvent : BoltObject, IDisposable, IBoltEvent {
     evnt.Dispose();
   }
 
-  static void Call (BoltEvent evnt) {
+  static void Call (BoltEventBase evnt) {
     Assert.True(evnt._refCount > 0);
     IBoltEventFactory handler = BoltFactory.GetEventFactory(evnt._id);
 

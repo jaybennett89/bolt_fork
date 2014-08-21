@@ -88,7 +88,7 @@ class BoltEntityProxy : BoltObject {
   public BoltRingBuffer<BoltEntityProxyEnvelope> envelopes;
 
   public BoltEntityProxy () {
-    envelopes = new BoltRingBuffer<BoltEntityProxyEnvelope>(BoltCore.udpConfig.PacketWindow);
+    envelopes = new BoltRingBuffer<BoltEntityProxyEnvelope>(BoltCore._udpConfig.PacketWindow);
   }
 
   public BoltEntityProxyEnvelope CreateEnvelope () {

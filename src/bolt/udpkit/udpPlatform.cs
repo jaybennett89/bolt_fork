@@ -1,10 +1,4 @@
 ﻿namespace UdpKit {
-  public enum UdpSocketPlatformError {
-    None = 0,
-    Unknown = 1,
-    WouldBlock = 2
-  }
-
   public abstract class UdpPlatform {
     public abstract UdpEndPoint EndPoint { get; }
     public abstract string PlatformErrorString { get; }
