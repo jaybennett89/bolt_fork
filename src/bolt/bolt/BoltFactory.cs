@@ -11,6 +11,17 @@ public static class BoltFactory {
   static Dictionary<Type, IBoltCommandFactory> _cmdFactoryByType = new Dictionary<Type, IBoltCommandFactory>();
   static Dictionary<ushort, IBoltCommandFactory> _cmdFactoryById = new Dictionary<ushort, IBoltCommandFactory>();
 
+  public static bool IsEmpty {
+    get {
+      return
+        _stateFactoryByType.Count == 0 &&
+        _eventFactoryByType.Count == 0 &&
+        _eventFactoryById.Count == 0 &&
+        _cmdFactoryByType.Count == 0 &&
+        _cmdFactoryById.Count == 0;
+    }
+  }
+
   /// <summary>
   /// Creates a new event of type T, which has to be an interface
   /// which inherits from IBoltEvent
@@ -50,7 +61,7 @@ public static class BoltFactory {
     IBoltEventFactory f;
 
     if (_eventFactoryByType.TryGetValue(t, out f)) {
-      BoltEvent evnt = (BoltEvent) f.Create();
+      BoltEventBase evnt = (BoltEventBase) f.Create();
       evnt.RefCountIncrement();
 
       return (IBoltEvent) (object) evnt;
@@ -107,7 +118,7 @@ public static class BoltFactory {
     _cmdFactoryById.Add(factory.commandId, factory);
     _cmdFactoryByType.Add(factory.commandType, factory);
   }
-  
+
   /// <summary>
   /// Registers a new event factory, this has to be done in the BoltCallback.IStartDone callback. This allows
   /// you to register custom event types which are not compiled through an event asset.
@@ -139,11 +150,11 @@ public static class BoltFactory {
     throw new BoltException("unknown command id {0}", id);
   }
 
-  internal static BoltEvent NewEvent (ushort id) {
+  internal static BoltEventBase NewEvent (ushort id) {
     IBoltEventFactory handler;
 
     if (_eventFactoryById.TryGetValue(id, out handler)) {
-      BoltEvent evnt = (BoltEvent) handler.Create();
+      BoltEventBase evnt = (BoltEventBase) handler.Create();
       evnt.RefCountIncrement();
       return evnt;
     }

@@ -6,24 +6,24 @@ class BoltEventChannel : BoltChannel {
   BoltSendBuffer<BoltEventReliable> _reliableSend;
   BoltRecvBuffer<BoltEventReliable> _reliableRecv;
 
-  Queue<BoltEvent> _unreliableSend;
-  Queue<BoltEvent> _unreliableRecv;
+  Queue<BoltEventBase> _unreliableSend;
+  Queue<BoltEventBase> _unreliableRecv;
 
-  Queue<BoltEvent> _unreliableSyncedSend;
-  Queue<BoltEvent> _unreliableSyncedRecv;
+  Queue<BoltEventBase> _unreliableSyncedSend;
+  Queue<BoltEventBase> _unreliableSyncedRecv;
 
   public BoltEventChannel () {
-    _reliableSend = new BoltSendBuffer<BoltEventReliable>(BoltEvent.RELIABLE_WINDOW_BITS, BoltEvent.RELIABLE_SEQUENCE_BITS);
-    _reliableRecv = new BoltRecvBuffer<BoltEventReliable>(BoltEvent.RELIABLE_WINDOW_BITS, BoltEvent.RELIABLE_SEQUENCE_BITS);
+    _reliableSend = new BoltSendBuffer<BoltEventReliable>(BoltEventBase.RELIABLE_WINDOW_BITS, BoltEventBase.RELIABLE_SEQUENCE_BITS);
+    _reliableRecv = new BoltRecvBuffer<BoltEventReliable>(BoltEventBase.RELIABLE_WINDOW_BITS, BoltEventBase.RELIABLE_SEQUENCE_BITS);
 
-    _unreliableSend = new Queue<BoltEvent>();
-    _unreliableRecv = new Queue<BoltEvent>();
+    _unreliableSend = new Queue<BoltEventBase>();
+    _unreliableRecv = new Queue<BoltEventBase>();
 
-    _unreliableSyncedSend = new Queue<BoltEvent>();
-    _unreliableSyncedRecv = new Queue<BoltEvent>();
+    _unreliableSyncedSend = new Queue<BoltEventBase>();
+    _unreliableSyncedRecv = new Queue<BoltEventBase>();
   }
 
-  public void Queue (BoltEvent evnt) {
+  public void Queue (BoltEventBase evnt) {
     Assert.True(evnt._refCount > 0);
 
     if (evnt.FilterSend(connection)) {
@@ -33,7 +33,7 @@ class BoltEventChannel : BoltChannel {
           reliable.evnt = evnt;
 
           if (_reliableSend.TryEnqueue(reliable) == false) {
-            BoltLog.Warning("reliable event send queue for {0} is full, disconnecting", connection);
+            BoltLog.Warn("reliable event send queue for {0} is full, disconnecting", connection);
             connection.Disconnect();
           }
           break;
@@ -104,7 +104,7 @@ class BoltEventChannel : BoltChannel {
 
     // throw away frame synced events which could not be sent
     if (_unreliableSyncedSend.Count > 0) {
-      BoltLog.Warning("could not send all frame synced events, {0} events will be disposed", _unreliableSyncedSend.Count);
+      BoltLog.Warn("could not send all frame synced events, {0} events will be disposed", _unreliableSyncedSend.Count);
 
       while (_unreliableSyncedSend.Count > 0) {
         _unreliableSyncedSend.Dequeue().Dispose();
@@ -113,7 +113,7 @@ class BoltEventChannel : BoltChannel {
 
     // warn if we have any unsent unreliable events
     if (_unreliableSend.Count > 0) {
-      BoltLog.Warning("could not send all unreliable events, {0} events remain in queue", _unreliableSend.Count);
+      BoltLog.Warn("could not send all unreliable events, {0} events remain in queue", _unreliableSend.Count);
     }
   }
 
@@ -139,7 +139,7 @@ class BoltEventChannel : BoltChannel {
     // read unreliable synced events
     {
       while (packet.stream.CanRead()) {
-        BoltEvent evnt;
+        BoltEventBase evnt;
 
         if (ReadUnreliableEvent(packet, out evnt)) {
           _unreliableSyncedRecv.Enqueue(evnt);
@@ -153,7 +153,7 @@ class BoltEventChannel : BoltChannel {
     // read unreliable events
     {
       while (packet.stream.CanRead()) {
-        BoltEvent evnt;
+        BoltEventBase evnt;
 
         if (ReadUnreliableEvent(packet, out evnt)) {
           _unreliableRecv.Enqueue(evnt);
@@ -200,7 +200,7 @@ class BoltEventChannel : BoltChannel {
       BoltEventReliable reliable;
 
       while (_reliableRecv.TryRemove(out reliable)) {
-        BoltEvent.Invoke(reliable.evnt);
+        BoltEventBase.Invoke(reliable.evnt);
 
         reliable.evnt = null;
         reliable.Dispose();
@@ -210,15 +210,15 @@ class BoltEventChannel : BoltChannel {
     // invoke unreliable events
     {
       while (_unreliableRecv.Count > 0) {
-        BoltEvent evnt = _unreliableRecv.Dequeue();
+        BoltEventBase evnt = _unreliableRecv.Dequeue();
         evnt.GrabEntity(connection);
-        BoltEvent.Invoke(evnt);
+        BoltEventBase.Invoke(evnt);
       }
     }
 
     // grab entity objects for frame synced events
     {
-      foreach (BoltEvent evnt in _unreliableSyncedRecv) {
+      foreach (BoltEventBase evnt in _unreliableSyncedRecv) {
         evnt.GrabEntity(connection);
       }
     }
@@ -230,19 +230,19 @@ class BoltEventChannel : BoltChannel {
       while (_unreliableSyncedRecv.Count > 0) {
 
         if (_unreliableSyncedRecv.Peek()._frame == connection.remoteFrame) {
-          BoltEvent evnt = _unreliableSyncedRecv.Dequeue();
-          BoltLog.Warning("invoking {0} on correct frame ({1})", evnt, evnt._frame);
-          BoltEvent.Invoke(evnt);
+          BoltEventBase evnt = _unreliableSyncedRecv.Dequeue();
+          BoltLog.Warn("invoking {0} on correct frame ({1})", evnt, evnt._frame);
+          BoltEventBase.Invoke(evnt);
 
         } else if (_unreliableSyncedRecv.Peek()._frame < connection.remoteFrame) {
-          BoltEvent evnt = _unreliableSyncedRecv.Dequeue();
-          BoltLog.Warning("invoking {0} on invalid frame (expected: {1}, was: {2})", evnt, evnt._frame, connection.remoteFrame);
-          BoltEvent.Invoke(evnt);
+          BoltEventBase evnt = _unreliableSyncedRecv.Dequeue();
+          BoltLog.Warn("invoking {0} on invalid frame (expected: {1}, was: {2})", evnt, evnt._frame, connection.remoteFrame);
+          BoltEventBase.Invoke(evnt);
 
         } else {
           if (_unreliableSyncedRecv.Peek()._frame - BoltCore.localInterpolationDelayMax > connection.remoteFrame) {
-            BoltEvent evnt = _unreliableSyncedRecv.Dequeue();
-            BoltLog.Warning("disposing of uninvokved {0} as frame is out of sync (expected: {1}, was: {2})", evnt, connection.remoteFrame + BoltCore.localInterpolationDelayMax, evnt._frame);
+            BoltEventBase evnt = _unreliableSyncedRecv.Dequeue();
+            BoltLog.Warn("disposing of uninvokved {0} as frame is out of sync (expected: {1}, was: {2})", evnt, connection.remoteFrame + BoltCore.localInterpolationDelayMax, evnt._frame);
             evnt.Dispose();
           }
           break;
@@ -251,7 +251,7 @@ class BoltEventChannel : BoltChannel {
     }
   }
 
-  bool PackUnreliableEvent (BoltPacket packet, BoltEvent evnt) {
+  bool PackUnreliableEvent (BoltPacket packet, BoltEventBase evnt) {
     int pos = packet.stream.Position;
 
     Assert.True(evnt._refCount > 0);
@@ -302,7 +302,7 @@ class BoltEventChannel : BoltChannel {
     }
   }
 
-  bool ReadUnreliableEvent (BoltPacket packet, out BoltEvent evnt) {
+  bool ReadUnreliableEvent (BoltPacket packet, out BoltEventBase evnt) {
     Assert.False(packet.stream.Overflowing);
 
     if (packet.stream.ReadBool() == false) {
@@ -333,7 +333,7 @@ class BoltEventChannel : BoltChannel {
   }
 
 
-  bool PackReliableEvent (BoltPacket packet, BoltEvent evnt, uint sequence) {
+  bool PackReliableEvent (BoltPacket packet, BoltEventBase evnt, uint sequence) {
     int pos = packet.stream.Position;
     Assert.True(evnt._refCount > 0);
 

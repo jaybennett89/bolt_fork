@@ -7,7 +7,7 @@ public static class UdpStreamExtensions {
       int length = Mathf.Min(array.Length, maxLength);
 
       if (length < array.Length) {
-        BoltLog.Warning("Only sendig {0}/{1} bytes from byte array", length, array.Length);
+        BoltLog.Warn("Only sendig {0}/{1} bytes from byte array", length, array.Length);
       }
 
       stream.WriteUShort((ushort) length);
@@ -491,6 +491,17 @@ public static class UdpStreamExtensions {
       networkId = uint.MaxValue;
       return null;
     }
+  }
+
+  public static void WriteUniqueId (this UdpStream stream, BoltUniqueId id) {
+    stream.WriteUInt(id.peer.id);
+    stream.WriteUInt(id.obj.id);
+  }
+
+  public static BoltUniqueId ReadUniqueId (this UdpStream stream) {
+    uint peerId = stream.ReadUInt();
+    uint objId = stream.ReadUInt();
+    return new BoltUniqueId(new BoltPeerId(peerId), new BoltObjectId(peerId));
   }
 
   public static void WriteStopMarker (this UdpStream stream) {

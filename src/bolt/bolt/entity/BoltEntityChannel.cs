@@ -134,7 +134,7 @@ partial class BoltEntityChannel : BoltChannel {
     uint id;
 
     if (_outgoingProxiesNetworkIdPool.Acquire(out id) == false) {
-      BoltLog.Warning("{0} is already proxying the max amount of objects", connection);
+      BoltLog.Warn("{0} is already proxying the max amount of objects", connection);
       return false;
     }
 

@@ -15,11 +15,19 @@ public struct BoltObjectId {
 }
 
 public struct BoltUniqueId {
-  public readonly BoltPeerId peerId;
-  public readonly BoltObjectId objectId;
+  public readonly BoltPeerId peer;
+  public readonly BoltObjectId obj;
 
   internal BoltUniqueId (BoltPeerId peerId, BoltObjectId objectId) {
-    this.peerId = peerId;
-    this.objectId = objectId;
+    this.peer = peerId;
+    this.obj = objectId;
+  }
+
+  public static bool operator ==(BoltUniqueId l, BoltUniqueId r) {
+    return l.peer.id == r.peer.id && l.obj.id == r.obj.id;
+  }
+
+  public static bool operator !=(BoltUniqueId l, BoltUniqueId r) {
+    return l.peer.id != r.peer.id || l.obj.id != r.obj.id;
   }
 }

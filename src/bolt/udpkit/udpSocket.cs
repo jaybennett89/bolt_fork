@@ -54,6 +54,7 @@ namespace UdpKit {
 
     int handshakeSize = 0;
     byte[] handshakeBuffer = null;
+    uint connectionNumberCounter = 0;
 
     volatile int frame;
     volatile UdpSocketMode mode;
@@ -1108,7 +1109,7 @@ namespace UdpKit {
           ++handshakeBufferOffset;
         }
       }
-      
+
       UdpLog.Info("handshake success (value)");
       result.type = UdpHandshakeResultType.Success;
       return result;
