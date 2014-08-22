@@ -44,3 +44,6 @@ src/bolt.unity/Assets/bolt/assemblies/udpkit.meta
 src/bolt.unity/Assets/bolt/assemblies/udpkit/udpkit.dll
 src/bolt.unity/Assets/bolt/assemblies/udpkit/udpkit.dll.meta
 src/bolt.unity/Assets/Plugins/Android/libudpkit_android.so
+src/bolt.unity/Assets/Plugins/Android/libudpkit_android.so.meta
+src/bolt.unity/Assets/Plugins/Android.meta
+src/bolt.unity/Assets/Plugins.meta
