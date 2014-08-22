@@ -40,7 +40,8 @@ static partial class BoltCompiler {
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Vector4, typeof(Vector4).CSharpName());
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Quaternion, typeof(Quaternion).CSharpName());
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Entity, typeof(BoltEntity).CSharpName());
-
+    
+    file.EmitLine("using {0} = {1};", BoltAssetPropertyType.UniqueId, typeof(BoltUniqueId).CSharpName());
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Custom, typeof(IBoltStateProperty).CSharpName());
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Mecanim, typeof(IBoltStateProperty).CSharpName());
     file.EmitLine("using {0} = {1};", BoltAssetPropertyType.Transform, typeof(IBoltStateProperty).CSharpName());
@@ -59,6 +60,16 @@ static partial class BoltCompiler {
     string expr = string.Format(valexpr, p.name);
 
     switch (p.type) {
+
+      case BoltAssetPropertyType.UniqueId:
+        if (write) {
+          file.EmitLine("stream.WriteUniqueId({0});", expr);
+        } else {
+          
+          file.EmitLine("{0} = stream.ReadUniqueId();", expr);
+        }
+        break;
+
       case BoltAssetPropertyType.ByteArray:
         if (write) {
           file.EmitLine("stream.WriteByteArraySimple({0}, 256);", expr);
