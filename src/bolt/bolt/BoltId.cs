@@ -1,21 +1,26 @@
 ﻿public struct BoltUniqueId {
   public readonly uint peer;
-  public readonly uint obj;
+  public readonly uint entity;
 
-  internal BoltUniqueId (uint peerId, uint objectId) {
-    this.peer = peerId;
-    this.obj = objectId;
+  internal BoltUniqueId (uint peer, uint entity) {
+    this.peer = peer;
+    this.entity = entity;
   }
 
   public override string ToString () {
-    return string.Format("[Id peer={0} object={1}]", peer, obj);
+    if (peer == 0) {
+      Assert.True(entity == 0);
+      return "[Id NULL]";
+    }
+
+    return string.Format("[Id peer={0} entity={1}]", peer, entity);
   }
 
   public static bool operator ==(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer == r.peer && l.obj == r.obj;
+    return l.peer == r.peer && l.entity == r.entity;
   }
 
   public static bool operator !=(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer != r.peer || l.obj != r.obj;
+    return l.peer != r.peer || l.entity != r.entity;
   }
 }

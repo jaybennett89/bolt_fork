@@ -498,7 +498,7 @@ public static class UdpStreamExtensions {
       stream.WriteUInt(id.peer);
     }
 
-    stream.WriteUInt(id.obj);
+    stream.WriteUInt(id.entity);
   }
 
   public static BoltUniqueId ReadUniqueId (this UdpStream stream) {
