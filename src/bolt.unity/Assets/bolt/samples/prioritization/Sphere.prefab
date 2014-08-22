@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefabId: 0
-  _serializer: {fileID: 11400002}
+  _serializer: {fileID: 0}
   _persistanceMode: 0
   _updateRate: 1
   _sceneObject: 0
