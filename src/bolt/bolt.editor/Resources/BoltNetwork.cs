@@ -171,6 +171,10 @@ public static partial class BoltNetwork {
     BoltCore.Destroy(gameobject);
   }
 
+  public static BoltEntity FindEntity (BoltUniqueId id) {
+    return BoltCore.FindEntity(id);
+  }
+
   /// <summary>
   /// Load a map asset
   /// </summary>
