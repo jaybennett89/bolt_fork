@@ -21,6 +21,11 @@ MonoBehaviour:
   - {fileID: 100102, guid: cb85761c21278dc42b8af0c82ba2af6d, type: 2}
   _config:
     framesPerSecond: 60
+    autoCreateConsole: 1
+    logToConsole: 1
+    globalUniqueIds: 0
+    applicationGuid: b8abbb2374bc614294dcb527b1882216
+    logTargets: -1
     clientSendRate: 3
     clientDejitterDelay: 6
     clientDejitterDelayMin: 0
@@ -42,5 +47,5 @@ MonoBehaviour:
     simulatedRandomFunction: 0
   debugClientCount: 1
   debugStartPort: 55671
-  debugStartMapName: 
+  debugStartMapName: Sample_RootMotion
   debugEditorMode: 1
