@@ -109,6 +109,13 @@
       get { return stats; }
     }
 
+    /// <summary>
+    /// Unique id for this connection
+    /// </summary>
+    public uint uid {
+      get { return id; }
+    }
+
     int mtu;
     float networkRtt = 0.1f;
     float aliasedRtt = 0.1f;
@@ -127,6 +134,7 @@
     uint connectTimeout;
     uint connectAttempts;
 
+    internal uint id;
     internal UdpSocket socket;
     internal UdpConnectionState state;
 
@@ -340,6 +348,16 @@
       }
     }
 
+    internal void SendAcceptedCommand () {
+      if (CheckCanSend(true) == UdpSendFailReason.None) {
+        UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
+        stream.WriteByte((byte) UdpCommandType.Accepted, 8);
+        stream.WriteUInt(id);
+
+        WriteCommandHeaderAndSend(stream, socket);
+      }
+    }
+
     internal void SendConnectCommand () {
       if (CheckCanSend(true) == UdpSendFailReason.None) {
         UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
@@ -483,7 +501,7 @@
         UdpLog.Info("connected to {0} ({1})", endpoint.ToString(), mode);
 
         if (IsServer) {
-          SendSimpleCommand(UdpCommandType.Accepted);
+          SendAcceptedCommand();
         }
 
         socket.Raise(UdpEvent.PUBLIC_CONNECTED, this);
@@ -507,7 +525,7 @@
     void OnCommandConnect (UdpStream buffer) {
       if (IsServer) {
         if (CheckState(UdpConnectionState.Connected)) {
-          SendSimpleCommand(UdpCommandType.Accepted);
+          SendAcceptedCommand();
         }
       } else {
         ConnectionError(UdpConnectionError.IncorrectCommand);
@@ -516,7 +534,12 @@
 
     void OnCommandAccepted (UdpStream buffer) {
       if (IsClient) {
+        uint remoteId = buffer.ReadUInt();
+
         if (CheckState(UdpConnectionState.Connecting)) {
+          UdpLog.Debug("connection to {0} accepted with id {1}", RemoteEndPoint, remoteId);
+
+          id = remoteId;
           ChangeState(UdpConnectionState.Connected);
         }
       } else {

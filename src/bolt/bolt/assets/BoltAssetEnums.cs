@@ -72,7 +72,8 @@ public enum BoltAssetPropertyType {
   Mecanim,
   Custom,
   Trigger,
-  ByteArray
+  ByteArray,
+  UniqueId
 }
 
 public enum BoltAssetQuaternionMode {

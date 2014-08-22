@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: -467024293, guid: a6c37f8d9bde2ac45bf14bc232ed017c, type: 3}
   m_Name: SphereState
   m_EditorClassIdentifier: 
-  compile: 1
+  compile: 0
   tranform:
     name: transform
     enabled: 1

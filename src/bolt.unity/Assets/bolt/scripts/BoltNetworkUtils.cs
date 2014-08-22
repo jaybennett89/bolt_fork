@@ -26,7 +26,7 @@ public static class BoltNetworkUtils {
       return UdpPlatformManaged.FindBroadcastAddress();
 #endif
     } catch (Exception exn) {
-      BoltLog.Warning("FindBroadcastAddress threw exception: '{0}' {1}, using 255.255.255.255", exn.GetType().FullName, exn.Message);
+      BoltLog.Warn("FindBroadcastAddress threw exception: '{0}' {1}, using 255.255.255.255", exn.GetType().FullName, exn.Message);
       return new UdpIPv4Address(255, 255, 255, 255);
     }
   }

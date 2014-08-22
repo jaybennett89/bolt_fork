@@ -115,7 +115,7 @@
     <Compile Include="BoltException.cs" />
     <Compile Include="BoltExecutionOrder.cs" />
     <Compile Include="BoltRuntimeSettings.cs" />
-    <Compile Include="BoltNetworkÍnternal.cs" />
+    <Compile Include="BoltNetworkCore.cs" />
     <Compile Include="BoltObject.cs" />
     <Compile Include="BoltPacket.cs" />
     <Compile Include="BoltPacketPool.cs" />
