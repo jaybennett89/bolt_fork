@@ -218,25 +218,29 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate (GameObject prefab, Vector3 position, Quaternion rotation) {
     prefab.GetComponent<BoltEntity>()._sceneObject = false;
-
     GameObject go = (GameObject) GameObject.Instantiate(prefab, position, rotation);
+    return Attach(go.GetComponent<BoltEntity>(), null, Bits.zero, GenerateUniqueId());
+  }
+
+  public static BoltEntity Attach (BoltEntity entity) {
+    entity.Attach(null, Bits.zero, GenerateUniqueId());
+    return entity;
+  }
+
+  static BoltUniqueId GenerateUniqueId () {
     BoltUniqueId id = new BoltUniqueId();
 
     if (_config.globalUniqueIds) {
       id = new BoltUniqueId(_uid, ++_uidEntityCounter);
     }
 
-    return Attach(go.GetComponent<BoltEntity>(), null, Bits.zero, id);
-  }
 
-  public static BoltEntity Attach (BoltEntity entity) {
-    entity.Attach(null, Bits.zero);
-    return entity;
+    return id;
   }
 
   internal static BoltEntity Attach (BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     entity.enabled = true;
-    entity.Attach(source, flags);
+    entity.Attach(source, flags, uniqueId);
 
     return entity;
   }

@@ -587,7 +587,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _serializer.AfterStep();
   }
 
-  internal void Attach (BoltConnection source, Bits flags) {
+  internal void Attach (BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     if (_attached) {
       return;
     }
@@ -607,6 +607,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
     _flags = flags;
     _source = source;
+    _uniqueId = uniqueId;
 
     // set persistance flag
     if (_persistanceMode == BoltEntityPersistanceMode.PersistOnLoad) {

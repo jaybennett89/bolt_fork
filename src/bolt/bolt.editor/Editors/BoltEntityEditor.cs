@@ -20,7 +20,6 @@ public class BoltEntityEditor : Editor {
     }
 
     if (prefabType == PrefabType.Prefab || prefabType == PrefabType.PrefabInstance) {
-
       // Scene object
       EditorGUI.BeginDisabledGroup(true);
       EditorGUILayout.Toggle("Scene Object", entity.boltIsSceneObject);
@@ -68,8 +67,6 @@ public class BoltEntityEditor : Editor {
       }
 
       EditorGUI.EndDisabledGroup();
-    } else {
-      EditorGUILayout.HelpBox("It's not possible to drop entity prefabs in the scene, they need to be instantiated during runtime", MessageType.Warning);
     }
   }
 }
