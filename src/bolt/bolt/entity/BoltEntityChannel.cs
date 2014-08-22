@@ -374,10 +374,14 @@ partial class BoltEntityChannel : BoltChannel {
 
       packet.stream.WriteBool(ReferenceEquals(proxy.entity._remoteController, connection));
 
-      // on first packet we should write the prefab id also
+      // data for first packet
       if (info.first) {
         packet.stream.WriteInt(proxy.entity.boltPrefabId);
         packet.stream.WriteVector3Half(proxy.entity.transform.position);
+        
+        if (BoltCore._config.globalUniqueIds) {
+          packet.stream.WriteUniqueId(proxy.entity._uniqueId);
+        }
       }
 
       // copy proxy mask
@@ -443,23 +447,29 @@ partial class BoltEntityChannel : BoltChannel {
 
         int prefabId = packet.stream.ReadInt();
         Vector3 spawnAt = packet.stream.ReadVector3Half();
+        BoltUniqueId uid = new BoltUniqueId();
+
+        if (BoltCore._config.globalUniqueIds) {
+          uid = packet.stream.ReadUniqueId();
+        }
 
         GameObject prefab = null;
 
         if (BoltRuntimeSettings.prefabs.TryGetIndex(prefabId, out prefab)) {
           Assert.Null(_incommingProxiesByNetworkId[networkId]);
 
+          var go = (GameObject) GameObject.Instantiate(prefab, spawnAt, Quaternion.identity);
+          var en = go.GetComponent<BoltEntity>();
+
           proxy = BoltEntityProxy.Alloc();
           proxy.connection = connection;
           proxy.networkId = networkId;
-          proxy.entity = ((GameObject) GameObject.Instantiate(prefab, spawnAt, Quaternion.identity)).GetComponent<BoltEntity>();
-          proxy.entity.enabled = true; // this allows the entity to be disabled in the prefab.
+          proxy.entity = en;
 
           _incommingProxiesByNetworkId[networkId] = proxy;
           _incommingProxiesByEntityId[proxy.entity._id] = proxy;
 
-          proxy.entity.Attach(connection, BoltEntity.FLAG_IS_PROXY);
-
+          BoltCore.Attach(proxy.entity, connection, BoltEntity.FLAG_IS_PROXY, uid);
           BoltLog.Debug("Received proxy {0} from {1}", proxy.entity, connection);
 
           if (controlling) {

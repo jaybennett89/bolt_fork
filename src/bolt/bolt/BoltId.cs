@@ -1,33 +1,17 @@
-﻿public struct BoltPeerId {
-  public readonly uint id;
+﻿public struct BoltUniqueId {
+  public readonly uint peer;
+  public readonly uint obj;
 
-  internal BoltPeerId (uint id) {
-    this.id = id;
-  }
-}
-
-public struct BoltObjectId {
-  public readonly uint id;
-
-  internal BoltObjectId (uint id) {
-    this.id = id;
-  }
-}
-
-public struct BoltUniqueId {
-  public readonly BoltPeerId peer;
-  public readonly BoltObjectId obj;
-
-  internal BoltUniqueId (BoltPeerId peerId, BoltObjectId objectId) {
+  internal BoltUniqueId (uint peerId, uint objectId) {
     this.peer = peerId;
     this.obj = objectId;
   }
 
   public static bool operator ==(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer.id == r.peer.id && l.obj.id == r.obj.id;
+    return l.peer == r.peer && l.obj == r.obj;
   }
 
   public static bool operator !=(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer.id != r.peer.id || l.obj.id != r.obj.id;
+    return l.peer != r.peer || l.obj != r.obj;
   }
 }

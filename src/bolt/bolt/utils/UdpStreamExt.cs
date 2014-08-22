@@ -494,14 +494,24 @@ public static class UdpStreamExtensions {
   }
 
   public static void WriteUniqueId (this UdpStream stream, BoltUniqueId id) {
-    stream.WriteUInt(id.peer.id);
-    stream.WriteUInt(id.obj.id);
+    if (stream.WriteBool(id.peer == 1u) == false) {
+      stream.WriteUInt(id.peer);
+    }
+
+    stream.WriteUInt(id.obj);
   }
 
   public static BoltUniqueId ReadUniqueId (this UdpStream stream) {
-    uint peerId = stream.ReadUInt();
-    uint objId = stream.ReadUInt();
-    return new BoltUniqueId(new BoltPeerId(peerId), new BoltObjectId(peerId));
+    uint peerId;
+
+    if (stream.ReadBool()) {
+      peerId = 1u;
+    } else {
+      peerId = stream.ReadUInt();
+    }
+
+    uint entityId = stream.ReadUInt();
+    return new BoltUniqueId(peerId, entityId);
   }
 
   public static void WriteStopMarker (this UdpStream stream) {

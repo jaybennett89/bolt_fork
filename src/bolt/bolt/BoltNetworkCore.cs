@@ -20,6 +20,8 @@ internal static class BoltCore {
   static internal BoltMapLoadOp _loadedMapTarget;
 
   static internal uint _uid;
+  static internal uint _uidEntityCounter;
+
   static internal int _frame = 0;
   static internal byte[] _userAssemblyHash = null;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
@@ -191,10 +193,6 @@ internal static class BoltCore {
     Initialize(BoltNetworkModes.Client, endpoint, autogen, config);
   }
 
-  public static BoltEntity Instantiate (GameObject prefab) {
-    return InstantiateAttach(prefab, null, Bits.zero);
-  }
-
   public static void Destroy (BoltEntity entity) {
     entity.Detach();
     GameObject.Destroy(entity.gameObject);
@@ -210,27 +208,37 @@ internal static class BoltCore {
     }
   }
 
-  public static BoltEntity Attach (BoltEntity entity) {
-    entity.Attach(null,  Bits.zero);
-    return entity;
-  }
-
   public static void Detach (BoltEntity entity) {
     entity.Detach();
   }
 
-  internal static BoltEntity InstantiateAttach (GameObject prefab, BoltConnection source, Bits flags) {
+  public static BoltEntity Instantiate (GameObject prefab) {
+    return Instantiate(prefab, Vector3.zero, Quaternion.identity);
+  }
+
+  public static BoltEntity Instantiate (GameObject prefab, Vector3 position, Quaternion rotation) {
     prefab.GetComponent<BoltEntity>()._sceneObject = false;
 
-    GameObject go = (GameObject) GameObject.Instantiate(prefab);
-    BoltEntity be;
+    GameObject go = (GameObject) GameObject.Instantiate(prefab, position, rotation);
+    BoltUniqueId id = new BoltUniqueId();
 
-    // force enabled
-    be = go.GetComponent<BoltEntity>();
-    be.enabled = true;
-    be.Attach(source, flags);
+    if (_config.globalUniqueIds) {
+      id = new BoltUniqueId(_uid, ++_uidEntityCounter);
+    }
 
-    return be;
+    return Attach(go.GetComponent<BoltEntity>(), null, Bits.zero, id);
+  }
+
+  public static BoltEntity Attach (BoltEntity entity) {
+    entity.Attach(null, Bits.zero);
+    return entity;
+  }
+
+  internal static BoltEntity Attach (BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
+    entity.enabled = true;
+    entity.Attach(source, flags);
+
+    return entity;
   }
 
   public static void DontDestroyOnMapLoad (BoltEntity entity) {
@@ -257,6 +265,8 @@ internal static class BoltCore {
       try {
         // 
         _mode = BoltNetworkModes.None;
+        _uid = 0;
+
 
         // disconnect from everywhere
         foreach (BoltConnection connection in _connections) {
@@ -565,6 +575,8 @@ internal static class BoltCore {
   }
 
   static void HandleConnected (UdpConnection udp) {
+    Assert.True(udp.uid > 1);
+
     _uid = udp.uid;
 
     BoltLog.Debug("connected as connection uid {0}", udp.uid);
@@ -718,6 +730,10 @@ internal static class BoltCore {
     // close any existing socket
     Shutdown();
 
+    if (isServer) {
+      _uid = 1;
+    }
+
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
     var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
@@ -797,11 +813,6 @@ internal static class BoltCore {
     _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
     _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
 
-    if (isServer) {
-      _uid = 1;
-    } else {
-      _uid = 0;
-    }
 
     // create and start socket
     _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);
