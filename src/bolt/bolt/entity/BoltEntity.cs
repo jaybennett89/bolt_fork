@@ -39,7 +39,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   [SerializeField]
   internal bool _clientPredicted = true;
-  
+
   internal uint _id;
   internal Bits _mask;
   internal Bits _flags;
@@ -455,7 +455,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   }
 
   public override string ToString () {
-    return string.Format("[Entity id={0} gameobject={1}]", _id, gameObject.name);
+    return string.Format("[Entity localId={2} uniqueId={0} gameobject={1}]", uniqueId, gameObject.name, _id);
   }
 
   internal void TakeControlInternal () {
