@@ -12,9 +12,13 @@ let unityDir = "./src/bolt.unity"
 let buildDir = "./build"
 let buildDirUdpKit = "./build/udpkit"
 let rootDir = currentDirectory
+
 let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
   System.Environment.OSVersion.Platform <> System.PlatformID.Unix
+
+let buildAndroid
+  = fileExists ndkPath
 
 let execProcessCheckFail f =
   if execProcess f (System.TimeSpan.FromMinutes 5.0) |> not then
@@ -66,14 +70,14 @@ Target "BuildBolt" (fun _ ->
 )
 
 Target "InstallAndroidNative" (fun _ ->
-  //mkdir "./src/bolt.unity/Assets/Plugins/Android"
-  //CopyFile "./src/bolt.unity/Assets/Plugins/Android" (buildDir + "/libudpkit_android.so")
+  mkdir "./src/bolt.unity/Assets/Plugins/Android"
+  CopyFile "./src/bolt.unity/Assets/Plugins/Android" (buildDir + "/libudpkit_android.so")
   ()
 )
 
 Target "InstallIOSNative" (fun _ ->
-  //mkdir "./src/bolt.unity/Assets/Plugins/iOS"
-  //CopyFile "./src/bolt.unity/Assets/Plugins/iOS" (buildDir + "/libudpkit_ios.a")
+  mkdir "./src/bolt.unity/Assets/Plugins/iOS"
+  CopyFile "./src/bolt.unity/Assets/Plugins/iOS" (buildDir + "/libudpkit_ios.a")
   ()
 )
 
@@ -107,10 +111,10 @@ Target "InstallBoltDebugFiles" (fun _ ->
 
 "Clean"
   =?> ("BuildIOSNative", not isWindows)
-  =?> ("BuildAndroidNative", isWindows)  
+  =?> ("BuildAndroidNative", buildAndroid)  
   ==> "BuildBolt" 
   =?> ("InstallIOSNative", not isWindows)
-  =?> ("InstallAndroidNative", isWindows)
+  =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
   ==> "InstallBoltDebugFiles"
 
