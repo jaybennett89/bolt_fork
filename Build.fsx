@@ -19,7 +19,6 @@ let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
   System.Environment.OSVersion.Platform <> System.PlatformID.Unix
 
-
 let execProcessCheckFail f =
   if execProcess f (System.TimeSpan.FromMinutes 5.0) |> not then
     failwith "process failed"
@@ -50,12 +49,8 @@ Target "BuildAndroidNative" (fun _ ->
   CopyFile "./src/bolt/bolt.editor/Resources" "./build/libudpkit_android.so" 
 )
 
-let boltProjects = [
-  "./src/bolt/bolt.sln"
-]
-
 Target "BuildBolt" (fun _ ->
-  boltProjects
+  ["./src/bolt/bolt.sln"]
   |> MSBuildDebug buildDir "Build"
   |> Log "AppBuild-Output: "
 )
