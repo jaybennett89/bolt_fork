@@ -4,8 +4,10 @@ open Fake.FileSystem
 open Fake.FileSystemHelper
 open Fake.FileUtils
 
+let ndkPath = environVar "ndkbuild"
+let buildiOS = hasBuildParam "ios" && isMacOS
+let buildAndroid = hasBuildParam "ndkbuild"
 
-let ndkPath = @"C:/android_ndk/ndk-build.cmd"
 let iosDir = "./src/bolt/udpkit.native/ios"
 let androidDir = "./src/bolt/udpkit.native/android"
 let unityDir = "./src/bolt.unity"
@@ -17,8 +19,6 @@ let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
   System.Environment.OSVersion.Platform <> System.PlatformID.Unix
 
-let buildAndroid
-  = fileExists ndkPath
 
 let execProcessCheckFail f =
   if execProcess f (System.TimeSpan.FromMinutes 5.0) |> not then
@@ -49,15 +49,6 @@ Target "BuildAndroidNative" (fun _ ->
   CopyFile "./build" (androidDir + "/libs/armeabi/libudpkit_android.so")
   CopyFile "./src/bolt/bolt.editor/Resources" "./build/libudpkit_android.so" 
 )
-
-//Target "BuildUnityPackage" (fun _ ->
-//  execProcessCheckFail (fun s ->
-//    s.FileName <- @"C:\Program Files (x86)\Unity\Editor\Unity.exe"
-//    s.Arguments <- (sprintf "-quit -batchmode -projectPath \"%s\" -exportPackage Assets/Tutorial/TutorialAssets \"%s/TutorialAssets.unitypackage\"" (directoryInfo unityDir).FullName (directoryInfo buildDir).FullName)
-//  )
-//  
-//  CopyFile "./src/bolt/bolt.editor/Resources" "./build/TutorialAssets.unitypackage" 
-//)
 
 let boltProjects = [
   "./src/bolt/bolt.sln"
@@ -110,10 +101,10 @@ Target "InstallBoltDebugFiles" (fun _ ->
 )
 
 "Clean"
-  =?> ("BuildIOSNative", not isWindows)
+  =?> ("BuildIOSNative", buildiOS)
   =?> ("BuildAndroidNative", buildAndroid)  
   ==> "BuildBolt" 
-  =?> ("InstallIOSNative", not isWindows)
+  =?> ("InstallIOSNative", buildiOS)
   =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
   ==> "InstallBoltDebugFiles"
