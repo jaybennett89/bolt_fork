@@ -8,12 +8,24 @@ public class BoltMecanimAssetEditor : Editor {
     BoltMecanimAsset asset = (BoltMecanimAsset) target;
 
     GUILayout.Label("Settings", EditorStyles.boldLabel);
-    
+
     GUI.color = BoltAssetEditorGUI.lightOrange;
     BoltAssetEditorGUI.EditBox(BoltAssetEditorGUI.BoxStyle(4), () => {
       GUI.color = Color.white;
 
+      EditorGUILayout.BeginVertical();
+
       asset.controller = (RuntimeAnimatorController) EditorGUILayout.ObjectField(asset.controller, typeof(RuntimeAnimatorController), false);
+
+      EditorGUILayout.BeginHorizontal();
+      asset.replicateLayerWeights = EditorGUILayout.Toggle(asset.replicateLayerWeights, GUILayout.Width(12));
+
+      GUIStyle s = new GUIStyle(EditorStyles.label);
+      s.normal.textColor = new Color(0.125f, 0.125f, 0.125f);
+      GUILayout.Label("Replicate Layer Weights", s);
+      
+      EditorGUILayout.EndHorizontal();
+      EditorGUILayout.EndVertical();
     });
 
     if (asset.controller) {

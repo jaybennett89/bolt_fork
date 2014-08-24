@@ -27,6 +27,8 @@ partial class BoltCompiler {
             file.EmitLine("void {0}();", p.name);
             file.EmitLine("Action on{0} {{ get; set; }}", p.name);
           }
+
+          file.EmitLine("float this[int layer] { get; set; }");
         });
 
         file.EmitScope("class {0} : BoltMecanimFrame", m.frameclassName, () => {
@@ -37,6 +39,8 @@ partial class BoltCompiler {
           foreach (BoltAssetProperty p in m.triggerProperties) {
             file.EmitLine("public bool {0};", p.name);
           }
+
+          file.EmitLine("public float[] layerWeights;");
 
           // clone method
           file.EmitScope("public override BoltMecanimFrame Clone ()", () => {
@@ -103,6 +107,19 @@ partial class BoltCompiler {
             });
           }
 
+          // interface implementation (layer weights)
+
+          file.EmitScope("float {0}.this[int layer]", m.interfaceName, () => {
+
+            if (m.replicateLayerWeights) {
+              file.EmitLine("get { return GetLayerWeight(layer); }");
+              file.EmitLine("set { SetLayerWeight(layer, value); }");
+            } else {
+              file.EmitLine("get {{ BoltLog.Warn(\"Mecanim animator {0} is not setup to replicate layer weights\"); return -1f; }}", m.name);
+              file.EmitLine("set {{ BoltLog.Warn(\"Mecanim animator {0} is not setup to replicate layer weights\"); }}", m.name);
+            }
+          });
+
           // constructor
           file.EmitScope("public {0} (IBoltState state, BoltEntity entity) : base(entity, state)", m.name, () => {
             foreach (BoltAssetProperty p in m.nonTriggerProperties) {
@@ -112,14 +129,24 @@ partial class BoltCompiler {
 
           // pack method
           file.EmitScope("public override void Pack (BoltEntityUpdateInfo info, UdpStream stream)", () => {
+
+            // parameters
             foreach (BoltAssetProperty p in m.nonTriggerProperties) {
               EmitWrite(file, p, MecanimValue(p), "info.connection");
             }
 
+            // triggers
             file.EmitLine("AlignTriggerFrame(BoltCore.frame);");
 
             foreach (BoltAssetProperty p in m.triggerProperties) {
               file.EmitLine("stream.WriteULong({0}, _entity.boltSendRate);", MecanimValue(p));
+            }
+
+            // layer weights
+            if (m.replicateLayerWeights) {
+              file.EmitScope("for (int i = 0; i < _layerWeights.Length; ++i)", () => {
+                file.EmitLine("stream.WriteHalf(_layerWeights[i]);");
+              });
             }
           });
 
@@ -129,16 +156,21 @@ partial class BoltCompiler {
             file.EmitLine("f._frame = info.frame;");
             file.EmitLine("f._triggerOnly = false;");
 
+            if (m.replicateLayerWeights) {
+              file.EmitLine("f._layerWeights = new float[_layerWeights.Length];");
+            }
+
+            // parameters
             foreach (BoltAssetProperty p in m.nonTriggerProperties) {
               EmitRead(file, p, "f.{0}", "info.connection");
             }
 
+            // triggers
             foreach (BoltAssetProperty p in m.triggerProperties) {
               file.EmitLine("ulong {0}_val = stream.ReadULong(_entity.boltSendRate);", p.name);
             }
 
             if (m.triggerProperties.Count() > 0) {
-
               file.EmitScope("for (int i = _entity.boltSendRate - 1; i > 0; --i)", () => {
                 file.EmitLine("ulong bit = 1UL << i;");
 
@@ -164,6 +196,14 @@ partial class BoltCompiler {
               file.EmitLine("f.{0} = ({0}_val & 1UL) == 1UL;", p.name);
             }
 
+            if (m.replicateLayerWeights) {
+              // layer weights
+              file.EmitScope("for (int i = 0; i < _layerWeights.Length; ++i)", () => {
+                file.EmitLine("f._layerWeights[i] = stream.ReadHalf();");
+              });
+            }
+
+            // store on buffer
             file.EmitLine("_buffer.AddLast(f);");
           });
 
@@ -181,8 +221,16 @@ partial class BoltCompiler {
               file.EmitLine("var iface = ({0})this;", m.interfaceName);
 
               file.EmitScope("if (f._triggerOnly == false)", () => {
+                // non triggers
                 foreach (BoltAssetProperty p in m.nonTriggerProperties) {
                   file.EmitLine("iface.{0} = f.{0};", p.name);
+                }
+
+                if (m.replicateLayerWeights) {
+                  // layer weights
+                  file.EmitScope("for (int i = 0; i < _layerWeights.Length; ++i)", () => {
+                    file.EmitLine("iface[i] = f._layerWeights[i];");
+                  });
                 }
               });
 

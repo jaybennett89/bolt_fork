@@ -47,5 +47,5 @@ MonoBehaviour:
     simulatedRandomFunction: 0
   debugClientCount: 1
   debugStartPort: 59111
-  debugStartMapName: Sample_RootMotion
+  debugStartMapName: Sample_TeleportAndElevators
   debugEditorMode: 1

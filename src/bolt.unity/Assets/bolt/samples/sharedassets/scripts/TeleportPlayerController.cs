@@ -50,6 +50,7 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
     playerCmd.input.forward = forward;
     playerCmd.input.backward = backward;
     playerCmd.input.yRotation = yRotation;
+    playerCmd.input.shoot = Input.GetMouseButton(0);
 
     boltEntity.QueueCommand(playerCmd);
 
@@ -80,6 +81,12 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
       playerCmd.state.grounded = motor.grounded;
 
       if (playerCmd.isFirstExecution) {
+        if (playerCmd.input.shoot) {
+          boltState.mecanim[1] = 1f;
+        } else {
+          boltState.mecanim[1] = 0f;
+        }
+
         float x = 0;
         float z = 0;
 
