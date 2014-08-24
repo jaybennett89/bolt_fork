@@ -190,6 +190,12 @@ class BoltUserAssemblyCompiler {
         return;
       }
 
+#if DEBUG
+      // clear developer console
+      Debug.ClearDeveloperConsole();
+#endif
+
+      // calculate source dir
       _sourceDir = BoltEditorUtils.MakePath(Path.GetDirectoryName(assetDir), "Temp", "bolt");
 
       // ensure temp path exists
