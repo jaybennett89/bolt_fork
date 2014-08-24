@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: TeleportPlayerMecanim
   m_EditorClassIdentifier: 
   compile: 0
+  replicateLayerWeights: 1
   controller: {fileID: 9100000, guid: c6058d2be0efd3342a9e09401bdcea7d, type: 2}
   properties:
   - name: MoveX

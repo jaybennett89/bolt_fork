@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: PlayerMecanim
   m_EditorClassIdentifier: 
   compile: 0
+  replicateLayerWeights: 0
   controller: {fileID: 9100000, guid: cfbf9449d08af6c458a6bb727dd067a0, type: 2}
   properties:
   - name: MoveZ
