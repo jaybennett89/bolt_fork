@@ -3,28 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System;
 
-public static class MecanimReflectionExtensions {
-
-  static Dictionary<Type, Dictionary<string, PropertyInfo>>
-    reflectionCache = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
-
-  static bool boltIsRunning {
-    get { return BoltNetwork.isServer || BoltNetwork.isServer; }
-  }
-
-
-  public static void SetFloatReflected (this Animator animator, string name, float value) {
-    animator.SetFloat(name, value);
-
-    if (boltIsRunning) {
-
-      animator.
-
-    }
-  }
-
-}
-
 public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerializer, ITeleportPlayerState> {
   bool left;
   bool right;
@@ -107,9 +85,9 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
 
       if (playerCmd.isFirstExecution) {
         if (playerCmd.input.shoot) {
-          boltState.mecanim[1] = 1f;
+          GetComponentInChildren<Animator>().SetLayerWeightReflected(1, 1f);
         } else {
-          boltState.mecanim[1] = 0f;
+          GetComponentInChildren<Animator>().SetLayerWeightReflected(1, 0f);
         }
 
         float x = 0;
@@ -121,8 +99,8 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
         if (playerCmd.input.left) { x = -1; }
         if (playerCmd.input.right) { x = +1; }
 
-        boltState.mecanim.MoveX = x;
-        boltState.mecanim.MoveZ = z;
+        GetComponentInChildren<Animator>().SetFloatReflected("MoveX", x);
+        GetComponentInChildren<Animator>().SetFloatReflected("MoveZ", z);
       }
     }
   }

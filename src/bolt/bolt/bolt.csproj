@@ -55,6 +55,7 @@
     <Compile Include="animator\BoltMecanimBoolean.cs" />
     <Compile Include="animator\BoltMecanimFrame.cs" />
     <Compile Include="animator\BoltMecanimInteger.cs" />
+    <Compile Include="animator\BoltMecanimReflectionExtensions.cs" />
     <Compile Include="animator\BoltMecanimTrigger.cs" />
     <Compile Include="assets\BoltCommandAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
