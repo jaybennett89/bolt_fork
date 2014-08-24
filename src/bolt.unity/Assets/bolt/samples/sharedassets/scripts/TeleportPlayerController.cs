@@ -1,4 +1,29 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Reflection;
+using System;
+
+public static class MecanimReflectionExtensions {
+
+  static Dictionary<Type, Dictionary<string, PropertyInfo>>
+    reflectionCache = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
+
+  static bool boltIsRunning {
+    get { return BoltNetwork.isServer || BoltNetwork.isServer; }
+  }
+
+
+  public static void SetFloatReflected (this Animator animator, string name, float value) {
+    animator.SetFloat(name, value);
+
+    if (boltIsRunning) {
+
+      animator.
+
+    }
+  }
+
+}
 
 public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerializer, ITeleportPlayerState> {
   bool left;

@@ -162,8 +162,8 @@
     <Compile Include="BoltSendBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="utils\BitUtils.cs" />
-    <Compile Include="utils\BoltMonoBehaviourExtensions.cs" />
-    <Compile Include="utils\BoltRuntimeReflection.cs" />
+    <Compile Include="BoltComponentExtensions.cs" />
+    <Compile Include="BoltRuntimeReflection.cs" />
     <Compile Include="utils\UdpStreamExt.cs" />
   </ItemGroup>
   <ItemGroup>

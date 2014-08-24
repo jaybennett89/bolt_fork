@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-public static class BoltMonoBehaviourExtensions {
+public static class BoltComponentExtensions {
 
-  public static BoltEntity GetBoltEntity (this MonoBehaviour mb) {
+  public static BoltEntity GetBoltEntity (this Component mb) {
     BoltEntity entity = null;
     Transform t = mb.transform;
 
@@ -18,11 +18,11 @@ public static class BoltMonoBehaviourExtensions {
     return entity;
   }
 
-  public static BoltEntitySerializer GetBoltSerializer (this MonoBehaviour mb) {
+  public static BoltEntitySerializer GetBoltSerializer (this Component mb) {
     return mb.GetBoltEntity().boltSerializer;
   }
 
-  public static TState GetBoltState<TState> (this MonoBehaviour mb) where TState : class, IBoltState {
+  public static TState GetBoltState<TState> (this Component mb) where TState : class, IBoltState {
     return ((BoltEntitySerializer<TState>) mb.GetBoltSerializer()).boltState;
   }
 }
