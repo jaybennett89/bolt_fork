@@ -82,7 +82,7 @@ public class BoltConsole : MonoBehaviour {
   int lineHeight = 11;
 
   [SerializeField]
-  bool visible = true;
+  internal bool visible = true;
 
   [SerializeField]
   float backgroundTransparency = 0.5f;
@@ -97,7 +97,7 @@ public class BoltConsole : MonoBehaviour {
   Color inputColor = Color.white;
 
   [SerializeField]
-  KeyCode toggleKey = KeyCode.Tab;
+  internal KeyCode toggleKey = KeyCode.Tab;
 
   [SerializeField]
   int inset = 10;

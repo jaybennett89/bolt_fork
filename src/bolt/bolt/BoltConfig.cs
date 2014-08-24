@@ -22,7 +22,6 @@ public enum BoltConfigLogTargets {
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public bool autoCreateConsole = true;
-  public bool logToConsole = true;
   public bool globalUniqueIds = false;
   public byte[] applicationGuid;
   public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
