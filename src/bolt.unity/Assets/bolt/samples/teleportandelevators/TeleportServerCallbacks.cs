@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[BoltGlobalBehaviour(BoltNetworkModes.Server, "Sample_TeleportAndElevators")]
 public class TeleportServerCallbacks : BoltCallbacks {
   void Awake () {
     GameObject.DontDestroyOnLoad(gameObject);
