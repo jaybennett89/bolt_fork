@@ -170,8 +170,11 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUILayout.EndVertical();
   }
 
+  Vector2 scrollPos = Vector2.zero;
+
   void OnGUI () {
-    GUILayout.Space(2);
+    GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
+    scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
     BoltAssetEditorGUI.Header("network", "Network Settings");
     Network();
@@ -184,7 +187,9 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Header("console", "Console");
     Console();
-
+    
+    EditorGUILayout.EndScrollView();
+    GUILayout.EndArea();
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
     Footer();
     GUILayout.EndArea();
