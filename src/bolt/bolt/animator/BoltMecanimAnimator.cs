@@ -27,6 +27,14 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
     _buffer = new BoltSingleList<T>();
   }
 
+  protected void SetLayerWeight (int layer, float weight) {
+    Assert.True(layer >= 0 && layer < _layerWeights.Length);
+
+    _layerWeights[layer] = weight;
+    _animator.SetLayerWeight(layer, weight);
+    _state.PropertyChanged(this);
+  }
+
   public abstract void Pack (BoltEntityUpdateInfo info, UdpStream stream);
   public abstract void Read (BoltEntityUpdateInfo info, UdpStream stream);
   public abstract void Skip (BoltEntityUpdateInfo info);
