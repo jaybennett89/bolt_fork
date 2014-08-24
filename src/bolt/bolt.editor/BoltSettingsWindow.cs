@@ -166,6 +166,7 @@ public class BoltSettingsWindow : EditorWindow {
       settings.consoleVisibleByDefault = EditorGUILayout.Toggle(settings.consoleVisibleByDefault);
     });
 
+    EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
   }
 
