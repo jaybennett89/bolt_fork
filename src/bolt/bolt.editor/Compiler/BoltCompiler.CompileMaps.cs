@@ -9,7 +9,7 @@ partial class BoltCompiler {
       file.EmitScope("public static class BoltMaps", () => {
         for (int i = 0; i < EditorBuildSettings.scenes.Length; ++i) {
           var s = EditorBuildSettings.scenes[i];
-          file.EmitLine("public static readonly string {0} = \"{0}\";", Path.GetFileNameWithoutExtension(s.path));
+          file.EmitLine("public const string {0} = \"{0}\";", Path.GetFileNameWithoutExtension(s.path));
         }
       });
 
