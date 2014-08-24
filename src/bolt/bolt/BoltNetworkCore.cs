@@ -670,7 +670,12 @@ internal static class BoltCore {
   static internal void UpdateActiveGlobalBehaviours (string map) {
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
-      CreateGlobalBehaviour(typeof(BoltConsole));
+      BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
+
+      if (console) {
+        console.toggleKey = BoltRuntimeSettings.instance.consoleToggleKey;
+        console.visible = BoltRuntimeSettings.instance.consoleVisibleByDefault;
+      }
     } else {
       DeleteGlobalBehaviour(typeof(BoltConsole));
     }
@@ -703,16 +708,18 @@ internal static class BoltCore {
     }
   }
 
-  static void CreateGlobalBehaviour (Type t) {
+  static Component CreateGlobalBehaviour (Type t) {
     if (_globalBehaviourObject) {
       var component = _globalBehaviourObject.GetComponent(t);
       var shouldCreate = !component;
 
       if (shouldCreate) {
         BoltLog.Debug("creating '{0}'", t);
-        _globalBehaviourObject.AddComponent(t);
+        return _globalBehaviourObject.AddComponent(t);
       }
     }
+
+    return null;
   }
 
   static void DeleteGlobalBehaviour (Type t) {

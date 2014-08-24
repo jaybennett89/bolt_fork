@@ -639,7 +639,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     _serializer.AttachedLate();
 
     // done!
-    //BoltLog.Debug("attached {0}", this);
+    BoltLog.Debug("attached {0}", this);
   }
 
   internal void UpdateScope () {

@@ -55,6 +55,7 @@
     <Compile Include="animator\BoltMecanimBoolean.cs" />
     <Compile Include="animator\BoltMecanimFrame.cs" />
     <Compile Include="animator\BoltMecanimInteger.cs" />
+    <Compile Include="animator\BoltMecanimReflectionExtensions.cs" />
     <Compile Include="animator\BoltMecanimTrigger.cs" />
     <Compile Include="assets\BoltCommandAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="hitbox\BoltHitboxType.cs" />
     <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
+    <Compile Include="LoadMapState.cs" />
     <Compile Include="state\BoltStateFactory.cs" />
     <Compile Include="state\Transform\BoltStateTransform.cs" />
     <Compile Include="utils\Bits.cs" />
@@ -161,8 +163,8 @@
     <Compile Include="BoltSendBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="utils\BitUtils.cs" />
-    <Compile Include="utils\BoltMonoBehaviourExtensions.cs" />
-    <Compile Include="utils\BoltRuntimeReflection.cs" />
+    <Compile Include="BoltComponentExtensions.cs" />
+    <Compile Include="BoltRuntimeReflection.cs" />
     <Compile Include="utils\UdpStreamExt.cs" />
   </ItemGroup>
   <ItemGroup>

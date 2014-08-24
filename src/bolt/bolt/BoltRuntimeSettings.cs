@@ -43,6 +43,12 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
+  [SerializeField]
+  public KeyCode consoleToggleKey = KeyCode.Tab;
+
+  [SerializeField]
+  public bool consoleVisibleByDefault = true;
+
   public BoltConfig GetConfigCopy () {
     return _config.Clone();
   }

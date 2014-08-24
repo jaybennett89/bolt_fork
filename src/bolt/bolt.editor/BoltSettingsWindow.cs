@@ -107,7 +107,7 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     EditorGUILayout.BeginVertical();
-    
+
     BoltAssetEditorGUI.Label("Use Unique Ids", () => {
       settings._config.globalUniqueIds = EditorGUILayout.Toggle(settings._config.globalUniqueIds);
     });
@@ -134,19 +134,6 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
-    //BoltAssetEditorGUI.Label("Application Version", () => {
-    //  GUIStyle dotStyle = new GUIStyle(EditorStyles.boldLabel);
-    //  dotStyle.contentOffset = new Vector2(0, -3);
-
-    //  settings._config.applicationVersion.major = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.major, "major");
-    //  GUILayout.Label(".", dotStyle);
-    //  settings._config.applicationVersion.minor = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.minor, "minor");
-    //  GUILayout.Label(".", dotStyle);
-    //  settings._config.applicationVersion.patch = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.patch, "patch");
-    //  GUILayout.Label(".", dotStyle);
-    //  settings._config.applicationVersion.build = BoltAssetEditorGUI.IntFieldOverlay(settings._config.applicationVersion.build, "build");
-    //});
-
     BoltAssetEditorGUI.Label("Assembly Hash", () => {
       byte[] hash = null;
 
@@ -162,8 +149,32 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUILayout.EndVertical();
   }
 
+  void Console () {
+
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    var consoleEnabled = (settings._config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
+    EditorGUI.BeginDisabledGroup(consoleEnabled == false);
+
+    EditorGUILayout.BeginVertical();
+
+    BoltAssetEditorGUI.Label("Toggle Key", () => {
+      settings.consoleToggleKey = (KeyCode) EditorGUILayout.EnumPopup(settings.consoleToggleKey);
+    });
+
+    BoltAssetEditorGUI.Label("Visible By Default", () => {
+      settings.consoleVisibleByDefault = EditorGUILayout.Toggle(settings.consoleVisibleByDefault);
+    });
+
+    EditorGUI.EndDisabledGroup();
+    EditorGUILayout.EndVertical();
+  }
+
+  Vector2 scrollPos = Vector2.zero;
+
   void OnGUI () {
-    GUILayout.Space(2);
+    GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
+    scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
     BoltAssetEditorGUI.Header("network", "Network Settings");
     Network();
@@ -174,6 +185,11 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Header("settings", "Miscellaneous");
     Miscellaneous();
 
+    BoltAssetEditorGUI.Header("console", "Console");
+    Console();
+    
+    EditorGUILayout.EndScrollView();
+    GUILayout.EndArea();
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
     Footer();
     GUILayout.EndArea();

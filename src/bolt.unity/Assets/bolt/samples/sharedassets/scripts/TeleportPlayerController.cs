@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Reflection;
+using System;
 
 public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerializer, ITeleportPlayerState> {
   bool left;
@@ -50,6 +53,7 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
     playerCmd.input.forward = forward;
     playerCmd.input.backward = backward;
     playerCmd.input.yRotation = yRotation;
+    playerCmd.input.shoot = Input.GetMouseButton(0);
 
     boltEntity.QueueCommand(playerCmd);
 
@@ -80,6 +84,12 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
       playerCmd.state.grounded = motor.grounded;
 
       if (playerCmd.isFirstExecution) {
+        if (playerCmd.input.shoot) {
+          GetComponentInChildren<Animator>().SetLayerWeightReflected(1, 1f);
+        } else {
+          GetComponentInChildren<Animator>().SetLayerWeightReflected(1, 0f);
+        }
+
         float x = 0;
         float z = 0;
 
@@ -89,8 +99,8 @@ public class TeleportPlayerController : BoltEntityBehaviour<TeleportPlayerSerial
         if (playerCmd.input.left) { x = -1; }
         if (playerCmd.input.right) { x = +1; }
 
-        boltState.mecanim.MoveX = x;
-        boltState.mecanim.MoveZ = z;
+        GetComponentInChildren<Animator>().SetFloatReflected("MoveX", x);
+        GetComponentInChildren<Animator>().SetFloatReflected("MoveZ", z);
       }
     }
   }

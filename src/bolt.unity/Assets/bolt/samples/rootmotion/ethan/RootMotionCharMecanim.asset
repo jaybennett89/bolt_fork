@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: RootMotionCharMecanim
   m_EditorClassIdentifier: 
   compile: 0
+  replicateLayerWeights: 0
   controller: {fileID: 9100000, guid: 1db68d53accfc2c4893b2b3e5707d6e7, type: 2}
   properties:
   - name: Speed

@@ -2,6 +2,7 @@
 using UnityEngine;
 
 public class BoltMecanimAsset : BoltCompilableAsset {
+  public bool replicateLayerWeights = false;
   public RuntimeAnimatorController controller = null;
   public BoltAssetProperty[] properties = new BoltAssetProperty[0];
   public string interfaceName { get { return "I" + name; } }
