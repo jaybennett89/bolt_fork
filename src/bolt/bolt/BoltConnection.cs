@@ -228,7 +228,7 @@ public class BoltConnection : BoltObject {
 
     if (_remoteMapLoadState.stage == MapLoadStage.Callback) {
       // invoke
-      BoltCallbacksBase.MapLoadRemoteDoneInvoke(_remoteMapLoadState.map.name, this);
+      BoltCallbacksBase.MapLoadRemoteDoneInvoke(this, _remoteMapLoadState.map.name);
 
       // done!
       _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.map);

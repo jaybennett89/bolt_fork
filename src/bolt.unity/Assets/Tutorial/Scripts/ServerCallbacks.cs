@@ -11,7 +11,7 @@ public class ServerCallbacks : BoltCallbacks {
     entity.TakeControl();
   }
 
-  public override void MapLoadRemoteDone (string map, BoltConnection arg) {
+  public override void MapLoadRemoteDone (BoltConnection arg, string map) {
     // spawn new entity
     BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player);
 

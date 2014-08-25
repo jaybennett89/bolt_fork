@@ -9,7 +9,7 @@
 Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
 cbs.Add("MapLoadLocalBegin", new[] { "string", "map" });
 cbs.Add("MapLoadLocalDone", new[] { "string", "map" });
-cbs.Add("MapLoadRemoteDone", new[] { "string", "map", "BoltConnection", "connection" });
+cbs.Add("MapLoadRemoteDone", new[] { "BoltConnection", "connection", "string", "map" });
 
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("Connected", "BoltConnection"));
