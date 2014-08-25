@@ -4,7 +4,7 @@ using System.Collections;
 [BoltGlobalBehaviour(BoltNetworkModes.Server, "StartupShutdown_MapGreen", "StartupShutdown_MapRed")]
 public class StartupShutdown_Server : BoltCallbacks {
   void Awake () {
-	BoltNetwork.ShutdownComplete = BoltNetwork.ShutdownComplete.Combine (BoltNetwork_ShutdownComplete);
+    BoltNetwork.ShutdownComplete = BoltNetwork.ShutdownComplete.Combine(BoltNetwork_ShutdownComplete);
   }
 
   void BoltNetwork_ShutdownComplete () {
@@ -37,7 +37,7 @@ public class StartupShutdown_Server : BoltCallbacks {
     }
   }
 
-  public override void MapLoadRemoteDone (string map, BoltConnection arg) {
+  public override void MapLoadRemoteDone (BoltConnection arg, string map) {
     BoltEntity cube =  BoltNetwork.Instantiate(BoltPrefabs.ClientCube);
     cube.transform.position = new Vector3(Random.Range(-8f, 8f), 0, Random.Range(-8f, 8f));
     cube.GiveControl(arg);

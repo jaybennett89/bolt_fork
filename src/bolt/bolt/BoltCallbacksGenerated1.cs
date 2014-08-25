@@ -134,13 +134,13 @@ partial class BoltCallbacksBase {
   }
 
   
-  public virtual void MapLoadRemoteDone(string map, BoltConnection connection) { 
+  public virtual void MapLoadRemoteDone(BoltConnection connection, string map) { 
   }
 
-  internal static void MapLoadRemoteDoneInvoke(string map, BoltConnection connection) { 
+  internal static void MapLoadRemoteDoneInvoke(BoltConnection connection, string map) { 
     BoltLog.Debug("Invoking callback MapLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
-        cb.MapLoadRemoteDone(map, connection);
+        cb.MapLoadRemoteDone(connection, map);
     }
   }
 

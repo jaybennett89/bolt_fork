@@ -15,7 +15,7 @@ public class TeleportServerCallbacks : BoltCallbacks {
     }
   }
 
-  public override void MapLoadRemoteDone (string map, BoltConnection connection) {
+  public override void MapLoadRemoteDone (BoltConnection connection, string map) {
     BoltEntity entity = SpawnAvatar();
     connection.userToken = entity;
     entity.GiveControl(connection);
