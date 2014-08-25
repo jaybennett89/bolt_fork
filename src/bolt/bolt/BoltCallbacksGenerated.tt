@@ -7,11 +7,11 @@
 <#@ output extension=".cs" #><#
 
 Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
-cbs.Add("MapLoadLocalBegin", new[] { "string", "map", "BoltConnection", "connection" });
+cbs.Add("MapLoadLocalBegin", new[] { "string", "map" });
+cbs.Add("MapLoadLocalDone", new[] { "string", "map" });
+cbs.Add("MapLoadRemoteDone", new[] { "string", "map", "BoltConnection", "connection" });
 
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
-callbacks.Add(Tuple.Create<string, string>("MapLoadBegin", "string"));
-callbacks.Add(Tuple.Create<string, string>("MapLoadDone", "string"));
 callbacks.Add(Tuple.Create<string, string>("Connected", "BoltConnection"));
 callbacks.Add(Tuple.Create<string, string>("Disconnected", "BoltConnection"));
 callbacks.Add(Tuple.Create<string, string>("ConnectRequest", "UdpEndPoint"));
@@ -25,8 +25,6 @@ callbacks.Add(Tuple.Create<string, string>("EntityAttached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("EntityDetached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("ControlOfEntityGained", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("ControlOfEntityLost", "BoltEntity"));
-callbacks.Add(Tuple.Create<string, string>("ClientLoadedMap", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("ServerLoadedMap", "BoltConnection"));
 #>
 using UdpKit;
 using UnityEngine;
@@ -43,4 +41,22 @@ partial class BoltCallbacksBase {
     }
   }
   <# } #> 
+
+  <# foreach (var cb in cbs) { 
+    var pairs = cb.Value.Select((value, index) => new { value, index } ).GroupBy(x => x.index / 2, x => x.value);
+    var args = String.Join(", ", pairs.Select(x => String.Join(" ", x.ToArray())).ToArray());
+    var callArgs = String.Join(", ", cb.Value.Select((value, index) => new { value, index } ).Where(x => x.index % 2 == 1).Select(x => x.value).ToArray());
+  #>
+
+  public virtual void <#= cb.Key #>(<#= args #>) { 
+  }
+
+  internal static void <#= cb.Key #>Invoke(<#= args #>) { 
+    BoltLog.Debug("Invoking callback <#= cb.Key #>");
+    foreach (BoltCallbacksBase cb in callbacks) {
+        cb.<#= cb.Key #>(<#= callArgs #>);
+    }
+  }
+
+  <# } #>
 }

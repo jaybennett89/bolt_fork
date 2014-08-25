@@ -648,7 +648,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
     while (cnIter.Next(out cn)) {
       // if this connection isn't allowed to proxy objects, skip it
-      if (cn._flags & BoltConnection.FLAG_LOADING_MAP) { continue; }
+      if (cn.isLoadingMap) { continue; }
 
       // if proxying is disabled for this object, skip it
       if (this._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }

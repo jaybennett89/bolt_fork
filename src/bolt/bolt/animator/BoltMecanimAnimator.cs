@@ -28,7 +28,7 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
   }
 
   protected void SetLayerWeight (int layer, float weight) {
-    Assert.True(layer >= 0 && layer < _layerWeights.Length);
+    Assert.True(layer >= 0 && layer < _layerWeights.Length, string.Format("incorret layer value: {0}", layer));
 
     _layerWeights[layer] = weight;
     _animator.SetLayerWeight(layer, weight);
@@ -36,7 +36,7 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
   }
 
   protected float GetLayerWeight (int layer) {
-    Assert.True(layer >= 0 && layer < _layerWeights.Length);
+    Assert.True(layer >= 0 && layer < _layerWeights.Length, string.Format("incorret layer value: {0}", layer));
     return _animator.GetLayerWeight(layer);
   }
 

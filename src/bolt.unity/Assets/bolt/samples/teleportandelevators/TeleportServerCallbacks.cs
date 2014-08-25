@@ -15,13 +15,13 @@ public class TeleportServerCallbacks : BoltCallbacks {
     }
   }
 
-  public override void ClientConnected (BoltConnection arg) {
+  public override void MapLoadRemoteDone (string map, BoltConnection connection) {
     BoltEntity entity = SpawnAvatar();
-    arg.userToken = entity;
-    entity.GiveControl(arg);
+    connection.userToken = entity;
+    entity.GiveControl(connection);
   }
 
-  public override void MapLoadDone (string arg) {
+  public override void MapLoadLocalDone (string arg) {
     SpawnAvatar().TakeControl();
   }
 
