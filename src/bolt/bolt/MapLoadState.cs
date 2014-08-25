@@ -69,7 +69,7 @@ struct MapLoadState {
 
   public MapLoadState BeginCallback (MapLoadState localState) {
     if (this.map == localState.map) {
-      if (localState.stage >= MapLoadStage.LoadDone) {
+      if (this.stage == MapLoadStage.LoadDone && localState.stage >= MapLoadStage.LoadDone) {
         return ChangeStage(MapLoadStage.Callback);
       }
 

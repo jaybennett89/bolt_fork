@@ -80,7 +80,7 @@ internal static class BoltCore {
 
   public static IEnumerable<BoltConnection> clients {
     get { return connections.Where(c => c.udpConnection.IsServer); }
-  }
+  }                                                                                                                                   
 
   public static BoltConnection server {
     get { return connections.FirstOrDefault(c => c.udpConnection.IsClient); }
@@ -638,7 +638,7 @@ internal static class BoltCore {
 
     while (cnIter.Next(out cn)) {
       // if this connection isn't allowed to proxy objects, skip it
-      if (cn._flags & BoltConnection.FLAG_LOADING_MAP) { continue; }
+      if (cn._remoteMapLoadState.stage != MapLoadStage.CallbackDone) { continue; }
 
       BoltEntity en = null;
       var enIter = _entities.GetIterator();
@@ -877,8 +877,12 @@ internal static class BoltCore {
         it.val.LoadMapOnClient(map);
       }
     }
-
+    
+    // call out to user code
     BoltCallbacksBase.MapLoadLocalBeginInvoke(map.name);
+
+    // destroy old behaviours
+    UpdateActiveGlobalBehaviours(null);
   }
 
   internal static void LoadMapDoneInternal (Map map) {
@@ -897,6 +901,10 @@ internal static class BoltCore {
       it.val.SendMapLoadDoneToRemote();
     }
 
+    // update active behaviours
+    UpdateActiveGlobalBehaviours(map.name);
+
+    // call out to sure code
     BoltCallbacksBase.MapLoadLocalDoneInvoke(map.name);
 
     it = _connections.GetIterator();

@@ -9,7 +9,7 @@ class BoltMapLoader : MonoBehaviour {
 
   static readonly BoltSingleList<LoadOp> _loadOps = new BoltSingleList<LoadOp>();
   static internal bool isLoading {
-    get { return _loadOps; }
+    get { return _loadOps.count > 0; }
   }
 
   void Update () {

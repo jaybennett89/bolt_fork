@@ -6,8 +6,6 @@ using UnityEngine;
 /// Represents a connection from a remote host
 /// </summary>
 public class BoltConnection : BoltObject {
-  internal const uint FLAG_LOADING_MAP = 1;
-
   static int _idCounter;
 
   UdpConnection _udp;
@@ -29,12 +27,14 @@ public class BoltConnection : BoltObject {
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
 
-  internal Bits _flags;
   internal MapLoadState _remoteMapLoadState;
-
   internal BoltEventChannel _eventChannel;
   internal BoltEntityChannel _entityChannel;
   internal BoltEntityChannel.CommandChannel _commandChannel;
+
+  public bool isLoadingMap {
+    get { return _remoteMapLoadState.stage != MapLoadStage.CallbackDone; }
+  }
 
   /// <summary>
   /// Unique id for this connection
@@ -80,13 +80,6 @@ public class BoltConnection : BoltObject {
   }
 
   /// <summary>
-  /// If the other end of this connection is loading a map currently
-  /// </summary>
-  public bool isLoadingMap {
-    get { return _flags & FLAG_LOADING_MAP; }
-  }
-
-  /// <summary>
   /// How many bits per second we are receiving in
   /// </summary>
   public int bitsPerSecondIn {
@@ -120,7 +113,6 @@ public class BoltConnection : BoltObject {
     _udp.UserToken = this;
 
     _id = ++_idCounter;
-    _flags = 0;
     _remoteFrameAdjust = false;
 
     _channels = new BoltChannel[] {
@@ -235,6 +227,7 @@ public class BoltConnection : BoltObject {
     _remoteMapLoadState = _remoteMapLoadState.BeginCallback(BoltCore._mapLoadState);
 
     if (_remoteMapLoadState.stage == MapLoadStage.Callback) {
+      // invoke
       BoltCallbacksBase.MapLoadRemoteDoneInvoke(_remoteMapLoadState.map.name, this);
 
       // done!
