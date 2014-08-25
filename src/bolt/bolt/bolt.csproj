@@ -107,7 +107,7 @@
     <Compile Include="hitbox\BoltHitboxType.cs" />
     <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
-    <Compile Include="LoadMapState.cs" />
+    <Compile Include="MapLoadState.cs" />
     <Compile Include="state\BoltStateFactory.cs" />
     <Compile Include="state\Transform\BoltStateTransform.cs" />
     <Compile Include="utils\Bits.cs" />

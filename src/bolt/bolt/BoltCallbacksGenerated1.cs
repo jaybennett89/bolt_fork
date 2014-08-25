@@ -4,10 +4,6 @@ using UnityEngine;
 
 partial class BoltCallbacksBase {
    
-  public virtual void MapLoadBegin(string arg) { }
-   
-  public virtual void MapLoadDone(string arg) { }
-   
   public virtual void Connected(BoltConnection arg) { }
    
   public virtual void Disconnected(BoltConnection arg) { }
@@ -34,23 +30,7 @@ partial class BoltCallbacksBase {
    
   public virtual void ControlOfEntityLost(BoltEntity arg) { }
    
-  public virtual void ClientLoadedMap(BoltConnection arg) { }
-   
-  public virtual void ServerLoadedMap(BoltConnection arg) { }
-   
 
-   
-  internal static void MapLoadBeginInvoke(string arg) { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.MapLoadBegin(arg);
-    }
-  }
-   
-  internal static void MapLoadDoneInvoke(string arg) { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.MapLoadDone(arg);
-    }
-  }
    
   internal static void ConnectedInvoke(BoltConnection arg) { 
     foreach (BoltCallbacksBase cb in callbacks) {
@@ -130,16 +110,35 @@ partial class BoltCallbacksBase {
     }
   }
    
-  internal static void ClientLoadedMapInvoke(BoltConnection arg) { 
+
+  
+  public virtual void MapLoadLocalBegin(string map) { 
+  }
+
+  internal static void MapLoadLocalBeginInvoke(string map) { 
     foreach (BoltCallbacksBase cb in callbacks) {
-      cb.ClientLoadedMap(arg);
+        cb.MapLoadLocalBegin(map);
     }
   }
-   
-  internal static void ServerLoadedMapInvoke(BoltConnection arg) { 
+
+  
+  public virtual void MapLoadLocalDone(string map) { 
+  }
+
+  internal static void MapLoadLocalDoneInvoke(string map) { 
     foreach (BoltCallbacksBase cb in callbacks) {
-      cb.ServerLoadedMap(arg);
+        cb.MapLoadLocalDone(map);
     }
   }
-   
-}
+
+  
+  public virtual void MapLoadRemoteDone(string map, BoltConnection connection) { 
+  }
+
+  internal static void MapLoadRemoteDoneInvoke(string map, BoltConnection connection) { 
+    foreach (BoltCallbacksBase cb in callbacks) {
+        cb.MapLoadRemoteDone(map, connection);
+    }
+  }
+
+  }

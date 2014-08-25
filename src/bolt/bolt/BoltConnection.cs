@@ -30,6 +30,8 @@ public class BoltConnection : BoltObject {
   int _bitsSecondOutAcc;
 
   internal Bits _flags;
+  internal MapLoadState _remoteMapLoadState;
+
   internal BoltMapLoadOp _loadedMap;
   internal BoltMapLoadOp _loadedMapTarget;
   internal BoltMapLoadOp _loadedMapCallback;
@@ -208,48 +210,28 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void TriggerClientLoadedMapCallback () {
-    if (BoltMapLoader.isLoading) return;
-    if (_loadedMap.Equals(_loadedMapTarget) == false) return;
-    if (_loadedMap.Equals(BoltCore._loadedMap) == false) return;
-    if (_loadedMapTarget.Equals(BoltCore._loadedMapTarget) == false) return;
-    if (_loadedMapCallback.Equals(_loadedMap) == true) return;
-    if ((_flags & BoltConnection.FLAG_LOADING_MAP) == false) return;
+  internal void LoadMapOnClient (Map map) {
+    Assert.True(udpConnection.IsServer);
+    _remoteMapLoadState = _remoteMapLoadState.BeginLoad(map);
 
-    try {
-      BoltCallbacksBase.ClientLoadedMapInvoke(this);
-    } finally {
-      _flags &= ~BoltConnection.FLAG_LOADING_MAP;
-      _loadedMapCallback = _loadedMapTarget;
+    if (_remoteMapLoadState.stage == MapLoadStage.Load) {
+      SendMapLoadEventToRemote();
     }
   }
 
-  internal void TriggerServerLoadedMapCallback () {
-    if (BoltMapLoader.isLoading) return;
-    if (_loadedMap.Equals(_loadedMapTarget) == false) return;
-    if (_loadedMap.Equals(BoltCore._loadedMap) == false) return;
-    if (_loadedMapTarget.Equals(BoltCore._loadedMapTarget) == false) return;
-    if (_loadedMapCallback.Equals(_loadedMap) == true) return;
-    if ((_flags & BoltConnection.FLAG_LOADING_MAP) == false) return;
-
-    try {
-      BoltCallbacksBase.ServerLoadedMapInvoke(this);
-    } finally {
-      _flags &= ~BoltConnection.FLAG_LOADING_MAP;
-      _loadedMapCallback = _loadedMapTarget;
-    }
+  internal void SendMapLoadEventToRemote () {
+    Assert.True(udpConnection.IsServer);
+    Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.map);
   }
 
-  internal void LoadMapOnClient (BoltMapLoadOp op) {
-    if (_loadedMapTarget.Equals(op) == false) {
-      // send rpc to this connection
-      Raise<ILoadMap>(evt => evt.op = op);
+  internal void TriggerRemoteMapDoneCallbacks () {
+    _remoteMapLoadState = _remoteMapLoadState.BeginCallback(BoltCore._mapLoadState);
 
-      // set loading token
-      _loadedMapTarget = op;
+    if (_remoteMapLoadState.stage == MapLoadStage.Callback) {
+      BoltCallbacksBase.MapLoadRemoteDoneInvoke(_remoteMapLoadState.map.name, this);
 
-      // set flag
-      _flags |= FLAG_LOADING_MAP;
+      // done!
+      _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.map);
     }
   }
 
@@ -422,4 +404,5 @@ public class BoltConnection : BoltObject {
   public static implicit operator bool (BoltConnection cn) {
     return cn != null;
   }
+
 }

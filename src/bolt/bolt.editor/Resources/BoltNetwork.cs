@@ -154,7 +154,7 @@ public static partial class BoltNetwork {
   public static void Accept (UdpEndPoint ep) {
     BoltCore.AcceptConnection(ep);
   }
-  
+
   public static void Refuse (UdpEndPoint ep) {
     BoltCore.RefuseConnection(ep);
   }
@@ -340,7 +340,7 @@ public static partial class BoltNetwork {
   public static UdpSession[] GetSessions () {
     return BoltCore.GetSessions();
   }
-  
+
   static UdpIPv4Address GetBroadcastAddress () {
     BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
 
@@ -362,10 +362,8 @@ public static partial class BoltNetwork {
   }
 
   partial class Network : IBoltNetwork {
-    Type IBoltNetwork.loadBehaviourType {
-      get {
-        //MAPLOADER
-      }
+    bool IBoltNetwork.isUnityPro {
+      get { return BoltNetwork.isPro; }
     }
 
     void IBoltNetwork.Setup () {

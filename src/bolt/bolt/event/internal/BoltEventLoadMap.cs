@@ -1,22 +1,22 @@
 using System;
 using UdpKit;
 
-public interface ILoadMap : IBoltEvent {
-  BoltMapLoadOp op { get; set; }
+internal interface ILoadMap : IBoltEvent {
+  Map map { get; set; }
 }
 
-public interface ILoadMapReceiver {
+internal interface ILoadMapReceiver {
   void OnEvent (ILoadMap evnt, BoltConnection connection);
 }
 
 class LoadMap : BoltEventS2C, ILoadMap {
   public const ushort ID = 0;
 
-  BoltMapLoadOp _op;
+  Map _map;
 
-  public BoltMapLoadOp op {
-    get { return _op; }
-    set { _op = value; }
+  public Map map {
+    get { return _map; }
+    set { _map = value; }
   }
 
   internal LoadMap ()
@@ -24,18 +24,16 @@ class LoadMap : BoltEventS2C, ILoadMap {
   }
 
   public override void Pack (UdpStream stream, BoltConnection cn) {
-    stream.WriteString(_op.map);
-    stream.WriteInt(_op.token);
+    stream.WriteString(_map.name);
+    stream.WriteInt(_map.token);
   }
 
   public override void Read (UdpStream stream, BoltConnection cn) {
-    _op.map = stream.ReadString();
-    _op.token = stream.ReadInt();
+    _map = new Map(stream.ReadString(), stream.ReadInt());
   }
 
   public override void Free () {
-    _op.map = default(string);
-    _op.token = default(int);
+    _map = new Map();
   }
 }
 

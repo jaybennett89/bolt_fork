@@ -6,8 +6,9 @@ class BoltEventClientReceiver : BoltEventGlobalReceiverInternal, ILoadMapReceive
     Assert.False(BoltCore.isServer);
 
 #if BOLT_CLIENT
-    connection._loadedMap = evnt.op;
-    connection.TriggerServerLoadedMapCallback();
+    // finish remote state
+    connection._remoteMapLoadState = connection._remoteMapLoadState.FinishLoad(evnt.map, BoltCore._mapLoadState.map);
+    connection.TriggerRemoteMapDoneCallbacks();
 #endif
   }
 
@@ -16,12 +17,11 @@ class BoltEventClientReceiver : BoltEventGlobalReceiverInternal, ILoadMapReceive
     Assert.False(BoltCore.isServer);
 
 #if BOLT_CLIENT
-    // load target
-    connection._loadedMapTarget = evnt.op;
-    connection._flags |= BoltConnection.FLAG_LOADING_MAP;
+    // begin loading map locally
+    BoltCore.LoadMapInternal(evnt.map);
 
-    // start loading
-    BoltCore.LoadMapInternal(evnt.op);
+    // set remote map load state
+    connection._remoteMapLoadState = connection._remoteMapLoadState.BeginLoad(evnt.map);
 #endif
   }
 }

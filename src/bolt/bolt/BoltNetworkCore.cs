@@ -16,6 +16,7 @@ public enum BoltNetworkModes {
 internal static class BoltCore {
   static UdpSocket _udpSocket;
   static Assembly _unityAssembly;
+  static internal MapLoadState _mapLoadState;
   static internal BoltMapLoadOp _loadedMap;
   static internal BoltMapLoadOp _loadedMapTarget;
 
@@ -57,6 +58,10 @@ internal static class BoltCore {
 
   public static GameObject[] prefabs {
     get { return BoltRuntimeSettings.prefabs; }
+  }
+
+  public static bool isUnityPro {
+    get { return _autogen.isUnityPro; }
   }
 
   public static string loadedMap {
@@ -259,7 +264,26 @@ internal static class BoltCore {
       return;
     }
 
-    LoadMapInternal(new BoltMapLoadOp(name, _loadedMapTarget));
+    LoadMapInternal(new Map(name, _mapLoadState.map.token + 1));
+  }
+
+
+  internal static void LoadMapInternal (Map map) {
+    foreach (BoltEntity entity in entities) {
+      // destroy entities which we are in control of and which are not labelled as proxies
+      if (entity._flags & BoltEntity.FLAG_IS_PROXY) { continue; }
+      if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
+
+      // pop!
+      Destroy(entity);
+    }
+
+    if (_mapLoadState.map != map) {
+      _mapLoadState = _mapLoadState.BeginLoad(map);
+
+      // start loading
+      BoltMapLoader.Enqueue(_mapLoadState.map);
+    }
   }
 
   public static void Shutdown () {
@@ -483,26 +507,6 @@ internal static class BoltCore {
     return null;
   }
 
-  internal static void LoadMapInternal (BoltMapLoadOp loadOp) {
-    foreach (BoltEntity entity in entities) {
-      // destroy entities which we are in control of and which are not labelled as proxies
-      if (entity._flags & BoltEntity.FLAG_IS_PROXY) { continue; }
-      if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
-
-      // pop!
-      Destroy(entity);
-    }
-
-    // debug and stuff
-    //BoltLog.Debug("loading map {0}", map);
-
-    // the current "target" (where we cant to get in the end)
-    _loadedMapTarget = loadOp;
-
-    // load map for ourselves
-    BoltMapLoader.LoadMap(_loadedMapTarget);
-  }
-
   internal static void Send () {
     if (hasSocket) {
       BoltPhysics.SnapshotWorld();
@@ -591,8 +595,8 @@ internal static class BoltCore {
 
     // load map on clients which connect
     if (isServer) {
-      if (_loadedMapTarget.isValid) {
-        cn.LoadMapOnClient(_loadedMapTarget);
+      if (_mapLoadState.map.name != null) {
+        cn.LoadMapOnClient(_mapLoadState.map);
       } else {
         BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
@@ -682,7 +686,7 @@ internal static class BoltCore {
 
     CreateGlobalBehaviour(typeof(BoltPoll));
     CreateGlobalBehaviour(typeof(BoltSend));
-    CreateGlobalBehaviour(_autogen.loadBehaviourType);
+    CreateGlobalBehaviour(typeof(BoltMapLoader));
 
     if (isServer) {
       CreateGlobalBehaviour(typeof(BoltEventServerReceiver));
@@ -867,4 +871,26 @@ internal static class BoltCore {
         break;
     }
   }
+  internal static void LoadMapBeginInternal (Map map) {
+    if (isServer) {
+      var it = _connections.GetIterator();
+
+      while (it.Next()) {
+        it.val.LoadMapOnClient(map);
+      }
+    }
+
+    BoltCallbacksBase.MapLoadLocalBeginInvoke(map.name);
+  }
+
+  internal static void LoadMapDoneInternal (Map map) {
+    BoltCallbacksBase.MapLoadLocalDoneInvoke(map.name);
+
+    var it = _connections.GetIterator();
+
+    while (it.Next()) {
+      it.val.TriggerRemoteMapDoneCallbacks();
+    }
+  }
+
 }

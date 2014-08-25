@@ -2,8 +2,7 @@
 using UdpKit;
 
 internal interface IBoltNetwork {
-  Type loadBehaviourType { get; }
-
+  bool isUnityPro { get; }
   void Setup ();
   void Reset ();
 }
