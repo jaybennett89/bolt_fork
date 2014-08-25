@@ -17,8 +17,6 @@ internal static class BoltCore {
   static UdpSocket _udpSocket;
   static Assembly _unityAssembly;
   static internal MapLoadState _mapLoadState;
-  static internal BoltMapLoadOp _loadedMap;
-  static internal BoltMapLoadOp _loadedMapTarget;
 
   static internal uint _uid;
   static internal uint _uidEntityCounter;
@@ -65,7 +63,7 @@ internal static class BoltCore {
   }
 
   public static string loadedMap {
-    get { return _loadedMap.map; }
+    get { return _mapLoadState.map.name; }
   }
 
   public static byte[] userAssemblyHash {

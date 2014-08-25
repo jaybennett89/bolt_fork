@@ -32,10 +32,6 @@ public class BoltConnection : BoltObject {
   internal Bits _flags;
   internal MapLoadState _remoteMapLoadState;
 
-  internal BoltMapLoadOp _loadedMap;
-  internal BoltMapLoadOp _loadedMapTarget;
-  internal BoltMapLoadOp _loadedMapCallback;
-
   internal BoltEventChannel _eventChannel;
   internal BoltEntityChannel _entityChannel;
   internal BoltEntityChannel.CommandChannel _commandChannel;
@@ -243,6 +239,9 @@ public class BoltConnection : BoltObject {
 
       // done!
       _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.map);
+
+      // this gotta be true now
+      Assert.True(_remoteMapLoadState.stage == MapLoadStage.CallbackDone);
     }
   }
 
