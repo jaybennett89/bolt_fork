@@ -884,13 +884,26 @@ internal static class BoltCore {
   }
 
   internal static void LoadMapDoneInternal (Map map) {
+    Assert.True(_mapLoadState.stage == MapLoadStage.Load);
+    _mapLoadState = _mapLoadState.FinishLoad(_mapLoadState.map, _mapLoadState.map);
+    Assert.True(_mapLoadState.stage == MapLoadStage.LoadDone);
+    _mapLoadState = _mapLoadState.BeginCallback(_mapLoadState);
+    Assert.True(_mapLoadState.stage == MapLoadStage.Callback);
+    _mapLoadState = _mapLoadState.FinishCallback(_mapLoadState.map);
+    Assert.True(_mapLoadState.stage == MapLoadStage.CallbackDone);
+
+    BoltIterator<BoltConnection> it;
+
+    it = _connections.GetIterator();
+    while (it.Next()) {
+      it.val.SendMapLoadDoneToRemote();
+    }
+
     BoltCallbacksBase.MapLoadLocalDoneInvoke(map.name);
 
-    var it = _connections.GetIterator();
-
+    it = _connections.GetIterator();
     while (it.Next()) {
       it.val.TriggerRemoteMapDoneCallbacks();
     }
   }
-
 }

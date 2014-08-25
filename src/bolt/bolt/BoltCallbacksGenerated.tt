@@ -52,6 +52,7 @@ partial class BoltCallbacksBase {
   }
 
   internal static void <#= cb.Key #>Invoke(<#= args #>) { 
+    BoltLog.Debug("Invoking callback <#= cb.Key #>");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.<#= cb.Key #>(<#= callArgs #>);
     }

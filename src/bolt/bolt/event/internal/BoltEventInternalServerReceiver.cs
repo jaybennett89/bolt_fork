@@ -12,7 +12,7 @@ class BoltEventServerReceiver : BoltEventGlobalReceiverInternal, ILoadMapDoneRec
     switch (connection._remoteMapLoadState.stage) {
       case MapLoadStage.Load:
         // we are loading a new map
-        connection.SendMapLoadEventToRemote(); break;
+        connection.SendMapLoadToRemote(); break;
 
       case MapLoadStage.LoadDone:
         // we are done loading and should try to trigger callback

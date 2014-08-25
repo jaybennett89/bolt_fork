@@ -116,6 +116,7 @@ partial class BoltCallbacksBase {
   }
 
   internal static void MapLoadLocalBeginInvoke(string map) { 
+    BoltLog.Debug("Invoking callback MapLoadLocalBegin");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.MapLoadLocalBegin(map);
     }
@@ -126,6 +127,7 @@ partial class BoltCallbacksBase {
   }
 
   internal static void MapLoadLocalDoneInvoke(string map) { 
+    BoltLog.Debug("Invoking callback MapLoadLocalDone");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.MapLoadLocalDone(map);
     }
@@ -136,6 +138,7 @@ partial class BoltCallbacksBase {
   }
 
   internal static void MapLoadRemoteDoneInvoke(string map, BoltConnection connection) { 
+    BoltLog.Debug("Invoking callback MapLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.MapLoadRemoteDone(map, connection);
     }

@@ -12,6 +12,14 @@ struct Map {
     this.token = token;
   }
 
+  public override int GetHashCode () {
+    return token ^ name.GetHashCode();
+  }
+
+  public override bool Equals (object obj) {
+    return ((Map) obj) == this;
+  }
+
   public static bool operator == (Map a, Map b) {
     return a.name == b.name && a.token == b.token;
   }
@@ -60,8 +68,6 @@ struct MapLoadState {
   }
 
   public MapLoadState BeginCallback (MapLoadState localState) {
-    Assert.True(this.stage >= MapLoadStage.LoadDone);
-
     if (this.map == localState.map) {
       if (localState.stage >= MapLoadStage.LoadDone) {
         return ChangeStage(MapLoadStage.Callback);

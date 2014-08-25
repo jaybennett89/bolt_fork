@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 public class ServerCallbacks : BoltCallbacks {
-  public override void MapLoadDone (string arg) {
+  public override void MapLoadLocalDone (string arg) {
     // Spawn entity for server
     BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player);
     entity.transform.position = new Vector3(0, 1f, 0);
@@ -11,7 +11,7 @@ public class ServerCallbacks : BoltCallbacks {
     entity.TakeControl();
   }
 
-  public override void ClientLoadedMap (BoltConnection arg) {
+  public override void MapLoadRemoteDone (string map, BoltConnection arg) {
     // spawn new entity
     BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Player);
 

@@ -215,13 +215,24 @@ public class BoltConnection : BoltObject {
     _remoteMapLoadState = _remoteMapLoadState.BeginLoad(map);
 
     if (_remoteMapLoadState.stage == MapLoadStage.Load) {
-      SendMapLoadEventToRemote();
+      SendMapLoadToRemote();
     }
   }
 
-  internal void SendMapLoadEventToRemote () {
+  internal void SendMapLoadDoneToRemote () {
+    Assert.True(BoltCore._mapLoadState.stage >= MapLoadStage.Callback);
+    Assert.True(BoltCore._mapLoadState.map == _remoteMapLoadState.map);
+
+    Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.map);
+  }
+
+  internal void SendMapLoadToRemote () {
     Assert.True(udpConnection.IsServer);
     Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.map);
+
+    if (BoltCore._mapLoadState.stage == MapLoadStage.CallbackDone) {
+      SendMapLoadDoneToRemote();
+    }
   }
 
   internal void TriggerRemoteMapDoneCallbacks () {

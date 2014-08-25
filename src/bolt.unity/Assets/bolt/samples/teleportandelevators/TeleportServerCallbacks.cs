@@ -21,7 +21,7 @@ public class TeleportServerCallbacks : BoltCallbacks {
     entity.GiveControl(arg);
   }
 
-  public override void MapLoadDone (string arg) {
+  public override void MapLoadLocalDone (string arg) {
     SpawnAvatar().TakeControl();
   }
 
