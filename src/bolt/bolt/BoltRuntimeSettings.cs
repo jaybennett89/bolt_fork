@@ -49,6 +49,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public bool consoleVisibleByDefault = true;
 
+  [SerializeField]
+  public int compilationWarnLevel = 4;
+
   public BoltConfig GetConfigCopy () {
     return _config.Clone();
   }

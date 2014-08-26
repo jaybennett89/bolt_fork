@@ -253,9 +253,9 @@ class BoltUserAssemblyCompiler {
 
   static void RunCSharpCompiler (BoltCompilerOperation op) {
 #if DEBUG
-    const string CMD_ARGS = "\"{0}\" -out:\"{1}\" {2} -platform:anycpu -target:library -debug+ -optimize- ";
+    const string CMD_ARGS = "\"{0}\" -out:\"{1}\" {2} -platform:anycpu -target:library -debug+ -optimize- -warn:{3} ";
 #else
-    const string CMD_ARGS = "\"{0}\" -out:\"{1}\" {2} -platform:anycpu -target:library -debug- -optimize+ -warn:0 ";
+    const string CMD_ARGS = "\"{0}\" -out:\"{1}\" {2} -platform:anycpu -target:library -debug- -optimize+ -warn:{3} ";
 #endif
 
     string args = CMD_ARGS;
@@ -266,7 +266,7 @@ class BoltUserAssemblyCompiler {
 
     Process p = new Process();
     p.StartInfo.FileName = monoPath;
-    p.StartInfo.Arguments = string.Format(args + sourceFileList, csharpCompilerPath, boltUserAssemblyPath, assemblyReferencesList);
+    p.StartInfo.Arguments = string.Format(args + sourceFileList, csharpCompilerPath, boltUserAssemblyPath, assemblyReferencesList, Mathf.Clamp(BoltRuntimeSettings.instance.compilationWarnLevel, 0, 4));
 
     p.EnableRaisingEvents = true;
     p.StartInfo.CreateNoWindow = true;
