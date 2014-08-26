@@ -5,6 +5,7 @@ open Fake.FileSystemHelper
 open Fake.FileUtils
 
 let ndkPath = environVar "ndkbuild"
+let isRelease = hasBuildParam "release"
 let buildiOS = hasBuildParam "ios" && isMacOS
 let buildAndroid = hasBuildParam "ndkbuild"
 
@@ -50,8 +51,16 @@ Target "BuildAndroidNative" (fun _ ->
 )
 
 Target "BuildBolt" (fun _ ->
+  log "DEBUG MODE"
   ["./src/bolt/bolt.sln"]
   |> MSBuildDebug buildDir "Build"
+  |> Log "AppBuild-Output: "
+)
+
+Target "BuildBoltRelease" (fun _ ->
+  log "RELEASE MODE"
+  ["./src/bolt/bolt.sln"]
+  |> MSBuildRelease buildDir "Build"
   |> Log "AppBuild-Output: "
 )
 
@@ -98,10 +107,12 @@ Target "InstallBoltDebugFiles" (fun _ ->
 "Clean"
   =?> ("BuildIOSNative", buildiOS)
   =?> ("BuildAndroidNative", buildAndroid)  
-  ==> "BuildBolt" 
+  ==> (if isRelease then "BuildBoltRelease" else "BuildBolt")
   =?> ("InstallIOSNative", buildiOS)
   =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
-  ==> "InstallBoltDebugFiles"
+  =?> ("InstallBoltDebugFiles", not isRelease)
 
-Run "InstallBoltDebugFiles"
+if isRelease 
+  then Run "InstallBolt"
+  else Run "InstallBoltDebugFiles"
