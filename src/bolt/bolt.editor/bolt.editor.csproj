@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;BOLT_EDITOR</DefineConstants>
+    <DefineConstants>TRACE;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
