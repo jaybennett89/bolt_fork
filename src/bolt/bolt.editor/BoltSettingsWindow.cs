@@ -108,6 +108,11 @@ public class BoltSettingsWindow : EditorWindow {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     EditorGUILayout.BeginVertical();
 
+    BoltAssetEditorGUI.Label("Compiler Warn Level", () => {
+      settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
+      settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
+    });
+
     BoltAssetEditorGUI.Label("Use Unique Ids", () => {
       settings._config.globalUniqueIds = EditorGUILayout.Toggle(settings._config.globalUniqueIds);
     });
@@ -187,7 +192,7 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Header("console", "Console");
     Console();
-    
+
     EditorGUILayout.EndScrollView();
     GUILayout.EndArea();
     GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
