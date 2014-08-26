@@ -11,10 +11,14 @@ let buildAndroid = hasBuildParam "ndkbuild"
 
 let iosDir = "./src/bolt/udpkit.native/ios"
 let androidDir = "./src/bolt/udpkit.native/android"
-let unityDir = "./src/bolt.unity"
 let buildDir = "./build"
 let buildDirUdpKit = "./build/udpkit"
 let rootDir = currentDirectory
+
+let unityDir =
+  if (hasBuildParam "unityProjectDir") 
+    then environVar "unityProjectDir"
+    else "./src/bolt.unity"
 
 let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
@@ -50,15 +54,13 @@ Target "BuildAndroidNative" (fun _ ->
   CopyFile "./src/bolt/bolt.editor/Resources" "./build/libudpkit_android.so" 
 )
 
-Target "BuildBolt" (fun _ ->
-  log "DEBUG MODE"
+Target "BuildBoltDebug" (fun _ ->
   ["./src/bolt/bolt.sln"]
   |> MSBuildDebug buildDir "Build"
   |> Log "AppBuild-Output: "
 )
 
 Target "BuildBoltRelease" (fun _ ->
-  log "RELEASE MODE"
   ["./src/bolt/bolt.sln"]
   |> MSBuildRelease buildDir "Build"
   |> Log "AppBuild-Output: "
@@ -66,26 +68,30 @@ Target "BuildBoltRelease" (fun _ ->
 
 Target "InstallAndroidNative" (fun _ ->
   mkdir "./src/bolt.unity/Assets/Plugins/Android"
-  CopyFile "./src/bolt.unity/Assets/Plugins/Android" (buildDir + "/libudpkit_android.so")
-  ()
+  CopyFile (unityDir + "/Assets/Plugins/Android") (buildDir + "/libudpkit_android.so")
 )
 
 Target "InstallIOSNative" (fun _ ->
   mkdir "./src/bolt.unity/Assets/Plugins/iOS"
-  CopyFile "./src/bolt.unity/Assets/Plugins/iOS" (buildDir + "/libudpkit_ios.a")
-  ()
+  CopyFile (unityDir + "/Assets/Plugins/iOS") (buildDir + "/libudpkit_ios.a")
 )
 
 Target "InstallBolt" (fun _ ->
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies" (buildDir + "/bolt.dll")
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies/editor/" (buildDir + "/bolt.editor.dll")
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.dll")
+  mkdir (unityDir + "/Assets/bolt/assemblies")
+  mkdir (unityDir + "/Assets/bolt/assemblies/editor")
+  mkdir (unityDir + "/Assets/bolt/assemblies/udpkit")
+
+  CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->
-  let pdb2mdbPath = @"C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
+  // have to convert pdb to mdb on windows
   if isWindows then
+    let pdb2mdbPath =  @"C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
+
     (directoryInfo "./build")
     |> filesInDirMatching "*.pdb"
     |> Seq.iter (fun file ->
@@ -99,15 +105,16 @@ Target "InstallBoltDebugFiles" (fun _ ->
       |> ignore
     )
     
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies" (buildDir + "/bolt.dll.mdb")
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies/editor/" (buildDir + "/bolt.editor.dll.mdb")
-  CopyFile "./src/bolt.unity/Assets/bolt/assemblies/udpkit/" (buildDir + "/udpkit.dll.mdb")
+  // copy files into unity folder
+  CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll.mdb")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll.mdb")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
 )
 
 "Clean"
   =?> ("BuildIOSNative", buildiOS)
   =?> ("BuildAndroidNative", buildAndroid)  
-  ==> (if isRelease then "BuildBoltRelease" else "BuildBolt")
+  ==> (if isRelease then "BuildBoltRelease" else "BuildBoltDebug")
   =?> ("InstallIOSNative", buildiOS)
   =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
