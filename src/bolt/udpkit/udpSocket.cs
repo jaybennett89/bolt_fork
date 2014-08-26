@@ -1165,11 +1165,6 @@ namespace UdpKit {
     }
 #endif
 
-    #region Partial Methods
-    partial void DelayPacket (UdpEndPoint ep, byte[] data, int length);
-    partial void RecvDelayedPackets ();
-    #endregion
-
     public static UdpSocket Create (UdpPlatform platform, UdpSerializerFactory serializer, UdpConfig config) {
       return new UdpSocket(platform, serializer, config);
     }
