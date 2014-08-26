@@ -30,7 +30,7 @@ namespace UdpKit {
             }
         }
 
-        partial void DelayPacket (UdpEndPoint ep, byte[] data, int length) {
+         void DelayPacket (UdpEndPoint ep, byte[] data, int length) {
             uint pingMin = (uint) Config.SimulatedPingMin;
             uint pingMax = (uint) Config.SimulatedPingMax;
             uint delay =  pingMin + (uint) ((pingMax - pingMin) * Config.NoiseFunction());
@@ -48,7 +48,7 @@ namespace UdpKit {
             delayedPackets.Enqueue(packet);
         }
 
-        partial void RecvDelayedPackets () {
+         void RecvDelayedPackets () {
             while (delayedPackets.Count > 0 && GetCurrentTime() >= delayedPackets.Peek().Time) {
                 DelayedPacket packet = delayedPackets.Dequeue();
                 UdpStream stream = GetReadStream();
@@ -75,6 +75,12 @@ namespace UdpKit {
 
         bool ShouldDropPacket {
             get { return false; }
+        }
+  
+        void DelayPacket (UdpEndPoint ep, byte[] data, int length) {
+        }
+  
+        void RecvDelayedPackets () {
         }
     }
 #endif
