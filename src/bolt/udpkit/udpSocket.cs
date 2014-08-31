@@ -15,7 +15,6 @@ namespace UdpKit {
   }
 
   public partial class UdpSocket {
-
     /// <summary>
     /// The amount of redundant acks we should do, valid values are:
     /// 8, 16, 24, 32, 40, 48, 56, 64
@@ -38,7 +37,7 @@ namespace UdpKit {
     /// </summary>
     public static int HeaderBitSize {
       // do not change this code unless you know EXACTLY what you are doings
-      get { return ((UdpHeader.SEQ_BITS + UdpHeader.SEQ_PADD) * 2) + AckRedundancy + (CalculateNetworkPing ? 16 : 0); }
+      get { return ((UdpHeader.SEQ_BITS + UdpHeader.SEQ_PADD) * 2) + AckRedundancy + (CalculateNetworkPing ? UdpHeader.NETPING_BITS : 0); }
     }
 
     readonly internal UdpConfig Config;
@@ -249,6 +248,13 @@ namespace UdpKit {
     /// <param name="endpoint">The endpoint to cancel connect attempt to</param>
     public void CancelConnect (UdpEndPoint endpoint) {
       Raise(UdpEvent.INTERNAL_CONNECT_CANCEL, endpoint);
+    }
+
+    /// <summary>
+    /// Removes all existing found sessions
+    /// </summary>
+    public void ForgetAllSessions () {
+      Raise(UdpEvent.INTERNAL_FORGET_ALL_SESSIONS);
     }
 
     /// <summary>
@@ -747,11 +753,16 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_ENABLE_BROADCAST: OnEventEnableBroadcast(ev); break;
           case UdpEvent.INTERNAL_DISABLE_BROADCAST: OnEventDisableBroadcast(ev); break;
           case UdpEvent.INTERNAL_SET_SESSION_DATA: OnEventSetSessionData(ev); break;
+          case UdpEvent.INTERNAL_FORGET_ALL_SESSIONS: OnEventForgetAllSessions(ev); break;
 #if CLOUD
           case UdpEvent.INTERNAL_CLOUD_SET_MASTER: OnEventSetCloudMaster(ev); break;
 #endif
         }
       }
+    }
+
+    void OnEventForgetAllSessions (UdpEvent ev) {
+      sessionHandler.Sessions = new UdpBag<UdpSession>();
     }
 
     void OnEventSetSessionData (UdpEvent ev) {
@@ -980,7 +991,6 @@ namespace UdpKit {
         UdpStream stream = GetReadStream();
 
         if (platform.RecvFrom(stream.Data, stream.Data.Length, ref bytes, ref ep)) {
-
 #if CLOUD
           if (mode == UdpSocketMode.Cloud) {
             RecvCloudPacket(ref ep, stream);

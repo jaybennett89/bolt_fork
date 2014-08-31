@@ -24,6 +24,8 @@
   }
 
   public class UdpConnection {
+    public volatile bool RemoteHasAppInBackground;
+
     /// <summary>
     /// A user-assignable object
     /// </summary>
@@ -447,6 +449,8 @@
 
       UdpHeader header = new UdpHeader();
       header.Unpack(stream, socket);
+
+      RemoteHasAppInBackground = header.InBackground;
 
       // after unpacking the header, the pointer should be at the header size
       UdpAssert.Assert(stream.Ptr == UdpSocket.HeaderBitSize);
