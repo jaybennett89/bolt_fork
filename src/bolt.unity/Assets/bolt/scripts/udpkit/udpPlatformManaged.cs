@@ -2,23 +2,26 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Diagnostics;
 
+#if !UNITY_WEBPLAYER
+using System.Net.NetworkInformation;
+#endif
+
 namespace UdpKit {
-	class UdpPrecisionTimer {
-		static readonly long start = Stopwatch.GetTimestamp();
-		static readonly double freq = 1.0 / (double) Stopwatch.Frequency;
-		
-		internal static uint GetCurrentTime () {
-			long diff = Stopwatch.GetTimestamp() - start;
-			double seconds = (double) diff * freq;
-			return (uint) (seconds * 1000.0);
-		}
-	}
-	
-	public sealed class UdpPlatformManaged : UdpPlatform {
+  class UdpPrecisionTimer {
+    static readonly long start = Stopwatch.GetTimestamp();
+    static readonly double freq = 1.0 / (double) Stopwatch.Frequency;
+
+    internal static uint GetCurrentTime () {
+      long diff = Stopwatch.GetTimestamp() - start;
+      double seconds = (double) diff * freq;
+      return (uint) (seconds * 1000.0);
+    }
+  }
+
+  public sealed class UdpPlatformManaged : UdpPlatform {
     Socket socket;
     EndPoint recvEndPoint;
     IPAddress convertAddress;
@@ -199,6 +202,7 @@ namespace UdpKit {
       } catch { }
     }
 
+#if !UNITY_WEBPLAYER
     static bool IsValidInterface (NetworkInterface nic, IPInterfaceProperties p) {
       foreach (var addr in p.GatewayAddresses) {
         byte[] bytes = addr.Address.GetAddressBytes();
@@ -225,7 +229,7 @@ namespace UdpKit {
 
             if (nic.OperationalStatus == OperationalStatus.Up || nic.OperationalStatus == OperationalStatus.Unknown) {
               IPInterfaceProperties p = nic.GetIPProperties();
-              
+
               if ((strict == false) || IsValidInterface(nic, p)) {
                 foreach (UnicastIPAddressInformation address in p.UnicastAddresses) {
                   if (address.Address.AddressFamily == AddressFamily.InterNetwork) {
@@ -259,10 +263,15 @@ namespace UdpKit {
 
       return IPAddress.Any;
     }
+#endif
 
 #pragma warning disable 618
     static public UdpIPv4Address FindBroadcastAddress () {
+#if UNITY_WEBPLAYER
+      return new UdpIPv4Address(255, 255, 255, 255);
+#else
       return new UdpIPv4Address(FindBroadcastAddress(true).Address);
+#endif
     }
 #pragma warning restore 618
   }
