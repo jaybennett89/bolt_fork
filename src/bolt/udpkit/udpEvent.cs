@@ -51,6 +51,7 @@ namespace UdpKit {
     internal const int INTERNAL_ENABLE_BROADCAST = 23;
     internal const int INTERNAL_DISABLE_BROADCAST = 29;
     internal const int INTERNAL_SET_SESSION_DATA = 25;
+    internal const int INTERNAL_FORGET_ALL_SESSIONS = 31;
 
     internal const int PUBLIC_CONNECT_REQUEST = 2;
     internal const int PUBLIC_CONNECT_FAILED = 4;
