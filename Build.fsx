@@ -133,9 +133,19 @@ Target "InstallBoltDebugFiles" (fun _ ->
 )
 
 Target "CreateUnityPackage" (fun _ -> 
+
+  let dirs = 
+    ["Assets/bolt/assemblies"; "Assets/bolt/resources"; "Assets/bolt/scenes"; "Assets/bolt/scripts"]
+    |> String.concat " "
+
   execProcessCheckFail (fun s -> 
     s.FileName <- unityPath
-    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage \"Assets/bolt\" \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName (directoryInfo buildDir).FullName
+    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -executeMethod BoltUserAssemblyCompiler.Run" (directoryInfo "./src/bolt.unity").FullName
+  )
+
+  execProcessCheckFail (fun s -> 
+    s.FileName <- unityPath
+    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage %s \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName dirs (directoryInfo buildDir).FullName
   )
 )
 
