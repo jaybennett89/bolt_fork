@@ -121,7 +121,7 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.logTargets = (BoltConfigLogTargets) EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
 
-    if (settings._config.applicationGuid == null) {
+    if (settings._config.applicationGuid == null || settings._config.applicationGuid.Length != 16) {
       settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
       Save();
     }
