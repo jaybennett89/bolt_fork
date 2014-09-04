@@ -756,7 +756,7 @@ internal static class BoltCore {
     if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
     if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
     if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
-    if (fileLog) { BoltLog.Add(new BoltLog.File()); }
+    //if (fileLog) { BoltLog.Add(new BoltLog.File()); }
 
     // set config
     _config = config;
