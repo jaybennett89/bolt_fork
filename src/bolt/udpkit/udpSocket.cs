@@ -644,8 +644,8 @@ namespace UdpKit {
             RecvDelayedPackets();
             RecvNetworkData();
             ProcessTimeouts();
-            ProcessIncommingEvents(false);
             ProcessSessionDiscovery();
+            ProcessIncommingEvents(false);
 
             frame += 1;
           }
@@ -746,7 +746,12 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_ACCEPT: OnEventAccept(ev); break;
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconect(ev); break;
-          case UdpEvent.INTERNAL_CLOSE: OnEventClose(ev); break;
+
+          case UdpEvent.INTERNAL_CLOSE: 
+            OnEventClose(ev); 
+            return;
+            break;
+
           case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
           case UdpEvent.INTERNAL_CONNECTION_OPTION: OnEventConnectionOption(ev); break;
           case UdpEvent.INTERNAL_SLEEP: OnEventSleep(ev); break;
