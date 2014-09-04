@@ -9,6 +9,7 @@ let isRelease = hasBuildParam "release"
 let buildiOS = hasBuildParam "ios" && isMacOS
 let buildAndroid = hasBuildParam "ndkbuild"
 
+
 let iosDir = "./src/bolt/udpkit.native/ios"
 let androidDir = "./src/bolt/udpkit.native/android"
 let buildDir = "./build"
@@ -23,6 +24,26 @@ let unityDir =
 let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
   System.Environment.OSVersion.Platform <> System.PlatformID.Unix
+
+let unityPackageSlim =
+  hasBuildParam "package-nosamples"
+
+let unityPackageCreate = 
+  hasBuildParam "package" || hasBuildParam "package-nosamples"
+
+let unityPath = 
+  if hasBuildParam "unityPath" then 
+    let n = environVar "unityPath"
+    log n
+    log n
+    log n
+    log n
+    n
+  elif isWindows then 
+    @"C:\Program Files (x86)\Unity\Editor\Unity.exe"
+
+  else 
+    @""
 
 let execProcessCheckFail f =
   if execProcess f (System.TimeSpan.FromMinutes 5.0) |> not then
@@ -111,6 +132,13 @@ Target "InstallBoltDebugFiles" (fun _ ->
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
 )
 
+Target "CreateUnityPackage" (fun _ -> 
+  execProcessCheckFail (fun s -> 
+    s.FileName <- unityPath
+    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage \"Assets/bolt\" \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName (directoryInfo buildDir).FullName
+  )
+)
+
 "Clean"
   =?> ("BuildIOSNative", buildiOS)
   =?> ("BuildAndroidNative", buildAndroid)  
@@ -119,7 +147,13 @@ Target "InstallBoltDebugFiles" (fun _ ->
   =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
   =?> ("InstallBoltDebugFiles", not isRelease)
+  =?> ("CreateUnityPackage", unityPackageCreate)
 
-if isRelease 
-  then Run "InstallBolt"
-  else Run "InstallBoltDebugFiles"
+if unityPackageCreate then 
+  Run "CreateUnityPackage"
+
+elif isRelease then 
+  Run "InstallBolt"
+
+else 
+  Run "InstallBoltDebugFiles"
