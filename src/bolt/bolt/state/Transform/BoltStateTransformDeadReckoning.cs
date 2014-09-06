@@ -121,6 +121,7 @@ public abstract class BoltStateTransformDeadReckoning : BoltStateTransform, IBol
         var f = _buffer.Dequeue();
 
         if (f.frame == _entity.boltFrame) {
+
           if (_inferVelocity) {
             f.velocity = (f.position - _to.position) / ratef;
             if (_zeroVelocityX) { f.velocity.x = 0; }
@@ -182,12 +183,10 @@ public abstract class BoltStateTransformDeadReckoning : BoltStateTransform, IBol
         break;
       }
     }
+
   }
 
   public virtual void AfterStep () {
-  }
-
-  public virtual void BeforeSend () {
     Vector3 p = transformPosition;
     Vector3 v = p - _owner.position;
     Quaternion r = transformRotation;
