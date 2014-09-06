@@ -10,7 +10,7 @@ public class VehiclesServerCallbacks : BoltCallbacks {
     }
   }
 
-  public override void MapLoadRemoteDone (BoltConnection arg, string map) {
+  public override void SceneLoadRemoteDone (BoltConnection arg, string map) {
     CarConnectionToken token = (CarConnectionToken) arg.userToken;
     token.character = BoltNetwork.Instantiate(BoltPrefabs.CarPlayer);
     token.character.transform.position = new Vector3(Random.Range(-8f, 8f), 0, Random.Range(-8f, 8f));
