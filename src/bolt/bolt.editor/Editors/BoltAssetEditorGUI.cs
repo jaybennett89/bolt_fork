@@ -16,8 +16,26 @@ public static class BoltAssetEditorGUI {
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
   public static void Header (string icon, string text) {
+    HeaderBackground(() => {
+      DrawIcon(icon, new RectOffset(6, 0, 0, 0));
 
-    GUILayout.Space(2);
+      GUIStyle label;
+      label = new GUIStyle(EditorStyles.label);
+      label.fontStyle = FontStyle.Bold;
+      label.alignment = TextAnchor.UpperLeft;
+      label.contentOffset = new Vector2(0, 0);
+      GUILayout.Label(text, label, GUILayout.ExpandWidth(false));
+    }, 2, 4);
+  }
+
+  public static void HeaderBackground (Action contents, int topSpace, int bottomSpace) {
+    BeginHeaderBackground(topSpace);
+    contents();
+    EndHeaderBackground(bottomSpace);
+  }
+
+  public static void BeginHeaderBackground (int topSpace) {
+    GUILayout.Space(topSpace);
     GUI.color = new Color(.15f, .15f, .15f);
     GUIStyle bg = new GUIStyle();
     bg.normal.background = EditorGUIUtility.whiteTexture;
@@ -25,19 +43,35 @@ public static class BoltAssetEditorGUI {
     GUILayout.BeginHorizontal(bg);
     GUI.color = Color.white;
 
-    DrawIcon(icon, new RectOffset(6, 0, 0, 0));
-    
+  }
+
+  public static void EndHeaderBackground (int bottomSpace) {
+    GUILayout.EndHorizontal();
+    GUILayout.Space(bottomSpace);
+  }
+
+
+  public static void HeaderPropertyList (string icon, string text, ref BoltAssetProperty[] properties) {
+    BeginHeaderBackground(2);
+
+    BoltAssetEditorGUI.DrawIcon(icon, new RectOffset(6, 0, 0, 0));
+
     GUIStyle label;
     label = new GUIStyle(EditorStyles.label);
     label.fontStyle = FontStyle.Bold;
     label.alignment = TextAnchor.UpperLeft;
     label.contentOffset = new Vector2(0, 0);
-    GUILayout.Label(text, label, GUILayout.ExpandWidth(false));
+    GUILayout.Label(text, label);
 
-    GUILayout.EndHorizontal();
-    GUILayout.Space(4);
+    if (mode != BoltAssetPropertyEditMode.Mecanim) {
+      if (BoltAssetEditorGUI.IconButton("properties_add", new RectOffset(0, 6, 0, 0))) {
+        ArrayUtility.Add(ref properties, BoltAssetEditorGUI.CreateProperty());
+      }
+    }
+
+    EndHeaderBackground(2);
   }
-  
+
   public static void DrawIcon (string name) {
     DrawIcon(name, new RectOffset());
   }
@@ -51,9 +85,23 @@ public static class BoltAssetEditorGUI {
     GUILayout.Box(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
   }
 
+  public static bool IconButton (string name) {
+    return IconButton(name, new RectOffset());
+  }
+
+  public static bool IconButton (string name, RectOffset offset) {
+    GUIStyle s;
+
+    s = new GUIStyle(GUIStyle.none);
+    s.margin = offset;
+
+    return GUILayout.Button(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
+  }
+
   public static GUIStyle BoxStyle (int n) {
     GUIStyle s = new GUIStyle("flow node " + n);
     s.padding = new RectOffset();
+    s.margin = new RectOffset();
     return s;
   }
 
@@ -132,20 +180,17 @@ public static class BoltAssetEditorGUI {
       if (flags.Length > 1) {
         if (i == 0) {
           style = new GUIStyle(EditorStyles.miniButtonLeft);
-        }
-        else if (i + 1 == flags.Length) {
+        } else if (i + 1 == flags.Length) {
           style = new GUIStyle(EditorStyles.miniButtonRight);
-        }
-        else {
+        } else {
           style = new GUIStyle(EditorStyles.miniButtonMid);
         }
       }
 
       if (EditorGUIUtility.isProSkin) {
-        style.normal.textColor = set ? lightOrange : style.normal.textColor;
-        style.active.textColor = set ? lightOrange : style.active.textColor;
-      }
-      else {
+        style.normal.textColor = set ? lightGreen : style.normal.textColor;
+        style.active.textColor = set ? lightGreen : style.active.textColor;
+      } else {
         if (set) {
           GUI.color = lightOrange;
         }
@@ -154,8 +199,7 @@ public static class BoltAssetEditorGUI {
       if (GUILayout.Button(flags[i], style, GUILayout.ExpandWidth(false), GUILayout.MinWidth(20))) {
         if (set) {
           mask &= ~flag;
-        }
-        else {
+        } else {
           mask |= flag;
         }
       }
@@ -180,9 +224,9 @@ public static class BoltAssetEditorGUI {
     }
 
     if (asset.compile) {
-      if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
-        BoltUserAssemblyCompiler.Run();
-      }
+      //if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
+      //BoltUserAssemblyCompiler.Run();
+      //}
     }
   }
 
@@ -205,7 +249,7 @@ public static class BoltAssetEditorGUI {
     return ps;
   }
 
-  static BoltAssetProperty CreateProperty () {
+  public static BoltAssetProperty CreateProperty () {
     BoltAssetProperty p = new BoltAssetProperty();
     p.name = "new_property";
     p.type = BoltAssetPropertyType.Float;
@@ -232,7 +276,10 @@ public static class BoltAssetEditorGUI {
 
   public static void EditPropertyName (BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
-    p.name = EditorGUILayout.TextField(p.name);
+    GUIStyle s = new GUIStyle("TextField");
+    s.normal.textColor = Color.white;
+
+    p.name = EditorGUILayout.TextField(p.name, s);
     EditorGUI.EndDisabledGroup();
   }
 
@@ -244,11 +291,17 @@ public static class BoltAssetEditorGUI {
     Label("Target", () => p.syncTarget = ToggleRow<BoltAssetSyncTarget>((int) p.syncTarget));
   }
 
+  static bool DeleteDialog () {
+    return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
+  }
+
   public static void EditPropertyDeleteButton (BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
-    if (BoltAssetEditorGUI.DeleteButton()) {
-      p.delete = true;
+
+    if (IconButton("minus", new RectOffset(0, 6, 2, 0))) {
+      p.delete = DeleteDialog();
     }
+
     EditorGUI.EndDisabledGroup();
   }
 
@@ -262,8 +315,7 @@ public static class BoltAssetEditorGUI {
     Label("Changed Callback", () => {
       if (EditorGUILayout.Toggle((p.options & BoltAssetPropertyOptions.Notify) == BoltAssetPropertyOptions.Notify)) {
         p.options |= BoltAssetPropertyOptions.Notify;
-      }
-      else {
+      } else {
         p.options &= ~BoltAssetPropertyOptions.Notify;
       }
     });
@@ -272,13 +324,21 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void EditPropertyEnabled (BoltAssetProperty p) {
-    p.enabled = GUILayout.Toggle(p.enabled, "", GUILayout.Width(14));
+    if (IconButton(p.enabled ? "status" : "status-offline", new RectOffset(6, 0, 2, 0))) {
+      p.enabled = !p.enabled;
+    }
   }
 
   public static void EditPropertyFoldout (BoltAssetProperty p) {
-    if (ArrowButton(p.foldout ? "BoltArrowDown" : "BoltArrowRight")) {
+    var noFoldout = (p.type == BoltAssetPropertyType.Bool) || (p.type == BoltAssetPropertyType.Trigger);
+
+    EditorGUI.BeginDisabledGroup(noFoldout);
+
+    if (IconButton((p.foldout && !noFoldout) ? "arrow_down" : "arrow_right", new RectOffset(0, 0, 2, 0))) {
       p.foldout = !p.foldout;
     }
+
+    EditorGUI.EndDisabledGroup();
   }
 
   public static bool ArrowButton (string icon) {
@@ -295,35 +355,35 @@ public static class BoltAssetEditorGUI {
   public static void EditPropertyType (BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
 
-    Label("Type", () => {
-      BoltAssetPropertyType type = p.type;
-      p.type = (BoltAssetPropertyType) EditorGUILayout.EnumPopup(p.type);
+    //Label("Type", () => {
+    BoltAssetPropertyType type = p.type;
+    p.type = (BoltAssetPropertyType) EditorGUILayout.EnumPopup(p.type, GUILayout.Width(80));
 
-      switch (p.type) {
-        case BoltAssetPropertyType.ByteArray:
-          if (mode != BoltAssetPropertyEditMode.Event) {
-            p.type = type;
-          }
-          break;
-
-        case BoltAssetPropertyType.Transform:
-        case BoltAssetPropertyType.Mecanim:
+    switch (p.type) {
+      case BoltAssetPropertyType.ByteArray:
+        if (mode != BoltAssetPropertyEditMode.Event) {
           p.type = type;
-          break;
+        }
+        break;
 
-        case BoltAssetPropertyType.Trigger:
-          if (mode != BoltAssetPropertyEditMode.Mecanim) {
-            p.type = type;
-          }
-          break;
+      case BoltAssetPropertyType.Transform:
+      case BoltAssetPropertyType.Mecanim:
+        p.type = type;
+        break;
 
-        case BoltAssetPropertyType.Custom:
-          if (mode != BoltAssetPropertyEditMode.State) {
-            p.type = type;
-          }
-          break;
-      }
-    });
+      case BoltAssetPropertyType.Trigger:
+        if (mode != BoltAssetPropertyEditMode.Mecanim) {
+          p.type = type;
+        }
+        break;
+
+      case BoltAssetPropertyType.Custom:
+        if (mode != BoltAssetPropertyEditMode.State) {
+          p.type = type;
+        }
+        break;
+    }
+    //});
 
     EditorGUI.EndDisabledGroup();
   }
@@ -471,33 +531,49 @@ public static class BoltAssetEditorGUI {
     //Label("Synchronize", () => s.synchronize = EditorGUILayout.Toggle(s.synchronize));
   }
 
-  public static BoltAssetProperty EditProperty (BoltAssetProperty p, BoltAssetPropertyEditMode mode, bool grouped) {
+  public static BoltAssetProperty EditProperty (BoltAssetProperty p, BoltAssetPropertyEditMode mode, bool odd) {
     BoltAssetEditorGUI.mode = mode;
 
-    GUI.color = p.isDefault ? BoltAssetEditorGUI.lightBlue : Color.white;
-    GUIStyle style = p.isDefault ? BoltAssetEditorGUI.BoxStyle(1) : BoltAssetEditorGUI.BoxStyle(0);
-    EditorGUILayout.BeginVertical(style);
+    //GUI.color = p.isDefault ? BoltAssetEditorGUI.lightBlue : Color.white;
+    //GUIStyle style = p.isDefault ? BoltAssetEditorGUI.BoxStyle(1) : BoltAssetEditorGUI.BoxStyle(0);
+
+    EditorGUILayout.BeginVertical();
+
+    //GUI.color = Color.white;
+
+    GUIStyle s = new GUIStyle(GUIStyle.none);
+    s.normal.background = EditorGUIUtility.whiteTexture;
+    s.padding = new RectOffset(0, 0, 0, 2);
+
+    float c = odd ? 0.25f : 0.3f;
+
+    GUI.color = new Color(c, c, c);
+
+    EditorGUILayout.BeginHorizontal(s);
+
     GUI.color = Color.white;
 
-    EditorGUILayout.BeginHorizontal();
+    //BoltAssetEditorGUI.HeaderBackground(() => {
     BoltAssetEditorGUI.EditPropertyEnabled(p);
     BoltAssetEditorGUI.EditPropertyFoldout(p);
 
     EditorGUI.BeginDisabledGroup(p.enabled == false);
     BoltAssetEditorGUI.EditPropertyName(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
+    BoltAssetEditorGUI.EditPropertyType(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
 
     EditorGUI.BeginDisabledGroup(p.isDefault);
-    if (ArrowButton("BoltArrowDown")) { p.shift = 1; }
-    if (ArrowButton("BoltArrowUp")) { p.shift = -1; }
+    if (IconButton("move_down", new RectOffset(0, 4, 2, 0))) { p.shift = 1; }
+    if (IconButton("move_up", new RectOffset(0, 4, 2, 0))) { p.shift = -1; }
     EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.EditPropertyDeleteButton(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
+
+    //}, 0, 0);
+
     EditorGUILayout.EndHorizontal();
 
     if (p.foldout) {
-      BoltAssetEditorGUI.EditPropertyType(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
-
-      if (mode == BoltAssetPropertyEditMode.State && grouped == false) {
+      if (mode == BoltAssetPropertyEditMode.State && odd == false) {
         BoltAssetEditorGUI.EditPropertySyncMode(p);
         BoltAssetEditorGUI.EditPropertySyncTarget(p);
       }
@@ -515,14 +591,15 @@ public static class BoltAssetEditorGUI {
 
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
-    GUILayout.Space(4);
+
+    //GUILayout.Space(2);
 
     return p;
   }
 
   public static BoltAssetProperty[] EditPropertyArray (BoltAssetProperty[] ps, BoltAssetPropertyEditMode mode, bool group) {
     for (int i = 0; i < ps.Length; ++i) {
-      ps[i] = EditProperty(ps[i], mode, group);
+      ps[i] = EditProperty(ps[i], mode, (i & 1) == 1);
 
       if (ps[i].shift != 0) {
         int s = i + ps[i].shift;
@@ -539,13 +616,6 @@ public static class BoltAssetEditorGUI {
       }
     }
 
-    if (mode != BoltAssetPropertyEditMode.Mecanim) {
-      if (GUILayout.Button("Create", EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
-        ArrayUtility.Add(ref ps, CreateProperty());
-      }
-    }
-
-    GUILayout.Space(4);
     return BoltAssetEditorGUI.RemoveDeletedProperties(ps);
   }
 

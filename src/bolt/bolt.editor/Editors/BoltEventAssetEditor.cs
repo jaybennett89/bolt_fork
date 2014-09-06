@@ -3,26 +3,31 @@ using UnityEngine;
 
 [CustomEditor(typeof(BoltEventAsset))]
 public class BoltEventAssetEditor : Editor {
+
+  public override bool UseDefaultMargins () { return false; }
+
   public override void OnInspectorGUI () {
     BoltEventAsset asset = (BoltEventAsset) target;
 
     // event specific stuff editor
-    GUILayout.Label("Settings", EditorStyles.boldLabel);
+    BoltAssetEditorGUI.Header("settings", "Settings");
+
+    //GUILayout.Label("Settings", EditorStyles.boldLabel);
 
     GUI.color = BoltAssetEditorGUI.lightOrange;
-    BoltAssetEditorGUI.EditBox(BoltAssetEditorGUI.BoxStyle(4), () => {
+    BoltAssetEditorGUI.EditBox(GUIStyle.none, () => {
       GUI.color = Color.white;
       EditorGUILayout.BeginVertical();
 
       BoltEventDeliveryMode deliveryMode = asset.deliveryMode;
 
 
-      BoltAssetEditorGUI.DarkLabel("Target", () => {
+      BoltAssetEditorGUI.Label("Target", () => {
         asset.eventMode = (BoltAssetEventMode) EditorGUILayout.EnumPopup(asset.eventMode);
       });
 
 
-      BoltAssetEditorGUI.DarkLabel("Delivery", () => {
+      BoltAssetEditorGUI.Label("Delivery", () => {
         asset.deliveryMode = (BoltEventDeliveryMode) EditorGUILayout.EnumPopup(asset.deliveryMode);
       });
 
@@ -39,13 +44,13 @@ public class BoltEventAssetEditor : Editor {
       switch (asset.eventMode) {
         case BoltAssetEventMode.Entity:
           GUILayout.BeginHorizontal();
-          BoltAssetEditorGUI.DarkLabel("Senders", () => {
+          BoltAssetEditorGUI.Label("Senders", () => {
             asset.entitySource = BoltAssetEditorGUI.ToggleRow<BoltAssetEventEntitySource>(asset.entitySource);
           });
           GUILayout.EndHorizontal();
 
           GUILayout.BeginHorizontal();
-          BoltAssetEditorGUI.DarkLabel("Receivers", () => {
+          BoltAssetEditorGUI.Label("Receivers", () => {
             asset.entityTarget = BoltAssetEditorGUI.ToggleRow<BoltAssetEventEntityTarget>(asset.entityTarget);
           });
           GUILayout.EndHorizontal();
@@ -53,13 +58,13 @@ public class BoltEventAssetEditor : Editor {
 
         case BoltAssetEventMode.Global:
           GUILayout.BeginHorizontal();
-          BoltAssetEditorGUI.DarkLabel("Senders", () => {
+          BoltAssetEditorGUI.Label("Senders", () => {
             asset.globalSource = BoltAssetEditorGUI.ToggleRow<BoltAssetEventGlobalSource>(asset.globalSource);
           });
           GUILayout.EndHorizontal();
 
           GUILayout.BeginHorizontal();
-          BoltAssetEditorGUI.DarkLabel("Receivers", () => {
+          BoltAssetEditorGUI.Label("Receivers", () => {
             asset.globalTarget = BoltAssetEditorGUI.ToggleRow<BoltAssetEventGlobalTarget>(asset.globalTarget);
           });
           GUILayout.EndHorizontal();
@@ -70,7 +75,7 @@ public class BoltEventAssetEditor : Editor {
     });
 
     // property editor
-    GUILayout.Label("Properties", EditorStyles.boldLabel);
+    BoltAssetEditorGUI.HeaderPropertyList("properties", "Properties", ref asset.properties);
     asset.properties = BoltAssetEditorGUI.EditPropertyArray(asset.properties, BoltAssetPropertyEditMode.Event, false);
 
     // compile button

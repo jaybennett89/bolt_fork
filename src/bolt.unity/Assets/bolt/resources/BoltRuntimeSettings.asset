@@ -12,12 +12,18 @@ MonoBehaviour:
   m_Name: BoltRuntimeSettings
   m_EditorClassIdentifier: 
   _prefabs:
+  - {fileID: 100000, guid: 1a74a9a6c6b98e143b3da787e6fc52f7, type: 2}
+  - {fileID: 100068, guid: 2edbce016c854e54a918477009d12aca, type: 2}
+  - {fileID: 100000, guid: 2124ab6dc334d5d43a0bce838392bb4a, type: 2}
+  - {fileID: 100000, guid: c6f7493a98e5f0e44b087b4fbe6818eb, type: 2}
+  - {fileID: 100032, guid: 0e7ee4df08df88c4880f43398f9ad2c2, type: 2}
+  - {fileID: 100102, guid: 6f909c3edc0470b47ba8fe549f4ca977, type: 2}
   - {fileID: 100102, guid: cb85761c21278dc42b8af0c82ba2af6d, type: 2}
   _config:
     framesPerSecond: 60
     autoCreateConsole: 1
     globalUniqueIds: 1
-    applicationGuid: b8abbb2374bc614294dcb527b1882216
+    applicationGuid: 4e0ccd0683b2b74b8021abcc48a73fa4
     logTargets: -1
     clientSendRate: 3
     clientDejitterDelay: 6
@@ -42,6 +48,6 @@ MonoBehaviour:
   debugStartPort: 59111
   debugStartMapName: Sample_TeleportAndElevators
   debugEditorMode: 2
-  consoleToggleKey: 103
+  consoleToggleKey: 9
   consoleVisibleByDefault: 1
   compilationWarnLevel: 4

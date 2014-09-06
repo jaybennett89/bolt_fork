@@ -11,11 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: -467024293, guid: a6c37f8d9bde2ac45bf14bc232ed017c, type: 3}
   m_Name: PlayerState
   m_EditorClassIdentifier: 
-  compile: 0
+  compile: 1
   tranform:
     name: transform
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
     syncTarget: 1
     type: 14
@@ -63,7 +63,7 @@ MonoBehaviour:
   mecanim:
     name: mecanim
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
     syncTarget: 1
     type: 15
@@ -111,7 +111,7 @@ MonoBehaviour:
   _properties:
   - name: name
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 1
     syncTarget: 3
     type: 13
