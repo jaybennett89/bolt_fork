@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server | BoltNetworkModes.Client, "Sample_RootMotion")]
 public class RootMotionSpawnScript : BoltCallbacks {

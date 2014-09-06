@@ -137,6 +137,7 @@
     uint connectAttempts;
 
     internal uint id;
+    internal byte[] token;
     internal UdpSocket socket;
     internal UdpConnectionState state;
 
@@ -208,7 +209,7 @@
 
       if (CheckState(UdpConnectionState.Connected)) {
         if (sendTime + socket.Config.PingTimeout < now || recvSinceLastSend >= socket.Config.RecvWithoutAckLimit) {
-          SendSimpleCommand(UdpCommandType.Ping);
+          SendCommand(UdpCommandType.Ping);
         }
       }
     }
@@ -337,14 +338,14 @@
       }
     }
 
-    internal void SendSimpleCommand (UdpCommandType cmd) {
+    internal void SendCommand (UdpCommandType cmd) {
+      UdpAssert.Assert(cmd != UdpCommandType.Connect);
+      UdpAssert.Assert(cmd != UdpCommandType.Accepted);
+
       if (CheckCanSend(true) == UdpSendFailReason.None) {
         UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
         stream.WriteByte((byte) cmd, 8);
 
-        for (int i = 0; i < socket.Config.HandshakeData.Length; ++i) {
-          stream.WriteByteArray(socket.Config.HandshakeData[i].Data);
-        }
 
         WriteCommandHeaderAndSend(stream, socket);
       }
@@ -364,6 +365,15 @@
       if (CheckCanSend(true) == UdpSendFailReason.None) {
         UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
         stream.WriteByte((byte) UdpCommandType.Connect, 8);
+
+        if (stream.WriteBool(token != null)) {
+          stream.WriteInt(token.Length);
+          stream.WriteByteArray(token);
+        }
+
+        for (int i = 0; i < socket.Config.HandshakeData.Length; ++i) {
+          stream.WriteByteArray(socket.Config.HandshakeData[i].Data);
+        }
 
         WriteCommandHeaderAndSend(stream, socket);
       }
@@ -623,7 +633,7 @@
           UdpLog.Info("retrying connection to {0}", endpoint.ToString());
         }
 
-        SendSimpleCommand(UdpCommandType.Connect);
+        SendConnectCommand();
 
         connectTimeout = socket.GetCurrentTime() + socket.Config.ConnectRequestTimeout;
         connectAttempts += 1u;

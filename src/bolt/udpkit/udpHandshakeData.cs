@@ -19,6 +19,6 @@
   enum UdpHandshakeResultType {
     Success,
     InvalidSize,
-    InvalidValue
+    InvalidValue,
   }
 }

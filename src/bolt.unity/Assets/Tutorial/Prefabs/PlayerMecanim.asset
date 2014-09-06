@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: -1601357315, guid: a6c37f8d9bde2ac45bf14bc232ed017c, type: 3}
   m_Name: PlayerMecanim
   m_EditorClassIdentifier: 
-  compile: 1
+  compile: 0
   replicateLayerWeights: 0
   controller: {fileID: 9100000, guid: cfbf9449d08af6c458a6bb727dd067a0, type: 2}
   properties:

@@ -80,7 +80,7 @@ internal static class BoltCore {
 
   public static IEnumerable<BoltConnection> clients {
     get { return connections.Where(c => c.udpConnection.IsServer); }
-  }                                                                                                                                   
+  }
 
   public static BoltConnection server {
     get { return connections.FirstOrDefault(c => c.udpConnection.IsClient); }
@@ -335,6 +335,10 @@ internal static class BoltCore {
   }
 
   public static void Connect (UdpEndPoint endpoint) {
+    Connect(endpoint, null);
+  }
+
+  public static void Connect (UdpEndPoint endpoint, byte[] token) {
     if (server != null) {
       BoltLog.Error("You must disconnect from the current server first");
       return;
@@ -344,7 +348,7 @@ internal static class BoltCore {
     DisableLanBroadcast();
 
     // connect
-    _udpSocket.Connect(endpoint);
+    _udpSocket.Connect(endpoint, token);
   }
 
   public static void Raise (IBoltEvent evnt) {
@@ -423,7 +427,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRequest:
-          BoltCallbacksBase.ConnectRequestInvoke(ev.EndPoint);
+          BoltCallbacksBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
           break;
 
         case UdpEventType.ConnectFailed:
@@ -798,9 +802,9 @@ internal static class BoltCore {
     // setup udpkit configuration
 #if DEBUG
     _udpConfig = new UdpConfig();
-    _udpConfig.ConnectionTimeout = 600000;
-    _udpConfig.ConnectRequestAttempts = 100;
-    _udpConfig.ConnectRequestTimeout = 1000;
+    _udpConfig.ConnectionTimeout = (uint) config.connectionTimeout;
+    _udpConfig.ConnectRequestAttempts = (uint) config.connectionRequestAttempts;
+    _udpConfig.ConnectRequestTimeout = (uint) config.connectionRequestTimeout;
 
     _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
     _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
@@ -822,9 +826,9 @@ internal static class BoltCore {
     _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketSize = 1024;
     _udpConfig.UseAvailableEventEvent = false;
-    _udpConfig.HandshakeData = new UdpHandshakeData[1];
-    //_udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    _udpConfig.HandshakeData[0] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
+    _udpConfig.HandshakeData = new UdpHandshakeData[2];
+    _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
 
 
     // create and start socket
@@ -877,7 +881,7 @@ internal static class BoltCore {
         it.val.LoadMapOnClient(map);
       }
     }
-    
+
     // call out to user code
     BoltCallbacksBase.MapLoadLocalBeginInvoke(map.name);
 

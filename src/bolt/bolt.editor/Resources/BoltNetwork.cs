@@ -201,6 +201,11 @@ public static partial class BoltNetwork {
   public static void Connect (UdpEndPoint endpoint) {
     BoltCore.Connect(endpoint);
   }
+  
+  [BoltDocsClientOnly]
+  public static void Connect (UdpEndPoint endpoint, byte[] token) {
+    BoltCore.Connect(endpoint, token);
+  }
 
   /// <summary>
   /// Start a server locally
