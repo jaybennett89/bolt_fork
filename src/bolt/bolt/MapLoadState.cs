@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-struct Map {
+struct Scene {
   public readonly int token;
   public readonly string name;
 
-  public Map (string map, int token) {
+  public Scene (string map, int token) {
     this.name = map;
     this.token = token;
   }
@@ -17,48 +17,48 @@ struct Map {
   }
 
   public override bool Equals (object obj) {
-    return ((Map) obj) == this;
+    return ((Scene) obj) == this;
   }
 
-  public static bool operator == (Map a, Map b) {
+  public static bool operator == (Scene a, Scene b) {
     return a.name == b.name && a.token == b.token;
   }
 
-  public static bool operator != (Map a, Map b) {
+  public static bool operator != (Scene a, Scene b) {
     return a.name != b.name || a.token != b.token;
   }
 }
 
-struct MapLoadState {
-  public readonly Map map;
-  public readonly MapLoadStage stage;
+struct SceneLoadState {
+  public readonly Scene scene;
+  public readonly SceneLoadStage stage;
 
-  MapLoadState (Map map, MapLoadStage stage) {
-    this.map = map;
+  SceneLoadState (Scene map, SceneLoadStage stage) {
+    this.scene = map;
     this.stage = stage;
   }
 
-  MapLoadState ChangeStage (MapLoadStage stage) {
-    return new MapLoadState(this.map, stage);
+  SceneLoadState ChangeStage (SceneLoadStage stage) {
+    return new SceneLoadState(this.scene, stage);
   }
 
-  public MapLoadState BeginLoad (Map map) {
-    if (this.map != map) {
-      Assert.True(map.token > this.map.token);
-      return new MapLoadState(map, MapLoadStage.Load);
+  public SceneLoadState BeginLoad (Scene scene) {
+    if (this.scene != scene) {
+      Assert.True(scene.token > this.scene.token);
+      return new SceneLoadState(scene, SceneLoadStage.Load);
     }
 
     return this;
   }
 
-  public MapLoadState FinishLoad (Map finished, Map target) {
-    Assert.True(this.stage >= MapLoadStage.Load);
+  public SceneLoadState FinishLoad (Scene finished, Scene target) {
+    Assert.True(this.stage >= SceneLoadStage.Load);
 
     if (target == finished) {
-      Assert.True(map == target);
+      Assert.True(scene == target);
 
-      if (this.stage == MapLoadStage.Load) {
-        return ChangeStage(MapLoadStage.LoadDone);
+      if (this.stage == SceneLoadStage.Load) {
+        return ChangeStage(SceneLoadStage.LoadDone);
       }
 
       return this;
@@ -67,39 +67,39 @@ struct MapLoadState {
     }
   }
 
-  public MapLoadState BeginCallback (MapLoadState localState) {
-    if (this.map == localState.map) {
-      if (this.stage == MapLoadStage.LoadDone && localState.stage >= MapLoadStage.LoadDone) {
-        return ChangeStage(MapLoadStage.Callback);
+  public SceneLoadState BeginCallback (SceneLoadState localState) {
+    if (this.scene == localState.scene) {
+      if (this.stage == SceneLoadStage.LoadDone && localState.stage >= SceneLoadStage.LoadDone) {
+        return ChangeStage(SceneLoadStage.Callback);
       }
 
       return this;
     } else {
-      return BeginLoad(localState.map);
+      return BeginLoad(localState.scene);
     }
   }
 
-  public MapLoadState FinishCallback (Map map) {
-    Assert.True(this.stage >= MapLoadStage.Callback);
-    Assert.True(map.token >= this.map.token);
+  public SceneLoadState FinishCallback (Scene scene) {
+    Assert.True(this.stage >= SceneLoadStage.Callback);
+    Assert.True(scene.token >= this.scene.token);
 
-    if (this.map == map) {
-      if (this.stage == MapLoadStage.Callback) {
-        return ChangeStage(MapLoadStage.CallbackDone);
+    if (this.scene == scene) {
+      if (this.stage == SceneLoadStage.Callback) {
+        return ChangeStage(SceneLoadStage.CallbackDone);
       } else {
         return this;
       }
     } else {
-      return BeginLoad(map);
+      return BeginLoad(scene);
     }
   }
 
   public override string ToString () {
-    return string.Format("[LoadMapState map={0} token={1} state={2}]", map.name, map.token, stage);
+    return string.Format("[LoadMapState scene={0} token={1} stage={2}]", scene.name, scene.token, stage);
   }
 }
 
-enum MapLoadStage {
+enum SceneLoadStage {
   Idle = 0,
   Load = 1,
   LoadDone = 2,

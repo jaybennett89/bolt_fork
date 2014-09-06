@@ -65,7 +65,7 @@ end tell'";
     BoltNetworkUtils.FindBroadcastAddress();
   }
 
-  public override void MapLoadLocalDone (string arg) {
+  public override void SceneLoadLocalDone (string arg) {
     Destroy(gameObject);
   }
 }

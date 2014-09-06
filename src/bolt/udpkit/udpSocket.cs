@@ -15,6 +15,10 @@ namespace UdpKit {
   }
 
   public partial class UdpSocket {
+    public static int MaxConnectionTokenSize {
+      get { return 512; }
+    }
+
     /// <summary>
     /// The amount of redundant acks we should do, valid values are:
     /// 8, 16, 24, 32, 40, 48, 56, 64
@@ -1081,7 +1085,7 @@ namespace UdpKit {
           if (buffer.ReadBool()) {
             int length = buffer.ReadInt();
 
-            if ((length < 0) || (length > 256)) {
+            if ((length < 0) || (length > MaxConnectionTokenSize)) {
               SendRefusedCommand(ep, new UdpHandshakeResult());
               return;
             }

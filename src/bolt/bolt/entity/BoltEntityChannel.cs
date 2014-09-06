@@ -180,7 +180,7 @@ partial class BoltEntityChannel : BoltChannel {
 
       } else if (proxy.flags & BoltEntityProxy.FLAG_CREATE) {
         if (proxy.flags & BoltEntityProxy.FLAG_CREATE_IN_PROGRESS) { continue; }
-        if (connection.isLoadingMap || BoltMapLoader.isLoading) { continue; }
+        if (connection.isLoadingMap || BoltSceneLoader.isLoading) { continue; }
 
         if (proxy.entity.IsControlledBy(connection)) {
           proxy.mask = proxy.entity.boltSerializer.controllerMask;
@@ -192,7 +192,7 @@ partial class BoltEntityChannel : BoltChannel {
 
       } else {
         // skip if the connection is disabled
-        if (connection.isLoadingMap || BoltMapLoader.isLoading) {
+        if (connection.isLoadingMap || BoltSceneLoader.isLoading) {
           continue;
         }
 

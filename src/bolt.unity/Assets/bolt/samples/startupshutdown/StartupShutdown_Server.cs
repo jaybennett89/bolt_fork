@@ -37,7 +37,7 @@ public class StartupShutdown_Server : BoltCallbacks {
     }
   }
 
-  public override void MapLoadRemoteDone (BoltConnection arg, string map) {
+  public override void SceneLoadRemoteDone (BoltConnection arg, string map) {
     BoltEntity cube =  BoltNetwork.Instantiate(BoltPrefabs.ClientCube);
     cube.transform.position = new Vector3(Random.Range(-8f, 8f), 0, Random.Range(-8f, 8f));
     cube.GiveControl(arg);
