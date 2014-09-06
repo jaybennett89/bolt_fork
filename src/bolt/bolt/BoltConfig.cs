@@ -24,6 +24,7 @@ public sealed class BoltConfig {
   public bool autoCreateConsole = true;
   public bool globalUniqueIds = false;
   public byte[] applicationGuid;
+  public bool useAssemblyChecksum = true;
   public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
   public int clientSendRate;

@@ -42,12 +42,12 @@ public class BoltSettingsWindow : EditorWindow {
 
     // uncompiled
     GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
-    
+
     // compile button
     GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
-    compileButton.normal.textColor = 
-      uncompiledCount == 0 
-        ? compileButton.normal.textColor 
+    compileButton.normal.textColor =
+      uncompiledCount == 0
+        ? compileButton.normal.textColor
         : BoltAssetEditorGUI.lightBlue;
 
     if (GUILayout.Button("Compile", compileButton)) {
@@ -176,6 +176,8 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
+    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == true);
+
     BoltAssetEditorGUI.Label("Assembly Checksum", () => {
       byte[] hash = null;
 
@@ -186,6 +188,9 @@ public class BoltSettingsWindow : EditorWindow {
       }
 
       GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x).ToUpperInvariant()).ToArray()));
+      EditorGUI.EndDisabledGroup();
+
+      settings._config.useAssemblyChecksum = EditorGUILayout.Toggle(settings._config.useAssemblyChecksum, GUILayout.Width(17));
     });
   }
 
