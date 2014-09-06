@@ -33,14 +33,10 @@ let unityPackageCreate =
 
 let unityPath = 
   if hasBuildParam "unityPath" then 
-    let n = environVar "unityPath"
-    log n
-    log n
-    log n
-    log n
-    n
+    environVar "unityPath"
+
   elif isWindows then 
-    @"C:\Program Files (x86)\Unity\Editor\Unity.exe"
+    @"C:\Program Files (x86)\Unity"
 
   else 
     @""
@@ -141,17 +137,20 @@ Target "InstallBoltDebugFiles" (fun _ ->
 )
 
 Target "CreateUnityPackage" (fun _ -> 
+  let unityExe =
+    combinePaths unityPath @"Editor\Unity.exe"
+
   let dirs = 
     ["Assets/bolt/assemblies"; "Assets/bolt/resources"; "Assets/bolt/scenes"; "Assets/bolt/scripts"]
     |> String.concat " "
 
   execProcessCheckFail (fun s -> 
-    s.FileName <- unityPath
+    s.FileName <- unityExe
     s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -executeMethod BoltUserAssemblyCompiler.Run" (directoryInfo "./src/bolt.unity").FullName
   )
 
   execProcessCheckFail (fun s -> 
-    s.FileName <- unityPath
+    s.FileName <- unityExe
     s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage %s \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName dirs (directoryInfo buildDir).FullName
   )
 )
