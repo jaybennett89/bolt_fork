@@ -16,7 +16,7 @@ namespace UdpKit {
 
   public partial class UdpSocket {
     public static int MaxConnectionTokenSize {
-      get { return 512; }
+      get { return 768; }
     }
 
     /// <summary>

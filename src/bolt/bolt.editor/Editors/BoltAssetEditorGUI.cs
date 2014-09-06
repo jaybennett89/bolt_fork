@@ -648,8 +648,11 @@ public static class BoltAssetEditorGUI {
 
   public static void Label (string label, Action action) {
     EditorGUILayout.BeginHorizontal();
-    EditorGUILayout.PrefixLabel(label);
-    action();
+    GUILayout.Label(label, GUILayout.Width(150));
+    try {
+      action();
+    } catch { };
+
     EditorGUILayout.EndHorizontal();
   }
 

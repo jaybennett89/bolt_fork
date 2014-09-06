@@ -23,11 +23,18 @@ public class BoltSettingsWindow : EditorWindow {
     }
   }
 
-  void Footer () {
+  void Footer (Rect r) {
     var version = Assembly.GetExecutingAssembly().GetName().Version;
     var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
 
-    GUILayout.BeginHorizontal();
+    GUIStyle bg;
+
+    bg = new GUIStyle(GUIStyle.none);
+    bg.normal.background = EditorGUIUtility.whiteTexture;
+
+    GUI.color = new Color(0.25f, 0.25f, 0.25f);
+    GUILayout.BeginHorizontal(bg);
+    GUI.color = Color.white;
 
     // version
     GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
@@ -35,8 +42,15 @@ public class BoltSettingsWindow : EditorWindow {
 
     // uncompiled
     GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
+    
+    // compile button
+    GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
+    compileButton.normal.textColor = 
+      uncompiledCount == 0 
+        ? compileButton.normal.textColor 
+        : BoltAssetEditorGUI.lightBlue;
 
-    if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
+    if (GUILayout.Button("Compile", compileButton)) {
       BoltUserAssemblyCompiler.Run();
     }
 
@@ -130,7 +144,6 @@ public class BoltSettingsWindow : EditorWindow {
 
   void Miscellaneous () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
-    EditorGUILayout.BeginVertical();
 
     BoltAssetEditorGUI.Label("Compiler Warn Level", () => {
       settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
@@ -150,7 +163,7 @@ public class BoltSettingsWindow : EditorWindow {
       Save();
     }
 
-    BoltAssetEditorGUI.Label("Application GUID", () => {
+    BoltAssetEditorGUI.Label("Application Identifier", () => {
       Guid g;
       g = new Guid(settings._config.applicationGuid);
       g = new Guid(EditorGUILayout.TextField(g.ToString().ToUpperInvariant()));
@@ -163,7 +176,7 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
-    BoltAssetEditorGUI.Label("Assembly Hash", () => {
+    BoltAssetEditorGUI.Label("Assembly Checksum", () => {
       byte[] hash = null;
 
       try {
@@ -174,8 +187,6 @@ public class BoltSettingsWindow : EditorWindow {
 
       GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x).ToUpperInvariant()).ToArray()));
     });
-
-    EditorGUILayout.EndVertical();
   }
 
   void Console () {
@@ -220,10 +231,15 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Header("console", "Console");
     Console();
 
+    GUILayout.Space(4);
+
     EditorGUILayout.EndScrollView();
+
+    Rect r = new Rect(0, position.height - 20, position.width, 20);
+
     GUILayout.EndArea();
-    GUILayout.BeginArea(new Rect(2, position.height - 18, position.width - 4, 20));
-    Footer();
+    GUILayout.BeginArea(r);
+    Footer(r);
     GUILayout.EndArea();
 
     if (GUI.changed) {
