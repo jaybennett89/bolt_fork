@@ -32,8 +32,8 @@ let buildDirUdpKit = "./build/udpkit"
 let rootDir = currentDirectory
 
 let unityDir =
-  if (hasBuildParam "project")
-    then environVar "project"
+  if (hasBuildParam "unityProjectPath")
+    then environVar "unityProjectPath"
     else "./src/bolt.unity"
 
 let isWindows =
@@ -44,8 +44,8 @@ let unityPackageCreate =
   hasBuildParam "package"
 
 let unityPath = 
-  if hasBuildParam "unityPath" then 
-    environVar "unityPath"
+  if hasBuildParam "unityEditorPath" then 
+    environVar "unityEditorPath"
 
   elif isWindows then 
     @"C:\Program Files (x86)\Unity"
