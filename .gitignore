@@ -1,4 +1,10 @@
+bolt.dll*
+bolt.editor.dll*
+udpkit.dll*
+
 build
+Temp
+Library
 
 .DS_Store
 bin
