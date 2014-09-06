@@ -92,7 +92,7 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
 
     BoltAssetEditorGUI.Label("Accept Token Size", () => {
-      settings._config.connectionTokenSize = Mathf.Clamp(BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, 256);
+      settings._config.connectionTokenSize = Mathf.Clamp(BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, UdpKit.UdpSocket.MaxConnectionTokenSize);
     });
 
     EditorGUI.EndDisabledGroup();
