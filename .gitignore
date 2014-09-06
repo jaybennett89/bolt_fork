@@ -1,28 +1,4 @@
-# Ignore everything
-/*
-
-# Allow these things
-
-# root files
-!.gitignore
-!*.txt
-!*.bat
-!*.fsx
-!*.sh
-
-# main src
-!/src/
-/src/*
-
-# bolt sub folder
-!/src/bolt/
-
-# bolt unity sub folder
-!/src/bolt.unity/
-/src/bolt.unity/*
-!/src/bolt.unity/Assets/
-!/src/bolt.unity/ProjectSettings/
-src/bolt/udpkit.native/android/build
+build
 
 .DS_Store
 bin
@@ -33,17 +9,3 @@ armeabi
 *.db
 *.userprefs
 *.suo
-src/bolt.unity/Assets/bolt/assemblies/bolt.dll
-src/bolt.unity/Assets/bolt/assemblies/bolt.dll.meta
-src/bolt.unity/Assets/bolt/assemblies/bolt.user.dll
-src/bolt.unity/Assets/bolt/assemblies/bolt.user.dll.meta
-src/bolt.unity/Assets/bolt/assemblies/editor.meta
-src/bolt.unity/Assets/bolt/assemblies/editor/bolt.editor.dll
-src/bolt.unity/Assets/bolt/assemblies/editor/bolt.editor.dll.meta
-src/bolt.unity/Assets/bolt/assemblies/udpkit.meta
-src/bolt.unity/Assets/bolt/assemblies/udpkit/udpkit.dll
-src/bolt.unity/Assets/bolt/assemblies/udpkit/udpkit.dll.meta
-src/bolt.unity/Assets/Plugins/Android/libudpkit_android.so
-src/bolt.unity/Assets/Plugins/Android/libudpkit_android.so.meta
-src/bolt.unity/Assets/Plugins/Android.meta
-src/bolt.unity/Assets/Plugins.meta
