@@ -4,3 +4,4 @@ public interface IBoltStateFactory {
   Type stateType { get; }
   IBoltState Create ();
 }
+ 

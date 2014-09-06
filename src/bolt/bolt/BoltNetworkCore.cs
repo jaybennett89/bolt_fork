@@ -840,10 +840,15 @@ internal static class BoltCore {
     _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketSize = 1024;
     _udpConfig.UseAvailableEventEvent = false;
-    _udpConfig.HandshakeData = new UdpHandshakeData[2];
-    _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
 
+    if (_config.useAssemblyChecksum) {
+      _udpConfig.HandshakeData = new UdpHandshakeData[2];
+      _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+      _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
+    } else {
+      _udpConfig.HandshakeData = new UdpHandshakeData[1];
+      _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    }
 
     // create and start socket
     _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);

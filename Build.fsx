@@ -4,11 +4,26 @@ open Fake.FileSystem
 open Fake.FileSystemHelper
 open Fake.FileUtils
 
+let rec findDirs (skip:string list) dir = 
+  seq {
+    yield dir
+
+    for sub in subDirectories dir do
+      if skip |> List.exists (fun d -> sub.Name.ToLowerInvariant() = d.ToLowerInvariant()) |> not then
+        yield! findDirs skip sub
+  }
+
+let rec findFiles pattern dirs =
+  seq {
+    for d in dirs do
+      for f in filesInDirMatching pattern d do
+        yield f
+  }
+
 let ndkPath = environVar "ndkbuild"
 let isRelease = hasBuildParam "release"
 let buildiOS = hasBuildParam "ios" && isMacOS
 let buildAndroid = hasBuildParam "ndkbuild"
-
 
 let iosDir = "./src/bolt/udpkit.native/ios"
 let androidDir = "./src/bolt/udpkit.native/android"
@@ -17,30 +32,23 @@ let buildDirUdpKit = "./build/udpkit"
 let rootDir = currentDirectory
 
 let unityDir =
-  if (hasBuildParam "unityProjectDir") 
-    then environVar "unityProjectDir"
+  if (hasBuildParam "unityProjectPath")
+    then environVar "unityProjectPath"
     else "./src/bolt.unity"
 
 let isWindows =
   System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
   System.Environment.OSVersion.Platform <> System.PlatformID.Unix
 
-let unityPackageSlim =
-  hasBuildParam "package-nosamples"
-
 let unityPackageCreate = 
-  hasBuildParam "package" || hasBuildParam "package-nosamples"
+  hasBuildParam "package"
 
 let unityPath = 
-  if hasBuildParam "unityPath" then 
-    let n = environVar "unityPath"
-    log n
-    log n
-    log n
-    log n
-    n
+  if hasBuildParam "unityEditorPath" then 
+    environVar "unityEditorPath"
+
   elif isWindows then 
-    @"C:\Program Files (x86)\Unity\Editor\Unity.exe"
+    @"C:\Program Files (x86)\Unity"
 
   else 
     @""
@@ -101,18 +109,10 @@ Target "InstallBolt" (fun _ ->
   mkdir (unityDir + "/Assets/bolt/assemblies")
   mkdir (unityDir + "/Assets/bolt/assemblies/editor")
   mkdir (unityDir + "/Assets/bolt/assemblies/udpkit")
-  
-  mkdir (unityDir + ".samples/Assets/bolt/assemblies")
-  mkdir (unityDir + ".samples/Assets/bolt/assemblies/editor")
-  mkdir (unityDir + ".samples/Assets/bolt/assemblies/udpkit")
 
   CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
-
-  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
-  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
-  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->
@@ -141,19 +141,37 @@ Target "InstallBoltDebugFiles" (fun _ ->
 )
 
 Target "CreateUnityPackage" (fun _ -> 
+  let unityExe =
+    combinePaths unityPath @"Editor\Unity.exe"
+
   let dirs = 
     ["Assets/bolt/assemblies"; "Assets/bolt/resources"; "Assets/bolt/scenes"; "Assets/bolt/scripts"]
     |> String.concat " "
 
   execProcessCheckFail (fun s -> 
-    s.FileName <- unityPath
+    s.FileName <- unityExe
     s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -executeMethod BoltUserAssemblyCompiler.Run" (directoryInfo "./src/bolt.unity").FullName
   )
-
+  
   execProcessCheckFail (fun s -> 
-    s.FileName <- unityPath
+    s.FileName <- unityExe
     s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage %s \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName dirs (directoryInfo buildDir).FullName
   )
+
+  let allowedMetaFiles =
+    ["BoltDebugScene.unity.meta"; "BoltRuntimeSettings.asset.meta"]
+
+  let zipRoot = (directoryInfo (unityDir + "/Assets")).FullName
+  let zipFileName = buildDir + "/bolt.zip"
+  let zipFiles = 
+    (unityDir + "/Assets/bolt") 
+    |> directoryInfo
+    |> findDirs []
+    |> findFiles "*"
+    |> Seq.map (fun f -> f.FullName)
+    
+  DeleteFile zipFileName
+  Zip zipRoot zipFileName zipFiles
 )
 
 "Clean"
