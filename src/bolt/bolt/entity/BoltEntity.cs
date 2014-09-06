@@ -681,8 +681,11 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     }
 
     // notify all clients
-    foreach (BoltConnection cn in BoltCore.clients) {
-      cn._entityChannel.DestroyOnRemote(this, BoltEntityDestroyMode.LocalDestroy);
+    var it = BoltCore._connections.GetIterator();
+
+    // propertly destroy 
+    while (it.Next()) {
+      it.val._entityChannel.DestroyOnRemote(this, BoltEntityDestroyMode.LocalDestroy);
     }
 
     // notify user
