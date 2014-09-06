@@ -512,7 +512,6 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy (BoltEntityProxy proxy, bool allowWithoutDestroy) {
-    Assert.Null(proxy.entity);
     Assert.True(proxy.flags & BoltEntityProxy.FLAG_DESTROY, "not marked with FLAG_DESTROY");
 
     _outgoingProxiesByNetworkId[proxy.networkId] = null;
