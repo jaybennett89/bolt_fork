@@ -50,6 +50,11 @@ public sealed class BoltConfig {
   public int simulatedPingJitter;
   public BoltRandomFunction simulatedRandomFunction = BoltRandomFunction.PerlinNoise;
 
+  public int connectionTimeout = 10000;
+  public int connectionRequestTimeout = 500;
+  public int connectionRequestAttempts = 20;
+  public int connectionTokenSize = 128;
+
   public BoltConfig () {
     // sendrates of server/client
     serverSendRate = 3;

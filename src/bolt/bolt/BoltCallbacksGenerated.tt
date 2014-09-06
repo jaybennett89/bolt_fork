@@ -11,10 +11,11 @@ cbs.Add("MapLoadLocalBegin", new[] { "string", "map" });
 cbs.Add("MapLoadLocalDone", new[] { "string", "map" });
 cbs.Add("MapLoadRemoteDone", new[] { "BoltConnection", "connection", "string", "map" });
 
+cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
+
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("Connected", "BoltConnection"));
 callbacks.Add(Tuple.Create<string, string>("Disconnected", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("ConnectRequest", "UdpEndPoint"));
 callbacks.Add(Tuple.Create<string, string>("ConnectFailed", "UdpEndPoint"));
 callbacks.Add(Tuple.Create<string, string>("ConnectRefused", "UdpEndPoint"));
 callbacks.Add(Tuple.Create<string, string>("ConnectedToServer", "BoltConnection"));

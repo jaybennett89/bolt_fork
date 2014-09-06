@@ -8,8 +8,6 @@ partial class BoltCallbacksBase {
    
   public virtual void Disconnected(BoltConnection arg) { }
    
-  public virtual void ConnectRequest(UdpEndPoint arg) { }
-   
   public virtual void ConnectFailed(UdpEndPoint arg) { }
    
   public virtual void ConnectRefused(UdpEndPoint arg) { }
@@ -41,12 +39,6 @@ partial class BoltCallbacksBase {
   internal static void DisconnectedInvoke(BoltConnection arg) { 
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.Disconnected(arg);
-    }
-  }
-   
-  internal static void ConnectRequestInvoke(UdpEndPoint arg) { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.ConnectRequest(arg);
     }
   }
    
@@ -141,6 +133,17 @@ partial class BoltCallbacksBase {
     BoltLog.Debug("Invoking callback MapLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.MapLoadRemoteDone(connection, map);
+    }
+  }
+
+  
+  public virtual void ConnectRequest(UdpEndPoint endpoint, byte[] token) { 
+  }
+
+  internal static void ConnectRequestInvoke(UdpEndPoint endpoint, byte[] token) { 
+    BoltLog.Debug("Invoking callback ConnectRequest");
+    foreach (BoltCallbacksBase cb in callbacks) {
+        cb.ConnectRequest(endpoint, token);
     }
   }
 

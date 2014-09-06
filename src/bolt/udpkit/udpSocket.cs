@@ -243,6 +243,14 @@ namespace UdpKit {
     }
 
     /// <summary>
+    /// Connect to remote endpoint
+    /// </summary>
+    /// <param name="endpoint">The endpoint to connect to</param>
+    public void Connect (UdpEndPoint endpoint, byte[] token) {
+      Raise(UdpEvent.INTERNAL_CONNECT, endpoint, token);
+    }
+
+    /// <summary>
     /// Cancel ongoing attempt to connect to endpoint
     /// </summary>
     /// <param name="endpoint">The endpoint to cancel connect attempt to</param>
@@ -364,6 +372,14 @@ namespace UdpKit {
       UdpEvent ev = new UdpEvent();
       ev.Type = eventType;
       ev.EndPoint = endpoint;
+      Raise(ev);
+    }
+
+    internal void Raise (int eventType, UdpEndPoint endpoint, object object0) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = eventType;
+      ev.EndPoint = endpoint;
+      ev.Object0 = object0;
       Raise(ev);
     }
 
@@ -747,8 +763,8 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconect(ev); break;
 
-          case UdpEvent.INTERNAL_CLOSE: 
-            OnEventClose(ev); 
+          case UdpEvent.INTERNAL_CLOSE:
+            OnEventClose(ev);
             return;
             break;
 
@@ -836,6 +852,7 @@ namespace UdpKit {
 
         // start joining
         UdpConnection cn = CreateConnection(ev.EndPoint, UdpConnectionMode.Client);
+        cn.token = ev.Object0 as byte[];
 
         if (cn == null) {
           UdpLog.Error("could not create connection for endpoint {0}", ev.EndPoint.ToString());
@@ -861,7 +878,7 @@ namespace UdpKit {
 
           // if we are connected, disconnect 
           else if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-            ev.Connection.SendSimpleCommand(UdpCommandType.Disconnected);
+            ev.Connection.SendCommand(UdpCommandType.Disconnected);
             ev.Connection.ChangeState(UdpConnectionState.Disconnected);
           }
         }
@@ -882,7 +899,7 @@ namespace UdpKit {
 
     void OnEventDisconect (UdpEvent ev) {
       if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-        ev.Connection.SendSimpleCommand(UdpCommandType.Disconnected);
+        ev.Connection.SendCommand(UdpCommandType.Disconnected);
         ev.Connection.ChangeState(UdpConnectionState.Disconnected);
       }
     }
@@ -891,7 +908,7 @@ namespace UdpKit {
       if (ChangeState(UdpSocketState.Running, UdpSocketState.Shutdown)) {
         for (int i = 0; i < connList.Count; ++i) {
           UdpConnection cn = connList[i];
-          cn.SendSimpleCommand(UdpCommandType.Disconnected);
+          cn.SendCommand(UdpCommandType.Disconnected);
           cn.ChangeState(UdpConnectionState.Disconnected);
         }
 
@@ -1058,6 +1075,21 @@ namespace UdpKit {
         buffer.Ptr = HeaderBitSize;
 
         if (buffer.ReadByte(8) == (byte) UdpCommandType.Connect) {
+
+          byte[] token = null;
+
+          if (buffer.ReadBool()) {
+            int length = buffer.ReadInt();
+
+            if ((length < 0) || (length > 256)) {
+              SendRefusedCommand(ep, new UdpHandshakeResult());
+              return;
+            }
+
+            token = new byte[length];
+            buffer.ReadByteArray(token);  
+          }
+
           UdpHandshakeResult handshake = VerifyHandshake(buffer);
 
           switch (handshake.type) {
@@ -1067,7 +1099,7 @@ namespace UdpKit {
                   AcceptConnection(ep);
                 } else {
                   if (pendingConnections.Add(ep)) {
-                    Raise(UdpEvent.PUBLIC_CONNECT_REQUEST, ep);
+                    Raise(UdpEvent.PUBLIC_CONNECT_REQUEST, ep, token);
                   }
                 }
               } else {
@@ -1103,12 +1135,6 @@ namespace UdpKit {
 
       if (buffer.Overflowing) {
         UdpLog.Info("handshake failed (size - overflow)");
-        result.type = UdpHandshakeResultType.InvalidSize;
-        return result;
-      }
-
-      if (buffer.Done == false) {
-        UdpLog.Info("handshake failed (size - too large)");
         result.type = UdpHandshakeResultType.InvalidSize;
         return result;
       }

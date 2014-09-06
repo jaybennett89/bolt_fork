@@ -43,7 +43,7 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.EndHorizontal();
   }
 
-  void Network () {
+  void Replication () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
@@ -52,14 +52,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Label("Packet Interval", () => {
       settings._config.serverSendRate = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
-    });
-
-    BoltAssetEditorGUI.Label("Max Connections", () => {
-      settings._config.serverConnectionLimit = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
-    });
-
-    BoltAssetEditorGUI.Label("Accept Mode", () => {
-      settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode) EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
     });
 
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
@@ -72,6 +64,38 @@ public class BoltSettingsWindow : EditorWindow {
     settings._config.clientDejitterDelay = settings._config.serverDejitterDelay;
     settings._config.clientDejitterDelayMin = settings._config.serverDejitterDelayMin;
     settings._config.clientDejitterDelayMax = settings._config.serverDejitterDelayMax;
+  }
+
+  void Connection () {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    BoltAssetEditorGUI.Label("Limit", () => {
+      settings._config.serverConnectionLimit = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
+    });
+
+    BoltAssetEditorGUI.Label("Timeout", () => {
+      settings._config.connectionTimeout = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTimeout, "ms");
+    });
+
+    BoltAssetEditorGUI.Label("Connect Timeout", () => {
+      settings._config.connectionRequestTimeout = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionRequestTimeout, "ms");
+    });
+
+    BoltAssetEditorGUI.Label("Connect Attempts", () => {
+      settings._config.connectionRequestAttempts = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionRequestAttempts, "");
+    });
+
+    BoltAssetEditorGUI.Label("Accept Mode", () => {
+      settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode) EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
+    });
+
+    EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
+
+    BoltAssetEditorGUI.Label("Accept Token Size", () => {
+      settings._config.connectionTokenSize = Mathf.Clamp(BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, 256);
+    });
+
+    EditorGUI.EndDisabledGroup();
   }
 
   void Simulation () {
@@ -181,8 +205,11 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-    BoltAssetEditorGUI.Header("network", "Network Settings");
-    Network();
+    BoltAssetEditorGUI.Header("network", "Replication");
+    Replication();
+
+    BoltAssetEditorGUI.Header("connection", "Connection");
+    Connection();
 
     BoltAssetEditorGUI.Header("latency", "Latency Simulation");
     Simulation();

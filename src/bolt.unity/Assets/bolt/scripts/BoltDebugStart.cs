@@ -25,13 +25,21 @@ end tell'";
     UdpEndPoint _serverEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, (ushort) BoltRuntimeSettings.instance.debugStartPort);
     UdpEndPoint _clientEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, 0);
 
+    BoltConfig cfg;
+    
+    cfg = BoltRuntimeSettings.instance.GetConfigCopy();
+    cfg.serverConnectionAcceptMode = BoltConnectionAcceptMode.Auto;
+    cfg.connectionTimeout = 60000000;
+    cfg.connectionRequestTimeout = 500;
+    cfg.connectionRequestAttempts = 1000;
+
     if (string.IsNullOrEmpty(BoltRuntimeSettings.instance.debugStartMapName) == false) {
       if (BoltDebugStartSettings.startServer) {
-        BoltNetwork.StartServer(_serverEndPoint, BoltRuntimeSettings.instance.GetConfigCopy());
+        BoltNetwork.StartServer(_serverEndPoint, cfg);
         BoltNetwork.LoadMap(BoltRuntimeSettings.instance.debugStartMapName);
       }
       else if (BoltDebugStartSettings.startClient) {
-        BoltNetwork.StartClient(_clientEndPoint, BoltRuntimeSettings.instance.GetConfigCopy());
+        BoltNetwork.StartClient(_clientEndPoint, cfg);
         BoltNetwork.Connect(_serverEndPoint);
       }
 
