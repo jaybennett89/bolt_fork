@@ -50,8 +50,16 @@ internal static class BoltCore {
     get { return null; }
   }
 
+  internal static Func<GameObject, Vector3, Quaternion, GameObject> _instantiate = 
+    (go, p, r) => (GameObject) UnityEngine.GameObject.Instantiate(go, p, r);
+
+  internal static Action<GameObject> _destroy =
+    (go) => GameObject.Destroy(go);
+
   public static Func<int, Transform> resolveTransform = BoltOrigin.ResolveTransform;
   public static Func<Transform, int> resolveTransformId = BoltOrigin.ResolveTransformId;
+
+
   public static Action ShutdownComplete;
 
   public static GameObject[] prefabs {
@@ -198,7 +206,7 @@ internal static class BoltCore {
 
   public static void Destroy (BoltEntity entity) {
     entity.Detach();
-    GameObject.Destroy(entity.gameObject);
+    _destroy(entity.gameObject);
   }
 
   public static void Destroy (GameObject go) {
@@ -221,8 +229,14 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate (GameObject prefab, Vector3 position, Quaternion rotation) {
     prefab.GetComponent<BoltEntity>()._sceneObject = false;
-    GameObject go = (GameObject) GameObject.Instantiate(prefab, position, rotation);
-    return Attach(go.GetComponent<BoltEntity>(), null, Bits.zero, GenerateUniqueId());
+    GameObject go = _instantiate(prefab, position, rotation);
+    BoltEntity en = go.GetComponent<BoltEntity>();
+
+    if (isClient && (en._allowInstantiateOnClient == false)) {
+      throw new BoltException("This prefab is not allowed to be instantiated on clients");
+    }
+
+    return Attach(en, null, Bits.zero, GenerateUniqueId());
   }
 
   public static BoltEntity Attach (BoltEntity entity) {

@@ -378,7 +378,7 @@ partial class BoltEntityChannel : BoltChannel {
       if (info.first) {
         packet.stream.WriteInt(proxy.entity.boltPrefabId);
         packet.stream.WriteVector3Half(proxy.entity.transform.position);
-        
+
         if (BoltCore._config.globalUniqueIds) {
           packet.stream.WriteUniqueId(proxy.entity._uniqueId);
         }
@@ -458,8 +458,16 @@ partial class BoltEntityChannel : BoltChannel {
         if (BoltRuntimeSettings.prefabs.TryGetIndex(prefabId, out prefab)) {
           Assert.Null(_incommingProxiesByNetworkId[networkId]);
 
-          var go = (GameObject) GameObject.Instantiate(prefab, spawnAt, Quaternion.identity);
+          var go = BoltCore._instantiate(prefab, spawnAt, Quaternion.identity);
           var en = go.GetComponent<BoltEntity>();
+
+          if (BoltCore.isServer) {
+            if (!en._allowInstantiateOnClient) {
+              GameObject.Destroy(go);
+
+              throw new BoltException("Received entity of prefab {1} from client at {0}, but this entity is not allowed to be instantiated from clients", connection.remoteEndPoint, prefab.name);
+            }
+          }
 
           proxy = BoltEntityProxy.Alloc();
           proxy.connection = connection;
@@ -512,7 +520,6 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy (BoltEntityProxy proxy, bool allowWithoutDestroy) {
-    Assert.Null(proxy.entity);
     Assert.True(proxy.flags & BoltEntityProxy.FLAG_DESTROY, "not marked with FLAG_DESTROY");
 
     _outgoingProxiesByNetworkId[proxy.networkId] = null;

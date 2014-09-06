@@ -15,7 +15,7 @@ MonoBehaviour:
   tranform:
     name: transform
     enabled: 1
-    foldout: 0
+    foldout: 1
     syncMode: 0
     syncTarget: 1
     type: 14
@@ -63,7 +63,7 @@ MonoBehaviour:
   mecanim:
     name: mecanim
     enabled: 1
-    foldout: 0
+    foldout: 1
     syncMode: 0
     syncTarget: 1
     type: 15

@@ -60,6 +60,7 @@ public class BoltEntityEditor : Editor {
 
       //
       entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);
+      entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Client Can Instantiate", entity._allowInstantiateOnClient);
 
       // save changes
       if (GUI.changed) {
