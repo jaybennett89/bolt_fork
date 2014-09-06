@@ -9,7 +9,7 @@ public static class BoltAssetEditorGUI {
 
   public static BoltAssetPropertyEditMode mode = BoltAssetPropertyEditMode.State;
   public static readonly Color blue = new Color(0 / 255f, 162f / 255f, 232f / 255f);
-  public static readonly Color lightBlue = new Color(0f / 255f, 232f / 255f, 226f / 255f);
+  public static readonly Color lightBlue = new Color(81f / 255f, 203f / 255f, 255f / 255f);
   public static readonly Color orange = new Color(255f / 255f, 127f / 255f, 39f / 255f);
   public static readonly Color lightGreen = new Color(105f / 255f, 251f / 255f, 9f / 255f);
   public static readonly Color darkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
@@ -188,8 +188,8 @@ public static class BoltAssetEditorGUI {
       }
 
       if (EditorGUIUtility.isProSkin) {
-        style.normal.textColor = set ? lightGreen : style.normal.textColor;
-        style.active.textColor = set ? lightGreen : style.active.textColor;
+        style.normal.textColor = set ? lightBlue : style.normal.textColor;
+        style.active.textColor = set ? lightBlue : style.active.textColor;
       } else {
         if (set) {
           GUI.color = lightOrange;

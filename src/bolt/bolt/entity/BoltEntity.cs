@@ -40,6 +40,9 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   [SerializeField]
   internal bool _clientPredicted = true;
 
+  [SerializeField]
+  internal bool _allowInstantiateOnClient = true;
+
   internal uint _id;
   internal Bits _mask;
   internal Bits _flags;
@@ -589,6 +592,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   internal void Attach (BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     if (_attached) {
+      BoltLog.Error("this entity is already attached");
       return;
     }
 

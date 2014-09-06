@@ -1571,6 +1571,7 @@ MonoBehaviour:
   _updateRate: 1
   _sceneObject: 0
   _clientPredicted: 1
+  _allowInstantiateOnClient: 1
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1

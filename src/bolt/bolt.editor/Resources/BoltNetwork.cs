@@ -124,6 +124,17 @@ public static partial class BoltNetwork {
     }
   }
 
+  public static void SetInstantiateDestroyCallbacks (Func<GameObject, Vector3, Quaternion, GameObject> instantiate, Action<GameObject> destroy) {
+    if (instantiate == null)
+      throw new System.ArgumentNullException("instantiate");
+
+    if (destroy == null)
+      throw new System.ArgumentNullException("destroy");
+
+    BoltCore._instantiate = instantiate;
+    BoltCore._destroy = destroy;
+  }
+
   /// <summary>
   /// Instantiate a prefab and attach it to bolt
   /// </summary>
@@ -187,7 +198,7 @@ public static partial class BoltNetwork {
 
   [BoltDocsServerOnly]
   public static void LoadScene (string scene) {
-    BoltCore.LoadMap(map);
+    BoltCore.LoadMap(scene);
   }
 
   ///// <summary>
