@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: -662633507, guid: a6c37f8d9bde2ac45bf14bc232ed017c, type: 3}
   m_Name: PlayerCommand
   m_EditorClassIdentifier: 
-  compile: 0
+  compile: 1
   inputProperties:
   - name: forward
     enabled: 1
@@ -203,7 +203,7 @@ MonoBehaviour:
       synchronize: 1
   - name: yRotation
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
     syncTarget: 1
     type: 5
@@ -251,7 +251,7 @@ MonoBehaviour:
   stateProperties:
   - name: position
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
     syncTarget: 1
     type: 9
@@ -298,7 +298,7 @@ MonoBehaviour:
       synchronize: 1
   - name: velocity
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
     syncTarget: 1
     type: 9

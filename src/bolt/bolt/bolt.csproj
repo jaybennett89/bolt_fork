@@ -57,13 +57,13 @@
     <Compile Include="animator\BoltMecanimInteger.cs" />
     <Compile Include="animator\BoltMecanimReflectionExtensions.cs" />
     <Compile Include="animator\BoltMecanimTrigger.cs" />
-    <Compile Include="assets\BoltCommandAsset.cs" />
-    <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltAssetEnums.cs" />
+    <Compile Include="assets\BoltAssetProperty.cs" />
     <Compile Include="assets\BoltAssetPropertyGroup.cs" />
+    <Compile Include="assets\BoltCommandAsset.cs" />
     <Compile Include="assets\BoltCompilableAsset.cs" />
     <Compile Include="assets\BoltEventAsset.cs" />
-    <Compile Include="assets\BoltAssetProperty.cs" />
+    <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
     <Compile Include="BoltCallbacksGenerated1.cs">

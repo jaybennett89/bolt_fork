@@ -4,13 +4,17 @@ using UnityEngine;
 [CustomEditor(typeof(BoltCommandAsset))]
 public class BoltCommandAssetEditor : Editor {
 
+  public override bool UseDefaultMargins () {
+    return false;
+  }
+
   public override void OnInspectorGUI () {
     BoltCommandAsset asset = (BoltCommandAsset) target;
 
-    GUILayout.Label("Input", EditorStyles.boldLabel);
+    BoltAssetEditorGUI.HeaderPropertyList("controller", "Input", ref asset.inputProperties);
     asset.inputProperties = BoltAssetEditorGUI.EditPropertyArray(asset.inputProperties, BoltAssetPropertyEditMode.Command, false);
 
-    GUILayout.Label("State", EditorStyles.boldLabel);
+    BoltAssetEditorGUI.HeaderPropertyList("result", "Result", ref asset.stateProperties);
     asset.stateProperties = BoltAssetEditorGUI.EditPropertyArray(asset.stateProperties, BoltAssetPropertyEditMode.Command, false);
 
     BoltAssetEditorGUI.CompileButton(asset);

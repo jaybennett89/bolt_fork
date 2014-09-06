@@ -4,7 +4,7 @@ using System.Security;
 using System.Runtime.InteropServices;
 
 namespace UdpKit {
-    public sealed class UdpPlatformMobile : UdpPlatform {
+  public sealed class UdpPlatformMobile : UdpPlatform {
 	
 #if UNITY_ANDROID
     public const string DLL_NAME = "udpkit_android";
@@ -12,65 +12,64 @@ namespace UdpKit {
     public const string DLL_NAME = "__Internal";
 #endif
 
-	public const int UDPKIT_SOCKET_OK = 0;
-	public const int UDPKIT_SOCKET_ERROR = -1;
-	public const int UDPKIT_SOCKET_NOTVALID = -2;
-	public const int UDPKIT_SOCKET_NODATA = -3;
+	  public const int UDPKIT_SOCKET_OK = 0;
+	  public const int UDPKIT_SOCKET_ERROR = -1;
+	  public const int UDPKIT_SOCKET_NOTVALID = -2;
+	  public const int UDPKIT_SOCKET_NODATA = -3;
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern IntPtr udpCreate ();
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern IntPtr udpCreate ();
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpBind (IntPtr socket, UdpEndPoint addr);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpBind (IntPtr socket, UdpEndPoint addr);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpEnableBroadcast (IntPtr socket);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpEnableBroadcast (IntPtr socket);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpSendTo (IntPtr socket, [Out] byte[] buffer, int size, UdpEndPoint addr);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpSendTo (IntPtr socket, [Out] byte[] buffer, int size, UdpEndPoint addr);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpRecvFrom (IntPtr socket, [Out] byte[] buffer, int size, [Out] out UdpEndPoint addr);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpRecvFrom (IntPtr socket, [Out] byte[] buffer, int size, [Out] out UdpEndPoint addr);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpRecvPoll (IntPtr socket, int timeout);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpRecvPoll (IntPtr socket, int timeout);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpLastError (IntPtr socket);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpLastError (IntPtr socket);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-     public static extern Int32 udpGetEndPoint (IntPtr socket, [Out] out UdpEndPoint addr);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+       public static extern Int32 udpGetEndPoint (IntPtr socket, [Out] out UdpEndPoint addr);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern Int32 udpClose (IntPtr socket);
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern Int32 udpClose (IntPtr socket);
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	static extern IntPtr udpPlatform ();
-	public static string udpGetPlatform () { return Marshal.PtrToStringAnsi(udpPlatform()); }
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  static extern IntPtr udpPlatform ();
+	  public static string udpGetPlatform () { return Marshal.PtrToStringAnsi(udpPlatform()); }
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	static extern IntPtr udpPlatformError ();
-	public static string udpErrorString () { return Marshal.PtrToStringAnsi(udpPlatformError()); }
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  static extern IntPtr udpPlatformError ();
+	  public static string udpErrorString () { return Marshal.PtrToStringAnsi(udpPlatformError()); }
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern UInt32 udpGetHighPrecisionTime ();
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern UInt32 udpGetHighPrecisionTime ();
 
-	[DllImport(DLL_NAME)]
-	[SuppressUnmanagedCodeSecurity]
-	public static extern UInt32 udpFindBroadcastAddress ();
-
+	  [DllImport(DLL_NAME)]
+	  [SuppressUnmanagedCodeSecurity]
+	  public static extern UInt32 udpFindBroadcastAddress ();
 
     IntPtr sptr;
     IntPtr bcptr;

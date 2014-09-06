@@ -101,10 +101,18 @@ Target "InstallBolt" (fun _ ->
   mkdir (unityDir + "/Assets/bolt/assemblies")
   mkdir (unityDir + "/Assets/bolt/assemblies/editor")
   mkdir (unityDir + "/Assets/bolt/assemblies/udpkit")
+  
+  mkdir (unityDir + ".samples/Assets/bolt/assemblies")
+  mkdir (unityDir + ".samples/Assets/bolt/assemblies/editor")
+  mkdir (unityDir + ".samples/Assets/bolt/assemblies/udpkit")
 
   CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
+
+  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
+  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
+  CopyFile (unityDir + ".samples/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->
@@ -133,7 +141,6 @@ Target "InstallBoltDebugFiles" (fun _ ->
 )
 
 Target "CreateUnityPackage" (fun _ -> 
-
   let dirs = 
     ["Assets/bolt/assemblies"; "Assets/bolt/resources"; "Assets/bolt/scenes"; "Assets/bolt/scripts"]
     |> String.concat " "

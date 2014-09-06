@@ -4,16 +4,21 @@ using UnityEngine;
 [CustomEditor(typeof(BoltStateAsset))]
 public class BoltStateAssetEditor : Editor {
 
+  public override bool UseDefaultMargins () {
+    return false;
+  }
+
   public override void OnInspectorGUI () {
     BoltStateAsset asset = (BoltStateAsset) target;
+    
+    BoltAssetEditorGUI.HeaderPropertyList("properties", "Properties", ref asset._properties);
 
-    GUILayout.Label("Default Properties", EditorStyles.boldLabel);
     asset.tranform = BoltAssetEditorGUI.EditProperty(asset.tranform, BoltAssetPropertyEditMode.State, false);
-    asset.mecanim = BoltAssetEditorGUI.EditProperty(asset.mecanim, BoltAssetPropertyEditMode.State, false);
+    asset.mecanim = BoltAssetEditorGUI.EditProperty(asset.mecanim, BoltAssetPropertyEditMode.State, true);
 
-    EditorGUILayout.LabelField("Custom Properties", EditorStyles.boldLabel);
     asset._properties = BoltAssetEditorGUI.EditPropertyArray(asset._properties, BoltAssetPropertyEditMode.State, false);
-    asset._groups = EditGroupArray(asset._groups);
+
+    //asset._groups = EditGroupArray(asset._groups);
 
     BoltAssetEditorGUI.CompileButton(asset);
   }
@@ -27,9 +32,9 @@ public class BoltStateAssetEditor : Editor {
       if (ga[i] == null) { ArrayUtility.RemoveAt(ref ga, i); }
     }
 
-    if (GUILayout.Button("New Group", EditorStyles.miniButton)) {
-      ArrayUtility.Add(ref ga, new BoltAssetPropertyGroup());
-    }
+    //if (GUILayout.Button("New Group", EditorStyles.miniButton)) {
+    //ArrayUtility.Add(ref ga, new BoltAssetPropertyGroup());
+    //}
 
     return ga;
   }

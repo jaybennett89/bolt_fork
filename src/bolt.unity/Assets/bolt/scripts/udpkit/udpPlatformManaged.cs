@@ -127,7 +127,6 @@ namespace UdpKit {
         return false;
       }
 
-      //if (broadcastSocket.Poll(1000, SelectMode.SelectRead)) {
       if (broadcastSocket.Available > 0) {
         EndPoint remote = new IPEndPoint(IPAddress.Any, 0);
         bytes = broadcastSocket.ReceiveFrom(buffer, ref remote);
