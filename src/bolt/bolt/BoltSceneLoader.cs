@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-class BoltMapLoader : MonoBehaviour {
+class BoltSceneLoader : MonoBehaviour {
   class LoadOp : BoltObject {
-    public Map map;
+    public Scene scene;
     public AsyncOperation async;
   }
 
@@ -24,10 +24,10 @@ class BoltMapLoader : MonoBehaviour {
 
   void Load () {
     // notify core of loading
-    BoltCore.LoadMapBeginInternal(_loadOps.first.map);
+    BoltCore.LoadMapBeginInternal(_loadOps.first.scene);
 
     // load level
-    Application.LoadLevel(_loadOps.first.map.name);
+    Application.LoadLevel(_loadOps.first.scene.name);
 
     // we are done!
     Done();
@@ -36,10 +36,10 @@ class BoltMapLoader : MonoBehaviour {
   void LoadAsync () {
     if (_loadOps.first.async == null) {
       // notify core of loading
-      BoltCore.LoadMapBeginInternal(_loadOps.first.map);
+      BoltCore.LoadMapBeginInternal(_loadOps.first.scene);
 
       // begin new async load
-      _loadOps.first.async = Application.LoadLevelAsync(_loadOps.first.map.name);
+      _loadOps.first.async = Application.LoadLevelAsync(_loadOps.first.scene.name);
 
     } else {
       if (_loadOps.first.async.isDone) {
@@ -54,13 +54,13 @@ class BoltMapLoader : MonoBehaviour {
       GC.Collect();
 
       // invoke to core
-      BoltCore.LoadMapDoneInternal(_loadOps.first.map);
+      BoltCore.LoadMapDoneInternal(_loadOps.first.scene);
     } finally {
       _loadOps.RemoveFirst();
     }
   }
 
-  internal static void Enqueue (Map map) {
-    _loadOps.AddLast(new LoadOp { map = map });
+  internal static void Enqueue (Scene scene) {
+    _loadOps.AddLast(new LoadOp { scene = scene });
   }
 }

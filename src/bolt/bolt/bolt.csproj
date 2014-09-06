@@ -96,7 +96,7 @@
     <Compile Include="hitbox\BoltPhysics.cs" />
     <Compile Include="BoltSingletonPrefab.cs" />
     <Compile Include="BoltConsoleCommand.cs" />
-    <Compile Include="BoltMapLoader.cs" />
+    <Compile Include="BoltSceneLoader.cs" />
     <Compile Include="BoltFloatCompression.cs" />
     <Compile Include="BoltNetworkInterface.cs" />
     <Compile Include="hitbox\BoltHitbox.cs" />

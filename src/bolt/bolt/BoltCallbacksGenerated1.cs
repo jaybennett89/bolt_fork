@@ -104,35 +104,35 @@ partial class BoltCallbacksBase {
    
 
   
-  public virtual void MapLoadLocalBegin(string map) { 
+  public virtual void SceneLoadLocalBegin(string map) { 
   }
 
-  internal static void MapLoadLocalBeginInvoke(string map) { 
-    BoltLog.Debug("Invoking callback MapLoadLocalBegin");
+  internal static void SceneLoadLocalBeginInvoke(string map) { 
+    BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
     foreach (BoltCallbacksBase cb in callbacks) {
-        cb.MapLoadLocalBegin(map);
+        cb.SceneLoadLocalBegin(map);
     }
   }
 
   
-  public virtual void MapLoadLocalDone(string map) { 
+  public virtual void SceneLoadLocalDone(string map) { 
   }
 
-  internal static void MapLoadLocalDoneInvoke(string map) { 
-    BoltLog.Debug("Invoking callback MapLoadLocalDone");
+  internal static void SceneLoadLocalDoneInvoke(string map) { 
+    BoltLog.Debug("Invoking callback SceneLoadLocalDone");
     foreach (BoltCallbacksBase cb in callbacks) {
-        cb.MapLoadLocalDone(map);
+        cb.SceneLoadLocalDone(map);
     }
   }
 
   
-  public virtual void MapLoadRemoteDone(BoltConnection connection, string map) { 
+  public virtual void SceneLoadRemoteDone(BoltConnection connection, string map) { 
   }
 
-  internal static void MapLoadRemoteDoneInvoke(BoltConnection connection, string map) { 
-    BoltLog.Debug("Invoking callback MapLoadRemoteDone");
+  internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, string map) { 
+    BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
-        cb.MapLoadRemoteDone(connection, map);
+        cb.SceneLoadRemoteDone(connection, map);
     }
   }
 

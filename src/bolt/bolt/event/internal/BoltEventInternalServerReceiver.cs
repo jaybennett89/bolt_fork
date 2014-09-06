@@ -7,14 +7,14 @@ class BoltEventServerReceiver : BoltEventGlobalReceiverInternal, ILoadMapDoneRec
 
 #if BOLT_SERVER
     // execute finish load on the state
-    connection._remoteMapLoadState = connection._remoteMapLoadState.FinishLoad(evnt.map, BoltCore._mapLoadState.map);
+    connection._remoteMapLoadState = connection._remoteMapLoadState.FinishLoad(evnt.map, BoltCore._mapLoadState.scene);
 
     switch (connection._remoteMapLoadState.stage) {
-      case MapLoadStage.Load:
+      case SceneLoadStage.Load:
         // we are loading a new map
         connection.SendMapLoadToRemote(); break;
 
-      case MapLoadStage.LoadDone:
+      case SceneLoadStage.LoadDone:
         // we are done loading and should try to trigger callback
         connection.TriggerRemoteMapDoneCallbacks(); break;
     }

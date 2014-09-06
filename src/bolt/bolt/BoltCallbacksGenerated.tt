@@ -7,9 +7,9 @@
 <#@ output extension=".cs" #><#
 
 Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
-cbs.Add("MapLoadLocalBegin", new[] { "string", "map" });
-cbs.Add("MapLoadLocalDone", new[] { "string", "map" });
-cbs.Add("MapLoadRemoteDone", new[] { "BoltConnection", "connection", "string", "map" });
+cbs.Add("SceneLoadLocalBegin", new[] { "string", "map" });
+cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
+cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection", "string", "map" });
 
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
 

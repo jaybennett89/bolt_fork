@@ -180,7 +180,13 @@ public static partial class BoltNetwork {
   /// </summary>
   /// <param name="map">Map to load</param>
   [BoltDocsServerOnly]
+  [Obsolete("Use BoltNetwork.LoadScene instead")]
   public static void LoadMap (string map) {
+    BoltCore.LoadMap(map);
+  }
+
+  [BoltDocsServerOnly]
+  public static void LoadScene (string scene) {
     BoltCore.LoadMap(map);
   }
 
@@ -201,7 +207,7 @@ public static partial class BoltNetwork {
   public static void Connect (UdpEndPoint endpoint) {
     BoltCore.Connect(endpoint);
   }
-  
+
   [BoltDocsClientOnly]
   public static void Connect (UdpEndPoint endpoint, byte[] token) {
     BoltCore.Connect(endpoint, token);

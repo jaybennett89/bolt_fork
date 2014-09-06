@@ -7,7 +7,7 @@ class BoltEventClientReceiver : BoltEventGlobalReceiverInternal, ILoadMapReceive
 
 #if BOLT_CLIENT
     // finish remote state
-    connection._remoteMapLoadState = connection._remoteMapLoadState.FinishLoad(evnt.map, BoltCore._mapLoadState.map);
+    connection._remoteMapLoadState = connection._remoteMapLoadState.FinishLoad(evnt.map, BoltCore._mapLoadState.scene);
     connection.TriggerRemoteMapDoneCallbacks();
 #endif
   }

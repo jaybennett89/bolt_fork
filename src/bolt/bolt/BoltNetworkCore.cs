@@ -16,7 +16,7 @@ public enum BoltNetworkModes {
 internal static class BoltCore {
   static UdpSocket _udpSocket;
   static Assembly _unityAssembly;
-  static internal MapLoadState _mapLoadState;
+  static internal SceneLoadState _mapLoadState;
 
   static internal uint _uid;
   static internal uint _uidEntityCounter;
@@ -63,7 +63,7 @@ internal static class BoltCore {
   }
 
   public static string loadedMap {
-    get { return _mapLoadState.map.name; }
+    get { return _mapLoadState.scene.name; }
   }
 
   public static byte[] userAssemblyHash {
@@ -262,11 +262,11 @@ internal static class BoltCore {
       return;
     }
 
-    LoadMapInternal(new Map(name, _mapLoadState.map.token + 1));
+    LoadMapInternal(new Scene(name, _mapLoadState.scene.token + 1));
   }
 
 
-  internal static void LoadMapInternal (Map map) {
+  internal static void LoadMapInternal (Scene map) {
     foreach (BoltEntity entity in entities) {
       // destroy entities which we are in control of and which are not labelled as proxies
       if (entity._flags & BoltEntity.FLAG_IS_PROXY) { continue; }
@@ -276,11 +276,11 @@ internal static class BoltCore {
       Destroy(entity);
     }
 
-    if (_mapLoadState.map != map) {
+    if (_mapLoadState.scene != map) {
       _mapLoadState = _mapLoadState.BeginLoad(map);
 
       // start loading
-      BoltMapLoader.Enqueue(_mapLoadState.map);
+      BoltSceneLoader.Enqueue(_mapLoadState.scene);
     }
   }
 
@@ -597,8 +597,8 @@ internal static class BoltCore {
 
     // load map on clients which connect
     if (isServer) {
-      if (_mapLoadState.map.name != null) {
-        cn.LoadMapOnClient(_mapLoadState.map);
+      if (_mapLoadState.scene.name != null) {
+        cn.LoadMapOnClient(_mapLoadState.scene);
       } else {
         BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
@@ -642,7 +642,7 @@ internal static class BoltCore {
 
     while (cnIter.Next(out cn)) {
       // if this connection isn't allowed to proxy objects, skip it
-      if (cn._remoteMapLoadState.stage != MapLoadStage.CallbackDone) { continue; }
+      if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) { continue; }
 
       BoltEntity en = null;
       var enIter = _entities.GetIterator();
@@ -688,7 +688,7 @@ internal static class BoltCore {
 
     CreateGlobalBehaviour(typeof(BoltPoll));
     CreateGlobalBehaviour(typeof(BoltSend));
-    CreateGlobalBehaviour(typeof(BoltMapLoader));
+    CreateGlobalBehaviour(typeof(BoltSceneLoader));
 
     if (isServer) {
       CreateGlobalBehaviour(typeof(BoltEventServerReceiver));
@@ -873,7 +873,7 @@ internal static class BoltCore {
         break;
     }
   }
-  internal static void LoadMapBeginInternal (Map map) {
+  internal static void LoadMapBeginInternal (Scene map) {
     if (isServer) {
       var it = _connections.GetIterator();
 
@@ -883,20 +883,20 @@ internal static class BoltCore {
     }
 
     // call out to user code
-    BoltCallbacksBase.MapLoadLocalBeginInvoke(map.name);
+    BoltCallbacksBase.SceneLoadLocalBeginInvoke(map.name);
 
     // destroy old behaviours
     UpdateActiveGlobalBehaviours(null);
   }
 
-  internal static void LoadMapDoneInternal (Map map) {
-    Assert.True(_mapLoadState.stage == MapLoadStage.Load);
-    _mapLoadState = _mapLoadState.FinishLoad(_mapLoadState.map, _mapLoadState.map);
-    Assert.True(_mapLoadState.stage == MapLoadStage.LoadDone);
+  internal static void LoadMapDoneInternal (Scene map) {
+    Assert.True(_mapLoadState.stage == SceneLoadStage.Load);
+    _mapLoadState = _mapLoadState.FinishLoad(_mapLoadState.scene, _mapLoadState.scene);
+    Assert.True(_mapLoadState.stage == SceneLoadStage.LoadDone);
     _mapLoadState = _mapLoadState.BeginCallback(_mapLoadState);
-    Assert.True(_mapLoadState.stage == MapLoadStage.Callback);
-    _mapLoadState = _mapLoadState.FinishCallback(_mapLoadState.map);
-    Assert.True(_mapLoadState.stage == MapLoadStage.CallbackDone);
+    Assert.True(_mapLoadState.stage == SceneLoadStage.Callback);
+    _mapLoadState = _mapLoadState.FinishCallback(_mapLoadState.scene);
+    Assert.True(_mapLoadState.stage == SceneLoadStage.CallbackDone);
 
     BoltIterator<BoltConnection> it;
 
@@ -909,7 +909,7 @@ internal static class BoltCore {
     UpdateActiveGlobalBehaviours(map.name);
 
     // call out to sure code
-    BoltCallbacksBase.MapLoadLocalDoneInvoke(map.name);
+    BoltCallbacksBase.SceneLoadLocalDoneInvoke(map.name);
 
     it = _connections.GetIterator();
     while (it.Next()) {

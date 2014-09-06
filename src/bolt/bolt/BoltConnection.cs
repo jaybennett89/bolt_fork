@@ -27,13 +27,13 @@ public class BoltConnection : BoltObject {
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
 
-  internal MapLoadState _remoteMapLoadState;
+  internal SceneLoadState _remoteMapLoadState;
   internal BoltEventChannel _eventChannel;
   internal BoltEntityChannel _entityChannel;
   internal BoltEntityChannel.CommandChannel _commandChannel;
 
   public bool isLoadingMap {
-    get { return _remoteMapLoadState.stage != MapLoadStage.CallbackDone; }
+    get { return _remoteMapLoadState.stage != SceneLoadStage.CallbackDone; }
   }
 
   /// <summary>
@@ -198,27 +198,27 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void LoadMapOnClient (Map map) {
+  internal void LoadMapOnClient (Scene map) {
     Assert.True(udpConnection.IsServer);
     _remoteMapLoadState = _remoteMapLoadState.BeginLoad(map);
 
-    if (_remoteMapLoadState.stage == MapLoadStage.Load) {
+    if (_remoteMapLoadState.stage == SceneLoadStage.Load) {
       SendMapLoadToRemote();
     }
   }
 
   internal void SendMapLoadDoneToRemote () {
-    Assert.True(BoltCore._mapLoadState.stage >= MapLoadStage.Callback);
-    Assert.True(BoltCore._mapLoadState.map == _remoteMapLoadState.map);
+    Assert.True(BoltCore._mapLoadState.stage >= SceneLoadStage.Callback);
+    Assert.True(BoltCore._mapLoadState.scene == _remoteMapLoadState.scene);
 
-    Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.map);
+    Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.scene);
   }
 
   internal void SendMapLoadToRemote () {
     Assert.True(udpConnection.IsServer);
-    Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.map);
+    Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.scene);
 
-    if (BoltCore._mapLoadState.stage == MapLoadStage.CallbackDone) {
+    if (BoltCore._mapLoadState.stage == SceneLoadStage.CallbackDone) {
       SendMapLoadDoneToRemote();
     }
   }
@@ -226,15 +226,15 @@ public class BoltConnection : BoltObject {
   internal void TriggerRemoteMapDoneCallbacks () {
     _remoteMapLoadState = _remoteMapLoadState.BeginCallback(BoltCore._mapLoadState);
 
-    if (_remoteMapLoadState.stage == MapLoadStage.Callback) {
+    if (_remoteMapLoadState.stage == SceneLoadStage.Callback) {
       // invoke
-      BoltCallbacksBase.MapLoadRemoteDoneInvoke(this, _remoteMapLoadState.map.name);
+      BoltCallbacksBase.SceneLoadRemoteDoneInvoke(this, _remoteMapLoadState.scene.name);
 
       // done!
-      _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.map);
+      _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.scene);
 
       // this gotta be true now
-      Assert.True(_remoteMapLoadState.stage == MapLoadStage.CallbackDone);
+      Assert.True(_remoteMapLoadState.stage == SceneLoadStage.CallbackDone);
     }
   }
 

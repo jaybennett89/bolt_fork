@@ -2,7 +2,7 @@ using System;
 using UdpKit;
 
 internal interface ILoadMap : IBoltEvent {
-  Map map { get; set; }
+  Scene map { get; set; }
 }
 
 internal interface ILoadMapReceiver {
@@ -12,9 +12,9 @@ internal interface ILoadMapReceiver {
 class LoadMap : BoltEventS2C, ILoadMap {
   public const ushort ID = 0;
 
-  Map _map;
+  Scene _map;
 
-  public Map map {
+  public Scene map {
     get { return _map; }
     set { _map = value; }
   }
@@ -29,11 +29,11 @@ class LoadMap : BoltEventS2C, ILoadMap {
   }
 
   public override void Read (UdpStream stream, BoltConnection cn) {
-    _map = new Map(stream.ReadString(), stream.ReadInt());
+    _map = new Scene(stream.ReadString(), stream.ReadInt());
   }
 
   public override void Free () {
-    _map = new Map();
+    _map = new Scene();
   }
 }
 
