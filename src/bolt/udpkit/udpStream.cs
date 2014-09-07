@@ -540,7 +540,7 @@ namespace UdpKit {
 
       ReadByteArray(bytes);
 
-      return encoding.GetString(bytes);
+      return encoding.GetString(bytes, 0, bytes.Length);
     }
 
     public string ReadString () {
