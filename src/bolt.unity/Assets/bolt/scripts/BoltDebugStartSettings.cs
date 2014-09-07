@@ -15,7 +15,7 @@ class BoltDebugStartSettings {
   public static int windowIndex {
     get { return -1; }
   }
-#else
+#elif UNITY_STANDALONE
   public static bool startServer {
     get {
       return Environment.GetCommandLineArgs().Contains("--bolt-debugstart-server");
@@ -37,6 +37,24 @@ class BoltDebugStartSettings {
       }
 
       return 0;
+    }
+  }
+#else
+  public static bool startServer {
+    get {
+      return false;
+    }
+  }
+
+  public static bool startClient {
+    get {
+      return false;
+    }
+  }
+
+  public static int windowIndex {
+    get {
+      return -1;
     }
   }
 #endif
