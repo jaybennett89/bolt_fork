@@ -306,7 +306,7 @@ internal static class BoltCore {
         // 
         _mode = BoltNetworkModes.None;
         _uid = 0;
-
+        _mapLoadState = new SceneLoadState();
 
         // disconnect from everywhere
         foreach (BoltConnection connection in _connections) {
