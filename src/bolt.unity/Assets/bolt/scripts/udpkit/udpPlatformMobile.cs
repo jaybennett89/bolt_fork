@@ -1,10 +1,12 @@
-﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+﻿#if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
 using System;
 using System.Security;
 using System.Runtime.InteropServices;
 
 namespace UdpKit {
   public sealed class UdpPlatformMobile : UdpPlatform {
+    public delegate Int32 Udp_RecvFrom (IntPtr socket, byte[] data, int size, out UdpEndPoint ep);
+    public delegate Int32 Udp_GetEndPoint (IntPtr socket, out UdpEndPoint ep);
 	
 #if UNITY_ANDROID
     public const string DLL_NAME = "udpkit_android";
@@ -17,6 +19,21 @@ namespace UdpKit {
 	  public const int UDPKIT_SOCKET_NOTVALID = -2;
 	  public const int UDPKIT_SOCKET_NODATA = -3;
 
+#if UNITY_WP8
+    public static System.Func<IntPtr> udpCreate;
+	  public static System.Func<IntPtr, UdpEndPoint, Int32> udpBind;
+    public static System.Func<IntPtr, Int32> udpEnableBroadcast;
+	  public static System.Func<IntPtr, byte[], int, UdpEndPoint, Int32> udpSendTo;
+	  public static Udp_RecvFrom udpRecvFrom;
+    public static System.Func<IntPtr, Int32, Int32> udpRecvPoll;
+    public static System.Func<IntPtr, Int32> udpLastError;
+    public static Udp_GetEndPoint udpGetEndPoint;
+	  public static System.Func<IntPtr, Int32> udpClose;
+    public static System.Func<string> udpGetPlatform;
+    public static System.Func<string> udpErrorString;
+    public static System.Func<UInt32> udpGetHighPrecisionTime;
+    public static System.Func<UInt32> udpFindBroadcastAddress;
+#else
 	  [DllImport(DLL_NAME)]
 	  [SuppressUnmanagedCodeSecurity]
 	  public static extern IntPtr udpCreate ();
@@ -47,7 +64,7 @@ namespace UdpKit {
 
 	  [DllImport(DLL_NAME)]
 	  [SuppressUnmanagedCodeSecurity]
-       public static extern Int32 udpGetEndPoint (IntPtr socket, [Out] out UdpEndPoint addr);
+    public static extern Int32 udpGetEndPoint (IntPtr socket, [Out] out UdpEndPoint addr);
 
 	  [DllImport(DLL_NAME)]
 	  [SuppressUnmanagedCodeSecurity]
@@ -70,6 +87,7 @@ namespace UdpKit {
 	  [DllImport(DLL_NAME)]
 	  [SuppressUnmanagedCodeSecurity]
 	  public static extern UInt32 udpFindBroadcastAddress ();
+#endif
 
     IntPtr sptr;
     IntPtr bcptr;
