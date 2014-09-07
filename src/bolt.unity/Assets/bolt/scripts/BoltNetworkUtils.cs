@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using UdpKit;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public static class BoltNetworkUtils {
   }
 
   public static UdpPlatform CreateUdpPlatform () {
-#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+#if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
     return new UdpPlatformMobile();
 #else
     return new UdpPlatformManaged();
@@ -22,6 +23,8 @@ public static class BoltNetworkUtils {
       return Android.GetBroadcastAddress();
 #elif UNITY_IPHONE && !UNITY_EDITOR
       return UdpPlatformMobile.FindBroadcastAddress_IOS();
+#elif UNITY_WP8 && !UNITY_EDITOR
+      return new UdpIPv4Address(255, 255, 255, 255);
 #else
       return UdpPlatformManaged.FindBroadcastAddress();
 #endif
