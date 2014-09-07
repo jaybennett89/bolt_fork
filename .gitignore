@@ -2,7 +2,11 @@ bolt.dll*
 bolt.editor.dll*
 udpkit.dll*
 
+*.csproj
+*.sln
+
 build
+upload
 Temp
 Library
 
