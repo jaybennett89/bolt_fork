@@ -599,10 +599,10 @@ internal static class BoltCore {
       var entityIter = _entities.GetIterator();
 
       while (entityIter.Next(out entity)) {
-        if (entity.boltIsOwner) {
+        if (entity.isOwner) {
           entity.SimulateStep();
         } else {
-          if (entity.boltIsControlling) {
+          if (entity.hasControl) {
             entity.SimulateStep();
           }
         }
