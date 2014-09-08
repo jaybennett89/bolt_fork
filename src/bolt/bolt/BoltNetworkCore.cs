@@ -507,6 +507,18 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint);
   }
 
+  public static bool HasEntity (BoltUniqueId id) {
+    var it = _entities.GetIterator();
+
+    while (it.Next()) {
+      if (it.val._uniqueId == id) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static BoltEntity FindEntity (BoltUniqueId id) {
     if (_config.globalUniqueIds == false) {
       throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");

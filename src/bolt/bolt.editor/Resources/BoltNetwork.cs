@@ -182,6 +182,10 @@ public static partial class BoltNetwork {
     BoltCore.Destroy(gameobject);
   }
 
+  public static bool HasEntity (BoltUniqueId id) {
+    return BoltCore.HasEntity(id);
+  }
+  
   public static BoltEntity FindEntity (BoltUniqueId id) {
     return BoltCore.FindEntity(id);
   }
