@@ -38,7 +38,7 @@ end tell'";
             if (BoltDebugStartSettings.startServer)
             {
                 BoltNetwork.StartServer(_serverEndPoint, cfg);
-                BoltNetwork.LoadMap(BoltRuntimeSettings.instance.debugStartMapName);
+                BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
             }
             else if (BoltDebugStartSettings.startClient)
             {
