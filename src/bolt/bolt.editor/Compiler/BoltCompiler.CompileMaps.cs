@@ -21,21 +21,21 @@ partial class BoltCompiler {
       file.EmitScope("public static class BoltScenes", () => {
         for (int i = 0; i < scenes.Length; ++i) {
           var s = scenes[i];
-          file.EmitLine("public const string {0} = \"{0}\";", Path.GetFileNameWithoutExtension(s.path));
+          file.EmitLine("public const string {0} = \"{0}\";", BoltEditorUtils.CSharpIdentifier(Path.GetFileNameWithoutExtension(s.path)));
         }
       });
 
       file.EmitScope("[System.Obsolete(\"Use BoltScenes instead\")] public static class BoltMaps", () => {
         for (int i = 0; i < scenes.Length; ++i) {
           var s = scenes[i];
-          file.EmitLine("public const string {0} = \"{0}\";", Path.GetFileNameWithoutExtension(s.path));
+          file.EmitLine("public const string {0} = \"{0}\";", BoltEditorUtils.CSharpIdentifier(Path.GetFileNameWithoutExtension(s.path)));
         }
       });
 
       file.EmitScope("[System.Obsolete(\"Use BoltScenes instead\")] public enum BoltMapNames", () => {
         for (int i = 0; i < scenes.Length; ++i) {
           var s = scenes[i];
-          file.EmitLine("{0} = {1},", Path.GetFileNameWithoutExtension(s.path), i);
+          file.EmitLine("{0} = {1},", BoltEditorUtils.CSharpIdentifier(Path.GetFileNameWithoutExtension(s.path)), i);
         }
       });
     }
