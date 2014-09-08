@@ -55,17 +55,7 @@ public static class BoltInstaller
     }
 
 
-    [MenuItem("Bolt/Install")]
-    public static void Install()
-    {
-        int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");
-        if (opt < 2)
-        {
-            Install(opt == 1); 
-        }
-    }
-
-    static void Install(bool force)
+    public static void Run(bool force)
     {
         if ((CurrentVersion != InstalledVersion) || force)
         {
