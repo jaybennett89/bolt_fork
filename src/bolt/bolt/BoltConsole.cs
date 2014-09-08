@@ -129,7 +129,7 @@ public class BoltConsole : MonoBehaviour
 
     void OnGUI()
     {
-        if (Event.current.Equals(Event.KeyboardEvent(toggleKey.ToString())))
+        if ((Event.current.type == EventType.KeyDown) && (Event.current.keyCode == toggleKey))
         {
             visible = !visible;
         }
