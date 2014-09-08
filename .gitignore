@@ -1,10 +1,7 @@
-bolt.dll*
-bolt.editor.dll*
-udpkit.dll*
-
 *.csproj
 *.sln
 *.pdb
+*.dll
 
 build
 upload
@@ -14,8 +11,6 @@ Gizmos
 Gizmos.meta
 Plugins
 Plugins.meta
-
-**/Assets/bolt/assemblies/*.dll
 
 **/Assets/bolt/resources
 **/Assets/bolt/resources.meta
