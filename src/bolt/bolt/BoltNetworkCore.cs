@@ -836,31 +836,31 @@ internal static class BoltCore {
     _autogen.Setup();
 
     // setup udpkit configuration
-#if DEBUG
     _udpConfig = new UdpConfig();
     _udpConfig.ConnectionTimeout = (uint) config.connectionTimeout;
     _udpConfig.ConnectRequestAttempts = (uint) config.connectionRequestAttempts;
     _udpConfig.ConnectRequestTimeout = (uint) config.connectionRequestTimeout;
 
-    _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
-    _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
-    _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
+#if DEBUG
+    if (config.useNetworkSimulation)
+    {
+        _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
+        _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
+        _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
 
-    switch (config.simulatedRandomFunction) {
-      case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
-      case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+        switch (config.simulatedRandomFunction)
+        {
+            case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
+            case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+        }
     }
-#else
-    _udpConfig.ConnectionTimeout = 5000;
-    _udpConfig.ConnectRequestAttempts = 10;
-    _udpConfig.ConnectRequestTimeout = 1000;
 #endif
 
     _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
     _udpConfig.AllowIncommingConnections = isServer;
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
-    _udpConfig.PacketSize = 1024;
+    _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
     if (_config.useAssemblyChecksum) {
