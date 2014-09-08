@@ -76,12 +76,12 @@ public class BoltRuntimeSettings : ScriptableObject {
     if (!entity)
       return false;
 
-    if (entity.boltPrefabId >= BoltRuntimeSettings.prefabs.Length)
+    if (entity._prefabId >= BoltRuntimeSettings.prefabs.Length)
       return false;
 
-    if (entity.boltPrefabId < 0)
+    if (entity._prefabId < 0)
       return false;
 
-    return BoltRuntimeSettings.prefabs[entity.boltPrefabId] == entity.gameObject;
+    return BoltRuntimeSettings.prefabs[entity._prefabId] == entity.gameObject;
   }
 }

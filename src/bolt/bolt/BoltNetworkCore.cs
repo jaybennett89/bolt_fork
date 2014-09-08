@@ -26,13 +26,13 @@ internal static class BoltCore {
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
   static internal IBoltNetwork _autogen = null;
 
-  static internal BoltConfig _config = null;
+  static internal BoltConfig _config = null; 
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal BoltDoubleList<BoltEntityProxy> _proxies = new BoltDoubleList<BoltEntityProxy>();
   static internal BoltDoubleList<BoltEntity> _entities = new BoltDoubleList<BoltEntity>();
-  static internal BoltEventDispatcher _eventDispatcher = new BoltEventDispatcher();
+  static internal BoltEventDispatcher _globalEventDispatcher = new BoltEventDispatcher();
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -320,7 +320,17 @@ internal static class BoltCore {
         _proxies.Clear();
         _entities.Clear();
         _connections.Clear();
-        _eventDispatcher._targets.Clear();
+
+        foreach (var callback in _globalEventDispatcher._targets.ToArray())
+        {
+            if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown())
+            {
+                continue;
+            }
+
+            _globalEventDispatcher._targets.Remove(callback);
+        }
+
         _globalBehaviours.Clear();
 
         if (_globalBehaviourObject) {
@@ -507,6 +517,18 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint);
   }
 
+  public static bool HasEntity (BoltUniqueId id) {
+    var it = _entities.GetIterator();
+
+    while (it.Next()) {
+      if (it.val._uniqueId == id) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static BoltEntity FindEntity (BoltUniqueId id) {
     if (_config.globalUniqueIds == false) {
       throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
@@ -587,10 +609,10 @@ internal static class BoltCore {
       var entityIter = _entities.GetIterator();
 
       while (entityIter.Next(out entity)) {
-        if (entity.boltIsOwner) {
+        if (entity.isOwner) {
           entity.SimulateStep();
         } else {
-          if (entity.boltIsControlling) {
+          if (entity.hasControl) {
             entity.SimulateStep();
           }
         }
@@ -814,31 +836,31 @@ internal static class BoltCore {
     _autogen.Setup();
 
     // setup udpkit configuration
-#if DEBUG
     _udpConfig = new UdpConfig();
     _udpConfig.ConnectionTimeout = (uint) config.connectionTimeout;
     _udpConfig.ConnectRequestAttempts = (uint) config.connectionRequestAttempts;
     _udpConfig.ConnectRequestTimeout = (uint) config.connectionRequestTimeout;
 
-    _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
-    _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
-    _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
+#if DEBUG
+    if (config.useNetworkSimulation)
+    {
+        _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
+        _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
+        _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
 
-    switch (config.simulatedRandomFunction) {
-      case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
-      case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+        switch (config.simulatedRandomFunction)
+        {
+            case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
+            case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+        }
     }
-#else
-    _udpConfig.ConnectionTimeout = 5000;
-    _udpConfig.ConnectRequestAttempts = 10;
-    _udpConfig.ConnectRequestTimeout = 1000;
 #endif
 
     _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
     _udpConfig.AllowIncommingConnections = isServer;
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
-    _udpConfig.PacketSize = 1024;
+    _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
     if (_config.useAssemblyChecksum) {

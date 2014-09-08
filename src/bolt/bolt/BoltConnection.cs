@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
+
 /// <summary>
 /// Represents a connection from a remote host
 /// </summary>

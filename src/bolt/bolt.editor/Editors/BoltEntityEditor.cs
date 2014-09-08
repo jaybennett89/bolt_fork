@@ -8,13 +8,13 @@ public class BoltEntityEditor : Editor {
     PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
 
     if (prefabType == PrefabType.PrefabInstance) {
-      if (entity.boltIsSceneObject == false) {
-        entity.boltIsSceneObject = true;
+      if (entity._sceneObject == false) {
+        entity._sceneObject = true;
         EditorUtility.SetDirty(entity);
       }
     } else {
-      if (entity.boltIsSceneObject) {
-        entity.boltIsSceneObject = false;
+      if (entity._sceneObject) {
+        entity._sceneObject = false;
         EditorUtility.SetDirty(entity);
       }
     }
@@ -22,16 +22,16 @@ public class BoltEntityEditor : Editor {
     if (prefabType == PrefabType.Prefab || prefabType == PrefabType.PrefabInstance) {
       // Scene object
       EditorGUI.BeginDisabledGroup(true);
-      EditorGUILayout.Toggle("Scene Object", entity.boltIsSceneObject);
+      EditorGUILayout.Toggle("Scene Object", entity._sceneObject);
       EditorGUI.EndDisabledGroup();
 
       // prefab id
       EditorGUI.BeginDisabledGroup(prefabType == PrefabType.PrefabInstance);
       EditorGUI.BeginDisabledGroup(true);
-      EditorGUILayout.LabelField("Prefab Id", entity.boltPrefabId.ToString());
+      EditorGUILayout.LabelField("Prefab Id", entity._prefabId.ToString());
       EditorGUI.EndDisabledGroup();
 
-      if (entity.boltPrefabId < 0) {
+      if (entity._prefabId < 0) {
         EditorGUILayout.HelpBox("Prefab Id not set, run the Bolt/Compile command to correct", MessageType.Error);
       }
 

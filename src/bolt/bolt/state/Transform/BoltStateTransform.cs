@@ -10,9 +10,9 @@ public abstract class BoltStateTransform {
 
   protected bool shouldStep {
     get {
-      if (_entity.boltIsOwner) {
+      if (_entity.isOwner) {
         return false;
-      } else if (_entity.boltIsControlling) {
+      } else if (_entity.hasControl) {
         return _stepOnController;
       } else {
         return _stepOnProxy;

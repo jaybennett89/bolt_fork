@@ -32,12 +32,10 @@ public static class BoltMecanimReflectionExtensions {
       cache.triggerMethods = new Dictionary<string, MethodInfo>();
 
       foreach (var property in cache.mecanimGetter.PropertyType.GetProperties()) {
-        Debug.Log(property.Name);
         cache.propertySetters.Add(property.Name, property);
       }
 
       foreach (var method in cache.mecanimGetter.PropertyType.GetMethods()) {
-        Debug.Log(method.Name);
         cache.triggerMethods.Add(method.Name, method);
       }
 

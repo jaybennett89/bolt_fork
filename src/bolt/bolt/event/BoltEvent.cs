@@ -191,7 +191,7 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
         evnt._entity._eventDispatcher.Dispatch(evnt, handler);
       }
     } else {
-      BoltCore._eventDispatcher.Dispatch(evnt, handler);
+      BoltCore._globalEventDispatcher.Dispatch(evnt, handler);
     }
   }
 }

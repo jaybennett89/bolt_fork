@@ -110,16 +110,30 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     EditorGUI.EndDisabledGroup();
+
+    BoltAssetEditorGUI.Label("Packet Size", () =>
+    {
+
+        settings._config.packetSize = BoltAssetEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
+    });
   }
 
   void Simulation () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
-
     EditorGUILayout.BeginVertical();
 
     if (BoltCore.isDebugMode == false) {
       EditorGUILayout.HelpBox("Bolt is compiled in release mode, these settings have no effectr", MessageType.Warning);
     }
+
+    EditorGUI.BeginDisabledGroup(BoltCore.isDebugMode == false);
+
+    BoltAssetEditorGUI.Label("Enabled", () => {
+        settings._config.useNetworkSimulation = EditorGUILayout.Toggle(settings._config.useNetworkSimulation);
+    });
+
+    EditorGUI.EndDisabledGroup();
+    EditorGUI.BeginDisabledGroup(settings._config.useNetworkSimulation == false || BoltCore.isDebugMode == false);
 
     BoltAssetEditorGUI.Label("Packet Loss", () => {
       int loss;
@@ -139,6 +153,7 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.simulatedRandomFunction = (BoltRandomFunction) EditorGUILayout.EnumPopup(settings._config.simulatedRandomFunction);
     });
 
+    EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
   }
 

@@ -156,7 +156,7 @@ partial class BoltEntityChannel : BoltChannel {
     for (int i = 0; i < _incommingProxiesByNetworkId.Length; ++i) {
       BoltEntityProxy proxy = _incommingProxiesByNetworkId[i];
 
-      if (proxy && proxy.entity.boltIsProxy == true && proxy.entity.boltIsControlling == false) {
+      if (proxy && proxy.entity.isRemote) {
         proxy.entity.SimulateStep();
       }
     }
@@ -197,7 +197,7 @@ partial class BoltEntityChannel : BoltChannel {
         }
 
         // check update rate of this entity
-        else if ((packet.number % proxy.entity.boltPackFrequency) != 0) {
+        else if ((packet.number % proxy.entity._updateRate) != 0) {
           continue;
         }
 
@@ -376,7 +376,7 @@ partial class BoltEntityChannel : BoltChannel {
 
       // data for first packet
       if (info.first) {
-        packet.stream.WriteInt(proxy.entity.boltPrefabId);
+        packet.stream.WriteInt(proxy.entity._prefabId);
         packet.stream.WriteVector3Half(proxy.entity.transform.position);
 
         if (BoltCore._config.globalUniqueIds) {
@@ -493,11 +493,11 @@ partial class BoltEntityChannel : BoltChannel {
           throw new BoltException("couldn't find proxy with id {0}", networkId);
         }
 
-        if (proxy.entity.boltIsControlling == true && controlling == false) {
+        if (proxy.entity.hasControl == true && controlling == false) {
           proxy.entity.ReleaseControlInternal();
         }
 
-        if (proxy.entity.boltIsControlling == false && controlling == true) {
+        if (proxy.entity.hasControl == false && controlling == true) {
           proxy.entity.TakeControlInternal();
         }
       }

@@ -33,14 +33,24 @@ static class BoltRuntimeReflection {
     List<STuple<BoltGlobalBehaviourAttribute, Type>> result = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
 
     foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
-      foreach (Type type in asm.GetTypes()) {
-        if (typeof(MonoBehaviour).IsAssignableFrom(type)) {
-          var attrs = (BoltGlobalBehaviourAttribute[]) type.GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
-          if (attrs.Length == 1) {
-            result.Add(new STuple<BoltGlobalBehaviourAttribute, Type>(attrs[0], type));
-          }
+        try
+        {
+            foreach (Type type in asm.GetTypes())
+            {
+                if (typeof(MonoBehaviour).IsAssignableFrom(type))
+                {
+                    var attrs = (BoltGlobalBehaviourAttribute[])type.GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
+                    if (attrs.Length == 1)
+                    {
+                        result.Add(new STuple<BoltGlobalBehaviourAttribute, Type>(attrs[0], type));
+                    }
+                }
+            }
         }
-      }
+        catch
+        {
+            // just eat this, a bit dangerous but meh.
+        }
     }
 
     return result;

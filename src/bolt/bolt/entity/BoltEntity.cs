@@ -23,16 +23,16 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   bool _attached;
 
   [SerializeField]
-  int _prefabId = -1;
+  internal int _prefabId = -1;
 
   [SerializeField]
-  BoltEntitySerializer _serializer = null;
+  internal BoltEntitySerializer _serializer = null;
 
   [SerializeField]
-  BoltEntityPersistanceMode _persistanceMode = BoltEntityPersistanceMode.DestroyOnLoad;
+  internal BoltEntityPersistanceMode _persistanceMode = BoltEntityPersistanceMode.DestroyOnLoad;
 
   [SerializeField]
-  int _updateRate = 1;
+  internal int _updateRate = 1;
 
   [SerializeField]
   internal bool _sceneObject = false;
@@ -71,6 +71,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// Returns the connection, if any, that is the source of this entity
   /// </summary>
+  [Obsolete("Use sourceConnection instead")]
   public BoltConnection boltSource {
     get { return _source; }
   }
@@ -78,6 +79,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// Returns the connection, if any, that is remotely controlling this entity
   /// </summary>
+  [Obsolete("Use controllingConnection instead")]
   public BoltConnection boltRemoteController {
     get { return _remoteController; }
   }
@@ -93,6 +95,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// Prefab id of this entity, this value is assigned by
   /// Bolt when the compiler runs.
   /// </summary>
+  [Obsolete("This property is being removed")]
   public int boltPrefabId {
     get { return _prefabId; }
   }
@@ -101,6 +104,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// How often this entity should be considered for packing by Bolt. 
   /// 1 means every packet, 2 means every other packet, etc.
   /// </summary>
+  [Obsolete("This property is being removed")]
   public int boltPackFrequency {
     get { return _updateRate; }
   }
@@ -108,28 +112,22 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// How often (in frames) we try to send states updates for this object
   /// </summary>
+  [Obsolete("Use BoltEntity.sendRate instead")]
   public int boltSendRate {
     get {
-      if (boltIsOwner) {
-        return _updateRate * BoltCore.localSendRate;
-      } else {
-        return _updateRate * BoltCore.remoteSendRate;
-      }
+        return sendRate;
     }
   }
 
-  [Obsolete("This property is not used anyomre and always returns -1, use BoltEntity.uniqueId instead.")]
+  [Obsolete("This property is not used anymore and always returns -1, use BoltEntity.uniqueId instead.")]
   public int boltId {
     get { return -1; }
-  }
-
-  public BoltUniqueId uniqueId {
-    get { return _uniqueId; }
   }
 
   /// <summary>
   /// Returns true if this entity is attached to bolt
   /// </summary>
+  [Obsolete("Use BoltEntity.isAttached instead")]
   public bool boltIsAttached {
     get { return _attached; }
   }
@@ -140,7 +138,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// in BoltEntity.boltSource
   /// </summary>
   /// 
-  [Obsolete("Use BoltEntity.hasAuthority instead")]
+  [Obsolete("Use !BoltEntity.isOwner instead")]
   public bool boltIsProxy {
     get { return _flags & FLAG_IS_PROXY; }
   }
@@ -148,9 +146,9 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// Returns true if we spawned this entity, false if it's from a remote connection
   /// </summary>
-  [Obsolete("Use BoltEntity.spawnedRemotely instead")]
+  [Obsolete("Use BoltEntity.isOwner instead")]
   public bool boltIsOwner {
-    get { return ReferenceEquals(_source, null); }
+      get { return ReferenceEquals(_source, null); }
   }
 
   /// <summary>
@@ -165,32 +163,56 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <summary>
   /// Returns true if this entity is being controlled by a remote connection
   /// </summary>
+  [Obsolete("Use 'BoltEntity.controllingConnection != null' instead")]
   public bool boltIsRemoteControlled {
     get { return _flags & FLAG_REMOTE_CONTROLLED; }
   }
-
-  /// <summary>
-  /// Returns true if this entity was placed in the scene
-  /// </summary>
-  public bool boltIsSceneObject {
-    get { return _sceneObject; }
-    internal set { _sceneObject = value; }
+     
+  public BoltConnection sourceConnection {
+      get { return _source; }
   }
 
-  public bool hasAuthority {
+  public BoltConnection controllingConnection { 
+      get { return _remoteController; } 
+  }
+
+  public int sendRate {
+      get
+      {
+          if (isOwner)
+          {
+              return _updateRate * BoltCore.localSendRate;
+          }
+          else
+          {
+              return _updateRate * BoltCore.remoteSendRate;
+          }
+      }
+  }
+
+  [Obsolete("Use !BoltEntity.isOwner instead")]
+  public bool isProxy {
+    get { return !isOwner; }
+  }
+
+  public bool isAttached {
+    get { return _attached; }
+  }
+
+  public bool isOwner {
     get { return ReferenceEquals(_source, null); }
+  }
+
+  public bool isRemote {
+      get { return !isOwner && !hasControl; }
   }
 
   public bool hasControl {
     get { return _flags & FLAG_IS_CONTROLLING; }
   }
 
-  public bool spawnedRemotely {
-    get { return ReferenceEquals(_source, null) == false; }
-  }
-
-  public bool isDummy {
-    get { return spawnedRemotely && !hasControl; }
+  public BoltUniqueId uniqueId {
+    get { return _uniqueId; }
   }
 
   /// <summary>
@@ -204,7 +226,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       if (ReferenceEquals(boltSource, null)) {
         return BoltCore._frame;
       } else {
-        if (boltIsControlling && _clientPredicted) {
+        if (hasControl && _clientPredicted) {
           return boltSource.remoteFrameLatest;
         } else {
           return boltSource.remoteFrame;
@@ -339,7 +361,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <param name="cmd">The command to queue</param>
   [BoltDocsControllerOnly]
   public bool QueueCommand (BoltCommand cmd) {
-    if (boltIsControlling == false) {
+    if (hasControl == false) {
       BoltLog.Error("queue of {0} to {1} failed, you are not controlling this entity", cmd, this);
       return false;
     }
@@ -407,7 +429,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// </summary>
   [BoltDocsOwnerOnly]
   public void SetOrigin (Transform origin) {
-    if (boltIsProxy) {
+    if (!isOwner) {
       BoltLog.Error("Only the owner can set the origin of an entity");
       return;
     }
@@ -437,7 +459,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// </summary>
   [BoltDocsOwnerOnly]
   public void Teleport (Vector3 position, Quaternion rotation) {
-    if (boltIsOwner == false) {
+    if (isOwner == false) {
       BoltLog.Error("Only the owner of an entity can teleport it");
       return;
     }
@@ -505,17 +527,13 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
     _serializer.BeforeStep();
 
-    if (boltIsProxy) {
-      Assert.False(boltIsOwner);
-
+    if (!isOwner) {
       _serializer.SimulateProxy();
 
       foreach (BoltEntityBehaviourBase sp in _entityBehaviours) {
         sp.SimulateProxy();
       }
     } else {
-      Assert.True(boltIsOwner);
-
       _serializer.SimulateOwner();
 
       foreach (BoltEntityBehaviourBase sa in _entityBehaviours) {
@@ -523,7 +541,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       }
     }
 
-    if (boltIsControlling) {
+    if (hasControl) {
       Assert.False(boltIsRemoteControlled);
 
       // execute all old commands (in order)
@@ -558,16 +576,15 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
       // if this is a local proxy we are controlling
       // we should dispose all commands except one
-      if (boltIsOwner) {
+      if (isOwner) {
         while (_commands.count > 0) {
           _commands.RemoveFirst().Dispose();
         }
       }
     }
 
-    if (boltIsRemoteControlled) {
-      Assert.False(boltIsProxy);
-      Assert.False(boltIsControlling);
+    if (_flags & FLAG_REMOTE_CONTROLLED) {
+      Assert.True(isOwner);
 
       do {
         cmd = null;
@@ -658,7 +675,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       if (this._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
 
       // if this object originates from this connection, skip it
-      if (ReferenceEquals(this.boltSource, cn)) { continue; }
+      if (ReferenceEquals(this.sourceConnection, cn)) { continue; }
 
       // a controlling connection is always considered in scope
       bool scope = this.boltSerializer.InScope(cn) || ReferenceEquals(this._remoteController, cn);

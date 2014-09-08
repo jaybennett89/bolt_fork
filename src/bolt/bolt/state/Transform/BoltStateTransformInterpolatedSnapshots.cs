@@ -61,7 +61,7 @@ public abstract class BoltStateTransformInterpolatedSnapshots : BoltStateTransfo
   }
 
   public void OriginChanging (Transform old, Transform @new) {
-    if (_entity.boltIsOwner) {
+    if (_entity.isOwner) {
       AfterStep();
 
     } else {

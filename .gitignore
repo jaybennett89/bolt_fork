@@ -1,14 +1,23 @@
-bolt.dll*
-bolt.editor.dll*
-udpkit.dll*
-
 *.csproj
 *.sln
+*.pdb
+*.dll
 
 build
 upload
 Temp
 Library
+Gizmos
+Gizmos.meta
+Plugins
+Plugins.meta
+
+**/Assets/bolt/resources
+**/Assets/bolt/resources.meta
+**/Assets/bolt/scripts
+**/Assets/bolt/scripts.meta
+**/Assets/bolt/scenes
+**/Assets/bolt/scenes.meta
 
 .DS_Store
 bin
