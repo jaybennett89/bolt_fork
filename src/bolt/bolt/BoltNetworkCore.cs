@@ -26,13 +26,13 @@ internal static class BoltCore {
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
   static internal IBoltNetwork _autogen = null;
 
-  static internal BoltConfig _config = null;
+  static internal BoltConfig _config = null; 
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal BoltDoubleList<BoltEntityProxy> _proxies = new BoltDoubleList<BoltEntityProxy>();
   static internal BoltDoubleList<BoltEntity> _entities = new BoltDoubleList<BoltEntity>();
-  static internal BoltEventDispatcher _eventDispatcher = new BoltEventDispatcher();
+  static internal BoltEventDispatcher _globalEventDispatcher = new BoltEventDispatcher();
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -320,7 +320,17 @@ internal static class BoltCore {
         _proxies.Clear();
         _entities.Clear();
         _connections.Clear();
-        _eventDispatcher._targets.Clear();
+
+        foreach (var callback in _globalEventDispatcher._targets.ToArray())
+        {
+            if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown())
+            {
+                continue;
+            }
+
+            _globalEventDispatcher._targets.Remove(callback);
+        }
+
         _globalBehaviours.Clear();
 
         if (_globalBehaviourObject) {

@@ -124,10 +124,6 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get { return -1; }
   }
 
-  public BoltUniqueId uniqueId {
-    get { return _uniqueId; }
-  }
-
   /// <summary>
   /// Returns true if this entity is attached to bolt
   /// </summary>
@@ -207,12 +203,16 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get { return ReferenceEquals(_source, null); }
   }
 
-  public bool isDummy {
+  public bool isRemote {
       get { return !isOwner && !hasControl; }
   }
 
   public bool hasControl {
     get { return _flags & FLAG_IS_CONTROLLING; }
+  }
+
+  public BoltUniqueId uniqueId {
+    get { return _uniqueId; }
   }
 
   /// <summary>
@@ -675,7 +675,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
       if (this._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
 
       // if this object originates from this connection, skip it
-      if (ReferenceEquals(this.boltSource, cn)) { continue; }
+      if (ReferenceEquals(this.sourceConnection, cn)) { continue; }
 
       // a controlling connection is always considered in scope
       bool scope = this.boltSerializer.InScope(cn) || ReferenceEquals(this._remoteController, cn);
