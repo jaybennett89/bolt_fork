@@ -61,7 +61,7 @@ end tell'";
 
     void OnGUI()
     {
-        GUI.DrawTexture(new Rect(10, Screen.height - 148, 256, 138), (Texture2D) Resources.Load("BoltLogo", typeof(Texture2D)));
+        GUI.DrawTexture(new Rect(10, Screen.height - 148, 256, 138), (Texture2D)Resources.Load("BoltLogo", typeof(Texture2D)));
     }
 
     void OnTriggerEnter()
