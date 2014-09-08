@@ -796,7 +796,17 @@ internal static class BoltCore {
     if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
     if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
     if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
-    //if (fileLog) { BoltLog.Add(new BoltLog.File()); }
+    if (fileLog) {
+        switch (Application.platform)
+        {
+            case RuntimePlatform.OSXEditor:
+            case RuntimePlatform.WindowsEditor:
+            case RuntimePlatform.WindowsPlayer:
+            case RuntimePlatform.OSXPlayer:
+                BoltLog.Add(new BoltLog.File()); 
+                break;
+        }
+    }
 
     // set config
     _config = config;
