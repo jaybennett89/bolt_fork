@@ -10,6 +10,19 @@ build
 upload
 Temp
 Library
+Gizmos
+Gizmos.meta
+Plugins
+Plugins.meta
+
+**/Assets/bolt/assemblies/*.dll
+
+**/Assets/bolt/resources
+**/Assets/bolt/resources.meta
+**/Assets/bolt/scripts
+**/Assets/bolt/scripts.meta
+**/Assets/bolt/scenes
+**/Assets/bolt/scenes.meta
 
 .DS_Store
 bin
