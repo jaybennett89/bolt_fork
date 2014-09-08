@@ -4,6 +4,7 @@ udpkit.dll*
 
 *.csproj
 *.sln
+*.pdb
 
 build
 upload
