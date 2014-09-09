@@ -126,10 +126,9 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   public bool CreateOnRemote (BoltEntity entity) {
-    BoltEntityProxy proxy;
 
-    if (_incommingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return true; }
-    if (_outgoingProxiesByEntityId.TryGetValue(entity._id, out proxy)) { return true; }
+    if (_incommingProxiesByEntityId.ContainsKey(entity._id)) { return true; }
+    if (_outgoingProxiesByEntityId.ContainsKey(entity._id)) { return true; }
 
     uint id;
 
@@ -137,6 +136,8 @@ partial class BoltEntityChannel : BoltChannel {
       BoltLog.Warn("{0} is already proxying the max amount of objects", connection);
       return false;
     }
+
+    BoltEntityProxy proxy;
 
     proxy = BoltEntityProxy.Alloc();
     proxy.connection = connection;
@@ -521,6 +522,11 @@ partial class BoltEntityChannel : BoltChannel {
 
   void DestroyOutgoingProxy (BoltEntityProxy proxy, bool allowWithoutDestroy) {
     Assert.True(proxy.flags & BoltEntityProxy.FLAG_DESTROY, "not marked with FLAG_DESTROY");
+
+    if (proxy.entity)
+    {
+        _outgoingProxiesByEntityId.Remove(proxy.entity._id);
+    }
 
     _outgoingProxiesByNetworkId[proxy.networkId] = null;
     _outgoingProxiesNetworkIdPool.Release(proxy.networkId);

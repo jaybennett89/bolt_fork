@@ -678,7 +678,9 @@ internal static class BoltCore {
 
     while (cnIter.Next(out cn)) {
       // if this connection isn't allowed to proxy objects, skip it
-      if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) { continue; }
+      if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
+          continue; 
+      }
 
       BoltEntity en = null;
       var enIter = _entities.GetIterator();
@@ -688,7 +690,7 @@ internal static class BoltCore {
         if (en._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
 
         // if this object originates from this connection, skip it
-        if (ReferenceEquals(en.boltSource, en)) { continue; }
+        if (ReferenceEquals(en._source, en)) { continue; }
 
         // a controlling connection is always considered in scope
         bool scope = en.boltSerializer.InScope(cn) || ReferenceEquals(en._remoteController, cn);
