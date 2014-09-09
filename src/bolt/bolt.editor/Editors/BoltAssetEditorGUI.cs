@@ -573,7 +573,7 @@ public static class BoltAssetEditorGUI {
     EditorGUILayout.EndHorizontal();
 
     if (p.foldout) {
-      if (mode == BoltAssetPropertyEditMode.State && odd == false) {
+      if (mode == BoltAssetPropertyEditMode.State) {
         BoltAssetEditorGUI.EditPropertySyncMode(p);
         BoltAssetEditorGUI.EditPropertySyncTarget(p);
       }
