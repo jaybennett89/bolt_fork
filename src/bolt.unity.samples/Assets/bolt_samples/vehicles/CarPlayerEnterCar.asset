@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Name: CarPlayerEnterCar
   m_EditorClassIdentifier: 
   compile: 0
-  assignedId: -1
   eventMode: 1
   deliveryMode: 0
   globalSource: 0

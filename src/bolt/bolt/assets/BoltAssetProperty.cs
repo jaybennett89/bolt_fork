@@ -130,7 +130,7 @@ public class BoltAssetProperty {
   public string runtimeType {
     get {
       if (type == BoltAssetPropertyType.Mecanim && mecanimSettings.mecanimAsset) {
-        return mecanimSettings.mecanimAsset.interfaceName;
+          return mecanimSettings.mecanimAsset.interfaceName;
       }
 
       if (type == BoltAssetPropertyType.Trigger) {

@@ -533,13 +533,7 @@ public static class BoltAssetEditorGUI {
 
   public static BoltAssetProperty EditProperty (BoltAssetProperty p, BoltAssetPropertyEditMode mode, bool odd) {
     BoltAssetEditorGUI.mode = mode;
-
-    //GUI.color = p.isDefault ? BoltAssetEditorGUI.lightBlue : Color.white;
-    //GUIStyle style = p.isDefault ? BoltAssetEditorGUI.BoxStyle(1) : BoltAssetEditorGUI.BoxStyle(0);
-
     EditorGUILayout.BeginVertical();
-
-    //GUI.color = Color.white;
 
     GUIStyle s = new GUIStyle(GUIStyle.none);
     s.normal.background = EditorGUIUtility.whiteTexture;
@@ -553,7 +547,6 @@ public static class BoltAssetEditorGUI {
 
     GUI.color = Color.white;
 
-    //BoltAssetEditorGUI.HeaderBackground(() => {
     BoltAssetEditorGUI.EditPropertyEnabled(p);
     BoltAssetEditorGUI.EditPropertyFoldout(p);
 
@@ -567,9 +560,6 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.EditPropertyDeleteButton(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
-
-    //}, 0, 0);
-
     EditorGUILayout.EndHorizontal();
 
     if (p.foldout) {
@@ -591,8 +581,6 @@ public static class BoltAssetEditorGUI {
 
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
-
-    //GUILayout.Space(2);
 
     return p;
   }

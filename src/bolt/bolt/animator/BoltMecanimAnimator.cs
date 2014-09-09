@@ -60,5 +60,4 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
       }
     }
   }
-
 }

@@ -3,7 +3,6 @@
 public class BoltEventAsset : BoltCompilableAsset {
   [HideInInspector]
   public ushort id;
-  public int assignedId = -1;
   public BoltAssetEventMode eventMode;
   public BoltEventDeliveryMode deliveryMode;
   public BoltAssetEventGlobalSource globalSource;

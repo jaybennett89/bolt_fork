@@ -12,6 +12,9 @@ Gizmos.meta
 Plugins
 Plugins.meta
 
+Bolt_DebugStart_Build
+Bolt_Log*
+
 **/Assets/bolt/resources
 **/Assets/bolt/resources.meta
 **/Assets/bolt/scripts
