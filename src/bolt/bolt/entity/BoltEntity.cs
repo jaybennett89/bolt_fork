@@ -203,10 +203,6 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     get { return ReferenceEquals(_source, null); }
   }
 
-  public bool isRemote {
-      get { return !isOwner && !hasControl; }
-  }
-
   public bool hasControl {
     get { return _flags & FLAG_IS_CONTROLLING; }
   }
