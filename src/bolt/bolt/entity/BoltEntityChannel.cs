@@ -157,7 +157,7 @@ partial class BoltEntityChannel : BoltChannel {
     for (int i = 0; i < _incommingProxiesByNetworkId.Length; ++i) {
       BoltEntityProxy proxy = _incommingProxiesByNetworkId[i];
 
-      if (proxy && proxy.entity.isRemote) {
+      if (proxy && !proxy.entity.isOwner && !proxy.entity.hasControl) {
         proxy.entity.SimulateStep();
       }
     }
