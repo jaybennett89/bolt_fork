@@ -4,6 +4,8 @@ using UnityEngine;
 [CustomEditor(typeof(BoltEntity))]
 public class BoltEntityEditor : Editor {
   public override void OnInspectorGUI () {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
     BoltEntity entity = (BoltEntity) target;
     PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
 
@@ -20,6 +22,12 @@ public class BoltEntityEditor : Editor {
     }
 
     if (prefabType == PrefabType.Prefab || prefabType == PrefabType.PrefabInstance) {
+      if (settings._config.globalUniqueIds) {
+        if (Application.isPlaying) {
+          EditorGUILayout.LabelField("Unique Id", entity._uniqueId.ToString());
+        }
+      }
+
       // Scene object
       EditorGUI.BeginDisabledGroup(true);
       EditorGUILayout.Toggle("Scene Object", entity._sceneObject);
@@ -45,6 +53,7 @@ public class BoltEntityEditor : Editor {
       BoltEntitySerializer aref = entity.GetField<BoltEntitySerializer>("_serializer");
       aref = EditorGUILayout.ObjectField("Serializer", aref, typeof(BoltEntitySerializer), false) as BoltEntitySerializer;
       entity.SetField("_serializer", aref);
+
 
       if (!aref) {
         EditorGUILayout.HelpBox("Serializer not attached, drag and drop an entity serializer component to correct", MessageType.Warning);
