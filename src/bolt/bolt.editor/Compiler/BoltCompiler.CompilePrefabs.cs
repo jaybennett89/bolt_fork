@@ -31,7 +31,7 @@ partial class BoltCompiler {
     using (BoltSourceFile file = new BoltSourceFile(op.prefabsFilePath)) {
       file.EmitScope("public static class BoltPrefabs", () => {
         foreach (BoltPrefab prefab in op.prefabs) {
-          file.EmitLine("public const string {0} = \"{0}\";", prefab.name, prefab.id);
+          file.EmitLine("public const string {0} = \"{0}\";", BoltEditorUtils.CSharpIdentifier(prefab.name), prefab.id);
         }
       });
     }

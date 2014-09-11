@@ -291,38 +291,49 @@ partial class BoltCompiler {
           file.EmitScope("get", () => {
             file.EmitLine("return {0};", p.backingFieldName);
           });
-          file.EmitScope("set", () => {
-            bool sendToProxy = (p.syncTarget & BoltAssetSyncTarget.Proxy) == BoltAssetSyncTarget.Proxy;
-            bool sendToController = (p.syncTarget & BoltAssetSyncTarget.Controller) == BoltAssetSyncTarget.Controller;
 
-            file.EmitScope("if (_entity.boltIsOwner == false)", () => {
-              Action exception = () => file.EmitLine("throw new BoltException(\"you are not allowed to set {0}.{1} locally\");", s.interfaceName, p.name);
-
-              if (sendToProxy && sendToController) {
-                exception();
-              } else {
-                if (sendToProxy) {
-                  file.EmitScope("if (_entity.boltIsControlling == false)", exception);
-                }
-
-                if (sendToController) {
-                  file.EmitScope("if (_entity.boltIsControlling)", exception);
-                }
-              }
-            });
-
-            file.EmitScope("if ({0} != value)", p.backingFieldName, () => {
+          if (p.type == BoltAssetPropertyType.Custom) {
+            file.EmitScope("set", () => {
+              file.EmitLine("if ({0} != null) throw new BoltException(\"Can't change custom property after setting it\");", p.backingFieldName);
+              file.EmitLine("if (value == null) throw new BoltException(\"Can't assign null to a custom property\");");
               file.EmitLine("{0} = value;", p.backingFieldName);
-
-              if (p.bit != int.MaxValue) {
-                file.EmitLine("_entity.SetMaskBits(1u << {0});", p.bit);
-              }
-
-              if (p.hasNotifyCallback) {
-                file.EmitLine("TriggerChangedEvent((({1})this).{0}Changed);", p.name, s.interfaceName);
-              }
             });
-          });
+          }
+          else {
+            file.EmitScope("set", () => {
+              bool sendToProxy = (p.syncTarget & BoltAssetSyncTarget.Proxy) == BoltAssetSyncTarget.Proxy;
+              bool sendToController = (p.syncTarget & BoltAssetSyncTarget.Controller) == BoltAssetSyncTarget.Controller;
+
+              file.EmitScope("if (_entity.boltIsOwner == false)", () => {
+                Action exception = () => file.EmitLine("throw new BoltException(\"you are not allowed to set {0}.{1} locally\");", s.interfaceName, p.name);
+
+                if (sendToProxy && sendToController) {
+                  exception();
+                }
+                else {
+                  if (sendToProxy) {
+                    file.EmitScope("if (_entity.boltIsControlling == false)", exception);
+                  }
+
+                  if (sendToController) {
+                    file.EmitScope("if (_entity.boltIsControlling)", exception);
+                  }
+                }
+              });
+
+              file.EmitScope("if ({0} != value)", p.backingFieldName, () => {
+                file.EmitLine("{0} = value;", p.backingFieldName);
+
+                if (p.bit != int.MaxValue) {
+                  file.EmitLine("_entity.SetMaskBits(1u << {0});", p.bit);
+                }
+
+                if (p.hasNotifyCallback) {
+                  file.EmitLine("TriggerChangedEvent((({1})this).{0}Changed);", p.name, s.interfaceName);
+                }
+              });
+            });
+          }
         });
       }
     }
