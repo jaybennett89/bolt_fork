@@ -875,14 +875,15 @@ internal static class BoltCore {
     _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
-    if (_config.useAssemblyChecksum) {
-      _udpConfig.HandshakeData = new UdpHandshakeData[2];
-      _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-      _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
-    } else {
-      _udpConfig.HandshakeData = new UdpHandshakeData[1];
-      _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    }
+    //var userHash = GetUserAssemblyHash();
+    //if (_config.useAssemblyChecksum && userHash != null && userHash.Length == 16) {
+    //  _udpConfig.HandshakeData = new UdpHandshakeData[1];
+    //  _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    //  _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
+    //} else {
+    //_udpConfig.HandshakeData = new UdpHandshakeData[1];
+    //_udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
+    //}
 
     // create and start socket
     _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);
