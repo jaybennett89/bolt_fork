@@ -144,6 +144,14 @@ public static partial class BoltNetwork {
     return BoltCore.Instantiate(prefab);
   }
 
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    return BoltCore.Instantiate(prefab, position, rotation);
+  }
+
+  public static BoltEntity Instantiate(string prefab, Vector3 position, Quaternion rotation) {
+    return Instantiate(BoltCore.FindPrefab(prefab), position, rotation);
+  }
+
   public static Func<int, Transform> resolveTransform {
     get { return BoltCore.resolveTransform; }
     set { BoltCore.resolveTransform = value; }

@@ -101,6 +101,6 @@ public abstract class BoltEntitySerializer : BoltEntityBehaviourBase, IBoltEntit
   }
 
   public override string ToString () {
-    return string.Format("[Serializer type={0} entity={1}]", GetType().Name, boltEntity);
+    return string.Format("[Serializer type={0} entity={1}]", GetType().Name, entity);
   }
 }

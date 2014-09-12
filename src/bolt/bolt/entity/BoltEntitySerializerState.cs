@@ -24,7 +24,7 @@ public abstract class BoltEntitySerializer<T> : BoltEntitySerializer where T : c
 #endif
 
     _state = (BoltState) (object) BoltFactory.NewState<T>();
-    _state._entity = boltEntity;
+    _state._entity = entity;
     _state.Initialize();
 
     Attached((T) (object) _state);
