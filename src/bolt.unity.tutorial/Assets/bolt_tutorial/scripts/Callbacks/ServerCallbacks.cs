@@ -5,8 +5,12 @@ using System.Text;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
 public class ServerCallbacks : BoltCallbacks {
+  public static bool ListenServer = true;
+
   void Awake() {
-    Player.CreateServerPlayer();
+    if (ListenServer) {
+      Player.CreateServerPlayer();
+    }
   }
 
   public override void ConnectRequest(UdpKit.UdpEndPoint endpoint, byte[] token) {
@@ -27,18 +31,23 @@ public class ServerCallbacks : BoltCallbacks {
     arg.userToken = p;
   }
 
-  public override void SceneLoadRemoteDone(BoltConnection connection, string map) {
-    Player player;
+  public override void Disconnected(BoltConnection arg) {
 
-    player = Player.GetPlayer(connection);
-    player.entity = SpawnPlayerCharacter();
-    player.entity.GiveControl(connection);
+  }
+
+  public override void SceneLoadRemoteDone(BoltConnection connection, string map) {
+    connection.GetPlayer().InstantiateEntity();
   }
 
   public override void SceneLoadLocalDone(string map) {
     if (Player.serverIsPlaying) {
-      Player.serverPlayer.entity = SpawnPlayerCharacter();
-      Player.serverPlayer.entity.TakeControl();
+      Player.serverPlayer.InstantiateEntity();
+    }
+  }
+
+  public override void SceneLoadLocalBegin(string map) {
+    foreach (Player p in Player.allPlayers) {
+      p.entity = null;
     }
   }
 

@@ -25,7 +25,7 @@ internal static class BoltCore {
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
   static internal IBoltNetwork _autogen = null;
 
-  static internal BoltConfig _config = null; 
+  static internal BoltConfig _config = null;
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
@@ -49,8 +49,8 @@ internal static class BoltCore {
     get { return null; }
   }
 
-  internal static Func<GameObject, Vector3, Quaternion, GameObject> _instantiate = 
-    (go, p, r) => (GameObject) UnityEngine.GameObject.Instantiate(go, p, r);
+  internal static Func<GameObject, Vector3, Quaternion, GameObject> _instantiate =
+    (go, p, r) => (GameObject)UnityEngine.GameObject.Instantiate(go, p, r);
 
   internal static Action<GameObject> _destroy =
     (go) => GameObject.Destroy(go);
@@ -106,7 +106,7 @@ internal static class BoltCore {
   }
 
   public static float serverTime {
-    get { return ((float) serverFrame) / ((float) framesPerSecond); }
+    get { return ((float)serverFrame) / ((float)framesPerSecond); }
   }
 
   public static float time {
@@ -129,7 +129,7 @@ internal static class BoltCore {
     get { return hasSocket && _mode == BoltNetworkModes.Server; }
   }
 
-  public static byte[] GetUserAssemblyHash () {
+  public static byte[] GetUserAssemblyHash() {
     return BoltRuntimeReflection.GetUserAssemblyHash();
   }
 
@@ -144,7 +144,7 @@ internal static class BoltCore {
   }
 
   internal static int localSendRateBits {
-    get { return BoltMath.Hibit((uint) localSendRate); }
+    get { return BoltMath.Hibit((uint)localSendRate); }
   }
 
   internal static int remoteSendRate {
@@ -158,7 +158,7 @@ internal static class BoltCore {
   }
 
   internal static int remoteSendRateBits {
-    get { return BoltMath.Hibit((uint) remoteSendRate); }
+    get { return BoltMath.Hibit((uint)remoteSendRate); }
   }
 
   internal static int localInterpolationDelay {
@@ -195,38 +195,39 @@ internal static class BoltCore {
     get { return _udpSocket != null; }
   }
 
-  public static void InitializeServer (UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
+  public static void InitializeServer(UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
     Initialize(BoltNetworkModes.Server, endpoint, autogen, config);
   }
 
-  public static void InitializeClient (UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
+  public static void InitializeClient(UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
     Initialize(BoltNetworkModes.Client, endpoint, autogen, config);
   }
 
-  public static void Destroy (BoltEntity entity) {
+  public static void Destroy(BoltEntity entity) {
     entity.Detach();
     _destroy(entity.gameObject);
   }
 
-  public static void Destroy (GameObject go) {
+  public static void Destroy(GameObject go) {
     BoltEntity entity = go.GetComponent<BoltEntity>();
 
     if (entity) {
       Destroy(entity);
-    } else {
+    }
+    else {
       BoltLog.Error("Can only destroy gameobjects with an BoltEntity component through BoltNetwork.Destroy");
     }
   }
 
-  public static void Detach (BoltEntity entity) {
+  public static void Detach(BoltEntity entity) {
     entity.Detach();
   }
 
-  public static BoltEntity Instantiate (GameObject prefab) {
+  public static BoltEntity Instantiate(GameObject prefab) {
     return Instantiate(prefab, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate (GameObject prefab, Vector3 position, Quaternion rotation) {
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     prefab.GetComponent<BoltEntity>()._sceneObject = false;
     GameObject go = _instantiate(prefab, position, rotation);
     BoltEntity en = go.GetComponent<BoltEntity>();
@@ -238,12 +239,12 @@ internal static class BoltCore {
     return Attach(en, null, Bits.zero, GenerateUniqueId());
   }
 
-  public static BoltEntity Attach (BoltEntity entity) {
+  public static BoltEntity Attach(BoltEntity entity) {
     entity.Attach(null, Bits.zero, GenerateUniqueId());
     return entity;
   }
 
-  static BoltUniqueId GenerateUniqueId () {
+  static BoltUniqueId GenerateUniqueId() {
     BoltUniqueId id = new BoltUniqueId();
 
     if (_config.globalUniqueIds) {
@@ -254,22 +255,22 @@ internal static class BoltCore {
     return id;
   }
 
-  internal static BoltEntity Attach (BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
+  internal static BoltEntity Attach(BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     entity.enabled = true;
     entity.Attach(source, flags, uniqueId);
 
     return entity;
   }
 
-  public static void DontDestroyOnMapLoad (BoltEntity entity) {
+  public static void DontDestroyOnMapLoad(BoltEntity entity) {
     entity._flags |= BoltEntity.FLAG_PERSIST_ON_MAP_LOAD;
   }
 
-  public static GameObject FindPrefab (string name) {
+  public static GameObject FindPrefab(string name) {
     return BoltRuntimeSettings.FindPrefab(name);
   }
 
-  public static void LoadMap (string name) {
+  public static void LoadMap(string name) {
     if (isServer == false) {
       BoltLog.Error("only server can initiate a map load");
       return;
@@ -279,7 +280,7 @@ internal static class BoltCore {
   }
 
 
-  internal static void LoadMapInternal (Scene map) {
+  internal static void LoadMapInternal(Scene map) {
     foreach (BoltEntity entity in entities) {
       // destroy entities which we are in control of and which are not labelled as proxies
       if (entity._flags & BoltEntity.FLAG_IS_PROXY) { continue; }
@@ -297,7 +298,7 @@ internal static class BoltCore {
     }
   }
 
-  public static void Shutdown () {
+  public static void Shutdown() {
     if (_udpSocket != null && _mode != BoltNetworkModes.None) {
       BoltLog.Info("shutting down");
 
@@ -320,14 +321,12 @@ internal static class BoltCore {
         _entities.Clear();
         _connections.Clear();
 
-        foreach (var callback in _globalEventDispatcher._targets.ToArray())
-        {
-            if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown())
-            {
-                continue;
-            }
+        foreach (var callback in _globalEventDispatcher._targets.ToArray()) {
+          if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown()) {
+            continue;
+          }
 
-            _globalEventDispatcher._targets.Remove(callback);
+          _globalEventDispatcher._targets.Remove(callback);
         }
 
         _globalBehaviours.Clear();
@@ -345,7 +344,8 @@ internal static class BoltCore {
         BoltFactory.UnregisterAll();
         BoltLog.RemoveAll();
 
-      } finally {
+      }
+      finally {
         if (ShutdownComplete != null) {
           ShutdownComplete();
         }
@@ -353,15 +353,15 @@ internal static class BoltCore {
     }
   }
 
-  public static UdpSession[] GetSessions () {
+  public static UdpSession[] GetSessions() {
     return _udpSocket.GetSessions();
   }
 
-  public static void Connect (UdpEndPoint endpoint) {
+  public static void Connect(UdpEndPoint endpoint) {
     Connect(endpoint, null);
   }
 
-  public static void Connect (UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, byte[] token) {
     if (server != null) {
       BoltLog.Error("You must disconnect from the current server first");
       return;
@@ -374,19 +374,19 @@ internal static class BoltCore {
     _udpSocket.Connect(endpoint, token);
   }
 
-  public static void Raise (IBoltEvent evnt) {
-    BoltEventBase.Invoke((BoltEventBase) evnt);
+  public static void Raise(IBoltEvent evnt) {
+    BoltEventBase.Invoke((BoltEventBase)evnt);
   }
 
-  public static void Raise (IBoltEvent evnt, IEnumerable connections) {
-    BoltEventBase.Invoke((BoltEventBase) evnt, connections);
+  public static void Raise(IBoltEvent evnt, IEnumerable connections) {
+    BoltEventBase.Invoke((BoltEventBase)evnt, connections);
   }
 
-  public static void Raise (IBoltEvent evnt, params BoltConnection[] connections) {
-    BoltEventBase.Invoke((BoltEventBase) evnt, connections);
+  public static void Raise(IBoltEvent evnt, params BoltConnection[] connections) {
+    BoltEventBase.Invoke((BoltEventBase)evnt, connections);
   }
 
-  public static void SetSessionData (string serverName, string userData) {
+  public static void SetSessionData(string serverName, string userData) {
     if (BoltCore.isServer == false) {
       BoltLog.Error("Only the server can call SetSessionData");
       return;
@@ -395,19 +395,20 @@ internal static class BoltCore {
     _udpSocket.SetSessionData(serverName, userData);
   }
 
-  public static void EnableLanBroadcast (UdpEndPoint endpoint) {
+  public static void EnableLanBroadcast(UdpEndPoint endpoint) {
     if (endpoint.Address == UdpIPv4Address.Any || endpoint.Port == 0) {
       BoltLog.Error("incorrect broadcast endpoint: {0}", endpoint);
-    } else {
+    }
+    else {
       _udpSocket.EnableLanBroadcast(endpoint, isServer);
     }
   }
 
-  public static void DisableLanBroadcast () {
+  public static void DisableLanBroadcast() {
     _udpSocket.DisableLanBroadcast();
   }
 
-  static void StepRemoteFrames () {
+  static void StepRemoteFrames() {
     BoltConnection cn;
     BoltIterator<BoltConnection> cnIter;
 
@@ -436,7 +437,7 @@ internal static class BoltCore {
     }
   }
 
-  static void PollNetwork () {
+  static void PollNetwork() {
     UdpEvent ev;
 
     while (hasSocket && _udpSocket.Poll(out ev)) {
@@ -462,26 +463,26 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ObjectSent:
-          ev.Connection.GetBoltConnection().PacketSent((BoltPacket) ev.Object0);
+          ev.Connection.GetBoltConnection().PacketSent((BoltPacket)ev.Object0);
           break;
 
         case UdpEventType.ObjectReceived:
-          using ((BoltPacket) ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket) ev.Object0);
+          using ((BoltPacket)ev.Object0) {
+            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
           }
           break;
 
         case UdpEventType.ObjectDelivered:
-          using ((BoltPacket) ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket) ev.Object0);
+          using ((BoltPacket)ev.Object0) {
+            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
           }
           break;
 
         case UdpEventType.ObjectLost:
         case UdpEventType.ObjectRejected:
         case UdpEventType.ObjectSendFailed:
-          using ((BoltPacket) ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketLost((BoltPacket) ev.Object0);
+          using ((BoltPacket)ev.Object0) {
+            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
           }
           break;
       }
@@ -492,7 +493,7 @@ internal static class BoltCore {
     AcceptConnection(endpoint, null);
   }
 
-  public static void AcceptConnection (UdpEndPoint endpoint, object userToken) {
+  public static void AcceptConnection(UdpEndPoint endpoint, object userToken) {
     if (!isServer) {
       BoltLog.Error("AcceptConnection: can only be called on the server");
       return;
@@ -506,7 +507,7 @@ internal static class BoltCore {
     _udpSocket.Accept(endpoint, userToken);
   }
 
-  public static void RefuseConnection (UdpEndPoint endpoint) {
+  public static void RefuseConnection(UdpEndPoint endpoint) {
     if (!isServer) {
       BoltLog.Error("RefuseConnection: can only be called on the server");
       return;
@@ -520,7 +521,7 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint);
   }
 
-  public static bool HasEntity (BoltUniqueId id) {
+  public static bool HasEntity(BoltUniqueId id) {
     var it = _entities.GetIterator();
 
     while (it.Next()) {
@@ -532,7 +533,7 @@ internal static class BoltCore {
     return false;
   }
 
-  public static BoltEntity FindEntity (BoltUniqueId id) {
+  public static BoltEntity FindEntity(BoltUniqueId id) {
     if (_config.globalUniqueIds == false) {
       throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
     }
@@ -548,7 +549,7 @@ internal static class BoltCore {
     return null;
   }
 
-  internal static void Send () {
+  internal static void Send() {
     if (hasSocket) {
       BoltPhysics.SnapshotWorld();
 
@@ -572,7 +573,8 @@ internal static class BoltCore {
           if (proxy.entity) {
             if (proxy.entity.IsControlledBy(proxy.connection)) {
               proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.controllerMask);
-            } else {
+            }
+            else {
               proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.proxyMask);
             }
           }
@@ -597,7 +599,7 @@ internal static class BoltCore {
     }
   }
 
-  internal static void FixedUpdate () {
+  internal static void FixedUpdate() {
     if (hasSocket) {
       _frame += 1;
 
@@ -614,7 +616,8 @@ internal static class BoltCore {
       while (entityIter.Next(out entity)) {
         if (entity.isOwner) {
           entity.SimulateStep();
-        } else {
+        }
+        else {
           if (entity.hasControl) {
             entity.SimulateStep();
           }
@@ -623,7 +626,7 @@ internal static class BoltCore {
     }
   }
 
-  static void HandleConnected (UdpConnection udp) {
+  static void HandleConnected(UdpConnection udp) {
     Assert.True(udp.uid > 1);
 
     _uid = udp.uid;
@@ -644,13 +647,14 @@ internal static class BoltCore {
     if (isServer) {
       if (_mapLoadState.scene.name != null) {
         cn.LoadMapOnClient(_mapLoadState.scene);
-      } else {
+      }
+      else {
         BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
     }
   }
 
-  static void HandleDisconnected (BoltConnection cn) {
+  static void HandleDisconnected(BoltConnection cn) {
     // invoke callback depending on connection type
     if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientDisconnectedInvoke(cn); } else { BoltCallbacksBase.DisconnectedFromServerInvoke(cn); }
 
@@ -661,7 +665,8 @@ internal static class BoltCore {
       // cleanup                                                      
       try {
         cn.DisconnectedInternal();
-      } catch (Exception exn) {
+      }
+      catch (Exception exn) {
         BoltLog.Error(exn);
       }
 
@@ -675,14 +680,14 @@ internal static class BoltCore {
     }
   }
 
-  static void UpdateScope () {
+  static void UpdateScope() {
     BoltConnection cn;
     var cnIter = _connections.GetIterator();
 
     while (cnIter.Next(out cn)) {
       // if this connection isn't allowed to proxy objects, skip it
       if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
-          continue; 
+        continue;
       }
 
       BoltEntity en = null;
@@ -714,7 +719,7 @@ internal static class BoltCore {
     }
   }
 
-  static internal void UpdateActiveGlobalBehaviours (string map) {
+  static internal void UpdateActiveGlobalBehaviours(string map) {
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
       BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
@@ -723,7 +728,8 @@ internal static class BoltCore {
         console.toggleKey = BoltRuntimeSettings.instance.consoleToggleKey;
         console.visible = BoltRuntimeSettings.instance.consoleVisibleByDefault;
       }
-    } else {
+    }
+    else {
       DeleteGlobalBehaviour(typeof(BoltConsole));
     }
 
@@ -734,7 +740,8 @@ internal static class BoltCore {
     if (isServer) {
       CreateGlobalBehaviour(typeof(BoltEventServerReceiver));
       DeleteGlobalBehaviour(typeof(BoltEventClientReceiver));
-    } else {
+    }
+    else {
       DeleteGlobalBehaviour(typeof(BoltEventServerReceiver));
       CreateGlobalBehaviour(typeof(BoltEventClientReceiver));
     }
@@ -746,16 +753,18 @@ internal static class BoltCore {
 
         if (anyMap || matchesMap) {
           CreateGlobalBehaviour(pair.item1);
-        } else {
+        }
+        else {
           DeleteGlobalBehaviour(pair.item1);
         }
-      } else {
+      }
+      else {
         DeleteGlobalBehaviour(pair.item1);
       }
     }
   }
 
-  static Component CreateGlobalBehaviour (Type t) {
+  static Component CreateGlobalBehaviour(Type t) {
     if (_globalBehaviourObject) {
       var component = _globalBehaviourObject.GetComponent(t);
       var shouldCreate = !component;
@@ -769,7 +778,7 @@ internal static class BoltCore {
     return null;
   }
 
-  static void DeleteGlobalBehaviour (Type t) {
+  static void DeleteGlobalBehaviour(Type t) {
     if (_globalBehaviourObject) {
       var component = _globalBehaviourObject.GetComponent(t);
       var shouldDelete = !!component;
@@ -781,7 +790,7 @@ internal static class BoltCore {
     }
   }
 
-  static void Initialize (BoltNetworkModes mode, UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
+  static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
@@ -802,22 +811,21 @@ internal static class BoltCore {
     if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
     if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
     if (fileLog) {
-        switch (Application.platform)
-        {
-            case RuntimePlatform.OSXEditor:
-            case RuntimePlatform.WindowsEditor:
-            case RuntimePlatform.WindowsPlayer:
-            case RuntimePlatform.OSXPlayer:
-                BoltLog.Add(new BoltLog.File()); 
-                break;
-        }
+      switch (Application.platform) {
+        case RuntimePlatform.OSXEditor:
+        case RuntimePlatform.WindowsEditor:
+        case RuntimePlatform.WindowsPlayer:
+        case RuntimePlatform.OSXPlayer:
+          BoltLog.Add(new BoltLog.File());
+          break;
+      }
     }
 
     // set config
     _config = config;
 
     // set frametime
-    Time.fixedDeltaTime = 1f / (float) config.framesPerSecond;
+    Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
 
     // set udpkits log writer
     UdpLog.SetWriter(UdpLogWriter);
@@ -852,29 +860,27 @@ internal static class BoltCore {
 
     // setup udpkit configuration
     _udpConfig = new UdpConfig();
-    _udpConfig.ConnectionTimeout = (uint) config.connectionTimeout;
-    _udpConfig.ConnectRequestAttempts = (uint) config.connectionRequestAttempts;
-    _udpConfig.ConnectRequestTimeout = (uint) config.connectionRequestTimeout;
+    _udpConfig.ConnectionTimeout = (uint)config.connectionTimeout;
+    _udpConfig.ConnectRequestAttempts = (uint)config.connectionRequestAttempts;
+    _udpConfig.ConnectRequestTimeout = (uint)config.connectionRequestTimeout;
 
 #if DEBUG
-    if (config.useNetworkSimulation)
-    {
-        _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
-        _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
-        _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
+    if (config.useNetworkSimulation) {
+      _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
+      _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
+      _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
 
-        switch (config.simulatedRandomFunction)
-        {
-            case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
-            case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
-        }
+      switch (config.simulatedRandomFunction) {
+        case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
+        case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+      }
     }
 #endif
 
     _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
     _udpConfig.AllowIncommingConnections = isServer;
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
-    _udpConfig.PingTimeout = (uint) (localSendRate * 1.5f * frameDeltaTime * 1000f);
+    _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
@@ -896,18 +902,18 @@ internal static class BoltCore {
     UpdateActiveGlobalBehaviours(null);
   }
 
-  static UdpNoise CreatePerlinNoise () {
+  static UdpNoise CreatePerlinNoise() {
     var x = UnityEngine.Random.value;
     var s = Stopwatch.StartNew();
-    return () => Mathf.PerlinNoise(x, (float) s.Elapsed.TotalSeconds);
+    return () => Mathf.PerlinNoise(x, (float)s.Elapsed.TotalSeconds);
   }
 
-  static UdpNoise CreateRandomNoise () {
+  static UdpNoise CreateRandomNoise() {
     var r = new System.Random();
-    return () => (float) r.NextDouble();
+    return () => (float)r.NextDouble();
   }
 
-  static void UdpLogWriter (uint level, string message) {
+  static void UdpLogWriter(uint level, string message) {
     switch (level) {
 #if DEBUG
       case UdpLog.DEBUG:
@@ -930,7 +936,18 @@ internal static class BoltCore {
         break;
     }
   }
-  internal static void LoadMapBeginInternal (Scene map) {
+
+  internal static void LoadMapBeginInternal(Scene map) {
+    {
+      var it = _entities.GetIterator();
+
+      while (it.Next()) {
+        if (it.val.isOwner && (it.val._persistanceMode == BoltEntityPersistanceMode.DestroyOnLoad)) {
+          Destroy(it.val);
+        }
+      }
+    }
+
     if (isServer) {
       var it = _connections.GetIterator();
 
@@ -946,7 +963,7 @@ internal static class BoltCore {
     UpdateActiveGlobalBehaviours(null);
   }
 
-  internal static void LoadMapDoneInternal (Scene map) {
+  internal static void LoadMapDoneInternal(Scene map) {
     Assert.True(_mapLoadState.stage == SceneLoadStage.Load);
     _mapLoadState = _mapLoadState.FinishLoad(_mapLoadState.scene, _mapLoadState.scene);
     Assert.True(_mapLoadState.stage == SceneLoadStage.LoadDone);
