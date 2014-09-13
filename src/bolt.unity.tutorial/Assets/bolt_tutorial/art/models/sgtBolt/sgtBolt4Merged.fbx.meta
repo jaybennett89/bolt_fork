@@ -728,7 +728,7 @@ ModelImporter:
       name: aimGun
       takeName: Scene
       firstFrame: 150
-      lastFrame: 151
+      lastFrame: 150.100006
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -964,7 +964,7 @@ ModelImporter:
       name: aimRifle
       takeName: Scene
       firstFrame: 194
-      lastFrame: 195
+      lastFrame: 194.100006
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -1200,7 +1200,7 @@ ModelImporter:
       name: aimGrenade
       takeName: Scene
       firstFrame: 211
-      lastFrame: 212
+      lastFrame: 211.100006
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

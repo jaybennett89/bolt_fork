@@ -1,15 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
 public class ServerCallbacks : BoltCallbacks {
-
   void Awake() {
     Player.CreateServerPlayer();
   }
 
-  public override void ClientConnected(BoltConnection arg) {
-    arg.userToken = new Player();
+  public override void ConnectRequest(UdpKit.UdpEndPoint endpoint, byte[] token) {
+    Player p;
+
+    p = new Player();
+    p.name = token == null ? "UNKNOWN" : Encoding.ASCII.GetString(token);
+
+    BoltNetwork.Accept(endpoint, p);
+  }
+
+  public override void Connected(BoltConnection arg) {
+    Player p;
+
+    p = new Player();
+    p.connection = arg;
+
+    arg.userToken = p;
   }
 
   public override void SceneLoadRemoteDone(BoltConnection connection, string map) {

@@ -2,7 +2,17 @@
 using System.Collections;
 
 public class Player {
+  public string name;
   public BoltEntity entity;
+  public BoltConnection connection;
+
+  public IPlayerState state {
+    get { return entity.GetBoltState<IPlayerState>(); }
+  }
+
+  public bool isServer {
+    get { return connection == null; }
+  }
 
   public static bool serverIsPlaying {
     get { return serverPlayer != null; }

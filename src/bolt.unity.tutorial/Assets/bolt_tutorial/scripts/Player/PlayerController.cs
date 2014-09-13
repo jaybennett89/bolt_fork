@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : BoltEntityBehaviour {
+public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   const float MOUSE_SENSEITIVITY = 2f;
 
   PlayerCommand.Input _input;
@@ -51,6 +51,26 @@ public class PlayerController : BoltEntityBehaviour {
     else {
       // move and save the resulting state
       cmd.state = _motor.Move(cmd.input);
+
+      if (cmd.isFirstExecution) {
+        if (cmd.input.forward ^ cmd.input.backward) {
+          state.mecanim.MoveZ = cmd.input.forward ? 1 : -1;
+        }
+        else {
+          state.mecanim.MoveZ = 0;
+        }
+
+        if (cmd.input.left ^ cmd.input.right) {
+          state.mecanim.MoveX = cmd.input.right ? 1 : -1;
+        }
+        else {
+          state.mecanim.MoveX = 0;
+        }
+
+        if (_motor.jumpStartedThisFrame) {
+          state.mecanim.Jump();
+        }
+      }
     }
   }
 }
