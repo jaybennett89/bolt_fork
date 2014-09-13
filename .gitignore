@@ -4,6 +4,9 @@
 *.pdb
 *.dll
 
+# third party assets used for tutorial dev
+Quantum Theory*
+
 build
 upload
 Temp

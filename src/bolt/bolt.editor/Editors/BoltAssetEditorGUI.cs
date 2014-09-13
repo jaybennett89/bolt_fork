@@ -8,11 +8,6 @@ public static class BoltAssetEditorGUI {
   public const int WIDTH = 100;
 
   public static BoltAssetPropertyEditMode mode = BoltAssetPropertyEditMode.State;
-  public static readonly Color blue = new Color(0 / 255f, 162f / 255f, 232f / 255f);
-  public static readonly Color lightBlue = new Color(81f / 255f, 203f / 255f, 255f / 255f);
-  public static readonly Color orange = new Color(255f / 255f, 127f / 255f, 39f / 255f);
-  public static readonly Color lightGreen = new Color(105f / 255f, 251f / 255f, 9f / 255f);
-  public static readonly Color darkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
   public static void Header (string icon, string text) {
@@ -187,14 +182,8 @@ public static class BoltAssetEditorGUI {
         }
       }
 
-      if (EditorGUIUtility.isProSkin) {
-        style.normal.textColor = set ? lightBlue : style.normal.textColor;
-        style.active.textColor = set ? lightBlue : style.active.textColor;
-      } else {
-        if (set) {
-          GUI.color = lightOrange;
-        }
-      }
+      style.normal.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.normal.textColor;
+      style.active.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.active.textColor;
 
       if (GUILayout.Button(flags[i], style, GUILayout.ExpandWidth(false), GUILayout.MinWidth(20))) {
         if (set) {
@@ -324,9 +313,13 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void EditPropertyEnabled (BoltAssetProperty p) {
+    GUI.color = BoltRuntimeSettings.instance.highlightColor;
+
     if (IconButton(p.enabled ? "status" : "status-offline", new RectOffset(6, 0, 2, 0))) {
       p.enabled = !p.enabled;
     }
+
+    GUI.color = Color.white;
   }
 
   public static void EditPropertyFoldout (BoltAssetProperty p) {

@@ -110,6 +110,8 @@ public class BoltConnection : BoltObject {
   }
 
   internal BoltConnection (UdpConnection udp) {
+    userToken = udp.UserToken;
+
     _udp = udp;
     _udp.UserToken = this;
 

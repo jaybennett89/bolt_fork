@@ -274,7 +274,11 @@ namespace UdpKit {
     /// </summary>
     /// <param name="endpoint">The endpoint to accept</param>
     public void Accept (UdpEndPoint endpoint) {
-      Raise(UdpEvent.INTERNAL_ACCEPT, endpoint);
+      Accept(endpoint, null);
+    }
+
+    public void Accept(UdpEndPoint endpoint, object userToken) {
+      Raise(UdpEvent.INTERNAL_ACCEPT, endpoint, userToken);
     }
 
     /// <summary>
@@ -770,7 +774,6 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_CLOSE:
             OnEventClose(ev);
             return;
-            break;
 
           case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
           case UdpEvent.INTERNAL_CONNECTION_OPTION: OnEventConnectionOption(ev); break;
@@ -891,7 +894,7 @@ namespace UdpKit {
 
     void OnEventAccept (UdpEvent ev) {
       if (pendingConnections.Remove(ev.EndPoint)) {
-        AcceptConnection(ev.EndPoint);
+        AcceptConnection(ev.EndPoint, ev.Object0);
       }
     }
 
@@ -943,8 +946,13 @@ namespace UdpKit {
       ev.Connection.OnEventConnectionOption(ev);
     }
 
-    void AcceptConnection (UdpEndPoint ep) {
+    void AcceptConnection(UdpEndPoint ep) {
+      AcceptConnection(ep, null);
+    }
+
+    void AcceptConnection (UdpEndPoint ep, object userToken) {
       UdpConnection cn = CreateConnection(ep, UdpConnectionMode.Server);
+      cn.UserToken = userToken;
       cn.ChangeState(UdpConnectionState.Connected);
     }
 

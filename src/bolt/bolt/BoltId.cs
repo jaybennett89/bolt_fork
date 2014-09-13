@@ -2,12 +2,24 @@
   public readonly uint peer;
   public readonly uint entity;
 
-  internal BoltUniqueId (uint peer, uint entity) {
+  internal BoltUniqueId(uint peer, uint entity) {
     this.peer = peer;
     this.entity = entity;
   }
 
-  public override string ToString () {
+  public override int GetHashCode() {
+    return (int)(this.peer ^ this.entity);
+  }
+
+  public override bool Equals(object obj) {
+    if (obj is BoltUniqueId) {
+      return this == ((BoltUniqueId)obj);
+    }
+
+    return false;
+  }
+
+  public override string ToString() {
     if (peer == 0) {
       Assert.True(entity == 0);
       return "[Id NULL]";

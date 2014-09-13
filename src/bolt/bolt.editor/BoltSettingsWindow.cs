@@ -48,7 +48,7 @@ public class BoltSettingsWindow : EditorWindow {
     compileButton.normal.textColor =
       uncompiledCount == 0
         ? compileButton.normal.textColor
-        : BoltAssetEditorGUI.lightBlue;
+        : BoltRuntimeSettings.instance.highlightColor;
 
     if (GUILayout.Button("Compile", compileButton)) {
       BoltUserAssemblyCompiler.Run();
@@ -191,7 +191,7 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
-    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == true);
+    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == false);
 
     BoltAssetEditorGUI.Label("Assembly Checksum", () => {
       byte[] hash = null;
@@ -206,6 +206,10 @@ public class BoltSettingsWindow : EditorWindow {
       EditorGUI.EndDisabledGroup();
 
       settings._config.useAssemblyChecksum = EditorGUILayout.Toggle(settings._config.useAssemblyChecksum, GUILayout.Width(17));
+    });
+
+    BoltAssetEditorGUI.Label("Editor Highlight Color", () => {
+      settings.highlightColor = EditorGUILayout.ColorField(settings.highlightColor);
     });
   }
 

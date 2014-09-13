@@ -40,13 +40,13 @@ public static class BoltPhysics {
 #if DEBUG
     return;
 
-    if (_saved != null) {
-      _saved.Draw();
-    } else {
-      if (_worldSnapshots.count > 0) {
-        _worldSnapshots.first.Draw();
-      }
-    }
+    //if (_saved != null) {
+    //  _saved.Draw();
+    //} else {
+    //  if (_worldSnapshots.count > 0) {
+    //    _worldSnapshots.first.Draw();
+    //  }
+    //}
 #endif
   }
 

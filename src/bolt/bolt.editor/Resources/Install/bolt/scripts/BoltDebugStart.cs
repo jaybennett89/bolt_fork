@@ -28,7 +28,6 @@ end tell'";
         BoltConfig cfg;
 
         cfg = BoltRuntimeSettings.instance.GetConfigCopy();
-        cfg.serverConnectionAcceptMode = BoltConnectionAcceptMode.Auto;
         cfg.connectionTimeout = 60000000;
         cfg.connectionRequestTimeout = 500;
         cfg.connectionRequestAttempts = 1000;

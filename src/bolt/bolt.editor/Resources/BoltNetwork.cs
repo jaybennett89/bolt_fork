@@ -171,7 +171,11 @@ public static partial class BoltNetwork {
   }
 
   public static void Accept (UdpEndPoint ep) {
-    BoltCore.AcceptConnection(ep);
+    Accept(ep, null);
+  }
+
+  public static void Accept(UdpEndPoint ep, object userToken) {
+    BoltCore.AcceptConnection(ep, userToken);
   }
 
   public static void Refuse (UdpEndPoint ep) {

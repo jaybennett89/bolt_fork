@@ -22,6 +22,7 @@
     <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1591,0618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -109,9 +110,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\Plugins\Android\libudpkit_android.so" />
     <EmbeddedResource Include="Resources\Install\Plugins\iOS\libudpkit_ios.a" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\TutorialAssets.unitypackage" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltEntity Gizmo.png" />

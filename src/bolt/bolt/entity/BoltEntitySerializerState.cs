@@ -12,7 +12,13 @@ public abstract class BoltEntitySerializer<T> : BoltEntitySerializer where T : c
     get { return _state.controllerMask; }
   }
 
+  [Obsolete("Use BoltEntitySerializer<T>.state instead")]
   public T boltState {
+    get { return state; }
+  }
+
+
+  public T state {
     get { return (T) (object) _state; }
   }
 

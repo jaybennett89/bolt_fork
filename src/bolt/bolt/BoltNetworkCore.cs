@@ -15,7 +15,6 @@ public enum BoltNetworkModes {
 
 internal static class BoltCore {
   static UdpSocket _udpSocket;
-  static Assembly _unityAssembly;
   static internal SceneLoadState _mapLoadState;
 
   static internal uint _uid;
@@ -489,7 +488,11 @@ internal static class BoltCore {
     }
   }
 
-  public static void AcceptConnection (UdpEndPoint endpoint) {
+  public static void AcceptConnection(UdpEndPoint endpoint) {
+    AcceptConnection(endpoint, null);
+  }
+
+  public static void AcceptConnection (UdpEndPoint endpoint, object userToken) {
     if (!isServer) {
       BoltLog.Error("AcceptConnection: can only be called on the server");
       return;
@@ -500,7 +503,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Accept(endpoint);
+    _udpSocket.Accept(endpoint, userToken);
   }
 
   public static void RefuseConnection (UdpEndPoint endpoint) {
@@ -631,6 +634,12 @@ internal static class BoltCore {
     // put on connection list
     _connections.AddLast(cn);
 
+    // generic connected callback
+    BoltCallbacksBase.ConnectedInvoke(cn);
+
+    // invoke callback depending on connection type
+    if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientConnectedInvoke(cn); } else { BoltCallbacksBase.ConnectedToServerInvoke(cn); }
+
     // load map on clients which connect
     if (isServer) {
       if (_mapLoadState.scene.name != null) {
@@ -639,12 +648,6 @@ internal static class BoltCore {
         BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
     }
-
-    // generic connected callback
-    BoltCallbacksBase.ConnectedInvoke(cn);
-
-    // invoke callback depending on connection type
-    if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientConnectedInvoke(cn); } else { BoltCallbacksBase.ConnectedToServerInvoke(cn); }
   }
 
   static void HandleDisconnected (BoltConnection cn) {
