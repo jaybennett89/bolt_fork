@@ -21,10 +21,13 @@ public class PlayerMotor : MonoBehaviour {
   float movingSpeed = 4f;
 
   [SerializeField]
+  float maxVelocity = 32f;
+
+  [SerializeField]
   LayerMask layerMask;
 
   float sphereRadius {
-    get { return _cc.radius - (skinWidth * 0.2f); }
+    get { return _cc.radius; }
   }
 
   Vector3 feetPosition {
@@ -34,7 +37,7 @@ public class PlayerMotor : MonoBehaviour {
       p.y += _cc.radius;
       p.y += _cc.center.y;
       p.y -= (_cc.height * 0.5f);
-      p.y -= (skinWidth * 1.25f);
+      p.y -= (skinWidth * 1.1f);
 
       return p;
     }
@@ -81,12 +84,17 @@ public class PlayerMotor : MonoBehaviour {
       Vector3 p;
 
       p = hit.point;
+      p.y += skinWidth;
 
       transform.position = p;
     }
 
     // update grounded state
     var overlapping = Physics.OverlapSphere(feetPosition, sphereRadius, layerMask);
+
+
+    Debug.Log(string.Join(", ", overlapping.Select(x => x.gameObject.name).ToArray()));
+
     if (overlapping.Count(x => x.isTrigger == false && (x is CharacterController) == false) > 0) {
       if (_state.isGrounded == false) {
         _state.isGrounded = true;
@@ -96,7 +104,6 @@ public class PlayerMotor : MonoBehaviour {
     else {
       _state.isGrounded = false;
     }
-
 
     //
     if (_state.isGrounded) {
@@ -113,13 +120,13 @@ public class PlayerMotor : MonoBehaviour {
       _state.velocity.y += gravityForce * BoltNetwork.frameDeltaTime;
     }
 
+    _state.velocity.y = Mathf.Clamp(_state.velocity.y, -maxVelocity, +maxVelocity);
+
     // apply velocity
     _cc.Move(_state.velocity * BoltNetwork.frameDeltaTime);
 
     // set local rotation
     transform.localRotation = Quaternion.Euler(0, input.yaw, 0);
-
-    Debug.Log(_state.velocity.y);
 
     // done
     return _state;
