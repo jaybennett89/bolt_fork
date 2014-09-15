@@ -64,21 +64,11 @@ public class BoltInit : MonoBehaviour {
 
   void State_SelectMap () {
     foreach (string value in Enum.GetNames(typeof(BoltMapNames))) {
-      GUI.color = (map == value) ? Color.green : Color.white;
-
-      if (ExpandButton(value)) {
-        map = value;
-      }
-
-      GUI.color = Color.white;
-    }
-
-    if (ExpandButton("Start Server")) {
-      if (string.IsNullOrEmpty(map)) {
-        Debug.LogWarning("Select a map first");
-      }
-      else {
-        state = State.StartServer;
+      if (Application.loadedLevelName != value) {
+        if (ExpandButton(value)) {
+          map = value;
+          state = State.StartServer;
+        }
       }
     }
   }

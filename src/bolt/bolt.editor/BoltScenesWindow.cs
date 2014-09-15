@@ -90,7 +90,7 @@ public class BoltScenesWindow : EditorWindow {
     get { return BuildOptions.Development | BuildOptions.AllowDebugging; }
   }
 
-  void BuildPlayer () {
+  void BuildPlayer() {
     try {
       if (BoltRuntimeSettings.instance.debugClientCount == 0 && BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.Server) {
         EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_START_PLAYERS);
@@ -104,7 +104,8 @@ public class BoltScenesWindow : EditorWindow {
 
       try {
         Directory.CreateDirectory(path);
-      } catch (Exception exn) {
+      }
+      catch (Exception exn) {
         Debug.LogException(exn);
       }
 
@@ -115,16 +116,18 @@ public class BoltScenesWindow : EditorWindow {
 
       if (result.Length == 0) {
         EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_START_PLAYERS);
-      } else {
+      }
+      else {
         EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
       }
-    } catch {
+    }
+    catch {
       EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
       throw;
     }
   }
 
-  void PositionWindowsOnOSX () {
+  void PositionWindowsOnOSX() {
     if (isOSX && (BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.None)) {
       Process p = new Process();
       p.StartInfo.FileName = "osascript";
@@ -138,7 +141,7 @@ end tell'";
     }
   }
 
-  void StartPlayers () {
+  void StartPlayers() {
     try {
       int clientCount = BoltRuntimeSettings.instance.debugClientCount;
 
@@ -163,12 +166,13 @@ end tell'";
       PositionWindowsOnOSX();
 
 
-    } finally {
+    }
+    finally {
       EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_START_EDITOR);
     }
   }
 
-  void StopPlayers () {
+  void StopPlayers() {
     if (Application.platform == RuntimePlatform.WindowsEditor) {
       try {
         foreach (Process p in Process.GetProcesses()) {
@@ -176,9 +180,11 @@ end tell'";
             if (p.ProcessName == "Bolt_DebugStart_Build") {
               p.Kill();
             }
-          } catch { }
+          }
+          catch { }
         }
-      } catch { }
+      }
+      catch { }
     }
 
     if (Application.platform == RuntimePlatform.OSXEditor) {
@@ -192,30 +198,33 @@ end tell'";
             if (p.ProcessName == "Bolt_DebugStart_Build") {
               p.Kill();
             }
-          } catch { }
+          }
+          catch { }
         }
-      } catch { }
+      }
+      catch { }
     }
   }
 
-  void LoadAndStartScene (bool pro) {
+  void LoadAndStartScene() {
     EditorPrefs.SetString(DEBUGSTART_RESTORESCENE, EditorApplication.currentScene);
     EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_PLAYING);
 
-    if (EditorApplication.OpenScene(pro ? debugScene : debugSceneNonPro)) {
+    if (EditorApplication.OpenScene(debugScene)) {
       EditorApplication.isPlaying = true;
     }
   }
 
-  void StartEditor () {
+  void StartEditor() {
     try {
       if (BoltEditorUtils.hasPro == false) {
-        LoadAndStartScene(false);
-      } else {
+        LoadAndStartScene();
+      }
+      else {
         switch (BoltRuntimeSettings.instance.debugEditorMode) {
           case BoltEditorStartMode.Client:
           case BoltEditorStartMode.Server:
-            LoadAndStartScene(true);
+            LoadAndStartScene();
             break;
 
           case BoltEditorStartMode.None:
@@ -223,13 +232,14 @@ end tell'";
             break;
         }
       }
-    } catch {
+    }
+    catch {
       EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
       throw;
     }
   }
 
-  void StopEditor () {
+  void StopEditor() {
     if (EditorApplication.isPlaying == false && EditorApplication.isPlayingOrWillChangePlaymode == false) {
       // reload scene
       if (EditorPrefs.HasKey(DEBUGSTART_RESTORESCENE)) {
@@ -245,12 +255,12 @@ end tell'";
     }
   }
 
-  void OnEnable () {
+  void OnEnable() {
     name = title = "Bolt Scenes";
     _lastRepaint = 0f;
   }
 
-  void Update () {
+  void Update() {
     if (_lastRepaint + 0.1f < Time.realtimeSinceStartup) {
       _lastRepaint = Time.realtimeSinceStartup;
       Repaint();
@@ -283,27 +293,33 @@ end tell'";
     }
   }
 
-  void SetStage (int stage) {
+  void SetStage(int stage) {
     EditorPrefs.SetInt(DEBUGSTART_STAGE, stage);
   }
-
-  void CompileBolt () {
+   
+  void CompileBolt() {
     if (EditorPrefs.GetBool(COMPILE_SETTING)) {
       SetStage(STAGE_COMPILE_BOLT_WAIT);
       BoltUserAssemblyCompiler.Run();
 
-    } else {
-      SetStage(STAGE_COMPILE_PLAYER);
+    }
+    else {
+      CompileBoltWait();
     }
   }
 
-  void CompileBoltWait () {
+  void CompileBoltWait() {
     if (EditorPrefs.GetBool(COMPILE_SETTING) == false && EditorApplication.isCompiling == false) {
-      SetStage(STAGE_COMPILE_PLAYER);
+      if (BoltRuntimeSettings.instance.debugPlayAsServer) {
+        SetStage(STAGE_START_EDITOR);
+      }
+      else {
+        SetStage(STAGE_COMPILE_PLAYER);
+      }
     }
   }
 
-  void CompileButton () {
+  void CompileButton() {
     if (EditorPrefs.GetBool(COMPILE_SETTING)) {
       GUI.color = Color.red;
     }
@@ -311,7 +327,7 @@ end tell'";
     GUI.color = Color.white;
   }
 
-  void Footer () {
+  void Footer() {
     var version = Assembly.GetExecutingAssembly().GetName().Version;
     var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
 
@@ -331,7 +347,7 @@ end tell'";
     GUILayout.EndHorizontal();
   }
 
-  void Settings_ServerPort () {
+  void Settings_ServerPort() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     GUILayout.BeginHorizontal();
@@ -347,7 +363,8 @@ end tell'";
       try {
         sc.Shutdown(SocketShutdown.Both);
         sc.Close();
-      } catch { }
+      }
+      catch { }
 
       EditorUtility.SetDirty(settings);
     }
@@ -356,18 +373,18 @@ end tell'";
 
   }
 
-  void Settings () {
+  void Settings() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     GUILayout.BeginVertical();
     Settings_ServerPort();
-    settings.debugEditorMode = (BoltEditorStartMode) EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
+    settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
     settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
     GUILayout.EndVertical();
   }
 
   Vector2 sceneScrollPosition;
 
-  void Scenes () {
+  void Scenes() {
     sceneScrollPosition = GUILayout.BeginScrollView(sceneScrollPosition, GUILayout.MaxHeight(300));
 
     foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes) {
@@ -392,12 +409,30 @@ end tell'";
 
         // Scene Start Button
 
-        if (BoltEditorUtils.hasPro) {
+        if (GUILayout.Button("Play As Server", EditorStyles.miniButton, GUILayout.Width(100))) {
           BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-          if (GUILayout.Button("Start", EditorStyles.miniButton, GUILayout.Width(50))) {
+          if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
+            settings.debugStartMapName = sceneName;
+            settings.debugPlayAsServer = true;
+            settings.debugEditorMode = BoltEditorStartMode.Server;
+
+            // save asset
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+
+            // set stage
+            SetStage(STAGE_COMPILE_BOLT);
+          }
+        }
+
+        if (BoltEditorUtils.hasPro) {
+          if (GUILayout.Button("Debug Start", EditorStyles.miniButton, GUILayout.Width(100))) {
+            BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
             if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
               settings.debugStartMapName = sceneName;
+              settings.debugPlayAsServer = false;
 
               // save asset
               EditorUtility.SetDirty(settings);
@@ -415,7 +450,7 @@ end tell'";
     GUILayout.EndScrollView();
   }
 
-  void OnGUI () {
+  void OnGUI() {
     GUILayout.Space(2);
 
     if (BoltEditorUtils.hasPro) {
