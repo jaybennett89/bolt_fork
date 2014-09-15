@@ -1,35 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerCamera : MonoBehaviour {
-  static PlayerCamera _instance;
-
-  public static PlayerCamera instance {
-    get {
-      if (!_instance) {
-        GameObject playerCamera = new GameObject("PlayerCamera");
-        GameObject camera = new GameObject("Camera");
-        GameObject dummyTarget = new GameObject("DummyTarget");
-        GameObject dummyRig = new GameObject("DummyRig");
-
-        // create camera component
-        _instance = playerCamera.AddComponent<PlayerCamera>();
-        _instance.cam = camera.transform;
-        _instance.dummyRig = dummyRig.transform;
-        _instance.dummyTarget = dummyTarget.transform;
-        
-        // add camera
-        camera.AddComponent<Camera>();
-        camera.transform.parent = _instance.transform;
-
-        // setup dummy objects
-        _instance.dummyRig.parent = _instance.transform;
-        _instance.dummyTarget.parent = dummyTarget.transform;
-      }
-
-      return _instance;
-    }
-  }
-
+public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
   // damp velocity of camera
   Vector3 _velocity;
 
@@ -86,6 +57,17 @@ public class PlayerCamera : MonoBehaviour {
 
   void UpdateCamera(bool allowSmoothing) {
     if (_target) {
+      GrayscaleEffect ge = GetComponentInChildren<GrayscaleEffect>();
+
+      if (_targetState.health >= 85) {
+        ge.ramp = 0f;
+      }
+      else {
+        ge.ramp = 1f - ((_targetState.health / 85f));
+      }
+
+      Screen.lockCursor = true;
+      Screen.showCursor = false;
 
       if (_aiming) {
         if (_targetState.mecanim.Aiming == false) {

@@ -20,7 +20,7 @@ static class BoltReflectionUtils {
       type.IsAbstract &&
       type.IsSealed &&
       type.IsPublic &&
-      type.IsVisible &&
+      type.IsVisible && 
       !type.IsNested &&
       !type.IsGenericType &&
       !type.IsGenericTypeDefinition &&

@@ -42,7 +42,7 @@ public class PlayerMotor : MonoBehaviour {
       p.y += _cc.radius;
       p.y += _cc.center.y;
       p.y -= (_cc.height * 0.5f);
-      p.y -= (skinWidth * 1.1f);
+      p.y -= (skinWidth * 1.25f);
 
       return p;
     }
@@ -51,7 +51,7 @@ public class PlayerMotor : MonoBehaviour {
   Vector3 feetLineCheck {
     get {
       return
-        feetPosition + (new Vector3(0, -sphereRadius * 1.25f, 0));
+        feetPosition + (new Vector3(0, -sphereRadius * 1.35f, 0));
     }
   }
 

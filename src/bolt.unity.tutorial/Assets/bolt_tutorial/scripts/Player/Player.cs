@@ -25,6 +25,30 @@ public partial class Player : IDisposable {
     players.Add(this);
   }
 
+  public void Kill() {
+    if (entity) {
+      state.dead = true;
+      state.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
+
+      ILogEvent ev;
+
+      ev = BoltFactory.NewEvent<ILogEvent>();
+      ev.message = name + " died";
+
+      BoltNetwork.Raise(ev);
+    }
+  }
+
+  internal void Spawn() {
+    if (entity) {
+      // not dead anymore
+      state.dead = false;
+      state.health = 100;
+
+      // teleport
+      entity.Teleport(RandomSpawn(), Quaternion.identity);
+    }
+  }
   public void Dispose() {
     players.Remove(this);
 
@@ -36,11 +60,24 @@ public partial class Player : IDisposable {
     // while we have a team difference of more then 1 player
     while (Mathf.Abs(redPlayers.Count() - bluePlayers.Count()) > 1) {
       if (redPlayers.Count() < bluePlayers.Count()) {
-        bluePlayers.First().state.team = TEAM_RED;
+        var player = bluePlayers.First();
+        player.Kill();
+        player.state.team = TEAM_RED;
       }
       else {
-        redPlayers.First().state.team = TEAM_BLUE;
+        var player = redPlayers.First();
+        player.Kill();
+        player.state.team = TEAM_BLUE;
       }
+    }
+  }
+
+  public void GiveControl(BoltEntity entity) {
+    if (connection == null) {
+      entity.TakeControl();
+    }
+    else {
+      entity.GiveControl(connection);
     }
   }
 
@@ -48,7 +85,7 @@ public partial class Player : IDisposable {
     float x = UE.Random.Range(-32f, +32f);
     float z = UE.Random.Range(-32f, +32f);
 
-    entity = BoltNetwork.Instantiate(BoltPrefabs.Player, new Vector3(x, 32f, z), Quaternion.identity);
+    entity = BoltNetwork.Instantiate(BoltPrefabs.Player, RandomSpawn(), Quaternion.identity);
     entity.GetBoltState<IPlayerState>().name = name;
 
     state.team =
@@ -62,7 +99,17 @@ public partial class Player : IDisposable {
     else {
       entity.GiveControl(connection);
     }
+
+    Spawn();
+
+    ILogEvent ev;
+
+    ev = BoltFactory.NewEvent<ILogEvent>();
+    ev.message = name + " joined the game";
+
+    BoltNetwork.Raise(ev);
   }
+
 }
 
 partial class Player {
@@ -91,6 +138,12 @@ partial class Player {
 
   public static void CreateServerPlayer() {
     serverPlayer = new Player();
+  }
+
+  static Vector3 RandomSpawn() {
+    float x = UE.Random.Range(-32f, +32f);
+    float z = UE.Random.Range(-32f, +32f);
+    return new Vector3(x, 32f, z);
   }
 
 }

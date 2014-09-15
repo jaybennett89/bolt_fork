@@ -323,7 +323,7 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void EditPropertyFoldout (BoltAssetProperty p) {
-    var noFoldout = (p.type == BoltAssetPropertyType.Bool) || (p.type == BoltAssetPropertyType.Trigger);
+    var noFoldout = (p.type == BoltAssetPropertyType.Trigger);
 
     EditorGUI.BeginDisabledGroup(noFoldout);
 

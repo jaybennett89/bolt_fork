@@ -44,16 +44,18 @@ public class PlayerIK : BoltEntityBehaviour<IPlayerState> {
       }
     }
 
-    weightacc += Time.deltaTime;
-    weight = Mathf.Lerp(weightfrom, weightto, weightacc / 0.4f);
+    // need to re-enable this
 
-    Vector3 pos = transform.position + transform.forward + new Vector3(0, 1.5f + pitchOffsetArm, 0) + (transform.right * 0.3f);
-    Quaternion rot = transform.parent.rotation * Quaternion.Euler(state.pitch, 0, -90);
+    //weightacc += Time.deltaTime;
+    //weight = Mathf.Lerp(weightfrom, weightto, weightacc / 0.4f);
 
-    _animator.SetIKPosition(AvatarIKGoal.RightHand, pos);
-    _animator.SetIKRotation(AvatarIKGoal.RightHand, rot);
+    //Vector3 pos = transform.position + transform.forward + new Vector3(0, 1.5f + pitchOffsetArm, 0) + (transform.right * 0.3f);
+    //Quaternion rot = transform.parent.rotation * Quaternion.Euler(state.pitch, 0, -90);
 
-    _animator.SetIKPositionWeight(AvatarIKGoal.RightHand, weight);
-    _animator.SetIKRotationWeight(AvatarIKGoal.RightHand, weight);
+    //_animator.SetIKPosition(AvatarIKGoal.RightHand, pos);
+    //_animator.SetIKRotation(AvatarIKGoal.RightHand, rot);
+
+    //_animator.SetIKPositionWeight(AvatarIKGoal.RightHand, weight);
+    //_animator.SetIKRotationWeight(AvatarIKGoal.RightHand, weight);
   }
 }

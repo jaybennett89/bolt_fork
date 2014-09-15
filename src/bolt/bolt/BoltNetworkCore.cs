@@ -244,13 +244,12 @@ internal static class BoltCore {
     return entity;
   }
 
-  static BoltUniqueId GenerateUniqueId() {
+  public static BoltUniqueId GenerateUniqueId() {
     BoltUniqueId id = new BoltUniqueId();
 
     if (_config.globalUniqueIds) {
       id = new BoltUniqueId(_uid, ++_uidEntityCounter);
     }
-
 
     return id;
   }
@@ -629,9 +628,11 @@ internal static class BoltCore {
   static void HandleConnected(UdpConnection udp) {
     Assert.True(udp.uid > 1);
 
-    _uid = udp.uid;
+    if (isClient) {
+      _uid = udp.uid;
+      BoltLog.Debug("connected as connection uid {0}", udp.uid);
+    }
 
-    BoltLog.Debug("connected as connection uid {0}", udp.uid);
     BoltConnection cn = new BoltConnection(udp);
 
     // put on connection list

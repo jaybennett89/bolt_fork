@@ -6,22 +6,19 @@ public class PlayerSerializer : BoltEntitySerializer<IPlayerState> {
     // force correct layerweights due to mecanim quirks
     state.mecanim.animator.SetLayerWeight(0, 1);
     state.mecanim.animator.SetLayerWeight(1, 1);
-
-    // team callback
-    state.teamChanged += TeamChanged;
   }
 
-  void TeamChanged() {
-    var smr = GetComponentInChildren<SkinnedMeshRenderer>();
+  public void ApplyDamage(byte damage) {
+    if (!state.dead) {
+      state.health -= damage;
 
-    switch (state.team) {
-      case Player.TEAM_RED:
-        smr.material.color = Color.red;
-        break;
+      if (state.health > 100) {
+        state.health = 0;
+      }
 
-      case Player.TEAM_BLUE:
-        smr.material.color = Color.blue;
-        break;
+      if (state.health == 0) {
+        entity.controllingConnection.GetPlayer().Kill();
+      }
     }
   }
 }

@@ -2,6 +2,11 @@
 using System.Collections;
 
 public class GameUI : BoltSingletonPrefab<GameUI> {
+
+  public GameCrosshair crosshair {
+    get { return GetComponentInChildren<GameCrosshair>(); }
+  }
+
   void Start() {
     if (!camera) {
       gameObject.AddComponent<Camera>();

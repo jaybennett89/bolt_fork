@@ -157,7 +157,38 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: Feets
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: 0
+            value: -.0136102028
+            inSlope: -1.04270351
+            outSlope: -1.04270351
+            tangentMode: 0
+          - time: .398897022
+            value: 2.49455595
+            inSlope: 1.77094233
+            outSlope: 1.77094233
+            tangentMode: 0
+          - time: .53576237
+            value: -.024053514
+            inSlope: -7.34333754
+            outSlope: -7.34333754
+            tangentMode: 0
+          - time: .87457031
+            value: 2.4699738
+            inSlope: -1.27237344
+            outSlope: -1.27237344
+            tangentMode: 0
+          - time: .948511124
+            value: -.0261091962
+            inSlope: -2.18876743
+            outSlope: -2.18876743
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask:
       - path: 
@@ -273,7 +304,43 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: Feets
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: .0102489013
+            value: .0522192717
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .330092728
+            value: 1.4759295
+            inSlope: 16.871666
+            outSlope: 16.871666
+            tangentMode: 0
+          - time: .465700388
+            value: 2.16187978
+            inSlope: -4.26878786
+            outSlope: -4.26878786
+            tangentMode: 0
+          - time: .702766836
+            value: -.0412078872
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .916519523
+            value: 2.06074548
+            inSlope: -21.411932
+            outSlope: -21.411932
+            tangentMode: 0
+          - time: .997101724
+            value: -.00972753763
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask:
       - path: 
@@ -391,7 +458,43 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: Feets
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: 0
+            value: .0104438215
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .375137269
+            value: .0117420554
+            inSlope: .176554799
+            outSlope: .176554799
+            tangentMode: 0
+          - time: .528855979
+            value: 2.44386435
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .723279655
+            value: .0104439259
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .917696476
+            value: 2.31853795
+            inSlope: -1.34296739
+            outSlope: -1.34296739
+            tangentMode: 0
+          - time: 1
+            value: .0104438215
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask:
       - path: 
@@ -509,7 +612,43 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: Feets
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: 0
+            value: -.0208877325
+            inSlope: .380045474
+            outSlope: .380045474
+            tangentMode: 0
+          - time: .264927417
+            value: .174844444
+            inSlope: 2.40255952
+            outSlope: 2.40255952
+            tangentMode: 0
+          - time: .474413216
+            value: 2.21410823
+            inSlope: .0361981802
+            outSlope: .0361981802
+            tangentMode: 0
+          - time: .614471436
+            value: -.0104438663
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .86886853
+            value: 2.46475196
+            inSlope: -2.84673977
+            outSlope: -2.84673977
+            tangentMode: 0
+          - time: 1.00292826
+            value: -.0104438663
+            inSlope: -3.05141187
+            outSlope: -3.05141187
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask:
       - path: 

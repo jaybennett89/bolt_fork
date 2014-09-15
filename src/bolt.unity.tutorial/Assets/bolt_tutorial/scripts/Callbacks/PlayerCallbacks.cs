@@ -2,12 +2,22 @@
 using System.Collections;
 
 [BoltGlobalBehaviour]
-public class PlayerCallbcks : BoltCallbacks {
+public class PlayerCallbacks : BoltCallbacks {
   public override void SceneLoadLocalDone(string map) {
+    // ui
     GameUI.Instantiate();
+
+    // camera
+    PlayerCamera.Instantiate();
   }
 
   public override void ControlOfEntityGained(BoltEntity arg) {
-    PlayerCamera.instance.SetTarget(arg);
+    if (arg.boltSerializer is PlayerSerializer) {
+      // add audio listener to our character
+      arg.gameObject.AddComponent<AudioListener>();
+
+      // set camera target
+      PlayerCamera.instance.SetTarget(arg);
+    }
   }
 }

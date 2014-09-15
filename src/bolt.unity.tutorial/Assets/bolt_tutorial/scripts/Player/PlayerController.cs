@@ -7,6 +7,16 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   PlayerCommand.Input _input;
   PlayerMotor _motor;
 
+  [SerializeField]
+  WeaponBase[] _weapons;
+
+  [SerializeField]
+  AudioSource _sfxSource;
+
+  public WeaponBase activeWeapon {
+    get { return _weapons[state.weapon]; }
+  }
+
   void Awake() {
     _motor = GetComponent<PlayerMotor>();
   }
@@ -23,13 +33,12 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
     _input.jump = Input.GetKey(KeyCode.Space);
     _input.aiming = Input.GetMouseButton(1);
     _input.fire = Input.GetMouseButton(0);
-    _input.weapon = 0;
 
     if (Input.GetKeyDown(KeyCode.Alpha1)) {
-      _input.weapon = 1;
+      _input.weapon = 0;
     }
     else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-      _input.weapon = 2;
+      _input.weapon = 1;
     }
 
     if (mouse) {
@@ -38,6 +47,46 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
 
       _input.pitch += (-Input.GetAxisRaw("Mouse Y") * MOUSE_SENSEITIVITY);
       _input.pitch = Mathf.Clamp(_input.pitch, -85f, +85f);
+    }
+  }
+
+  void DeadChanged() {
+    state.mecanim.Dead = state.dead;
+  }
+
+  void WeaponChanged() {
+    // setup weapon
+    for (int i = 0; i < _weapons.Length; ++i) {
+      _weapons[i].gameObject.SetActive(false);
+    }
+
+    _weapons[state.weapon].gameObject.SetActive(true);
+  }
+
+  void OnFire() {
+    // play sfx
+    _sfxSource.PlayOneShot(activeWeapon.fireSound);
+
+    GameUI.instance.crosshair.Spread += 0.1f;
+
+    // 
+    activeWeapon.Fx(entity);
+    activeWeapon.fireFrame = BoltNetwork.serverFrame;
+  }
+
+  public override void Attached() {
+    // callbacks
+    state.deadChanged += DeadChanged;
+    state.weaponChanged += WeaponChanged;
+    state.mecanim.onFire += OnFire;
+
+    // setup weapon
+    WeaponChanged();
+  }
+
+  public override void SimulateOwner() {
+    if ((BoltNetwork.frame % 5) == 0 && (state.dead == false)) {
+      state.health = (byte)Mathf.Clamp(state.health + 1, 0, 100);
     }
   }
 
@@ -53,6 +102,10 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   }
 
   public override void ExecuteCommand(BoltCommand c, bool resetState) {
+    if (state.mecanim.Dead) {
+      return;
+    }
+
     PlayerCommand cmd = (PlayerCommand)c;
 
     if (resetState) {
@@ -63,11 +116,18 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
       cmd.state = _motor.Move(cmd.input);
 
       if (cmd.isFirstExecution) {
+        // animation
         AnimatePlayer(cmd);
 
         // set state pitch
         state.pitch = cmd.input.pitch;
+        state.weapon = cmd.input.weapon;
         state.mecanim.Aiming = cmd.input.aiming;
+
+        // deal with weapons
+        if (cmd.input.aiming && cmd.input.fire) {
+          FireWeapon(cmd);
+        }
       }
     }
   }
@@ -92,6 +152,16 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
     // JUMP
     if (_motor.jumpStartedThisFrame) {
       state.mecanim.Jump();
+    }
+  }
+
+  void FireWeapon(PlayerCommand cmd) {
+    if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
+      // this gets replicated to all proxies
+      state.mecanim.Fire();
+
+      // if we are the owner and the active weapon is a hitscan weapon, do logic
+      
     }
   }
 }

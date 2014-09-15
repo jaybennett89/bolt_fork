@@ -144,6 +144,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltLogo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\Gizmos\BoltCommandAsset Icon.png" />
+    <EmbeddedResource Include="Resources\Install\Gizmos\BoltEventAsset Icon.png" />
+    <EmbeddedResource Include="Resources\Install\Gizmos\BoltMecanimAsset Icon.png" />
+    <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
+    <EmbeddedResource Include="Resources\Install\Gizmos\BoltStateAsset Icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

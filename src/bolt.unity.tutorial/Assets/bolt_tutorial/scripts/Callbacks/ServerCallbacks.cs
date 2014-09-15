@@ -10,29 +10,17 @@ public class ServerCallbacks : BoltCallbacks {
   void Awake() {
     if (ListenServer) {
       Player.CreateServerPlayer();
+      Player.serverPlayer.name = "SERVER";
     }
   }
 
-  public override void ConnectRequest(UdpKit.UdpEndPoint endpoint, byte[] token) {
-    Player p;
-
-    p = new Player();
-    p.name = token == null ? "UNKNOWN" : Encoding.ASCII.GetString(token);
-
-    BoltNetwork.Accept(endpoint, p);
-  }
-
-  public override void Connected(BoltConnection arg) {
-    Player p;
-
-    p = new Player();
-    p.connection = arg;
-
-    arg.userToken = p;
-  }
-
-  public override void Disconnected(BoltConnection arg) {
-
+  void FixedUpdate() {
+    foreach (Player p in Player.allPlayers) {
+      // if we have an entity, it's dead but our spawn frame has passed
+      if (p.entity && p.state.dead && p.state.respawnFrame <= BoltNetwork.serverFrame) {
+        p.Spawn();
+      }
+    }
   }
 
   public override void SceneLoadRemoteDone(BoltConnection connection, string map) {
