@@ -53,13 +53,14 @@ partial class BoltCompiler {
         EmitOnEventMethods(file, op.events, false);
       });
 
-      file.EmitScope("public abstract class BoltEntityBehaviour<TSerializer> : BoltEntityBehaviour where TSerializer : BoltEntitySerializer", () => {
-        file.EmitLine("public new TSerializer boltSerializer { get { return (TSerializer) base.boltSerializer; } }");
+      file.EmitScope("public abstract class BoltEntityBehaviour<TState> : BoltEntityBehaviour where TState : class, IBoltState", () => {
+        file.EmitLine("[System.Obsolete(\"Use BoltEntityBehaviour<TState>.state instead \")]");
+        file.EmitLine("public new TState boltState { get { return state; } }");
+        file.EmitLine("public new TState state { get { return ((BoltEntitySerializer<TState>) base.serializer).state; } }");
       });
 
-      file.EmitScope("public abstract class BoltEntityBehaviour<TSerializer, TState> : BoltEntityBehaviour<TSerializer> where TSerializer : BoltEntitySerializer<TState> where TState : class, IBoltState ", () => {
-        file.EmitLine("public TState boltState { get { return boltSerializer.boltState; } }");
-      });
+      file.EmitLine("[System.Obsolete(\"Inherit from the BoltEntityBehaviour<TState> class instead\")]");
+      file.EmitScope("public abstract class BoltEntityBehaviour<TSerializer, TState> : BoltEntityBehaviour<TState> where TState : class, IBoltState", () => { });
 
       foreach (BoltEventAsset evnt in op.events) {
         // event interface

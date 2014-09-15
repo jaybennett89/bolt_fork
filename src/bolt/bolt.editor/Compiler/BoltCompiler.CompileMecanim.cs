@@ -29,6 +29,7 @@ partial class BoltCompiler {
           }
 
           file.EmitLine("float this[int layer] { get; set; }");
+          file.EmitLine("UnityEngine.Animator animator { get; }");
         });
 
         file.EmitScope("class {0} : BoltMecanimFrame", m.frameclassName, () => {
@@ -106,6 +107,10 @@ partial class BoltCompiler {
               file.EmitLine("_state.PropertyChanged(this);");
             });
           }
+
+          // interface implementation animator getter
+          file.EmitLine("UnityEngine.Animator {0}.animator {{ get {{ return _animator; }} }}", m.interfaceName);
+
 
           // interface implementation (layer weights)
 

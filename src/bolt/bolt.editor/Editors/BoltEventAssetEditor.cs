@@ -21,7 +21,6 @@ public class BoltEventAssetEditor : Editor {
 
       BoltEventDeliveryMode deliveryMode = asset.deliveryMode;
 
-
       BoltAssetEditorGUI.Label("Target", () => {
         asset.eventMode = (BoltAssetEventMode) EditorGUILayout.EnumPopup(asset.eventMode);
       });

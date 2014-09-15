@@ -1,4 +1,5 @@
-﻿using UdpKit;
+﻿using System;
+using UdpKit;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,7 @@ public abstract class BoltEntitySerializer : BoltEntityBehaviourBase, IBoltEntit
   /// <summary>
   /// The dirty mask to use for a newly created simple proxy
   /// </summary>
+  [Obsolete]
   public virtual Bits proxyMask {
     get { return Bits.all; }
   }
@@ -16,6 +18,7 @@ public abstract class BoltEntitySerializer : BoltEntityBehaviourBase, IBoltEntit
   /// <summary>
   /// The dirty mask to use for a newly created controller proxy
   /// </summary>
+  [Obsolete]
   public virtual Bits controllerMask {
     get { return Bits.all; }
   }
@@ -23,14 +26,19 @@ public abstract class BoltEntitySerializer : BoltEntityBehaviourBase, IBoltEntit
   /// <summary>
   /// Returns the serializer itself
   /// </summary>
+  [Obsolete("Use BoltEntitySerializer.serializer instead")]
   public new BoltEntitySerializer boltSerializer {
+    get { return this; }
+  }
+
+  public new BoltEntitySerializer serializer {
     get { return this; }
   }
 
   /// <summary>
   /// Called when the serializer is attached to an entity
   /// </summary>
-  public abstract void Attached ();
+  public override void Attached () {}
 
   /// <summary>
   /// Called aftr all Attached() methods have been called, and after the entity has been scoped
@@ -101,6 +109,6 @@ public abstract class BoltEntitySerializer : BoltEntityBehaviourBase, IBoltEntit
   }
 
   public override string ToString () {
-    return string.Format("[Serializer type={0} entity={1}]", GetType().Name, boltEntity);
+    return string.Format("[Serializer type={0} entity={1}]", GetType().Name, entity);
   }
 }
