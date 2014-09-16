@@ -275,12 +275,47 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
+  static string[] whenOptions = new string[] {
+    "Value Changed",
+    "On First Replication"
+  };
+
   public static void EditPropertySyncMode(BoltAssetProperty p) {
-    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
+    Label("Replicate When", () => {
+      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions);
+    });
+
+    //Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
   }
 
+  static string[] targetOptions = new string[] {
+      "Everyone",
+      "Everyone Except Controller",
+      "Only Owner And Controller",
+      "Only Owner",
+  };
+
   public static void EditPropertySyncTarget(BoltAssetProperty p) {
-    Label("Target", () => p.syncTarget = ToggleRow<BoltAssetSyncTarget>((int)p.syncTarget));
+    Label("Replicate To", () => {
+      int selected = 0;
+
+      var hasProxy = (p.syncTarget & BoltAssetSyncTarget.Proxy) == BoltAssetSyncTarget.Proxy;
+      var hasController = (p.syncTarget & BoltAssetSyncTarget.Controller) == BoltAssetSyncTarget.Controller;
+
+      if (hasProxy && hasController) { selected = 0; }
+      else if(hasProxy) { selected = 1; }
+      else if (hasController) { selected = 2; }
+      else { selected = 3; }
+
+      selected = EditorGUILayout.Popup(selected, targetOptions);
+
+      switch (selected) {
+        case 0: p.syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller; break;
+        case 1: p.syncTarget = BoltAssetSyncTarget.Proxy; break;
+        case 2: p.syncTarget = BoltAssetSyncTarget.Controller; break;
+        case 3: p.syncTarget = default(BoltAssetSyncTarget); break;
+      }
+    });
   }
 
   static bool DeleteDialog() {
