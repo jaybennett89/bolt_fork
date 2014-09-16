@@ -115,6 +115,10 @@ public static partial class BoltNetwork {
     get { return BoltCore.isDebugMode; }
   }
 
+  public static GameObject globalObject {
+    get { return BoltCore.globalObject; }
+  }
+
   /// <summary>
   /// Returns true if Bolt was compiled with unity pro
   /// </summary>

@@ -77,6 +77,10 @@ internal static class BoltCore {
     get { return _userAssemblyHash; }
   }
 
+  public static GameObject globalObject {
+    get { return _globalBehaviourObject; }
+  }
+
   public static IEnumerable<BoltEntity> entities {
     get { return _entities; }
   }
