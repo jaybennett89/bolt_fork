@@ -119,7 +119,7 @@ Target "InstallBoltDebugFiles" (fun _ ->
 
   // have to convert pdb to mdb on windows
   if isWindows then
-    let pdb2mdbPath =  @"C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
+    let pdb2mdbPath = unityPath + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
     (directoryInfo "./build")
     |> filesInDirMatching "*.pdb"
