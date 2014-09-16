@@ -106,7 +106,7 @@ public class BoltAssetProperty {
   public bool enabled = true;
   public bool foldout = true;
   public BoltAssetSyncMode syncMode = BoltAssetSyncMode.Changed;
-  public BoltAssetSyncTarget syncTarget = BoltAssetSyncTarget.Proxy;
+  public BoltAssetSyncTarget syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller;
   public BoltAssetPropertyType type;
   public BoltAssetPropertyOptions options;
   public IntSettings intSettings = new IntSettings();
@@ -129,8 +129,8 @@ public class BoltAssetProperty {
 
   public string runtimeType {
     get {
-      if (type == BoltAssetPropertyType.Mecanim && mecanimSettings.mecanimAsset) {
-          return mecanimSettings.mecanimAsset.interfaceName;
+      if ((type == BoltAssetPropertyType.Mecanim) && mecanimSettings.mecanimAsset) {
+        return mecanimSettings.mecanimAsset.interfaceName;
       }
 
       if (type == BoltAssetPropertyType.Trigger) {

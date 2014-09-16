@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
+//[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
 public class ServerCallbacks : BoltCallbacks {
   public static bool ListenServer = true;
 

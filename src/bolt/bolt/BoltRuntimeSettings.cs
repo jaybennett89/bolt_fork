@@ -41,6 +41,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   public string debugStartMapName = null;
 
   [SerializeField]
+  public bool debugPlayAsServer = false;
+
+  [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   [SerializeField]
