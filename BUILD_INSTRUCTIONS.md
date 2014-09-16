@@ -5,6 +5,7 @@
 3. Run this command: chmod a+x Build.sh
 4. Run this command: ./Build.sh -ev unityProjectPath /path/to/your/unity/project
 5. Open your Unity project and run "Bolt/Install Bolt" from the top menu bar
+6. Restart Unity
 
 # Windows
 
@@ -13,3 +14,4 @@
 3. Open a command line terminal and navigate to the root directory of the bolt repository.
 4. Run this command Build.bat -ev unityProjectPath C:\path\to\your\unity\project
 5. Open your Unity project and run "Bolt/Install Bolt" from the top menu bar
+6. Restart Unity

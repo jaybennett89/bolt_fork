@@ -141,9 +141,6 @@ Target "InstallBoltDebugFiles" (fun _ ->
   ==> "InstallBolt"
   =?> ("InstallBoltDebugFiles", not isRelease)
 
-
-if isRelease then 
-  Run "InstallBolt"
-
-else 
-  Run "InstallBoltDebugFiles"
+if isRelease 
+  then Run "InstallBolt"
+  else Run "InstallBoltDebugFiles"
