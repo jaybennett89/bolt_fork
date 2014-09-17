@@ -18,8 +18,11 @@ public class BoltInit : MonoBehaviour {
   string map;
   string serverAddress = "127.0.0.1";
 
-  [SerializeField]
   int serverPort = 40000;
+
+  void Awake() {
+    serverPort = BoltRuntimeSettings.instance.debugStartPort;
+  }
 
   void OnGUI () {
     Rect tex = new Rect(10, 10, 140, 75);
