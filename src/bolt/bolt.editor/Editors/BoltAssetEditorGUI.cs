@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -214,12 +215,6 @@ public static class BoltAssetEditorGUI {
       EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, true);
       EditorUtility.SetDirty(asset);
     }
-
-    if (asset.compile) {
-      //if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
-      //BoltUserAssemblyCompiler.Run();
-      //}
-    }
   }
 
   public static bool DeleteButton() {
@@ -281,11 +276,11 @@ public static class BoltAssetEditorGUI {
   };
 
   public static void EditPropertySyncMode(BoltAssetProperty p) {
-    Label("Replicate When", () => {
-      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions);
-    });
+    Label("Replicate When", () => 
+      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions)
+    );
 
-    //Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
+    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
   }
 
   static string[] targetOptions = new string[] {
@@ -307,7 +302,8 @@ public static class BoltAssetEditorGUI {
       else if (hasController) { selected = 2; }
       else { selected = 3; }
 
-      selected = EditorGUILayout.Popup(selected, targetOptions);
+
+      selected = EditorGUILayout.IntPopup(selected, targetOptions, targetOptions.Select((v,i) => i).ToArray());
 
       switch (selected) {
         case 0: p.syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller; break;
@@ -315,6 +311,8 @@ public static class BoltAssetEditorGUI {
         case 2: p.syncTarget = BoltAssetSyncTarget.Controller; break;
         case 3: p.syncTarget = default(BoltAssetSyncTarget); break;
       }
+
+      return selected;
     });
   }
 

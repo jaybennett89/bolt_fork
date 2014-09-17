@@ -16,6 +16,11 @@ public class PlayerCallbacks : BoltCallbacks {
       // add audio listener to our character
       arg.gameObject.AddComponent<AudioListener>();
 
+      // set camera callbacks
+      PlayerCamera.instance.getAiming = _ => arg.GetBoltState<IPlayerState>().mecanim.Aiming;
+      PlayerCamera.instance.getHealth = _ => arg.GetBoltState<IPlayerState>().health;
+      PlayerCamera.instance.getPitch = _ => arg.GetBoltState<IPlayerState>().pitch;
+
       // set camera target
       PlayerCamera.instance.SetTarget(arg);
     }

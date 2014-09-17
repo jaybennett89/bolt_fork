@@ -11,7 +11,7 @@ public class WeaponRifle : WeaponBase {
       Quaternion look;
 
       // this calculate the looking angle for this specific entity
-      PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, state, out pos, out look);
+      PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, state.pitch, out pos, out look);
 
       // display debug
       Debug.DrawRay(pos, look * Vector3.forward);
@@ -32,7 +32,7 @@ public class WeaponRifle : WeaponBase {
   public override void Fx(BoltEntity entity) {
     Vector3 pos;
     Quaternion rot;
-    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetBoltState<IPlayerState>(), out pos, out rot);
+    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetBoltState<IPlayerState>().pitch, out pos, out rot);
 
     Ray r = new Ray(pos, rot * Vector3.forward);
     RaycastHit rh;
