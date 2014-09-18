@@ -1,4 +1,5 @@
 #r @"FAKE/tools/FakeLib.dll"
+
 open Fake
 open Fake.FileSystem
 open Fake.FileSystemHelper
@@ -36,18 +37,11 @@ let unityDir =
     then environVar "unityProjectPath"
     else "./src/bolt.unity"
 
-let isWindows =
-  System.Environment.OSVersion.Platform <> System.PlatformID.MacOSX &&
-  System.Environment.OSVersion.Platform <> System.PlatformID.Unix
-
-let unityPackageCreate = 
-  hasBuildParam "package"
-
 let unityPath = 
   if hasBuildParam "unityEditorPath" then 
     environVar "unityEditorPath"
 
-  elif isWindows then 
+  elif not isMacOS then 
     @"C:\Program Files (x86)\Unity"
 
   else 
@@ -116,10 +110,8 @@ Target "InstallBolt" (fun _ ->
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->
-
-  // have to convert pdb to mdb on windows
-  if isWindows then
-    let pdb2mdbPath =  @"C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
+  if not isMacOS then
+    let pdb2mdbPath = unityPath + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
     (directoryInfo "./build")
     |> filesInDirMatching "*.pdb"
@@ -140,40 +132,6 @@ Target "InstallBoltDebugFiles" (fun _ ->
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
 )
 
-Target "CreateUnityPackage" (fun _ -> 
-  let unityExe =
-    combinePaths unityPath @"Editor\Unity.exe"
-
-  let dirs = 
-    ["Assets/bolt/assemblies"; "Assets/bolt/resources"; "Assets/bolt/scenes"; "Assets/bolt/scripts"]
-    |> String.concat " "
-
-  execProcessCheckFail (fun s -> 
-    s.FileName <- unityExe
-    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -executeMethod BoltUserAssemblyCompiler.Run" (directoryInfo "./src/bolt.unity").FullName
-  )
-  
-  execProcessCheckFail (fun s -> 
-    s.FileName <- unityExe
-    s.Arguments <- sprintf "-batchmode -quit -projectPath \"%s\" -exportPackage %s \"%s/bolt.unitypackage\"" (directoryInfo "./src/bolt.unity").FullName dirs (directoryInfo buildDir).FullName
-  )
-
-  let allowedMetaFiles =
-    ["BoltDebugScene.unity.meta"; "BoltRuntimeSettings.asset.meta"]
-
-  let zipRoot = (directoryInfo (unityDir + "/Assets")).FullName
-  let zipFileName = buildDir + "/bolt.zip"
-  let zipFiles = 
-    (unityDir + "/Assets/bolt") 
-    |> directoryInfo
-    |> findDirs []
-    |> findFiles "*"
-    |> Seq.map (fun f -> f.FullName)
-    
-  DeleteFile zipFileName
-  Zip zipRoot zipFileName zipFiles
-)
-
 "Clean"
   =?> ("BuildIOSNative", buildiOS)
   =?> ("BuildAndroidNative", buildAndroid)  
@@ -182,13 +140,7 @@ Target "CreateUnityPackage" (fun _ ->
   =?> ("InstallAndroidNative", buildAndroid)
   ==> "InstallBolt"
   =?> ("InstallBoltDebugFiles", not isRelease)
-  =?> ("CreateUnityPackage", unityPackageCreate)
 
-if unityPackageCreate then 
-  Run "CreateUnityPackage"
-
-elif isRelease then 
-  Run "InstallBolt"
-
-else 
-  Run "InstallBoltDebugFiles"
+if isRelease 
+  then Run "InstallBolt"
+  else Run "InstallBoltDebugFiles"

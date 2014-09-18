@@ -1,4 +1,5 @@
 *.csproj
+*.unityproj
 *.sln
 *.pdb
 *.dll
@@ -11,6 +12,8 @@ Gizmos
 Gizmos.meta
 Plugins
 Plugins.meta
+
+**/Assets/tutorial*
 
 Bolt_DebugStart_Build
 Bolt_Log*

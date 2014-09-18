@@ -22,7 +22,7 @@ static class BoltEditorUtils {
 
   public static string CSharpIdentifier (this string value) {
     if (Char.IsDigit(value[0])) {
-      value = "_" + value;
+      value = "_" + value; 
     }
 
     return Regex.Replace(value, "[^a-zA-Z0-9_]+", "_");

@@ -605,7 +605,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   internal void Attach (BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     if (_attached) {
-      BoltLog.Error("this entity is already attached");
+      BoltLog.Error("this entity is already attached: {0}", this);
       return;
     }
 
@@ -720,7 +720,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     BoltCore._entities.Remove(this);
 
     // log!
-    //BoltLog.Debug("detached {0}", this);
+    BoltLog.Debug("detached {0}", this);
 
     // reset
     Reset();

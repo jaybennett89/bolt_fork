@@ -7,10 +7,7 @@ using UnityEngine;
 public abstract class BoltEntityBehaviourBase : MonoBehaviour {
   internal BoltEntity _entity;
 
-  /// <summary>
-  /// The entity this behaviour attached to
-  /// </summary>
-  public BoltEntity boltEntity {
+  public BoltEntity entity {
     get {
       if (!_entity) {
         Transform t = transform;
@@ -29,13 +26,19 @@ public abstract class BoltEntityBehaviourBase : MonoBehaviour {
     }
   }
 
+
   /// <summary>
-  /// The serializer for the entity this behaviour is attached to
+  /// The entity this behaviour attached to
   /// </summary>
-  public BoltEntitySerializer boltSerializer {
+  [Obsolete("Use BoltEntityBehaviour.entity instead")]
+  public BoltEntity boltEntity {
+    get { return entity; }
+  }
+
+  public BoltEntitySerializer serializer {
     get {
-      if (boltEntity) {
-        return boltEntity.boltSerializer;
+      if (entity) {
+        return entity.boltSerializer;
       }
 
       return null;
@@ -43,12 +46,21 @@ public abstract class BoltEntityBehaviourBase : MonoBehaviour {
   }
 
   /// <summary>
+  /// The serializer for the entity this behaviour is attached to
+  /// </summary>
+  [Obsolete("Use BoltEntityBehaviour.serializer instead")]
+  public BoltEntitySerializer boltSerializer {
+    get { return serializer; }
+  }
+
+  /// <summary>
   /// The frame interpolator for the entity this behaviour is attached to
   /// </summary>
+  [Obsolete("This property is being removed and all it's features will be rolled into a future version of Bolt")]
   public BoltFrameInterpolator boltFrameInterpolator {
     get {
-      if (boltEntity) {
-        return boltEntity.GetComponent<BoltFrameInterpolator>();
+      if (entity) {
+        return entity.GetComponent<BoltFrameInterpolator>();
       }
 
       return null;
@@ -57,11 +69,11 @@ public abstract class BoltEntityBehaviourBase : MonoBehaviour {
 
 
   protected void OnEnable () {
-    boltEntity._eventDispatcher.Register(this);
+    entity._eventDispatcher.Register(this);
   }
 
   protected void OnDisable () {
-    boltEntity._eventDispatcher.Remove(this);
+    entity._eventDispatcher.Remove(this);
   }
 
   /// <summary>

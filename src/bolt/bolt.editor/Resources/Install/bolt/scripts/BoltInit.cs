@@ -18,8 +18,11 @@ public class BoltInit : MonoBehaviour {
   string map;
   string serverAddress = "127.0.0.1";
 
-  [SerializeField]
   int serverPort = 40000;
+
+  void Awake() {
+    serverPort = BoltRuntimeSettings.instance.debugStartPort;
+  }
 
   void OnGUI () {
     Rect tex = new Rect(10, 10, 140, 75);
@@ -64,21 +67,11 @@ public class BoltInit : MonoBehaviour {
 
   void State_SelectMap () {
     foreach (string value in Enum.GetNames(typeof(BoltMapNames))) {
-      GUI.color = (map == value) ? Color.green : Color.white;
-
-      if (ExpandButton(value)) {
-        map = value;
-      }
-
-      GUI.color = Color.white;
-    }
-
-    if (ExpandButton("Start Server")) {
-      if (string.IsNullOrEmpty(map)) {
-        Debug.LogWarning("Select a map first");
-      }
-      else {
-        state = State.StartServer;
+      if (Application.loadedLevelName != value) {
+        if (ExpandButton(value)) {
+          map = value;
+          state = State.StartServer;
+        }
       }
     }
   }

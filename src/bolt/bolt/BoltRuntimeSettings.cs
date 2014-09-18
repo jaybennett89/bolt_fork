@@ -14,7 +14,7 @@ public class BoltRuntimeSettings : ScriptableObject {
   public static BoltRuntimeSettings instance {
     get {
       if (_instance == null) {
-        _instance = (BoltRuntimeSettings) Resources.Load(typeof(BoltRuntimeSettings).Name, typeof(BoltRuntimeSettings));
+        _instance = (BoltRuntimeSettings)Resources.Load(typeof(BoltRuntimeSettings).Name, typeof(BoltRuntimeSettings));
 
         if (_instance == null) {
           BoltLog.Error("could not find {0} asset", typeof(BoltRuntimeSettings));
@@ -41,6 +41,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   public string debugStartMapName = null;
 
   [SerializeField]
+  public bool debugPlayAsServer = false;
+
+  [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   [SerializeField]
@@ -52,7 +55,10 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public int compilationWarnLevel = 4;
 
-  public BoltConfig GetConfigCopy () {
+  [SerializeField]
+  public Color highlightColor = new Color(81f / 255f, 203f / 255f, 255f / 255f);
+
+  public BoltConfig GetConfigCopy() {
     return _config.Clone();
   }
 
@@ -65,11 +71,11 @@ public class BoltRuntimeSettings : ScriptableObject {
     }
   }
 
-  internal static GameObject FindPrefab (string name) {
+  internal static GameObject FindPrefab(string name) {
     return prefabs.FirstOrDefault(x => x.name == name);
   }
 
-  internal static bool ContainsPrefab (BoltEntity entity) {
+  internal static bool ContainsPrefab(BoltEntity entity) {
     if (prefabs == null)
       return false;
 

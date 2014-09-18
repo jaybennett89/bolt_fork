@@ -23,39 +23,6 @@ public class BoltSettingsWindow : EditorWindow {
     }
   }
 
-  void Footer (Rect r) {
-    var version = Assembly.GetExecutingAssembly().GetName().Version;
-    var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
-
-    GUIStyle bg;
-
-    bg = new GUIStyle(GUIStyle.none);
-    bg.normal.background = EditorGUIUtility.whiteTexture;
-
-    GUI.color = new Color(0.25f, 0.25f, 0.25f);
-    GUILayout.BeginHorizontal(bg);
-    GUI.color = Color.white;
-
-    // version
-    GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
-    GUILayout.FlexibleSpace();
-
-    // uncompiled
-    GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
-
-    // compile button
-    GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
-    compileButton.normal.textColor =
-      uncompiledCount == 0
-        ? compileButton.normal.textColor
-        : BoltAssetEditorGUI.lightBlue;
-
-    if (GUILayout.Button("Compile", compileButton)) {
-      BoltUserAssemblyCompiler.Run();
-    }
-
-    GUILayout.EndHorizontal();
-  }
 
   void Replication () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
@@ -191,7 +158,7 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
-    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == true);
+    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == false);
 
     BoltAssetEditorGUI.Label("Assembly Checksum", () => {
       byte[] hash = null;
@@ -206,6 +173,10 @@ public class BoltSettingsWindow : EditorWindow {
       EditorGUI.EndDisabledGroup();
 
       settings._config.useAssemblyChecksum = EditorGUILayout.Toggle(settings._config.useAssemblyChecksum, GUILayout.Width(17));
+    });
+
+    BoltAssetEditorGUI.Label("Editor Highlight Color", () => {
+      settings.highlightColor = EditorGUILayout.ColorField(settings.highlightColor);
     });
   }
 
@@ -254,12 +225,12 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.Space(4);
 
     EditorGUILayout.EndScrollView();
+    GUILayout.EndArea();
 
     Rect r = new Rect(0, position.height - 20, position.width, 20);
 
-    GUILayout.EndArea();
     GUILayout.BeginArea(r);
-    Footer(r);
+    BoltAssetEditorGUI.Footer(r);
     GUILayout.EndArea();
 
     if (GUI.changed) {

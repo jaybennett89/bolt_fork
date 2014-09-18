@@ -1,0 +1,674 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -662633507, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Name: PlayerCommand
+  m_EditorClassIdentifier: 
+  compile: 0
+  inputProperties:
+  - name: forward
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: backward
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: left
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: right
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: jump
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: yaw
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 5
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: pitch
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 5
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: aiming
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: fire
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: weapon
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 1
+    options: 0
+    intSettings:
+      byteBits: 3
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  stateProperties:
+  - name: position
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 9
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: velocity
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 9
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: jumpFrames
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 1
+    type: 1
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 8
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: isGrounded
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 0
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1

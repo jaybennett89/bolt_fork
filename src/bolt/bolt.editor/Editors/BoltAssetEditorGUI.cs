@@ -1,21 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 public static class BoltAssetEditorGUI {
   public const int WIDTH = 100;
 
   public static BoltAssetPropertyEditMode mode = BoltAssetPropertyEditMode.State;
-  public static readonly Color blue = new Color(0 / 255f, 162f / 255f, 232f / 255f);
-  public static readonly Color lightBlue = new Color(81f / 255f, 203f / 255f, 255f / 255f);
-  public static readonly Color orange = new Color(255f / 255f, 127f / 255f, 39f / 255f);
-  public static readonly Color lightGreen = new Color(105f / 255f, 251f / 255f, 9f / 255f);
-  public static readonly Color darkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
-  public static void Header (string icon, string text) {
+  public static void Footer(Rect r) {
+    var version = Assembly.GetExecutingAssembly().GetName().Version;
+    var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
+
+    GUIStyle bg;
+
+    bg = new GUIStyle(GUIStyle.none);
+    bg.normal.background = EditorGUIUtility.whiteTexture;
+
+    GUI.color = new Color(0.25f, 0.25f, 0.25f);
+    GUILayout.BeginHorizontal(bg);
+    GUI.color = Color.white;
+
+    // version
+    GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
+    GUILayout.FlexibleSpace();
+
+    // uncompiled
+    GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
+
+    // compile button
+    GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
+    compileButton.normal.textColor =
+      uncompiledCount == 0
+        ? compileButton.normal.textColor
+        : BoltRuntimeSettings.instance.highlightColor;
+
+    if (GUILayout.Button("Compile", compileButton)) {
+      BoltUserAssemblyCompiler.Run();
+    }
+
+    GUILayout.EndHorizontal();
+  }
+
+  public static void Header(string icon, string text) {
     HeaderBackground(() => {
       DrawIcon(icon, new RectOffset(6, 0, 0, 0));
 
@@ -28,13 +59,13 @@ public static class BoltAssetEditorGUI {
     }, 2, 4);
   }
 
-  public static void HeaderBackground (Action contents, int topSpace, int bottomSpace) {
+  public static void HeaderBackground(Action contents, int topSpace, int bottomSpace) {
     BeginHeaderBackground(topSpace);
     contents();
     EndHeaderBackground(bottomSpace);
   }
 
-  public static void BeginHeaderBackground (int topSpace) {
+  public static void BeginHeaderBackground(int topSpace) {
     GUILayout.Space(topSpace);
     GUI.color = new Color(.15f, .15f, .15f);
     GUIStyle bg = new GUIStyle();
@@ -45,13 +76,13 @@ public static class BoltAssetEditorGUI {
 
   }
 
-  public static void EndHeaderBackground (int bottomSpace) {
+  public static void EndHeaderBackground(int bottomSpace) {
     GUILayout.EndHorizontal();
     GUILayout.Space(bottomSpace);
   }
 
 
-  public static void HeaderPropertyList (string icon, string text, ref BoltAssetProperty[] properties) {
+  public static void HeaderPropertyList(string icon, string text, ref BoltAssetProperty[] properties) {
     BeginHeaderBackground(2);
 
     BoltAssetEditorGUI.DrawIcon(icon, new RectOffset(6, 0, 0, 0));
@@ -72,11 +103,11 @@ public static class BoltAssetEditorGUI {
     EndHeaderBackground(2);
   }
 
-  public static void DrawIcon (string name) {
+  public static void DrawIcon(string name) {
     DrawIcon(name, new RectOffset());
   }
 
-  public static void DrawIcon (string name, RectOffset offset) {
+  public static void DrawIcon(string name, RectOffset offset) {
     GUIStyle s;
 
     s = new GUIStyle(GUIStyle.none);
@@ -85,11 +116,11 @@ public static class BoltAssetEditorGUI {
     GUILayout.Box(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
   }
 
-  public static bool IconButton (string name) {
+  public static bool IconButton(string name) {
     return IconButton(name, new RectOffset());
   }
 
-  public static bool IconButton (string name, RectOffset offset) {
+  public static bool IconButton(string name, RectOffset offset) {
     GUIStyle s;
 
     s = new GUIStyle(GUIStyle.none);
@@ -98,22 +129,22 @@ public static class BoltAssetEditorGUI {
     return GUILayout.Button(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
   }
 
-  public static GUIStyle BoxStyle (int n) {
+  public static GUIStyle BoxStyle(int n) {
     GUIStyle s = new GUIStyle("flow node " + n);
     s.padding = new RectOffset();
     s.margin = new RectOffset();
     return s;
   }
 
-  public static Texture2D Gradient (string name) {
+  public static Texture2D Gradient(string name) {
     return Resources.Load("gradients/" + name, typeof(Texture2D)) as Texture2D;
   }
 
-  public static Texture2D Icon (string name) {
+  public static Texture2D Icon(string name) {
     return Resources.Load("icons/" + name, typeof(Texture2D)) as Texture2D;
   }
 
-  public static BoltAssetFloatCompression FloatCompressionPopupNoLabel (BoltAssetFloatCompression value) {
+  public static BoltAssetFloatCompression FloatCompressionPopupNoLabel(BoltAssetFloatCompression value) {
     string[] names = Enum.GetNames(typeof(BoltAssetFloatCompression));
 
     for (int i = 0; i < names.Length; ++i) {
@@ -134,38 +165,38 @@ public static class BoltAssetEditorGUI {
       }
     }
 
-    return (BoltAssetFloatCompression) EditorGUILayout.Popup((int) value, names);
+    return (BoltAssetFloatCompression)EditorGUILayout.Popup((int)value, names);
   }
 
-  public static BoltAssetFloatCompression FloatCompressionPopup (BoltAssetFloatCompression value) {
+  public static BoltAssetFloatCompression FloatCompressionPopup(BoltAssetFloatCompression value) {
     return Label("Compression", () => FloatCompressionPopupNoLabel(value));
   }
 
-  public static T ToggleRow<T> (T mask) where T : struct {
+  public static T ToggleRow<T>(T mask) where T : struct {
     if (!typeof(T).IsEnum) throw new InvalidOperationException("T must be an enumeration");
-    return (T) (ValueType) ToggleRow((int) (ValueType) mask, Enum.GetNames(typeof(T)));
+    return (T)(ValueType)ToggleRow((int)(ValueType)mask, Enum.GetNames(typeof(T)));
   }
 
-  public static T ToggleRow<T> (T mask, params int[] disabled) where T : struct {
+  public static T ToggleRow<T>(T mask, params int[] disabled) where T : struct {
     if (!typeof(T).IsEnum) throw new InvalidOperationException("T must be an enumeration");
-    return (T) (ValueType) ToggleRow((int) (ValueType) mask, disabled, Enum.GetNames(typeof(T)));
+    return (T)(ValueType)ToggleRow((int)(ValueType)mask, disabled, Enum.GetNames(typeof(T)));
   }
 
-  public static T ToggleRow<T> (int mask) where T : struct {
+  public static T ToggleRow<T>(int mask) where T : struct {
     if (!typeof(T).IsEnum) throw new InvalidOperationException("T must be an enumeration");
-    return (T) (ValueType) ToggleRow(mask, Enum.GetNames(typeof(T)));
+    return (T)(ValueType)ToggleRow(mask, Enum.GetNames(typeof(T)));
   }
 
-  public static T ToggleRow<T> (int mask, params int[] disabled) where T : struct {
+  public static T ToggleRow<T>(int mask, params int[] disabled) where T : struct {
     if (!typeof(T).IsEnum) throw new InvalidOperationException("T must be an enumeration");
-    return (T) (ValueType) ToggleRow(mask, disabled, Enum.GetNames(typeof(T)));
+    return (T)(ValueType)ToggleRow(mask, disabled, Enum.GetNames(typeof(T)));
   }
 
-  public static int ToggleRow (int mask, params string[] flags) {
+  public static int ToggleRow(int mask, params string[] flags) {
     return ToggleRow(mask, new int[0], flags);
   }
 
-  public static int ToggleRow (int mask, int[] disabled, params string[] flags) {
+  public static int ToggleRow(int mask, int[] disabled, params string[] flags) {
     for (int i = 0; i < flags.Length; ++i) {
       flags[i] = Regex.Replace(flags[i], "([A-Z]+)", " $1").Trim();
     }
@@ -180,26 +211,23 @@ public static class BoltAssetEditorGUI {
       if (flags.Length > 1) {
         if (i == 0) {
           style = new GUIStyle(EditorStyles.miniButtonLeft);
-        } else if (i + 1 == flags.Length) {
+        }
+        else if (i + 1 == flags.Length) {
           style = new GUIStyle(EditorStyles.miniButtonRight);
-        } else {
+        }
+        else {
           style = new GUIStyle(EditorStyles.miniButtonMid);
         }
       }
 
-      if (EditorGUIUtility.isProSkin) {
-        style.normal.textColor = set ? lightBlue : style.normal.textColor;
-        style.active.textColor = set ? lightBlue : style.active.textColor;
-      } else {
-        if (set) {
-          GUI.color = lightOrange;
-        }
-      }
+      style.normal.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.normal.textColor;
+      style.active.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.active.textColor;
 
       if (GUILayout.Button(flags[i], style, GUILayout.ExpandWidth(false), GUILayout.MinWidth(20))) {
         if (set) {
           mask &= ~flag;
-        } else {
+        }
+        else {
           mask |= flag;
         }
       }
@@ -211,7 +239,7 @@ public static class BoltAssetEditorGUI {
     return mask;
   }
 
-  public static void CompileButton (BoltCompilableAsset asset) {
+  public static void CompileButton(BoltCompilableAsset asset) {
     if (GUI.changed) {
       if (asset.compile == false) {
         EditorPrefs.SetInt("BOLT_UNCOMPILED_COUNT", EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0) + 1);
@@ -222,15 +250,9 @@ public static class BoltAssetEditorGUI {
       EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, true);
       EditorUtility.SetDirty(asset);
     }
-
-    if (asset.compile) {
-      //if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
-      //BoltUserAssemblyCompiler.Run();
-      //}
-    }
   }
 
-  public static bool DeleteButton () {
+  public static bool DeleteButton() {
     if (GUILayout.Button("Delete", EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
       return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
     }
@@ -238,7 +260,7 @@ public static class BoltAssetEditorGUI {
     return false;
   }
 
-  public static BoltAssetProperty[] RemoveDeletedProperties (BoltAssetProperty[] ps) {
+  public static BoltAssetProperty[] RemoveDeletedProperties(BoltAssetProperty[] ps) {
     for (int i = 0; i < ps.Length; ++i) {
       if (ps[i].delete) {
         ArrayUtility.RemoveAt(ref ps, i);
@@ -249,7 +271,7 @@ public static class BoltAssetEditorGUI {
     return ps;
   }
 
-  public static BoltAssetProperty CreateProperty () {
+  public static BoltAssetProperty CreateProperty() {
     BoltAssetProperty p = new BoltAssetProperty();
     p.name = "new_property";
     p.type = BoltAssetPropertyType.Float;
@@ -261,7 +283,7 @@ public static class BoltAssetEditorGUI {
     return p;
   }
 
-  public static void EditBox (GUIStyle style, params Action[] rows) {
+  public static void EditBox(GUIStyle style, params Action[] rows) {
     GUILayout.BeginVertical(style);
 
     for (int i = 0; i < rows.Length; ++i) {
@@ -274,7 +296,7 @@ public static class BoltAssetEditorGUI {
     GUILayout.Space(4);
   }
 
-  public static void EditPropertyName (BoltAssetProperty p, bool disabled) {
+  public static void EditPropertyName(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
     GUIStyle s = new GUIStyle("TextField");
     s.normal.textColor = Color.white;
@@ -283,19 +305,57 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  public static void EditPropertySyncMode (BoltAssetProperty p) {
-    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode) EditorGUILayout.EnumPopup(p.syncMode));
+  static string[] whenOptions = new string[] {
+    "Value Changed",
+    "On First Replication"
+  };
+
+  public static void EditPropertySyncMode(BoltAssetProperty p) {
+    Label("Replicate When", () => 
+      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions)
+    );
+
+    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
   }
 
-  public static void EditPropertySyncTarget (BoltAssetProperty p) {
-    Label("Target", () => p.syncTarget = ToggleRow<BoltAssetSyncTarget>((int) p.syncTarget));
+  static string[] targetOptions = new string[] {
+      "Everyone",
+      "Everyone Except Controller",
+      "Only Owner And Controller",
+      "Only Owner",
+  };
+
+  public static void EditPropertySyncTarget(BoltAssetProperty p) {
+    Label("Replicate To", () => {
+      int selected = 0;
+
+      var hasProxy = (p.syncTarget & BoltAssetSyncTarget.Proxy) == BoltAssetSyncTarget.Proxy;
+      var hasController = (p.syncTarget & BoltAssetSyncTarget.Controller) == BoltAssetSyncTarget.Controller;
+
+      if (hasProxy && hasController) { selected = 0; }
+      else if(hasProxy) { selected = 1; }
+      else if (hasController) { selected = 2; }
+      else { selected = 3; }
+
+
+      selected = EditorGUILayout.IntPopup(selected, targetOptions, targetOptions.Select((v,i) => i).ToArray());
+
+      switch (selected) {
+        case 0: p.syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller; break;
+        case 1: p.syncTarget = BoltAssetSyncTarget.Proxy; break;
+        case 2: p.syncTarget = BoltAssetSyncTarget.Controller; break;
+        case 3: p.syncTarget = default(BoltAssetSyncTarget); break;
+      }
+
+      return selected;
+    });
   }
 
-  static bool DeleteDialog () {
+  static bool DeleteDialog() {
     return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
   }
 
-  public static void EditPropertyDeleteButton (BoltAssetProperty p, bool disabled) {
+  public static void EditPropertyDeleteButton(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
 
     if (IconButton("minus", new RectOffset(0, 6, 2, 0))) {
@@ -305,7 +365,7 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  public static void EditPropertyOptions (BoltAssetProperty p, bool disabled) {
+  public static void EditPropertyOptions(BoltAssetProperty p, bool disabled) {
     if (p.isReference || p.isDefault) {
       return;
     }
@@ -315,7 +375,8 @@ public static class BoltAssetEditorGUI {
     Label("Changed Callback", () => {
       if (EditorGUILayout.Toggle((p.options & BoltAssetPropertyOptions.Notify) == BoltAssetPropertyOptions.Notify)) {
         p.options |= BoltAssetPropertyOptions.Notify;
-      } else {
+      }
+      else {
         p.options &= ~BoltAssetPropertyOptions.Notify;
       }
     });
@@ -323,14 +384,18 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  public static void EditPropertyEnabled (BoltAssetProperty p) {
+  public static void EditPropertyEnabled(BoltAssetProperty p) {
+    GUI.color = p.enabled ? BoltRuntimeSettings.instance.highlightColor : Color.white;
+
     if (IconButton(p.enabled ? "status" : "status-offline", new RectOffset(6, 0, 2, 0))) {
       p.enabled = !p.enabled;
     }
+
+    GUI.color = Color.white;
   }
 
-  public static void EditPropertyFoldout (BoltAssetProperty p) {
-    var noFoldout = (p.type == BoltAssetPropertyType.Bool) || (p.type == BoltAssetPropertyType.Trigger);
+  public static void EditPropertyFoldout(BoltAssetProperty p) {
+    var noFoldout = (p.type == BoltAssetPropertyType.Trigger);
 
     EditorGUI.BeginDisabledGroup(noFoldout);
 
@@ -341,7 +406,7 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  public static bool ArrowButton (string icon) {
+  public static bool ArrowButton(string icon) {
     if (EditorGUIUtility.isProSkin == false) {
       icon += "_Dark";
     }
@@ -352,12 +417,12 @@ public static class BoltAssetEditorGUI {
     return GUILayout.Button(t, s, GUILayout.Height(15), GUILayout.Width(20));
   }
 
-  public static void EditPropertyType (BoltAssetProperty p, bool disabled) {
+  public static void EditPropertyType(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
 
     //Label("Type", () => {
     BoltAssetPropertyType type = p.type;
-    p.type = (BoltAssetPropertyType) EditorGUILayout.EnumPopup(p.type, GUILayout.Width(80));
+    p.type = (BoltAssetPropertyType)EditorGUILayout.EnumPopup(p.type, GUILayout.Width(80));
 
     switch (p.type) {
       case BoltAssetPropertyType.ByteArray:
@@ -388,7 +453,7 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  public static void EditPropertySettings (BoltAssetProperty p, bool disabled) {
+  public static void EditPropertySettings(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
 
     switch (p.type) {
@@ -433,8 +498,8 @@ public static class BoltAssetEditorGUI {
     EditorGUI.EndDisabledGroup();
   }
 
-  static BoltAssetProperty.TransformSettings EditSettings (BoltAssetProperty.TransformSettings s) {
-    Label("Implementation", () => s.mode = (BoltAssetTransformModes) EditorGUILayout.EnumPopup(s.mode));
+  static BoltAssetProperty.TransformSettings EditSettings(BoltAssetProperty.TransformSettings s) {
+    Label("Implementation", () => s.mode = (BoltAssetTransformModes)EditorGUILayout.EnumPopup(s.mode));
 
     s.posAxes = EditAxes(s.posAxes, BoltAssetPropertyType.Vector3, "Position", () => s.posCompression = FloatCompressionPopupNoLabel(s.posCompression));
     s.rotAxes = EditAxes(s.rotAxes, BoltAssetPropertyType.Vector3, "Rotation", () => s.rotCompression = FloatCompressionPopupNoLabel(s.rotCompression));
@@ -443,12 +508,12 @@ public static class BoltAssetEditorGUI {
       s.velAxes = EditAxes(s.velAxes, BoltAssetPropertyType.Vector3, "Velocity", () => s.velCompression = FloatCompressionPopupNoLabel(s.velCompression));
 
       Label(" ", () => {
-        s.velMode = (BoltAssetTransformVelocityMode) EditorGUILayout.EnumPopup(s.velMode);
+        s.velMode = (BoltAssetTransformVelocityMode)EditorGUILayout.EnumPopup(s.velMode);
         s.velZeroTolerance = FloatFieldOverlay(s.velZeroTolerance, "Tolerance");
       });
 
       Label("Acceleration", () => {
-        s.accMode = (BoltAssetTransformAccelerationMode) EditorGUILayout.EnumPopup(s.accMode);
+        s.accMode = (BoltAssetTransformAccelerationMode)EditorGUILayout.EnumPopup(s.accMode);
         EditorGUI.BeginDisabledGroup(s.accMode == BoltAssetTransformAccelerationMode.DontUse);
         s.accZeroTolerance = FloatFieldOverlay(s.accZeroTolerance, "Tolerance");
         EditorGUI.EndDisabledGroup();
@@ -467,18 +532,18 @@ public static class BoltAssetEditorGUI {
     return s;
   }
 
-  static BoltAssetProperty.AssetSettingsMecanim EditSettings (BoltAssetProperty.AssetSettingsMecanim s) {
+  static BoltAssetProperty.AssetSettingsMecanim EditSettings(BoltAssetProperty.AssetSettingsMecanim s) {
     Label("Damping", () => s.interpolationTime = EditorGUILayout.FloatField(s.interpolationTime));
     return s;
   }
 
-  static BoltAssetProperty.StringSettings EditSettings (BoltAssetProperty.StringSettings s) {
-    Label("Encoding", () => s.encoding = (BoltAssetStringEncoding) EditorGUILayout.EnumPopup(s.encoding));
+  static BoltAssetProperty.StringSettings EditSettings(BoltAssetProperty.StringSettings s) {
+    Label("Encoding", () => s.encoding = (BoltAssetStringEncoding)EditorGUILayout.EnumPopup(s.encoding));
     Label("Max Length", () => s.maxLength = EditorGUILayout.IntField(s.maxLength));
     return s;
   }
 
-  static BoltAssetProperty.IntSettings EditSettings (BoltAssetProperty p, BoltAssetProperty.IntSettings s) {
+  static BoltAssetProperty.IntSettings EditSettings(BoltAssetProperty p, BoltAssetProperty.IntSettings s) {
     Label("Bits", () => {
       switch (p.type) {
         case BoltAssetPropertyType.Byte: s.byteBits = Mathf.Clamp(EditorGUILayout.IntField(s.byteBits), 1, 8); break;
@@ -491,7 +556,7 @@ public static class BoltAssetEditorGUI {
     return s;
   }
 
-  static BoltAssetProperty.FloatSettings EditSettings (BoltAssetProperty.FloatSettings s) {
+  static BoltAssetProperty.FloatSettings EditSettings(BoltAssetProperty.FloatSettings s) {
     s.compression = BoltAssetEditorGUI.FloatCompressionPopup(s.compression);
 
     if (mode == BoltAssetPropertyEditMode.State)
@@ -500,7 +565,7 @@ public static class BoltAssetEditorGUI {
     return s;
   }
 
-  static BoltAssetProperty.VectorSettings EditSettings (BoltAssetProperty.VectorSettings s, BoltAssetPropertyType type) {
+  static BoltAssetProperty.VectorSettings EditSettings(BoltAssetProperty.VectorSettings s, BoltAssetPropertyType type) {
     s.compression = FloatCompressionPopup(s.compression);
     s.axes = EditAxes(s.axes, type);
 
@@ -510,7 +575,7 @@ public static class BoltAssetEditorGUI {
     return s;
   }
 
-  static BoltAssetProperty.QuaternionSettings EditSettings (BoltAssetProperty.QuaternionSettings s) {
+  static BoltAssetProperty.QuaternionSettings EditSettings(BoltAssetProperty.QuaternionSettings s) {
     s.compression = FloatCompressionPopup(s.compression);
 
     //s.axes = EditAxes(s.axes, BoltAssetPropertyType.Quaternion);
@@ -522,16 +587,16 @@ public static class BoltAssetEditorGUI {
     return s;
   }
 
-  static BoltAssetProperty.MecanimSettings EditSettings (BoltAssetProperty.MecanimSettings s) {
-    Label("Mecanim Asset", () => s.mecanimAsset = (BoltMecanimAsset) EditorGUILayout.ObjectField(s.mecanimAsset, typeof(BoltMecanimAsset), false));
+  static BoltAssetProperty.MecanimSettings EditSettings(BoltAssetProperty.MecanimSettings s) {
+    Label("Mecanim Asset", () => s.mecanimAsset = (BoltMecanimAsset)EditorGUILayout.ObjectField(s.mecanimAsset, typeof(BoltMecanimAsset), false));
     return s;
   }
 
-  internal static void EditSettings (BoltAssetProperty.AssetSettingsCommand s) {
+  internal static void EditSettings(BoltAssetProperty.AssetSettingsCommand s) {
     //Label("Synchronize", () => s.synchronize = EditorGUILayout.Toggle(s.synchronize));
   }
 
-  public static BoltAssetProperty EditProperty (BoltAssetProperty p, BoltAssetPropertyEditMode mode, bool odd) {
+  public static BoltAssetProperty EditProperty(BoltAssetProperty p, BoltAssetPropertyEditMode mode, bool odd) {
     BoltAssetEditorGUI.mode = mode;
     EditorGUILayout.BeginVertical();
 
@@ -585,7 +650,7 @@ public static class BoltAssetEditorGUI {
     return p;
   }
 
-  public static BoltAssetProperty[] EditPropertyArray (BoltAssetProperty[] ps, BoltAssetPropertyEditMode mode, bool group) {
+  public static BoltAssetProperty[] EditPropertyArray(BoltAssetProperty[] ps, BoltAssetPropertyEditMode mode, bool group) {
     for (int i = 0; i < ps.Length; ++i) {
       ps[i] = EditProperty(ps[i], mode, (i & 1) == 1);
 
@@ -607,11 +672,11 @@ public static class BoltAssetEditorGUI {
     return BoltAssetEditorGUI.RemoveDeletedProperties(ps);
   }
 
-  static BoltAssetAxes EditAxes (BoltAssetAxes axes, BoltAssetPropertyType type) {
+  static BoltAssetAxes EditAxes(BoltAssetAxes axes, BoltAssetPropertyType type) {
     return EditAxes(axes, type, "Axes", null);
   }
 
-  static BoltAssetAxes EditAxes (BoltAssetAxes axes, BoltAssetPropertyType type, string label, Action after) {
+  static BoltAssetAxes EditAxes(BoltAssetAxes axes, BoltAssetPropertyType type, string label, Action after) {
     List<string> axesNames = new List<string>() { "X", "Y" };
 
     switch (type) {
@@ -621,30 +686,31 @@ public static class BoltAssetEditorGUI {
     }
 
     EditorGUILayout.BeginHorizontal();
-    BoltAssetAxes result = Label(label, () => (BoltAssetAxes) ToggleRow((int) axes, axesNames.ToArray()));
+    BoltAssetAxes result = Label(label, () => (BoltAssetAxes)ToggleRow((int)axes, axesNames.ToArray()));
     if (after != null) after();
     EditorGUILayout.EndHorizontal();
     return result;
   }
 
-  public static void Label (string label, GUIStyle style, Action action) {
+  public static void Label(string label, GUIStyle style, Action action) {
     EditorGUILayout.BeginHorizontal();
     GUILayout.Label(label, style);
     action();
     EditorGUILayout.EndHorizontal();
   }
 
-  public static void Label (string label, Action action) {
+  public static void Label(string label, Action action) {
     EditorGUILayout.BeginHorizontal();
     GUILayout.Label(label, GUILayout.Width(150));
     try {
       action();
-    } catch { };
+    }
+    catch { };
 
     EditorGUILayout.EndHorizontal();
   }
 
-  public static void DarkLabel (string label, Action action) {
+  public static void DarkLabel(string label, Action action) {
     EditorGUILayout.BeginHorizontal();
     GUIStyle s = new GUIStyle(EditorStyles.label);
     s.normal.textColor = new Color(0.125f, 0.125f, 0.125f);
@@ -653,7 +719,7 @@ public static class BoltAssetEditorGUI {
     EditorGUILayout.EndHorizontal();
   }
 
-  static T Label<T> (string label, Func<T> action) {
+  static T Label<T>(string label, Func<T> action) {
     EditorGUILayout.BeginHorizontal();
     EditorGUILayout.PrefixLabel(label);
     T result = action();
@@ -661,7 +727,7 @@ public static class BoltAssetEditorGUI {
     return result;
   }
 
-  public static float FloatFieldOverlay (float value, string overlay) {
+  public static float FloatFieldOverlay(float value, string overlay) {
     value = EditorGUILayout.FloatField(value);
 
     GUIStyle s = new GUIStyle("Label");
@@ -672,7 +738,7 @@ public static class BoltAssetEditorGUI {
     return value;
   }
 
-  public static int IntFieldOverlay (int value, string overlay) {
+  public static int IntFieldOverlay(int value, string overlay) {
     value = EditorGUILayout.IntField(value);
 
     GUIStyle s = new GUIStyle("Label");

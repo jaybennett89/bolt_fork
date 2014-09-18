@@ -81,13 +81,17 @@ public static partial class BoltNetwork {
   /// </summary>
   public static IEnumerable<BoltConnection> clients {
     get { return BoltCore.clients; }
-  }
+  } 
 
   /// <summary>
   /// The server connection
   /// </summary>
   public static BoltConnection server {
     get { return BoltCore.server; }
+  }
+
+  public static int framesPerSecond {
+    get { return BoltCore.framesPerSecond; }
   }
 
   /// <summary>
@@ -109,6 +113,10 @@ public static partial class BoltNetwork {
   /// </summary>
   public static bool isDebugMode {
     get { return BoltCore.isDebugMode; }
+  }
+
+  public static GameObject globalObject {
+    get { return BoltCore.globalObject; }
   }
 
   /// <summary>
@@ -144,6 +152,18 @@ public static partial class BoltNetwork {
     return BoltCore.Instantiate(prefab);
   }
 
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    return BoltCore.Instantiate(prefab, position, rotation);
+  }
+
+  public static BoltEntity Instantiate(string prefab, Vector3 position, Quaternion rotation) {
+    return Instantiate(BoltCore.FindPrefab(prefab), position, rotation);
+  }
+
+  public static BoltUniqueId GenerateUniqueId() {
+    return BoltCore.GenerateUniqueId();
+  }
+
   public static Func<int, Transform> resolveTransform {
     get { return BoltCore.resolveTransform; }
     set { BoltCore.resolveTransform = value; }
@@ -163,7 +183,11 @@ public static partial class BoltNetwork {
   }
 
   public static void Accept (UdpEndPoint ep) {
-    BoltCore.AcceptConnection(ep);
+    Accept(ep, null);
+  }
+
+  public static void Accept(UdpEndPoint ep, object userToken) {
+    BoltCore.AcceptConnection(ep, userToken);
   }
 
   public static void Refuse (UdpEndPoint ep) {
