@@ -23,7 +23,7 @@ let unityPath =
     
 let buildName =
   let now = System.DateTime.Now
-  sprintf "Bolt_Daily_Y%iM%iD%i" now.Year now.Month now.Day
+  sprintf "Bolt_Daily_Y%iM%iD%i_%s" now.Year now.Month now.Day (Git.Information.getCurrentHash())
 
 let packageUnityProject path packageName assetDirs =
 
