@@ -605,7 +605,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
 
   internal void Attach (BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
     if (_attached) {
-      BoltLog.Error("this entity is already attached");
+      BoltLog.Error("this entity is already attached: {0}", this);
       return;
     }
 
