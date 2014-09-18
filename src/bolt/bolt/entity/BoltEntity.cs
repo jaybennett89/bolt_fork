@@ -720,7 +720,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
     BoltCore._entities.Remove(this);
 
     // log!
-    //BoltLog.Debug("detached {0}", this);
+    BoltLog.Debug("detached {0}", this);
 
     // reset
     Reset();
