@@ -31,12 +31,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\assemblies\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Parameters\Definition\ParameterDefinition.cs" />
+    <Compile Include="Parameters\Definition\ParameterDefinitionTypeSettings.cs" />
+    <Compile Include="Parameters\ParameterType.cs" />
+    <Compile Include="Types\CommandDefinition.cs" />
+    <Compile Include="Types\EventDefinition.cs" />
+    <Compile Include="Types\StateDefinition.cs" />
+    <Compile Include="Types\TypeDefinition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
