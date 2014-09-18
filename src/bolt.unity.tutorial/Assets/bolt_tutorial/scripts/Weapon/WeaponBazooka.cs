@@ -16,7 +16,7 @@ public class WeaponBazooka : WeaponBase {
     // calculate where we are aiming
     Vector3 aimPos;
     Quaternion aimRot;
-    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetBoltState<IPlayerState>(), out aimPos, out aimRot);
+    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetBoltState<IPlayerState>().pitch, out aimPos, out aimRot);
 
     // extrapolate that 1024 units forward
     Vector3 aimPosDistant = aimPos + (aimRot * Vector3.forward * 1024f);

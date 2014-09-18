@@ -1,0 +1,1 @@
+.\FAKE\tools\Fake.exe Publish.fsx %*

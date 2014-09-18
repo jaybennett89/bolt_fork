@@ -21,7 +21,7 @@ public static class BoltMenuItems {
     BoltEditorUtils.CreateAsset<BoltMecanimAsset>("BoltMecanim");
   }
 
-  [MenuItem("Bolt/Compile Assets")]
+  [MenuItem("Assets/Compile Bolt Assets")]
   public static void RunCompiler() {
     try {
       BoltUserAssemblyCompiler.Run();
@@ -31,7 +31,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Bolt/Install Bolt")]
+  [MenuItem("Edit/Install Bolt")]
   public static void Install() {
     int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");
     if (opt < 2) {

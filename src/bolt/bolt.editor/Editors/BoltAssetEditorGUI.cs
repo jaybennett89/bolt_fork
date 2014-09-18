@@ -1,14 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 public static class BoltAssetEditorGUI {
   public const int WIDTH = 100;
 
   public static BoltAssetPropertyEditMode mode = BoltAssetPropertyEditMode.State;
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
+
+  public static void Footer(Rect r) {
+    var version = Assembly.GetExecutingAssembly().GetName().Version;
+    var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
+
+    GUIStyle bg;
+
+    bg = new GUIStyle(GUIStyle.none);
+    bg.normal.background = EditorGUIUtility.whiteTexture;
+
+    GUI.color = new Color(0.25f, 0.25f, 0.25f);
+    GUILayout.BeginHorizontal(bg);
+    GUI.color = Color.white;
+
+    // version
+    GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
+    GUILayout.FlexibleSpace();
+
+    // uncompiled
+    GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
+
+    // compile button
+    GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
+    compileButton.normal.textColor =
+      uncompiledCount == 0
+        ? compileButton.normal.textColor
+        : BoltRuntimeSettings.instance.highlightColor;
+
+    if (GUILayout.Button("Compile", compileButton)) {
+      BoltUserAssemblyCompiler.Run();
+    }
+
+    GUILayout.EndHorizontal();
+  }
 
   public static void Header(string icon, string text) {
     HeaderBackground(() => {
@@ -214,12 +250,6 @@ public static class BoltAssetEditorGUI {
       EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, true);
       EditorUtility.SetDirty(asset);
     }
-
-    if (asset.compile) {
-      //if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
-      //BoltUserAssemblyCompiler.Run();
-      //}
-    }
   }
 
   public static bool DeleteButton() {
@@ -281,11 +311,11 @@ public static class BoltAssetEditorGUI {
   };
 
   public static void EditPropertySyncMode(BoltAssetProperty p) {
-    Label("Replicate When", () => {
-      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions);
-    });
+    Label("Replicate When", () => 
+      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions)
+    );
 
-    //Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
+    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
   }
 
   static string[] targetOptions = new string[] {
@@ -307,7 +337,8 @@ public static class BoltAssetEditorGUI {
       else if (hasController) { selected = 2; }
       else { selected = 3; }
 
-      selected = EditorGUILayout.Popup(selected, targetOptions);
+
+      selected = EditorGUILayout.IntPopup(selected, targetOptions, targetOptions.Select((v,i) => i).ToArray());
 
       switch (selected) {
         case 0: p.syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller; break;
@@ -315,6 +346,8 @@ public static class BoltAssetEditorGUI {
         case 2: p.syncTarget = BoltAssetSyncTarget.Controller; break;
         case 3: p.syncTarget = default(BoltAssetSyncTarget); break;
       }
+
+      return selected;
     });
   }
 

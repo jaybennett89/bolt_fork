@@ -385,7 +385,7 @@ end tell'";
   Vector2 sceneScrollPosition;
 
   void Scenes() {
-    sceneScrollPosition = GUILayout.BeginScrollView(sceneScrollPosition, GUILayout.MaxHeight(300));
+    sceneScrollPosition = GUILayout.BeginScrollView(sceneScrollPosition);
 
     foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes) {
       if (scene.enabled) {
@@ -451,7 +451,7 @@ end tell'";
   }
 
   void OnGUI() {
-    GUILayout.Space(2);
+    GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
 
     if (BoltEditorUtils.hasPro) {
       BoltAssetEditorGUI.Header("play", "Debug Start Settings");
@@ -461,6 +461,14 @@ end tell'";
     BoltAssetEditorGUI.Header("scenes", "Scenes");
     GUILayout.Space(1);
     Scenes();
+
+    GUILayout.EndArea();
+
+    Rect r = new Rect(0, position.height - 20, position.width, 20);
+
+    GUILayout.BeginArea(r);
+    BoltAssetEditorGUI.Footer(r);
+    GUILayout.EndArea();
 
     if (GUI.changed) {
       EditorUtility.SetDirty(BoltRuntimeSettings.instance);

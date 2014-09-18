@@ -8,7 +8,7 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
   Transform _target;
 
   // camera target state
-  IPlayerState _targetState;
+  // IPlayerState _targetState;
 
   // if we are aiming or not
   bool _aiming = false;
@@ -47,7 +47,12 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
     get { return cam.camera; }
   }
 
+  public System.Func<BoltEntity, int> getHealth;
+  public System.Func<BoltEntity, bool> getAiming;
+  public System.Func<BoltEntity, float> getPitch;
+
   void Awake() {
+    DontDestroyOnLoad(gameObject);
     _distance = runningDistance;
   }
 
@@ -59,24 +64,28 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
     if (_target) {
       GrayscaleEffect ge = GetComponentInChildren<GrayscaleEffect>();
 
-      if (_targetState.health >= 85) {
+      var h = getHealth != null ? getHealth(_target.GetBoltEntity()) : 100;
+      var a = getAiming != null ? getAiming(_target.GetBoltEntity()) : false;
+      var p = getPitch != null ? getPitch(_target.GetBoltEntity()) : 0f;
+
+      if (h >= 85) {
         ge.ramp = 0f;
       }
       else {
-        ge.ramp = 1f - ((_targetState.health / 85f));
+        ge.ramp = 1f - ((h / 85f));
       }
 
       Screen.lockCursor = true;
       Screen.showCursor = false;
 
       if (_aiming) {
-        if (_targetState.mecanim.Aiming == false) {
+        if (a == false) {
           _aiming = false;
           _aimingAcc = 0f;
         }
       }
       else {
-        if (_targetState.mecanim.Aiming) {
+        if (a) {
           _aiming = true;
           _aimingAcc = 0f;
         }
@@ -91,17 +100,17 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
         _distance = Mathf.Lerp(_distance, runningDistance, _aimingAcc / 0.4f);
       }
 
-      Vector3 p;
-      Quaternion r;
+      Vector3 pos;
+      Quaternion rot;
 
-      CalculateCameraTransform(_target, _targetState, _distance, out p, out r);
+      CalculateCameraTransform(_target, p, _distance, out pos, out rot);
 
       if (!_aiming || allowSmoothing) {
-        p = Vector3.SmoothDamp(transform.position, p, ref _velocity, runningSmoothTime);
+        pos = Vector3.SmoothDamp(transform.position, pos, ref _velocity, runningSmoothTime);
       }
 
-      transform.position = p;
-      transform.rotation = r;
+      transform.position = pos;
+      transform.rotation = rot;
 
       cam.transform.localRotation = Quaternion.identity;
       cam.transform.localPosition = Vector3.zero;
@@ -110,16 +119,14 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
 
   public void SetTarget(BoltEntity entity) {
     _target = entity.transform;
-    _targetState = entity.GetBoltState<IPlayerState>();
-
     UpdateCamera(false);
   }
 
-  public void CalculateCameraAimTransform(Transform target, IPlayerState targetState, out Vector3 pos, out Quaternion rot) {
-    CalculateCameraTransform(target, targetState, aimingDistance, out pos, out rot);
+  public void CalculateCameraAimTransform(Transform target, float pitch, out Vector3 pos, out Quaternion rot) {
+    CalculateCameraTransform(target, pitch, aimingDistance, out pos, out rot);
   }
 
-  public void CalculateCameraTransform(Transform target, IPlayerState targetState, float distance, out Vector3 pos, out Quaternion rot) {
+  public void CalculateCameraTransform(Transform target, float pitch, float distance, out Vector3 pos, out Quaternion rot) {
 
     // copy transform to dummy
     dummyTarget.position = target.position;
@@ -130,7 +137,7 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
     dummyTarget.position += dummyTarget.right * offset;
 
     // clamp and calculate pitch rotation
-    Quaternion pitchRotation = Quaternion.Euler(targetState.pitch, 0, 0);
+    Quaternion pitchRotation = Quaternion.Euler(pitch, 0, 0);
 
     pos = dummyTarget.position;
     pos += (-dummyTarget.forward * distance);
