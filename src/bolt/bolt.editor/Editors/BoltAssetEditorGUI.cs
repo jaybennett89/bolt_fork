@@ -21,7 +21,7 @@ public static class BoltAssetEditorGUI {
     bg = new GUIStyle(GUIStyle.none);
     bg.normal.background = EditorGUIUtility.whiteTexture;
 
-    GUI.color = new Color(0.25f, 0.25f, 0.25f);
+    GUI.color = EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.45f, 0.45f, 0.45f);
     GUILayout.BeginHorizontal(bg);
     GUI.color = Color.white;
 
@@ -34,15 +34,25 @@ public static class BoltAssetEditorGUI {
 
     // compile button
     GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
-    compileButton.normal.textColor =
-      uncompiledCount == 0
-        ? compileButton.normal.textColor
-        : BoltRuntimeSettings.instance.highlightColor;
+
+    if (EditorGUIUtility.isProSkin) {
+      compileButton.normal.textColor =
+        uncompiledCount == 0
+          ? compileButton.normal.textColor
+          : BoltRuntimeSettings.instance.highlightColor;
+    }
+    else {
+      GUI.color = 
+        uncompiledCount == 0
+          ? Color.white
+          : BoltRuntimeSettings.instance.highlightColor;
+    }
 
     if (GUILayout.Button("Compile", compileButton)) {
       BoltUserAssemblyCompiler.Run();
     }
 
+    GUI.color = Color.white;
     GUILayout.EndHorizontal();
   }
 
@@ -67,7 +77,7 @@ public static class BoltAssetEditorGUI {
 
   public static void BeginHeaderBackground(int topSpace) {
     GUILayout.Space(topSpace);
-    GUI.color = new Color(.15f, .15f, .15f);
+    GUI.color = EditorGUIUtility.isProSkin ? new Color(.15f, .15f, .15f) : new Color(.5f, .5f, .5f);
     GUIStyle bg = new GUIStyle();
     bg.normal.background = EditorGUIUtility.whiteTexture;
     bg.padding = new RectOffset(0, 0, 2, 2);
@@ -220,8 +230,13 @@ public static class BoltAssetEditorGUI {
         }
       }
 
-      style.normal.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.normal.textColor;
-      style.active.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.active.textColor;
+      if (EditorGUIUtility.isProSkin) {
+        style.normal.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.normal.textColor;
+        style.active.textColor = set ? BoltRuntimeSettings.instance.highlightColor : style.active.textColor;
+      }
+      else {
+        GUI.color = set ? BoltRuntimeSettings.instance.highlightColor : Color.white;
+      }
 
       if (GUILayout.Button(flags[i], style, GUILayout.ExpandWidth(false), GUILayout.MinWidth(20))) {
         if (set) {
@@ -314,8 +329,6 @@ public static class BoltAssetEditorGUI {
     Label("Replicate When", () => 
       p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions)
     );
-
-    Label("Sync When", () => p.syncMode = (BoltAssetSyncMode)EditorGUILayout.EnumPopup(p.syncMode));
   }
 
   static string[] targetOptions = new string[] {
@@ -604,7 +617,10 @@ public static class BoltAssetEditorGUI {
     s.normal.background = EditorGUIUtility.whiteTexture;
     s.padding = new RectOffset(0, 0, 0, 2);
 
-    float c = odd ? 0.25f : 0.3f;
+    float c = 
+      EditorGUIUtility.isProSkin
+        ? (odd ? 0.25f : 0.3f)
+        : (odd ? 0.45f : 0.4f);
 
     GUI.color = new Color(c, c, c);
 
