@@ -8,7 +8,7 @@ namespace bolt.compiler {
   [ProtoInclude(100, typeof(StateDefinition))]
   [ProtoInclude(200, typeof(EventDefinition))]
   [ProtoInclude(300, typeof(CommandDefinition))]
-  public abstract class TypeDefinition {
+  public abstract class AssetDefinition {
     [ProtoIgnore]
     public bool Deleted;
 
@@ -23,5 +23,14 @@ namespace bolt.compiler {
 
     [ProtoMember(4)]
     public string AssetPath;
+
+    [ProtoMember(5)]
+    public string Comment;
+
+    [ProtoMember(6)]
+    public bool Enabled;
+
+    [ProtoMember(7)]
+    public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
   }
 }

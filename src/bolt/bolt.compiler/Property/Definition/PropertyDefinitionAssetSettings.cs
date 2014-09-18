@@ -5,7 +5,8 @@ using System.Text;
 
 namespace bolt.compiler {
   [ProtoContract]
-  public class CommandDefinition : TypeDefinition {
+  [ProtoInclude(100, typeof(PropertyDefinitionStateAssetSettings))]
+  public abstract class PropertyDefinitionAssetSettings {
 
   }
 }

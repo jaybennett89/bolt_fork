@@ -5,6 +5,7 @@ using System.Text;
 
 namespace bolt.compiler {
   [ProtoContract]
-  public class EventDefinition : TypeDefinition {
+  public class CommandDefinition : AssetDefinition {
+
   }
 }

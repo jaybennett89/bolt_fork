@@ -5,7 +5,6 @@ using System.Text;
 
 namespace bolt.compiler {
   [ProtoContract]
-  public abstract class ParameterType {
-
+  public class EventDefinition : AssetDefinition {
   }
 }
