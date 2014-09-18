@@ -21,7 +21,7 @@ public static class BoltMenuItems {
     BoltEditorUtils.CreateAsset<BoltMecanimAsset>("BoltMecanim");
   }
 
-  [MenuItem("Assets/Compile Bolt Assets")]
+  [MenuItem("Assets/Bolt Engine/Compile Assets", priority = 0)]
   public static void RunCompiler() {
     try {
       BoltUserAssemblyCompiler.Run();
@@ -31,7 +31,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Edit/Install Bolt")]
+  [MenuItem("Assets/Bolt Engine/Install", priority = 1)]
   public static void Install() {
     int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");
     if (opt < 2) {
@@ -39,7 +39,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Window/Bolt Remotes")]
+  [MenuItem("Window/Bolt Engine/Remotes", priority = 22)]
   public static void OpenInfoPanel() {
     BoltConnectionsWindow window = EditorWindow.GetWindow<BoltConnectionsWindow>();
     window.title = "Bolt Remotes";
@@ -47,7 +47,7 @@ public static class BoltMenuItems {
     window.Show();
   }
 
-  [MenuItem("Window/Bolt Settings")]
+  [MenuItem("Window/Bolt Engine/Settings", priority = 21)]
   public static void OpenBoltSettings() {
     BoltSettingsWindow window = EditorWindow.GetWindow<BoltSettingsWindow>();
     window.title = "Bolt Settings";
@@ -55,7 +55,7 @@ public static class BoltMenuItems {
     window.Show();
   }
 
-  [MenuItem("Window/Bolt Scenes")]
+  [MenuItem("Window/Bolt Engine/Scenes", priority = 20)]
   public static void OpenBoltScenes() {
     BoltScenesWindow window = EditorWindow.GetWindow<BoltScenesWindow>();
     window.title = "Bolt Scenes";

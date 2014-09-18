@@ -42,7 +42,7 @@ public static class BoltAssetEditorGUI {
           : BoltRuntimeSettings.instance.highlightColor;
     }
     else {
-      GUI.color = 
+      GUI.color =
         uncompiledCount == 0
           ? Color.white
           : BoltRuntimeSettings.instance.highlightColor;
@@ -326,8 +326,8 @@ public static class BoltAssetEditorGUI {
   };
 
   public static void EditPropertySyncMode(BoltAssetProperty p) {
-    Label("Replicate When", () => 
-      p.syncMode = (BoltAssetSyncMode) EditorGUILayout.Popup((int)p.syncMode, whenOptions)
+    Label("Replicate When", () =>
+      p.syncMode = (BoltAssetSyncMode)EditorGUILayout.Popup((int)p.syncMode, whenOptions)
     );
   }
 
@@ -346,12 +346,12 @@ public static class BoltAssetEditorGUI {
       var hasController = (p.syncTarget & BoltAssetSyncTarget.Controller) == BoltAssetSyncTarget.Controller;
 
       if (hasProxy && hasController) { selected = 0; }
-      else if(hasProxy) { selected = 1; }
+      else if (hasProxy) { selected = 1; }
       else if (hasController) { selected = 2; }
       else { selected = 3; }
 
 
-      selected = EditorGUILayout.IntPopup(selected, targetOptions, targetOptions.Select((v,i) => i).ToArray());
+      selected = EditorGUILayout.IntPopup(selected, targetOptions, targetOptions.Select((v, i) => i).ToArray());
 
       switch (selected) {
         case 0: p.syncTarget = BoltAssetSyncTarget.Proxy | BoltAssetSyncTarget.Controller; break;
@@ -617,7 +617,7 @@ public static class BoltAssetEditorGUI {
     s.normal.background = EditorGUIUtility.whiteTexture;
     s.padding = new RectOffset(0, 0, 0, 2);
 
-    float c = 
+    float c =
       EditorGUIUtility.isProSkin
         ? (odd ? 0.25f : 0.3f)
         : (odd ? 0.45f : 0.4f);

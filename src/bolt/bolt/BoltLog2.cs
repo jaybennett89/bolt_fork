@@ -8,10 +8,10 @@ using UE = UnityEngine;
 
 public static class BoltLog {
   public interface IWriter : IDisposable {
-    void Info (string message);
-    void Debug (string message);
-    void Warn (string message);
-    void Error (string message);
+    void Info(string message);
+    void Debug(string message);
+    void Warn(string message);
+    void Error(string message);
   }
 
   public class File : IWriter {
@@ -21,7 +21,7 @@ public static class BoltLog {
     AutoResetEvent threadEvent;
     Queue<string> threadQueue;
 
-    public File () {
+    public File() {
       threadEvent = new AutoResetEvent(false);
       threadQueue = new Queue<string>(1024);
 
@@ -30,34 +30,34 @@ public static class BoltLog {
       thread.Start();
     }
 
-    void Queue (string message) {
+    void Queue(string message) {
       lock (threadQueue) {
         threadQueue.Enqueue(message);
         threadEvent.Set();
       }
     }
 
-    public void Info (string message) {
+    public void Info(string message) {
       Queue(message);
     }
 
-    public void Debug (string message) {
+    public void Debug(string message) {
       Queue(message);
     }
 
-    public void Warn (string message) {
+    public void Warn(string message) {
       Queue(message);
     }
 
-    public void Error (string message) {
+    public void Error(string message) {
       Queue(message);
     }
 
-    public void Dispose () {
+    public void Dispose() {
       running = false;
     }
 
-    void WriteLoop () {
+    void WriteLoop() {
       try {
         var n = DateTime.Now;
 
@@ -88,74 +88,75 @@ public static class BoltLog {
         stream.Dispose();
 
         threadEvent.Close();
-      } catch (Exception exn) {
+      }
+      catch (Exception exn) {
         BoltLog.Exception(exn);
       }
     }
   }
 
   public class Console : IWriter {
-    public void Info (string message) {
+    public void Info(string message) {
       BoltConsole.Write(message, UE.Color.white);
     }
 
-    public void Debug (string message) {
+    public void Debug(string message) {
       BoltConsole.Write(message, UE.Color.gray);
     }
 
-    public void Warn (string message) {
+    public void Warn(string message) {
       BoltConsole.Write(message, UE.Color.yellow);
     }
 
-    public void Error (string message) {
+    public void Error(string message) {
       BoltConsole.Write(message, UE.Color.red);
     }
 
-    public void Dispose () {
+    public void Dispose() {
 
     }
   }
 
   public class SystemOut : IWriter {
-    public void Info (string message) {
+    public void Info(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Debug (string message) {
+    public void Debug(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Warn (string message) {
+    public void Warn(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Error (string message) {
+    public void Error(string message) {
       SYS.Console.Error.WriteLine(message);
     }
 
-    public void Dispose () {
+    public void Dispose() {
 
     }
   }
 
   public class Unity : IWriter {
-    public void Info (string message) {
+    public void Info(string message) {
       UE.Debug.Log(message);
     }
 
-    public void Debug (string message) {
+    public void Debug(string message) {
       UE.Debug.Log(message);
     }
 
-    public void Warn (string message) {
+    public void Warn(string message) {
       UE.Debug.LogWarning(message);
     }
 
-    public void Error (string message) {
+    public void Error(string message) {
       UE.Debug.LogError(message);
     }
 
-    public void Dispose () {
+    public void Dispose() {
 
     }
   }
@@ -163,7 +164,7 @@ public static class BoltLog {
   static readonly object _lock = new object();
   static List<IWriter> _writers = new List<IWriter>();
 
-  public static void RemoveAll () {
+  public static void RemoveAll() {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Dispose();
@@ -173,7 +174,7 @@ public static class BoltLog {
     }
   }
 
-  public static bool Has<T> () where T : class, IWriter {
+  public static bool Has<T>() where T : class, IWriter {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         if (typeof(T).IsAssignableFrom(_writers[i].GetType())) {
@@ -185,13 +186,13 @@ public static class BoltLog {
     return false;
   }
 
-  public static void Add<T> (T instance) where T : class, IWriter {
+  public static void Add<T>(T instance) where T : class, IWriter {
     lock (_lock) {
       _writers.Add(instance);
     }
   }
 
-  public static void Remove<T> () where T : class, IWriter {
+  public static void Remove<T>() where T : class, IWriter {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         if (typeof(T).IsAssignableFrom(_writers[i].GetType())) {
@@ -208,7 +209,7 @@ public static class BoltLog {
     }
   }
 
-  public static void Info (string message) {
+  public static void Info(string message) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Info(message);
@@ -216,28 +217,28 @@ public static class BoltLog {
     }
   }
 
-  public static void Info (object message) {
+  public static void Info(object message) {
     Info(message.ToString());
   }
 
-  public static void Info (string message, object arg0) {
+  public static void Info(string message, object arg0) {
     Info(string.Format(message, arg0));
   }
 
-  public static void Info (string message, object arg0, object arg1) {
+  public static void Info(string message, object arg0, object arg1) {
     Info(string.Format(message, arg0, arg1));
   }
 
-  public static void Info (string message, object arg0, object arg1, object arg2) {
+  public static void Info(string message, object arg0, object arg1, object arg2) {
     Info(string.Format(message, arg0, arg1, arg2));
   }
 
-  public static void Info (string message, params object[] args) {
+  public static void Info(string message, params object[] args) {
     Info(string.Format(message, args));
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (string message) {
+  internal static void Debug(string message) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Debug(message);
@@ -246,31 +247,31 @@ public static class BoltLog {
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (object message) {
+  internal static void Debug(object message) {
     Debug(message.ToString());
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (string message, object arg0) {
+  internal static void Debug(string message, object arg0) {
     Debug(string.Format(message, arg0));
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (string message, object arg0, object arg1) {
+  internal static void Debug(string message, object arg0, object arg1) {
     Debug(string.Format(message, arg0, arg1));
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (string message, object arg0, object arg1, object arg2) {
+  internal static void Debug(string message, object arg0, object arg1, object arg2) {
     Debug(string.Format(message, arg0, arg1, arg2));
   }
 
   [Conditional("DEBUG")]
-  internal static void Debug (string message, params object[] args) {
+  internal static void Debug(string message, params object[] args) {
     Debug(string.Format(message, args));
   }
 
-  public static void Warn (string message) {
+  public static void Warn(string message) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Warn(message);
@@ -278,27 +279,27 @@ public static class BoltLog {
     }
   }
 
-  public static void Warn (object message) {
+  public static void Warn(object message) {
     Warn(message.ToString());
   }
 
-  public static void Warn (string message, object arg0) {
+  public static void Warn(string message, object arg0) {
     Warn(string.Format(message, arg0));
   }
 
-  public static void Warn (string message, object arg0, object arg1) {
+  public static void Warn(string message, object arg0, object arg1) {
     Warn(string.Format(message, arg0, arg1));
   }
 
-  public static void Warn (string message, object arg0, object arg1, object arg2) {
+  public static void Warn(string message, object arg0, object arg1, object arg2) {
     Warn(string.Format(message, arg0, arg1, arg2));
   }
 
-  public static void Warn (string message, params object[] args) {
+  public static void Warn(string message, params object[] args) {
     Warn(string.Format(message, args));
   }
 
-  public static void Error (string message) {
+  public static void Error(string message) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Error(message);
@@ -306,27 +307,27 @@ public static class BoltLog {
     }
   }
 
-  public static void Error (object message) {
+  public static void Error(object message) {
     Error(message.ToString());
   }
 
-  public static void Error (string message, object arg0) {
+  public static void Error(string message, object arg0) {
     Error(string.Format(message, arg0));
   }
 
-  public static void Error (string message, object arg0, object arg1) {
+  public static void Error(string message, object arg0, object arg1) {
     Error(string.Format(message, arg0, arg1));
   }
 
-  public static void Error (string message, object arg0, object arg1, object arg2) {
+  public static void Error(string message, object arg0, object arg1, object arg2) {
     Error(string.Format(message, arg0, arg1, arg2));
   }
 
-  public static void Error (string message, params object[] args) {
+  public static void Error(string message, params object[] args) {
     Error(string.Format(message, args));
   }
 
-  public static void Exception (Exception exception) {
+  public static void Exception(Exception exception) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Error(exception.GetType() + ": " + exception.Message);
