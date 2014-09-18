@@ -7,9 +7,6 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
   // camera target
   Transform _target;
 
-  // camera target state
-  // IPlayerState _targetState;
-
   // if we are aiming or not
   bool _aiming = false;
 
