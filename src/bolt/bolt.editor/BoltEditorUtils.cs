@@ -78,6 +78,10 @@ static class BoltEditorUtils {
       if (asset) {
         yield return asset;
       }
+      else {
+        asset = null;
+        EditorUtility.UnloadUnusedAssets();
+      }
     }
   }
 
