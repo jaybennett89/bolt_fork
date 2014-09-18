@@ -152,7 +152,7 @@ Target "UploadPackage" (fun _ ->
   postFile uploadURL uploadData
 )
 
-//"CreatePackage" 
-  //==> "UploadPackage"
+"CreatePackage" 
+  ==> "UploadPackage"
 
 Run "UploadPackage"
