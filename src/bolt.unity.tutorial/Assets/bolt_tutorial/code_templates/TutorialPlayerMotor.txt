@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Linq;
 using System.Collections;
 
-public class PlayerMotor : MonoBehaviour {
+public class TutorialPlayerMotor : MonoBehaviour {
 
   CharacterController _cc;
-  PlayerCommand.State _state;
+  TutorialPlayerCommand.State _state;
 
   [SerializeField]
   float skinWidth = 0.08f;
@@ -63,11 +63,11 @@ public class PlayerMotor : MonoBehaviour {
 
   void Awake() {
     _cc = GetComponent<CharacterController>();
-    _state = new PlayerCommand.State();
+    _state = new TutorialPlayerCommand.State();
     _state.position = transform.localPosition;
   }
 
-  public void SetState(PlayerCommand.State state) {
+  public void SetState(TutorialPlayerCommand.State state) {
     // assign new state
     _state = state;
 
@@ -75,7 +75,7 @@ public class PlayerMotor : MonoBehaviour {
     transform.localPosition = _state.position;
   }
 
-  public PlayerCommand.State Move(PlayerCommand.Input input) {
+  public TutorialPlayerCommand.State Move(TutorialPlayerCommand.Input input) {
     var moving = false;
     var movingDir = Vector3.zero;
 

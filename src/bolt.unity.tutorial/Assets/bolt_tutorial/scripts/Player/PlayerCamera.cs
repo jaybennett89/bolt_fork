@@ -52,6 +52,7 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
   public System.Func<BoltEntity, float> getPitch;
 
   void Awake() {
+    DontDestroyOnLoad(gameObject);
     _distance = runningDistance;
   }
 
@@ -118,7 +119,6 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
 
   public void SetTarget(BoltEntity entity) {
     _target = entity.transform;
-
     UpdateCamera(false);
   }
 
