@@ -92,6 +92,10 @@
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\PlatformMobile.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\bolt.compiler\bolt.compiler.csproj">
+      <Project>{1b45bcef-50bc-4277-b917-defb550c15fa}</Project>
+      <Name>bolt.compiler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\bolt\bolt.csproj">
       <Project>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</Project>
       <Name>bolt</Name>

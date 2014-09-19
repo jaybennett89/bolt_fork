@@ -27,6 +27,7 @@ namespace bolt.compiler {
       get {
         yield return typeof(EventDefinition);
         yield return typeof(StateDefinition);
+        yield return typeof(ObjectDefinition);
         yield return typeof(CommandDefinition);
       }
     }

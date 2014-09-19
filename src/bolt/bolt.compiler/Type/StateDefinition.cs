@@ -8,6 +8,7 @@ namespace bolt.compiler {
   public struct StateDefinitionCompilationData {
     public int ByteCount;
     public int ObjectCount;
+    public List<PropertyDefinition> Properties;
   }
 
   [ProtoContract]
@@ -15,51 +16,32 @@ namespace bolt.compiler {
     [ProtoMember(50)]
     public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
 
-    [ProtoMember(51)]
-    public bool SubState;
-
-    [ProtoMember(52)]
-    public Guid ParentAssetGuid;
-
     [ProtoMember(53)]
     public bool IsAbstract;
+
+    [ProtoMember(52)]
+    public Guid ParentGuid;
 
     [ProtoIgnore]
     public StateDefinitionCompilationData CompilationDataState;
 
-    public bool IsRoot {
-      get { return !SubState; }
+    public bool HasParent {
+      get { return ParentGuid != Guid.Empty; }
     }
 
-    public bool IsParent {
-      get { return ParentAssetGuid == Guid.Empty; }
-    }
-
-    public StateDefinition ParentState {
+    public IEnumerable<StateDefinition> AllParentStates {
       get {
-        if (IsParent) {
-          return null;
-        }
+        if (HasParent) {
+          var parent = Context.FindState(ParentGuid);
 
-        return Context.FindState(ParentAssetGuid);
-      }
-    }
-
-    public IEnumerable<StateDefinition> ChildStates {
-      get { return Context.States.Where(x => x.ParentAssetGuid == this.AssetGuid); }
-    }
-
-    public IEnumerable<PropertyDefinition> AllProperties {
-      get {
-        if (!IsParent) {
-          foreach (PropertyDefinition def in ParentState.AllProperties) {
+          foreach (StateDefinition def in parent.AllParentStates) {
             yield return def;
           }
+
+          yield return parent;
         }
 
-        foreach (PropertyDefinition def in Properties) {
-          yield return def;
-        }
+        yield break;
       }
     }
 

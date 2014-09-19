@@ -12,7 +12,8 @@ namespace bolt.compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(StateDefinition))]
   [ProtoInclude(200, typeof(EventDefinition))]
-  [ProtoInclude(300, typeof(CommandDefinition))]
+  [ProtoInclude(300, typeof(ObjectDefinition))]
+  [ProtoInclude(400, typeof(CommandDefinition))]
   public abstract class AssetDefinition {
     [ProtoIgnore]
     public bool Deleted;
@@ -30,7 +31,7 @@ namespace bolt.compiler {
     public string AssetPath;
 
     [ProtoMember(5)]
-    public string Comment;
+    public string ClassComment;
 
     [ProtoMember(6)]
     public bool Enabled;

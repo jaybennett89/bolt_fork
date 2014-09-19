@@ -6,7 +6,7 @@ using System.Text;
 namespace bolt.compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(PropertyTypeFloat))]
-  [ProtoInclude(200, typeof(PropertyTypeState))]
+  [ProtoInclude(200, typeof(PropertyTypeObject))]
   [ProtoInclude(300, typeof(PropertyTypeArray))]
   public abstract class PropertyType {
     [ProtoIgnore]
@@ -16,10 +16,13 @@ namespace bolt.compiler {
     public abstract int ByteSize { get; }
 
     [ProtoIgnore]
-    public abstract bool MecanimUsable { get; }
+    public abstract IEnumerable<Type> AssetTypes { get; }
 
     [ProtoIgnore]
-    public abstract IEnumerable<Type> AssetTypes { get; }
+    public virtual bool MecanimUsable { get { return false; } }
+
+    [ProtoIgnore]
+    public virtual bool IsValue { get { return true; } }
 
     public virtual void CalculateObjectCount(StateDefinition state) {
 

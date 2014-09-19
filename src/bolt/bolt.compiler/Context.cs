@@ -13,6 +13,7 @@ namespace bolt.compiler {
   public class Context {
     List<EventDefinition> events = new List<EventDefinition>();
     List<StateDefinition> states = new List<StateDefinition>();
+    List<ObjectDefinition> objects = new List<ObjectDefinition>();
     List<CommandDefinition> commands = new List<CommandDefinition>();
 
     public ContextCompilationData CompilationData;
@@ -25,14 +26,19 @@ namespace bolt.compiler {
       get { return states; }
     }
 
+    public IEnumerable<ObjectDefinition> Objects {
+      get { return objects; }
+    }
+
     public IEnumerable<CommandDefinition> Commands {
       get { return commands; }
     }
 
     public IEnumerable<AssetDefinition> Assets {
       get {
-        foreach (var a in events) { yield return a; }
         foreach (var a in states) { yield return a; }
+        foreach (var a in events) { yield return a; }
+        foreach (var a in objects) { yield return a; }
         foreach (var a in commands) { yield return a; }
       }
     }
@@ -54,6 +60,10 @@ namespace bolt.compiler {
         states.Add((StateDefinition)asset);
       }
 
+      if (asset is ObjectDefinition) {
+        objects.Add((ObjectDefinition)asset);
+      }
+
       if (asset is CommandDefinition) {
         commands.Add((CommandDefinition)asset);
       }
@@ -61,6 +71,10 @@ namespace bolt.compiler {
 
     public StateDefinition FindState(Guid guid) {
       return states.First(x => x.AssetGuid == guid);
+    }
+
+    public ObjectDefinition FindObject(Guid guid) {
+      return objects.First(x => x.AssetGuid == guid);
     }
 
     public EventDefinition FindEvent(Guid guid) {

@@ -16,24 +16,27 @@ namespace bolt.compiler {
     public IEnumerable<Type> AllowedElementTypes {
       get {
         yield return typeof(PropertyTypeFloat);
-        yield return typeof(PropertyTypeState);
+        yield return typeof(PropertyTypeObject);
       }
+    }
+
+    public override bool IsValue {
+      get { return false; }
     }
 
     public override int ByteSize {
       get { throw new NotImplementedException(); }
     }
 
-    public override bool MecanimUsable {
-      get { return false; }
-    }
-
     public override IEnumerable<Type> AssetTypes {
-      get { yield return typeof(StateDefinition); }
+      get {
+        yield return typeof(StateDefinition);
+        yield return typeof(ObjectDefinition);
+      }
     }
 
     public override void CalculateObjectCount(StateDefinition state) {
-      if (ElementType is PropertyTypeState) {
+      if (ElementType is PropertyTypeObject) {
         state.CompilationDataState.ObjectCount += ElementCount;
       }
     }
