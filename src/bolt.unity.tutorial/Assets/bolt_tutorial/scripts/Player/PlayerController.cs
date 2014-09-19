@@ -160,8 +160,11 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
       // this gets replicated to all proxies
       state.mecanim.Fire();
 
+
       // if we are the owner and the active weapon is a hitscan weapon, do logic
-      
+      if (entity.isOwner) {
+        activeWeapon.OnOwner(cmd, entity);
+      }
     }
   }
 }
