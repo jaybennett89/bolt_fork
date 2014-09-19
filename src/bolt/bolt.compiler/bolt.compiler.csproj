@@ -42,8 +42,10 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Compression\IntCompression.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Dom.cs" />
+    <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
@@ -53,6 +55,8 @@
     <Compile Include="Property\Type\PropertyTypeFloat.cs" />
     <Compile Include="Property\Type\PropertyType.cs" />
     <Compile Include="Property\Type\PropertyTypeObject.cs" />
+    <Compile Include="Property\Type\PropertyTypeString.cs" />
+    <Compile Include="Property\Type\PropertyTypeVector.cs" />
     <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />
     <Compile Include="Type\EventDefinition.cs" />

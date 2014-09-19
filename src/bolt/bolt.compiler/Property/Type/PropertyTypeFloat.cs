@@ -6,14 +6,8 @@ using System.Text;
 namespace bolt.compiler {
   [ProtoContract]
   public class PropertyTypeFloat : PropertyType {
-    [ProtoMember(50)]
-    public int MinValue;
-
-    [ProtoMember(51)]
-    public int MaxValue;
-
-    [ProtoMember(52)]
-    public int Bits;
+    [ProtoMember(1)]
+    public FloatCompression Compression;
 
     public override int ByteSize {
       get { return 4; }
@@ -21,15 +15,6 @@ namespace bolt.compiler {
 
     public override bool MecanimUsable {
       get { return true; }
-    }
-
-    public override IEnumerable<Type> AssetTypes {
-      get {
-        yield return typeof(EventDefinition);
-        yield return typeof(StateDefinition);
-        yield return typeof(ObjectDefinition);
-        yield return typeof(CommandDefinition);
-      }
     }
   }
 }
