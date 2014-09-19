@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>bolt.compiler</RootNamespace>
     <AssemblyName>bolt.compiler</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -41,15 +41,24 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="Dom.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionStateAssetSettings.cs" />
-    <Compile Include="Property\PropertyType.cs" />
+    <Compile Include="Property\PropertyEnums.cs" />
+    <Compile Include="Property\Type\PropertyTypeArray.cs" />
+    <Compile Include="Property\Type\PropertyTypeFloat.cs" />
+    <Compile Include="Property\Type\PropertyType.cs" />
+    <Compile Include="Property\Type\PropertyTypeState.cs" />
+    <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />
     <Compile Include="Type\EventDefinition.cs" />
     <Compile Include="Type\StateDefinition.cs" />
     <Compile Include="Type\AssetDefinition.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
