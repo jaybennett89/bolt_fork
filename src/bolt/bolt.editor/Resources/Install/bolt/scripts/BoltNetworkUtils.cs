@@ -11,6 +11,8 @@ public static class BoltNetworkUtils {
   public static UdpPlatform CreateUdpPlatform () {
 #if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
     return new UdpPlatformMobile();
+#elif UNITY_PS4 && !UNITY_EDITOR
+    return new UdpPlatformManaged();
 #else
     return new UdpPlatformManaged();
 #endif
@@ -25,6 +27,8 @@ public static class BoltNetworkUtils {
       return UdpPlatformMobile.FindBroadcastAddress_IOS();
 #elif UNITY_WP8 && !UNITY_EDITOR
       return new UdpIPv4Address(255, 255, 255, 255);
+#elif UNITY_PS4 && !UNITY_EDITOR
+      return UdpPlatformManaged.FindBroadcastAddress();
 #else
       return UdpPlatformManaged.FindBroadcastAddress();
 #endif
