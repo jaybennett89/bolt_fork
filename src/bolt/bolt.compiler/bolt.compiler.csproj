@@ -40,13 +40,15 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Parameters\Definition\ParameterDefinition.cs" />
-    <Compile Include="Parameters\Definition\ParameterDefinitionTypeSettings.cs" />
-    <Compile Include="Parameters\ParameterType.cs" />
-    <Compile Include="Types\CommandDefinition.cs" />
-    <Compile Include="Types\EventDefinition.cs" />
-    <Compile Include="Types\StateDefinition.cs" />
-    <Compile Include="Types\TypeDefinition.cs" />
+    <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Property\Definition\PropertyDefinition.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionStateAssetSettings.cs" />
+    <Compile Include="Property\PropertyType.cs" />
+    <Compile Include="Type\CommandDefinition.cs" />
+    <Compile Include="Type\EventDefinition.cs" />
+    <Compile Include="Type\StateDefinition.cs" />
+    <Compile Include="Type\AssetDefinition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
