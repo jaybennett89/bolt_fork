@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>bolt.compiler</RootNamespace>
     <AssemblyName>bolt.compiler</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,19 +35,36 @@
       <HintPath>..\..\assemblies\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Parameters\Definition\ParameterDefinition.cs" />
-    <Compile Include="Parameters\Definition\ParameterDefinitionTypeSettings.cs" />
-    <Compile Include="Parameters\ParameterType.cs" />
-    <Compile Include="Types\CommandDefinition.cs" />
-    <Compile Include="Types\EventDefinition.cs" />
-    <Compile Include="Types\StateDefinition.cs" />
-    <Compile Include="Types\TypeDefinition.cs" />
+    <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="Compression\IntCompression.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="Dom.cs" />
+    <Compile Include="Compression\FloatCompression.cs" />
+    <Compile Include="Property\Definition\PropertyDefinition.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyDefinitionStateAssetSettings.cs" />
+    <Compile Include="Property\PropertyEnums.cs" />
+    <Compile Include="Property\Type\PropertyTypeArray.cs" />
+    <Compile Include="Property\Type\PropertyTypeFloat.cs" />
+    <Compile Include="Property\Type\PropertyType.cs" />
+    <Compile Include="Property\Type\PropertyTypeObject.cs" />
+    <Compile Include="Property\Type\PropertyTypeString.cs" />
+    <Compile Include="Property\Type\PropertyTypeVector.cs" />
+    <Compile Include="Type\AssetEnums.cs" />
+    <Compile Include="Type\CommandDefinition.cs" />
+    <Compile Include="Type\EventDefinition.cs" />
+    <Compile Include="Type\ObjectDefinition.cs" />
+    <Compile Include="Type\StateDefinition.cs" />
+    <Compile Include="Type\AssetDefinition.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
