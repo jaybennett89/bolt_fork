@@ -18,7 +18,7 @@ public class BoltInit : MonoBehaviour {
   string map;
   string serverAddress = "127.0.0.1";
 
-  int serverPort = 40000;
+  int serverPort = 25000;
 
   void Awake() {
     serverPort = BoltRuntimeSettings.instance.debugStartPort;
