@@ -36,6 +36,12 @@ namespace bolt.compiler {
       foreach (StateDefinition a in Context.States) {
         a.CompilationDataAsset = new AssetDefinitionCompilationData();
         a.CompilationDataState = new StateDefinitionCompilationData();
+        a.CompilationDataState.State = a;
+      }
+
+      foreach (ObjectDefinition a in Context.Objects) {
+        a.CompilationDataAsset = new AssetDefinitionCompilationData();
+        a.CompilationDataObject = new ObjectDefinitionCompilationData();
       }
 
       foreach (EventDefinition a in Context.Events) {
@@ -58,8 +64,11 @@ namespace bolt.compiler {
     }
 
     void CompileStates() {
+      // flatten properties into each state
       FlattenPropertyLists();
-      AssignBitIndexes();
+
+      // step through properties and assign index numbers and bits
+      AssignIndexesAndBits();
     }
 
     void FlattenPropertyLists() {
@@ -91,13 +100,13 @@ namespace bolt.compiler {
       }
     }
 
-    void AssignBitIndexes() {
+    void AssignIndexesAndBits() {
       foreach (StateDefinition s in Context.States) {
         int bit = 0;
 
         for (int i = 0; i < s.CompilationDataState.Properties.Count; ++i) {
           PropertyDefinition p;
-          
+
           p = s.CompilationDataState.Properties[i];
           p.CompilationData.Index = i;
 

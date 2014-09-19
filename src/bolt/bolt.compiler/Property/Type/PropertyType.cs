@@ -9,6 +9,8 @@ namespace bolt.compiler {
   [ProtoInclude(200, typeof(PropertyTypeObject))]
   [ProtoInclude(300, typeof(PropertyTypeArray))]
   [ProtoInclude(400, typeof(PropertyTypeVector))]
+  [ProtoInclude(500, typeof(PropertyTypeString))]
+  [ProtoInclude(600, typeof(PropertyTypeTrigger))]
   public abstract class PropertyType {
     [ProtoIgnore]
     public Context Context;

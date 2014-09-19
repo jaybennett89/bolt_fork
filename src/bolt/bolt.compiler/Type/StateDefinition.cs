@@ -6,9 +6,20 @@ using System.Linq;
 
 namespace bolt.compiler {
   public struct StateDefinitionCompilationData {
-    public int ByteCount;
-    public int ObjectCount;
+    public StateDefinition State;
     public List<PropertyDefinition> Properties;
+
+    public int ByteCount {
+      get {
+
+      }
+    }
+
+    public int ObjectCount {
+      get {
+
+      }
+    }
   }
 
   [ProtoContract]
