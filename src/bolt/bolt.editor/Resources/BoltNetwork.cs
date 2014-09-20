@@ -164,6 +164,22 @@ public static partial class BoltNetwork {
     return BoltCore.GenerateUniqueId();
   }
 
+  public static BoltPhysicsHits RaycastAll(Ray ray) {
+    return BoltPhysics.Raycast(ray);
+  }
+
+  public static BoltPhysicsHits RaycastAll(Ray ray, int frame) {
+    return BoltPhysics.Raycast(ray, frame);
+  }
+
+  public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius) {
+    return BoltPhysics.OverlapSphere(origin, radius);
+  }
+
+  public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius, int frame) {
+    return BoltPhysics.OverlapSphere(origin, radius, frame);
+  }
+
   public static Func<int, Transform> resolveTransform {
     get { return BoltCore.resolveTransform; }
     set { BoltCore.resolveTransform = value; }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Contains functions for raycasting against BoltHitboxBody objects
@@ -46,6 +47,7 @@ public static class BoltPhysics {
   /// <summary>
   /// Cast a ray against the last frame
   /// </summary>
+  [Obsolete("Use BoltNetwork.RaycastAll")]
   public static BoltPhysicsHits Raycast(Ray ray) {
     if (_worldSnapshots.count > 0) {
       return Raycast(ray, _worldSnapshots.last);
@@ -57,6 +59,7 @@ public static class BoltPhysics {
   /// <summary>
   /// Cast a ray against a specific frame number
   /// </summary>
+  [Obsolete("Use BoltNetwork.RaycastAll")]
   public static BoltPhysicsHits Raycast(Ray ray, int frame) {
     var it = _worldSnapshots.GetIterator();
 
@@ -76,6 +79,7 @@ public static class BoltPhysics {
   /// <summary>
   /// Overlap a sphere against the last frame
   /// </summary>
+  [Obsolete("Use BoltNetwork.OverlapSphereAll")]
   public static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius) {
     if (_worldSnapshots.count > 0) {
       return OverlapSphere(origin, radius, _worldSnapshots.last);
@@ -87,6 +91,7 @@ public static class BoltPhysics {
   /// <summary>
   /// Overlap a sphere gainst a specific frame
   /// </summary>
+  [Obsolete("Use BoltNetwork.OverlapSphereAll")]
   public static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius, int frame) {
     var it = _worldSnapshots.GetIterator();
 
