@@ -1914,7 +1914,7 @@ MonoBehaviour:
   _serializer: {fileID: 0}
   _persistanceMode: 0
   _updateRate: 1
-  _sceneObject: 1
+  _sceneObject: 0
   _clientPredicted: 1
   _allowInstantiateOnClient: 0
 --- !u!114 &11400002
