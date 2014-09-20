@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 public class PlayerIK : BoltEntityBehaviour<IPlayerState> {
-
   // weight blending
   float weight = 0f;
   float weightto = 0f;

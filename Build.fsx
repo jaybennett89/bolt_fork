@@ -33,13 +33,13 @@ let buildDirUdpKit = "./build/udpkit"
 let rootDir = currentDirectory
 
 let unityDir =
-  if (hasBuildParam "unityProjectPath")
-    then environVar "unityProjectPath"
+  if (hasBuildParam "project")
+    then environVar "project"
     else "./src/bolt.unity"
 
 let unityPath = 
-  if hasBuildParam "unityEditorPath" then 
-    environVar "unityEditorPath"
+  if hasBuildParam "unity" then 
+    environVar "unity"
 
   elif not isMacOS then 
     @"C:\Program Files (x86)\Unity"
