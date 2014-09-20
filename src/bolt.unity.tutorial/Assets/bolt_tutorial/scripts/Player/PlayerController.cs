@@ -11,7 +11,7 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   WeaponBase[] _weapons;
 
   [SerializeField]
-  AudioSource _sfxSource;
+  AudioSource _weaponSfxSource;
 
   public WeaponBase activeWeapon {
     get { return _weapons[state.weapon]; }
@@ -65,7 +65,7 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
 
   void OnFire() {
     // play sfx
-    _sfxSource.PlayOneShot(activeWeapon.fireSound);
+    _weaponSfxSource.PlayOneShot(activeWeapon.fireSound);
 
     GameUI.instance.crosshair.Spread += 0.1f;
 
@@ -159,7 +159,6 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
     if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
       // this gets replicated to all proxies
       state.mecanim.Fire();
-
 
       // if we are the owner and the active weapon is a hitscan weapon, do logic
       if (entity.isOwner) {

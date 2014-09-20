@@ -4,10 +4,6 @@ using UnityEngine;
 
 partial class BoltCallbacksBase {
    
-  public virtual void Connected(BoltConnection arg) { }
-   
-  public virtual void Disconnected(BoltConnection arg) { }
-   
   public virtual void ConnectFailed(UdpEndPoint arg) { }
    
   public virtual void ConnectRefused(UdpEndPoint arg) { }
@@ -29,18 +25,6 @@ partial class BoltCallbacksBase {
   public virtual void ControlOfEntityLost(BoltEntity arg) { }
    
 
-   
-  internal static void ConnectedInvoke(BoltConnection arg) { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.Connected(arg);
-    }
-  }
-   
-  internal static void DisconnectedInvoke(BoltConnection arg) { 
-    foreach (BoltCallbacksBase cb in callbacks) {
-      cb.Disconnected(arg);
-    }
-  }
    
   internal static void ConnectFailedInvoke(UdpEndPoint arg) { 
     foreach (BoltCallbacksBase cb in callbacks) {
@@ -133,6 +117,28 @@ partial class BoltCallbacksBase {
     BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
         cb.SceneLoadRemoteDone(connection, map);
+    }
+  }
+
+  
+  public virtual void Connected(BoltConnection connection) { 
+  }
+
+  internal static void ConnectedInvoke(BoltConnection connection) { 
+    BoltLog.Debug("Invoking callback Connected");
+    foreach (BoltCallbacksBase cb in callbacks) {
+        cb.Connected(connection);
+    }
+  }
+
+  
+  public virtual void Disconnected(BoltConnection connection) { 
+  }
+
+  internal static void DisconnectedInvoke(BoltConnection connection) { 
+    BoltLog.Debug("Invoking callback Disconnected");
+    foreach (BoltCallbacksBase cb in callbacks) {
+        cb.Disconnected(connection);
     }
   }
 

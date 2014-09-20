@@ -1960,8 +1960,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f26ff2b0d1464844bb72329af44af5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _weapons: []
-  _sfxSource: {fileID: 0}
+  _weapons:
+  - {fileID: 11400016}
+  - {fileID: 11400022}
+  _weaponSfxSource: {fileID: 8200002}
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1

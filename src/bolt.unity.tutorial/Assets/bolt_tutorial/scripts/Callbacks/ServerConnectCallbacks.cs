@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Text;
 
-//[BoltGlobalBehaviour(BoltNetworkModes.Server)]
+[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
 public class ServerConnectCallbacks : BoltCallbacks {
   public override void Connected(BoltConnection c) {
     c.userToken = new Player();

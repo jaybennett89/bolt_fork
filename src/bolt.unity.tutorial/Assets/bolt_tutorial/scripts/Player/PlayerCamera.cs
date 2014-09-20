@@ -44,9 +44,9 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
     get { return cam.camera; }
   }
 
-  public System.Func<BoltEntity, int> getHealth;
-  public System.Func<BoltEntity, bool> getAiming;
-  public System.Func<BoltEntity, float> getPitch;
+  public System.Func<int> getHealth;
+  public System.Func<bool> getAiming;
+  public System.Func<float> getPitch;
 
   void Awake() {
     DontDestroyOnLoad(gameObject);
@@ -61,9 +61,9 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
     if (_target) {
       GrayscaleEffect ge = GetComponentInChildren<GrayscaleEffect>();
 
-      var h = getHealth != null ? getHealth(_target.GetBoltEntity()) : 100;
-      var a = getAiming != null ? getAiming(_target.GetBoltEntity()) : false;
-      var p = getPitch != null ? getPitch(_target.GetBoltEntity()) : 0f;
+      var h = getHealth != null ? getHealth() : 100;
+      var a = getAiming != null ? getAiming() : false;
+      var p = getPitch != null ? getPitch() : 0f;
 
       if (h >= 85) {
         ge.ramp = 0f;

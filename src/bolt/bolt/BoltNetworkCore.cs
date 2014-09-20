@@ -208,7 +208,19 @@ internal static class BoltCore {
   }
 
   public static void Destroy(BoltEntity entity) {
+    if (entity.isOwner) {
+      BoltLog.Warn("Only the owner can destroy an entity, ignoring call to Destroy().");
+      return;
+    }
+
+    DestroyForce(entity);
+  }
+
+  internal static void DestroyForce(BoltEntity entity) {
+    // detach it
     entity.Detach();
+
+    // destroy it
     _destroy(entity.gameObject);
   }
 
@@ -285,12 +297,12 @@ internal static class BoltCore {
 
   internal static void LoadMapInternal(Scene map) {
     foreach (BoltEntity entity in entities) {
-      // destroy entities which we are in control of and which are not labelled as proxies
-      if (entity._flags & BoltEntity.FLAG_IS_PROXY) { continue; }
-      if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
+      if (entity.isOwner) {
+        if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
 
-      // pop!
-      Destroy(entity);
+        // pop!
+        DestroyForce(entity);
+      }
     }
 
     if (_mapLoadState.scene != map) {
@@ -317,7 +329,7 @@ internal static class BoltCore {
         }
 
         foreach (BoltEntity entity in entities.ToArray()) {
-          Destroy(entity);
+          DestroyForce(entity);
         }
 
         _proxies.Clear();
@@ -948,7 +960,7 @@ internal static class BoltCore {
 
       while (it.Next()) {
         if (it.val.isOwner && (it.val._persistanceMode == BoltEntityPersistanceMode.DestroyOnLoad)) {
-          Destroy(it.val);
+          DestroyForce(it.val);
         }
       }
     }
@@ -961,11 +973,11 @@ internal static class BoltCore {
       }
     }
 
+    // update behaviours
+    UpdateActiveGlobalBehaviours(map.name);
+
     // call out to user code
     BoltCallbacksBase.SceneLoadLocalBeginInvoke(map.name);
-
-    // destroy old behaviours
-    UpdateActiveGlobalBehaviours(null);
   }
 
   internal static void LoadMapDoneInternal(Scene map) {
@@ -983,9 +995,6 @@ internal static class BoltCore {
     while (it.Next()) {
       it.val.SendMapLoadDoneToRemote();
     }
-
-    // update active behaviours
-    UpdateActiveGlobalBehaviours(map.name);
 
     // call out to sure code
     BoltCallbacksBase.SceneLoadLocalDoneInvoke(map.name);
