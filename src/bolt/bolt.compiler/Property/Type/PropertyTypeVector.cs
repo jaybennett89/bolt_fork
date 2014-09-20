@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public enum VectorComponents {
-    X = 0, 
-    Y = 1, 
-    Z = 2, 
+    X = 0,
+    Y = 1,
+    Z = 2,
     W = 3
   }
 
@@ -37,6 +37,32 @@ namespace bolt.compiler {
 
     public override int ByteSize {
       get { return 16; }
+    }
+
+    public Axis this[VectorComponents component] {
+      get {
+        foreach (Axis axis in Axes) {
+          if (axis.Component == component) {
+            return axis;
+          }
+        }
+
+        throw new ArgumentOutOfRangeException();
+      }
+    }
+
+    public override string UserType {
+      get {
+        if (this[VectorComponents.W].Enabled) {
+          return "UE.Vector4";
+        }
+
+        if (this[VectorComponents.Z].Enabled) {
+          return "UE.Vector3";
+        }
+
+        return "UE.Vector2";
+      }
     }
   }
 }

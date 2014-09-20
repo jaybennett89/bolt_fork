@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public class IntCompression {
     [ProtoMember(1)]

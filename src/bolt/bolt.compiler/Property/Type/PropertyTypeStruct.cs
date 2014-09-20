@@ -4,29 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyTypeObject : PropertyType {
+  public class PropertyTypeStruct : PropertyType {
     [ProtoMember(50)]
     public Guid ObjectId;
 
-    public ObjectDefinition Object {
-      get { return Context.FindObject(ObjectId); }
+    public StructDefinition Struct {
+      get { return Context.FindStruct(ObjectId); }
     }
 
     public override int ByteSize {
       get { throw new NotImplementedException(); }
     }
 
+    public override bool IsValue {
+      get { return false; }
+    }
+
     public override IEnumerable<Type> AssetTypes {
       get {
         yield return typeof(StateDefinition);
-        yield return typeof(ObjectDefinition); 
+        yield return typeof(StructDefinition); 
       }
-    }
-
-    public override void CalculateObjectCount(StateDefinition state) {
-      state.CompilationDataState.ObjectCount += 1;
     }
   }
 }

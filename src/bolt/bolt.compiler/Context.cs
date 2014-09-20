@@ -4,7 +4,7 @@ using System.Text;
 using System.Linq;
 using System.CodeDom;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   public struct ContextCompilationData {
     public CodeNamespace Namespace;
     public CodeCompileUnit CompileUnit;
@@ -13,7 +13,7 @@ namespace bolt.compiler {
   public class Context {
     List<EventDefinition> events = new List<EventDefinition>();
     List<StateDefinition> states = new List<StateDefinition>();
-    List<ObjectDefinition> objects = new List<ObjectDefinition>();
+    List<StructDefinition> structs = new List<StructDefinition>();
     List<CommandDefinition> commands = new List<CommandDefinition>();
 
     public ContextCompilationData CompilationData;
@@ -26,8 +26,8 @@ namespace bolt.compiler {
       get { return states; }
     }
 
-    public IEnumerable<ObjectDefinition> Objects {
-      get { return objects; }
+    public IEnumerable<StructDefinition> Structs {
+      get { return structs; }
     }
 
     public IEnumerable<CommandDefinition> Commands {
@@ -38,19 +38,13 @@ namespace bolt.compiler {
       get {
         foreach (var a in states) { yield return a; }
         foreach (var a in events) { yield return a; }
-        foreach (var a in objects) { yield return a; }
+        foreach (var a in structs) { yield return a; }
         foreach (var a in commands) { yield return a; }
       }
     }
 
     public void Add(AssetDefinition asset) {
       asset.Context = this;
-
-      // assign context to all properties also
-      foreach (PropertyDefinition property in asset.DefinedProperties) {
-        property.Context = this;
-        property.PropertyType.Context = this;
-      }
 
       if (asset is EventDefinition) {
         events.Add((EventDefinition)asset);
@@ -60,8 +54,8 @@ namespace bolt.compiler {
         states.Add((StateDefinition)asset);
       }
 
-      if (asset is ObjectDefinition) {
-        objects.Add((ObjectDefinition)asset);
+      if (asset is StructDefinition) {
+        structs.Add((StructDefinition)asset);
       }
 
       if (asset is CommandDefinition) {
@@ -70,27 +64,26 @@ namespace bolt.compiler {
     }
 
     public StateDefinition FindState(Guid guid) {
-      return states.First(x => x.AssetGuid == guid);
+      return states.First(x => x.Guid == guid);
     }
 
-    public ObjectDefinition FindObject(Guid guid) {
-      return objects.First(x => x.AssetGuid == guid);
+    public StructDefinition FindStruct(Guid guid) {
+      return structs.First(x => x.Guid == guid);
     }
 
     public EventDefinition FindEvent(Guid guid) {
-      return events.First(x => x.AssetGuid == guid);
+      return events.First(x => x.Guid == guid);
     }
 
     public CommandDefinition FindCommand(Guid guid) {
-      return commands.First(x => x.AssetGuid == guid);
+      return commands.First(x => x.Guid == guid);
     }
 
     public void GenerateCode(string file) {
       CodeGenerator cg;
 
-      cg = new CodeGenerator(file);
-      cg.Context = this;
-      cg.Run();
+      cg = new CodeGenerator();
+      cg.Run(this, file);
     }
   }
 }

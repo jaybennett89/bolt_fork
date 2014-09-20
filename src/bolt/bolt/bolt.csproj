@@ -7,7 +7,7 @@
     <ProjectGuid>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>bolt</RootNamespace>
+    <RootNamespace>Bolt</RootNamespace>
     <AssemblyName>bolt</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -109,7 +109,8 @@
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
     <Compile Include="MapLoadState.cs" />
     <Compile Include="state2\Blit.cs" />
-    <Compile Include="state2\Frame.cs" />
+    <Compile Include="state2\StateFrame.cs" />
+    <Compile Include="state2\State.cs" />
     <Compile Include="state2\Slice.cs" />
     <Compile Include="state\BoltStateFactory.cs" />
     <Compile Include="state\Transform\BoltStateTransform.cs" />

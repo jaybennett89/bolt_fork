@@ -3,11 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public enum EventTypes {
     Global = 0,
     Entity = 1
+  }
+
+  [ProtoContract]
+  public enum ReliableModes {
+    Reliable = 0,
+    Unreliable = 1
   }
 
   [ProtoContract]

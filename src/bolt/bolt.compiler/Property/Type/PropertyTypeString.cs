@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public enum StringEncodings {
     ASCII = 0,
@@ -30,8 +30,16 @@ namespace bolt.compiler {
       }
     }
 
+    public override PropertyCodeEmitter CreateCodeEmitter() {
+      return new PropertyCodeEmitterString();
+    }
+
     public override int ByteSize {
       get { return 2 + EncodingClass.GetMaxByteCount(MaxLength); }
+    }
+
+    public override string UserType {
+      get { return typeof(string).FullName; }
     }
   }
 }

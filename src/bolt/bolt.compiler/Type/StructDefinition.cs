@@ -6,9 +6,8 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyTypeTrigger : PropertyType {
-    public override int ByteSize {
-      get { return 4; }
-    }
+  public class StructDefinition : AssetDefinition {
+    [ProtoMember(50)]
+    public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
   }
 }

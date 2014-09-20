@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeArray : PropertyType {
     [ProtoMember(50)]
@@ -16,7 +16,7 @@ namespace bolt.compiler {
     public IEnumerable<Type> AllowedElementTypes {
       get {
         yield return typeof(PropertyTypeFloat);
-        yield return typeof(PropertyTypeObject);
+        yield return typeof(PropertyTypeStruct);
       }
     }
 
@@ -31,13 +31,7 @@ namespace bolt.compiler {
     public override IEnumerable<Type> AssetTypes {
       get {
         yield return typeof(StateDefinition);
-        yield return typeof(ObjectDefinition);
-      }
-    }
-
-    public override void CalculateObjectCount(StateDefinition state) {
-      if (ElementType is PropertyTypeObject) {
-        state.CompilationDataState.ObjectCount += ElementCount;
+        yield return typeof(StructDefinition);
       }
     }
   }

@@ -7,7 +7,7 @@
     <ProjectGuid>{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>bolt.editor</RootNamespace>
+    <RootNamespace>Bolt.editor</RootNamespace>
     <AssemblyName>bolt.editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

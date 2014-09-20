@@ -3,11 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
-  public struct EventDefinitionCompilationData {
-
-  }
-
+namespace Bolt.Compiler {
   [ProtoContract]
   public class EventDefinition : AssetDefinition {
     [ProtoMember(50)]
@@ -15,6 +11,9 @@ namespace bolt.compiler {
 
     [ProtoMember(51)]
     public EventTypes EventType;
+
+    [ProtoMember(56)]
+    public ReliableModes DeliveryMode;
 
     [ProtoMember(52)]
     public ReplicationTargets EntityTargets;
@@ -27,12 +26,5 @@ namespace bolt.compiler {
 
     [ProtoMember(55)]
     public GlobalReplicationSenders GlobalSenders;
-
-    [ProtoIgnore]
-    public EventDefinitionCompilationData CompilationDataEvent;
-
-    public override IEnumerable<PropertyDefinition> DefinedProperties {
-      get { return Properties; }
-    }
   }
 }

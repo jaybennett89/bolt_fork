@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(PropertyTypeFloat))]
-  [ProtoInclude(200, typeof(PropertyTypeObject))]
+  [ProtoInclude(200, typeof(PropertyTypeStruct))]
   [ProtoInclude(300, typeof(PropertyTypeArray))]
   [ProtoInclude(400, typeof(PropertyTypeVector))]
   [ProtoInclude(500, typeof(PropertyTypeString))]
@@ -25,17 +25,20 @@ namespace bolt.compiler {
     public virtual bool IsValue { get { return true; } }
 
     [ProtoIgnore]
+    public virtual string UserType { get { return null; } }
+
+    [ProtoIgnore]
     public virtual IEnumerable<Type> AssetTypes {
       get {
         yield return typeof(EventDefinition);
         yield return typeof(StateDefinition);
-        yield return typeof(ObjectDefinition);
+        yield return typeof(StructDefinition);
         yield return typeof(CommandDefinition);
       }
     }
 
-    public virtual void CalculateObjectCount(StateDefinition state) {
-
+    public virtual PropertyCodeEmitter CreateCodeEmitter() {
+      throw new NotImplementedException();
     }
   }
 }

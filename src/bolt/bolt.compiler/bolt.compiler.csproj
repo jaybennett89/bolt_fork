@@ -7,7 +7,7 @@
     <ProjectGuid>{1B45BCEF-50BC-4277-B917-DEFB550C15FA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>bolt.compiler</RootNamespace>
+    <RootNamespace>Bolt.Compiler</RootNamespace>
     <AssemblyName>bolt.compiler</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,9 +42,20 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
+    <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
+    <Compile Include="CodeGenerator\Decorators\PropertyDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\StateDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\AssetDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\StructDecorator.cs" />
+    <Compile Include="CodeGenerator\Dom.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\StateCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\AssetCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterFloat.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterString.cs" />
     <Compile Include="Compression\IntCompression.cs" />
     <Compile Include="Context.cs" />
-    <Compile Include="Dom.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
@@ -54,13 +65,14 @@
     <Compile Include="Property\Type\PropertyTypeArray.cs" />
     <Compile Include="Property\Type\PropertyTypeFloat.cs" />
     <Compile Include="Property\Type\PropertyType.cs" />
-    <Compile Include="Property\Type\PropertyTypeObject.cs" />
+    <Compile Include="Property\Type\PropertyTypeStruct.cs" />
     <Compile Include="Property\Type\PropertyTypeString.cs" />
+    <Compile Include="Property\Type\PropertyTypeTrigger.cs" />
     <Compile Include="Property\Type\PropertyTypeVector.cs" />
     <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />
     <Compile Include="Type\EventDefinition.cs" />
-    <Compile Include="Type\ObjectDefinition.cs" />
+    <Compile Include="Type\StructDefinition.cs" />
     <Compile Include="Type\StateDefinition.cs" />
     <Compile Include="Type\AssetDefinition.cs" />
   </ItemGroup>

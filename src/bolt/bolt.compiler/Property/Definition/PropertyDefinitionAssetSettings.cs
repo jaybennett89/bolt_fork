@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(PropertyDefinitionStateAssetSettings))]
   [ProtoInclude(200, typeof(PropertyDefinitionEventAssetSettings))]

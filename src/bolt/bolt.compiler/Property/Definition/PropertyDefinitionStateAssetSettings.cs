@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyDefinitionStateAssetSettings : PropertyDefinitionAssetSettings {
     [ProtoMember(1)]

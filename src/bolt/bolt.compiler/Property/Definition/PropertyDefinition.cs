@@ -3,13 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace bolt.compiler {
-  public struct PropertyDefinitionCompilationData {
-    public int Bit;
-    public int Index;
-    public AssetDefinition DefiningAsset;
-  }
-
+namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyDefinition {
     [ProtoIgnore]
@@ -18,8 +12,8 @@ namespace bolt.compiler {
     [ProtoIgnore]
     public Context Context;
 
-    [ProtoIgnore]
-    public PropertyDefinitionCompilationData CompilationData;
+    [ProtoMember(1)]
+    public string Name;
 
     [ProtoMember(3)]
     public bool Enabled;

@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace bolt.compiler {
+namespace Bolt.Compiler {
   [ProtoContract]
   public enum ReplicationTargets {
     Everyone = 0,
