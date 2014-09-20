@@ -209,7 +209,7 @@ internal static class BoltCore {
 
   public static void Destroy(BoltEntity entity) {
     if (entity.isOwner) {
-      BoltLog.Error("Only the owner can destroy an entity");
+      BoltLog.Warn("Only the owner can destroy an entity, ignoring call to Destroy().");
       return;
     }
 
