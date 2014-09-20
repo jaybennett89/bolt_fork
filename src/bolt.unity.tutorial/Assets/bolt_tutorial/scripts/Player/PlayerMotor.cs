@@ -32,20 +32,20 @@ public class PlayerMotor : MonoBehaviour {
   [SerializeField]
   LayerMask layerMask;
 
-  Vector3 feetPosition {
+  Vector3 rayStart {
     get {
       Vector3 p;
 
       p = transform.position;
-      p.y += skinWidth;
+      p = p + _cc.center;
 
       return p;
     }
   }
 
-  float raycastDistance {
+  float rayDistance {
     get {
-      return skinWidth * 2.5f;
+      return _cc.center.y + (skinWidth * 2f);
     }
   }
 
@@ -69,26 +69,25 @@ public class PlayerMotor : MonoBehaviour {
     transform.localPosition = _state.position;
   }
 
+  void DrawRay(Ray r, float d, Color c) {
+    Debug.DrawLine(r.origin, r.origin + (r.direction * d), c);
+  }
+
   IEnumerable<RaycastHit> FindGround(Vector3 z, int count) {
-    Vector3 p;
-
-    p = transform.position;
-    p.y += skinWidth;
-
     for (int i = 0; i < count; ++i) {
       Ray r;
       RaycastHit rh;
 
       r = new Ray();
       r.direction = Vector3.down;
-      r.origin = p + (Quaternion.Euler(0, i * (360 / count), 0) * z);
+      r.origin = rayStart + (Quaternion.Euler(0, i * (360 / count), 0) * z);
 
-      if (Physics.Raycast(r, out rh, skinWidth * 2.5f, layerMask)) {
-        Debug.DrawRay(r.origin, r.direction, Color.green);
+      if (Physics.Raycast(r, out rh, rayDistance, layerMask)) {
+        DrawRay(r, rayDistance, Color.green);
         yield return rh;
       }
       else {
-        Debug.DrawRay(r.origin, r.direction, Color.red);
+        DrawRay(r, rayDistance, Color.red);
       }
     }
 
@@ -135,7 +134,7 @@ public class PlayerMotor : MonoBehaviour {
 
       if (_state.jumpFrames < (jumpTotalFrames / 2)) {
         Vector3 p;
-        
+
         p = transform.position;
         p.y = (hits[0].point.y + skinWidth);
 
