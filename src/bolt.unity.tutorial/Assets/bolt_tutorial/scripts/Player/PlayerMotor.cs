@@ -123,8 +123,6 @@ public class PlayerMotor : MonoBehaviour {
 
     // if we had any ray hits, we are grounded
     if (hits.Count > 0) {
-      Debug.Log(hits[0].transform.gameObject.name);
-
       // if we were not grounded before, zero out or velocity
       if (!_state.isGrounded) {
         _state.velocity.x = 0f;

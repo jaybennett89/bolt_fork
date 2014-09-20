@@ -47,12 +47,10 @@ public class WeaponRifle : WeaponBase {
 
       if (trailPrefab) {
         var trailGo = GameObject.Instantiate(trailPrefab, muzzleFlash.position, Quaternion.identity) as GameObject;
+        var trail = trailGo.GetComponent<LineRenderer>();
 
-        trailGo.transform.rotation = Quaternion.LookRotation((rh.point - muzzleFlash.position).normalized);
-
-        var trail = trailGo.GetComponent<TrailRenderer>();
-
-        trail.rigidbody.AddRelativeForce(Vector3.forward * 500f, ForceMode.VelocityChange);
+        trail.SetPosition(0, muzzleFlash.position);
+        trail.SetPosition(1, rh.point);
       }
 
     }
