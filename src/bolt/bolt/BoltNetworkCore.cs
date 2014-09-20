@@ -961,11 +961,11 @@ internal static class BoltCore {
       }
     }
 
+    // update behaviours
+    UpdateActiveGlobalBehaviours(map.name);
+
     // call out to user code
     BoltCallbacksBase.SceneLoadLocalBeginInvoke(map.name);
-
-    // destroy old behaviours
-    UpdateActiveGlobalBehaviours(null);
   }
 
   internal static void LoadMapDoneInternal(Scene map) {
@@ -983,9 +983,6 @@ internal static class BoltCore {
     while (it.Next()) {
       it.val.SendMapLoadDoneToRemote();
     }
-
-    // update active behaviours
-    UpdateActiveGlobalBehaviours(map.name);
 
     // call out to sure code
     BoltCallbacksBase.SceneLoadLocalDoneInvoke(map.name);

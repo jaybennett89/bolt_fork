@@ -11,7 +11,7 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   WeaponBase[] _weapons;
 
   [SerializeField]
-  AudioSource _sfxSource;
+  AudioSource _weaponSfxSource;
 
   public WeaponBase activeWeapon {
     get { return _weapons[state.weapon]; }
@@ -65,7 +65,7 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
 
   void OnFire() {
     // play sfx
-    _sfxSource.PlayOneShot(activeWeapon.fireSound);
+    _weaponSfxSource.PlayOneShot(activeWeapon.fireSound);
 
     GameUI.instance.crosshair.Spread += 0.1f;
 
