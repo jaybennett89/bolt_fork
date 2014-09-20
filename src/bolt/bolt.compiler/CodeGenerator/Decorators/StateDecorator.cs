@@ -14,10 +14,6 @@ namespace Bolt.Compiler {
       get { return Definition.ParentGuid != Guid.Empty; }
     }
 
-    public string Name {
-      get { return Path.GetFileNameWithoutExtension(Definition.AssetPath); }
-    }
-
     public string InterfaceName {
       get { return "I" + Name; }
     }
@@ -39,21 +35,6 @@ namespace Bolt.Compiler {
         }
 
         yield break;
-      }
-    }
-
-    public void CloneProperties(StateDecorator from) {
-      foreach (PropertyDefinition d in from.Definition.Properties) {
-        if (d.Enabled) {
-          PropertyDecorator decorator;
-
-          decorator = new PropertyDecorator();
-          decorator.Generator = Generator;
-          decorator.Definition = d;
-          decorator.DefiningAsset = from;
-
-          Properties.Add(decorator);
-        }
       }
     }
   }

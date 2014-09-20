@@ -36,7 +36,7 @@ namespace Bolt.Compiler {
       SortStatesByHierarchy();
 
       // flatten state hierarchy
-      FlattenStateHierarchy();
+      DecorateProperties();
 
       // go through all of the our assets and set them up for compilation
       CreateCompilationModel();
@@ -61,23 +61,27 @@ namespace Bolt.Compiler {
 
     void DecorateDefinitions() {
       foreach (StateDefinition def in Context.States) {
-        StateDecorator decorator;
+        if (def.Enabled) {
+          StateDecorator decorator;
 
-        decorator = new StateDecorator();
-        decorator.Definition = def;
-        decorator.Generator = this;
+          decorator = new StateDecorator();
+          decorator.Definition = def;
+          decorator.Generator = this;
 
-        States.Add(decorator);
+          States.Add(decorator);
+        }
       }
 
       foreach (StructDefinition def in Context.Structs) {
-        StructDecorator decorator;
+        if (def.Enabled) {
+          StructDecorator decorator;
 
-        decorator = new StructDecorator();
-        decorator.Definition = def;
-        decorator.Generator = this;
+          decorator = new StructDecorator();
+          decorator.Definition = def;
+          decorator.Generator = this;
 
-        Structs.Add(decorator);
+          Structs.Add(decorator);
+        }
       }
     }
 
@@ -112,51 +116,69 @@ namespace Bolt.Compiler {
     }
 
     void EmitCodeObjectModel() {
-      // flatten properties into each state
+      foreach (StructDecorator s in Structs) {
+        StructCodeEmitter emitter;
+        emitter = new StructCodeEmitter();
+        emitter.Decorator = s;
+        emitter.Generator = this;
+        emitter.Emit();
+      }
 
-      foreach (StateDecorator decorator in States) {
+      foreach (StateDecorator s in States) {
         StateCodeEmitter emitter;
         emitter = new StateCodeEmitter();
-        emitter.Decorator = decorator;
+        emitter.Decorator = s;
         emitter.Generator = this;
         emitter.Emit();
       }
     }
 
-    void FlattenStateHierarchy() {
-      foreach (StateDecorator decorator in States) {
+    void DecorateProperties() {
+      // Structs
+      foreach (StructDecorator s in Structs) {
+        // decorate own properties
+        s.Properties = PropertyDecorator.Decorate(s.Definition.Properties, s);
+      }
+
+      // States
+      foreach (StateDecorator s in States) {
         // clone all parents, in order
-        foreach (StateDecorator parent in decorator.ParentList) {
-          decorator.CloneProperties(parent);
+        foreach (StateDecorator parent in s.ParentList) {
+          s.Properties.AddRange(PropertyDecorator.Decorate(parent.Definition.Properties, parent));
         }
 
-        // clone own properties
-        decorator.CloneProperties(decorator);
+        // decorate own properties
+        s.Properties = PropertyDecorator.Decorate(s.Definition.Properties, s);
 
         // setup root struct definition
         StructDefinition rootDef = new StructDefinition();
-        rootDef.Enabled = decorator.Definition.Enabled;
-        rootDef.Guid = decorator.Definition.Guid;
-        rootDef.Comment = decorator.Definition.Comment;
-        rootDef.AssetPath = decorator.Definition.AssetPath;
-        rootDef.Properties = new List<PropertyDefinition>(decorator.Definition.Properties);
+        rootDef.Enabled = s.Definition.Enabled;
+        rootDef.Guid = s.Definition.Guid;
+        rootDef.Comment = s.Definition.Comment;
+        rootDef.AssetPath = s.Definition.AssetPath;
+        rootDef.Properties = new List<PropertyDefinition>(s.Definition.Properties);
 
         // setup root struct decorator
         StructDecorator rootDec = new StructDecorator();
-        rootDec.TypeId = decorator.TypeId;
         rootDec.Definition = rootDef;
-        rootDec.Generator = decorator.Generator;
-        rootDec.Properties = decorator.Properties;
+        rootDec.TypeId = s.TypeId;
+        rootDec.Generator = s.Generator;
+        rootDec.Properties = s.Properties;
+        rootDec.SourceState = s;
 
         // store on state decorator
-        decorator.RootStruct = rootDec;
+        s.RootStruct = rootDec;
 
         // and in our struct list
         Structs.Add(rootDec);
       }
+
+
     }
 
     void CreateCompilationModel() {
+      // sort, index and assign bits for properties
+
       foreach (StructDecorator decorator in Structs) {
         // properties are sorted in this order:
         // 1. Value Properties
@@ -202,5 +224,6 @@ namespace Bolt.Compiler {
 
       File.WriteAllText(file, sb.ToString());
     }
+
   }
 }

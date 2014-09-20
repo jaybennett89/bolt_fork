@@ -16,5 +16,16 @@ namespace Bolt.Compiler {
     public CodeTypeReference PropertyTypeReference {
       get { return new CodeTypeReference(Definition.PropertyType.UserType); }
     }
+
+    public static List<PropertyDecorator> Decorate(IEnumerable<PropertyDefinition> definitions, AssetDecorator asset) {
+      return
+        definitions
+          .Select(x => new PropertyDecorator {
+            Definition = x,
+            Generator = asset.Generator,
+            DefiningAsset = asset
+          })
+          .ToList();
+    }
   }
 }

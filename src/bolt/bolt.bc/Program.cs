@@ -7,6 +7,14 @@ using Bolt.Compiler;
 namespace Bolt.Bc {
   class Program {
     static void Main(string[] args) {
+      StructDefinition baz = new StructDefinition();
+      baz.AssetPath = "Test/Baz.asset";
+      baz.Comment = "My Comment";
+      baz.Enabled = true;
+      baz.Deleted = false;
+      baz.Guid = Guid.NewGuid();
+      baz.Properties = new List<PropertyDefinition>();
+
       StateDefinition foo = new StateDefinition();
       foo.AssetPath = "Test/Foo.asset";
       foo.Comment = "My Comment";
@@ -51,6 +59,7 @@ namespace Bolt.Bc {
       Context context = new Context();
       context.Add(bar);
       context.Add(foo);
+      context.Add(baz);
 
       context.GenerateCode("Test.cs");
     }

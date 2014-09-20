@@ -11,6 +11,7 @@ namespace Bolt.Compiler {
       CodeTypeDeclaration td;
 
       td = new CodeTypeDeclaration(name);
+      td.IsInterface = true;
       td.BaseTypes.AddRange(inherits.Select(x => new CodeTypeReference(x)).ToArray());
       td.TypeAttributes = TypeAttributes.Public | TypeAttributes.Interface;
 
@@ -19,5 +20,16 @@ namespace Bolt.Compiler {
       return td;
     }
 
+    public CodeTypeDeclaration DeclareStruct(string name) {
+      CodeTypeDeclaration td;
+
+      td = new CodeTypeDeclaration(name);
+      td.IsStruct = true;
+      td.TypeAttributes = TypeAttributes.Public;
+
+      CodeNamespace.Types.Add(td);
+
+      return td;
+    }
   }
 }
