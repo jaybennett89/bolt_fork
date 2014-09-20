@@ -553,7 +553,7 @@ partial class BoltEntityChannel : BoltChannel {
     //BoltLog.Debug("{0} is no longer proxied from {1}", proxy.entity, connection);
 
     // destroy entity
-    BoltCore.Destroy(proxy.entity);
+    BoltCore.DestroyForce(proxy.entity);
 
     // free proxy object
     BoltEntityProxy.Free(proxy);

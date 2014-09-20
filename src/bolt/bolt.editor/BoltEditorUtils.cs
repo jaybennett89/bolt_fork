@@ -71,16 +71,17 @@ static class BoltEditorUtils {
     }
   }
 
-  public static IEnumerable<T> FindAssets<T> () where T : ScriptableObject {
+  public static IEnumerable<T> FindAssets<T>() where T : ScriptableObject {
     foreach (var file in Directory.GetFiles(@"Assets", "*.asset", SearchOption.AllDirectories)) {
-      T asset = AssetDatabase.LoadAssetAtPath(file, typeof(T)) as T;
 
-      if (asset) {
-        yield return asset;
-      }
-      else {
-        asset = null;
-        EditorUtility.UnloadUnusedAssets();
+      FileInfo fi = new FileInfo(file);
+
+      if (fi.Length <= (1024 * 1024)) {
+        T asset = AssetDatabase.LoadAssetAtPath(file, typeof(T)) as T;
+
+        if (asset) {
+          yield return asset;
+        }
       }
     }
   }
