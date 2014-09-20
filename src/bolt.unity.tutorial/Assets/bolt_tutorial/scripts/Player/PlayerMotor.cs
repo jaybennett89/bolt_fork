@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerMotor : MonoBehaviour {
 
@@ -31,27 +32,20 @@ public class PlayerMotor : MonoBehaviour {
   [SerializeField]
   LayerMask layerMask;
 
-  float sphereRadius {
-    get { return _cc.radius; }
-  }
-
   Vector3 feetPosition {
     get {
-      Vector3 p = transform.position;
+      Vector3 p;
 
-      p.y += _cc.radius;
-      p.y += _cc.center.y;
-      p.y -= (_cc.height * 0.5f);
-      p.y -= (skinWidth * 1.25f);
+      p = transform.position;
+      p.y += skinWidth;
 
       return p;
     }
   }
 
-  Vector3 feetLineCheck {
+  float raycastDistance {
     get {
-      return
-        feetPosition + (new Vector3(0, -sphereRadius * 1.35f, 0));
+      return skinWidth * 2.5f;
     }
   }
 
@@ -75,7 +69,34 @@ public class PlayerMotor : MonoBehaviour {
     transform.localPosition = _state.position;
   }
 
+  IEnumerable<RaycastHit> FindGround(Vector3 z, int count) {
+    Vector3 p;
+
+    p = transform.position;
+    p.y += skinWidth;
+
+    for (int i = 0; i < count; ++i) {
+      Ray r;
+      RaycastHit rh;
+
+      r = new Ray();
+      r.direction = Vector3.down;
+      r.origin = p + (Quaternion.Euler(0, i * (360 / count), 0) * z);
+
+      if (Physics.Raycast(r, out rh, skinWidth * 2.5f, layerMask)) {
+        Debug.DrawRay(r.origin, r.direction, Color.green);
+        yield return rh;
+      }
+      else {
+        Debug.DrawRay(r.origin, r.direction, Color.red);
+      }
+    }
+
+    yield break;
+  }
+
   public PlayerCommand.State Move(PlayerCommand.Input input) {
+
     var moving = false;
     var movingDir = Vector3.zero;
 
@@ -92,30 +113,36 @@ public class PlayerMotor : MonoBehaviour {
       movingDir = Vector3.Normalize(Quaternion.Euler(0, input.yaw, 0) * movingDir);
     }
 
-    // clamp us to the ground
-    RaycastHit hit;
+    // find ground (if any)
+    var hits =
+      FindGround(new Vector3(0, 0, _cc.radius), 8)
+        .Concat(FindGround(new Vector3(0, 0, _cc.radius * 0.5f), 4))
+        .Concat(FindGround(new Vector3(0, 0, 0), 1))
+        .OrderBy(x => x.distance)
+        .ToList();
 
-    if (Physics.Linecast(feetPosition, feetLineCheck, out hit, layerMask)) {
-      if (_state.jumpFrames < (jumpTotalFrames / 2)) {
-        Vector3 p;
 
-        p = hit.point;
-        p.y += skinWidth;
+    // if we had any ray hits, we are grounded
+    if (hits.Count > 0) {
+      Debug.Log(hits[0].transform.gameObject.name);
 
-        transform.position = p;
-      }
-    }
-
-    // update grounded state
-    var overlapping = Physics.OverlapSphere(feetPosition, sphereRadius, layerMask);
-    if (overlapping.Count(x => x.isTrigger == false && (x is CharacterController) == false) > 0) {
-      if (_state.isGrounded == false) {
-        _state.isGrounded = true;
-
+      // if we were not grounded before, zero out or velocity
+      if (!_state.isGrounded) {
         _state.velocity.x = 0f;
         _state.velocity.y = 0f;
         _state.velocity.z = 0f;
       }
+
+      if (_state.jumpFrames < (jumpTotalFrames / 2)) {
+        Vector3 p;
+        
+        p = transform.position;
+        p.y = (hits[0].point.y + skinWidth);
+
+        transform.position = p;
+      }
+
+      _state.isGrounded = true;
     }
     else {
       _state.isGrounded = false;
@@ -183,15 +210,5 @@ public class PlayerMotor : MonoBehaviour {
     }
 
     return value;
-  }
-
-  void OnDrawGizmos() {
-    if (Application.isPlaying && _cc) {
-      Gizmos.color = _state.isGrounded ? Color.green : Color.red;
-      Gizmos.DrawWireSphere(feetPosition, sphereRadius);
-
-      Gizmos.color = Color.magenta;
-      Gizmos.DrawLine(feetPosition, feetLineCheck);
-    }
   }
 }
