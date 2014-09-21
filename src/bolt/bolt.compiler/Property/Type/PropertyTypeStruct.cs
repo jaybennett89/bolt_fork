@@ -8,15 +8,7 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeStruct : PropertyType {
     [ProtoMember(50)]
-    public Guid ObjectId;
-
-    public StructDefinition Struct {
-      get { return Context.FindStruct(ObjectId); }
-    }
-
-    public override int ByteSize {
-      get { throw new NotImplementedException(); }
-    }
+    public Guid StructGuid;
 
     public override bool IsValue {
       get { return false; }
@@ -27,6 +19,10 @@ namespace Bolt.Compiler {
         yield return typeof(StateDefinition);
         yield return typeof(StructDefinition); 
       }
+    }
+
+    public override PropertyDecorator CreateDecorator() {
+      return new PropertyDecoratorStruct();
     }
   }
 }

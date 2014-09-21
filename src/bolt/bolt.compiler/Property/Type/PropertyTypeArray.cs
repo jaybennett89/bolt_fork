@@ -7,11 +7,11 @@ using System.Text;
 namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeArray : PropertyType {
-    [ProtoMember(50)]
-    public PropertyType ElementType;
-
     [ProtoMember(51)]
     public int ElementCount;
+
+    [ProtoMember(52)]
+    public PropertyType ElementType;
 
     public IEnumerable<Type> AllowedElementTypes {
       get {
@@ -24,15 +24,15 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
-    public override int ByteSize {
-      get { throw new NotImplementedException(); }
-    }
-
     public override IEnumerable<Type> AssetTypes {
       get {
         yield return typeof(StateDefinition);
         yield return typeof(StructDefinition);
       }
+    }
+
+    public override PropertyDecorator CreateDecorator() {
+      return new PropertyDecoratorArray();
     }
   }
 }

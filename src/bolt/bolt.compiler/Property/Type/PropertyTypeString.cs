@@ -13,10 +13,10 @@ namespace Bolt.Compiler {
 
   [ProtoContract]
   public class PropertyTypeString : PropertyType {
-    [ProtoMember(1)]
-    public int MaxLength;
+    [ProtoMember(50)]
+    public int MaxLength = 1;
 
-    [ProtoMember(1)]
+    [ProtoMember(51)]
     public StringEncodings Encoding;
 
     public Encoding EncodingClass {
@@ -30,16 +30,8 @@ namespace Bolt.Compiler {
       }
     }
 
-    public override PropertyCodeEmitter CreateCodeEmitter() {
-      return new PropertyCodeEmitterString();
-    }
-
-    public override int ByteSize {
-      get { return 2 + EncodingClass.GetMaxByteCount(MaxLength); }
-    }
-
-    public override string UserType {
-      get { return typeof(string).FullName; }
+    public override PropertyDecorator CreateDecorator() {
+      return new PropertyDecoratorString();
     }
   }
 }

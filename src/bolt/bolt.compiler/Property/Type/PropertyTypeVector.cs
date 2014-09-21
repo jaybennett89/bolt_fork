@@ -35,9 +35,9 @@ namespace Bolt.Compiler {
       new Axis { Component = VectorComponents.W, Compression = FloatCompression.Default(), Enabled = false },
     };
 
-    public override int ByteSize {
-      get { return 16; }
-    }
+    //public override int ByteSize {
+    //  get { return 16; }
+    //}
 
     public Axis this[VectorComponents component] {
       get {
@@ -51,18 +51,18 @@ namespace Bolt.Compiler {
       }
     }
 
-    public override string UserType {
-      get {
-        if (this[VectorComponents.W].Enabled) {
-          return "UE.Vector4";
-        }
+    //public override string ClrType {
+    //  get {
+    //    if (this[VectorComponents.W].Enabled) {
+    //      return "UE.Vector4";
+    //    }
 
-        if (this[VectorComponents.Z].Enabled) {
-          return "UE.Vector3";
-        }
+    //    if (this[VectorComponents.Z].Enabled) {
+    //      return "UE.Vector3";
+    //    }
 
-        return "UE.Vector2";
-      }
-    }
+    //    return "UE.Vector2";
+    //  }
+    //}
   }
 }

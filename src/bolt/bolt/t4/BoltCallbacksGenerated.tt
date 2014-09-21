@@ -13,7 +13,6 @@ cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection", "string",
 
 cbs.Add("Connected", new[] { "BoltConnection", "connection" });
 cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
-
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
 
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();

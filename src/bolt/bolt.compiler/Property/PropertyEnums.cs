@@ -25,6 +25,14 @@ namespace Bolt.Compiler {
 
   [ProtoContract]
   public enum PropertyStateAssetOptions {
-    ChangedCallback = 0
+    ChangedCallback = 0,
+    Interpolate = 1,
+    Extrapolate = 2,
+  }
+
+  [ProtoContract]
+  public enum TransformModes {
+    InterpolatedSnapshots = 0,
+    DeadReckoning = 1
   }
 }

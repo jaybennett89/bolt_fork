@@ -6,11 +6,41 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyCodeEmitter {
-    public CodeGenerator Generator;
     public PropertyDecorator Decorator;
 
-    public virtual void EmitInterfaceProperty(CodeTypeDeclaration iface) {
-      iface.DeclareProperty(Decorator.PropertyTypeReference, Decorator.Definition.Name, (stms) => { }, (stms) => { });
+    public CodeGenerator Generator {
+      get { return Decorator.Generator; }
+    }
+
+    public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, (get) => { }, null);
+
+      var stateSettings = Decorator.Definition.StateAssetSettings;
+      if (stateSettings.Options.Contains(PropertyStateAssetOptions.ChangedCallback)) {
+        type.DeclareProperty(typeof(Action).FullName, Decorator.Definition.ChangedCallbackName, (get) => { }, (set) => { });
+      }
+    }
+
+    public virtual void EmitShimMembers(CodeTypeDeclaration type) {
+      throw new NotImplementedException();
+    }
+
+    public virtual void EmitModifierMembers(CodeTypeDeclaration type) {
+      throw new NotImplementedException();
+    }
+
+    public static PropertyCodeEmitter Create(PropertyDecorator decorator) {
+      PropertyCodeEmitter emitter;
+
+      emitter = decorator.CreateEmitter();
+      emitter.Decorator = decorator;
+
+      return emitter;
     }
   }
+
+  public abstract class PropertyCodeEmitter<T> : PropertyCodeEmitter where T : PropertyDecorator {
+    public new T Decorator { get { return (T)base.Decorator; } }
+  }
+
 }

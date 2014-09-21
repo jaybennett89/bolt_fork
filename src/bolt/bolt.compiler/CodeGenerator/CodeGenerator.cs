@@ -142,13 +142,13 @@ namespace Bolt.Compiler {
 
       // States
       foreach (StateDecorator s in States) {
-        // clone all parents, in order
+        // decorate and clone all parent properties, in order
         foreach (StateDecorator parent in s.ParentList) {
           s.Properties.AddRange(PropertyDecorator.Decorate(parent.Definition.Properties, parent));
         }
 
         // decorate own properties
-        s.Properties = PropertyDecorator.Decorate(s.Definition.Properties, s);
+        s.Properties.AddRange(PropertyDecorator.Decorate(s.Definition.Properties, s));
 
         // setup root struct definition
         StructDefinition rootDef = new StructDefinition();
@@ -176,10 +176,36 @@ namespace Bolt.Compiler {
 
     }
 
-    void CreateCompilationModel() {
-      // sort, index and assign bits for properties
+    void OrderStructsByDependancies() {
+      List<StructDecorator> structs = Structs.Where(x => x.Dependencies.Count() == 0).ToList();
+      List<StructDecorator> structsWithDeps = Structs.Where(x => x.Dependencies.Count() != 0).ToList();
 
-      foreach (StructDecorator decorator in Structs) {
+      while (structsWithDeps.Count > 0) {
+        for (int i = 0; i < structsWithDeps.Count; ++i) {
+          StructDecorator s = structsWithDeps[i];
+
+          if (s.Dependencies.All(x => structs.Any(y => y.Guid == x.Guid))) {
+            // remove from deps list
+            structsWithDeps.RemoveAt(i);
+
+            // insert into structs list
+            structs.Add(s);
+
+            // decrement index counter
+            i -= 1;
+          }
+        }
+      }
+
+      Structs = structs;
+    }
+
+    void CreateCompilationModel() {
+      OrderStructsByDependancies();
+
+      // sort, index and assign bits for properties
+      for (int i = 0; i < Structs.Count; ++i) {
+        StructDecorator decorator = Structs[i];
         // properties are sorted in this order:
         // 1. Value Properties
         // 2. Sub-Structs
@@ -191,25 +217,59 @@ namespace Bolt.Compiler {
             .ToList();
 
         // assign indexes
-        for (int i = 0; i < decorator.Properties.Count; ++i) {
+        for (int n = 0; n < decorator.Properties.Count; ++n) {
           PropertyDecorator p;
 
-          p = decorator.Properties[i];
-          p.Index = i;
+          p = decorator.Properties[n];
+          p.Index = n;
 
           if (p.Definition.Replicated && p.Definition.PropertyType.IsValue && p.Definition.StateAssetSettings.ReplicationCondition == ReplicationConditions.ValueChanged) {
-            p.Bit = decorator.BitCount++;
+            p.MaskBit = decorator.StructCount++;
           }
           else {
-            p.Bit = int.MinValue;
+            p.MaskBit = int.MinValue;
           }
         }
       }
+
+      // calculate sizes for all structs
+      for (int i = 0; i < Structs.Count; ++i) {
+        StructDecorator decorator = Structs[i];
+        decorator.ByteSize = 0;
+
+        for (int n = 0; n < decorator.Properties.Count; ++n) {
+          // copy byte offset to property
+          decorator.Properties[n].ByteOffset = decorator.ByteSize;
+
+          // increment byte offset
+          decorator.ByteSize += decorator.Properties[n].ByteSize;
+        }
+
+        decorator.ByteSizeCalculated = true;
+      }
+
+      // calculate mask counts for all structs
+      for (int i = 0; i < Structs.Count; ++i) {
+        StructDecorator decorator = Structs[i];
+        decorator.StructCount = 1;
+
+        for (int n = 0; n < decorator.Properties.Count; ++n) {
+          decorator.StructCount += decorator.Properties[n].StructCount;
+        }
+      }
+    }
+
+    void GenerateUsingStatements(StringBuilder sb) {
+      sb.AppendLine("using UE = UnityEngine;");
+      sb.AppendLine("using Encoding = System.Text.Encoding;");
+      sb.AppendLine();
     }
 
     void GenerateSourceCode(string file) {
       StringBuilder sb = new StringBuilder();
       StringWriter sw = new StringWriter(sb);
+
+      GenerateUsingStatements(sb);
 
       CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
       CodeGeneratorOptions options = new CodeGeneratorOptions();

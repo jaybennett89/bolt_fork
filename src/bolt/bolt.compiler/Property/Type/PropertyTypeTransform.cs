@@ -6,7 +6,8 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyTypeTrigger : PropertyType {
-
+  public class PropertyTypeTransform : PropertyType {
+    [ProtoMember(50)]
+    public TransformModes Mode;
   }
 }

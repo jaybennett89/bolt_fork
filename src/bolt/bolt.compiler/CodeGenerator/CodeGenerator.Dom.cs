@@ -31,5 +31,17 @@ namespace Bolt.Compiler {
 
       return td;
     }
+
+    public CodeTypeDeclaration DeclareClass(string name) {
+      CodeTypeDeclaration td;
+
+      td = new CodeTypeDeclaration(name);
+      td.IsClass = true;
+      td.TypeAttributes = TypeAttributes.Public;
+
+      CodeNamespace.Types.Add(td);
+
+      return td;
+    }
   }
 }

@@ -67,13 +67,18 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
-    <Compile Include="BoltCallbacksGenerated1.cs">
+    <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>BoltCallbacksGenerated.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
     <Compile Include="BoltFactory.cs" />
+    <Compile Include="t4\BoltFlagsGenerated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BoltFlagsGenerated.tt</DependentUpon>
+    </Compile>
     <Compile Include="BoltGlobalBehaviour.cs" />
     <Compile Include="BoltId.cs" />
     <Compile Include="BoltGUI.cs" />
@@ -109,9 +114,7 @@
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
     <Compile Include="MapLoadState.cs" />
     <Compile Include="state2\Blit.cs" />
-    <Compile Include="state2\StateFrame.cs" />
     <Compile Include="state2\State.cs" />
-    <Compile Include="state2\Slice.cs" />
     <Compile Include="state\BoltStateFactory.cs" />
     <Compile Include="state\Transform\BoltStateTransform.cs" />
     <Compile Include="utils\Bits.cs" />
@@ -172,9 +175,13 @@
     <Compile Include="utils\UdpStreamExt.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="BoltCallbacksGenerated.tt">
+    <None Include="t4\BoltCallbacksGenerated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltCallbacksGenerated1.cs</LastGenOutput>
+      <LastGenOutput>BoltCallbacksGenerated.cs</LastGenOutput>
+    </None>
+    <None Include="t4\BoltFlagsGenerated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BoltFlagsGenerated.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

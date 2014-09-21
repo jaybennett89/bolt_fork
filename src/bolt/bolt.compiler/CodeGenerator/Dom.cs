@@ -18,12 +18,50 @@ namespace Bolt.Compiler {
       get { return new CodeMethodReturnStatement(); }
     }
 
-    public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, CodeTypeReference propertyType, string propertyName, Action<CodeStatementCollection> getter, Action<CodeStatementCollection> setter) {
+    static void Comment(this CodeTypeMember member, bool doc, string comment, params object[] args) {
+      member.Comments.Add(new CodeCommentStatement(string.Format(comment ?? "", args), true));
+    }
+
+    public static void Comment(this CodeTypeMember member, string comment, params object[] args) {
+      Comment(member, false, comment, args);
+    }
+
+    public static void CommentDoc(this CodeTypeMember member, string comment, params object[] args) {
+      Comment(member, true, comment, args);
+    }
+
+    public static void CommentSummary(this CodeTypeMember member, Action<CodeTypeMember> commenter) {
+      Comment(member, true, "<summary>");
+      commenter(member);
+      Comment(member, true, "</summary>");
+    }
+
+    public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, string returnType, string methodName, Action<CodeMemberMethod> body) {
+      CodeMemberMethod method;
+
+      method = new CodeMemberMethod();
+      method.Name = methodName;
+      method.ReturnType = new CodeTypeReference(returnType);
+      method.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+
+      if (body != null) {
+        body(method);
+      }
+
+      type.Members.Add(method);
+      return method;
+    }
+
+    public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, Action<CodeStatementCollection> getter) {
+      return DeclareProperty(type, propertyType, propertyName, getter, null);
+    }
+
+    public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, Action<CodeStatementCollection> getter, Action<CodeStatementCollection> setter) {
       CodeMemberProperty prop;
 
       prop = new CodeMemberProperty();
       prop.Name = propertyName;
-      prop.Type = propertyType;
+      prop.Type = new CodeTypeReference(propertyType);
       prop.Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
       if (prop.HasGet = (getter != null)) {
@@ -54,11 +92,15 @@ namespace Bolt.Compiler {
       CodeMemberField field;
 
       field = new CodeMemberField(fieldType, fieldName);
-      field.Attributes = MemberAttributes.Private;
+      field.Attributes = MemberAttributes.Assembly;
 
       type.Members.Add(field);
 
       return field;
+    }
+
+    public static void DeclareParameter(this CodeMemberProperty method, string paramType, string paramName) {
+      method.Parameters.Add(new CodeParameterDeclarationExpression(paramType, paramName));
     }
 
     public static void DeclareParameter(this CodeMemberMethod method, string paramType, string paramName) {
@@ -69,8 +111,20 @@ namespace Bolt.Compiler {
       stmts.Add(new CodeAssignStatement(left, right));
     }
 
-    public static CodeExpression Expr(this string expr) {
-      return new CodeSnippetExpression(expr);
+    public static void Expr(this CodeStatementCollection stmts, string text, params object[] args) {
+      stmts.Add(text.Expr(args));
+    }
+
+    public static void Stmt(this CodeStatementCollection stmts, string text, params object[] args) {
+      stmts.Add(new CodeSnippetStatement(string.Format(text, args)));
+    }
+
+    public static CodeExpression Expr(this string text, params object[] args) {
+      return new CodeSnippetExpression(string.Format(text, args));
+    }
+
+    public static CodeExpression Expr(this int integer) {
+      return new CodeSnippetExpression(integer.ToString());
     }
   }
 }

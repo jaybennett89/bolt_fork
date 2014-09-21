@@ -41,22 +41,29 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Assert.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
-    <Compile Include="CodeGenerator\Decorators\PropertyDecorator.cs" />
-    <Compile Include="CodeGenerator\Decorators\StateDecorator.cs" />
-    <Compile Include="CodeGenerator\Decorators\AssetDecorator.cs" />
-    <Compile Include="CodeGenerator\Decorators\StructDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Asset\StateDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Asset\AssetDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Asset\StructDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorArray.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorFloat.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorStruct.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StateCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\AssetCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterArray.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterFloat.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterString.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="Compression\IntCompression.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
@@ -67,6 +74,7 @@
     <Compile Include="Property\Type\PropertyType.cs" />
     <Compile Include="Property\Type\PropertyTypeStruct.cs" />
     <Compile Include="Property\Type\PropertyTypeString.cs" />
+    <Compile Include="Property\Type\PropertyTypeTransform.cs" />
     <Compile Include="Property\Type\PropertyTypeTrigger.cs" />
     <Compile Include="Property\Type\PropertyTypeVector.cs" />
     <Compile Include="Type\AssetEnums.cs" />

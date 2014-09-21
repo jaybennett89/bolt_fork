@@ -18,6 +18,10 @@ namespace Bolt.Compiler {
       get { return "I" + Name; }
     }
 
+    public string ClassName {
+      get { return InterfaceName + "_Impl"; }
+    }
+
     public StateDecorator Parent {
       get { return Generator.FindState(Definition.ParentGuid); }
     }

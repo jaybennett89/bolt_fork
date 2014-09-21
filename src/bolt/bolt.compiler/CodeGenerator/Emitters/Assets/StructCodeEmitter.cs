@@ -12,24 +12,27 @@ namespace Bolt.Compiler {
     public void Emit() {
       EmitStruct();
       EmitArray();
+      EmitModifier();
     }
 
     void EmitStruct() {
-      CodeTypeDeclaration td;
+      CodeTypeDeclaration str;
 
-      td = Generator.DeclareStruct(Decorator.Name);
-      td.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
-      td.DeclareField("System.Byte[]", "data");
-      td.DeclareField("System.Int32", "offset");
+      str = Generator.DeclareStruct(Decorator.Name);
+      str.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
+      str.CommentSummary(m => {
+        m.CommentDoc(Decorator.Definition.Comment);
+        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.ByteSize);
+      });
 
-      td.DeclareConstructor(ctor => {
-        ctor.Attributes = MemberAttributes.Assembly;
+      DeclareShimConstructor(str);
 
-        ctor.DeclareParameter("System.Byte[]", "data");
-        ctor.DeclareParameter("System.Int32", "offset");
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitShimMembers(str);
+      }
 
-        ctor.Statements.Assign("this.data".Expr(), "data".Expr());
-        ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
+      str.DeclareMethod(Decorator.ModifierName, "Modify", method => {
+        method.Statements.Expr("return new {0}(data, offset)", Decorator.ModifierName);
       });
     }
 
@@ -38,15 +41,15 @@ namespace Bolt.Compiler {
         return;
       }
 
-      CodeTypeDeclaration td;
+      CodeTypeDeclaration arr;
 
-      td = Generator.DeclareStruct(Decorator.ArrayName);
-      td.TypeAttributes = TypeAttributes.Public;
-      td.DeclareField("System.Byte[]", "data");
-      td.DeclareField("System.Int32", "offset");
-      td.DeclareField("System.Int32", "length");
+      arr = Generator.DeclareStruct(Decorator.ArrayName);
+      arr.TypeAttributes = TypeAttributes.Public;
+      arr.DeclareField("System.Byte[]", "data");
+      arr.DeclareField("System.Int32", "offset");
+      arr.DeclareField("System.Int32", "length");
 
-      td.DeclareConstructor(ctor => {
+      arr.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
 
         ctor.DeclareParameter("System.Byte[]", "data");
@@ -56,6 +59,44 @@ namespace Bolt.Compiler {
         ctor.Statements.Assign("this.data".Expr(), "data".Expr());
         ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
         ctor.Statements.Assign("this.length".Expr(), "length".Expr());
+      });
+
+      arr.DeclareProperty(typeof(int).FullName, "Length", get => {
+        get.Expr("return length");
+      });
+
+      arr.DeclareProperty(Decorator.Name, "Item", get => {
+        get.Expr("if (index < 0 || index >= length) throw new IndexOutOfRangeException()");
+        get.Expr("return new {0}(data, offset + (index * {1}))", Decorator.Name, Decorator.ByteSize);
+      }).DeclareParameter(typeof(int).FullName, "index");
+    }
+
+    void EmitModifier() {
+      CodeTypeDeclaration mod;
+
+      mod = Generator.DeclareClass(Decorator.ModifierName);
+      mod.TypeAttributes = TypeAttributes.Public;
+      mod.BaseTypes.Add("System.IDisposable");
+
+      DeclareShimConstructor(mod);
+
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitModifierMembers(mod);
+      }
+    }
+
+    void DeclareShimConstructor(CodeTypeDeclaration type) {
+      type.DeclareField("System.Byte[]", "data");
+      type.DeclareField("System.Int32", "offset");
+
+      type.DeclareConstructor(ctor => {
+        ctor.Attributes = MemberAttributes.Assembly;
+
+        ctor.DeclareParameter("System.Byte[]", "data");
+        ctor.DeclareParameter("System.Int32", "offset");
+
+        ctor.Statements.Assign("this.data".Expr(), "data".Expr());
+        ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
       });
     }
   }

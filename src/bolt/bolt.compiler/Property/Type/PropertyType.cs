@@ -11,21 +11,16 @@ namespace Bolt.Compiler {
   [ProtoInclude(400, typeof(PropertyTypeVector))]
   [ProtoInclude(500, typeof(PropertyTypeString))]
   [ProtoInclude(600, typeof(PropertyTypeTrigger))]
+  [ProtoInclude(700, typeof(PropertyTypeTransform))]
   public abstract class PropertyType {
     [ProtoIgnore]
     public Context Context;
-
-    [ProtoIgnore]
-    public abstract int ByteSize { get; }
 
     [ProtoIgnore]
     public virtual bool MecanimUsable { get { return false; } }
 
     [ProtoIgnore]
     public virtual bool IsValue { get { return true; } }
-
-    [ProtoIgnore]
-    public virtual string UserType { get { return null; } }
 
     [ProtoIgnore]
     public virtual IEnumerable<Type> AssetTypes {
@@ -37,7 +32,7 @@ namespace Bolt.Compiler {
       }
     }
 
-    public virtual PropertyCodeEmitter CreateCodeEmitter() {
+    public virtual PropertyDecorator CreateDecorator() {
       throw new NotImplementedException();
     }
   }

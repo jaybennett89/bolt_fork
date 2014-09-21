@@ -14,6 +14,16 @@ namespace Bolt.Bc {
       baz.Deleted = false;
       baz.Guid = Guid.NewGuid();
       baz.Properties = new List<PropertyDefinition>();
+      baz.Properties.Add(new PropertyDefinition {
+        Comment = "My Comment",
+        Deleted = false,
+        Enabled = true,
+        Expanded = false,
+        Name = "TestFloat_Baz",
+        Replicated = true,
+        PropertyType = new PropertyTypeFloat(),
+        AssetSettings = new PropertyDefinitionStateAssetSettings(),
+      });
 
       StateDefinition foo = new StateDefinition();
       foo.AssetPath = "Test/Foo.asset";
@@ -29,7 +39,7 @@ namespace Bolt.Bc {
         Deleted = false,
         Enabled = true,
         Expanded = false,
-        Name = "Test1",
+        Name = "TestFloat",
         Replicated = true,
         PropertyType = new PropertyTypeFloat(),
         AssetSettings = new PropertyDefinitionStateAssetSettings(),
@@ -50,9 +60,40 @@ namespace Bolt.Bc {
         Deleted = false,
         Enabled = true,
         Expanded = false,
-        Name = "Test2",
+        Name = "TestString",
         Replicated = true,
         PropertyType = new PropertyTypeString(),
+        AssetSettings = new PropertyDefinitionStateAssetSettings(),
+      });
+
+      bar.Properties.Add(new PropertyDefinition {
+        Comment = "My Comment",
+        Deleted = false,
+        Enabled = true,
+        Expanded = false,
+        Name = "TestStruct",
+        Replicated = true,
+        PropertyType = new PropertyTypeStruct {
+          StructGuid = baz.Guid
+        },
+        AssetSettings = new PropertyDefinitionStateAssetSettings {
+          Options = new HashSet<PropertyStateAssetOptions>(new[] { PropertyStateAssetOptions.ChangedCallback })
+        },
+      });
+
+      bar.Properties.Add(new PropertyDefinition {
+        Comment = "My Comment",
+        Deleted = false,
+        Enabled = true,
+        Expanded = false,
+        Name = "TestArray",
+        Replicated = true,
+        PropertyType = new PropertyTypeArray {
+          ElementCount = 32,
+          ElementType = new PropertyTypeStruct {
+            StructGuid = baz.Guid
+          }
+        },
         AssetSettings = new PropertyDefinitionStateAssetSettings(),
       });
 
@@ -60,6 +101,32 @@ namespace Bolt.Bc {
       context.Add(bar);
       context.Add(foo);
       context.Add(baz);
+
+      //Context context = new Context();
+      //StructDefinition enchant = new StructDefinition();
+      //enchant.AssetPath = "Types/Enchant.asset";
+      //enchant.Enabled = true;
+      //enchant.Guid = Guid.NewGuid();
+
+      //StructDefinition item = new StructDefinition();
+      //item.AssetPath = "Types/Weapon.asset";
+      //item.Enabled = true;
+      //item.Guid = Guid.NewGuid();
+      //item.Properties.Add(new PropertyDefinition {
+      //  Name = "Enchants",
+      //  Enabled = true,
+      //  Replicated = true,
+      //  AssetSettings = new PropertyDefinitionStateAssetSettings { },
+      //  PropertyType = new PropertyTypeArray {
+      //    ElementCount = 2,
+      //    ElementType = new PropertyTypeStruct {
+      //      StructGuid = enchant.Guid
+      //    }
+      //  }
+      //});
+
+      //context.Add(enchant);
+      //context.Add(item);
 
       context.GenerateCode("Test.cs");
     }
