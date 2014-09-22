@@ -22,6 +22,10 @@ namespace Bolt.Compiler {
       get { return 0; }
     }
 
+    public virtual void GetStructList(List<StructDecorator> list) {
+
+    }
+
     public static List<PropertyDecorator> Decorate(IEnumerable<PropertyDefinition> definitions, AssetDecorator asset) {
       return definitions.Select(p => Decorate(p, asset)).ToList();
     }

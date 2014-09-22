@@ -15,6 +15,7 @@ namespace Bolt.Compiler {
     List<StateDefinition> states = new List<StateDefinition>();
     List<StructDefinition> structs = new List<StructDefinition>();
     List<CommandDefinition> commands = new List<CommandDefinition>();
+    List<PropertyFilterDefinition> filters = new List<PropertyFilterDefinition>();
 
     public ContextCompilationData CompilationData;
 
@@ -34,6 +35,10 @@ namespace Bolt.Compiler {
       get { return commands; }
     }
 
+    public IEnumerable<PropertyFilterDefinition> Filters {
+      get { return filters; }
+    }
+
     public IEnumerable<AssetDefinition> Assets {
       get {
         foreach (var a in states) { yield return a; }
@@ -41,6 +46,10 @@ namespace Bolt.Compiler {
         foreach (var a in structs) { yield return a; }
         foreach (var a in commands) { yield return a; }
       }
+    }
+
+    public void Add(PropertyFilterDefinition filter) {
+      filters.Add(filter);
     }
 
     public void Add(AssetDefinition asset) {

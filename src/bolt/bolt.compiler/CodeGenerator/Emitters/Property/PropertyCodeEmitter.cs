@@ -16,7 +16,7 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, (get) => { }, null);
 
       var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (stateSettings.Options.Contains(PropertyStateAssetOptions.ChangedCallback)) {
+      if (stateSettings.Options.Contains(StatePropertyOptions.ChangedCallback)) {
         type.DeclareProperty(typeof(Action).FullName, Decorator.Definition.ChangedCallbackName, (get) => { }, (set) => { });
       }
     }

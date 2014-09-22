@@ -11,6 +11,7 @@ namespace Bolt {
 
 Dictionary<string, string[]> flagList = new Dictionary<string, string[]>();
 flagList.Add("StateFlags", new string[]{ "Controlling", "Proxy", "Proxying_Disabled", "Persist_On_Load" });
+flagList.Add("Filter", new string[]{ });
 
 foreach(var kvp in flagList) {
 	var name = kvp.Key;
@@ -38,8 +39,8 @@ public static readonly <#=name#> <#=flags[i].ToUpper()#> = new <#=name#>(<#=(1 <
     }
 
     public override bool Equals(object obj) {
-      if (obj is StateFlags) {
-        return bits == ((StateFlags)obj).bits;
+      if (obj is <#=name#>) {
+        return bits == ((<#=name#>)obj).bits;
       }
 
       return false;
@@ -89,11 +90,11 @@ public static readonly <#=name#> <#=flags[i].ToUpper()#> = new <#=name#>(<#=(1 <
       return new <#=name#>(~a.bits);
     }
 	
-    public static bool operator ==(StateFlags a, StateFlags b) {
+    public static bool operator ==(<#=name#> a, <#=name#> b) {
       return a.bits == b.bits;
     }
 
-    public static bool operator !=(StateFlags a, StateFlags b) {
+    public static bool operator !=(<#=name#> a, <#=name#> b) {
       return a.bits != b.bits;
     }
 

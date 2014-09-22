@@ -67,6 +67,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="state2\Filter.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

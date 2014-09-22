@@ -34,7 +34,7 @@ namespace Bolt.Compiler {
     public PropertyDefinitionAssetSettings AssetSettings;
 
     [ProtoMember(8)]
-    public HashSet<int> Filters = new HashSet<int>(new[] { 0, 1 });
+    public HashSet<Guid> Filters = new HashSet<Guid>();
 
     public string ChangedCallbackName {
       get { return Name + "Changed"; }

@@ -52,6 +52,10 @@ namespace Bolt.Compiler {
       return method;
     }
 
+    public static void DeclareMember(this CodeTypeDeclaration type, string memberSource, params object[] args) {
+      type.Members.Add(new CodeSnippetTypeMember(string.Format(memberSource, args)));
+    }
+
     public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, Action<CodeStatementCollection> getter) {
       return DeclareProperty(type, propertyType, propertyName, getter, null);
     }
@@ -76,16 +80,25 @@ namespace Bolt.Compiler {
       return prop;
     }
 
-    public static CodeConstructor DeclareConstructor(this CodeTypeDeclaration type, Action<CodeConstructor> body) {
-      CodeConstructor ctor;
+    public static CodeTypeConstructor DeclareConstructorStatic(this CodeTypeDeclaration type, Action<CodeTypeConstructor> ctor) {
+      CodeTypeConstructor method = new CodeTypeConstructor();
+      type.Members.Add(method);
 
-      ctor = new CodeConstructor();
-      ctor.Attributes = MemberAttributes.Public;
-      type.Members.Add(ctor);
+      ctor(method);
 
-      body(ctor);
+      return method;
+    }
 
-      return ctor;
+    public static CodeConstructor DeclareConstructor(this CodeTypeDeclaration type, Action<CodeConstructor> ctor) {
+      CodeConstructor method;
+
+      method = new CodeConstructor();
+      method.Attributes = MemberAttributes.Public;
+      type.Members.Add(method);
+
+      ctor(method);
+
+      return method;
     }
 
     public static CodeMemberField DeclareField(this CodeTypeDeclaration type, string fieldType, string fieldName) {

@@ -33,7 +33,7 @@ namespace Bolt.Compiler {
     }
 
     public virtual PropertyDecorator CreateDecorator() {
-      throw new NotImplementedException();
+      return new PropertyDecoratorTransform();
     }
   }
 }

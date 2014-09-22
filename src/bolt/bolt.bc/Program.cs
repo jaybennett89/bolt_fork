@@ -45,6 +45,19 @@ namespace Bolt.Bc {
         AssetSettings = new PropertyDefinitionStateAssetSettings(),
       });
 
+      foo.Properties.Add(new PropertyDefinition {
+        Comment = "My Comment",
+        Deleted = false,
+        Enabled = true,
+        Expanded = false,
+        Name = "Transform",
+        Replicated = true,
+        PropertyType = new PropertyTypeTransform(),
+        AssetSettings = new PropertyDefinitionStateAssetSettings {
+          Options = new HashSet<StatePropertyOptions>(new[]{ StatePropertyOptions.Interpolate })
+        }
+      });
+
       StateDefinition bar = new StateDefinition();
       bar.AssetPath = "Test/Bar.asset";
       bar.Comment = "My Comment";
@@ -77,7 +90,7 @@ namespace Bolt.Bc {
           StructGuid = baz.Guid
         },
         AssetSettings = new PropertyDefinitionStateAssetSettings {
-          Options = new HashSet<PropertyStateAssetOptions>(new[] { PropertyStateAssetOptions.ChangedCallback })
+          Options = new HashSet<StatePropertyOptions>(new[] { StatePropertyOptions.ChangedCallback })
         },
       });
 
@@ -101,6 +114,12 @@ namespace Bolt.Bc {
       context.Add(bar);
       context.Add(foo);
       context.Add(baz);
+      context.Add(new PropertyFilterDefinition {
+        Guid = Guid.NewGuid(),
+        Index = 0,
+        IsDefault = true,
+        Name = "Default"
+      });
 
       //Context context = new Context();
       //StructDefinition enchant = new StructDefinition();

@@ -54,12 +54,6 @@ namespace Bolt {
     [StructLayout(LayoutKind.Explicit)]
     struct BitUnion {
       [FieldOffset(0)]
-      public Char Char;
-      [FieldOffset(0)]
-      public Int32 Signed32;
-      [FieldOffset(0)]
-      public UInt32 Unsigned32;
-      [FieldOffset(0)]
       public Single Float32;
 
       [FieldOffset(0)]

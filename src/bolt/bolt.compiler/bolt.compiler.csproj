@@ -51,6 +51,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorArray.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorFloat.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorStruct.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTransform.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
@@ -60,10 +61,12 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterFloat.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterString.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
     <Compile Include="Compression\IntCompression.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
+    <Compile Include="Property\PropertyFilterDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
@@ -83,6 +86,7 @@
     <Compile Include="Type\StructDefinition.cs" />
     <Compile Include="Type\StateDefinition.cs" />
     <Compile Include="Type\AssetDefinition.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

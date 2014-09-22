@@ -16,23 +16,28 @@ namespace Bolt.Compiler {
   }
 
   [ProtoContract]
-  public enum PropertyMecanimValueType {
-    None = 0,
-    Parameter = 1,
-    LayerWeight = 2,
-    Curve = 3
+  public enum MecanimPropertyTypes {
+    Parameter = 0,
+    LayerWeight = 1,
   }
 
   [ProtoContract]
-  public enum PropertyStateAssetOptions {
+  public enum MecanimDampMode {
+    None = 0,
+    Static = 1,
+    Dynamic = 2
+  }
+
+  [ProtoContract]
+  public enum StatePropertyOptions {
     ChangedCallback = 0,
     Interpolate = 1,
     Extrapolate = 2,
   }
 
   [ProtoContract]
-  public enum TransformModes {
-    InterpolatedSnapshots = 0,
-    DeadReckoning = 1
+  public enum TransformSpaces {
+    Local = 0,
+    World = 1,
   }
 }

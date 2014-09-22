@@ -51,11 +51,29 @@ namespace Bolt {
     protected readonly int StructCount;
     protected readonly BoltDoubleList<Frame> Frames;
 
-    protected State(int frameSize, int structCount) {
+    internal long[] CompleteMask;
+    internal long[][] FilterMask;
+    internal Dictionary<Filter, long[]> FilterPermutations;
+
+    protected State(int frameSize, int structCount, long[] complete, long[][] filters) {
       Frames = new BoltDoubleList<Frame>();
       FrameSize = frameSize;
       StructCount = structCount;
       Flags = StateFlags.ZERO;
+
+      // all filters
+      FilterMask = filters;
+      FilterPermutations = new Dictionary<Filter, long[]>();
+
+      // full mask
+      CompleteMask = complete;
+
+      // setup default filter permutations
+      for (int i = 0; i < filters.Length; ++i) {
+        if (filters[i] != null) {
+          FilterPermutations.Add(new Filter(1 << i), filters[i]);
+        }
+      }
     }
 
     protected Frame AllocFrame(int number) {
@@ -64,6 +82,28 @@ namespace Bolt {
 
     protected void FreeFrame(Frame frame) {
 
+    }
+
+    protected long[] CalculateFilterPermutation(Filter filter, long[][] filters, Dictionary<Filter, long[]> permutations) {
+      long[] permutation;
+
+      if (permutations.TryGetValue(filter, out permutation) == false) {
+        permutation = new long[StructCount];
+
+        for (int i = 0; i < 32; ++i) {
+          long b = 1 << i;
+
+          if ((filter.Bits & b) == b) {
+            for (int s = 0; s < StructCount; ++s) {
+              permutation[s] |= filters[i][s];
+            }
+          }
+        }
+
+        permutations.Add(filter, permutation);
+      }
+
+      return permutation;
     }
   }
 }

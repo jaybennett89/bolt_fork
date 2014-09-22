@@ -16,11 +16,15 @@ namespace Bolt.Compiler {
     [ProtoMember(3)]
     public int Bits;
 
+    [ProtoMember(4)]
+    public int Fractions;
+
     public static FloatCompression Default() {
       return new FloatCompression {
+        Bits = 32,
         MinValue = -2048,
         MaxValue = +2048,
-        Bits = 32
+        Fractions = 1000
       };
     }
   }

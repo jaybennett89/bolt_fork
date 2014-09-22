@@ -17,6 +17,10 @@ namespace Bolt.Compiler {
     public CodeNamespace CodeNamespace;
     public CodeCompileUnit CodeCompileUnit;
 
+    public IEnumerable<PropertyFilterDefinition> Filters {
+      get { return Context.Filters; }
+    }
+
     public CodeGenerator() {
       States = new List<StateDecorator>();
       Structs = new List<StructDecorator>();
@@ -49,6 +53,14 @@ namespace Bolt.Compiler {
 
       // generate code
       GenerateSourceCode(file);
+    }
+
+    public PropertyFilterDefinition FindFilter(Guid guid) {
+      return Filters.First(x => x.Guid == guid);
+    }
+
+    public PropertyFilterDefinition FindFilter(int index) {
+      return Filters.First(x => x.Index == index);
     }
 
     public StateDecorator FindState(Guid guid) {
@@ -131,6 +143,18 @@ namespace Bolt.Compiler {
         emitter.Generator = this;
         emitter.Emit();
       }
+
+      EmitFilters();
+    }
+
+    void EmitFilters() {
+      CodeTypeDeclaration type = DeclareStruct("BoltFilters");
+
+      foreach (PropertyFilterDefinition filter in Filters) {
+        type.DeclareProperty("Bolt.Filter", filter.Name, get => {
+          get.Expr("return new Bolt.Filter({0})", 1 << filter.Index);
+        }).Attributes |= MemberAttributes.Static;
+      }
     }
 
     void DecorateProperties() {
@@ -172,8 +196,6 @@ namespace Bolt.Compiler {
         // and in our struct list
         Structs.Add(rootDec);
       }
-
-
     }
 
     void OrderStructsByDependancies() {
@@ -223,7 +245,7 @@ namespace Bolt.Compiler {
           p = decorator.Properties[n];
           p.Index = n;
 
-          if (p.Definition.Replicated && p.Definition.PropertyType.IsValue && p.Definition.StateAssetSettings.ReplicationCondition == ReplicationConditions.ValueChanged) {
+          if (p.Definition.Replicated && p.Definition.PropertyType.IsValue && p.Definition.StateAssetSettings.Condition == ReplicationConditions.ValueChanged) {
             p.MaskBit = decorator.StructCount++;
           }
           else {

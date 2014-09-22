@@ -24,6 +24,16 @@ namespace Bolt.Compiler {
       get { return Name + "Modifier"; }
     }
 
+    public List<StructDecorator> GetStructList(List<StructDecorator> list) {
+      list.Add(this);
+
+      for (int i = 0; i < Properties.Count; ++i) {
+        Properties[i].GetStructList(list);
+      }
+
+      return list;
+    }
+
     public override string ToString() {
       return string.Format("[Struct {0}]", Name);
     }
@@ -53,6 +63,37 @@ namespace Bolt.Compiler {
           }
         }
       }
+    }
+
+    public long CalculateCompleteMask() {
+      return CalculateMask(-1);
+    }
+
+    public long CalculateFilterMask(int filter) {
+      return CalculateMask(filter);
+    }
+
+    long CalculateMask(int filter) {
+      long mask = 0;
+      Guid filterGuid = filter == -1 ? Guid.Empty : Generator.FindFilter(filter).Guid;
+
+      for (int i = 0; i < Properties.Count; ++i) {
+        PropertyDecorator p = Properties[i];
+
+        if (p.MaskBit >= 0 && p.MaskBit <= 63) {
+          long b = 1L << Properties[i].MaskBit;
+
+          // should NOT be set!
+          Assert.True((mask & b) == 0L);
+
+          // get filter
+          if ((filter == -1) || p.Definition.StateAssetSettings.Filters.Contains(filterGuid)) {
+            mask |= b;
+          }
+        }
+      }
+
+      return mask;
     }
   }
 }

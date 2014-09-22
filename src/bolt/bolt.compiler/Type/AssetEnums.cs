@@ -40,20 +40,8 @@ namespace Bolt.Compiler {
   }
 
   [ProtoContract]
-  public enum TransformSpaces {
-    World = 0,
-    Local = 1
-  }
-
-  [ProtoContract]
   public enum TransformRotationModes {
     Quaternion = 0,
     EulerAngles = 1
-  }
-
-  [ProtoContract]
-  public enum TransformImplementations {
-    InterpolatedSnapshots = 0,
-    DeadReckoning = 1
   }
 }

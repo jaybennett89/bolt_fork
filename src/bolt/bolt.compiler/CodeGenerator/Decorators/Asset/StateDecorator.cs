@@ -41,5 +41,9 @@ namespace Bolt.Compiler {
         yield break;
       }
     }
+
+    public List<StructDecorator> CalculateStructList() {
+      return RootStruct.GetStructList(new List<StructDecorator>());
+    }
   }
 }

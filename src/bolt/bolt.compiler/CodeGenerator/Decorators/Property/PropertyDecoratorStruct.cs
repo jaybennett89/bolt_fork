@@ -30,5 +30,9 @@ namespace Bolt.Compiler {
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterStruct();
     }
+
+    public override void GetStructList(List<StructDecorator> list) {
+      Struct.GetStructList(list);
+    }
   }
 }
