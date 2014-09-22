@@ -3,7 +3,7 @@
 ## Links
 Get the latest [Bolt daily build](https://github.com/BoltEngine/bolt/releases).
 
-[Website](http://www.boltengine.com/) | [Forum](http://forum.boltengine.com/) | [Support Chat](https://jabbr.net/#/rooms/bolt)
+[Website](http://www.boltengine.com/) | [Forum](http://forum.boltengine.com/) | [Support Chat](https://jabbr.net/#/rooms/bolt) |  [Tutorial](https://github.com/BoltEngine/bolt_tutorial/blob/master/chapter1.md)
 
 [Bolt on the Asset Store](https://www.assetstore.unity3d.com/en/#!/content/18358) | [Bolt Unity Forum Thread](http://forum.unity3d.com/threads/released-bolt-the-new-generation-of-networking-solution-for-unity.248912/) | [Bolt Youtube Channel](https://www.youtube.com/channel/UC9NVIbI5rpP7zmEOiB2Cs6Q)
 
