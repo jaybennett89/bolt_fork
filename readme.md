@@ -1,4 +1,4 @@
-# Bolt Engine
+# ![Bolt Engine](https://github.com/tonybilby/bolt/blob/master/z-bolt-logo.png "Bolt Engine")
 "Best Unity networking solution period."
 ## Links
 Get the latest [Bolt daily build](https://github.com/BoltEngine/bolt/releases).
