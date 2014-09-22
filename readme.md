@@ -1,12 +1,9 @@
 # Bolt Engine
-
+"Best Unity networking solution period."
 ## Links
-Get the latest [Bolt daily build](https://github.com/BoltEngine/bolt/releases)
+Get the latest [Bolt daily build](https://github.com/BoltEngine/bolt/releases).
 
-[Bolt on the Asset Store](https://www.assetstore.unity3d.com/en/#!/content/18358)
-[Bolt Unity Forum Thread](http://forum.unity3d.com/threads/released-bolt-the-new-generation-of-networking-solution-for-unity.248912/)
-[Bolt Support Forum](http://forum.boltengine.com/)
-[Bolt JabbR Chat](https://jabbr.net/#/rooms/bolt)
+[Asset Store](https://www.assetstore.unity3d.com/en/#!/content/18358) | [Unity Forum Thread](http://forum.unity3d.com/threads/released-bolt-the-new-generation-of-networking-solution-for-unity.248912/) | [Support Forum](http://forum.boltengine.com/) | [Bolt JabbR Support Chat](https://jabbr.net/#/rooms/bolt)
 
 ## EULA (End User License Agreement)
 THIS IS A LEGAL DOCUMENT. PLEASE READ THIS DOCUMENT CAREFULLY BEFORE USING THIS SOFTWARE. THIS LICENSE PROVIDES IMPORTANT INFORMATION CONCERNING THE SOFTWARE, PROVIDES YOU WITH A LICENSE TO USE THE SOFTWARE AND CONTAINS WARRANTY AND LIABILITY INFORMATION. BY USING THE SOFTWARE, YOU ARE ACCEPTING THE SOFTWARE “AS IS” AND AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE AGREEMENT. IF YOU DO NOT WISH TO BE LEGALLY BOUND BY THIS AGREEMENT, DO NOT USE THE SOFTWARE.
