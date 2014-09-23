@@ -7,7 +7,7 @@
     <ProjectGuid>{3C6D5ADA-BE03-4F38-8204-F3D14C5EBDDF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bolt.editor</RootNamespace>
+    <RootNamespace>bolt.editor</RootNamespace>
     <AssemblyName>bolt.editor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -60,6 +60,9 @@
     <Compile Include="BoltConnectionsWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileCommands.cs" />
+    <Compile Include="EditorAsset.cs" />
+    <Compile Include="Editors2\BoltBinaryAssetEditor.cs" />
+    <Compile Include="Editors2\BoltBinaryAssetEditor.Struct.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
     <Compile Include="Editors\BoltConfigAssetEditor.cs" />
@@ -154,6 +157,9 @@
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltMecanimAsset Icon.png" />
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltStateAsset Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Editors2\BoltBinaryAssetEditor.State.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

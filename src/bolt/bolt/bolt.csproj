@@ -66,6 +66,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="BoltBinaryAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
     <Compile Include="entity\EntitySerializer.cs" />
     <Compile Include="state2\BitArray.cs" />

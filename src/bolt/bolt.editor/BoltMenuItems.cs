@@ -1,9 +1,18 @@
-﻿using UnityEditor;
+﻿using ProtoBuf;
+using UnityEditor;
 
 public static class BoltMenuItems {
+  [MenuItem("Assets/Create/Bolt/State (Legacy)")]
+  public static void NewStateAsset() {
+    BoltEditorUtils.CreateAsset<BoltStateAsset>("BoltState_Legacy");
+  }
+
   [MenuItem("Assets/Create/Bolt/State")]
   public static void NewStateAsset() {
-    BoltEditorUtils.CreateAsset<BoltStateAsset>("BoltState");
+    BoltEditorUtils.CreateAsset<BoltBinaryAsset>("BoltState", asset => {
+      asset.Type = BoltBinaryAssetTypes.State;
+      asset.Data = Bolt.Compiler.StateDefinition.Default();
+    });
   }
 
   [MenuItem("Assets/Create/Bolt/Event")]

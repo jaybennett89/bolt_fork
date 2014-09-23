@@ -587,25 +587,30 @@ namespace UdpKit {
     }
 
     void InternalWriteByte (byte value, int bits) {
+      WriteByteAt(Data, Ptr, bits, value);
+
+      Ptr += bits;
+    }
+
+    public static void WriteByteAt(byte[] data, int ptr, int bits, byte value) {
       if (bits <= 0)
         return;
 
-      value = (byte) (value & (0xFF >> (8 - bits)));
+      value = (byte)(value & (0xFF >> (8 - bits)));
 
-      int p = Ptr >> 3;
-      int bitsUsed = Ptr & 0x7;
+      int p = ptr >> 3;
+      int bitsUsed = ptr & 0x7;
       int bitsFree = 8 - bitsUsed;
       int bitsLeft = bitsFree - bits;
 
       if (bitsLeft >= 0) {
         int mask = (0xFF >> bitsFree) | (0xFF << (8 - bitsLeft));
-        Data[p] = (byte) ((Data[p] & mask) | (value << bitsUsed));
-      } else {
-        Data[p] = (byte) ((Data[p] & (0xFF >> bitsFree)) | (value << bitsUsed));
-        Data[p + 1] = (byte) ((Data[p + 1] & (0xFF << (bits - bitsFree))) | (value >> bitsFree));
+        data[p] = (byte)((data[p] & mask) | (value << bitsUsed));
       }
-
-      Ptr += bits;
+      else {
+        data[p] = (byte)((data[p] & (0xFF >> bitsFree)) | (value << bitsUsed));
+        data[p + 1] = (byte)((data[p + 1] & (0xFF << (bits - bitsFree))) | (value >> bitsFree));
+      }
     }
 
     byte InternalReadByte (int bits) {

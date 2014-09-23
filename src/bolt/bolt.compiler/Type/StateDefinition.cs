@@ -15,5 +15,15 @@ namespace Bolt.Compiler {
 
     [ProtoMember(52)]
     public Guid ParentGuid;
+
+    public static StateDefinition Default() {
+      StateDefinition s;
+
+      s = new StateDefinition();
+      s.Guid = Guid.NewGuid();
+      s.Enabled = true;
+
+      return s;
+    }
   }
 }
