@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class StructDecorator : AssetDecorator<StructDefinition> {
-    public int ByteSize;
+    public int FrameSize;
     public int StructCount;
     public bool ByteSizeCalculated;
 

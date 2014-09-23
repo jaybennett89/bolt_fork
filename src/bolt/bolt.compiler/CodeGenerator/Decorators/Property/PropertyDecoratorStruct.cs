@@ -19,7 +19,7 @@ namespace Bolt.Compiler {
         Assert.True(Struct.ByteSizeCalculated);
 
         // return value
-        return Struct.ByteSize;
+        return Struct.FrameSize;
       }
     }
 

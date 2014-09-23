@@ -10,6 +10,16 @@ namespace Bolt {
   }
 
   public abstract class State {
+    internal struct ByteMask {
+      public long Mask;
+      public int Index;
+
+      public ByteMask(int index, int mask) {
+        Index = index;
+        Mask = mask; 
+      }
+    }
+
     protected class Frame : IBoltListNode {
       public int Number;
       public readonly byte[] Data;
@@ -51,29 +61,47 @@ namespace Bolt {
     protected readonly int StructCount;
     protected readonly BoltDoubleList<Frame> Frames;
 
-    internal long[] CompleteMask;
-    internal long[][] FilterMask;
-    internal Dictionary<Filter, long[]> FilterPermutations;
+    protected abstract void Diff(byte[] a, byte[] b, long[] mask);
+    protected abstract long[] GetFilter(Filter filter);
+    protected abstract long[] GetDiffMask();
+    protected abstract long[] GetFullMask();
+    protected abstract ByteMask[] GetByteMasks();
 
-    protected State(int frameSize, int structCount, long[] complete, long[][] filters) {
+    protected State(int frameSize, int structCount) {
       Frames = new BoltDoubleList<Frame>();
       FrameSize = frameSize;
       StructCount = structCount;
       Flags = StateFlags.ZERO;
+    }
 
-      // all filters
-      FilterMask = filters;
-      FilterPermutations = new Dictionary<Filter, long[]>();
+    internal long[] CalculateDiff(byte[] a, byte[] b) {
+      Assert.True(a != null);
+      Assert.True(a.Length == FrameSize);
 
-      // full mask
-      CompleteMask = complete;
+      Assert.True(b != null);
+      Assert.True(b.Length == FrameSize);
 
-      // setup default filter permutations
-      for (int i = 0; i < filters.Length; ++i) {
-        if (filters[i] != null) {
-          FilterPermutations.Add(new Filter(1 << i), filters[i]);
+      // setup vars
+      int length = a.Length;
+      long[] mask = GetDiffMask();
+      ByteMask[] byteMap = GetByteMasks();
+
+      // always zero out mask
+      Array.Clear(mask, 0, mask.Length);
+
+      // do unsafe fast compare
+      unsafe {
+        fixed (byte* ap = a)
+        fixed (byte* bp = b) {
+          for (int i = 0; i < length; ++i) {
+            if (ap[i] != bp[i]) {
+              mask[byteMap[i].Index] |= byteMap[i].Mask;
+            }
+          }
         }
       }
+
+      return mask;
     }
 
     protected Frame AllocFrame(int number) {
@@ -105,5 +133,6 @@ namespace Bolt {
 
       return permutation;
     }
+
   }
 }

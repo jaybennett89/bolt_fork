@@ -30,6 +30,10 @@ namespace Bolt.Compiler {
       Comment(member, true, comment, args);
     }
 
+    public static void Comment(this CodeStatementCollection statements, string comment, params object[] args) {
+      statements.Add(new CodeCommentStatement(string.Format(comment, args)));
+    }
+
     public static void CommentSummary(this CodeTypeMember member, Action<CodeTypeMember> commenter) {
       Comment(member, true, "<summary>");
       commenter(member);
@@ -112,6 +116,19 @@ namespace Bolt.Compiler {
       return field;
     }
 
+    public static void For(this CodeStatementCollection stmts, string variableName, string testExpression, Action<CodeStatementCollection> body) {
+      CodeIterationStatement it;
+
+      it = new CodeIterationStatement();
+      it.InitStatement = (variableName + " = 0").Stmt();
+      it.TestExpression = testExpression.Expr();
+      it.IncrementStatement = ("++" + variableName).Stmt();
+
+      body(it.Statements);
+
+      stmts.Add(it);
+    }
+
     public static void DeclareParameter(this CodeMemberProperty method, string paramType, string paramName) {
       method.Parameters.Add(new CodeParameterDeclarationExpression(paramType, paramName));
     }
@@ -134,6 +151,14 @@ namespace Bolt.Compiler {
 
     public static CodeExpression Expr(this string text, params object[] args) {
       return new CodeSnippetExpression(string.Format(text, args));
+    }
+
+    public static CodeSnippetStatement Stmt(this string text, params object[] args) {
+      return new CodeSnippetStatement(string.Format(text, args));
+    }
+
+    public static string Indent(this string text, int indent) {
+      return (new string(' ', indent * 2) + text);
     }
 
     public static CodeExpression Expr(this int integer) {

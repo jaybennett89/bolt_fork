@@ -7,12 +7,49 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class StructCodeEmitter : AssetCodeEmitter {
-    public StructDecorator Decorator;
+    public new StructDecorator Decorator {
+      get { return (StructDecorator)base.Decorator; }
+      set { base.Decorator = value; }
+    }
 
-    public void Emit() {
+    public override void EmitTypes() {
       EmitStruct();
       EmitArray();
       EmitModifier();
+    }
+
+    void EmitByteMasks(CodeStatementCollection stmts) {
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        PropertyDecorator p = Decorator.Properties[i];
+
+        if (p.HasMask) {
+          stmts.Comment(p.Definition.Name);
+          stmts.Expr("for(int i = 0; i < {0}; ++i) ByteMasks[byteOffset++] = new ByteMask(structIndex, {1})", p.ByteSize, 1L << p.MaskBit);
+        }
+      }
+
+      stmts.Expr("structIndex += 1");
+
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        PropertyDecorator p = Decorator.Properties[i];
+        PropertyDecoratorArray arrayProperty = p as PropertyDecoratorArray;
+        PropertyDecoratorStruct structProperty = p as PropertyDecoratorStruct;
+
+        if (structProperty != null) {
+          stmts.Comment(p.Definition.Name);
+          stmts.Expr("{0}.InitByteMask(masks, ref structIndex, ref byteOffset)", structProperty.Struct.Name);
+        }
+        else
+          if (arrayProperty != null) {
+            PropertyTypeStruct elementType = arrayProperty.PropertyType.ElementType as PropertyTypeStruct;
+
+            if (elementType != null) {
+              StructDecorator elementStruct = Generator.FindStruct(elementType.StructGuid);
+              stmts.Comment(p.Definition.Name);
+              stmts.Expr("for(int i = 0; i < {0}; ++i) {1}.InitByteMask(masks, ref structIndex, ref byteOffset)", arrayProperty.PropertyType.ElementCount, elementStruct.Name);
+            }
+          }
+      }
     }
 
     void EmitStruct() {
@@ -22,7 +59,7 @@ namespace Bolt.Compiler {
       str.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
       str.CommentSummary(m => {
         m.CommentDoc(Decorator.Definition.Comment);
-        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.ByteSize);
+        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.FrameSize);
       });
 
       DeclareShimConstructor(str);
@@ -34,6 +71,15 @@ namespace Bolt.Compiler {
       str.DeclareMethod(Decorator.ModifierName, "Modify", method => {
         method.Statements.Expr("return new {0}(data, offset)", Decorator.ModifierName);
       });
+
+      str.DeclareMethod(typeof(void).FullName, "InitByteMask", method => {
+        method.DeclareParameter("Bolt.State.ByteMasks[]", "masks");
+        method.DeclareParameter("ref int", "structIndex");
+        method.DeclareParameter("ref int", "byteOffset");
+
+        EmitByteMasks(method.Statements);
+
+      }).Attributes = MemberAttributes.Static | MemberAttributes.Assembly;
     }
 
     void EmitArray() {
@@ -67,7 +113,7 @@ namespace Bolt.Compiler {
 
       arr.DeclareProperty(Decorator.Name, "Item", get => {
         get.Expr("if (index < 0 || index >= length) throw new IndexOutOfRangeException()");
-        get.Expr("return new {0}(data, offset + (index * {1}))", Decorator.Name, Decorator.ByteSize);
+        get.Expr("return new {0}(data, offset + (index * {1}))", Decorator.Name, Decorator.FrameSize);
       }).DeclareParameter(typeof(int).FullName, "index");
     }
 
@@ -99,5 +145,6 @@ namespace Bolt.Compiler {
         ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
       });
     }
+
   }
 }

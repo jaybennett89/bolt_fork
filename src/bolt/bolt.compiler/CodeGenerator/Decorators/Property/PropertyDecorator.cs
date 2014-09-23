@@ -14,6 +14,10 @@ namespace Bolt.Compiler {
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
 
+    public bool HasMask {
+      get { return MaskBit >= 0 && MaskBit <= 63; }
+    }
+
     public abstract int ByteSize { get; }
     public abstract string ClrType { get; }
     public abstract PropertyCodeEmitter CreateEmitter();

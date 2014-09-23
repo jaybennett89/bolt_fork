@@ -129,19 +129,17 @@ namespace Bolt.Compiler {
 
     void EmitCodeObjectModel() {
       foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
+        AssetCodeEmitter emitter;
         emitter = new StructCodeEmitter();
         emitter.Decorator = s;
-        emitter.Generator = this;
-        emitter.Emit();
+        emitter.EmitTypes();
       }
 
       foreach (StateDecorator s in States) {
-        StateCodeEmitter emitter;
+        AssetCodeEmitter emitter;
         emitter = new StateCodeEmitter();
         emitter.Decorator = s;
-        emitter.Generator = this;
-        emitter.Emit();
+        emitter.EmitTypes();
       }
 
       EmitFilters();
@@ -257,14 +255,14 @@ namespace Bolt.Compiler {
       // calculate sizes for all structs
       for (int i = 0; i < Structs.Count; ++i) {
         StructDecorator decorator = Structs[i];
-        decorator.ByteSize = 0;
+        decorator.FrameSize = 0;
 
         for (int n = 0; n < decorator.Properties.Count; ++n) {
           // copy byte offset to property
-          decorator.Properties[n].ByteOffset = decorator.ByteSize;
+          decorator.Properties[n].ByteOffset = decorator.FrameSize;
 
           // increment byte offset
-          decorator.ByteSize += decorator.Properties[n].ByteSize;
+          decorator.FrameSize += decorator.Properties[n].ByteSize;
         }
 
         decorator.ByteSizeCalculated = true;

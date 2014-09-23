@@ -7,146 +7,117 @@ using Bolt.Compiler;
 namespace Bolt.Bc {
   class Program {
     static void Main(string[] args) {
-      StructDefinition baz = new StructDefinition();
-      baz.AssetPath = "Test/Baz.asset";
-      baz.Comment = "My Comment";
-      baz.Enabled = true;
-      baz.Deleted = false;
-      baz.Guid = Guid.NewGuid();
-      baz.Properties = new List<PropertyDefinition>();
-      baz.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
+
+      StructDefinition enchant = new StructDefinition();
+      enchant.AssetPath = "Types/Enchant.asset";
+      enchant.Enabled = true;
+      enchant.Guid = Guid.NewGuid();
+      enchant.Properties.Add(new PropertyDefinition {
+        Name = "Value",
         Enabled = true,
-        Expanded = false,
-        Name = "TestFloat_Baz",
         Replicated = true,
-        PropertyType = new PropertyTypeFloat(),
-        AssetSettings = new PropertyDefinitionStateAssetSettings(),
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeFloat { }
       });
 
-      StateDefinition foo = new StateDefinition();
-      foo.AssetPath = "Test/Foo.asset";
-      foo.Comment = "My Comment";
-      foo.Enabled = true;
-      foo.Deleted = false;
-      foo.Guid = Guid.NewGuid();
-      foo.IsAbstract = false;
-      foo.Properties = new List<PropertyDefinition>();
-
-      foo.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
+      enchant.Properties.Add(new PropertyDefinition {
+        Name = "Type",
         Enabled = true,
-        Expanded = false,
-        Name = "TestFloat",
         Replicated = true,
-        PropertyType = new PropertyTypeFloat(),
-        AssetSettings = new PropertyDefinitionStateAssetSettings(),
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeString { MaxLength = 16 }
       });
 
-      foo.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
+      StructDefinition item = new StructDefinition();
+      item.AssetPath = "Types/Item.asset";
+      item.Enabled = true;
+      item.Guid = Guid.NewGuid();
+      item.Properties.Add(new PropertyDefinition {
+        Name = "Enchant",
         Enabled = true,
-        Expanded = false,
-        Name = "Transform",
         Replicated = true,
-        PropertyType = new PropertyTypeTransform(),
-        AssetSettings = new PropertyDefinitionStateAssetSettings {
-          Options = new HashSet<StatePropertyOptions>(new[]{ StatePropertyOptions.Interpolate })
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeStruct { StructGuid = enchant.Guid }
+      });
+
+      StructDefinition buff = new StructDefinition();
+      buff.AssetPath = "Types/Buff.asset";
+      buff.Enabled = true;
+      buff.Guid = Guid.NewGuid();
+
+      buff.Properties.Add(new PropertyDefinition {
+        Name = "Value",
+        Enabled = true,
+        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeFloat { }
+      });
+
+      buff.Properties.Add(new PropertyDefinition {
+        Name = "Type",
+        Enabled = true,
+        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeString { MaxLength = 16 }
+      });
+
+      buff.Properties.Add(new PropertyDefinition {
+        Name = "Timer",
+        Enabled = true,
+        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeFloat { }
+      });
+
+      StateDefinition character = new StateDefinition();
+      character.AssetPath = "Types/Character.asset";
+      character.Enabled = true;
+      character.Guid = Guid.NewGuid();
+
+      character.Properties.Add(new PropertyDefinition {
+        Name = "Buffs",
+        Enabled = true,
+        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeArray {
+          ElementCount = 16,
+          ElementType = new PropertyTypeStruct {
+            StructGuid = buff.Guid
+          }
         }
       });
 
-      StateDefinition bar = new StateDefinition();
-      bar.AssetPath = "Test/Bar.asset";
-      bar.Comment = "My Comment";
-      bar.Enabled = true;
-      bar.Deleted = false;
-      bar.Guid = Guid.NewGuid();
-      bar.ParentGuid = foo.Guid;
-      bar.IsAbstract = false;
-      bar.Properties = new List<PropertyDefinition>();
-
-      bar.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
+      character.Properties.Add(new PropertyDefinition {
+        Name = "Debuffs",
         Enabled = true,
-        Expanded = false,
-        Name = "TestString",
         Replicated = true,
-        PropertyType = new PropertyTypeString(),
-        AssetSettings = new PropertyDefinitionStateAssetSettings(),
-      });
-
-      bar.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
-        Enabled = true,
-        Expanded = false,
-        Name = "TestStruct",
-        Replicated = true,
-        PropertyType = new PropertyTypeStruct {
-          StructGuid = baz.Guid
-        },
-        AssetSettings = new PropertyDefinitionStateAssetSettings {
-          Options = new HashSet<StatePropertyOptions>(new[] { StatePropertyOptions.ChangedCallback })
-        },
-      });
-
-      bar.Properties.Add(new PropertyDefinition {
-        Comment = "My Comment",
-        Deleted = false,
-        Enabled = true,
-        Expanded = false,
-        Name = "TestArray",
-        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
         PropertyType = new PropertyTypeArray {
-          ElementCount = 32,
+          ElementCount = 16,
           ElementType = new PropertyTypeStruct {
-            StructGuid = baz.Guid
+            StructGuid = buff.Guid
           }
-        },
-        AssetSettings = new PropertyDefinitionStateAssetSettings(),
+        }
+      });
+
+      character.Properties.Add(new PropertyDefinition {
+        Name = "Inventory",
+        Enabled = true,
+        Replicated = true,
+        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        PropertyType = new PropertyTypeArray {
+          ElementCount = 256,
+          ElementType = new PropertyTypeStruct {
+            StructGuid = item.Guid
+          }
+        }
       });
 
       Context context = new Context();
-      context.Add(bar);
-      context.Add(foo);
-      context.Add(baz);
-      context.Add(new PropertyFilterDefinition {
-        Guid = Guid.NewGuid(),
-        Index = 0,
-        IsDefault = true,
-        Name = "Default"
-      });
-
-      //Context context = new Context();
-      //StructDefinition enchant = new StructDefinition();
-      //enchant.AssetPath = "Types/Enchant.asset";
-      //enchant.Enabled = true;
-      //enchant.Guid = Guid.NewGuid();
-
-      //StructDefinition item = new StructDefinition();
-      //item.AssetPath = "Types/Weapon.asset";
-      //item.Enabled = true;
-      //item.Guid = Guid.NewGuid();
-      //item.Properties.Add(new PropertyDefinition {
-      //  Name = "Enchants",
-      //  Enabled = true,
-      //  Replicated = true,
-      //  AssetSettings = new PropertyDefinitionStateAssetSettings { },
-      //  PropertyType = new PropertyTypeArray {
-      //    ElementCount = 2,
-      //    ElementType = new PropertyTypeStruct {
-      //      StructGuid = enchant.Guid
-      //    }
-      //  }
-      //});
-
-      //context.Add(enchant);
-      //context.Add(item);
-
+      context.Add(buff);
+      context.Add(item);
+      context.Add(enchant);
+      context.Add(character);
       context.GenerateCode("Test.cs");
     }
   }
