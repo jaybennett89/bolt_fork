@@ -5,9 +5,15 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
+  public struct StateProperty {
+    public int Index;
+    public PropertyDecorator Decorator;
+  }
+
   public class StateDecorator : AssetDecorator<StateDefinition> {
     public int BitCount = 0;
     public StructDecorator RootStruct;
+    public List<StateProperty> AllProperties = new List<StateProperty>();
     public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
 
     public bool HasParent {

@@ -67,7 +67,14 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="entity\EntitySerializer.cs" />
+    <Compile Include="state2\BitArray.cs" />
     <Compile Include="state2\Filter.cs" />
+    <Compile Include="state2\Priority.cs" />
+    <Compile Include="state2\Serializers\PropertySerializer.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerString.cs" />
+    <Compile Include="state2\StateFactory.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

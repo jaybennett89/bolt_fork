@@ -27,6 +27,9 @@ namespace Bolt.Compiler {
     [ProtoMember(7)]
     public string Comment;
 
+    [ProtoMember(9)]
+    public float Priority;
+
     [ProtoMember(2)]
     public PropertyType PropertyType;
 

@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 
 class BoltEntityProxyEnvelope : BoltObject, IDisposable {
-  public bool pooled = true;
   public Bits mask = 0;
   public Bits flags = 0;
+
   public BoltEntityProxy proxy = null;
 
-  public void Dispose () {
+  public Bolt.ProxyFlags Flags;
+  public List<int> Properties = new List<int>();
+
+  public void Dispose() {
     mask = 0;
     flags = 0;
     proxy = null;
+
+    Flags = Bolt.ProxyFlags.ZERO;
+    Properties.Clear();
+
     BoltEntityProxyEnvelopePool.Release(this);
   }
 }
@@ -18,53 +25,30 @@ class BoltEntityProxyEnvelope : BoltObject, IDisposable {
 static class BoltEntityProxyEnvelopePool {
   static readonly Stack<BoltEntityProxyEnvelope> pool = new Stack<BoltEntityProxyEnvelope>();
 
-  internal static BoltEntityProxyEnvelope Acquire () {
+  internal static BoltEntityProxyEnvelope Acquire() {
     BoltEntityProxyEnvelope obj;
 
     if (pool.Count > 0) {
       obj = pool.Pop();
-    } else {
+    }
+    else {
       obj = new BoltEntityProxyEnvelope();
     }
 
-    Assert.True(obj.pooled);
-    obj.pooled = false;
+    Assert.True(obj._pooled);
+    obj._pooled = false;
     return obj;
   }
 
-  internal static void Release (BoltEntityProxyEnvelope obj) {
-    Assert.False(obj.pooled);
-    obj.pooled = true;
+  internal static void Release(BoltEntityProxyEnvelope obj) {
+    Assert.False(obj._pooled);
+    obj._pooled = true;
     pool.Push(obj);
   }
 }
-
-class BoltEntityProxy : BoltObject {
-  public class PriorityComparer : IComparer<BoltEntityProxy> {
-    public static readonly PriorityComparer Instance = new PriorityComparer();
-
-    PriorityComparer () {
-
-    }
-
-    int IComparer<BoltEntityProxy>.Compare (BoltEntityProxy x, BoltEntityProxy y) {
-      return y.priority.CompareTo(x.priority);
-    }
-  }
-
-  public static BoltEntityProxy Alloc () {
-    BoltEntityProxy proxy = new BoltEntityProxy();
-    BoltCore._proxies.AddLast(proxy);
-    return proxy;
-  }
-
-  public static void Free (BoltEntityProxy proxy) {
-    // mark as destroyed
-    proxy.destroyed = true;
-
-    // remove from global list
-    BoltCore._proxies.Remove(proxy);
-  }
+  
+partial class BoltEntityProxy : BoltObject {
+  // ################### OLD
 
   public const uint FLAG_CREATE = 1;
   public const uint FLAG_CREATE_IN_PROGRESS = 2;
@@ -81,17 +65,35 @@ class BoltEntityProxy : BoltObject {
   public uint skipped = 0;
   public Bits mask = 0;
   public Bits flags = 0;
-  public bool destroyed = false;
 
+  public bool destroyed = false;
   public BoltEntity entity = null;
   public BoltConnection connection = null;
   public BoltRingBuffer<BoltEntityProxyEnvelope> envelopes;
 
-  public BoltEntityProxy () {
+  // ################### NEW
+
+  public Bolt.State State;
+  public Bolt.Filter Filter;
+  public Bolt.BitArray Mask;
+  public Bolt.ProxyFlags Flags;
+  public Bolt.PropertyPriority[] PropertyPriority;
+
+  public BoltConnection Connection;
+  public BoltRingBuffer<BoltEntityProxyEnvelope> Envelopes;
+
+  public int Skip;
+  public int WireId;
+  public float Priority;
+
+  // ###################
+
+  public BoltEntityProxy() {
     envelopes = new BoltRingBuffer<BoltEntityProxyEnvelope>(BoltCore._udpConfig.PacketWindow);
+    Envelopes = new BoltRingBuffer<BoltEntityProxyEnvelope>(BoltCore._udpConfig.PacketWindow);
   }
 
-  public BoltEntityProxyEnvelope CreateEnvelope () {
+  public BoltEntityProxyEnvelope CreateEnvelope() {
     BoltEntityProxyEnvelope env = BoltEntityProxyEnvelopePool.Acquire();
     env.flags = flags;
     env.proxy = this;
@@ -99,11 +101,40 @@ class BoltEntityProxy : BoltObject {
     return env;
   }
 
-  public override string ToString () {
-    return string.Format("[EntityProxy id={0} entity={1}]", networkId, ((object) entity) ?? ((object) "NULL"));
+  public override string ToString() {
+    return string.Format("[Proxy wireId={0} entity={1}]", networkId, ((object)entity) ?? ((object)"NULL"));
+  }
+}
+
+partial class BoltEntityProxy : BoltObject {
+  public class PriorityComparer : IComparer<BoltEntityProxy> {
+    public static readonly PriorityComparer Instance = new PriorityComparer();
+
+    PriorityComparer() {
+
+    }
+
+    int IComparer<BoltEntityProxy>.Compare(BoltEntityProxy x, BoltEntityProxy y) {
+      return y.priority.CompareTo(x.priority);
+    }
   }
 
-  public static implicit operator bool (BoltEntityProxy proxy) {
+  public static BoltEntityProxy Alloc() {
+    BoltEntityProxy proxy = new BoltEntityProxy();
+    BoltCore._proxies.AddLast(proxy);
+    return proxy;
+  }
+
+  public static void Free(BoltEntityProxy proxy) {
+    // mark as destroyed
+    proxy.Flags |= Bolt.ProxyFlags.DESTROY_DONE;
+    proxy.destroyed = true;
+
+    // remove from global list
+    BoltCore._proxies.Remove(proxy);
+  }
+
+  public static implicit operator bool(BoltEntityProxy proxy) {
     return proxy != null;
   }
 }

@@ -11,7 +11,7 @@ namespace Bolt {
 
 Dictionary<string, string[]> flagList = new Dictionary<string, string[]>();
 flagList.Add("StateFlags", new string[]{ "Controlling", "Proxy", "Proxying_Disabled", "Persist_On_Load" });
-flagList.Add("Filter", new string[]{ });
+flagList.Add("ProxyFlags", new string[]{ "Create_Requested", "Create_In_Progress", "Destroy_Requested", "Destroy_In_Progress", "Destroy_Done", "Idle", "Force_Sync" });
 
 foreach(var kvp in flagList) {
 	var name = kvp.Key;
@@ -97,14 +97,6 @@ public static readonly <#=name#> <#=flags[i].ToUpper()#> = new <#=name#>(<#=(1 <
     public static bool operator !=(<#=name#> a, <#=name#> b) {
       return a.bits != b.bits;
     }
-
-    //public void Pack (UdpStream stream, int bitCount) {
-    //  stream.WriteInt(bits, bitCount);
-    //}
-	//
-    //public static <#=name#> Read (UdpStream stream, int bitCount) {
-    //  return new <#=name#>(stream.ReadInt(bitCount));
-    //}
   }
 
 <# } #>

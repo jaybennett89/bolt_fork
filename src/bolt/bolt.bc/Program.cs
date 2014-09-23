@@ -7,6 +7,12 @@ using Bolt.Compiler;
 namespace Bolt.Bc {
   class Program {
     static void Main(string[] args) {
+      PropertyFilterDefinition filter = new PropertyFilterDefinition {
+        Guid = Guid.NewGuid(),
+        Index = 0,
+        IsDefault = true,
+        Name = "Default"
+      };
 
       StructDefinition enchant = new StructDefinition();
       enchant.AssetPath = "Types/Enchant.asset";
@@ -57,7 +63,7 @@ namespace Bolt.Bc {
         Name = "Type",
         Enabled = true,
         Replicated = true,
-        AssetSettings = new PropertyDefinitionStateAssetSettings { },
+        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = new HashSet<Guid>(new[] { filter.Guid }) },
         PropertyType = new PropertyTypeString { MaxLength = 16 }
       });
 
@@ -65,8 +71,8 @@ namespace Bolt.Bc {
         Name = "Timer",
         Enabled = true,
         Replicated = true,
-        AssetSettings = new PropertyDefinitionStateAssetSettings { },
-        PropertyType = new PropertyTypeFloat { }
+        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = new HashSet<Guid>(new[] { filter.Guid }) },
+        PropertyType = new PropertyTypeFloat {  }
       });
 
       StateDefinition character = new StateDefinition();
@@ -114,6 +120,7 @@ namespace Bolt.Bc {
       });
 
       Context context = new Context();
+      context.Add(filter);
       context.Add(buff);
       context.Add(item);
       context.Add(enchant);

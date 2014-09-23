@@ -235,26 +235,13 @@ namespace Bolt.Compiler {
             .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeStruct))
             .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeArray))
             .ToList();
-
-        // assign indexes
-        for (int n = 0; n < decorator.Properties.Count; ++n) {
-          PropertyDecorator p;
-
-          p = decorator.Properties[n];
-          p.Index = n;
-
-          if (p.Definition.Replicated && p.Definition.PropertyType.IsValue && p.Definition.StateAssetSettings.Condition == ReplicationConditions.ValueChanged) {
-            p.MaskBit = decorator.StructCount++;
-          }
-          else {
-            p.MaskBit = int.MinValue;
-          }
-        }
       }
 
       // calculate sizes for all structs
       for (int i = 0; i < Structs.Count; ++i) {
-        StructDecorator decorator = Structs[i];
+        StructDecorator decorator;
+
+        decorator = Structs[i];
         decorator.FrameSize = 0;
 
         for (int n = 0; n < decorator.Properties.Count; ++n) {
@@ -265,16 +252,27 @@ namespace Bolt.Compiler {
           decorator.FrameSize += decorator.Properties[n].ByteSize;
         }
 
-        decorator.ByteSizeCalculated = true;
+        decorator.FrameSizeCalculated = true;
       }
 
-      // calculate mask counts for all structs
-      for (int i = 0; i < Structs.Count; ++i) {
-        StructDecorator decorator = Structs[i];
-        decorator.StructCount = 1;
+      // calculate absolute property indexes for all properties
+      foreach (var state in States) {
+        var structs = state.CalculateStructList();
 
-        for (int n = 0; n < decorator.Properties.Count; ++n) {
-          decorator.StructCount += decorator.Properties[n].StructCount;
+        for (int i = 0; i < structs.Count; ++i) {
+          var s = structs[i];
+
+          for (int n = 0; n < s.Properties.Count; ++n) {
+            var p = s.Properties[n];
+            var t = p.Definition.PropertyType;
+
+            if (t.IsValue) {
+              state.AllProperties.Add(new StateProperty {
+                Index = state.AllProperties.Count,
+                Decorator = p
+              });
+            }
+          }
         }
       }
     }

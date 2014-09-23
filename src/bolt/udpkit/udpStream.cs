@@ -472,6 +472,12 @@ namespace UdpKit {
       Ptr += (count * 8);
     }
 
+    public byte[] ReadByteArray(int size) {
+      byte[] data = new byte[size];
+      ReadByteArray(data);
+      return data;
+    }
+
     public void ReadByteArray (byte[] to) {
       ReadByteArray(to, 0, to.Length);
     }

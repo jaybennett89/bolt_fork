@@ -7,16 +7,11 @@ using System.Text;
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
     public int Index;
-    public int MaskBit;
     public int ByteOffset;
 
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
-
-    public bool HasMask {
-      get { return MaskBit >= 0 && MaskBit <= 63; }
-    }
 
     public abstract int ByteSize { get; }
     public abstract string ClrType { get; }

@@ -10,12 +10,6 @@ namespace Bolt.Compiler {
   }
 
   [ProtoContract]
-  public enum ReplicationConditions {
-    ValueChanged = 0,
-    FirstReplication = 1
-  }
-
-  [ProtoContract]
   public enum MecanimPropertyTypes {
     Parameter = 0,
     LayerWeight = 1,

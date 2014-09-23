@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
@@ -9,17 +10,7 @@ namespace Bolt {
 
   }
 
-  public abstract class State {
-    internal struct ByteMask {
-      public long Mask;
-      public int Index;
-
-      public ByteMask(int index, int mask) {
-        Index = index;
-        Mask = mask; 
-      }
-    }
-
+  internal abstract class State {
     protected class Frame : IBoltListNode {
       public int Number;
       public readonly byte[] Data;
@@ -27,6 +18,12 @@ namespace Bolt {
       public Frame(int number, int size) {
         Number = number;
         Data = new byte[size];
+      }
+
+      public Frame Duplicate() {
+        Frame f = new Frame(Number, Data.Length);
+        Array.Copy(Data, 0, f.Data, 0, Data.Length);
+        return f;
       }
 
       object IBoltListNode.prev {
@@ -47,61 +44,94 @@ namespace Bolt {
 
     internal int LocalId;
     internal int PrefabId;
-    internal int NetworkId;
     internal BoltUniqueId UniqueId;
 
     internal UE.Vector3 SpawnPosition;
     internal UE.Quaternion SpawnRotation;
 
     internal StateFlags Flags;
+
     internal BoltEntity Entity;
     internal BoltConnection SourceConnection;
 
     protected readonly int FrameSize;
-    protected readonly int StructCount;
-    protected readonly BoltDoubleList<Frame> Frames;
+    protected readonly int PropertyCount;
+    protected readonly int PropertyIdBits;
+    protected readonly int MaxBitsPerPacket;
+    protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
 
-    protected abstract void Diff(byte[] a, byte[] b, long[] mask);
-    protected abstract long[] GetFilter(Filter filter);
-    protected abstract long[] GetDiffMask();
-    protected abstract long[] GetFullMask();
-    protected abstract ByteMask[] GetByteMasks();
+    protected abstract BitArray GetDiffArray();
+    protected abstract BitArray GetFullArray();
+    protected abstract BitArray GetFilterArray(Filter filter);
+    protected abstract PropertySerializer[] GetPropertyArray();
 
-    protected State(int frameSize, int structCount) {
-      Frames = new BoltDoubleList<Frame>();
+    protected State(int frameSize, int propertyCount, int maxBitsPerPacket) {
       FrameSize = frameSize;
-      StructCount = structCount;
-      Flags = StateFlags.ZERO;
+      PropertyCount = propertyCount;
+      PropertyIdBits = BoltMath.BitsRequired(propertyCount - 1);
+      MaxBitsPerPacket = maxBitsPerPacket;
     }
 
-    internal long[] CalculateDiff(byte[] a, byte[] b) {
+    internal void Pack(int frame, UdpConnection connection, UdpStream stream, PropertyPriority[] priority, List<PropertyPriority> written) {
+      int bits = 0;
+      PropertySerializer[] serializers = GetPropertyArray();
+
+      for (int i = 0; (i < priority.Length); ++i) {
+        if ((bits + PropertyIdBits + 1) >= MaxBitsPerPacket) {
+          return;
+        }
+
+        PropertyPriority p = priority[i];
+        PropertySerializer s = serializers[p.Property];
+
+        if (p.Priority == 0) {
+          return;
+        }
+
+        int b = s.CalculateBits(Frames.first.Data);
+
+        if ((bits + b) <= MaxBitsPerPacket) {
+          // write property id
+          stream.WriteInt(p.Property, PropertyIdBits);
+
+          // write data into stream
+          s.Pack(frame, connection, stream, Frames.first.Data);
+
+          // increment bits
+          bits += b;
+
+          // add to written list
+          written.Add(p);
+
+          // zero out priority (since we just sent it)
+          priority[i].Priority = 0;
+        }
+      }
+    }
+
+    internal BitArray GetFilter(Filter filter) {
+      return GetFilterArray(filter);
+    }
+
+    internal BitArray CalculateDiff(byte[] a, byte[] b) {
       Assert.True(a != null);
       Assert.True(a.Length == FrameSize);
 
       Assert.True(b != null);
       Assert.True(b.Length == FrameSize);
 
-      // setup vars
-      int length = a.Length;
-      long[] mask = GetDiffMask();
-      ByteMask[] byteMap = GetByteMasks();
+      var array = GetDiffArray();
+      var properties = GetPropertyArray();
 
-      // always zero out mask
-      Array.Clear(mask, 0, mask.Length);
+      array.Clear();
 
-      // do unsafe fast compare
-      unsafe {
-        fixed (byte* ap = a)
-        fixed (byte* bp = b) {
-          for (int i = 0; i < length; ++i) {
-            if (ap[i] != bp[i]) {
-              mask[byteMap[i].Index] |= byteMap[i].Mask;
-            }
-          }
+      for (int i = 0; i < properties.Length; ++i) {
+        if (Blit.Diff(a, b, properties[i].Offset, properties[i].Length)) {
+          array.Set(i);
         }
       }
 
-      return mask;
+      return array;
     }
 
     protected Frame AllocFrame(int number) {
@@ -112,19 +142,17 @@ namespace Bolt {
 
     }
 
-    protected long[] CalculateFilterPermutation(Filter filter, long[][] filters, Dictionary<Filter, long[]> permutations) {
-      long[] permutation;
+    protected BitArray CalculateFilterPermutation(Filter filter, BitArray[] filters, Dictionary<Filter, BitArray> permutations) {
+      BitArray permutation;
 
       if (permutations.TryGetValue(filter, out permutation) == false) {
-        permutation = new long[StructCount];
+        permutation = BitArray.CreateClear(PropertyCount);
 
         for (int i = 0; i < 32; ++i) {
           long b = 1 << i;
 
           if ((filter.Bits & b) == b) {
-            for (int s = 0; s < StructCount; ++s) {
-              permutation[s] |= filters[i][s];
-            }
+            permutation.OrAssign(filters[i]);
           }
         }
 

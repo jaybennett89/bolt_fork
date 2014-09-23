@@ -22,10 +22,6 @@ namespace Bolt.Compiler {
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
         PropertyDecorator p = Decorator.Properties[i];
 
-        if (p.HasMask) {
-          stmts.Comment(p.Definition.Name);
-          stmts.Expr("for(int i = 0; i < {0}; ++i) ByteMasks[byteOffset++] = new ByteMask(structIndex, {1})", p.ByteSize, 1L << p.MaskBit);
-        }
       }
 
       stmts.Expr("structIndex += 1");

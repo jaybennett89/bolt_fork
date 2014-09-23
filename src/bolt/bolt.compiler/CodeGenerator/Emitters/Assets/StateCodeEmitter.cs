@@ -35,58 +35,82 @@ namespace Bolt.Compiler {
       type.BaseTypes.Add("Bolt.State");
       type.BaseTypes.Add(Decorator.InterfaceName);
 
-      type.DeclareField(typeof(int).FullName, "FrameSize").Attributes |= MemberAttributes.Static;
-      type.DeclareField(typeof(int).FullName, "StructCount").Attributes |= MemberAttributes.Static;
-      type.DeclareField("ByteMask[]", "ByteMasks").Attributes |= MemberAttributes.Static;
+      type.DeclareField(typeof(int).FullName, "_FrameSize").Attributes = MemberAttributes.Static | MemberAttributes.Private;
+      type.DeclareField(typeof(int).FullName, "_PropertyCount").Attributes = MemberAttributes.Static | MemberAttributes.Private;
+      type.DeclareField("PropertySlice[]", "_Properties").Attributes = MemberAttributes.Static | MemberAttributes.Private;
 
-      type.DeclareField(typeof(long[]).FullName, "FullMask").Attributes |= MemberAttributes.Static;
-      type.DeclareField(typeof(long[]).FullName, "DiffMask").Attributes |= MemberAttributes.Static;
-      type.DeclareField(typeof(long[][]).FullName, "Filters").Attributes |= MemberAttributes.Static;
-      type.DeclareField("Dictionary<Filter, long[]>", "FilterPermutations").Attributes |= MemberAttributes.Static;
+      type.DeclareField("Bolt.BitArray", "_FullMask").Attributes = MemberAttributes.Static | MemberAttributes.Private;
+      type.DeclareField("Bolt.BitArray", "_DiffMask").Attributes = MemberAttributes.Static | MemberAttributes.Private;
+
+      type.DeclareField("Bolt.BitArray[]", "_Filters").Attributes = MemberAttributes.Static | MemberAttributes.Private;
+      type.DeclareField("Dictionary<Bolt.Filter, Bolt.BitArray>", "_FilterPermutations").Attributes = MemberAttributes.Static | MemberAttributes.Private;
 
       type.DeclareConstructorStatic(ctor => {
         var structs = Decorator.CalculateStructList();
 
-        ctor.Statements.Expr("FrameSize = {0}", Decorator.RootStruct.FrameSize);
-        ctor.Statements.Expr("StructCount = {0}", Decorator.RootStruct.StructCount);
+        ctor.Statements.Expr("_FrameSize = {0}", Decorator.RootStruct.FrameSize);
+        ctor.Statements.Expr("_PropertyCount = {0}", Decorator.AllProperties.Count);
 
-        ctor.Statements.Expr("// default masks");
-        ctor.Statements.Expr("FullMask = new long[StructCount] {{ {0} }}", structs.Select(x => x.CalculateCompleteMask()).Join(", "));
-        ctor.Statements.Expr("DiffMask = new long[StructCount]");
+        ctor.Statements.Comment("default masks");
+        ctor.Statements.Expr("_FullMask = Bolt.BitArray.CreateSet(PropertyCount)");
+        ctor.Statements.Expr("_DiffMask = Bolt.BitArray.CreateClear(PropertyCount)");
 
-        ctor.Statements.Expr("// filters");
-        ctor.Statements.Expr("FilterPermutations = new Dictionary<Bolt.Filter, long[]>(Bolt.Filter.EqualityComparer.Instance, 512)");
-        ctor.Statements.Expr("Filters = new long[32][]");
+        ctor.Statements.Comment("filters");
+        ctor.Statements.Expr("_FilterPermutations = new Dictionary<Bolt.Filter, Bolt.BitArray>(Bolt.Filter.EqualityComparer.Instance, 128)");
+        ctor.Statements.Expr("_Filters = new Bolt.BitArray[32]");
 
         foreach (PropertyFilterDefinition filter in Generator.Filters.OrderBy(x => x.Index)) {
-          ctor.Statements.Expr("Filters[{0}] = new long[StructCount] {{ {1} }}", filter.Index, structs.Select(x => x.CalculateFilterMask(filter.Index)).Join(", "));
+          var ba = BitArray.CreateClear(Decorator.AllProperties.Count);
+
+          for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
+            var p = Decorator.AllProperties[i];
+
+            if (p.Decorator.Definition.StateAssetSettings.Filters.Contains(filter.Guid)) {
+              ba.Set(p.Index);
+            }
+          }
+
+          ctor.Statements.Expr("_Filters[{0}] = Bolt.BitArray.CreateFrom({1}, new int[] {{ {2} }})", filter.Index, Decorator.AllProperties.Count, ba.ToArray().Join(", "));
         }
 
-        ctor.Statements.Expr("// byte masks");
-        ctor.Statements.Expr("int stuctIndex = 0");
-        ctor.Statements.Expr("int byteOffset = 0");
-        ctor.Statements.Expr("ByteMasks = new ByteMask[FrameSize]");
-        ctor.Statements.Expr("{0}.InitByteMasks(ByteMasks, ref stuctIndex, ref byteOffset)", Decorator.RootStruct.Name);
-        ctor.Statements.Expr("Assert.True(stuctIndex == StructCount)");
-        ctor.Statements.Expr("Assert.True(byteOffset == FrameSize)");
+        ctor.Statements.Comment("properties");
+        ctor.Statements.Expr("_Properties = new PropertySlice[{0}]", Decorator.AllProperties.Count);
+
+        int byteOffset = 0;
+
+        for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
+          // grab property
+          var p = Decorator.AllProperties[i];
+          var s = Generator.FindStruct(p.Decorator.DefiningAsset.Guid);
+
+          // emit init expression
+          ctor.Statements.Expr("_Properties[{0}] = new PropertySlice {{ Offset = {1}, Length = {2} }} /* {3}.{4} */", p.Index.ToString().PadRight(4), byteOffset.ToString().PadRight(5), p.Decorator.ByteSize.ToString().PadRight(3), s.Name, p.Decorator.Definition.Name);
+
+          // increase byte offset
+          byteOffset += p.Decorator.ByteSize;
+        }
       });
 
       type.DeclareConstructor(ctor => {
-        ctor.BaseConstructorArgs.Add("FrameSize".Expr());
-        ctor.BaseConstructorArgs.Add("StructCount".Expr());
+        ctor.BaseConstructorArgs.Add("_FrameSize".Expr());
+        ctor.BaseConstructorArgs.Add("_PropertyCount".Expr());
       });
 
-      type.DeclareMethod(typeof(long[]).FullName, "GetFilter", method => {
+      type.DeclareMethod("PropertySlice[]", "GetPropertyArray", method => {
+        method.Statements.Expr("return _Properties");
+      }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
+
+      type.DeclareMethod("Bolt.BitArray", "GetFilterArray", method => {
         method.DeclareParameter("Bolt.Filter", "filter");
-        method.Statements.Expr("return CalculatePermutation(filter, Filters, FilterPermutations)");
+        method.Statements.Expr("return CalculatePermutation(filter, _Filters, _FilterPermutations)");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod(typeof(long[]).FullName, "GetDiffMask", method => {
-        method.Statements.Expr("return DiffMask");
+      type.DeclareMethod("Bolt.BitArray", "GetDiffArray", method => {
+        method.Statements.Expr("return _DiffMask");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod(typeof(long[]).FullName, "GetFullMask", method => {
-        method.Statements.Expr("return FullMask");
+      type.DeclareMethod("Bolt.BitArray", "GetFullArray", method => {
+        method.Statements.Expr("return _FullMask");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
     }
 

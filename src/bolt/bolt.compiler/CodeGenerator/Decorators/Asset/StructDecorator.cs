@@ -6,8 +6,7 @@ using System.Text;
 namespace Bolt.Compiler {
   public class StructDecorator : AssetDecorator<StructDefinition> {
     public int FrameSize;
-    public int StructCount;
-    public bool ByteSizeCalculated;
+    public bool FrameSizeCalculated;
 
     public StateDecorator SourceState = null;
     public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
@@ -63,37 +62,6 @@ namespace Bolt.Compiler {
           }
         }
       }
-    }
-
-    public long CalculateCompleteMask() {
-      return CalculateMask(-1);
-    }
-
-    public long CalculateFilterMask(int filter) {
-      return CalculateMask(filter);
-    }
-
-    long CalculateMask(int filter) {
-      long mask = 0;
-      Guid filterGuid = filter == -1 ? Guid.Empty : Generator.FindFilter(filter).Guid;
-
-      for (int i = 0; i < Properties.Count; ++i) {
-        PropertyDecorator p = Properties[i];
-
-        if (p.MaskBit >= 0 && p.MaskBit <= 63) {
-          long b = 1L << Properties[i].MaskBit;
-
-          // should NOT be set!
-          Assert.True((mask & b) == 0L);
-
-          // get filter
-          if ((filter == -1) || p.Definition.StateAssetSettings.Filters.Contains(filterGuid)) {
-            mask |= b;
-          }
-        }
-      }
-
-      return mask;
     }
   }
 }

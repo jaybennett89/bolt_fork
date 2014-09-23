@@ -25,9 +25,6 @@ namespace Bolt.Compiler {
       public MecanimPropertyTypes PropertyType;
     }
 
-    [ProtoMember(1)]
-    public ReplicationConditions Condition;
-
     [ProtoMember(2)]
     public HashSet<Guid> Filters = new HashSet<Guid>();
 

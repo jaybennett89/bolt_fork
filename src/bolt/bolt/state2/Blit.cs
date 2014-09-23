@@ -3,6 +3,25 @@ using System.Runtime.InteropServices;
 
 namespace Bolt {
   public static class Blit {
+    public static bool Diff(byte[] a, byte[] b, int offset, int length) {
+      Assert.True(a != null);
+      Assert.True(b != null);
+      Assert.True(a.Length == b.Length);
+
+      int count = a.Length;
+
+      while (length > 0) {
+        if (a[offset] != b[offset]) {
+          return false;
+        }
+
+        ++offset;
+        --length;
+      }
+
+      return true;
+    }
+
     public static void PackBool(this byte[] data, int offset, bool value) {
       data[offset] = (value ? (byte)1 : (byte)0);
     }
@@ -51,6 +70,10 @@ namespace Bolt {
       return c.Float32;
     }
 
+    public static void PackBytes(byte[] data, int offset, byte[] bytes) {
+      Array.Copy(bytes, 0, data, offset, bytes.Length);
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     struct BitUnion {
       [FieldOffset(0)]
@@ -65,5 +88,6 @@ namespace Bolt {
       [FieldOffset(3)]
       public Byte Byte3;
     }
+
   }
 }

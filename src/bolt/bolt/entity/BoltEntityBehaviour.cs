@@ -26,7 +26,6 @@ public abstract class BoltEntityBehaviourBase : MonoBehaviour {
     }
   }
 
-
   /// <summary>
   /// The entity this behaviour attached to
   /// </summary>

@@ -6,6 +6,10 @@ using System.Collections.Generic;
 /// </summary>
 public static class BoltFactory {
   static Dictionary<Type, IBoltStateFactory> _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>();
+
+  static Dictionary<int, Bolt.IStateFactory> _state2FactoryById = new Dictionary<int, Bolt.IStateFactory>();
+  static Dictionary<Type, Bolt.IStateFactory> _state2FactoryByType = new Dictionary<Type, Bolt.IStateFactory>();
+
   static Dictionary<Type, IBoltEventFactory> _eventFactoryByType = new Dictionary<Type, IBoltEventFactory>();
   static Dictionary<ushort, IBoltEventFactory> _eventFactoryById = new Dictionary<ushort, IBoltEventFactory>();
   static Dictionary<Type, IBoltCommandFactory> _cmdFactoryByType = new Dictionary<Type, IBoltCommandFactory>();
@@ -14,6 +18,8 @@ public static class BoltFactory {
   public static bool IsEmpty {
     get {
       return
+        _state2FactoryByType.Count == 0 &&
+        _state2FactoryById.Count == 0 &&
         _stateFactoryByType.Count == 0 &&
         _eventFactoryByType.Count == 0 &&
         _eventFactoryById.Count == 0 &&
@@ -30,8 +36,8 @@ public static class BoltFactory {
   /// <example>
   /// IUserEventType evt = BoltFactory.NewEvent&lt;IUserEventType&gt;();
   /// </example>
-  public static T NewEvent<T> () where T : IBoltEvent {
-    return (T) (object) NewEvent(typeof(T));
+  public static T NewEvent<T>() where T : IBoltEvent {
+    return (T)(object)NewEvent(typeof(T));
   }
 
   /// <summary>
@@ -42,12 +48,12 @@ public static class BoltFactory {
   /// <example>
   /// UserCommandType cmd = BoltFactory.NewCommand&lt;UserCommandType&gt;();
   /// </example>
-  public static T NewCommand<T> () where T : BoltCommand {
-    return (T) NewCommand(typeof(T));
+  public static T NewCommand<T>() where T : BoltCommand {
+    return (T)NewCommand(typeof(T));
   }
 
-  internal static T NewState<T> () where T : IBoltState {
-    return (T) NewState(typeof(T));
+  internal static T NewState<T>() where T : IBoltState {
+    return (T)NewState(typeof(T));
   }
 
   /// <summary>
@@ -57,14 +63,14 @@ public static class BoltFactory {
   /// <example>
   /// IBoltEvent evt = BoltFactory.NewEvent(typeof(IUserEventType));
   /// </example>
-  public static IBoltEvent NewEvent (Type t) {
+  public static IBoltEvent NewEvent(Type t) {
     IBoltEventFactory f;
 
     if (_eventFactoryByType.TryGetValue(t, out f)) {
-      BoltEventBase evnt = (BoltEventBase) f.Create();
+      BoltEventBase evnt = (BoltEventBase)f.Create();
       evnt.RefCountIncrement();
 
-      return (IBoltEvent) (object) evnt;
+      return (IBoltEvent)(object)evnt;
     }
 
     throw new BoltException("unknown event type {0}", t.FullName);
@@ -77,7 +83,7 @@ public static class BoltFactory {
   /// <example>
   /// BoltCommand cmd = BoltFactory.NewCommand(typeof(UserCommandType));
   /// </example>
-  public static BoltCommand NewCommand (Type t) {
+  public static BoltCommand NewCommand(Type t) {
     IBoltCommandFactory f;
 
     if (_cmdFactoryByType.TryGetValue(t, out f)) {
@@ -87,7 +93,7 @@ public static class BoltFactory {
     throw new BoltException("unknown command type {0}", t);
   }
 
-  internal static IBoltState NewState (Type t) {
+  internal static IBoltState NewState(Type t) {
     IBoltStateFactory f;
 
     if (_stateFactoryByType.TryGetValue(t, out f)) {
@@ -97,8 +103,23 @@ public static class BoltFactory {
     throw new BoltException("unknown state type {0}", t);
   }
 
-  internal static void Register (IBoltStateFactory factory) {
+  internal static Bolt.IState NewState2(Type t) {
+    Bolt.IStateFactory f;
+
+    if (_state2FactoryByType.TryGetValue(t, out f)) {
+      return f.Create();
+    }
+
+    throw new BoltException("unknown state type {0}", t);
+  }
+
+  internal static void Register(IBoltStateFactory factory) {
     _stateFactoryByType.Add(factory.stateType, factory);
+  }
+
+  internal static void Register(Bolt.IStateFactory factory) {
+    _state2FactoryById.Add(factory.TypeId, factory);
+    _state2FactoryByType.Add(factory.TypeObject, factory);
   }
 
   /// <summary>
@@ -114,7 +135,7 @@ public static class BoltFactory {
   ///	}
   ///}
   /// </example>
-  public static void Register (IBoltCommandFactory factory) {
+  public static void Register(IBoltCommandFactory factory) {
     _cmdFactoryById.Add(factory.commandId, factory);
     _cmdFactoryByType.Add(factory.commandType, factory);
   }
@@ -132,7 +153,7 @@ public static class BoltFactory {
   ///	}
   ///}
   /// </example>
-  public static void Register (IBoltEventFactory factory) {
+  public static void Register(IBoltEventFactory factory) {
     if (factory.eventId != ushort.MaxValue) {
       _eventFactoryById.Add(factory.eventId, factory);
     }
@@ -140,7 +161,7 @@ public static class BoltFactory {
     _eventFactoryByType.Add(factory.eventType, factory);
   }
 
-  internal static BoltCommand NewCommand (ushort id) {
+  internal static BoltCommand NewCommand(ushort id) {
     IBoltCommandFactory handler;
 
     if (_cmdFactoryById.TryGetValue(id, out handler)) {
@@ -150,11 +171,11 @@ public static class BoltFactory {
     throw new BoltException("unknown command id {0}", id);
   }
 
-  internal static BoltEventBase NewEvent (ushort id) {
+  internal static BoltEventBase NewEvent(ushort id) {
     IBoltEventFactory handler;
 
     if (_eventFactoryById.TryGetValue(id, out handler)) {
-      BoltEventBase evnt = (BoltEventBase) handler.Create();
+      BoltEventBase evnt = (BoltEventBase)handler.Create();
       evnt.RefCountIncrement();
       return evnt;
     }
@@ -162,15 +183,15 @@ public static class BoltFactory {
     throw new BoltException("unknown event id {0}", id);
   }
 
-  internal static IBoltEventFactory GetEventFactory (ushort id) {
+  internal static IBoltEventFactory GetEventFactory(ushort id) {
     return _eventFactoryById[id];
   }
 
-  internal static IBoltCommandFactory GetCommandFactory (ushort id) {
+  internal static IBoltCommandFactory GetCommandFactory(ushort id) {
     return _cmdFactoryById[id];
   }
 
-  internal static void UnregisterAll () {
+  internal static void UnregisterAll() {
     _eventFactoryByType.Clear();
     _eventFactoryByType = new Dictionary<Type, IBoltEventFactory>(128);
 
@@ -185,5 +206,11 @@ public static class BoltFactory {
 
     _stateFactoryByType.Clear();
     _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>(128);
+
+    _state2FactoryByType.Clear();
+    _state2FactoryByType = new Dictionary<Type, Bolt.IStateFactory>(128);
+
+    _state2FactoryById.Clear();
+    _state2FactoryById = new Dictionary<int, Bolt.IStateFactory>(128);
   }
 }

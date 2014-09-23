@@ -42,6 +42,9 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\bolt\state2\BitArray.cs">
+      <Link>BitArray.cs</Link>
+    </Compile>
     <Compile Include="Assert.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
