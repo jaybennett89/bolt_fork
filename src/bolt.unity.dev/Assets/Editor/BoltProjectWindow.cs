@@ -45,6 +45,7 @@ public class BoltProjectWindow : BoltWindow {
   void NewFolder() {
     AssetFolder folder;
     folder = new AssetFolder();
+    folder.Guid = Guid.NewGuid(); 
     folder.Name = "NewFolder";
 
     // add to parent
@@ -60,6 +61,7 @@ public class BoltProjectWindow : BoltWindow {
   void NewState() {
     StateDefinition state;
     state = new StateDefinition();
+    state.Guid = Guid.NewGuid();
     state.Name = "NewState";
 
     // add to parent
@@ -146,10 +148,8 @@ public class BoltProjectWindow : BoltWindow {
       EndEditName(false);
     }
 
-    if (Selected is AssetFolder) {
-      editName = ((AssetFolder)Selected).Name;
-      edit = true;
-    }
+    editName = Selected.GetName();
+    edit = true;
   }
 
   void EndEditName(bool save) {
@@ -159,11 +159,15 @@ public class BoltProjectWindow : BoltWindow {
       if (Selected is AssetFolder) {
         ((AssetFolder)Selected).Name = editName;
       }
+
+      if (Selected is AssetDefinition) {
+        ((AssetDefinition)Selected).Name = editName;
+      }
     }
 
+    BeginClearFocus();
     Save();
   }
-
 
   void Sidebar() {
     GUILayout.Space(3);
@@ -280,9 +284,11 @@ public class BoltProjectWindow : BoltWindow {
       GUILayout.BeginHorizontal();
     }
 
-    RectOffset r = new RectOffset(indent * 10, 0, 0, 0);
-    BoltEditorGUI.IconClickable(folder.Expanded ? "arrow_down" : "arrow_right", r, () => { if (BoltEditorGUI.IsLeftClick) { Expand(folder); } });
-    BoltEditorGUI.IconClickable("folder-medium", () => { SelectOrExpand(folder); });
+    //RectOffset r = new RectOffset((indent * 10) + (Math.Max(0, indent - 1) * 3), 0, 0, 0);
+
+    RectOffset r = new RectOffset(3 + (indent * 11), 0, 0, 0);
+    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_arrow_down_8px" : "boltico_arrow_right", r, () => { if (BoltEditorGUI.IsLeftClick) Expand(folder); }, 9);
+    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_folder_open" : "boltico_folder_closed", () => { SelectOrExpand(folder); });
 
     GUIStyle label = new GUIStyle(GUI.skin.label);
     label.margin = new RectOffset();
@@ -362,8 +368,8 @@ public class BoltProjectWindow : BoltWindow {
       GUILayout.BeginHorizontal();
     }
 
-    RectOffset r = new RectOffset(16 + (indent * 10), 0, 0, 0);
-    BoltEditorGUI.IconClickable("state", r, () => { Select(asset); });
+    RectOffset r = new RectOffset(12 + (indent * 11), 0, 0, 0);
+    BoltEditorGUI.IconClickable("boltico_replistate2", r, () => { Select(asset); });
 
     GUIStyle label = new GUIStyle(GUI.skin.label);
     label.margin = new RectOffset();
@@ -376,6 +382,10 @@ public class BoltProjectWindow : BoltWindow {
     else {
       BoltEditorGUI.LabelClickable(asset.Name, label, () => { Select(asset); });
     }
+
+    GUILayout.FlexibleSpace();
+
+    BoltEditorGUI.Icon("new");
 
     GUILayout.EndHorizontal();
   }
