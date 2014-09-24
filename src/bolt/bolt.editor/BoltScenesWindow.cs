@@ -296,7 +296,7 @@ end tell'";
   void SetStage(int stage) {
     EditorPrefs.SetInt(DEBUGSTART_STAGE, stage);
   }
-   
+
   void CompileBolt() {
     if (EditorPrefs.GetBool(COMPILE_SETTING)) {
       SetStage(STAGE_COMPILE_BOLT_WAIT);
@@ -377,8 +377,12 @@ end tell'";
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     GUILayout.BeginVertical();
     Settings_ServerPort();
-    settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
-    settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
+
+    if (BoltEditorUtils.hasPro) {
+      settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
+      settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
+    }
+
     GUILayout.EndVertical();
   }
 
@@ -453,10 +457,8 @@ end tell'";
   void OnGUI() {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
 
-    if (BoltEditorUtils.hasPro) {
-      BoltAssetEditorGUI.Header("play", "Debug Start Settings");
-      Settings();
-    }
+    BoltAssetEditorGUI.Header("play", "Debug Start Settings");
+    Settings();
 
     BoltAssetEditorGUI.Header("scenes", "Scenes");
     GUILayout.Space(1);

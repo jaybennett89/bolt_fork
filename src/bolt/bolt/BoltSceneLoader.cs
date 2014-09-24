@@ -6,23 +6,35 @@ class BoltSceneLoader : MonoBehaviour {
     public Scene scene;
     public AsyncOperation async;
   }
+  static Scene _loaded;
+  static int _loadedDelay;
 
   static readonly BoltSingleList<LoadOp> _loadOps = new BoltSingleList<LoadOp>();
-  static internal bool isLoading {
-    get { return _loadOps.count > 0; }
-  }
+  static internal bool isLoading { get { return _loadOps.count > 0; } }
 
-  void Update () {
+  void Update() {
     if (_loadOps.count > 0) {
       if (BoltCore.isUnityPro) {
         LoadAsync();
-      } else {
+      }
+      else {
         Load();
+      }
+    }
+    else {
+      if (_loadedDelay > 0) {
+
+        if (--_loadedDelay == 0) {
+          if (_loadOps.count == 0) {
+            BoltCore.LoadMapDoneInternal(_loaded);
+          }
+        }
       }
     }
   }
 
-  void Load () {
+  void Load() {
+
     // notify core of loading
     BoltCore.LoadMapBeginInternal(_loadOps.first.scene);
 
@@ -33,7 +45,7 @@ class BoltSceneLoader : MonoBehaviour {
     Done();
   }
 
-  void LoadAsync () {
+  void LoadAsync() {
     if (_loadOps.first.async == null) {
       // notify core of loading
       BoltCore.LoadMapBeginInternal(_loadOps.first.scene);
@@ -41,26 +53,29 @@ class BoltSceneLoader : MonoBehaviour {
       // begin new async load
       _loadOps.first.async = Application.LoadLevelAsync(_loadOps.first.scene.name);
 
-    } else {
+    }
+    else {
       if (_loadOps.first.async.isDone) {
         Done();
       }
     }
   }
 
-  void Done () {
+  void Done() {
     try {
-      // collect all old garbage
       GC.Collect();
 
-      // invoke to core
-      BoltCore.LoadMapDoneInternal(_loadOps.first.scene);
-    } finally {
-      _loadOps.RemoveFirst();
+      _loaded = _loadOps.RemoveFirst().scene;
+    }
+    finally {
+      if (_loadOps.count == 0) {
+        _loadedDelay = 10;
+      }
     }
   }
 
-  internal static void Enqueue (Scene scene) {
+  internal static void Enqueue(Scene scene) {
+    _loadedDelay = 0;
     _loadOps.AddLast(new LoadOp { scene = scene });
   }
 }

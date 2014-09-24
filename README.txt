@@ -7,15 +7,15 @@ THIS IS A LEGAL DOCUMENT. PLEASE READ THIS DOCUMENT CAREFULLY BEFORE USING THIS 
 (b) The Licensee - Refers to the person or entity which has purchased a license for Bolt.
 2. Terms of License
 
-Arpi & Holmström Ek. För. grants to the Licensee a non-exclusive, worldwide, and perpetual license to the Software to integrate the Software only as incorporated and embedded components of electronic games and interactive media and distribute such electronic game and interactive media, except for game services software development kits (“Services SDKs”). The licensee may modify the Software. The licensee may otherwise not sell, reproduce, distribute, sublicense, rent, lease or lend the Software. It is emphasized that the Licensee shall not be entitled to distribute or transfer in any way (including, without, limitation by way of sublicense) the Software. in any other way than as integrated components of electronic games and interactive media. Without limitation of the foregoing it is emphasized that the Licensee shall not be entitled to share the costs related to purchasing the Software. and then let any third party that has contributed to such purchase use the Software.
+Bolt Engine AB grants to the Licensee a non-exclusive, worldwide, and perpetual license to the Software to integrate the Software only as incorporated and embedded components of electronic games and interactive media and distribute such electronic game and interactive media, except for game services software development kits (“Services SDKs”). The licensee may modify the Software. The licensee may otherwise not sell, reproduce, distribute, sublicense, rent, lease or lend the Software. It is emphasized that the Licensee shall not be entitled to distribute or transfer in any way (including, without, limitation by way of sublicense) the Software. in any other way than as integrated components of electronic games and interactive media. Without limitation of the foregoing it is emphasized that the Licensee shall not be entitled to share the costs related to purchasing the Software. and then let any third party that has contributed to such purchase use the Software.
 
 3. Ownership
 
-This license provides the Licensee with limited rights to use the Software. Arpi & Holmström Ek. För. retains all ownership, right, title and interest in, to and of the Software and all copies of it. All rights not specifically granted in this license, including domestic and international copyrights, are reserved by Arpi & Holmström Ek. För.
+This license provides the Licensee with limited rights to use the Software. Bolt Engine AB retains all ownership, right, title and interest in, to and of the Software and all copies of it. All rights not specifically granted in this license, including domestic and international copyrights, are reserved by Bolt Engine AB.
 
 4. Proprietary Markings
 
-Arpi & Holmström Ek. För. and Bolt logos, product names, manuals, documentation, and other support materials are either patented, copyrighted, trademarked, constitute valuable trade secrets (whether or not any portion of them may be copyrighted or patented) or are otherwise proprietary to Arpi & Holmström Ek. För. The licensee shall not remove or obscure Arpi & Holmström Ek. För. copyright, trade mark or other proprietary notices from any of the materials contained in this package or downloaded together with the Software.
+Bolt Engine AB and Bolt logos, product names, manuals, documentation, and other support materials are either patented, copyrighted, trademarked, constitute valuable trade secrets (whether or not any portion of them may be copyrighted or patented) or are otherwise proprietary to Bolt Engine AB. The licensee shall not remove or obscure Bolt Engine AB. copyright, trade mark or other proprietary notices from any of the materials contained in this package or downloaded together with the Software.
 
 5. Disclaimer of Warranties and Technical Support
 
@@ -23,7 +23,7 @@ The Software is provided to the Licensee on an “as is” basis, without any te
 
 6. Limitation of Liability
 
-ARPI & HOLMSTRÖM EK. FÖR. SHALL NOT BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES OR LOSS, INCLUDING DAMAGES FOR LOSS OF BUSINESS, LOSS OF PROFITS, OR THE LIKE, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR OTHERWISE, EVEN IF ARPI & HOLMSTRÖM EK. FÖR. OR ITS REPRESENTATIVES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OR EXCLUSION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS LIMITATION OR EXCLUSION MAY NOT APPLY TO THE LICENSEE. This warranty gives the Licensee specific legal rights, and the Licensee may also have other rights which vary from jurisdiction to jurisdiction.
+BOLT ENGINE AB SHALL NOT BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES OR LOSS, INCLUDING DAMAGES FOR LOSS OF BUSINESS, LOSS OF PROFITS, OR THE LIKE, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR OTHERWISE, EVEN IF BOLT ENGINE AB OR ITS REPRESENTATIVES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OR EXCLUSION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS LIMITATION OR EXCLUSION MAY NOT APPLY TO THE LICENSEE. This warranty gives the Licensee specific legal rights, and the Licensee may also have other rights which vary from jurisdiction to jurisdiction.
 
 7. Term and Termination
 
