@@ -6,8 +6,9 @@ class BoltSceneLoader : MonoBehaviour {
     public Scene scene;
     public AsyncOperation async;
   }
+  static Scene _loaded;
+  static int _loadedDelay;
 
-  static int _frameDelay;
   static readonly BoltSingleList<LoadOp> _loadOps = new BoltSingleList<LoadOp>();
   static internal bool isLoading { get { return _loadOps.count > 0; } }
 
@@ -21,13 +22,11 @@ class BoltSceneLoader : MonoBehaviour {
       }
     }
     else {
-      if (_frameDelay > 0) {
-        if (--_frameDelay == 0) {
-          try {
-            BoltCore.LoadMapDoneInternal(_loadOps.first.scene);
-          }
-          finally {
-            _loadOps.RemoveFirst();
+      if (_loadedDelay > 0) {
+
+        if (--_loadedDelay == 0) {
+          if (_loadOps.count == 0) {
+            BoltCore.LoadMapDoneInternal(_loaded);
           }
         }
       }
@@ -63,12 +62,20 @@ class BoltSceneLoader : MonoBehaviour {
   }
 
   void Done() {
-    GC.Collect();
-    _frameDelay = 10;
+    try {
+      GC.Collect();
+
+      _loaded = _loadOps.RemoveFirst().scene;
+    }
+    finally {
+      if (_loadOps.count == 0) {
+        _loadedDelay = 10;
+      }
+    }
   }
 
   internal static void Enqueue(Scene scene) {
-    _frameDelay = 0;
+    _loadedDelay = 0;
     _loadOps.AddLast(new LoadOp { scene = scene });
   }
 }
