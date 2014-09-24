@@ -58,6 +58,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public Color highlightColor = new Color(81f / 255f, 203f / 255f, 255f / 255f);
 
+  [SerializeField]
+  public string projectPath = "";
+
   public BoltConfig GetConfigCopy() {
     return _config.Clone();
   }

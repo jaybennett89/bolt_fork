@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: d3bb4e60fc3f4ec4995cd0d76bd56c20
+MonoAssemblyImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder:
+    BoltEntity: -2500
+    BoltFrameInterpolator: 7500
+    BoltPoll: -10000
+    BoltSend: 10000
+  userData: 

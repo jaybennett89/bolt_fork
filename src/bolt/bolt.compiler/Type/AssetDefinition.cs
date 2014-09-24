@@ -10,23 +10,27 @@ namespace Bolt.Compiler {
   [ProtoInclude(200, typeof(EventDefinition))]
   [ProtoInclude(300, typeof(StructDefinition))]
   [ProtoInclude(400, typeof(CommandDefinition))]
-  public abstract class AssetDefinition {
+  public abstract class AssetDefinition : INamedAsset {
     [ProtoIgnore]
     public bool Deleted;
 
     [ProtoIgnore]
-    public Context Context;
+    public Project Project;
+
+    [ProtoMember(2)]
+    public string Name;
 
     [ProtoMember(1)]
     public Guid Guid;
-
-    [ProtoMember(4)]
-    public string AssetPath;
 
     [ProtoMember(5)]
     public string Comment;
 
     [ProtoMember(6)]
     public bool Enabled;
+
+    string INamedAsset.GetName() {
+      return Name;
+    }
   }
 }

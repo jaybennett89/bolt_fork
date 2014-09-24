@@ -15,7 +15,7 @@ namespace Bolt.Bc {
       };
 
       StructDefinition enchant = new StructDefinition();
-      enchant.AssetPath = "Types/Enchant.asset";
+      enchant.Name = "Types/Enchant.asset";
       enchant.Enabled = true;
       enchant.Guid = Guid.NewGuid();
       enchant.Properties.Add(new PropertyDefinition {
@@ -35,7 +35,7 @@ namespace Bolt.Bc {
       });
 
       StructDefinition item = new StructDefinition();
-      item.AssetPath = "Types/Item.asset";
+      item.Name = "Types/Item.asset";
       item.Enabled = true;
       item.Guid = Guid.NewGuid();
       item.Properties.Add(new PropertyDefinition {
@@ -47,7 +47,7 @@ namespace Bolt.Bc {
       });
 
       StructDefinition buff = new StructDefinition();
-      buff.AssetPath = "Types/Buff.asset";
+      buff.Name = "Types/Buff.asset";
       buff.Enabled = true;
       buff.Guid = Guid.NewGuid();
 
@@ -76,7 +76,7 @@ namespace Bolt.Bc {
       });
 
       StateDefinition character = new StateDefinition();
-      character.AssetPath = "Types/Character.asset";
+      character.Name = "Types/Character.asset";
       character.Enabled = true;
       character.Guid = Guid.NewGuid();
 
@@ -119,13 +119,6 @@ namespace Bolt.Bc {
         }
       });
 
-      Context context = new Context();
-      context.Add(filter);
-      context.Add(buff);
-      context.Add(item);
-      context.Add(enchant);
-      context.Add(character);
-      context.GenerateCode("Test.cs");
     }
   }
 }

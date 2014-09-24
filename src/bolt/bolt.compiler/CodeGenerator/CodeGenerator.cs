@@ -9,7 +9,7 @@ using System.CodeDom.Compiler;
 
 namespace Bolt.Compiler {
   public partial class CodeGenerator {
-    Context Context;
+    Project Context;
 
     public List<StateDecorator> States;
     public List<StructDecorator> Structs;
@@ -26,7 +26,7 @@ namespace Bolt.Compiler {
       Structs = new List<StructDecorator>();
     }
 
-    public void Run(Context context, string file) {
+    public void Run(Project context, string file) {
       Context = context;
 
       CodeNamespace = new CodeNamespace();
@@ -177,7 +177,7 @@ namespace Bolt.Compiler {
         rootDef.Enabled = s.Definition.Enabled;
         rootDef.Guid = s.Definition.Guid;
         rootDef.Comment = s.Definition.Comment;
-        rootDef.AssetPath = s.Definition.AssetPath;
+        rootDef.Name = s.Definition.Name;
         rootDef.Properties = new List<PropertyDefinition>(s.Definition.Properties);
 
         // setup root struct decorator

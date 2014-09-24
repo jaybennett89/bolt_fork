@@ -67,7 +67,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
     <Compile Include="Compression\IntCompression.cs" />
-    <Compile Include="Context.cs" />
+    <Compile Include="Project.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
     <Compile Include="Property\PropertyFilterDefinition.cs" />
@@ -87,6 +87,7 @@
     <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />
     <Compile Include="Type\EventDefinition.cs" />
+    <Compile Include="SerializerUtils.cs" />
     <Compile Include="Type\StructDefinition.cs" />
     <Compile Include="Type\StateDefinition.cs" />
     <Compile Include="Type\AssetDefinition.cs" />

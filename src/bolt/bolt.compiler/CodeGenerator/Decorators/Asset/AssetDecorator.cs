@@ -22,7 +22,7 @@ namespace Bolt.Compiler {
     }
 
     public string Name {
-      get { return Path.GetFileNameWithoutExtension(Definition.AssetPath); }
+      get { return Path.GetFileNameWithoutExtension(Definition.Name); }
     }
   }
 }

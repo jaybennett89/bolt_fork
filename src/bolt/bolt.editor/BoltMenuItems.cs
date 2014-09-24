@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using UnityEditor;
+using Bolt.Compiler;
 
 public static class BoltMenuItems {
   [MenuItem("Assets/Create/Bolt/State (Legacy)")]
@@ -8,10 +9,10 @@ public static class BoltMenuItems {
   }
 
   [MenuItem("Assets/Create/Bolt/State")]
-  public static void NewStateAsset() {
+  public static void NewStateAsset2() {
     BoltEditorUtils.CreateAsset<BoltBinaryAsset>("BoltState", asset => {
       asset.Type = BoltBinaryAssetTypes.State;
-      asset.Data = Bolt.Compiler.StateDefinition.Default();
+      asset.Data = Bolt.Compiler.StateDefinition.Default().ToByteArray();
     });
   }
 

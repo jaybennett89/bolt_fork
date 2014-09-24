@@ -14,7 +14,7 @@ namespace Bolt.Compiler {
   [ProtoInclude(700, typeof(PropertyTypeTransform))]
   public abstract class PropertyType {
     [ProtoIgnore]
-    public Context Context;
+    public Project Context;
 
     [ProtoIgnore]
     public virtual bool MecanimUsable { get { return false; } }

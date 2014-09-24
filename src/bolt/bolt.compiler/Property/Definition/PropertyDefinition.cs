@@ -10,7 +10,7 @@ namespace Bolt.Compiler {
     public bool Deleted;
 
     [ProtoIgnore]
-    public Context Context;
+    public Project Context;
 
     [ProtoMember(1)]
     public string Name;
