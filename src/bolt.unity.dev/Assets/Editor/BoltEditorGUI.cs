@@ -43,8 +43,17 @@ public static class BoltEditorGUI {
     }
   }
 
+  public static Color Color(int r, int g, int b) {
+    return new Color(r / 255f, g / 255f, b / 255f);
+  }
+
   public static Color StateHeaderColor {
     get { return Blue; }
+  }
+
+
+  public static Color StructHeaderColor {
+    get { return Color(163, 73, 164); }
   }
 
 
@@ -162,7 +171,7 @@ public static class BoltEditorGUI {
     var types = asset.AllowedPropertyTypes.ToArray();
     var typesNames = types.Select(x => x.Name.Replace("PropertyType", "")).ToArray();
     var selected = Array.IndexOf(types, definition.PropertyType.GetType());
-    var selectedNew = EditorGUILayout.Popup(selected, typesNames);
+    var selectedNew = EditorGUILayout.Popup(selected, typesNames, GUILayout.Width(80));
 
     if (selected != selectedNew) {
       definition.PropertyType = (PropertyType)Activator.CreateInstance(types[selectedNew]);

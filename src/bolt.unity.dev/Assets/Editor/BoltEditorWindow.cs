@@ -67,7 +67,7 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
-    EditPropertyList(def, def.Properties);
+    EditPropertyList(def, def.Properties, StateAndStructToolbar);
   }
 
   void EditStruct(StructDefinition def) {
@@ -79,7 +79,7 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
-    EditPropertyList(def, def.Properties);
+    EditPropertyList(def, def.Properties, StateAndStructToolbar);
   }
 
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action) {
@@ -96,9 +96,9 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.EndHorizontal();
   }
 
-  void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
+  void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list, Action<AssetDefinition, PropertyDefinition> toolbar) {
     for (int i = 0; i < list.Count; ++i) {
-      EditProperty(def, list[i]);
+      EditProperty(def, list[i], toolbar);
     }
 
     // move nudged property
@@ -138,14 +138,18 @@ public class BoltEditorWindow : BoltWindow {
     }
   }
 
-  void EditProperty(AssetDefinition def, PropertyDefinition p) {
+  void EditProperty(AssetDefinition def, PropertyDefinition p, Action<AssetDefinition, PropertyDefinition> toolbar) {
     EditorGUILayout.BeginHorizontal(BoltEditorGUI.ParameterBackgroundStyle);
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name);
+    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.MinWidth(100));
 
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
+
+    if (toolbar != null) {
+      toolbar(def, p);
+    }
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.IconButton("delete")) {
@@ -159,5 +163,37 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     EditorGUILayout.EndHorizontal();
+  }
+
+  GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, PropertyFilterDefinition f) {
+    return () => { p.Filters ^= f.Bit; };
+  }
+
+  void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
+    EditFilters(p);
+
+    if (BoltEditorGUI.IconButton("boltico_playcom2", !p.ExcludeController)) {
+      p.ExcludeController = !p.ExcludeController;
+    }
+  }
+
+  void EditFilters(PropertyDefinition p) {
+    if (Project.UseFilters) {
+      GUIStyle s = new GUIStyle(EditorStyles.miniButton);
+      s.alignment = TextAnchor.MiddleLeft;
+
+      if (GUILayout.Button(Project.EnabledFilters.Where(x => x.IsOn(p.Filters)).Select(x => x.Name).Join(", "), s, GUILayout.Width(200))) {
+        GenericMenu m = new GenericMenu();
+
+        foreach (PropertyFilterDefinition f in Project.EnabledFilters) {
+          m.AddItem(new GUIContent(f.Name), f.IsOn(p.Filters), FilterSetter(p, f));
+        }
+
+        m.ShowAsContext();
+      }
+
+      var r = GUILayoutUtility.GetLastRect();
+      GUI.DrawTexture(new Rect(r.xMax - 18, r.yMin, 16, 16), BoltEditorGUI.LoadIcon("boltico_arrow_down"));
+    }
   }
 }

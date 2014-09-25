@@ -10,16 +10,10 @@ namespace Bolt.Compiler {
     [ProtoContract]
     public class MecanimSettings {
       [ProtoMember(1)]
-      public float StaticDampTime;
+      public int LayerIndex;
 
       [ProtoMember(2)]
       public string ParameterName;
-
-      [ProtoMember(3)]
-      public int LayerIndex;
-
-      [ProtoMember(4)]
-      public MecanimDampMode MecanimDampMode;
 
       [ProtoMember(5)]
       public MecanimPropertyTypes PropertyType;

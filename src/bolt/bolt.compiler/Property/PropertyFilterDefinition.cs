@@ -19,5 +19,9 @@ namespace Bolt.Compiler {
     public int Bit {
       get { return 1 << Index; }
     }
+
+    public bool IsOn(int bits) {
+      return (bits & Bit) == Bit;
+    }
   }
 }

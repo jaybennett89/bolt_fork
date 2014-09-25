@@ -12,6 +12,10 @@ namespace Bolt.Compiler {
     [ProtoMember(2)]
     public PropertyFilterDefinition[] Filters = new PropertyFilterDefinition[0];
 
+    public IEnumerable<PropertyFilterDefinition> EnabledFilters {
+      get { return Filters.Where(x => x.Enabled); }
+    }
+
     public IEnumerable<StateDefinition> States {
       get { return RootFolder.AssetsAll.Where(x => x is StateDefinition).Cast<StateDefinition>(); }
     }
@@ -21,7 +25,7 @@ namespace Bolt.Compiler {
     }
 
     public bool UseFilters {
-      get { return Filters.Count(x => x.Enabled) > 0; }
+      get { return EnabledFilters.Count() > 0; }
     }
 
     public StateDefinition FindState(Guid guid) {
