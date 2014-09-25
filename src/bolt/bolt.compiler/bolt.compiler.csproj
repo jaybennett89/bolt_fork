@@ -46,6 +46,7 @@
       <Link>BitArray.cs</Link>
     </Compile>
     <Compile Include="Assert.cs" />
+    <Compile Include="AssetFolder.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecorator.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
     <Compile Include="Compression\IntCompression.cs" />
+    <Compile Include="NamedAsset.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />

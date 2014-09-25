@@ -26,7 +26,7 @@ namespace Bolt.Compiler {
     }
 
     [ProtoMember(2)]
-    public HashSet<Guid> Filters = new HashSet<Guid>();
+    public int Filters;
 
     [ProtoMember(3)]
     public HashSet<StatePropertyOptions> Options = new HashSet<StatePropertyOptions>();

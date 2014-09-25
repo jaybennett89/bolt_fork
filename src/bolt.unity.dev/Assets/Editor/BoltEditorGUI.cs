@@ -213,6 +213,10 @@ public static class BoltEditorGUI {
     return GUILayout.Button(LoadIcon(enabled ? on : off) as Texture, ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
   }
 
+  public static bool OnOffButton(string on, string off, bool enabled, float offOpacity) {
+    return IconButton(enabled ? on : off, enabled ? 1f : offOpacity);
+  }
+
   public static bool IconButton(string icon, float opacity) {
     return IconButton(icon, new Color(1, 1, 1, Mathf.Clamp01(opacity)));
   }

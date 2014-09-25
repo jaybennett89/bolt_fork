@@ -55,10 +55,6 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
-    public PropertyFilterDefinition FindFilter(Guid guid) {
-      return Filters.First(x => x.Guid == guid);
-    }
-
     public PropertyFilterDefinition FindFilter(int index) {
       return Filters.First(x => x.Index == index);
     }

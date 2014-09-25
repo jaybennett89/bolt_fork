@@ -10,13 +10,14 @@ namespace Bolt.Compiler {
     [ProtoMember(1)]
     public int Index;
 
-    [ProtoMember(2)]
-    public Guid Guid;
+    [ProtoMember(5)]
+    public bool Enabled;
 
     [ProtoMember(3)]
     public string Name;
 
-    [ProtoMember(4)]
-    public bool IsDefault;
+    public int Bit {
+      get { return 1 << Index; }
+    }
   }
 }

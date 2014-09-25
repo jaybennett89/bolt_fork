@@ -65,7 +65,7 @@ namespace Bolt.Compiler {
           for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
             var p = Decorator.AllProperties[i];
 
-            if (p.Decorator.Definition.StateAssetSettings.Filters.Contains(filter.Guid)) {
+            if ((p.Decorator.Definition.StateAssetSettings.Filters & filter.Bit) == filter.Bit) {
               ba.Set(p.Index);
             }
           }

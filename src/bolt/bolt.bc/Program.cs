@@ -8,10 +8,9 @@ namespace Bolt.Bc {
   class Program {
     static void Main(string[] args) {
       PropertyFilterDefinition filter = new PropertyFilterDefinition {
-        Guid = Guid.NewGuid(),
         Index = 0,
-        IsDefault = true,
-        Name = "Default"
+        Name = "Default",
+        Enabled = true
       };
 
       StructDefinition enchant = new StructDefinition();
@@ -63,7 +62,7 @@ namespace Bolt.Bc {
         Name = "Type",
         Enabled = true,
         Replicated = true,
-        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = new HashSet<Guid>(new[] { filter.Guid }) },
+        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = 1 },
         PropertyType = new PropertyTypeString { MaxLength = 16 }
       });
 
@@ -71,7 +70,7 @@ namespace Bolt.Bc {
         Name = "Timer",
         Enabled = true,
         Replicated = true,
-        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = new HashSet<Guid>(new[] { filter.Guid }) },
+        AssetSettings = new PropertyDefinitionStateAssetSettings { Filters = 1 },
         PropertyType = new PropertyTypeFloat {  }
       });
 
