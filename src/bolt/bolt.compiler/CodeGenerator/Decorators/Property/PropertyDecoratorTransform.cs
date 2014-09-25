@@ -7,7 +7,7 @@ namespace Bolt.Compiler {
   public class PropertyDecoratorTransform : PropertyDecorator<PropertyTypeTransform> {
     public override int ByteSize {
       get {
-        if (Definition.StateAssetSettings.Options.Contains(StatePropertyOptions.Extrapolate)) {
+        if (Definition.StateAssetSettings.InterpMode == StateInterpolationMode.Extrapolate) {
           // position + rotation + velocity + acceleration
           return 12 + 16 + 12 + 4;
         }

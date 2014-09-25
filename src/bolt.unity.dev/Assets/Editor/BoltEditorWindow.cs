@@ -71,7 +71,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStruct(StructDefinition def) {
-    EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, () => {
+    EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StructHeaderColor, () => {
 
     });
 
@@ -86,6 +86,15 @@ public class BoltEditorWindow : BoltWindow {
     GUI.color = color;
     GUILayout.BeginHorizontal(style);
     GUI.color = Color.white;
+
+    if (def is StructDefinition) {
+      BoltEditorGUI.Icon("boltico_object", new RectOffset(3, 0, 0, 0));
+    }
+
+    if (def is StateDefinition) {
+      BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 0, 0));
+
+    }
 
     // edit asset name
     def.Name = EditorGUILayout.TextField(def.Name);
@@ -174,6 +183,10 @@ public class BoltEditorWindow : BoltWindow {
 
     if (BoltEditorGUI.IconButton("boltico_playcom2", !p.ExcludeController)) {
       p.ExcludeController = !p.ExcludeController;
+    }
+
+    if (BoltEditorGUI.IconButton("callback", p.StateAssetSettings.Callback)) {
+      p.StateAssetSettings.Callback = !p.StateAssetSettings.Callback;
     }
   }
 

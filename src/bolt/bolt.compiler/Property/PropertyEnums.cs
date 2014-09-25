@@ -23,8 +23,8 @@ namespace Bolt.Compiler {
   }
 
   [ProtoContract]
-  public enum StatePropertyOptions {
-    ChangedCallback = 0,
+  public enum StateInterpolationMode {
+    None = 0,
     Interpolate = 1,
     Extrapolate = 2,
   }

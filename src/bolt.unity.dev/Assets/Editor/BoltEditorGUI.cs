@@ -43,7 +43,7 @@ public static class BoltEditorGUI {
     }
   }
 
-  public static Color Color(int r, int g, int b) {
+  public static Color ColorInt(int r, int g, int b) {
     return new Color(r / 255f, g / 255f, b / 255f);
   }
 
@@ -53,7 +53,7 @@ public static class BoltEditorGUI {
 
 
   public static Color StructHeaderColor {
-    get { return Color(163, 73, 164); }
+    get { return ColorInt(200, 89, 200); }
   }
 
 
