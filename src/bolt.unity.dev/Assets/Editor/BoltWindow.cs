@@ -71,7 +71,7 @@ public abstract class BoltWindow : EditorWindow {
 
   protected void LoadProject() {
     if (Project == null) {
-      Debug.Log("Loading project ... " + ProjectPath);
+      Debug.Log("Loading project... " + ProjectPath);
 
       if (File.Exists(ProjectPath) == false) {
         InitNewProject();
