@@ -42,7 +42,7 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void Update() {
-    if ((Repaints > 0) || ((repaintTime + 0.1f) < Time.realtimeSinceStartup)) {
+    if ((Repaints > 0) || ((repaintTime + 0.05f) < Time.realtimeSinceStartup)) {
       Repaint();
       repaintTime = Time.realtimeSinceStartup;
     }
@@ -71,6 +71,8 @@ public abstract class BoltWindow : EditorWindow {
 
   protected void LoadProject() {
     if (Project == null) {
+      Debug.Log("Loading project ... " + ProjectPath);
+
       if (File.Exists(ProjectPath) == false) {
         InitNewProject();
       }

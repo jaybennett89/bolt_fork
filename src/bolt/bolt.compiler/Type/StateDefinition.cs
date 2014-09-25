@@ -16,6 +16,10 @@ namespace Bolt.Compiler {
     [ProtoMember(52)]
     public Guid ParentGuid;
 
+    public override IEnumerable<Type> AllowedPropertyTypes {
+      get { return AllowedStateAndStructPropertyTypes(); }
+    }
+
     public static StateDefinition Default() {
       StateDefinition s;
 
@@ -25,5 +29,15 @@ namespace Bolt.Compiler {
 
       return s;
     }
+
+    internal static IEnumerable<Type> AllowedStateAndStructPropertyTypes() {
+      yield return typeof(PropertyTypeFloat);
+      yield return typeof(PropertyTypeArray);
+      yield return typeof(PropertyTypeStruct);
+      yield return typeof(PropertyTypeString);
+      yield return typeof(PropertyTypeTrigger);
+      yield return typeof(PropertyTypeTransform);
+    }
   }
 }
+

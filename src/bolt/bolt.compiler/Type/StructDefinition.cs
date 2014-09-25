@@ -9,5 +9,9 @@ namespace Bolt.Compiler {
   public class StructDefinition : AssetDefinition {
     [ProtoMember(50)]
     public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
+
+    public override IEnumerable<Type> AllowedPropertyTypes {
+      get { return StateDefinition.AllowedStateAndStructPropertyTypes(); }
+    }
   }
 }

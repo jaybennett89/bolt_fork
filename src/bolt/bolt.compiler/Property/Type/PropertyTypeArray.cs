@@ -24,13 +24,6 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
-    public override IEnumerable<Type> AssetTypes {
-      get {
-        yield return typeof(StateDefinition);
-        yield return typeof(StructDefinition);
-      }
-    }
-
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorArray();
     }

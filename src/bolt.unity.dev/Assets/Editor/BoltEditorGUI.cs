@@ -14,6 +14,15 @@ public static class BoltEditorGUI {
   public static readonly Color DarkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color LightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
+  public static GUIStyle ImageButtonStyle {
+    get {
+      GUIStyle style;
+      style = new GUIStyle();
+      style.margin = new RectOffset(4, 4, 2, 0);
+      return style;
+    }
+  }
+
   public static GUIStyle ParameterBackgroundStyle {
     get {
       GUIStyle style;
@@ -44,7 +53,7 @@ public static class BoltEditorGUI {
       GUIStyle style;
 
       style = new GUIStyle(EditorStyles.label);
-      style.contentOffset = new Vector2(0, -1);
+      style.contentOffset = new Vector2(2, -1);
       style.normal.textColor = Color.white;
 
       return style;
@@ -145,6 +154,21 @@ public static class BoltEditorGUI {
     return filtered[selected - 1].Guid;
   }
 
+  public static void PropertyTypePopup(AssetDefinition asset, PropertyDefinition definition) {
+    if (!asset.AllowedPropertyTypes.Contains(definition.PropertyType.GetType())) {
+      definition.PropertyType = new PropertyTypeFloat();
+    }
+
+    var types = asset.AllowedPropertyTypes.ToArray();
+    var typesNames = types.Select(x => x.Name.Replace("PropertyType", "")).ToArray();
+    var selected = Array.IndexOf(types, definition.PropertyType.GetType());
+    var selectedNew = EditorGUILayout.Popup(selected, typesNames);
+
+    if (selected != selectedNew) {
+      definition.PropertyType = (PropertyType)Activator.CreateInstance(types[selectedNew]);
+    }
+  }
+
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyDefinitionAssetSettings> newSettings) {
     GUIStyle labelStyle = new GUIStyle(EditorStyles.miniLabel);
     labelStyle.margin = new RectOffset();
@@ -174,6 +198,43 @@ public static class BoltEditorGUI {
           AssetSettings = newSettings()
         }
       );
+    }
+  }
+
+  public static bool IconButton(string icon) {
+    return IconButton(icon, Color.white);
+  }
+
+  public static bool IconButton(string icon, bool enabled) {
+    return IconButton(icon, new Color(1, 1, 1, enabled ? 1f : 0.25f));
+  }
+
+  public static bool OnOffButton(string on, string off, bool enabled) {
+    return GUILayout.Button(LoadIcon(enabled ? on : off) as Texture, ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
+  }
+
+  public static bool IconButton(string icon, float opacity) {
+    return IconButton(icon, new Color(1, 1, 1, Mathf.Clamp01(opacity)));
+  }
+
+  public static bool IconButton(string icon, Color color) {
+    bool result = false;
+
+    WithColor(color, () => {
+      result = GUILayout.Button(LoadIcon(icon) as Texture, ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
+    });
+
+    return result;
+  }
+
+  public static void WithColor(Color color, Action gui) {
+    GUI.color = color;
+
+    try {
+      gui();
+    }
+    finally {
+      GUI.color = Color.white;
     }
   }
 

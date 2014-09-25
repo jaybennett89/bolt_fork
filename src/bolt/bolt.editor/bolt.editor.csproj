@@ -65,8 +65,6 @@
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileCommands.cs" />
     <Compile Include="EditorAsset.cs" />
-    <Compile Include="Editors2\BoltBinaryAssetEditor.cs" />
-    <Compile Include="Editors2\BoltBinaryAssetEditor.Struct.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
     <Compile Include="Editors\BoltConfigAssetEditor.cs" />
@@ -161,9 +159,6 @@
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltMecanimAsset Icon.png" />
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltStateAsset Icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Editors2\BoltBinaryAssetEditor.State.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -22,18 +22,8 @@ namespace Bolt.Compiler {
     [ProtoIgnore]
     public virtual bool IsValue { get { return true; } }
 
-    [ProtoIgnore]
-    public virtual IEnumerable<Type> AssetTypes {
-      get {
-        yield return typeof(EventDefinition);
-        yield return typeof(StateDefinition);
-        yield return typeof(StructDefinition);
-        yield return typeof(CommandDefinition);
-      }
-    }
-
     public virtual PropertyDecorator CreateDecorator() {
-      return new PropertyDecoratorTransform();
+      throw new NotImplementedException();
     }
   }
 }

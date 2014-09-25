@@ -7,6 +7,9 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyDefinition {
     [ProtoIgnore]
+    public int Nudge;
+
+    [ProtoIgnore]
     public bool Deleted;
 
     [ProtoIgnore]

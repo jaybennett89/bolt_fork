@@ -26,5 +26,9 @@ namespace Bolt.Compiler {
 
     [ProtoMember(55)]
     public GlobalReplicationSenders GlobalSenders;
+
+    public override IEnumerable<Type> AllowedPropertyTypes {
+      get { yield break; }
+    }
   }
 }

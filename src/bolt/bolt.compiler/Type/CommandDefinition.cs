@@ -11,5 +11,9 @@ namespace Bolt.Compiler {
 
     [ProtoMember(51)]
     public List<PropertyDefinition> Result = new List<PropertyDefinition>();
+
+    public override IEnumerable<Type> AllowedPropertyTypes {
+      get { yield break; }
+    }
   }
 }

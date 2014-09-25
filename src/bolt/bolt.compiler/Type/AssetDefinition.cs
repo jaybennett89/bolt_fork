@@ -29,6 +29,10 @@ namespace Bolt.Compiler {
     [ProtoMember(6)]
     public bool Enabled;
 
+    public abstract IEnumerable<Type> AllowedPropertyTypes {
+      get;
+    }
+
     string INamedAsset.GetName() {
       return Name;
     }

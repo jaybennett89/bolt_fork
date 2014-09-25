@@ -9,12 +9,5 @@ namespace Bolt.Compiler {
   public class PropertyTypeTransform : PropertyType {
     [ProtoMember(1)]
     public TransformSpaces Space;
-
-    public override IEnumerable<Type> AssetTypes {
-      get {
-        yield return typeof(StateDefinition);
-        yield return typeof(StructDefinition);
-      }
-    }
   }
 }
