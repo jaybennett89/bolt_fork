@@ -24,7 +24,7 @@ namespace Bolt.Compiler {
     public virtual int ObjectSize {
       get {
         if ((DefiningAsset is StateDecorator) || (DefiningAsset is StructDecorator)) {
-          if (Definition.StateAssetSettings.Callback) {
+          if (Definition.StateAssetSettings.Callback && Definition.PropertyType.CallbackAllowed) {
             return 1;
           }
         }

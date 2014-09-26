@@ -170,6 +170,10 @@ public static class BoltEditorGUI {
     Icon(name, new RectOffset());
   }
 
+  public static void Icon(string name, Rect r) {
+    GUI.DrawTexture(r, LoadIcon(name));
+  }
+
   public static void Icon(string name, RectOffset offset) {
     Icon(name, offset, GUILayout.Width(16), GUILayout.Height(16));
   }
@@ -359,7 +363,9 @@ public static class BoltEditorGUI {
       c = new FloatCompression() { Bits = 32, Fractions = 1000, MinValue = -2048, MaxValue = +2048 };
     }
 
-    c.Bits = EditorGUILayout.IntField(c.Bits);
+    WithLabel("Bits", () => {
+      c.Bits = EditorGUILayout.IntField(c.Bits);
+    });
 
     return c;
   }

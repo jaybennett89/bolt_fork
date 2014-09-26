@@ -239,9 +239,15 @@ public class BoltEditorWindow : BoltWindow {
       p.ExcludeController = !p.ExcludeController;
     }
 
-    if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
-      p.StateAssetSettings.Callback = !p.StateAssetSettings.Callback;
+    if (p.PropertyType.CallbackAllowed) {
+      if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
+        p.StateAssetSettings.Callback = (!p.StateAssetSettings.Callback) && p.PropertyType.CallbackAllowed;
+      }
     }
+    else {
+      BoltEditorGUI.IconButton("cross-script".ToContent());
+    }
+
   }
 
   GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, FilterDefinition f) {
@@ -254,7 +260,7 @@ public class BoltEditorWindow : BoltWindow {
       s.alignment = TextAnchor.MiddleLeft;
 
       Rect menuRect;
-      
+
       menuRect = GUILayoutUtility.GetLastRect();
       menuRect.x += 85;
 

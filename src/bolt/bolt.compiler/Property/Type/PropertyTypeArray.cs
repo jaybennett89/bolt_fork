@@ -25,7 +25,7 @@ namespace Bolt.Compiler {
     }
 
     public override bool CallbackAllowed {
-      get { return true; }
+      get { return false; }
     }
 
     public override bool InterpolateAllowed {

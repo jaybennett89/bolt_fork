@@ -5,6 +5,8 @@ using UnityEditor;
 
 public class PropertyEditorArray : PropertyEditor<PropertyTypeArray> {
   protected override void Edit(bool array) {
+    EditorGUILayout.LabelField("Settings", BoltEditorGUI.SmallWhiteText);
+
     BoltEditorGUI.WithLabel("Element Type", () => {
       PropertyType.ElementType = BoltEditorGUI.PropertyTypePopup(PropertyType.AllowedElementTypes, PropertyType.ElementType);
     });
@@ -15,7 +17,7 @@ public class PropertyEditorArray : PropertyEditor<PropertyTypeArray> {
 
     GUILayout.Space(5);
     EditorGUILayout.BeginVertical();
-    EditorGUILayout.LabelField("test", BoltEditorGUI.SmallWhiteText);
+    EditorGUILayout.LabelField("Element Type Settings", BoltEditorGUI.SmallWhiteText);
     PropertyEditorRegistry.GetEditor(PropertyType.ElementType).EditArrayElement(Asset, Definition, PropertyType.ElementType);
     EditorGUILayout.EndVertical();
   }

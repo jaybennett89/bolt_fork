@@ -17,7 +17,7 @@ namespace Bolt.Compiler {
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
 
-      if (Decorator.Definition.StateAssetSettings.Callback) {
+      if (Decorator.Definition.StateAssetSettings.Callback && Decorator.Definition.PropertyType.CallbackAllowed) {
         EmitChangedCallbackProperty(type, true);
       }
     }
