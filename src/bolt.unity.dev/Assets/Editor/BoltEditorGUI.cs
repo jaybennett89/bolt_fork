@@ -280,7 +280,7 @@ public static class BoltEditorGUI {
           Deleted = false,
           Enabled = true,
           Expanded = true,
-          PropertyType = new PropertyTypeFloat { Compression = new FloatCompression { Bits = 32 } },
+          PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
           AssetSettings = newSettings()
         }
       );
@@ -360,11 +360,15 @@ public static class BoltEditorGUI {
 
   internal static FloatCompression EditFloatCompression(FloatCompression c) {
     if (c == null) {
-      c = new FloatCompression() { Bits = 32, Fractions = 1000, MinValue = -2048, MaxValue = +2048 };
+      c = FloatCompression.Default();
     }
 
-    WithLabel("Bits", () => {
-      c.Bits = EditorGUILayout.IntField(c.Bits);
+    WithLabel("Min Value", () => { c.MinValue = Mathf.Min(EditorGUILayout.IntField(c.MinValue), c.MaxValue - 1); });
+    WithLabel("Max Value", () => { c.MaxValue = Mathf.Max(EditorGUILayout.IntField(c.MaxValue), c.MinValue + 1); });
+    WithLabel("Fractions", () => { c.Fractions = Mathf.Clamp(EditorGUILayout.IntField(c.Fractions), 1, 10000); });
+    WithLabel("Result", () => {
+      EditorGUILayout.LabelField("Bits: " + BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions).ToString());
+      EditorGUILayout.LabelField("Accuracy: " + (1f / c.Fractions));
     });
 
     return c;

@@ -222,6 +222,7 @@ public class BoltEditorWindow : BoltWindow {
       GUILayout.Space(20);
 
       EditorGUILayout.BeginVertical();
+      EditorGUILayout.LabelField("Settings", BoltEditorGUI.SmallWhiteText);
       PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
       EditorGUILayout.EndVertical();
 

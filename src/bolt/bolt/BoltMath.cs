@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-static class BoltMath {
+public static class BoltMath {
     public static uint Bit (int shift) {
         return 1u << shift;
     }
