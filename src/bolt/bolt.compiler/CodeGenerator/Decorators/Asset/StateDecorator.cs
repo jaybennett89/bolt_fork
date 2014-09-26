@@ -7,6 +7,8 @@ using System.Text;
 namespace Bolt.Compiler {
   public struct StateProperty {
     public int Index;
+    public int Filters;
+    public bool Controller;
     public PropertyDecorator Decorator;
   }
 
@@ -50,10 +52,6 @@ namespace Bolt.Compiler {
 
         yield break;
       }
-    }
-
-    public List<StructDecorator> CalculateStructList() {
-      return RootStruct.GetStructList(new List<StructDecorator>());
     }
   }
 }

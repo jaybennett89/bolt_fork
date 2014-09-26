@@ -236,15 +236,13 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
-    EditorGUI.BeginDisabledGroup(!p.PropertyType.IsValue);
     EditFilters(p);
-    EditorGUI.EndDisabledGroup();
+
+    if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), p.Controller)) {
+      p.Controller = !p.Controller;
+    }
 
     if (p.PropertyType.IsValue) {
-      if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), !p.ExcludeController)) {
-        p.ExcludeController = !p.ExcludeController;
-      }
-
       if (p.PropertyType.CallbackAllowed) {
         if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
           p.StateAssetSettings.Callback = (!p.StateAssetSettings.Callback) && p.PropertyType.CallbackAllowed;
@@ -252,7 +250,6 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
     else {
-      BoltEditorGUI.IconButton("cross-script".ToContent());
       BoltEditorGUI.IconButton("cross-script".ToContent());
     }
   }

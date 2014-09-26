@@ -53,10 +53,6 @@ namespace Bolt.Compiler {
 
     public abstract PropertyCodeEmitter CreateEmitter();
 
-    public virtual void GetStructList(List<StructDecorator> list) {
-
-    }
-
     public static List<PropertyDecorator> Decorate(IEnumerable<PropertyDefinition> definitions, AssetDecorator asset) {
       return definitions.Select(p => Decorate(p, asset)).ToList();
     }
@@ -70,6 +66,10 @@ namespace Bolt.Compiler {
       decorator.DefiningAsset = asset;
 
       return decorator;
+    }
+
+    public virtual void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
+      all.Add(new StateProperty { Decorator = this, Index = all.Count, Filters = (Definition.Filters & filterMask), Controller = (Definition.Controller && controller) });
     }
   }
 

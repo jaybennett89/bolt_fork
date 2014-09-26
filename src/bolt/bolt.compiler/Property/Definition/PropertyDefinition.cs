@@ -28,7 +28,7 @@ namespace Bolt.Compiler {
     public bool Expanded;
 
     [ProtoMember(10)]
-    public bool ExcludeController;
+    public bool Controller;
 
     [ProtoMember(7)]
     public string Comment;

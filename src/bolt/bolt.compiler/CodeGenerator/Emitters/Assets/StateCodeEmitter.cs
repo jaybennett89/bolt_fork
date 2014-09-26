@@ -136,7 +136,7 @@ namespace Bolt.Compiler {
         for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
           var p = Decorator.AllProperties[i];
 
-          if ((p.Decorator.Definition.Filters & filter.Bit) == filter.Bit) {
+          if ((p.Filters & filter.Bit) == filter.Bit) {
             ba.Set(p.Index);
           }
         }
@@ -151,8 +151,7 @@ namespace Bolt.Compiler {
 
       for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
         var p = Decorator.AllProperties[i];
-
-        if (!p.Decorator.Definition.ExcludeController) {
+        if (p.Controller) {
           ba.Set(p.Index);
         }
       }

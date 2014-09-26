@@ -28,18 +28,14 @@ namespace Bolt.Compiler {
       get { return "I" + ModifierName; }
     }
 
-    public List<StructDecorator> GetStructList(List<StructDecorator> list) {
-      list.Add(this);
-
-      for (int i = 0; i < Properties.Count; ++i) {
-        Properties[i].GetStructList(list);
-      }
-
-      return list;
-    }
-
     public override string ToString() {
       return string.Format("[Struct {0}]", Name);
+    }
+
+    public void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
+      for (int i = 0; i < Properties.Count; ++i) {
+        Properties[i].FindAllProperties(all, filterMask, controller);
+      }
     }
 
     public IEnumerable<StructDecorator> Dependencies {

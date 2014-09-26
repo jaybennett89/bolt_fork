@@ -283,25 +283,9 @@ namespace Bolt.Compiler {
         decorator.FrameSizeCalculated = true;
       }
 
-      // calculate absolute property indexes for all properties
+      // calculate absolute property indexes and filters for all properties
       foreach (var state in States) {
-        var structs = state.CalculateStructList();
-
-        for (int i = 0; i < structs.Count; ++i) {
-          var s = structs[i];
-
-          for (int n = 0; n < s.Properties.Count; ++n) {
-            var p = s.Properties[n];
-            var t = p.Definition.PropertyType;
-
-            if (t.IsValue) {
-              state.AllProperties.Add(new StateProperty {
-                Index = state.AllProperties.Count,
-                Decorator = p
-              });
-            }
-          }
-        }
+        state.RootStruct.FindAllProperties(state.AllProperties, -1, true);
       }
     }
 

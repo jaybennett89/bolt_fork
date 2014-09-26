@@ -37,13 +37,9 @@ namespace Bolt.Compiler {
       return new PropertyCodeEmitterArray();
     }
 
-    public override void GetStructList(List<StructDecorator> list) {
-      if (PropertyType.ElementType is PropertyTypeStruct) {
-        StructDecorator s = Generator.FindStruct(((PropertyTypeStruct)PropertyType.ElementType).StructGuid);
-
-        for (int i = 0; i < PropertyType.ElementCount; ++i) {
-          s.GetStructList(list);
-        }
+    public override void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
+      for (int i = 0; i < PropertyType.ElementCount; ++i) {
+        ElementDecorator.FindAllProperties(all, (Definition.Filters & filterMask), (Definition.Controller && controller));
       }
     }
   }
