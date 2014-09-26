@@ -78,8 +78,7 @@ public static class BoltEditorGUI {
 
   public static GUIStyle SmallWhiteText {
     get {
-      GUIStyle s = new GUIStyle();
-      s.margin = new RectOffset();
+      GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
       s.normal.textColor = Color.white;
       return s;
     }
@@ -97,8 +96,8 @@ public static class BoltEditorGUI {
     get {
       GUIStyle s;
       s = new GUIStyle(EditorStyles.label);
-      s.contentOffset = new Vector2(0, 0);
       s.padding = new RectOffset(4, 2, 0, 0);
+      s.contentOffset = new Vector2(0, 0);
       s.normal.textColor = Color.white;
       return s;
     }
@@ -149,6 +148,15 @@ public static class BoltEditorGUI {
     if (Event.current != null) {
       Event.current.Use();
     }
+  }
+
+  public static string EditComment(string comment) {
+    GUILayout.BeginHorizontal();
+    GUILayout.Label("//", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.Width(15));
+    comment = EditorGUILayout.TextArea(comment);
+    GUILayout.EndHorizontal();
+
+    return comment;
   }
 
   public static GUIStyle NodeStyle(int n) {
@@ -217,7 +225,7 @@ public static class BoltEditorGUI {
 
   public static void WithLabel(string label, Action gui) {
     GUILayout.BeginHorizontal();
-    GUILayout.Label(label, GUILayout.Width(100));
+    EditorGUILayout.LabelField(label, GUILayout.Width(100));
 
     gui();
 
