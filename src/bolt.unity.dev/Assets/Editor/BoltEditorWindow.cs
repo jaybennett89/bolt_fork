@@ -85,7 +85,9 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);
+
+    //BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
@@ -94,7 +96,7 @@ public class BoltEditorWindow : BoltWindow {
 
     while (guid != Guid.Empty) {
       var parent = Project.FindState(guid);
-      GUILayout.Label(string.Format("Inherited from {0}", parent.Name), BoltEditorGUI.PropertiesAddTextStyle);
+      GUILayout.Label(string.Format("Inherited from {0}", parent.Name), BoltEditorGUI.MiniLabelButtonStyle);
 
       EditorGUI.BeginDisabledGroup(true);
       EditPropertyList(parent, parent.Properties, StateAndStructToolbar);
@@ -234,21 +236,25 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
+    EditorGUI.BeginDisabledGroup(!p.PropertyType.IsValue);
     EditFilters(p);
+    EditorGUI.EndDisabledGroup();
 
-    if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), !p.ExcludeController)) {
-      p.ExcludeController = !p.ExcludeController;
-    }
+    if (p.PropertyType.IsValue) {
+      if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), !p.ExcludeController)) {
+        p.ExcludeController = !p.ExcludeController;
+      }
 
-    if (p.PropertyType.CallbackAllowed) {
-      if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
-        p.StateAssetSettings.Callback = (!p.StateAssetSettings.Callback) && p.PropertyType.CallbackAllowed;
+      if (p.PropertyType.CallbackAllowed) {
+        if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
+          p.StateAssetSettings.Callback = (!p.StateAssetSettings.Callback) && p.PropertyType.CallbackAllowed;
+        }
       }
     }
     else {
       BoltEditorGUI.IconButton("cross-script".ToContent());
+      BoltEditorGUI.IconButton("cross-script".ToContent());
     }
-
   }
 
   GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, FilterDefinition f) {

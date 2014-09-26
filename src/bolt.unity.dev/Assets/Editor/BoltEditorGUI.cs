@@ -87,7 +87,6 @@ public static class BoltEditorGUI {
   public static GUIStyle PropertiesAddTextStyle {
     get {
       GUIStyle s = new GUIStyle(SmallWhiteText);
-      s.padding = new RectOffset(5, 0, 1, 0);
       return s;
     }
   }
@@ -103,11 +102,10 @@ public static class BoltEditorGUI {
     }
   }
 
-  public static GUIStyle InheritanceSeparatorStyleMini {
+  public static GUIStyle MiniLabelButtonStyle {
     get {
       GUIStyle s;
       s = new GUIStyle(EditorStyles.miniLabel);
-      s.contentOffset = new Vector2(2, -1);
       s.normal.textColor = Color.white;
       return s;
     }
@@ -262,14 +260,11 @@ public static class BoltEditorGUI {
   }
 
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyDefinitionAssetSettings> newSettings) {
-    GUIStyle buttonStyle = new GUIStyle();
-    buttonStyle.margin = new RectOffset(0, 0, -1, 0);
-    buttonStyle.padding = new RectOffset();
-    buttonStyle.contentOffset = new Vector2();
+
 
     EditorGUILayout.BeginHorizontal();
-    bool btn0 = GUILayout.Button(text, PropertiesAddTextStyle, GUILayout.ExpandWidth(false));
-    bool btn1 = GUILayout.Button(LoadIcon("boltico_plus") as Texture, buttonStyle, GUILayout.Width(16), GUILayout.Height(16));
+    bool btn0 = LabelButton(text, true, 1, GUILayout.ExpandWidth(false));
+    bool btn1 = IconButton("boltico_plus".ToContent());
     EditorGUILayout.EndHorizontal();
 
     if (btn0 || btn1) {
@@ -333,7 +328,7 @@ public static class BoltEditorGUI {
     bool result = false;
 
     WithColor(enabled ? Color.white : ColorOpacity(opacity), () => {
-      result = GUILayout.Button(label, BoltEditorGUI.InheritanceSeparatorStyleMini, options);
+      result = GUILayout.Button(label, BoltEditorGUI.MiniLabelButtonStyle, options);
     });
 
     return result;

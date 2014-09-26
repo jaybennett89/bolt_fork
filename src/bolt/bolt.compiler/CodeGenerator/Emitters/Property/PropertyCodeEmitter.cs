@@ -25,11 +25,11 @@ namespace Bolt.Compiler {
       EmitForwardStateMember(decorator, type);
 
       var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (stateSettings.Callback && Decorator.Definition.PropertyType.CallbackAllowed) {
-        type.DeclareProperty(CallbackDelegateType, Decorator.Definition.ChangedCallbackName, (get) => {
-          get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.ChangedCallbackName);
+      if (Decorator.EmitChangedCallback) {
+        type.DeclareProperty(CallbackDelegateType, Decorator.ChangedCallbackName, (get) => {
+          get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.ChangedCallbackName);
         }, (set) => {
-          set.Expr("(new {0}(Frames.first, 0, 0)).{1} = value", decorator.RootStruct.Name, Decorator.Definition.ChangedCallbackName);
+          set.Expr("(new {0}(Frames.first, 0, 0)).{1} = value", decorator.RootStruct.Name, Decorator.ChangedCallbackName);
         });
       }
     }
@@ -66,8 +66,8 @@ namespace Bolt.Compiler {
 
     protected void EmitChangedCallbackProperty(CodeTypeDeclaration type, bool code) {
       var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (stateSettings.Callback && Decorator.Definition.PropertyType.CallbackAllowed) {
-        type.DeclareProperty(CallbackDelegateType, Decorator.Definition.ChangedCallbackName, (get) => {
+      if (Decorator.EmitChangedCallback) {
+        type.DeclareProperty(CallbackDelegateType, Decorator.ChangedCallbackName, (get) => {
           if (code) {
             get.Expr("return ({0}) frame.Objects[offsetObjects + {1}]", CallbackDelegateType, Decorator.ObjectOffset);
           }

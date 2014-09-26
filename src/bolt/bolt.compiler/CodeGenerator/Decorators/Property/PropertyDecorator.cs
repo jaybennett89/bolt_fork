@@ -13,6 +13,26 @@ namespace Bolt.Compiler {
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
 
+    public string ChangedCallbackName {
+      get { return Definition.Name + "Changed"; }
+    }
+
+    public bool EmitChangedCallback {
+      get {
+        return
+          (
+            (DefiningAsset is StructDecorator) ||
+            (DefiningAsset is StateDecorator)
+          )
+          &&
+          Definition.StateAssetSettings.Callback
+          &&
+          Definition.PropertyType.IsValue
+          &&
+          Definition.PropertyType.CallbackAllowed;
+      }
+    }
+
     public abstract string ClrType {
       get;
     }
@@ -23,10 +43,8 @@ namespace Bolt.Compiler {
 
     public virtual int ObjectSize {
       get {
-        if ((DefiningAsset is StateDecorator) || (DefiningAsset is StructDecorator)) {
-          if (Definition.StateAssetSettings.Callback && Definition.PropertyType.CallbackAllowed) {
-            return 1;
-          }
+        if (EmitChangedCallback) {
+          return 1;
         }
 
         return 0;

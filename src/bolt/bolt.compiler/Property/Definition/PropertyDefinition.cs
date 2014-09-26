@@ -45,10 +45,6 @@ namespace Bolt.Compiler {
     [ProtoMember(8)]
     public int Filters;
 
-    public string ChangedCallbackName {
-      get { return Name + "Changed"; }
-    }
-
     public PropertyDefinitionStateAssetSettings StateAssetSettings {
       get { return (PropertyDefinitionStateAssetSettings)AssetSettings; }
     }
