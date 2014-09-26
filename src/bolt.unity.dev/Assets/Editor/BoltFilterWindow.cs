@@ -54,7 +54,7 @@ public class BoltFilterWindow : BoltWindow {
   void EditFilters() {
     // always has a value
     if (Project.Filters == null) {
-      Project.Filters = new PropertyFilterDefinition[32];
+      Project.Filters = new FilterDefinition[32];
       Save();
     }
 
@@ -67,7 +67,7 @@ public class BoltFilterWindow : BoltWindow {
     // always has values
     for (int i = 0; i < Project.Filters.Length; ++i) {
       if (Project.Filters[i] == null) {
-        Project.Filters[i] = new PropertyFilterDefinition() { Enabled = (i == 0), Index = i, Name = "Filter" + i };
+        Project.Filters[i] = new FilterDefinition() { Enabled = (i == 0), Index = i, Name = "Filter" + i, Color = BoltEditorGUI.ColorInt(179, 179, 179).ToBoltColor() };
         Save();
       }
     }
@@ -78,15 +78,16 @@ public class BoltFilterWindow : BoltWindow {
     }
   }
 
-  void EditFilter(PropertyFilterDefinition f) {
+  void EditFilter(FilterDefinition f) {
     EditorGUILayout.BeginHorizontal();
 
-    if (BoltEditorGUI.OnOffButton("ui-check-box", "ui-check-box-uncheck", f.Enabled)) {
+    if (BoltEditorGUI.OnOffButton("ui-check-box".ToContent(), "ui-check-box-uncheck".ToContent(), f.Enabled)) {
       f.Enabled = !f.Enabled;
     }
 
     EditorGUI.BeginDisabledGroup(f.Enabled == false);
     f.Name = EditorGUILayout.TextField(f.Name);
+    f.Color = EditorGUILayout.ColorField(f.Color.ToUnityColor()).ToBoltColor();
     EditorGUI.EndDisabledGroup();
 
     EditorGUILayout.EndHorizontal();

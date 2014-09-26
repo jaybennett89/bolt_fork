@@ -16,6 +16,12 @@ namespace Bolt.Compiler {
     [ProtoMember(52)]
     public Guid ParentGuid;
 
+    [ProtoMember(54)]
+    public int PacketMaxBits = 512;
+
+    [ProtoMember(55)]
+    public int PacketMaxProperties = 16;
+
     public override IEnumerable<Type> AllowedPropertyTypes {
       get { return AllowedStateAndStructPropertyTypes(); }
     }

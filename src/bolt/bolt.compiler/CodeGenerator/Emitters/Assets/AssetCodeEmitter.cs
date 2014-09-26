@@ -7,7 +7,5 @@ namespace Bolt.Compiler {
   public abstract class AssetCodeEmitter {
     public AssetDecorator Decorator;
     public CodeGenerator Generator { get { return Decorator.Generator; } }
-
-    public abstract void EmitTypes();
   }
 }

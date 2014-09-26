@@ -2,7 +2,7 @@
 using System.Reflection;
 
 partial class BoltCompiler {
-  static void CompileNetwork (BoltCompilerOperation op) {
+  static void CompileNetwork(BoltCompilerOperation op) {
     mode = BoltCompilerMode.Network;
 
     using (BoltSourceFile file = new BoltSourceFile(op.networkFilePath)) {
@@ -11,7 +11,8 @@ partial class BoltCompiler {
       // map loader
       if (BoltEditorUtils.hasPro) {
         src = src.Replace("//MAPLOADER", "return typeof(BoltMapLoaderPro);");
-      } else {
+      }
+      else {
         src = src.Replace("//MAPLOADER", "return typeof(BoltMapLoaderFree);");
       }
 
@@ -22,7 +23,8 @@ partial class BoltCompiler {
 
       // state registration
       src = src.Replace("//STATE",
-        op.states.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
+        op.project.States.Where(x => !x.IsAbstract).Select(x => string.Format("BoltFactory.Register(new {0}_Factory());", x.Name)).Join("\r\n")
+        //op.states.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
       );
 
       // command registration

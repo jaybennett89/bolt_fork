@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class StructDecorator : AssetDecorator<StructDefinition> {
-    public int FrameSize;
+    public int ByteSize;
+    public int ObjectSize;
     public bool FrameSizeCalculated;
 
     public StateDecorator SourceState = null;
@@ -21,6 +22,10 @@ namespace Bolt.Compiler {
 
     public string ModifierName {
       get { return Name + "Modifier"; }
+    }
+
+    public string ModifierInterfaceName {
+      get { return "I" + ModifierName; }
     }
 
     public List<StructDecorator> GetStructList(List<StructDecorator> list) {

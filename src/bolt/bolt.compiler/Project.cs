@@ -10,9 +10,9 @@ namespace Bolt.Compiler {
     public AssetFolder RootFolder = new AssetFolder();
 
     [ProtoMember(2)]
-    public PropertyFilterDefinition[] Filters = new PropertyFilterDefinition[0];
+    public FilterDefinition[] Filters = new FilterDefinition[0];
 
-    public IEnumerable<PropertyFilterDefinition> EnabledFilters {
+    public IEnumerable<FilterDefinition> EnabledFilters {
       get { return Filters.Where(x => x.Enabled); }
     }
 

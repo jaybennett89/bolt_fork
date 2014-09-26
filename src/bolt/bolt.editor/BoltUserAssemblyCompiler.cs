@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Compiler;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -65,6 +66,10 @@ class BoltUserAssemblyCompiler {
     get { return BoltEditorUtils.MakePath(sourceDir, "network.cs"); }
   }
 
+  static string projectFile {
+    get { return BoltEditorUtils.MakePath(sourceDir, "project.cs"); }
+  }
+
   static string assemblyInfoFile {
     get { return BoltEditorUtils.MakePath(sourceDir, "assemblyinfo.cs"); }
   }
@@ -95,6 +100,7 @@ class BoltUserAssemblyCompiler {
         "\"" + mapsFile + "\" " +
         "\"" + mecanimFile + "\" " +
         "\"" + commandsFile + "\" " +
+        "\"" + projectFile + "\" " +
         "\"" + assemblyInfoFile + "\" ";
     }
   }
@@ -217,6 +223,9 @@ class BoltUserAssemblyCompiler {
 
       // setup compiler options
       BoltCompilerOperation op = new BoltCompilerOperation();
+
+      op.projectFile = projectFile;
+      op.project = File.ReadAllBytes("Assets/bolt/project.bytes").ToObject<Project>();
 
       // network config
       op.networkFilePath = networkFile;

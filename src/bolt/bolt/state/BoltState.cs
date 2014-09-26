@@ -41,6 +41,7 @@ public abstract class BoltState : IBoltState, IBoltEntityCallbacks {
     }
   }
 
+
   protected static float FrameSmoothed (float from, float to, int fromFrame, int toFrame, int actualFrame) {
     actualFrame = Mathf.Clamp(actualFrame, fromFrame, toFrame);
 

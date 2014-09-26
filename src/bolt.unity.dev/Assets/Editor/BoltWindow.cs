@@ -27,8 +27,9 @@ public abstract class BoltWindow : EditorWindow {
   float saveTime;
   float repaintTime;
 
+  static internal Project Project;
+
   static protected int Repaints;
-  static protected Project Project;
   static protected INamedAsset Selected;
   static protected AssetDefinition SelectedAsset;
 

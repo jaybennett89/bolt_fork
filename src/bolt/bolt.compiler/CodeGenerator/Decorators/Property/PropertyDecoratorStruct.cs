@@ -15,7 +15,17 @@ namespace Bolt.Compiler {
         Assert.True(Struct.FrameSizeCalculated);
 
         // return value
-        return Struct.FrameSize;
+        return Struct.ByteSize;
+      }
+    }
+
+    public override int ObjectSize {
+      get {
+        // make sure we actually calculated the property size for this struct
+        Assert.True(Struct.FrameSizeCalculated);
+
+        // return value
+        return Struct.ObjectSize;
       }
     }
 

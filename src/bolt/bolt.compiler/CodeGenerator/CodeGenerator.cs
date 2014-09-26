@@ -17,8 +17,8 @@ namespace Bolt.Compiler {
     public CodeNamespace CodeNamespace;
     public CodeCompileUnit CodeCompileUnit;
 
-    public IEnumerable<PropertyFilterDefinition> Filters {
-      get { return Context.Filters; }
+    public IEnumerable<FilterDefinition> Filters {
+      get { return Context.EnabledFilters; }
     }
 
     public CodeGenerator() {
@@ -55,7 +55,7 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
-    public PropertyFilterDefinition FindFilter(int index) {
+    public FilterDefinition FindFilter(int index) {
       return Filters.First(x => x.Index == index);
     }
 
@@ -67,29 +67,29 @@ namespace Bolt.Compiler {
       return Structs.First(x => x.Definition.Guid == guid);
     }
 
+    public bool HasState(Guid guid) {
+      return States.Any(x => x.Guid == guid);
+    }
+
     void DecorateDefinitions() {
       foreach (StateDefinition def in Context.States) {
-        if (def.Enabled) {
-          StateDecorator decorator;
+        StateDecorator decorator;
 
-          decorator = new StateDecorator();
-          decorator.Definition = def;
-          decorator.Generator = this;
+        decorator = new StateDecorator();
+        decorator.Definition = def;
+        decorator.Generator = this;
 
-          States.Add(decorator);
-        }
+        States.Add(decorator);
       }
 
       foreach (StructDefinition def in Context.Structs) {
-        if (def.Enabled) {
-          StructDecorator decorator;
+        StructDecorator decorator;
 
-          decorator = new StructDecorator();
-          decorator.Definition = def;
-          decorator.Generator = this;
+        decorator = new StructDecorator();
+        decorator.Definition = def;
+        decorator.Generator = this;
 
-          Structs.Add(decorator);
-        }
+        Structs.Add(decorator);
       }
     }
 
@@ -124,18 +124,47 @@ namespace Bolt.Compiler {
     }
 
     void EmitCodeObjectModel() {
+      foreach (StateDecorator s in States) {
+        StateCodeEmitter emitter;
+        emitter = new StateCodeEmitter();
+        emitter.Decorator = s;
+        emitter.EmitInterface();
+      }
+
       foreach (StructDecorator s in Structs) {
-        AssetCodeEmitter emitter;
+        StructCodeEmitter emitter;
         emitter = new StructCodeEmitter();
         emitter.Decorator = s;
-        emitter.EmitTypes();
+        emitter.EmitStruct();
+        emitter.EmitArray();
+      }
+
+      foreach (StructDecorator s in Structs) {
+        StructCodeEmitter emitter;
+        emitter = new StructCodeEmitter();
+        emitter.Decorator = s;
+        emitter.EmitModifierInterface();
+      }
+
+      foreach (StructDecorator s in Structs) {
+        StructCodeEmitter emitter;
+        emitter = new StructCodeEmitter();
+        emitter.Decorator = s;
+        emitter.EmitModifier();
       }
 
       foreach (StateDecorator s in States) {
-        AssetCodeEmitter emitter;
+        StateCodeEmitter emitter;
         emitter = new StateCodeEmitter();
         emitter.Decorator = s;
-        emitter.EmitTypes();
+        emitter.EmitImplementationClass();
+      }
+
+      foreach (StateDecorator s in States) {
+        StateCodeEmitter emitter;
+        emitter = new StateCodeEmitter();
+        emitter.Decorator = s;
+        emitter.EmitFactoryClass();
       }
 
       EmitFilters();
@@ -144,7 +173,7 @@ namespace Bolt.Compiler {
     void EmitFilters() {
       CodeTypeDeclaration type = DeclareStruct("BoltFilters");
 
-      foreach (PropertyFilterDefinition filter in Filters) {
+      foreach (FilterDefinition filter in Filters) {
         type.DeclareProperty("Bolt.Filter", filter.Name, get => {
           get.Expr("return new Bolt.Filter({0})", 1 << filter.Index);
         }).Attributes |= MemberAttributes.Static;
@@ -238,14 +267,17 @@ namespace Bolt.Compiler {
         StructDecorator decorator;
 
         decorator = Structs[i];
-        decorator.FrameSize = 0;
+        decorator.ByteSize = 0;
+        decorator.ObjectSize = 0;
 
         for (int n = 0; n < decorator.Properties.Count; ++n) {
           // copy byte offset to property
-          decorator.Properties[n].ByteOffset = decorator.FrameSize;
+          decorator.Properties[n].ByteOffset = decorator.ByteSize;
+          decorator.Properties[n].ObjectOffset = decorator.ObjectSize;
 
           // increment byte offset
-          decorator.FrameSize += decorator.Properties[n].ByteSize;
+          decorator.ByteSize += decorator.Properties[n].ByteSize;
+          decorator.ObjectSize += decorator.Properties[n].ObjectSize;
         }
 
         decorator.FrameSizeCalculated = true;
@@ -274,6 +306,9 @@ namespace Bolt.Compiler {
     }
 
     void GenerateUsingStatements(StringBuilder sb) {
+      sb.AppendLine("using System;");
+      sb.AppendLine("using System.Collections.Generic;");
+      sb.AppendLine();
       sb.AppendLine("using UE = UnityEngine;");
       sb.AppendLine("using Encoding = System.Text.Encoding;");
       sb.AppendLine();

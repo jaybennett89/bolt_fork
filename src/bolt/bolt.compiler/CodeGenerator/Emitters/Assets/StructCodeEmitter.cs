@@ -12,50 +12,18 @@ namespace Bolt.Compiler {
       set { base.Decorator = value; }
     }
 
-    public override void EmitTypes() {
-      EmitStruct();
-      EmitArray();
-      EmitModifier();
-    }
-
-    void EmitByteMasks(CodeStatementCollection stmts) {
-      for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyDecorator p = Decorator.Properties[i];
-
+    public void EmitStruct() {
+      if (Decorator.BasedOnState && Decorator.SourceState.Definition.IsAbstract) {
+        return;
       }
 
-      stmts.Expr("structIndex += 1");
-
-      for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyDecorator p = Decorator.Properties[i];
-        PropertyDecoratorArray arrayProperty = p as PropertyDecoratorArray;
-        PropertyDecoratorStruct structProperty = p as PropertyDecoratorStruct;
-
-        if (structProperty != null) {
-          stmts.Comment(p.Definition.Name);
-          stmts.Expr("{0}.InitByteMask(masks, ref structIndex, ref byteOffset)", structProperty.Struct.Name);
-        }
-        else
-          if (arrayProperty != null) {
-            PropertyTypeStruct elementType = arrayProperty.PropertyType.ElementType as PropertyTypeStruct;
-
-            if (elementType != null) {
-              StructDecorator elementStruct = Generator.FindStruct(elementType.StructGuid);
-              stmts.Comment(p.Definition.Name);
-              stmts.Expr("for(int i = 0; i < {0}; ++i) {1}.InitByteMask(masks, ref structIndex, ref byteOffset)", arrayProperty.PropertyType.ElementCount, elementStruct.Name);
-            }
-          }
-      }
-    }
-
-    void EmitStruct() {
       CodeTypeDeclaration str;
 
       str = Generator.DeclareStruct(Decorator.Name);
       str.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
       str.CommentSummary(m => {
         m.CommentDoc(Decorator.Definition.Comment);
-        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.FrameSize);
+        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.ByteSize);
       });
 
       DeclareShimConstructor(str);
@@ -64,21 +32,12 @@ namespace Bolt.Compiler {
         PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitShimMembers(str);
       }
 
-      str.DeclareMethod(Decorator.ModifierName, "Modify", method => {
-        method.Statements.Expr("return new {0}(data, offset)", Decorator.ModifierName);
+      str.DeclareMethod(Decorator.ModifierInterfaceName, "Modify", method => {
+        method.Statements.Expr("return new {0}(frame, offsetBytes, offsetObjects)", Decorator.ModifierName);
       });
-
-      str.DeclareMethod(typeof(void).FullName, "InitByteMask", method => {
-        method.DeclareParameter("Bolt.State.ByteMasks[]", "masks");
-        method.DeclareParameter("ref int", "structIndex");
-        method.DeclareParameter("ref int", "byteOffset");
-
-        EmitByteMasks(method.Statements);
-
-      }).Attributes = MemberAttributes.Static | MemberAttributes.Assembly;
     }
 
-    void EmitArray() {
+    public void EmitArray() {
       if (Decorator.BasedOnState) {
         return;
       }
@@ -87,19 +46,22 @@ namespace Bolt.Compiler {
 
       arr = Generator.DeclareStruct(Decorator.ArrayName);
       arr.TypeAttributes = TypeAttributes.Public;
-      arr.DeclareField("System.Byte[]", "data");
-      arr.DeclareField("System.Int32", "offset");
+      arr.DeclareField("Bolt.State.Frame", "frame");
+      arr.DeclareField("System.Int32", "offsetBytes");
+      arr.DeclareField("System.Int32", "offsetObjects");
       arr.DeclareField("System.Int32", "length");
 
       arr.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
 
-        ctor.DeclareParameter("System.Byte[]", "data");
-        ctor.DeclareParameter("System.Int32", "offset");
+        ctor.DeclareParameter("Bolt.State.Frame", "frame");
+        ctor.DeclareParameter("System.Int32", "offsetBytes");
+        ctor.DeclareParameter("System.Int32", "offsetObjects");
         ctor.DeclareParameter("System.Int32", "length");
 
-        ctor.Statements.Assign("this.data".Expr(), "data".Expr());
-        ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
+        ctor.Statements.Assign("this.frame".Expr(), "frame".Expr());
+        ctor.Statements.Assign("this.offsetBytes".Expr(), "offsetBytes".Expr());
+        ctor.Statements.Assign("this.offsetObjects".Expr(), "offsetObjects".Expr());
         ctor.Statements.Assign("this.length".Expr(), "length".Expr());
       });
 
@@ -109,16 +71,46 @@ namespace Bolt.Compiler {
 
       arr.DeclareProperty(Decorator.Name, "Item", get => {
         get.Expr("if (index < 0 || index >= length) throw new IndexOutOfRangeException()");
-        get.Expr("return new {0}(data, offset + (index * {1}))", Decorator.Name, Decorator.FrameSize);
+        get.Expr("return new {0}(frame, offsetBytes + (index * {1}), offsetObjects + (index * {2}))", Decorator.Name, Decorator.ByteSize, Decorator.ObjectSize);
       }).DeclareParameter(typeof(int).FullName, "index");
     }
 
-    void EmitModifier() {
+    public void EmitModifierInterface() {
+      CodeTypeDeclaration imod;
+
+      imod = Generator.DeclareInterface(Decorator.ModifierInterfaceName);
+      imod.TypeAttributes = TypeAttributes.Public | TypeAttributes.Interface;
+
+      if (Decorator.BasedOnState && Decorator.SourceState.HasParent) {
+        imod.BaseTypes.Add(Generator.FindStruct(Decorator.SourceState.Parent.Guid).ModifierInterfaceName);
+      }
+      else {
+        imod.BaseTypes.Add("Bolt.IStateModifier");
+      }
+
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        if (Decorator.BasedOnState) {
+          // if this was not defined on this asset skip it (as it will be inherited from the parent)
+          if (Decorator.Properties[i].DefiningAsset.Guid != Decorator.SourceState.Guid) {
+            continue;
+          }
+        }
+
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitModifierInterfaceMembers(imod);
+      }
+    }
+
+    public void EmitModifier() {
+      // check if this is based on an abstract state and if true then dont emit anything
+      if (Decorator.BasedOnState && Decorator.SourceState.Definition.IsAbstract) {
+        return;
+      }
+
       CodeTypeDeclaration mod;
 
       mod = Generator.DeclareClass(Decorator.ModifierName);
-      mod.TypeAttributes = TypeAttributes.Public;
-      mod.BaseTypes.Add("System.IDisposable");
+      mod.TypeAttributes = TypeAttributes.NotPublic;
+      mod.BaseTypes.Add(Decorator.ModifierInterfaceName);
 
       DeclareShimConstructor(mod);
 
@@ -128,17 +120,20 @@ namespace Bolt.Compiler {
     }
 
     void DeclareShimConstructor(CodeTypeDeclaration type) {
-      type.DeclareField("System.Byte[]", "data");
-      type.DeclareField("System.Int32", "offset");
+      type.DeclareField("Bolt.State.Frame", "frame");
+      type.DeclareField("System.Int32", "offsetBytes");
+      type.DeclareField("System.Int32", "offsetObjects");
 
       type.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
 
-        ctor.DeclareParameter("System.Byte[]", "data");
-        ctor.DeclareParameter("System.Int32", "offset");
+        ctor.DeclareParameter("Bolt.State.Frame", "frame");
+        ctor.DeclareParameter("System.Int32", "offsetBytes");
+        ctor.DeclareParameter("System.Int32", "offsetObjects");
 
-        ctor.Statements.Assign("this.data".Expr(), "data".Expr());
-        ctor.Statements.Assign("this.offset".Expr(), "offset".Expr());
+        ctor.Statements.Assign("this.frame".Expr(), "frame".Expr());
+        ctor.Statements.Assign("this.offsetBytes".Expr(), "offsetBytes".Expr());
+        ctor.Statements.Assign("this.offsetObjects".Expr(), "offsetObjects".Expr());
       });
     }
 

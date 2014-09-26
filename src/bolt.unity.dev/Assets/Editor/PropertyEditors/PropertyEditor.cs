@@ -6,23 +6,37 @@ using System.Collections.Generic;
 using System.Reflection;
 
 public abstract class PropertyEditor {
+  public AssetDefinition Asset;
   public PropertyDefinition Definition;
-  public PropertyType PropertyType { get { return Definition.PropertyType; } }
+  public PropertyType PropertyType;
 
-  public void Edit(PropertyDefinition definition) {
+  public void Edit(AssetDefinition asset, PropertyDefinition definition) {
+    Asset = asset;
     Definition = definition;
-    Edit();
+    PropertyType = definition.PropertyType;
+    Edit(false);
   }
 
-  protected abstract void Edit();
+  public void EditArrayElement(AssetDefinition asset, PropertyDefinition definition, PropertyType type) {
+    Asset = asset;
+    Definition = definition;
+    PropertyType = type;
+    Edit(true);
+  }
+
+  protected abstract void Edit(bool array);
 }
 
 public abstract class PropertyEditor<T> : PropertyEditor where T : PropertyType {
-  public new T Type { get { return (T)base.PropertyType; } }
+  public new T PropertyType { get { return (T)base.PropertyType; } }
 }
 
 public static class PropertyEditorRegistry {
   static Dictionary<Type, Type> editorLookup;
+
+  public static PropertyEditor GetEditor(PropertyType propertyType) {
+    return GetEditor(propertyType.GetType());
+  }
 
   public static PropertyEditor GetEditor(Type propertyType) {
     if (editorLookup == null) {
@@ -32,11 +46,7 @@ public static class PropertyEditorRegistry {
         if (asm.GetName().Name.Contains("CSharp")) {
           foreach (Type type in asm.GetTypes()) {
             if (typeof(PropertyEditor).IsAssignableFrom(type) && !type.IsAbstract) {
-              var attributes = type.GetCustomAttributes(typeof(PropertyEditorAttribute), false);
-              if (attributes.Length == 1) {
-                var attr = (PropertyEditorAttribute)attributes[0];
-                editorLookup.Add(attr.PropertyType, type);
-              }
+              editorLookup.Add(type.BaseType.GetGenericArguments()[0], type); 
             }
           }
         }

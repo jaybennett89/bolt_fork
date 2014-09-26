@@ -6,20 +6,34 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
-    public int Index;
     public int ByteOffset;
+    public int ObjectOffset;
 
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
 
-    public abstract int ByteSize { get; }
-    public abstract string ClrType { get; }
-    public abstract PropertyCodeEmitter CreateEmitter();
-
-    public virtual int StructCount {
-      get { return 0; }
+    public abstract string ClrType {
+      get;
     }
+
+    public abstract int ByteSize {
+      get;
+    }
+
+    public virtual int ObjectSize {
+      get {
+        if ((DefiningAsset is StateDecorator) || (DefiningAsset is StructDecorator)) {
+          if (Definition.StateAssetSettings.Callback) {
+            return 1;
+          }
+        }
+
+        return 0;
+      }
+    }
+
+    public abstract PropertyCodeEmitter CreateEmitter();
 
     public virtual void GetStructList(List<StructDecorator> list) {
 

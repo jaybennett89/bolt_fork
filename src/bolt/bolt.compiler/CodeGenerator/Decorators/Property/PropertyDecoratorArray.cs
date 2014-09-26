@@ -7,11 +7,15 @@ using System.Text;
 namespace Bolt.Compiler {
   public class PropertyDecoratorArray : PropertyDecorator<PropertyTypeArray> {
     public override int ByteSize {
-      get { return ElementDecorator.ByteSize * PropertyType.ElementCount; }
+      get {
+        return ElementDecorator.ByteSize * PropertyType.ElementCount;
+      }
     }
 
-    public override int StructCount {
-      get { return ElementDecorator.StructCount * PropertyType.ElementCount; }
+    public override int ObjectSize {
+      get {
+        return ElementDecorator.ObjectSize * PropertyType.ElementCount;
+      }
     }
 
     public PropertyDecorator ElementDecorator {

@@ -20,8 +20,10 @@ public class BoltEditorWindow : BoltWindow {
 
   Vector2 scroll;
 
-  void OnGUI() {
+  new void OnGUI() {
     base.OnGUI();
+
+    GUILayout.BeginArea(new Rect(0, 5, position.width, position.height - 25));
 
     scroll = GUILayout.BeginScrollView(scroll, false, false);
 
@@ -30,15 +32,29 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     GUILayout.EndScrollView();
+    GUILayout.EndArea();
 
     if (GUI.changed) {
       Save();
     }
+
+    Rect r = new Rect(0, position.height - 20, position.width, 20);
+    GUILayout.BeginArea(r);
+    Footer(r);
+    GUILayout.EndArea();
+  }
+
+  void Footer(Rect r) {
+    GUI.color = EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.45f, 0.45f, 0.45f);
+    GUILayout.BeginHorizontal(BoltEditorGUI.WhiteTextureBackgroundStyle);
+    GUI.color = Color.white;
+
+    GUILayout.Label(GUI.tooltip);
+
+    GUILayout.EndHorizontal();
   }
 
   void Editor() {
-    GUILayout.Space(5);
-
     if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) != null)) {
       SelectedAsset = (AssetDefinition)Selected;
     }
@@ -61,13 +77,31 @@ public class BoltEditorWindow : BoltWindow {
 
       // inheritnace
       def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, new Guid[] { });
+
+      // 
+      if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
+        def.IsAbstract = !def.IsAbstract;
+      }
     });
 
     // add button
-    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
+
+    Guid guid = def.ParentGuid;
+
+    while (guid != Guid.Empty) {
+      var parent = Project.FindState(guid);
+      GUILayout.Label(string.Format("Inherited from {0}", parent.Name), BoltEditorGUI.PropertiesAddTextStyle);
+
+      EditorGUI.BeginDisabledGroup(true);
+      EditPropertyList(parent, parent.Properties, StateAndStructToolbar);
+      EditorGUI.EndDisabledGroup();
+
+      guid = parent.ParentGuid;
+    }
   }
 
   void EditStruct(StructDefinition def) {
@@ -76,23 +110,25 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
+
   }
 
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action) {
     GUI.color = color;
-    GUILayout.BeginHorizontal(style);
+    GUILayout.BeginVertical(style);
     GUI.color = Color.white;
+    GUILayout.BeginHorizontal();
 
     if (def is StructDefinition) {
-      BoltEditorGUI.Icon("boltico_object", new RectOffset(3, 0, 0, 0));
+      BoltEditorGUI.Icon("boltico_object", new RectOffset(3, 0, 2, 0));
     }
 
     if (def is StateDefinition) {
-      BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 0, 0));
+      BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 2, 0));
 
     }
 
@@ -103,6 +139,13 @@ public class BoltEditorWindow : BoltWindow {
     action();
 
     GUILayout.EndHorizontal();
+
+    GUILayout.BeginHorizontal();
+    GUILayout.Label("//", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.Width(15));
+    def.Comment = EditorGUILayout.TextArea(def.Comment);
+    GUILayout.EndHorizontal();
+
+    GUILayout.EndVertical();
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list, Action<AssetDefinition, PropertyDefinition> toolbar) {
@@ -148,10 +191,22 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditProperty(AssetDefinition def, PropertyDefinition p, Action<AssetDefinition, PropertyDefinition> toolbar) {
-    EditorGUILayout.BeginHorizontal(BoltEditorGUI.ParameterBackgroundStyle);
+    EditorGUILayout.BeginVertical(BoltEditorGUI.ParameterBackgroundStyle);
+    EditorGUILayout.BeginHorizontal();
+
+    if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
+      if (BoltEditorGUI.IconButton("boltico_x".ToContent("Delete this property"))) {
+        p.Deleted = true;
+      }
+    }
+    else {
+      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent("Collapse this property"), "boltico_arrow_right".ToContent("Expand this property"), p.Expanded)) {
+        p.Expanded = !p.Expanded;
+      }
+    }
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.MinWidth(100));
+    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(100));
 
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
@@ -160,34 +215,37 @@ public class BoltEditorWindow : BoltWindow {
       toolbar(def, p);
     }
 
-    if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      if (BoltEditorGUI.IconButton("delete")) {
-        p.Deleted = true;
-      }
-    }
-    else {
-      if (BoltEditorGUI.IconButton("settings2", p.Expanded)) {
-        p.Expanded = !p.Expanded;
-      }
-    }
-
     EditorGUILayout.EndHorizontal();
+
+    if (p.Expanded) {
+      EditorGUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+
+      EditorGUILayout.BeginVertical();
+      PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
+      EditorGUILayout.EndVertical();
+
+      EditorGUILayout.EndHorizontal();
+    }
+
+    EditorGUILayout.EndVertical();
   }
 
-  GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, PropertyFilterDefinition f) {
-    return () => { p.Filters ^= f.Bit; };
-  }
 
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
     EditFilters(p);
 
-    if (BoltEditorGUI.IconButton("boltico_playcom2", !p.ExcludeController)) {
+    if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), !p.ExcludeController)) {
       p.ExcludeController = !p.ExcludeController;
     }
 
-    if (BoltEditorGUI.IconButton("callback", p.StateAssetSettings.Callback)) {
+    if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
       p.StateAssetSettings.Callback = !p.StateAssetSettings.Callback;
     }
+  }
+
+  GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, FilterDefinition f) {
+    return () => { p.Filters ^= f.Bit; };
   }
 
   void EditFilters(PropertyDefinition p) {
@@ -195,17 +253,46 @@ public class BoltEditorWindow : BoltWindow {
       GUIStyle s = new GUIStyle(EditorStyles.miniButton);
       s.alignment = TextAnchor.MiddleLeft;
 
-      if (GUILayout.Button(Project.EnabledFilters.Where(x => x.IsOn(p.Filters)).Select(x => x.Name).Join(", "), s, GUILayout.Width(200))) {
-        GenericMenu m = new GenericMenu();
+      Rect menuRect;
+      
+      menuRect = GUILayoutUtility.GetLastRect();
+      menuRect.x += 85;
 
-        foreach (PropertyFilterDefinition f in Project.EnabledFilters) {
-          m.AddItem(new GUIContent(f.Name), f.IsOn(p.Filters), FilterSetter(p, f));
+      if (GUILayout.Button("", s, GUILayout.Width(200))) {
+        GenericMenu menu = new GenericMenu();
+
+        foreach (FilterDefinition f in Project.EnabledFilters) {
+          menu.AddItem(new GUIContent(f.Name), f.IsOn(p.Filters), FilterSetter(p, f));
         }
 
-        m.ShowAsContext();
+        menu.DropDown(menuRect);
+        EditorGUIUtility.ExitGUI();
       }
 
+      // rect of the button
       var r = GUILayoutUtility.GetLastRect();
+      var labelRect = r;
+
+      labelRect.xMin += 3;
+      labelRect.yMin -= 1;
+      labelRect.xMax -= 17;
+
+      //GUILayout.BeginArea(r);
+
+      foreach (FilterDefinition f in Project.EnabledFilters) {
+        if (f.IsOn(p.Filters)) {
+          var label = BoltEditorGUI.MiniLabelWithColor(f.Color.ToUnityColor());
+          var sizex = Mathf.Min(label.CalcSize(new GUIContent(f.Name)).x, labelRect.width);
+
+          GUI.Label(labelRect, f.Name, label);
+
+          labelRect.xMin += sizex;
+          labelRect.xMin = Mathf.Min(labelRect.xMin, labelRect.xMax);
+        }
+      }
+
+      //GUILayout.EndArea();
+
       GUI.DrawTexture(new Rect(r.xMax - 18, r.yMin, 16, 16), BoltEditorGUI.LoadIcon("boltico_arrow_down"));
     }
   }

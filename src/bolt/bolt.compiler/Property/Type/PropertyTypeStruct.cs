@@ -14,6 +14,14 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
+    public override bool CallbackAllowed {
+      get { return false; }
+    }
+
+    public override bool InterpolateAllowed {
+      get { return false; }
+    }
+
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorStruct();
     }

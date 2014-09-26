@@ -9,5 +9,13 @@ namespace Bolt.Compiler {
   public class PropertyTypeTransform : PropertyType {
     [ProtoMember(1)]
     public TransformSpaces Space;
+
+    public override bool InterpolateAllowed {
+      get { return true; }
+    }
+
+    public override bool CallbackAllowed {
+      get { return false; }
+    }
   }
 }

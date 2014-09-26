@@ -303,7 +303,7 @@ public class BoltProjectWindow : BoltWindow {
     }
 
     RectOffset r = new RectOffset(3 + (indent * 11), 0, 0, 0);
-    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_arrow_down_8px" : "boltico_arrow_right", r, () => { if (BoltEditorGUI.IsLeftClick) Expand(folder); }, 9);
+    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_arrow_down_8px" : "boltico_arrow_right_8px", r, () => { if (BoltEditorGUI.IsLeftClick) Expand(folder); }, 9);
     BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_folder_open" : "boltico_folder_closed", () => { SelectOrExpand(folder); });
 
     GUIStyle label = new GUIStyle(GUI.skin.label);

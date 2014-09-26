@@ -8,14 +8,18 @@ namespace Bolt.Compiler {
   public class PropertyCodeEmitterFloat : PropertyCodeEmitter<PropertyDecoratorFloat> {
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return Blit.ReadF32(data, offset + {0})", Decorator.ByteOffset);
+        get.Expr("return Bolt.Blit.ReadF32(frame.Data, offsetBytes + {0})", Decorator.ByteOffset);
       };
 
       Action<CodeStatementCollection> setter = set => {
-        set.Expr("Blit.PackF32(data, offset + {0}, value)", Decorator.ByteOffset);
+        set.Expr("Bolt.Blit.PackF32(frame.Data, offsetBytes + {0}, value)", Decorator.ByteOffset);
       };
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
+
+      if (Decorator.Definition.StateAssetSettings.Callback) {
+        EmitChangedCallbackProperty(type, true);
+      }
     }
 
     public override void EmitShimMembers(CodeTypeDeclaration type) {
@@ -24,6 +28,10 @@ namespace Bolt.Compiler {
 
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, true);
+    }
+
+    public override CodeExpression CreatePropertyArrayInitializerExpression(int byteOffset, int objectOffset) {
+      return "new Bolt.PropertySerializerFloat({0}, {1}, {2}, {3})".Expr(byteOffset, Decorator.ByteSize, objectOffset, Decorator.Definition.Priority);
     }
   }
 }

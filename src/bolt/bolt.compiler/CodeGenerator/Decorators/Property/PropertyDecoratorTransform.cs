@@ -18,6 +18,10 @@ namespace Bolt.Compiler {
       }
     }
 
+    public override int ObjectSize {
+      get { return 1; }
+    }
+
     public override string ClrType {
       get { return "UE.Transform"; }
     }

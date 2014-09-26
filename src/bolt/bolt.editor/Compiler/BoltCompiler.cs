@@ -22,6 +22,8 @@ static partial class BoltCompiler {
     CompileMaps(op);
     CompileCommands(op);
     CompileAssemblyInfo(op);
+
+    op.project.GenerateCode(op.projectFile);
   }
 
   static void EmitFileHeader (BoltSourceFile file) {

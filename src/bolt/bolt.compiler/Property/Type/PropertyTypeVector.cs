@@ -39,6 +39,10 @@ namespace Bolt.Compiler {
     //  get { return 16; }
     //}
 
+    public override bool InterpolateAllowed {
+      get { return true; }
+    }
+
     public Axis this[VectorComponents component] {
       get {
         foreach (Axis axis in Axes) {

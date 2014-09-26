@@ -19,7 +19,7 @@ namespace Bolt.Compiler {
     }
 
     static void Comment(this CodeTypeMember member, bool doc, string comment, params object[] args) {
-      member.Comments.Add(new CodeCommentStatement(string.Format(comment ?? "", args), true));
+      member.Comments.Add(new CodeCommentStatement(string.Format(comment ?? "", args), doc));
     }
 
     public static void Comment(this CodeTypeMember member, string comment, params object[] args) {

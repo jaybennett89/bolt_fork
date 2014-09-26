@@ -10,6 +10,8 @@ class BoltCompilerOperation {
   public string mapsFilePath = "";
   public string commandsFilePath = "";
   public string assemblyInfoFilePath = "";
+  public string projectFile = "";
+  public Bolt.Compiler.Project project;
   public List<BoltPrefab> prefabs = new List<BoltPrefab>();
   public List<BoltEventAsset> events = new List<BoltEventAsset>();
   public List<BoltStateAsset> states = new List<BoltStateAsset>();

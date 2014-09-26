@@ -25,7 +25,11 @@ namespace Bolt.Compiler {
     }
 
     public string ClassName {
-      get { return InterfaceName + "_Impl"; }
+      get { return Name + "_State"; }
+    }
+
+    public string FactoryName {
+      get { return Name + "_Factory"; }
     }
 
     public StateDecorator Parent {

@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  public class PropertySerializerFloat : PropertySerializer {
+  class PropertySerializerFloat : PropertySerializer {
     public override int CalculateBits(byte[] data) {
       return 32;
     }
 
-    public override void Pack(int frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream, byte[] data) {
-      stream.WriteFloat(Blit.ReadF32(data, Offset));
+    public override void Pack(State.Frame frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream) {
+      stream.WriteFloat(Blit.ReadF32(frame.Data, ByteOffset));
     }
 
-    public override void Read(int frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream, byte[] data) {
-      Blit.PackF32(data, Offset, stream.ReadFloat());
+    public override void Read(State.Frame frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream) {
+      Blit.PackF32(frame.Data, ByteOffset, stream.ReadFloat());
     }
 
-    public PropertySerializerFloat(int offset, int length, int priority)
-      : base(offset, length, priority) {
+    public PropertySerializerFloat(int byteOffset, int byteLength, int objectOffset, int priority)
+      : base(byteOffset, byteLength, objectOffset, priority) {
     }
   }
 }

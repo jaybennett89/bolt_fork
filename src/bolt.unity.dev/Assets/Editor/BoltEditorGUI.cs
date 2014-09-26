@@ -43,29 +43,74 @@ public static class BoltEditorGUI {
     }
   }
 
+  public static GUIStyle WhiteTextureBackgroundStyle {
+    get {
+      GUIStyle bg;
+      bg = new GUIStyle(GUIStyle.none);
+      bg.normal.background = EditorGUIUtility.whiteTexture;
+      return bg;
+    }
+  }
+
+  public static Color ToUnityColor(this Color4 c) {
+    return new Color(c.R, c.G, c.B, c.A);
+  }
+
+  public static Color4 ToBoltColor(this Color c) {
+    return new Color4(c.r, c.g, c.b, c.a);
+  }
+
   public static Color ColorInt(int r, int g, int b) {
     return new Color(r / 255f, g / 255f, b / 255f);
+  }
+
+  public static Color ColorOpacity(float opacity) {
+    return new Color(1, 1, 1, opacity);
   }
 
   public static Color StateHeaderColor {
     get { return Blue; }
   }
 
-
   public static Color StructHeaderColor {
     get { return ColorInt(200, 89, 200); }
   }
 
+  public static GUIStyle SmallWhiteText {
+    get {
+      GUIStyle s = new GUIStyle();
+      s.margin = new RectOffset();
+      s.normal.textColor = Color.white;
+      return s;
+    }
+  }
+
+  public static GUIStyle PropertiesAddTextStyle {
+    get {
+      GUIStyle s = new GUIStyle(SmallWhiteText);
+      s.padding = new RectOffset(5, 0, 1, 0);
+      return s;
+    }
+  }
 
   public static GUIStyle InheritanceSeparatorStyle {
     get {
-      GUIStyle style;
+      GUIStyle s;
+      s = new GUIStyle(EditorStyles.label);
+      s.contentOffset = new Vector2(0, 0);
+      s.padding = new RectOffset(4, 2, 0, 0);
+      s.normal.textColor = Color.white;
+      return s;
+    }
+  }
 
-      style = new GUIStyle(EditorStyles.label);
-      style.contentOffset = new Vector2(2, -1);
-      style.normal.textColor = Color.white;
-
-      return style;
+  public static GUIStyle InheritanceSeparatorStyleMini {
+    get {
+      GUIStyle s;
+      s = new GUIStyle(EditorStyles.miniLabel);
+      s.contentOffset = new Vector2(2, -1);
+      s.normal.textColor = Color.white;
+      return s;
     }
   }
 
@@ -75,6 +120,13 @@ public static class BoltEditorGUI {
       s.normal.background = ((GUIStyle)"LODSliderRangeSelected").normal.background;
       return s;
     }
+  }
+
+  public static GUIStyle MiniLabelWithColor(Color c) {
+    GUIStyle s;
+    s = new GUIStyle(EditorStyles.miniLabel);
+    s.normal.textColor = c;
+    return s;
   }
 
   public static int ClickCount {
@@ -163,36 +215,49 @@ public static class BoltEditorGUI {
     return filtered[selected - 1].Guid;
   }
 
+  public static void WithLabel(string label, Action gui) {
+    GUILayout.BeginHorizontal();
+    GUILayout.Label(label, GUILayout.Width(100));
+
+    gui();
+
+    GUILayout.EndHorizontal();
+  }
+
   public static void PropertyTypePopup(AssetDefinition asset, PropertyDefinition definition) {
     if (!asset.AllowedPropertyTypes.Contains(definition.PropertyType.GetType())) {
       definition.PropertyType = new PropertyTypeFloat();
     }
 
-    var types = asset.AllowedPropertyTypes.ToArray();
+    definition.PropertyType = PropertyTypePopup(asset.AllowedPropertyTypes, definition.PropertyType);
+  }
+
+  public static PropertyType PropertyTypePopup(IEnumerable<Type> allTypes, PropertyType current, params GUILayoutOption[] options) {
+    if (current == null) {
+      current = (PropertyType)Activator.CreateInstance(allTypes.First());
+    }
+
+    var types = allTypes.ToArray();
     var typesNames = types.Select(x => x.Name.Replace("PropertyType", "")).ToArray();
-    var selected = Array.IndexOf(types, definition.PropertyType.GetType());
-    var selectedNew = EditorGUILayout.Popup(selected, typesNames, GUILayout.Width(80));
+    var selected = Array.IndexOf(types, current.GetType());
+    var selectedNew = EditorGUILayout.Popup(selected, typesNames, options);
 
     if (selected != selectedNew) {
-      definition.PropertyType = (PropertyType)Activator.CreateInstance(types[selectedNew]);
+      return (PropertyType)Activator.CreateInstance(types[selectedNew]);
     }
+
+    return current;
   }
 
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyDefinitionAssetSettings> newSettings) {
-    GUIStyle labelStyle = new GUIStyle(EditorStyles.miniLabel);
-    labelStyle.margin = new RectOffset();
-    labelStyle.padding = new RectOffset(5, 0, 1, 0);
-    labelStyle.contentOffset = new Vector2();
-    labelStyle.normal.textColor = Color.white;
-
     GUIStyle buttonStyle = new GUIStyle();
-    buttonStyle.margin = new RectOffset();
+    buttonStyle.margin = new RectOffset(0, 0, -1, 0);
     buttonStyle.padding = new RectOffset();
     buttonStyle.contentOffset = new Vector2();
 
     EditorGUILayout.BeginHorizontal();
-    bool btn0 = GUILayout.Button(text, labelStyle, GUILayout.ExpandWidth(false));
-    bool btn1 = GUILayout.Button(LoadIcon("boltico_add") as Texture, buttonStyle, GUILayout.Width(16), GUILayout.Height(16));
+    bool btn0 = GUILayout.Button(text, PropertiesAddTextStyle, GUILayout.ExpandWidth(false));
+    bool btn1 = GUILayout.Button(LoadIcon("boltico_plus") as Texture, buttonStyle, GUILayout.Width(16), GUILayout.Height(16));
     EditorGUILayout.EndHorizontal();
 
     if (btn0 || btn1) {
@@ -210,31 +275,53 @@ public static class BoltEditorGUI {
     }
   }
 
-  public static bool IconButton(string icon) {
+  public static GUIContent ToContent(this string text) {
+    return ToContent(text, "");
+  }
+
+  public static GUIContent ToContent(this string text, string tooltip) {
+    return new GUIContent(text, tooltip);
+  }
+
+  public static bool IconButton(GUIContent icon) {
     return IconButton(icon, Color.white);
   }
 
-  public static bool IconButton(string icon, bool enabled) {
+  public static bool IconButton(GUIContent icon, bool enabled) {
     return IconButton(icon, new Color(1, 1, 1, enabled ? 1f : 0.25f));
   }
 
-  public static bool OnOffButton(string on, string off, bool enabled) {
-    return GUILayout.Button(LoadIcon(enabled ? on : off) as Texture, ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
+  public static bool OnOffButton(GUIContent on, GUIContent off, bool enabled) {
+    var texture = LoadIcon(enabled ? on.text : off.text) as Texture;
+    var tooltip = enabled ? on.tooltip : off.tooltip;
+    return GUILayout.Button(new GUIContent(texture, tooltip), ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
   }
 
-  public static bool OnOffButton(string on, string off, bool enabled, float offOpacity) {
+  public static bool OnOffButton(GUIContent on, GUIContent off, bool enabled, float offOpacity) {
     return IconButton(enabled ? on : off, enabled ? 1f : offOpacity);
   }
 
-  public static bool IconButton(string icon, float opacity) {
+  public static bool IconButton(GUIContent icon, float opacity) {
     return IconButton(icon, new Color(1, 1, 1, Mathf.Clamp01(opacity)));
   }
 
-  public static bool IconButton(string icon, Color color) {
+  public static bool IconButton(GUIContent icon, Color color) {
     bool result = false;
 
     WithColor(color, () => {
-      result = GUILayout.Button(LoadIcon(icon) as Texture, ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
+      var texture = LoadIcon(icon.text) as Texture;
+      var tooltip = icon.tooltip;
+      result = GUILayout.Button(new GUIContent(texture, tooltip), ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
+    });
+
+    return result;
+  }
+
+  public static bool LabelButton(string label, bool enabled, float opacity, params GUILayoutOption[] options) {
+    bool result = false;
+
+    WithColor(enabled ? Color.white : ColorOpacity(opacity), () => {
+      result = GUILayout.Button(label, BoltEditorGUI.InheritanceSeparatorStyleMini, options);
     });
 
     return result;
@@ -257,5 +344,15 @@ public static class BoltEditorGUI {
     if (Event.current.type == EventType.MouseDown && r.Contains(Event.current.mousePosition)) {
       onClick();
     }
+  }
+
+  internal static FloatCompression EditFloatCompression(FloatCompression c) {
+    if (c == null) {
+      c = new FloatCompression() { Bits = 32, Fractions = 1000, MinValue = -2048, MaxValue = +2048 };
+    }
+
+    c.Bits = EditorGUILayout.IntField(c.Bits);
+
+    return c;
   }
 }

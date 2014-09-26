@@ -17,10 +17,13 @@ namespace Bolt.Compiler {
     public Project Context;
 
     [ProtoIgnore]
-    public virtual bool MecanimUsable { get { return false; } }
+    public virtual bool IsValue { get { return true; } }
 
     [ProtoIgnore]
-    public virtual bool IsValue { get { return true; } }
+    public virtual bool CallbackAllowed { get { return true; } }
+
+    [ProtoIgnore]
+    public virtual bool InterpolateAllowed { get { return false; } }
 
     public virtual PropertyDecorator CreateDecorator() {
       throw new NotImplementedException();

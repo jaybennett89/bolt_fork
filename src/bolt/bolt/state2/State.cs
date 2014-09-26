@@ -10,9 +10,14 @@ namespace Bolt {
 
   }
 
+  public interface IStateModifier {
+
+  }
+
   internal abstract class State {
-    protected class Frame : IBoltListNode {
+    public class Frame : IBoltListNode {
       public int Number;
+      public object[] Objects;
       public readonly byte[] Data;
       public readonly List<int> ReadProperties;
 
@@ -52,33 +57,34 @@ namespace Bolt {
     internal UE.Quaternion SpawnRotation;
 
     internal StateFlags Flags;
-
     internal BoltEntity Entity;
     internal BoltConnection SourceConnection;
 
     protected readonly int FrameSize;
     protected readonly int PropertyCount;
     protected readonly int PropertyIdBits;
+    protected readonly object[] PropertyObjects;
 
-    protected readonly int MaxBitsPerPacket;
-
-    protected readonly int MaxPropertyCount;
-    protected readonly int MaxPropertyCountBits;
+    protected readonly int PacketMaxBits;
+    protected readonly int PacketMaxProperties;
+    protected readonly int PacketMaxPropertiesBits;
 
     protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
 
     protected abstract BitArray GetDiffArray();
     protected abstract BitArray GetFullArray();
     protected abstract BitArray GetFilterArray(Filter filter);
+    protected abstract BitArray GetControllerFilterArray();
     protected abstract PropertySerializer[] GetPropertyArray();
 
-    protected State(int frameSize, int propertyCount, int maxBitsPerPacket, int maxPropertyCount) {
+    protected State(int frameSize, int objectCount, int propertyCount, int packetMaxBits, int packetMaxProperties) {
       FrameSize = frameSize;
       PropertyCount = propertyCount;
       PropertyIdBits = BoltMath.BitsRequired(propertyCount - 1);
-      MaxBitsPerPacket = maxBitsPerPacket;
-      MaxPropertyCount = Math.Min(maxPropertyCount, 255);
-      MaxPropertyCountBits = BoltMath.BitsRequired(MaxPropertyCount);
+      PropertyObjects = new object[objectCount];
+      PacketMaxBits = packetMaxBits;
+      PacketMaxProperties = Math.Max(Math.Min(packetMaxProperties, 255), 1);
+      PacketMaxPropertiesBits = BoltMath.BitsRequired(PacketMaxProperties);
     }
 
     internal void Pack(int frame, UdpConnection connection, UdpStream stream, PropertyPriority[] priority, List<PropertyPriority> written) {
@@ -86,14 +92,14 @@ namespace Bolt {
       int bits = 0;
 
       // reserve the space for our count
-      stream.WriteByte(0, MaxPropertyCountBits);
+      stream.WriteByte(0, PacketMaxPropertiesBits);
 
       for (int i = 0; (i < priority.Length); ++i) {
-        if ((bits + PropertyIdBits + 1) >= MaxBitsPerPacket) {
+        if ((bits + PropertyIdBits + 1) >= PacketMaxBits) {
           break;
         }
 
-        if (written.Count == MaxPropertyCount) {
+        if (written.Count == PacketMaxProperties) {
           break;
         }
 
@@ -106,12 +112,12 @@ namespace Bolt {
 
         int b = s.CalculateBits(Frames.first.Data);
 
-        if ((bits + b) <= MaxBitsPerPacket) {
+        if ((bits + b) <= PacketMaxBits) {
           // write property id
           stream.WriteInt(p.Property, PropertyIdBits);
 
           // write data into stream
-          s.Pack(frame, connection, stream, Frames.first.Data);
+          s.Pack(Frames.first, connection, stream);
 
           // increment bits
           bits += b;
@@ -125,14 +131,14 @@ namespace Bolt {
       }
 
       // gotta be less then 256
-      Assert.True(written.Count <= MaxPropertyCount);
+      Assert.True(written.Count <= PacketMaxProperties);
 
       // write the amount of properties
-      UdpStream.WriteByteAt(stream.Data, ptr, MaxPropertyCountBits, (byte)written.Count);
+      UdpStream.WriteByteAt(stream.Data, ptr, PacketMaxPropertiesBits, (byte)written.Count);
     }
 
     internal void Read(int frameNumber, UdpConnection connection, UdpStream stream) {
-      int count = stream.ReadByte(MaxPropertyCountBits);
+      int count = stream.ReadByte(PacketMaxPropertiesBits);
       var frame = default(Frame);
 
       if (Frames.count == 0) {
@@ -147,13 +153,15 @@ namespace Bolt {
         var serializer = GetPropertyArray()[property];
 
         // read data into frame
-        serializer.Read(frameNumber, connection, stream, frame.Data);
+        serializer.Read(frame, connection, stream);
 
         // put property index into updated list
         frame.ReadProperties.Add(property);
 
         --count;
       }
+
+      Frames.AddLast(frame);
     }
 
     internal BitArray GetFilter(Filter filter) {
@@ -173,7 +181,7 @@ namespace Bolt {
       array.Clear();
 
       for (int i = 0; i < properties.Length; ++i) {
-        if (Blit.Diff(a, b, properties[i].Offset, properties[i].Length)) {
+        if (Blit.Diff(a, b, properties[i].ByteOffset, properties[i].ByteLength)) {
           array.Set(i);
         }
       }
@@ -182,7 +190,12 @@ namespace Bolt {
     }
 
     protected Frame AllocFrame(int number) {
-      return new Frame(number, FrameSize);
+      Frame f;
+
+      f = new Frame(number, FrameSize);
+      f.Objects = PropertyObjects;
+
+      return f;
     }
 
     protected void FreeFrame(Frame frame) {

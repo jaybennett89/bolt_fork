@@ -4,23 +4,23 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  public class PropertySerializerString : PropertySerializer {
+  class PropertySerializerString : PropertySerializer {
     public override int CalculateBits(byte[] data) {
-      return 32 + (Blit.ReadI32(data, Offset) * 8);
+      return 32 + (Blit.ReadI32(data, ByteOffset) * 8);
     }
 
-    public override void Pack(int frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream, byte[] data) {
-      stream.WriteInt(Blit.ReadI32(data, Offset));
-      stream.WriteByteArray(data, Offset + 4, Blit.ReadI32(data, Offset));
+    public override void Pack(State.Frame frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream) {
+      stream.WriteInt(Blit.ReadI32(frame.Data, ByteOffset));
+      stream.WriteByteArray(frame.Data, ByteOffset + 4, Blit.ReadI32(frame.Data, ByteOffset));
     }
 
-    public override void Read(int frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream, byte[] data) {
-      Blit.PackI32(data, Offset, stream.ReadInt());
-      Blit.PackBytes(data, Offset + 4, stream.ReadByteArray(Blit.ReadI32(data, Offset)));
+    public override void Read(State.Frame frame, UdpKit.UdpConnection connection, UdpKit.UdpStream stream) {
+      Blit.PackI32(frame.Data, ByteOffset, stream.ReadInt());
+      Blit.PackBytes(frame.Data, ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(frame.Data, ByteOffset)));
     }
 
-    public PropertySerializerString(int offset, int length, int priority)
-      : base(offset, length, priority) {
+    public PropertySerializerString(int byteOffset, int byteLength, int objectOffset, int priority)
+      : base(byteOffset, byteLength, objectOffset, priority) {
     }
   }
 }

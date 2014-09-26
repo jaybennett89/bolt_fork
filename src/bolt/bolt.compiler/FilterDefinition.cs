@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyFilterDefinition {
+  public class FilterDefinition {
     [ProtoMember(1)]
     public int Index;
 
@@ -15,6 +15,9 @@ namespace Bolt.Compiler {
 
     [ProtoMember(3)]
     public string Name;
+
+    [ProtoMember(4)]
+    public Color4 Color;
 
     public int Bit {
       get { return 1 << Index; }
