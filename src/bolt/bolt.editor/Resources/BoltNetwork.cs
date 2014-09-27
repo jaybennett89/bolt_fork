@@ -160,10 +160,6 @@ public static partial class BoltNetwork {
     return Instantiate(BoltCore.FindPrefab(prefab), position, rotation);
   }
 
-  public static BoltUniqueId GenerateUniqueId() {
-    return BoltCore.GenerateUniqueId();
-  }
-
   public static BoltPhysicsHits RaycastAll(Ray ray) {
     return BoltPhysics.Raycast(ray);
   }
@@ -222,100 +218,20 @@ public static partial class BoltNetwork {
     BoltCore.Destroy(gameobject);
   }
 
-  public static bool HasEntity (BoltUniqueId id) {
-    return BoltCore.HasEntity(id);
-  }
-  
-  public static BoltEntity FindEntity (BoltUniqueId id) {
-    return BoltCore.FindEntity(id);
-  }
-
-  /// <summary>
-  /// Load a map asset
-  /// </summary>
-  /// <param name="map">Map to load</param>
-  [BoltDocsServerOnly]
-  [Obsolete("Use BoltNetwork.LoadScene instead")]
-  public static void LoadMap (string map) {
-    BoltCore.LoadMap(map);
-  }
-
-  [BoltDocsServerOnly]
   public static void LoadScene (string scene) {
     BoltCore.LoadMap(scene);
   }
-
-  ///// <summary>
-  ///// Load a map asset by name
-  ///// </summary>
-  ///// <param name="map">Map to load</param>
-  //[BoltDocsServerOnly]
-  //public static void LoadMap (BoltMapNames map) {
-  //  LoadMap(map.ToString());
-  //}
 
   /// <summary>
   /// Connect to a server
   /// </summary>
   /// <param name="endpoint">Server end point to connect to</param>
-  [BoltDocsClientOnly]
   public static void Connect (UdpEndPoint endpoint) {
     BoltCore.Connect(endpoint);
   }
 
-  [BoltDocsClientOnly]
   public static void Connect (UdpEndPoint endpoint, byte[] token) {
     BoltCore.Connect(endpoint, token);
-  }
-
-  /// <summary>
-  /// Start a server locally
-  /// </summary>
-  /// <param name="endpoint">The endpoint to use</param>
-  [Obsolete("Use StartServer instead")]
-  public static void InitializeServer (UdpEndPoint endpoint) {
-    InitializeServer(endpoint, BoltRuntimeSettings.instance._config);
-  }
-
-  /// <summary>
-  /// Start a server locally
-  /// </summary>
-  [Obsolete("Use StartServer instead")]
-  public static void InitializeServer (UdpEndPoint endpoint, BoltConfig config) {
-    BoltCore.InitializeServer(endpoint, new Network(), config);
-  }
-
-  /// <summary>
-  /// Start a client locally
-  /// </summary>
-  [Obsolete("Use StartClient instead")]
-  public static void InitializeClient () {
-    InitializeClient(UdpEndPoint.Any);
-  }
-
-  /// <summary>
-  /// Start a client locally with a specific endpoint
-  /// </summary>
-  /// <param name="endpoint">The end point to use</param>
-  [Obsolete("Use StartClient instead")]
-  public static void InitializeClient (UdpEndPoint endpoint) {
-    InitializeClient(endpoint, BoltRuntimeSettings.instance._config);
-  }
-
-  /// <summary>
-  /// Start a client locally with a specific configuration
-  /// </summary>
-  [Obsolete("Use StartClient instead")]
-  public static void InitializeClient (BoltConfig config) {
-    InitializeClient(UdpEndPoint.Any, config);
-  }
-
-  /// <summary>
-  /// Start a client locally with a specific endpoint and configuration
-  /// </summary>
-  [Obsolete("Use StartClient instead")]
-  public static void InitializeClient (UdpEndPoint endpoint, BoltConfig config) {
-    BoltCore.InitializeClient(endpoint, new Network(), config);
   }
 
   /// <summary>
@@ -381,7 +297,7 @@ public static partial class BoltNetwork {
   /// Raise a global event to yourself and the specified connections
   /// </summary>
   public static void Raise (IBoltEvent evnt, params BoltConnection[] connections) {
-    BoltCore.Raise((BoltEvent) evnt, connections);
+    //BoltCore.Raise((BoltEvent) evnt, connections);
   }
 
   /// <summary>

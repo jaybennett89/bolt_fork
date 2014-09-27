@@ -12,7 +12,8 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
   protected BoltSingleList<T> _buffer;
 
   public int mecanimFrame {
-    get { return (_entity.isOwner || _entity.hasControl) ? BoltCore.frame : _entity.boltFrame; }
+    get { throw new NotImplementedException(); }
+    //get { return (_entity.isOwner || _entity.hasControl) ? BoltCore.frame : _entity.boltFrame; }
   }
 
   public BoltMecanimAnimator (BoltEntity entity, IBoltState state)

@@ -68,7 +68,6 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
     <Compile Include="Color.cs" />
-    <Compile Include="Compression\IntCompression.cs" />
     <Compile Include="NamedAsset.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Compression\FloatCompression.cs" />
@@ -82,6 +81,7 @@
     <Compile Include="Property\Type\PropertyTypeArray.cs" />
     <Compile Include="Property\Type\PropertyTypeFloat.cs" />
     <Compile Include="Property\Type\PropertyType.cs" />
+    <Compile Include="Property\Type\PropertyTypeInteger.cs" />
     <Compile Include="Property\Type\PropertyTypeStruct.cs" />
     <Compile Include="Property\Type\PropertyTypeString.cs" />
     <Compile Include="Property\Type\PropertyTypeTransform.cs" />

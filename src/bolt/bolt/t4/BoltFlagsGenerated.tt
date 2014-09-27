@@ -10,8 +10,8 @@ namespace Bolt {
 <#
 
 Dictionary<string, string[]> flagList = new Dictionary<string, string[]>();
-flagList.Add("StateFlags", new string[]{ "Controlling", "Proxy", "Proxying_Disabled", "Persist_On_Load" });
-flagList.Add("ProxyFlags", new string[]{ "Create_Requested", "Create_In_Progress", "Destroy_Requested", "Destroy_In_Progress", "Destroy_Done", "Idle", "Force_Sync" });
+flagList.Add("EntityFlags", new string[]{ "Controlling", "Persist_On_Load" });
+flagList.Add("ProxyFlags", new string[]{ "Create_Requested", "Create_In_Progress", "Create_Done", "Destroy_Requested", "Destroy_In_Progress", "Destroy_Done", "Idle", "Force_Sync" });
 
 foreach(var kvp in flagList) {
 	var name = kvp.Key;

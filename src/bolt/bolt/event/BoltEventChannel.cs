@@ -267,15 +267,15 @@ class BoltEventChannel : BoltChannel {
         return true;
       }
 
-      uint networkId = connection.GetNetworkId(evnt._entity);
+      var networkId = connection._entityChannel.GetNetworkId(evnt._entity);
 
       // entity doesn't exist on remote
-      if (networkId == uint.MaxValue) {
+      if (networkId.Value == int.MaxValue) {
         packet.stream.Position = pos;
         return true;
       }
 
-      packet.stream.WriteBool(ReferenceEquals(evnt._entity._source, connection));
+      packet.stream.WriteBool(ReferenceEquals(evnt._entity.Source, connection));
       packet.stream.WriteNetworkId(networkId);
     }
 

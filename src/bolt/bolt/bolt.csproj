@@ -68,14 +68,14 @@
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltBinaryAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
-    <Compile Include="entity\EntitySerializer.cs" />
+    <Compile Include="entity2\EntityObject.cs" />
+    <Compile Include="entity2\EntityInterfaces.cs" />
     <Compile Include="state2\BitArray.cs" />
     <Compile Include="state2\Filter.cs" />
     <Compile Include="state2\Priority.cs" />
     <Compile Include="state2\Serializers\PropertySerializer.cs" />
     <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state2\Serializers\PropertySerializerString.cs" />
-    <Compile Include="state2\StateFactory.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -97,11 +97,6 @@
     <Compile Include="BoltOrigin.cs" />
     <Compile Include="collections\BoltIterator.cs" />
     <Compile Include="collections\STuple.cs" />
-    <Compile Include="docs\BoltDocsClientOnly.cs" />
-    <Compile Include="docs\BoltDocsControllerOnly.cs" />
-    <Compile Include="docs\BoltDocsOwnerOnly.cs" />
-    <Compile Include="docs\BoltDocsProxyOnly.cs" />
-    <Compile Include="docs\BoltDocsServerOnly.cs" />
     <Compile Include="entity\BoltEntityCallbacks.cs" />
     <Compile Include="entity\BoltEntityPersistanceMode.cs" />
     <Compile Include="entity\BoltEntityUpdateInfo.cs" />
@@ -126,6 +121,11 @@
     <Compile Include="state2\State.cs" />
     <Compile Include="state\BoltStateFactory.cs" />
     <Compile Include="state\Transform\BoltStateTransform.cs" />
+    <Compile Include="t4\BoltIds.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BoltIds.tt</DependentUpon>
+    </Compile>
     <Compile Include="utils\Bits.cs" />
     <Compile Include="BoltChannel.cs" />
     <Compile Include="BoltConnection.cs" />
@@ -191,6 +191,10 @@
     <None Include="t4\BoltFlagsGenerated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BoltFlagsGenerated.cs</LastGenOutput>
+    </None>
+    <None Include="t4\BoltIds.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BoltIds.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

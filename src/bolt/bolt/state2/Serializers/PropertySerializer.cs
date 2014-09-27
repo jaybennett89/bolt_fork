@@ -5,7 +5,7 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  abstract class PropertySerializer {
+  public abstract class PropertySerializer {
     public readonly int ByteOffset;
     public readonly int ByteLength;
     public readonly int ObjectOffset;

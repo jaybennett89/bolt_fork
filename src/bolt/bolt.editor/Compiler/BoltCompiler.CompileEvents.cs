@@ -41,6 +41,10 @@ partial class BoltCompiler {
     using (BoltSourceFile file = new BoltSourceFile(op.eventFilePath)) {
       EmitFileHeader(file);
 
+      return;
+
+      // TODO
+
       file.EmitScope("public abstract class BoltEvent : BoltEventBase", () => {
         file.EmitLine("protected BoltEvent(ushort id, bool entity, BoltEventDeliveryMode mode) : base(id, entity, mode) { }");
       });

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 
 /// <summary>
@@ -7,8 +8,8 @@ using System.Collections.Generic;
 public static class BoltFactory {
   static Dictionary<Type, IBoltStateFactory> _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>();
 
-  static Dictionary<int, Bolt.IStateFactory> _state2FactoryById = new Dictionary<int, Bolt.IStateFactory>();
-  static Dictionary<Type, Bolt.IStateFactory> _state2FactoryByType = new Dictionary<Type, Bolt.IStateFactory>();
+  static Dictionary<Type, Bolt.IEntitySerializerFactory> _state2FactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>();
+  static Dictionary<TypeId, Bolt.IEntitySerializerFactory> _state2FactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(TypeId.EqualityComparer.Instance);
 
   static Dictionary<Type, IBoltEventFactory> _eventFactoryByType = new Dictionary<Type, IBoltEventFactory>();
   static Dictionary<ushort, IBoltEventFactory> _eventFactoryById = new Dictionary<ushort, IBoltEventFactory>();
@@ -103,21 +104,12 @@ public static class BoltFactory {
     throw new BoltException("unknown state type {0}", t);
   }
 
-  internal static Bolt.IState NewState2(Type t) {
-    Bolt.IStateFactory f;
-
-    if (_state2FactoryByType.TryGetValue(t, out f)) {
-      return f.Create();
-    }
-
-    throw new BoltException("unknown state type {0}", t);
-  }
 
   internal static void Register(IBoltStateFactory factory) {
     _stateFactoryByType.Add(factory.stateType, factory);
   }
 
-  internal static void Register(Bolt.IStateFactory factory) {
+  internal static void Register(Bolt.IEntitySerializerFactory factory) {
     _state2FactoryById.Add(factory.TypeId, factory);
     _state2FactoryByType.Add(factory.TypeObject, factory);
   }
@@ -191,6 +183,10 @@ public static class BoltFactory {
     return _cmdFactoryById[id];
   }
 
+  internal static Bolt.IEntitySerializer CreateSerializer(Bolt.TypeId id) {
+    return _state2FactoryById[id].Create();
+  }
+
   internal static void UnregisterAll() {
     _eventFactoryByType.Clear();
     _eventFactoryByType = new Dictionary<Type, IBoltEventFactory>(128);
@@ -208,9 +204,10 @@ public static class BoltFactory {
     _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>(128);
 
     _state2FactoryByType.Clear();
-    _state2FactoryByType = new Dictionary<Type, Bolt.IStateFactory>(128);
+    _state2FactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>(128);
 
     _state2FactoryById.Clear();
-    _state2FactoryById = new Dictionary<int, Bolt.IStateFactory>(128);
+    _state2FactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(128, TypeId.EqualityComparer.Instance);
   }
+
 }

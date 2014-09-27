@@ -14,7 +14,11 @@ namespace Bolt {
 
   }
 
-  internal abstract class State {
+  public interface IStatePredictor {
+
+  }
+
+  public abstract class State : IEntitySerializer {
     public class Frame : IBoltListNode {
       public int Number;
       public object[] Objects;
@@ -28,8 +32,13 @@ namespace Bolt {
       }
 
       public Frame Duplicate(int frameNumber) {
-        Frame f = new Frame(frameNumber, Data.Length);
+        Frame f;
+
+        f = new Frame(frameNumber, Data.Length);
+        f.Objects = Objects;
+
         Array.Copy(Data, 0, f.Data, 0, Data.Length);
+
         return f;
       }
 
@@ -49,16 +58,7 @@ namespace Bolt {
       }
     }
 
-    internal int LocalId;
-    internal int PrefabId;
-    internal BoltUniqueId UniqueId;
-
-    internal UE.Vector3 SpawnPosition;
-    internal UE.Quaternion SpawnRotation;
-
-    internal StateFlags Flags;
-    internal BoltEntity Entity;
-    internal BoltConnection SourceConnection;
+    internal EntityObject Entity;
 
     protected readonly int FrameSize;
     protected readonly int PropertyCount;
@@ -71,11 +71,13 @@ namespace Bolt {
 
     protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
 
-    protected abstract BitArray GetDiffArray();
-    protected abstract BitArray GetFullArray();
-    protected abstract BitArray GetFilterArray(Filter filter);
-    protected abstract BitArray GetControllerFilterArray();
-    protected abstract PropertySerializer[] GetPropertyArray();
+    protected abstract BitArray GetDiffMask();
+    protected abstract BitArray GetControllerMask();
+    protected abstract BitArray GetFilterMask(Filter filter);
+
+    protected abstract Priority[] GetTemporaryPriorityArray();
+
+    protected abstract PropertySerializer[] GetPropertySerializersArray();
 
     protected State(int frameSize, int objectCount, int propertyCount, int packetMaxBits, int packetMaxProperties) {
       FrameSize = frameSize;
@@ -87,7 +89,7 @@ namespace Bolt {
       PacketMaxPropertiesBits = BoltMath.BitsRequired(PacketMaxProperties);
     }
 
-    internal void Pack(int frame, UdpConnection connection, UdpStream stream, PropertyPriority[] priority, List<PropertyPriority> written) {
+    internal void Pack(int frame, UdpConnection connection, UdpStream stream, Priority[] priority, List<Priority> written) {
       int ptr = stream.Ptr;
       int bits = 0;
 
@@ -103,10 +105,10 @@ namespace Bolt {
           break;
         }
 
-        PropertyPriority p = priority[i];
-        PropertySerializer s = GetPropertyArray()[p.Property];
+        Priority p = priority[i];
+        PropertySerializer s = GetPropertySerializersArray()[p.Property];
 
-        if (p.Priority == 0) {
+        if (p.Value == 0) {
           break;
         }
 
@@ -126,7 +128,7 @@ namespace Bolt {
           written.Add(p);
 
           // zero out priority (since we just sent it)
-          priority[i].Priority = 0;
+          priority[i].Value = 0;
         }
       }
 
@@ -150,7 +152,7 @@ namespace Bolt {
 
       while (count > 0) {
         int property = stream.ReadInt(PropertyIdBits);
-        var serializer = GetPropertyArray()[property];
+        var serializer = GetPropertySerializersArray()[property];
 
         // read data into frame
         serializer.Read(frame, connection, stream);
@@ -164,10 +166,6 @@ namespace Bolt {
       Frames.AddLast(frame);
     }
 
-    internal BitArray GetFilter(Filter filter) {
-      return GetFilterArray(filter);
-    }
-
     internal BitArray CalculateDiff(byte[] a, byte[] b) {
       Assert.True(a != null);
       Assert.True(a.Length == FrameSize);
@@ -175,8 +173,8 @@ namespace Bolt {
       Assert.True(b != null);
       Assert.True(b.Length == FrameSize);
 
-      var array = GetDiffArray();
-      var properties = GetPropertyArray();
+      var array = GetDiffMask();
+      var properties = GetPropertySerializersArray();
 
       array.Clear();
 
@@ -203,6 +201,10 @@ namespace Bolt {
     }
 
     protected BitArray CalculateFilterPermutation(Filter filter, BitArray[] filters, Dictionary<Filter, BitArray> permutations) {
+      if ((filter.Bits & 1) == 1) {
+        return GetFullMask();
+      }
+
       BitArray permutation;
 
       if (permutations.TryGetValue(filter, out permutation) == false) {
@@ -222,5 +224,72 @@ namespace Bolt {
       return permutation;
     }
 
+    #region Serializer
+
+    public abstract TypeId TypeId { get; }
+    public abstract BitArray GetFullMask();
+
+    public virtual Filter GetDefaultFilter() {
+      return new Filter(1);
+    }
+
+    public virtual float CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
+      return skipped;
+    }
+
+    public virtual void OnRender() {
+    }
+
+    public virtual void OnCreate(EntityObject entity) {
+      Entity = entity;
+    }
+
+    public virtual void OnSimulateBefore() {
+    }
+
+    public virtual void OnSimulateAfter() {
+    }
+
+    public virtual bool Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env) {
+      BitArray filter = ResolveFilter(connection, env);
+      PropertySerializer[] serializers = GetPropertySerializersArray();
+
+      int tempCount = 0;
+
+      Priority[] tempPriority = GetTemporaryPriorityArray();
+      Priority[] proxyPriority = env.Proxy.PropertyPriority;
+
+      for (int i = 0; i < proxyPriority.Length; ++i) {
+        // if this property is set both in our filter and the proxy mask we can consider it for sending
+        if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
+
+          // increment priority for this property
+          proxyPriority[i].Value += serializers[proxyPriority[i].Property].Priority;
+
+          // copy to our temp array
+          tempPriority[tempCount] = proxyPriority[i];
+
+          // increment temp count
+          tempCount += 1;
+        }
+      }
+
+      // copy to temp array and sort it based on priority
+      Array.Sort<Priority>(tempPriority, 0, tempCount, Priority.Comparer.Instance);
+    }
+
+    public virtual void Read(BoltConnection connection, UdpStream stream, int frame) {
+
+    }
+
+    public virtual BitArray ResolveFilter(BoltConnection connection, EntityProxyEnvelope env) {
+      if (Entity.IsController(connection)) {
+        return GetControllerMask();
+      }
+
+      return GetFilterMask(env.Proxy.Filter);
+    }
+
+    #endregion
   }
 }

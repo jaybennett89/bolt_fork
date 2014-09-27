@@ -22,11 +22,11 @@ public class BoltEntityEditor : Editor {
     }
 
     if (prefabType == PrefabType.Prefab || prefabType == PrefabType.PrefabInstance) {
-      if (settings._config.globalUniqueIds) {
-        if (Application.isPlaying) {
-          EditorGUILayout.LabelField("Unique Id", entity._uniqueId.ToString());
-        }
-      }
+      //if (settings._config.globalUniqueIds) {
+      //  if (Application.isPlaying) {
+      //    EditorGUILayout.LabelField("Unique Id", entity._uniqueId.ToString());
+      //  }
+      //}
 
       // Scene object
       EditorGUI.BeginDisabledGroup(true);
@@ -49,15 +49,14 @@ public class BoltEntityEditor : Editor {
         }
       }
 
-      // entity callback
-      BoltEntitySerializer aref = entity.GetField<BoltEntitySerializer>("_serializer");
-      aref = EditorGUILayout.ObjectField("Serializer", aref, typeof(BoltEntitySerializer), false) as BoltEntitySerializer;
-      entity.SetField("_serializer", aref);
+      //// entity callback
+      //BoltEntitySerializer aref = entity.GetField<BoltEntitySerializer>("_serializer");
+      //aref = EditorGUILayout.ObjectField("Serializer", aref, typeof(BoltEntitySerializer), false) as BoltEntitySerializer;
+      //entity.SetField("_serializer", aref);
 
-
-      if (!aref) {
-        EditorGUILayout.HelpBox("Serializer not attached, drag and drop an entity serializer component to correct", MessageType.Warning);
-      }
+      //if (!aref) {
+      //  EditorGUILayout.HelpBox("Serializer not attached, drag and drop an entity serializer component to correct", MessageType.Warning);
+      //}
 
       // persistance mode
       BoltEntityPersistanceMode pmode = entity.GetField<BoltEntityPersistanceMode>("_persistanceMode");

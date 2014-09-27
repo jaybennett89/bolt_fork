@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
@@ -140,12 +141,12 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// How many updates have been skipped for the entity to this connection
   /// </summary>
-  public uint GetSkippedUpdates (BoltEntity en) {
-    return _entityChannel.GetSkippedUpdates(en);
+  public int GetSkippedUpdates (BoltEntity en) {
+    return _entityChannel.GetSkippedUpdates(en.Entity);
   }
 
-  internal uint GetNetworkId (BoltEntity en) {
-    return _entityChannel.GetNetworkId(en);
+  internal NetId GetNetworkId (BoltEntity en) {
+    return _entityChannel.GetNetworkId(en.Entity);
   }
 
   /// <summary>
@@ -179,12 +180,12 @@ public class BoltConnection : BoltObject {
     return string.Format("[Connection addr={0} port={1}]", _udp.RemoteEndPoint.Address, _udp.RemoteEndPoint.Port);
   }
 
-  internal BoltEntity GetIncommingEntity (uint networkId) {
-    return _entityChannel.GetIncommingEntity(networkId);
+  internal BoltEntity GetIncommingEntity (NetId networkId) {
+    return _entityChannel.GetIncommingEntity(networkId).UserToken as BoltEntity;
   }
 
-  internal BoltEntity GetOutgoingEntity (uint networkId) {
-    return _entityChannel.GetOutgoingEntity(networkId);
+  internal BoltEntity GetOutgoingEntity(NetId networkId) {
+    return _entityChannel.GetOutgoingEntity(networkId).UserToken as BoltEntity;
   }
 
   internal void DisconnectedInternal () {

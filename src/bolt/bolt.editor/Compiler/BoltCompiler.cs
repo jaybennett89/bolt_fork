@@ -14,9 +14,9 @@ static partial class BoltCompiler {
   public static BoltCompilerMode mode = BoltCompilerMode.Event;
 
   public static void Run (BoltCompilerOperation op) {
-    CompileMecanim(op);
+    //CompileMecanim(op);
     CompileEvents(op);
-    CompileStates(op);
+    //CompileStates(op);
     CompilePrefabs(op);
     CompileNetwork(op);
     CompileMaps(op);

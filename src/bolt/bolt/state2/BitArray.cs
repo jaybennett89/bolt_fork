@@ -27,6 +27,29 @@ namespace Bolt {
       this.bits = new int[length];
     }
 
+    public BitArray Clone() {
+      // create a new array of equal size
+      BitArray clone = new BitArray(this.size);
+
+      // copy all bits over from this to our new clone
+      Array.Copy(this.bits, 0, clone.bits, 0, this.bits.Length);
+
+      // done!
+      return clone;
+    }
+
+    public bool AndCheck(BitArray that) {
+      Assert.True(this.size == that.size);
+
+      for (int i = 0; i < that.bits.Length; ++i) {
+        if ((this.bits[i] & that.bits[i]) != 0) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     public void Clear() {
       Array.Clear(bits, 0, bits.Length);
     }
@@ -77,6 +100,11 @@ namespace Bolt {
       }
 
       return array;
+    }
+
+    public static bool SetInBoth(BitArray a, BitArray b, int bit) {
+      Assert.True(a.size == b.size);
+      return (a.bits[bit / 32] & b.bits[bit / 32] & (1 << (bit % 32))) == (1 << (bit % 32));
     }
   }
 }

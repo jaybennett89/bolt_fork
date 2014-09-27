@@ -38,6 +38,7 @@ namespace Bolt.Compiler {
 
     internal static IEnumerable<Type> AllowedStateAndStructPropertyTypes() {
       yield return typeof(PropertyTypeFloat);
+      yield return typeof(PropertyTypeInteger);
       yield return typeof(PropertyTypeArray);
       yield return typeof(PropertyTypeStruct);
       yield return typeof(PropertyTypeString);

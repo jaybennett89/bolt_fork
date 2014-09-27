@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,10 @@ internal static class BoltCore {
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
-  static internal BoltDoubleList<BoltEntityProxy> _proxies = new BoltDoubleList<BoltEntityProxy>();
-  static internal BoltDoubleList<BoltEntity> _entities = new BoltDoubleList<BoltEntity>();
+
+  static internal BoltDoubleList<EntityProxy> _proxies = new BoltDoubleList<EntityProxy>();
+  static internal BoltDoubleList<EntityObject> _entities = new BoltDoubleList<EntityObject>();
+
   static internal BoltEventDispatcher _globalEventDispatcher = new BoltEventDispatcher();
 
   static internal GameObject _globalBehaviourObject = null;
@@ -82,7 +85,7 @@ internal static class BoltCore {
   }
 
   public static IEnumerable<BoltEntity> entities {
-    get { return _entities; }
+    get { return _entities.Select(x => x.UserToken); }
   }
 
   public static IEnumerable<BoltConnection> connections {
@@ -213,15 +216,20 @@ internal static class BoltCore {
       return;
     }
 
-    DestroyForce(entity);
+    if (!entity.isAttached) {
+      BoltLog.Warn("Entity is not attached, ignoring call to Destroy().");
+      return;
+    }
+
+    DestroyForce(entity.Entity);
   }
 
-  internal static void DestroyForce(BoltEntity entity) {
-    // detach it
+  internal static void DestroyForce(Bolt.EntityObject entity) {
+    // detach
     entity.Detach();
 
-    // destroy it
-    _destroy(entity.gameObject);
+    // destroy
+    GameObject.Destroy(entity.UserToken.gameObject);
   }
 
   public static void Destroy(GameObject go) {
@@ -235,50 +243,76 @@ internal static class BoltCore {
     }
   }
 
-  public static void Detach(BoltEntity entity) {
-    entity.Detach();
-  }
-
   public static BoltEntity Instantiate(GameObject prefab) {
     return Instantiate(prefab, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    prefab.GetComponent<BoltEntity>()._sceneObject = false;
-    GameObject go = _instantiate(prefab, position, rotation);
-    BoltEntity en = go.GetComponent<BoltEntity>();
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position) {
+    return Instantiate(prefab, position, Quaternion.identity);
+  }
 
-    if (isClient && (en._allowInstantiateOnClient == false)) {
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    BoltEntity ec;
+    ec = prefab.GetComponent<BoltEntity>();
+    ec._sceneObject = false;
+
+    if (isClient && (ec._allowInstantiateOnClient == false)) {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
-    return Attach(en, null, Bits.zero, GenerateUniqueId());
+    EntityObject eo;
+
+    eo = CreateEntity(prefab);
+    eo.UserToken.transform.position = position;
+    eo.UserToken.transform.rotation = rotation;
+    eo.Attach();
+
+    return eo.UserToken;
   }
 
   public static BoltEntity Attach(BoltEntity entity) {
-    entity.Attach(null, Bits.zero, GenerateUniqueId());
-    return entity;
+    Assert.Null(entity.Entity);
+
+    EntityObject en;
+    en = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerId));
+    en.UserToken = entity;
+    en.Attach();
+
+    return en.UserToken;
   }
 
-  public static BoltUniqueId GenerateUniqueId() {
-    BoltUniqueId id = new BoltUniqueId();
+  internal static EntityObject CreateEntity(GameObject prefab) {
+    // prefab entity component
+    BoltEntity ec;
+    ec = prefab.GetComponent<BoltEntity>();
 
-    if (_config.globalUniqueIds) {
-      id = new BoltUniqueId(_uid, ++_uidEntityCounter);
-    }
-
-    return id;
+    // create with default serializer
+    return CreateEntity(prefab, new TypeId(ec._defaultSerializerId));
   }
 
-  internal static BoltEntity Attach(BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
-    entity.enabled = true;
-    entity.Attach(source, flags, uniqueId);
+  internal static EntityObject CreateEntity(GameObject prefab, TypeId serializerId) {
+    // prefab entity component
+    BoltEntity ec;
+    ec = prefab.GetComponent<BoltEntity>();
+    ec._sceneObject = false;
 
-    return entity;
+    // instance of prefab
+    GameObject go;
+    go = (GameObject)GameObject.Instantiate(prefab);
+
+    // entity object
+    EntityObject eo;
+    eo = EntityObject.CreateFrom(ec, serializerId);
+    eo.UserToken = go.GetComponent<BoltEntity>();
+    eo.Behaviours = (IEntityBehaviour[])eo.UserToken.GetComponentsInChildren(typeof(IEntityBehaviour));
+    eo.Serializer.OnCreate(eo);
+
+    return eo;
   }
 
-  public static void DontDestroyOnMapLoad(BoltEntity entity) {
-    entity._flags |= BoltEntity.FLAG_PERSIST_ON_MAP_LOAD;
+  public static void Detach(BoltEntity entity) {
+    Assert.NotNull(entity.Entity);
+    entity.Entity.Detach();
   }
 
   public static GameObject FindPrefab(string name) {
@@ -296,15 +330,6 @@ internal static class BoltCore {
 
 
   internal static void LoadMapInternal(Scene map) {
-    foreach (BoltEntity entity in entities) {
-      if (entity.isOwner) {
-        if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
-
-        // pop!
-        DestroyForce(entity);
-      }
-    }
-
     if (_mapLoadState.scene != map) {
       _mapLoadState = _mapLoadState.BeginLoad(map);
 
@@ -328,7 +353,7 @@ internal static class BoltCore {
           connection.Disconnect();
         }
 
-        foreach (BoltEntity entity in entities.ToArray()) {
+        foreach (Bolt.EntityObject entity in _entities.ToArray()) {
           DestroyForce(entity);
         }
 
@@ -536,33 +561,33 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint);
   }
 
-  public static bool HasEntity(BoltUniqueId id) {
-    var it = _entities.GetIterator();
+  //public static bool HasEntity(BoltUniqueId id) {
+  //  var it = _entities.GetIterator();
 
-    while (it.Next()) {
-      if (it.val._uniqueId == id) {
-        return true;
-      }
-    }
+  //  while (it.Next()) {
+  //    if (it.val._uniqueId == id) {
+  //      return true;
+  //    }
+  //  }
 
-    return false;
-  }
+  //  return false;
+  //}
 
-  public static BoltEntity FindEntity(BoltUniqueId id) {
-    if (_config.globalUniqueIds == false) {
-      throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
-    }
+  //public static BoltEntity FindEntity(BoltUniqueId id) {
+  //  if (_config.globalUniqueIds == false) {
+  //    throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
+  //  }
 
-    var it = _entities.GetIterator();
+  //  var it = _entities.GetIterator();
 
-    while (it.Next()) {
-      if (it.val._uniqueId == id) {
-        return it.val;
-      }
-    }
+  //  while (it.Next()) {
+  //    if (it.val._uniqueId == id) {
+  //      return it.val;
+  //    }
+  //  }
 
-    return null;
-  }
+  //  return null;
+  //}
 
   internal static void Send() {
     if (hasSocket) {
@@ -577,38 +602,20 @@ internal static class BoltCore {
       }
 
       if ((_frame % localSendRate) == 0) {
-        // update the scope for all connections/entities
-        BoltCore.UpdateScope();
-
-        // copy all bitmasks from entities to proxies
-        BoltEntityProxy proxy = null;
+        // prepare all proxies for sending
         var proxyIter = _proxies.GetIterator();
 
-        while (proxyIter.Next(out proxy)) {
-          if (proxy.entity) {
-            if (proxy.entity.IsControlledBy(proxy.connection)) {
-              proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.controllerMask);
-            }
-            else {
-              proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.proxyMask);
-            }
+        while (proxyIter.Next()) {
+          if (proxyIter.val.Entity) {
+            proxyIter.val.Entity.OnPrepareSend(proxyIter.val);
           }
         }
 
-        // clear all masks on entities
-        BoltEntity entity = null;
-        var entityIter = _entities.GetIterator();
+        // send data on all connections
+        var connIter = _connections.GetIterator();
 
-        while (entityIter.Next(out entity)) {
-          entity._mask = Bits.zero;
-        }
-
-        // send out updates to all connections
-        BoltConnection cn;
-        var cnIter = _connections.GetIterator();
-
-        while (cnIter.Next(out cn)) {
-          cn.Send();
+        while (connIter.Next()) {
+          connIter.val.Send();
         }
       }
     }
@@ -625,17 +632,11 @@ internal static class BoltCore {
       BoltCore.StepRemoteFrames();
 
       // step entities which we in some way are controlling locally
-      BoltEntity entity = null;
-      var entityIter = _entities.GetIterator();
+      var iter = _entities.GetIterator();
 
-      while (entityIter.Next(out entity)) {
-        if (entity.isOwner) {
-          entity.SimulateStep();
-        }
-        else {
-          if (entity.hasControl) {
-            entity.SimulateStep();
-          }
+      while (iter.Next()) {
+        if (iter.val.IsOwner || iter.val.HasControl) {
+          iter.val.Simulate();
         }
       }
     }
@@ -697,44 +698,44 @@ internal static class BoltCore {
     }
   }
 
-  static void UpdateScope() {
-    BoltConnection cn;
-    var cnIter = _connections.GetIterator();
+  //static void UpdateScope() {
+  //  BoltConnection cn;
+  //  var cnIter = _connections.GetIterator();
 
-    while (cnIter.Next(out cn)) {
-      // if this connection isn't allowed to proxy objects, skip it
-      if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
-        continue;
-      }
+  //  while (cnIter.Next(out cn)) {
+  //    // if this connection isn't allowed to proxy objects, skip it
+  //    if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
+  //      continue;
+  //    }
 
-      BoltEntity en = null;
-      var enIter = _entities.GetIterator();
+  //    BoltEntity en = null;
+  //    var enIter = _entities.GetIterator();
 
-      while (enIter.Next(out en)) {
-        // if proxying is disabled for this object, skip it
-        if (en._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
+  //    while (enIter.Next(out en)) {
+  //      // if proxying is disabled for this object, skip it
+  //      if (en._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
 
-        // if this object originates from this connection, skip it
-        if (ReferenceEquals(en._source, en)) { continue; }
+  //      // if this object originates from this connection, skip it
+  //      if (ReferenceEquals(en._source, en)) { continue; }
 
-        // a controlling connection is always considered in scope
-        bool scope = en.boltSerializer.InScope(cn) || ReferenceEquals(en._remoteController, cn);
-        bool exists = cn._entityChannel.ExistsOnRemote(en);
+  //      // a controlling connection is always considered in scope
+  //      bool scope = en.boltSerializer.InScope(cn) || ReferenceEquals(en._remoteController, cn);
+  //      bool exists = cn._entityChannel.ExistsOnRemote(en);
 
-        // if we DO exists on remote but ARE NOT in scope
-        // anymore, we should mark the proxy for deletion
-        if (exists && !scope) {
-          cn._entityChannel.DestroyOnRemote(en, BoltEntityDestroyMode.OutOfScope);
-        }
+  //      // if we DO exists on remote but ARE NOT in scope
+  //      // anymore, we should mark the proxy for deletion
+  //      if (exists && !scope) {
+  //        cn._entityChannel.DestroyOnRemote(en, BoltEntityDestroyMode.OutOfScope);
+  //      }
 
-        // if we DO NOT exist on remote but ARE in scope
-        // we should create a new proxy on this connection
-        if (!exists && scope) {
-          cn._entityChannel.CreateOnRemote(en);
-        }
-      }
-    }
-  }
+  //      // if we DO NOT exist on remote but ARE in scope
+  //      // we should create a new proxy on this connection
+  //      if (!exists && scope) {
+  //        cn._entityChannel.CreateOnRemote(en);
+  //      }
+  //    }
+  //  }
+  //}
 
   static internal void UpdateActiveGlobalBehaviours(string map) {
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
@@ -959,7 +960,7 @@ internal static class BoltCore {
       var it = _entities.GetIterator();
 
       while (it.Next()) {
-        if (it.val.isOwner && (it.val._persistanceMode == BoltEntityPersistanceMode.DestroyOnLoad)) {
+        if (it.val.IsOwner && (it.val.PersistsOnSceneLoad == false)) {
           DestroyForce(it.val);
         }
       }

@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  public struct PropertyPriority {
-    public class Comparer : IComparer<PropertyPriority> {
+  public struct Priority {
+    public class Comparer : IComparer<Priority> {
       public static readonly Comparer Instance = new Comparer();
 
       Comparer() {
 
       }
 
-      int IComparer<PropertyPriority>.Compare(PropertyPriority x, PropertyPriority y) {
-        return y.Priority - x.Priority;
+      int IComparer<Priority>.Compare(Priority x, Priority y) {
+        return y.Value - x.Value;
       }
     }
 
     public int Property;
-    public int Priority;
+    public int Value;
   }
 }

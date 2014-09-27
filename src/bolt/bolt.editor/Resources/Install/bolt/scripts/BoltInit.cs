@@ -78,7 +78,7 @@ public class BoltInit : MonoBehaviour {
 
   void State_StartServer () {
     BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort) serverPort));
-    BoltNetwork.LoadMap(map);
+    BoltNetwork.LoadScene(map);
     state = State.Started;
   }
 

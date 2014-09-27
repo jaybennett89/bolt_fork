@@ -95,10 +95,10 @@ class BoltUserAssemblyCompiler {
       return
         "\"" + eventsFile + "\" " +
         "\"" + networkFile + "\" " +
-        "\"" + statesFile + "\" " +
+        //"\"" + statesFile + "\" " +
         "\"" + prefabsFile + "\" " +
         "\"" + mapsFile + "\" " +
-        "\"" + mecanimFile + "\" " +
+        //"\"" + mecanimFile + "\" " +
         "\"" + commandsFile + "\" " +
         "\"" + projectFile + "\" " +
         "\"" + assemblyInfoFile + "\" ";

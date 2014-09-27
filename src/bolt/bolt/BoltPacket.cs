@@ -15,7 +15,7 @@ internal class BoltPacket : IDisposable {
   internal int number;
   internal volatile bool pooled = true;
   internal BoltPacketInfo info = null;
-  internal BoltSingleList<BoltEntityProxyEnvelope> envelopes = new BoltSingleList<BoltEntityProxyEnvelope>();
+  internal BoltSingleList<EntityProxyEnvelope> envelopes = new BoltSingleList<EntityProxyEnvelope>();
   internal BoltSingleList<BoltEventReliable> eventReliable = new BoltSingleList<BoltEventReliable>();
 
   public int frame { get; internal set; }

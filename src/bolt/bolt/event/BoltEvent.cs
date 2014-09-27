@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UdpKit;
@@ -61,10 +62,10 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
 
   internal int _frame;
   internal int _refCount;
-  internal uint _entityNetworkId;
   internal bool _entityIsOutgoing;
+  internal NetId _entityNetworkId;
 
-  internal BoltEntity _entity;
+  internal EntityObject _entity;
   internal BoltConnection _connection;
   internal BoltEventDeliveryMode _deliveryMode;
 
@@ -137,9 +138,9 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
   internal void GrabEntity (BoltConnection connection) {
     if (_isEntityEvent) {
       if (_entityIsOutgoing) {
-        _entity = connection.GetOutgoingEntity(_entityNetworkId);
+        _entity = connection.GetOutgoingEntity(_entityNetworkId).Entity;
       } else {
-        _entity = connection.GetIncommingEntity(_entityNetworkId);
+        _entity = connection.GetIncommingEntity(_entityNetworkId).Entity;
       }
     }
   }
@@ -188,7 +189,7 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
 
     if (evnt._isEntityEvent) {
       if (evnt._entity) {
-        evnt._entity._eventDispatcher.Dispatch(evnt, handler);
+        evnt._entity.EventDispatcher.Dispatch(evnt, handler);
       }
     } else {
       BoltCore._globalEventDispatcher.Dispatch(evnt, handler);

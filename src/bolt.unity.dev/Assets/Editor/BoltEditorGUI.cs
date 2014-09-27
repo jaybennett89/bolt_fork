@@ -361,7 +361,7 @@ public static class BoltEditorGUI {
     WithLabel("Min Value", () => { c.MinValue = Mathf.Min(EditorGUILayout.IntField(c.MinValue), c.MaxValue - 1); });
     WithLabel("Max Value", () => { c.MaxValue = Mathf.Max(EditorGUILayout.IntField(c.MaxValue), c.MinValue + 1); });
     WithLabel("Fractions", () => { c.Fractions = Mathf.Clamp(EditorGUILayout.IntField(c.Fractions), 1, 10000); });
-    WithLabel("Result", () => {
+    WithLabel("Info", () => {
       EditorGUILayout.LabelField("Bits: " + BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions).ToString());
       EditorGUILayout.LabelField("Accuracy: " + (1f / c.Fractions));
     });

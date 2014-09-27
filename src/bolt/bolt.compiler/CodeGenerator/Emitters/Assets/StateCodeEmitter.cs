@@ -31,17 +31,17 @@ namespace Bolt.Compiler {
 
       type = Generator.DeclareClass(Decorator.FactoryName);
       type.TypeAttributes = TypeAttributes.NotPublic;
-      type.BaseTypes.Add("Bolt.IStateFactory");
+      type.BaseTypes.Add("Bolt.IEntitySerializerFactory");
 
-      type.DeclareProperty("Type", "Bolt.IStateFactory.TypeObject", get => {
+      type.DeclareProperty("Type", "Bolt.IEntitySerializerFactory.TypeObject", get => {
         get.Expr("return typeof({0})", Decorator.InterfaceName);
       }).Attributes = default(MemberAttributes);
 
-      type.DeclareProperty(typeof(int).FullName, "Bolt.IStateFactory.TypeId", get => {
-        get.Expr("return {0}", Decorator.TypeId);
+      type.DeclareProperty("Bolt.TypeId", "Bolt.IEntitySerializerFactory.TypeId", get => {
+        get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
       }).Attributes = default(MemberAttributes);
 
-      type.DeclareMethod("Bolt.IState", "Bolt.IStateFactory.Create", methoid => {
+      type.DeclareMethod("Bolt.IEntitySerializer", "Bolt.IEntitySerializerFactory.Create", methoid => {
         methoid.Statements.Expr("return new {0}()", Decorator.ClassName);
       }).Attributes = default(MemberAttributes);
     }
@@ -101,6 +101,10 @@ namespace Bolt.Compiler {
         ctor.BaseConstructorArgs.Add(Decorator.Definition.PacketMaxBits.ToString().Expr());
         ctor.BaseConstructorArgs.Add(Decorator.Definition.PacketMaxProperties.ToString().Expr());
       });
+
+      type.DeclareProperty("Bolt.TypeId", "TypeId", get => {
+        get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
+      }).Attributes = (MemberAttributes.Override | MemberAttributes.Public); 
 
       type.DeclareMethod("Bolt.PropertySerializer[]", "GetPropertyArray", method => {
         method.Statements.Expr("return _Properties");
