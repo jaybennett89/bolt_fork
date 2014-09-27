@@ -32,6 +32,7 @@ namespace Bolt {
 
     internal BoltEventDispatcher EventDispatcher = new BoltEventDispatcher();
     internal BoltDoubleList<BoltCommand> CommandQueue = new BoltDoubleList<BoltCommand>();
+    internal BoltDoubleList<EntityProxy> Proxies = new BoltDoubleList<EntityProxy>();
 
     internal int SendRate {
       get {
@@ -59,6 +60,17 @@ namespace Bolt {
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
+
+    internal EntityProxy CreateProxy() {
+      EntityProxy p;
+
+      p = new EntityProxy();
+      p.Entity = this;
+
+      Proxies.AddLast(p);
+
+      return p;
+    }
 
     internal void Attach() {
       Assert.NotNull(UserToken);
@@ -136,8 +148,13 @@ namespace Bolt {
       throw new NotImplementedException();
     }
 
-    internal void OnPrepareSend(EntityProxy entityProxy) {
-      throw new NotImplementedException();
+    internal void OnPrepareSend() {
+      Serializer.OnPrepareSend(Proxies);
+    }
+
+    internal void Initialize() {
+      Behaviours = (IEntityBehaviour[])UserToken.GetComponentsInChildren(typeof(IEntityBehaviour));
+      Serializer.OnInitialized();
     }
 
     internal void TakeControlInternal() {
@@ -357,19 +374,19 @@ namespace Bolt {
 
 
     internal static EntityObject CreateFrom(BoltEntity entity, TypeId serializerId) {
-      EntityObject en;
+      EntityObject eo;
 
-      en = new EntityObject();
-      en.PrefabId = new PrefabId(entity._prefabId);
-      en.UpdateRate = entity._updateRate;
-      en.Serializer = BoltFactory.CreateSerializer(serializerId);
-      en.ClientPrediction = entity._clientPredicted;
-      en.Flags =
-        entity._persistanceMode == BoltEntityPersistanceMode.PersistOnLoad
-        ? EntityFlags.PERSIST_ON_LOAD
-        : EntityFlags.ZERO;
+      eo = new EntityObject();
+      eo.PrefabId = new PrefabId(entity._prefabId);
+      eo.UpdateRate = entity._updateRate;
+      eo.ClientPrediction = entity._clientPredicted;
+      eo.Flags = entity._persistanceMode == BoltEntityPersistanceMode.PersistOnLoad ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
-      return en;
+      // create serializer
+      eo.Serializer = BoltFactory.CreateSerializer(serializerId);
+      eo.Serializer.OnCreated(eo);
+
+      return eo;
     }
 
     public static implicit operator bool(EntityObject entity) {

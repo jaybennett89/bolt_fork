@@ -5,7 +5,7 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  public abstract class PropertySerializer {
+  internal abstract class PropertySerializer {
     public readonly int ByteOffset;
     public readonly int ByteLength;
     public readonly int ObjectOffset;
@@ -20,7 +20,7 @@ namespace Bolt {
 
     public abstract int CalculateBits(byte[] data);
 
-    public abstract void Pack(State.Frame frame, UdpConnection connection, UdpStream stream);
-    public abstract void Read(State.Frame frame, UdpConnection connection, UdpStream stream);
+    public abstract void Pack(State.Frame frame, BoltConnection connection, UdpStream stream);
+    public abstract void Read(State.Frame frame, BoltConnection connection, UdpStream stream);
   }
 }

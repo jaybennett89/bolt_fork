@@ -43,6 +43,18 @@ static class BoltEntityProxyEnvelopePool {
   }
 }
 internal partial class EntityProxy : BoltObject {
+  public class PriorityComparer : IComparer<EntityProxy> {
+    public static readonly PriorityComparer Instance = new PriorityComparer();
+
+    PriorityComparer() {
+
+    }
+
+    int IComparer<EntityProxy>.Compare(EntityProxy x, EntityProxy y) {
+      return y.Priority.CompareTo(x.Priority);
+    }
+  }
+
   // ################### OLD
 
 
@@ -98,37 +110,5 @@ internal partial class EntityProxy : BoltObject {
 
   public override string ToString() {
     return string.Format("[Proxy {0} {1}]", NetId, ((object)Entity) ?? ((object)"NULL"));
-  }
-}
-
-partial class EntityProxy : BoltObject {
-  public class PriorityComparer : IComparer<EntityProxy> {
-    public static readonly PriorityComparer Instance = new PriorityComparer();
-
-    PriorityComparer() {
-
-    }
-
-    int IComparer<EntityProxy>.Compare(EntityProxy x, EntityProxy y) {
-      return y.Priority.CompareTo(x.Priority);
-    }
-  }
-
-  public static EntityProxy Alloc() {
-    EntityProxy proxy = new EntityProxy();
-    BoltCore._proxies.AddLast(proxy);
-    return proxy;
-  }
-
-  public static void Free(EntityProxy proxy) {
-    // mark as destroyed
-    proxy.Flags |= Bolt.ProxyFlags.DESTROY_DONE;
-
-    // remove from global list
-    BoltCore._proxies.Remove(proxy);
-  }
-
-  public static implicit operator bool(EntityProxy proxy) {
-    return proxy != null;
   }
 }

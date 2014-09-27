@@ -76,13 +76,13 @@ namespace Bolt {
       }
     }
 
-    public void XOrAssign(BitArray that) {
-      Assert.True(this.size == that.size);
+    //public void XOrAssign(BitArray that) {
+    //  Assert.True(this.size == that.size);
 
-      for (int i = 0; i < that.bits.Length; ++i) {
-        this.bits[i] ^= that.bits[i];
-      }
-    }
+    //  for (int i = 0; i < that.bits.Length; ++i) {
+    //    this.bits[i] ^= that.bits[i];
+    //  }
+    //}
 
     public static BitArray CreateFrom(int size, int[] bits) {
       return new BitArray(size, bits);

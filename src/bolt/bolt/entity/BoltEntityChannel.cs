@@ -129,13 +129,12 @@ partial class BoltEntityChannel : BoltChannel {
 
     EntityProxy proxy;
 
-    proxy = EntityProxy.Alloc();
+    proxy = entity.CreateProxy();
     proxy.NetId = id;
-    proxy.Entity = entity;
-    proxy.Connection = connection;
     proxy.Flags = ProxyFlags.CREATE_REQUESTED;
-    proxy.Mask = entity.Serializer.GetFullMask().Clone();
-    proxy.Filter = entity.Serializer.GetDefaultFilter();
+    proxy.Filter = new Filter(1);
+    proxy.Connection = connection;
+    proxy.Mask = entity.Serializer.GetDefaultMask();
 
     _outgoingProxiesByNetId[proxy.NetId] = proxy;
     _outgoingProxiesByInstanceId[entity.InstanceId] = proxy;
@@ -338,7 +337,7 @@ partial class BoltEntityChannel : BoltChannel {
       env.Proxy.Mask.Set(p.Property);
 
       // increment priority
-      env.Proxy.PropertyPriority[p.Value].Value += p.Value;
+      env.Proxy.PropertyPriority[p.PriorityValue].PriorityValue += p.PriorityValue;
     }
   }
 
@@ -389,7 +388,7 @@ partial class BoltEntityChannel : BoltChannel {
       // clear out property priorities and dirty bits
       for (int i = 0; i < env.Written.Count; ++i) {
         Priority p = env.Written[i];
-        proxy.PropertyPriority[p.Property].Value = 0;
+        proxy.PropertyPriority[p.Property].PriorityValue = 0;
         proxy.Mask.Clear(p.Property);
       }
 
@@ -434,8 +433,6 @@ partial class BoltEntityChannel : BoltChannel {
 
       if (create) {
         GameObject prefab = null;
-        GameObject instance = null;
-
         PrefabId prefabId = PrefabId.Read(packet.stream, 32);
         TypeId serializerId = TypeId.Read(packet.stream, 32);
 
@@ -451,22 +448,24 @@ partial class BoltEntityChannel : BoltChannel {
         // create entity
         entity = BoltCore.CreateEntity(prefab, serializerId);
         entity.Source = connection;
-        entity.Serializer.Read(connection, packet.stream, packet.frame);
 
         // create proxy
-        proxy = EntityProxy.Alloc();
+        proxy = entity.CreateProxy();
         proxy.NetId = netId;
-        proxy.Entity = entity;
         proxy.Connection = connection;
 
         // register proxy
         _incommingProxiesByNetId[netId] = proxy;
         _incommingProxiesByInstanceId[proxy.Entity.InstanceId] = proxy;
 
-        // handle case where we are given control (it needs to be true during the attached callbacks)
+        // handle case where we are given control (it needs to be true during the initialize and attached callbacks)
         if (controlling) {
           entity.Flags |= EntityFlags.HAS_CONTROL;
         }
+
+        // read first frame of data
+        entity.Initialize();
+        entity.Serializer.Read(connection, packet.stream, packet.frame);
 
         // attach entity
         proxy.Entity.Attach();
@@ -504,30 +503,16 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy(EntityProxy proxy) {
-    if (proxy.Entity != null) {
-      _outgoingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
-    }
-
     _outgoingProxiesByNetId.Remove(proxy.NetId);
     _outgoingProxiesNetworkIdPool.Release(proxy.NetId);
-
-    EntityProxy.Free(proxy);
+    _outgoingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
   }
 
   void DestroyIncommingProxy(EntityProxy proxy) {
-    if (proxy.Entity != null) {
-      _incommingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
-    }
-
+    _incommingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
     _incommingProxiesByNetId.Remove(proxy.NetId);
-
-    // debugggggggg!
-    //BoltLog.Debug("{0} is no longer proxied from {1}", proxy.entity, connection);
 
     // destroy entity
     BoltCore.DestroyForce(proxy.Entity);
-
-    // free proxy object
-    EntityProxy.Free(proxy);
   }
 }

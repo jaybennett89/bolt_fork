@@ -26,16 +26,16 @@ namespace Bolt {
     TypeId TypeId { get; }
 
     void OnRender();
-    void OnCreate(EntityObject entity);
+    void OnInitialized();
+    void OnCreated(EntityObject entity);
+    void OnPrepareSend(BoltDoubleList<EntityProxy> proxies);
 
     void OnSimulateBefore();
     void OnSimulateAfter();
 
     float CalculatePriority(BoltConnection connection, BitArray mask, int skipped);
 
-    Filter GetDefaultFilter();
-
-    BitArray GetFullMask();
+    BitArray GetDefaultMask();
     BitArray GetFilter(BoltConnection connection, EntityProxy proxy);
 
     bool Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);

@@ -13,11 +13,11 @@ namespace Bolt {
       }
 
       int IComparer<Priority>.Compare(Priority x, Priority y) {
-        return y.Value - x.Value;
+        return y.PriorityValue - x.PriorityValue;
       }
     }
 
     public int Property;
-    public int Value;
+    public int PriorityValue;
   }
 }

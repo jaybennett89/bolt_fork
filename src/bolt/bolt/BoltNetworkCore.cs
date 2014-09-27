@@ -265,6 +265,7 @@ internal static class BoltCore {
     eo = CreateEntity(prefab);
     eo.UserToken.transform.position = position;
     eo.UserToken.transform.rotation = rotation;
+    eo.Initialize();
     eo.Attach();
 
     return eo.UserToken;
@@ -273,12 +274,12 @@ internal static class BoltCore {
   public static BoltEntity Attach(BoltEntity entity) {
     Assert.Null(entity.Entity);
 
-    EntityObject en;
-    en = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerId));
-    en.UserToken = entity;
-    en.Attach();
+    EntityObject eo;
+    eo = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerId));
+    eo.Initialize();
+    eo.Attach();
 
-    return en.UserToken;
+    return eo.UserToken;
   }
 
   internal static EntityObject CreateEntity(GameObject prefab) {
@@ -304,8 +305,6 @@ internal static class BoltCore {
     EntityObject eo;
     eo = EntityObject.CreateFrom(ec, serializerId);
     eo.UserToken = go.GetComponent<BoltEntity>();
-    eo.Behaviours = (IEntityBehaviour[])eo.UserToken.GetComponentsInChildren(typeof(IEntityBehaviour));
-    eo.Serializer.OnCreate(eo);
 
     return eo;
   }
@@ -603,11 +602,11 @@ internal static class BoltCore {
 
       if ((_frame % localSendRate) == 0) {
         // prepare all proxies for sending
-        var proxyIter = _proxies.GetIterator();
+        var proxyIter = _entities.GetIterator();
 
         while (proxyIter.Next()) {
-          if (proxyIter.val.Entity) {
-            proxyIter.val.Entity.OnPrepareSend(proxyIter.val);
+          if (proxyIter.val) {
+            proxyIter.val.OnPrepareSend();
           }
         }
 
