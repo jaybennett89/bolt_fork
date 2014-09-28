@@ -64,7 +64,6 @@
     <Compile Include="BoltConnectionsWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileCommands.cs" />
-    <Compile Include="EditorAsset.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
     <Compile Include="Editors\BoltConfigAssetEditor.cs" />

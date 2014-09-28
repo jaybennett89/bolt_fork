@@ -181,11 +181,11 @@ public class BoltConnection : BoltObject {
   }
 
   internal BoltEntity GetIncommingEntity (NetId networkId) {
-    return _entityChannel.GetIncommingEntity(networkId).UserToken as BoltEntity;
+    return _entityChannel.GetIncommingEntity(networkId).UnityObject as BoltEntity;
   }
 
   internal BoltEntity GetOutgoingEntity(NetId networkId) {
-    return _entityChannel.GetOutgoingEntity(networkId).UserToken as BoltEntity;
+    return _entityChannel.GetOutgoingEntity(networkId).UnityObject as BoltEntity;
   }
 
   internal void DisconnectedInternal () {

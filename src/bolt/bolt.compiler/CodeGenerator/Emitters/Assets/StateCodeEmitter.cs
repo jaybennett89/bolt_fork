@@ -20,6 +20,12 @@ namespace Bolt.Compiler {
           PropertyCodeEmitter.Create(property).EmitStateInterfaceMembers(type);
         }
       }
+
+      type.DeclareMethod(Decorator.RootStruct.ModifierInterfaceName, "Modify", method => {
+        if (Decorator.HasParent) {
+          method.Attributes = MemberAttributes.New;
+        }
+      });
     }
 
     public void EmitFactoryClass() {
@@ -63,7 +69,9 @@ namespace Bolt.Compiler {
       type.DeclareField(typeof(int).FullName, "_FrameSize").Attributes = STATIC_PRIVATE;
       type.DeclareField(typeof(int).FullName, "_ObjectSize").Attributes = STATIC_PRIVATE;
       type.DeclareField(typeof(int).FullName, "_PropertyCount").Attributes = STATIC_PRIVATE;
-      type.DeclareField("Bolt.PropertySerializer[]", "_Properties").Attributes = STATIC_PRIVATE;
+      type.DeclareField("Bolt.PropertySerializer[]", "_Serializers").Attributes = STATIC_PRIVATE;
+      type.DeclareField("Bolt.Priority[]", "_TemporaryPriority").Attributes = STATIC_PRIVATE;
+      type.DeclareField("Bolt.State.Frame", "_NullFrame").Attributes = STATIC_PRIVATE;
 
       type.DeclareField("Bolt.BitArray", "_FullMask").Attributes = STATIC_PRIVATE;
       type.DeclareField("Bolt.BitArray", "_DiffMask").Attributes = STATIC_PRIVATE;
@@ -81,12 +89,14 @@ namespace Bolt.Compiler {
         ctor.Statements.Expr("_FullMask = Bolt.BitArray.CreateSet(_PropertyCount)");
         ctor.Statements.Expr("_DiffMask = Bolt.BitArray.CreateClear(_PropertyCount)");
 
-        ctor.Statements.Comment("filters");
+        ctor.Statements.Comment("filter setup");
         ctor.Statements.Expr("_FilterPermutations = new Dictionary<Bolt.Filter, Bolt.BitArray>(128, Bolt.Filter.EqualityComparer.Instance)");
         ctor.Statements.Expr("_Filters = new Bolt.BitArray[32]");
 
-        ctor.Statements.Comment("properties");
-        ctor.Statements.Expr("_Properties = new Bolt.PropertySerializer[{0}]", Decorator.AllProperties.Count);
+        ctor.Statements.Comment("property setup");
+        ctor.Statements.Expr("_NullFrame = new Bolt.State.Frame(-1, _FrameSize)");
+        ctor.Statements.Expr("_Serializers = new Bolt.PropertySerializer[_PropertyCount]");
+        ctor.Statements.Expr("_TemporaryPriority = new Bolt.Priority[_PropertyCount]");
 
         EmitFilters(ctor);
         EmitControllerFilter(ctor);
@@ -94,7 +104,6 @@ namespace Bolt.Compiler {
       });
 
       type.DeclareConstructor(ctor => {
-        ctor.Comment("######## INSTANCE ########");
         ctor.BaseConstructorArgs.Add("_FrameSize".Expr());
         ctor.BaseConstructorArgs.Add("_ObjectSize".Expr());
         ctor.BaseConstructorArgs.Add("_PropertyCount".Expr());
@@ -102,34 +111,55 @@ namespace Bolt.Compiler {
         ctor.BaseConstructorArgs.Add(Decorator.Definition.PacketMaxProperties.ToString().Expr());
       });
 
-      type.DeclareProperty("Bolt.TypeId", "TypeId", get => {
-        get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
-      }).Attributes = (MemberAttributes.Override | MemberAttributes.Public); 
-
-      type.DeclareMethod("Bolt.PropertySerializer[]", "GetPropertyArray", method => {
-        method.Statements.Expr("return _Properties");
+      type.DeclareMethod("Bolt.TypeId", "GetTypeId", method => {
+        method.Statements.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod("Bolt.BitArray", "GetFilterArray", method => {
+      type.DeclareMethod("Bolt.State.Frame", "GetNullFrame", method => {
+        method.Statements.Expr("return _NullFrame");
+      }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
+
+      type.DeclareMethod("Bolt.PropertySerializer[]", "GetPropertySerializersArray", method => {
+        method.Statements.Expr("return _Serializers");
+      }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
+
+      type.DeclareMethod("Bolt.Priority[]", "GetTemporaryPriorityArray", method => {
+        method.Statements.Expr("return _TemporaryPriority");
+      }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
+
+      type.DeclareMethod("Bolt.BitArray", "GetFilterMask", method => {
         method.DeclareParameter("Bolt.Filter", "filter");
         method.Statements.Expr("return CalculateFilterPermutation(filter, _Filters, _FilterPermutations)");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod("Bolt.BitArray", "GetControllerFilterArray", method => {
+      type.DeclareMethod("Bolt.BitArray", "GetControllerMask", method => {
         method.Statements.Expr("return _ControllerFilter");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod("Bolt.BitArray", "GetDiffArray", method => {
+      type.DeclareMethod("Bolt.BitArray", "GetDiffMask", method => {
         method.Statements.Expr("return _DiffMask");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
-      type.DeclareMethod("Bolt.BitArray", "GetFullArray", method => {
+      type.DeclareMethod("Bolt.BitArray", "GetFullMask", method => {
         method.Statements.Expr("return _FullMask");
       }).Attributes = (MemberAttributes.Override | MemberAttributes.Family);
 
       foreach (PropertyDecorator p in Decorator.RootStruct.Properties) {
         PropertyCodeEmitter.Create(p).EmitStateClassMembers(Decorator, type);
       }
+
+      foreach (StateDecorator parent in Decorator.ParentList) {
+        DeclareModify(type, parent);
+      }
+
+      DeclareModify(type, Decorator);
+    }
+
+    void DeclareModify(CodeTypeDeclaration type, StateDecorator decorator) {
+      type.DeclareMethod(decorator.RootStruct.ModifierInterfaceName, "Modify", method => {
+        method.PrivateImplementationType = new CodeTypeReference(decorator.InterfaceName);
+        method.Statements.Expr("return new {0}(Frames.first, 0, 0)", Decorator.RootStruct.ModifierName);
+      });
     }
 
     void EmitFilters(CodeTypeConstructor ctor) {
@@ -174,7 +204,7 @@ namespace Bolt.Compiler {
         var s = Generator.FindStruct(p.Decorator.DefiningAsset.Guid);
 
         // emit init expression
-        ctor.Statements.Assign("_Properties[{0}]".Expr(p.Index.ToString().PadRight(4)), PropertyCodeEmitter.Create(p.Decorator).CreatePropertyArrayInitializerExpression(byteOffset, objectOffset));
+        ctor.Statements.Assign("_Serializers[{0}]".Expr(p.Index.ToString().PadRight(4)), PropertyCodeEmitter.Create(p.Decorator).CreatePropertyArrayInitializerExpression(byteOffset, objectOffset));
 
         //ctor.Statements.Expr("_Properties[{0}] = new PropertySlice {{ Offset = {1}, Length = {2} }} /* {3}.{4} */", p.Index.ToString().PadRight(4), byteOffset.ToString().PadRight(5), p.Decorator.ByteSize.ToString().PadRight(3), s.Name, p.Decorator.Definition.Name);
 

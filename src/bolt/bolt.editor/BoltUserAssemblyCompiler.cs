@@ -176,7 +176,6 @@ class BoltUserAssemblyCompiler {
       if (entity) {
         if (entity) {
           entity.SetField("_prefabId", id);
-          entity._sceneObject = false;
 
           EditorUtility.SetDirty(entity.gameObject);
           EditorUtility.SetDirty(entity);

@@ -114,6 +114,10 @@ namespace Bolt.Compiler {
 
       DeclareShimConstructor(mod);
 
+      // dispose method
+      mod.DeclareMethod(typeof(void).FullName, "Dispose", method => { }).Attributes = MemberAttributes.Public;
+
+      // other stuff
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
         PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitModifierMembers(mod);
       }

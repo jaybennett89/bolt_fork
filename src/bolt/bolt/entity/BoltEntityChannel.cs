@@ -167,12 +167,19 @@ partial class BoltEntityChannel : BoltChannel {
         proxy.Mask.Clear();
         proxy.Priority = 1 << 16;
       }
-      else if (proxy.Flags & ProxyFlags.CREATE_DONE) {
-        // if we are loading
+      else if (proxy.Flags & ProxyFlags.CREATE_REQUESTED) {
+        if (proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS) { continue; }
         if (connection.isLoadingMap || BoltSceneLoader.isLoading) { continue; }
 
+        BoltLog.Info("CREATE_REQUESTED: " + proxy.Entity.InstanceId);
+        proxy.Priority = 1 << 17;
+      }
+      else if (proxy.Flags & ProxyFlags.CREATE_DONE) {
         // check update rate of this entity
         if ((packet.number % proxy.Entity.UpdateRate) != 0) { continue; }
+
+        // if we are loading
+        if (connection.isLoadingMap || BoltSceneLoader.isLoading) { continue; }
 
         // we are forcing a sync 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
@@ -189,12 +196,6 @@ partial class BoltEntityChannel : BoltChannel {
           proxy.Priority = Mathf.Clamp(proxy.Entity.Serializer.CalculatePriority(connection, proxy.Mask, proxy.Skipped), 0, 1 << 15);
         }
       }
-      else if (proxy.Flags & ProxyFlags.CREATE_REQUESTED) {
-        if (proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS) { continue; }
-        if (connection.isLoadingMap || BoltSceneLoader.isLoading) { continue; }
-
-        proxy.Priority = 1 << 17;
-      }
 
       _outgoingProxiesByPriority[n++] = proxy;
     }
@@ -207,12 +208,16 @@ partial class BoltEntityChannel : BoltChannel {
       // write as many proxies into the packet as possible
 
       int i = 0;
+      int failCount = 0;
 
       for (; i < n; ++i) {
-        bool success = PackUpdate(packet, _outgoingProxiesByPriority[i]);
+        if (PackUpdate(packet, _outgoingProxiesByPriority[i]) == false) {
+          failCount += 1;
 
-        // we failed to write this into the packet
-        if (success == false) { break; }
+          if (failCount >= 2) {
+            break;
+          }
+        }
       }
 
       // proxies not written get their skipped count increased by one
@@ -240,34 +245,32 @@ partial class BoltEntityChannel : BoltChannel {
       var env = packet.envelopes.RemoveFirst();
       var pending = env.Proxy.Envelopes.Dequeue();
 
-      if (!(env.Proxy.Flags & ProxyFlags.DESTROY_DONE)) {
-        Assert.Same(env, pending);
-        Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
+      Assert.Same(env, pending);
+      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
 
-        // copy back all priorities
-        ApplyPropertyPriorities(env);
+      // copy back all priorities
+      ApplyPropertyPriorities(env);
 
-        // push skipped count up one
-        env.Proxy.Skipped += 1;
+      // push skipped count up one
+      env.Proxy.Skipped += 1;
 
-        // if this was a forced sync, set flag on proxy again
-        if (env.Flags & ProxyFlags.FORCE_SYNC) {
-          env.Proxy.Flags |= ProxyFlags.FORCE_SYNC;
-        }
+      // if this was a forced sync, set flag on proxy again
+      if (env.Flags & ProxyFlags.FORCE_SYNC) {
+        env.Proxy.Flags |= ProxyFlags.FORCE_SYNC;
+      }
 
-        // if we failed to destroy this clear destroying flag
-        if (env.Flags & ProxyFlags.DESTROY_IN_PROGRESS) {
-          Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_IN_PROGRESS);
-          Assert.True(env.Proxy.Envelopes.count == 0);
-          env.Proxy.Flags &= ~ProxyFlags.DESTROY_IN_PROGRESS;
-        }
+      // if we failed to destroy this clear destroying flag
+      if (env.Flags & ProxyFlags.DESTROY_IN_PROGRESS) {
+        Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_IN_PROGRESS);
+        Assert.True(env.Proxy.Envelopes.count == 0);
+        env.Proxy.Flags &= ~ProxyFlags.DESTROY_IN_PROGRESS;
+      }
 
-        // if we failed to create this clear creating flag
-        else if (env.Flags & ProxyFlags.CREATE_IN_PROGRESS) {
-          Assert.True(env.Proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS);
-          Assert.True(env.Proxy.Envelopes.count == 0);
-          env.Proxy.Flags &= ~ProxyFlags.CREATE_IN_PROGRESS;
-        }
+      // if we failed to create this clear creating flag
+      else if (env.Flags & ProxyFlags.CREATE_IN_PROGRESS) {
+        Assert.True(env.Proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS);
+        Assert.True(env.Proxy.Envelopes.count == 0);
+        env.Proxy.Flags &= ~ProxyFlags.CREATE_IN_PROGRESS;
       }
 
       env.Dispose();
@@ -279,26 +282,34 @@ partial class BoltEntityChannel : BoltChannel {
       var env = packet.envelopes.RemoveFirst();
       var pending = env.Proxy.Envelopes.Dequeue();
 
-      if (!(env.Proxy.Flags & ProxyFlags.DESTROY_DONE)) {
-        Assert.Same(env, pending);
-        Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
+      Assert.Same(env, pending);
+      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
 
-        if (env.Flags & ProxyFlags.DESTROY_IN_PROGRESS) {
-          Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_IN_PROGRESS);
-          Assert.True(env.Proxy.Envelopes.count == 0);
+      if (env.Flags & ProxyFlags.DESTROY_IN_PROGRESS) {
+        Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_IN_PROGRESS);
+        Assert.True(env.Proxy.Envelopes.count == 0);
 
-          env.Proxy.Flags |= ProxyFlags.DESTROY_DONE;
+        // clear out request / progress for create
+        env.Proxy.Flags &= ~ProxyFlags.DESTROY_REQUESTED;
+        env.Proxy.Flags &= ~ProxyFlags.DESTROY_IN_PROGRESS;
 
-          DestroyOutgoingProxy(env.Proxy);
+        // set destroy done
+        env.Proxy.Flags |= ProxyFlags.DESTROY_DONE;
 
-        }
-        else if (env.Flags & ProxyFlags.CREATE_IN_PROGRESS) {
-          Assert.True(env.Proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS);
-          Assert.True(env.Proxy.Envelopes.count == 0);
+        // delete proxy
+        DestroyOutgoingProxy(env.Proxy);
 
-          env.Proxy.Flags &= ~ProxyFlags.CREATE_REQUESTED;
-          env.Proxy.Flags |= ProxyFlags.CREATE_DONE;
-        }
+      }
+      else if (env.Flags & ProxyFlags.CREATE_IN_PROGRESS) {
+        Assert.True(env.Proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS);
+        Assert.True(env.Proxy.Envelopes.count == 0);
+
+        // clear out request / progress for create
+        env.Proxy.Flags &= ~ProxyFlags.CREATE_REQUESTED;
+        env.Proxy.Flags &= ~ProxyFlags.CREATE_IN_PROGRESS;
+
+        // set create done
+        env.Proxy.Flags |= ProxyFlags.CREATE_DONE;
       }
 
       env.Dispose();
@@ -334,15 +345,23 @@ partial class BoltEntityChannel : BoltChannel {
       Priority p = env.Written[i];
 
       // set flag for sending this property again
-      env.Proxy.Mask.Set(p.Property);
+      env.Proxy.Mask.Set(p.PropertyIndex);
 
       // increment priority
       env.Proxy.PropertyPriority[p.PriorityValue].PriorityValue += p.PriorityValue;
     }
   }
 
+  enum PackResult {
+    Sent,
+    Next,
+    Abort
+  }
+
   bool PackUpdate(BoltPacket packet, EntityProxy proxy) {
     int pos = packet.stream.Position;
+    int packCount = 0;
+
     EntityProxyEnvelope env = proxy.CreateEnvelope();
 
     packet.stream.WriteBool(true);
@@ -357,6 +376,9 @@ partial class BoltEntityChannel : BoltChannel {
       //info.frame = packet.frame;
       //info.first = packet.stream.WriteBool(proxy.flags & BoltEntityProxy.FLAG_CREATE);
 
+      // if the remote is the controller or not
+      packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
+
       // data for first packet
       if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
         proxy.Entity.PrefabId.Pack(packet.stream, 32);
@@ -368,37 +390,36 @@ partial class BoltEntityChannel : BoltChannel {
         //}
       }
 
-      // if the remote is the controller or not
-      packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
-
-      // let serializer pack data
-      proxy.Entity.Serializer.Pack(connection, packet.stream, env);
+      packCount = proxy.Entity.Serializer.Pack(connection, packet.stream, env);
     }
 
     if (packet.stream.Overflowing) {
       packet.stream.Position = pos;
       return false;
-
+    }
+    if (packCount == -1) {
+      packet.stream.Position = pos;
+      return true;
     }
     else {
-      // clear force sync flag and skipped count
+      var isCreate = proxy.Flags & ProxyFlags.CREATE_REQUESTED;
+      var isDestroy = proxy.Flags & ProxyFlags.DESTROY_REQUESTED;
+
+      // if we didn't pack anything and we are not creating or destroying this, just goto next
+      if ((packCount == 0) && !isCreate && !isDestroy) {
+        packet.stream.Position = pos;
+        return true;
+      }
+
+      // set in progress flags
+      if (isCreate) { env.Flags = (proxy.Flags |= ProxyFlags.CREATE_IN_PROGRESS); }
+      if (isDestroy) { env.Flags = (proxy.Flags |= ProxyFlags.DESTROY_IN_PROGRESS); }
+
+      // clear force sync flag
       proxy.Flags &= ~ProxyFlags.FORCE_SYNC;
+
+      // clear skipped count
       proxy.Skipped = 0;
-
-      // clear out property priorities and dirty bits
-      for (int i = 0; i < env.Written.Count; ++i) {
-        Priority p = env.Written[i];
-        proxy.PropertyPriority[p.Property].PriorityValue = 0;
-        proxy.Mask.Clear(p.Property);
-      }
-
-      // set in progress flag
-      if ((proxy.Flags & ProxyFlags.DESTROY_REQUESTED)) {
-        env.Flags = (proxy.Flags |= ProxyFlags.DESTROY_IN_PROGRESS);
-      }
-      else if ((proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
-        env.Flags = (proxy.Flags |= ProxyFlags.CREATE_IN_PROGRESS);
-      }
 
       // put on packets list
       packet.envelopes.AddLast(env);
@@ -417,21 +438,21 @@ partial class BoltEntityChannel : BoltChannel {
 
     // grab networkid
     var netId = packet.stream.ReadNetworkId();
-    var destroy = packet.stream.ReadBool();
+    var destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
-    if (destroy) {
+    if (destroyRequested) {
       Assert.NotNull(_incommingProxiesByNetId[netId]);
       DestroyIncommingProxy(_incommingProxiesByNetId[netId]);
     }
     else {
-      bool create = packet.stream.ReadBool();
-      bool controlling = packet.stream.ReadBool();
+      bool isController = packet.stream.ReadBool();
+      bool createRequested = packet.stream.ReadBool();
 
       EntityObject entity = null;
       EntityProxy proxy = null;
 
-      if (create) {
+      if (createRequested) {
         GameObject prefab = null;
         PrefabId prefabId = PrefabId.Read(packet.stream, 32);
         TypeId serializerId = TypeId.Read(packet.stream, 32);
@@ -449,45 +470,52 @@ partial class BoltEntityChannel : BoltChannel {
         entity = BoltCore.CreateEntity(prefab, serializerId);
         entity.Source = connection;
 
+        // initialize entity
+        entity.Initialize();
+
         // create proxy
         proxy = entity.CreateProxy();
         proxy.NetId = netId;
         proxy.Connection = connection;
 
         // register proxy
-        _incommingProxiesByNetId[netId] = proxy;
-        _incommingProxiesByInstanceId[proxy.Entity.InstanceId] = proxy;
+        _incommingProxiesByNetId.Add(netId, proxy);
+        _incommingProxiesByInstanceId.Add(proxy.Entity.InstanceId, proxy);
 
-        // handle case where we are given control (it needs to be true during the initialize and attached callbacks)
-        if (controlling) {
+        // handle case where we are given control (it needs to be true during the read and attached callbacks)
+        if (isController) {
           entity.Flags |= EntityFlags.HAS_CONTROL;
         }
 
-        // read first frame of data
-        entity.Initialize();
+        // read packet
         entity.Serializer.Read(connection, packet.stream, packet.frame);
 
         // attach entity
         proxy.Entity.Attach();
 
         // again for the given control case, we need to clear out the HAS_CONTROL flag or .TakeControl will complain
-        if (controlling) {
+        if (isController) {
           proxy.Entity.Flags &= ~EntityFlags.HAS_CONTROL;
           proxy.Entity.TakeControl();
         }
 
         // log debug info
-        BoltLog.Debug("Received proxy for {0} from {1}", entity.UserToken, connection);
+        BoltLog.Debug("Received proxy for {0} from {1}", entity.UnityObject, connection);
       }
       else {
+        // find proxy
         proxy = _incommingProxiesByNetId[netId];
 
         if (proxy == null) {
           throw new BoltException("couldn't find proxy with id {0}", netId);
         }
 
-        if (proxy.Entity.HasControl ^ controlling) {
-          if (controlling) {
+        // read update
+        proxy.Entity.Serializer.Read(connection, packet.stream, packet.frame);
+
+        // update control state yes/no
+        if (proxy.Entity.HasControl ^ isController) {
+          if (isController) {
             proxy.Entity.TakeControl();
           }
           else {
@@ -496,7 +524,6 @@ partial class BoltEntityChannel : BoltChannel {
         }
       }
 
-      proxy.Entity.Serializer.Read(connection, packet.stream, packet.frame);
     }
 
     return true;

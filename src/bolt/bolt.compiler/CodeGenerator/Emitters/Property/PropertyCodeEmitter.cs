@@ -43,7 +43,7 @@ namespace Bolt.Compiler {
     }
 
     public virtual void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, false);
+      EmitSimpleIntefaceMember(type, true, true);
     }
 
     protected void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {

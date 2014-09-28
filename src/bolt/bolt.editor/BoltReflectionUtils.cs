@@ -51,6 +51,17 @@ static class BoltReflectionUtils {
     }
   }
 
+  public static IEnumerable<Type> FindInterfaceImplementations(this Type t) {
+    foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
+      foreach (Type type in asm.GetTypes()) {
+        if (type.IsClass && t.IsAssignableFrom(type)) {
+          yield return type;
+        }
+      }
+    }
+  }
+
+
   public static bool HasPublicDefaultConstructor (this Type type) {
     return type.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null) != null;
   }

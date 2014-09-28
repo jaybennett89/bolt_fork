@@ -19,7 +19,7 @@ namespace Bolt {
     internal UE.Vector3 SpawnPosition;
     internal UE.Quaternion SpawnRotation;
 
-    internal BoltEntity UserToken;
+    internal BoltEntity UnityObject;
     internal BoltConnection Source;
     internal BoltConnection Controller;
 
@@ -67,23 +67,24 @@ namespace Bolt {
       p = new EntityProxy();
       p.Entity = this;
 
+      // add to list
       Proxies.AddLast(p);
+
+      // let serializer init
+      Serializer.InitProxy(p);
 
       return p;
     }
 
     internal void Attach() {
-      Assert.NotNull(UserToken);
-      Assert.True(InstanceId.Value == 0);
-
-      // set instance id
-      InstanceId = new InstanceId(++_instanceIdCounter);
+      Assert.NotNull(UnityObject);
+      Assert.True(InstanceId.Value != 0);
 
       // add to entities list
       BoltCore._entities.AddLast(this);
 
       // call out to user
-      BoltCallbacksBase.EntityAttachedInvoke(this.UserToken);
+      BoltCallbacksBase.EntityAttachedInvoke(this.UnityObject);
 
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -102,7 +103,7 @@ namespace Bolt {
     }
 
     internal void Detach() {
-      Assert.NotNull(UserToken);
+      Assert.NotNull(UnityObject);
       Assert.True(InstanceId.Value != 0);
 
       // destroy on all connections
@@ -118,10 +119,13 @@ namespace Bolt {
       }
 
       // call out to user
-      BoltCallbacksBase.EntityDetachedInvoke(this.UserToken);
+      BoltCallbacksBase.EntityDetachedInvoke(this.UnityObject);
 
       // remove from entities list
       BoltCore._entities.Remove(this);
+
+      // clear from unity object
+      UnityObject.Entity = null;
 
       // log
       BoltLog.Debug("Detached {0}", this);
@@ -145,7 +149,7 @@ namespace Bolt {
     }
 
     internal void Render() {
-      throw new NotImplementedException();
+
     }
 
     internal void OnPrepareSend() {
@@ -153,7 +157,16 @@ namespace Bolt {
     }
 
     internal void Initialize() {
-      Behaviours = (IEntityBehaviour[])UserToken.GetComponentsInChildren(typeof(IEntityBehaviour));
+      // grab all behaviours
+      Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
+
+      // set instance id
+      InstanceId = new InstanceId(++_instanceIdCounter);
+
+      // assign usertokens
+      UnityObject.Entity = this;
+
+      // call into serializer
       Serializer.OnInitialized();
     }
 
@@ -164,7 +177,7 @@ namespace Bolt {
       CommandSequence = 0;
 
       // raise user event
-      BoltCallbacksBase.ControlOfEntityGainedInvoke(UserToken);
+      BoltCallbacksBase.ControlOfEntityGainedInvoke(UnityObject);
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -185,7 +198,7 @@ namespace Bolt {
       }
 
       // call user event
-      BoltCallbacksBase.ControlOfEntityLostInvoke(UserToken);
+      BoltCallbacksBase.ControlOfEntityLostInvoke(UnityObject);
     }
 
     internal void GiveControl(BoltConnection cn) {
@@ -380,7 +393,7 @@ namespace Bolt {
       eo.PrefabId = new PrefabId(entity._prefabId);
       eo.UpdateRate = entity._updateRate;
       eo.ClientPrediction = entity._clientPredicted;
-      eo.Flags = entity._persistanceMode == BoltEntityPersistanceMode.PersistOnLoad ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
+      eo.Flags = entity._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
       // create serializer
       eo.Serializer = BoltFactory.CreateSerializer(serializerId);

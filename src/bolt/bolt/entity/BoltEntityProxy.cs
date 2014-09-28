@@ -4,8 +4,8 @@ using Bolt;
 
 internal class EntityProxyEnvelope : BoltObject, IDisposable {
   public int Frame;
-  public EntityProxy Proxy = null;
   public ProxyFlags Flags;
+  public EntityProxy Proxy = null;
   public List<Priority> Written = new List<Priority>();
 
   public void Dispose() {

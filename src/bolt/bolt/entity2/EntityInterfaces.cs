@@ -38,7 +38,9 @@ namespace Bolt {
     BitArray GetDefaultMask();
     BitArray GetFilter(BoltConnection connection, EntityProxy proxy);
 
-    bool Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);
+    void InitProxy(EntityProxy p);
+
+    int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);
     void Read(BoltConnection connection, UdpStream stream, int frame);
   }
 

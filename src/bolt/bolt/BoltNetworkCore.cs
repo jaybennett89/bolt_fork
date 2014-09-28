@@ -85,7 +85,7 @@ internal static class BoltCore {
   }
 
   public static IEnumerable<BoltEntity> entities {
-    get { return _entities.Select(x => x.UserToken); }
+    get { return _entities.Select(x => x.UnityObject); }
   }
 
   public static IEnumerable<BoltConnection> connections {
@@ -229,7 +229,7 @@ internal static class BoltCore {
     entity.Detach();
 
     // destroy
-    GameObject.Destroy(entity.UserToken.gameObject);
+    GameObject.Destroy(entity.UnityObject.gameObject);
   }
 
   public static void Destroy(GameObject go) {
@@ -252,34 +252,30 @@ internal static class BoltCore {
   }
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    BoltEntity ec;
-    ec = prefab.GetComponent<BoltEntity>();
-    ec._sceneObject = false;
-
-    if (isClient && (ec._allowInstantiateOnClient == false)) {
+    if (isClient && (prefab.GetComponent<BoltEntity>()._allowInstantiateOnClient == false)) {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
     EntityObject eo;
 
     eo = CreateEntity(prefab);
-    eo.UserToken.transform.position = position;
-    eo.UserToken.transform.rotation = rotation;
+    eo.UnityObject.transform.position = position;
+    eo.UnityObject.transform.rotation = rotation;
     eo.Initialize();
     eo.Attach();
 
-    return eo.UserToken;
+    return eo.UnityObject;
   }
 
   public static BoltEntity Attach(BoltEntity entity) {
     Assert.Null(entity.Entity);
 
     EntityObject eo;
-    eo = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerId));
+    eo = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
     eo.Initialize();
     eo.Attach();
 
-    return eo.UserToken;
+    return eo.UnityObject;
   }
 
   internal static EntityObject CreateEntity(GameObject prefab) {
@@ -288,14 +284,14 @@ internal static class BoltCore {
     ec = prefab.GetComponent<BoltEntity>();
 
     // create with default serializer
-    return CreateEntity(prefab, new TypeId(ec._defaultSerializerId));
+    return CreateEntity(prefab, new TypeId(ec._defaultSerializerTypeId));
   }
 
   internal static EntityObject CreateEntity(GameObject prefab, TypeId serializerId) {
     // prefab entity component
     BoltEntity ec;
     ec = prefab.GetComponent<BoltEntity>();
-    ec._sceneObject = false;
+    //ec._sceneObject = false;
 
     // instance of prefab
     GameObject go;
@@ -304,7 +300,7 @@ internal static class BoltCore {
     // entity object
     EntityObject eo;
     eo = EntityObject.CreateFrom(ec, serializerId);
-    eo.UserToken = go.GetComponent<BoltEntity>();
+    eo.UnityObject = go.GetComponent<BoltEntity>();
 
     return eo;
   }
@@ -605,7 +601,7 @@ internal static class BoltCore {
         var proxyIter = _entities.GetIterator();
 
         while (proxyIter.Next()) {
-          if (proxyIter.val) {
+          if (proxyIter.val && proxyIter.val.IsOwner) {
             proxyIter.val.OnPrepareSend();
           }
         }
@@ -668,6 +664,10 @@ internal static class BoltCore {
       else {
         BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
       }
+    }
+
+    foreach (EntityObject eo in _entities) {
+      cn._entityChannel.CreateOnRemote(eo);
     }
   }
 

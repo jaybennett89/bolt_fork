@@ -6,6 +6,7 @@ using System.CodeDom;
 using ProtoBuf;
 using System.IO;
 using System.CodeDom.Compiler;
+using System.Reflection;
 
 namespace Bolt.Compiler {
   public partial class CodeGenerator {
@@ -94,7 +95,7 @@ namespace Bolt.Compiler {
     }
 
     void AssignTypeIds() {
-      uint typeId = 0;
+      uint typeId = 1;
 
       foreach (StateDecorator decorator in States) {
         decorator.TypeId = ++typeId;

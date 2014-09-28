@@ -11,11 +11,11 @@ namespace Bolt {
     public readonly int ObjectOffset;
     public readonly int Priority;
 
-    protected PropertySerializer(int offset, int length, int objectOffset, int priority) {
-      ByteOffset = offset;
-      ByteLength = length;
+    protected PropertySerializer(int byteOffset, int byteLength, int objectOffset, int priority) {
+      ByteOffset = byteOffset;
+      ByteLength = byteLength;
       ObjectOffset = objectOffset;
-      Priority = priority;
+      Priority = Math.Max(1, priority);
     }
 
     public abstract int CalculateBits(byte[] data);

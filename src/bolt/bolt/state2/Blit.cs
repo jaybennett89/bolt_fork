@@ -12,14 +12,14 @@ namespace Bolt {
 
       while (length > 0) {
         if (a[offset] != b[offset]) {
-          return false;
+          return true;
         }
 
         ++offset;
         --length;
       }
 
-      return true;
+      return false;
     }
 
     public static void PackBool(this byte[] data, int offset, bool value) {

@@ -17,7 +17,7 @@ namespace Bolt {
       }
     }
 
-    public int Property;
+    public int PropertyIndex;
     public int PriorityValue;
   }
 }

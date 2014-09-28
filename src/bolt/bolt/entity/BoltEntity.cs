@@ -15,10 +15,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   internal int _updateRate = 1;
 
   [SerializeField]
-  internal int _defaultSerializerId = -1;
-
-  [SerializeField]
-  internal bool _sceneObject = false;
+  internal int _defaultSerializerTypeId = 0;
 
   [SerializeField]
   internal bool _clientPredicted = true;
@@ -27,7 +24,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   internal bool _allowInstantiateOnClient = true;
 
   [SerializeField]
-  internal BoltEntityPersistanceMode _persistanceMode = BoltEntityPersistanceMode.DestroyOnLoad;
+  internal bool _persistThroughSceneLoads = false;
 
   // our link to Bolts internal entity object
   internal Bolt.EntityObject Entity;
@@ -131,6 +128,10 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   /// <param name="ev">The event to raise</param>
   public void Raise(IBoltEvent ev) {
     Entity.Raise(ev);
+  }
+
+  public TState GetState<TState>() where TState : Bolt.IState {
+    return (TState)(object)Entity.Serializer;
   }
 
   public override string ToString() {
