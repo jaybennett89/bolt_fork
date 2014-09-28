@@ -3,6 +3,7 @@ using System.Collections;
 
 public class CubeBehaviour : MonoBehaviour, Bolt.IEntityBehaviour {
   void Bolt.IEntityBehaviour.Attached() {
+    GetComponent<BoltEntity>().GetState<IPlayer>().HealthChanged += HealthChanged;
   }
 
   void Bolt.IEntityBehaviour.ControlGained() {
@@ -26,11 +27,8 @@ public class CubeBehaviour : MonoBehaviour, Bolt.IEntityBehaviour {
     }
   }
 
-  void FixedUpdate() {
+  void HealthChanged(ICharacter character) {
     var en = GetComponent<BoltEntity>();
-
-    if (!en.isOwner) {
-      BoltLog.Info("Remote Health: {0}", en.GetState<IPlayer>().Health);
-    }
+    BoltLog.Info("Health Of {0} is {1}", en, en.GetState<IPlayer>().Health);
   }
 }

@@ -35,7 +35,7 @@ public class BoltFilterWindow : BoltWindow {
 
   Vector2 scroll;
 
-  void OnGUI() {
+  new void OnGUI() {
     base.OnGUI();
 
     scroll = GUILayout.BeginScrollView(scroll, false, false);

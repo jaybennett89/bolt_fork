@@ -171,7 +171,6 @@ partial class BoltEntityChannel : BoltChannel {
         if (proxy.Flags & ProxyFlags.CREATE_IN_PROGRESS) { continue; }
         if (connection.isLoadingMap || BoltSceneLoader.isLoading) { continue; }
 
-        BoltLog.Info("CREATE_REQUESTED: " + proxy.Entity.InstanceId);
         proxy.Priority = 1 << 17;
       }
       else if (proxy.Flags & ProxyFlags.CREATE_DONE) {
@@ -211,10 +210,9 @@ partial class BoltEntityChannel : BoltChannel {
       int failCount = 0;
 
       for (; i < n; ++i) {
-        if (PackUpdate(packet, _outgoingProxiesByPriority[i]) == false) {
-          failCount += 1;
-
-          if (failCount >= 2) {
+        var result = PackUpdate(packet, _outgoingProxiesByPriority[i]);
+        if (result == false) {
+          if (++failCount >= 2) {
             break;
           }
         }

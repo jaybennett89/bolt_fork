@@ -28,7 +28,7 @@ namespace Bolt {
     void OnRender();
     void OnInitialized();
     void OnCreated(EntityObject entity);
-    void OnPrepareSend(BoltDoubleList<EntityProxy> proxies);
+    void OnPrepareSend();
 
     void OnSimulateBefore();
     void OnSimulateAfter();

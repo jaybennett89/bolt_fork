@@ -170,25 +170,12 @@ namespace Bolt {
       p.PropertyPriority = new Priority[PropertyCount];
     }
 
-    public void OnPrepareSend(BoltDoubleList<EntityProxy> proxy) {
-      Assert.True(Entity.IsOwner);
-      Assert.True(Frames.count > 0);
+    public void OnPrepareSend() {
 
-      // calculate diff mask
-      BitArray diff = Diff(Frames.first, FrameDiffBuffer);
-
-      // combine with existing masks for proxies
-      var it = proxy.GetIterator();
-
-      while (it.Next()) {
-        it.val.Mask.OrAssign(diff);
-      }
-
-      // copy data from latest frame to diff buffer
-      Array.Copy(Frames.first.Data, 0, FrameDiffBuffer.Data, 0, Frames.first.Data.Length);
     }
 
     public void OnRender() {
+
     }
 
     public void OnInitialized() {
@@ -202,11 +189,47 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
+      if (Entity.IsOwner) {
+        return;
+      }
 
+      while ((Entity.Frame > Frames.first.Number) && (Frames.count > 1)) {
+        FreeFrame(Frames.RemoveFirst());
+      }
     }
 
     public void OnSimulateAfter() {
+      if (Entity.IsOwner) {
+        // calculate diff mask
+        BitArray diff = Diff(Frames.first, FrameDiffBuffer);
 
+        // combine with existing masks for proxies
+        var it = Entity.Proxies.GetIterator();
+
+        while (it.Next()) {
+          it.val.Mask.OrAssign(diff);
+        }
+
+        // raise local changed events
+        for (int i = 0; i < diff.Size; ++i) {
+          if (diff.IsSet(i)) {
+            GetPropertySerializersArray()[i].Changed(this);
+          }
+        }
+
+        // copy data from latest frame to diff buffer
+        Array.Copy(Frames.first.Data, 0, FrameDiffBuffer.Data, 0, Frames.first.Data.Length);
+      }
+      else {
+        // if we have any properties to call events for
+        if (Frames.first.ReadProperties.Count > 0) {
+          for (int i = 0; i < Frames.first.ReadProperties.Count; ++i) {
+            GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
+          }
+
+          Frames.first.ReadProperties.Clear();
+        }
+      }
     }
 
     public int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env) {

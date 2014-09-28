@@ -109,7 +109,7 @@ public class BoltProjectWindow : BoltWindow {
     }
   }
 
-  void OnGUI() {
+  new void OnGUI() {
     base.OnGUI();
 
     if (Selected != null) {

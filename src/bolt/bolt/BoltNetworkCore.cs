@@ -602,7 +602,7 @@ internal static class BoltCore {
 
         while (proxyIter.Next()) {
           if (proxyIter.val && proxyIter.val.IsOwner) {
-            proxyIter.val.OnPrepareSend();
+            proxyIter.val.PrepareSend();
           }
         }
 

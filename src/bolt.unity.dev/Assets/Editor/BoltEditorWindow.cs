@@ -55,7 +55,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void Editor() {
-    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) != null)) {
+    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) != false)) {
       SelectedAsset = (AssetDefinition)Selected;
     }
 

@@ -76,6 +76,10 @@ namespace Bolt {
       }
     }
 
+    public bool IsSet(int bit) {
+      return ((bits[bit / 32] & (bit % 32)) == (bit % 32));
+    }
+
     //public void XOrAssign(BitArray that) {
     //  Assert.True(this.size == that.size);
 
@@ -106,5 +110,6 @@ namespace Bolt {
       Assert.True(a.size == b.size);
       return (a.bits[bit / 32] & b.bits[bit / 32] & (1 << (bit % 32))) == (1 << (bit % 32));
     }
+
   }
 }

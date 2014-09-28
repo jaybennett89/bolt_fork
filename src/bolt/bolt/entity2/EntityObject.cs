@@ -45,6 +45,20 @@ namespace Bolt {
       }
     }
 
+    internal int Frame {
+      get {
+        if (IsOwner) {
+          return BoltCore.frame;
+        }
+
+        if (HasControl && ClientPrediction) {
+          return Source.remoteFrameLatest;
+        }
+
+        return Source.remoteFrame;
+      }
+    }
+
     internal bool IsOwner {
       get { return ReferenceEquals(Source, null); }
     }
@@ -149,11 +163,11 @@ namespace Bolt {
     }
 
     internal void Render() {
-
+      Serializer.OnRender();
     }
 
-    internal void OnPrepareSend() {
-      Serializer.OnPrepareSend(Proxies);
+    internal void PrepareSend() {
+      Serializer.OnPrepareSend();
     }
 
     internal void Initialize() {

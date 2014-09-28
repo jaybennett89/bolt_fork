@@ -18,8 +18,11 @@ namespace Bolt {
       Priority = Math.Max(1, priority);
     }
 
-    public abstract int CalculateBits(byte[] data);
+    public virtual void Changed(State state) {
 
+    }
+
+    public abstract int CalculateBits(byte[] data);
     public abstract void Pack(State.Frame frame, BoltConnection connection, UdpStream stream);
     public abstract void Read(State.Frame frame, BoltConnection connection, UdpStream stream);
   }
