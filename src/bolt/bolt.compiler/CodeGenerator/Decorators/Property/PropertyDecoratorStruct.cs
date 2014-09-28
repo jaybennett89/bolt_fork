@@ -37,8 +37,12 @@ namespace Bolt.Compiler {
       return new PropertyCodeEmitterStruct();
     }
 
-    public override void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
-      Struct.FindAllProperties(all, (filterMask & Definition.Filters), (Definition.Controller && controller));
+    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
+      p.Filters = p.Filters & Definition.Filters;
+      p.Controller = p.Controller && Definition.Controller;
+      p.CallbackPath = p.CallbackPath + "." + Definition.Name;
+
+      Struct.FindAllProperties(all, p);
     }
   }
 }

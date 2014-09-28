@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using UdpKit;
@@ -18,7 +19,23 @@ namespace Bolt {
 
   }
 
-  internal abstract class State : IEntitySerializer {
+
+  internal abstract class State : IState, IEntitySerializer {
+    protected struct StateMetaData {
+      public TypeId TypeId;
+
+      public int FrameSize;
+      public int ObjectCount;
+      public int PropertyCount;
+      public int PacketMaxBits;
+      public int PacketMaxProperties;
+
+      public BitArray[] PropertyFilters;
+      public BitArray PropertyControllerFilter;
+      public PropertySerializer[] PropertySerializers;
+      public Dictionary<Filter, BitArray> PropertyFilterCache;
+    }
+
     public class Frame : IBoltListNode {
       public int Number;
       public object[] Objects;
@@ -60,101 +77,40 @@ namespace Bolt {
 
     internal EntityObject Entity;
 
-    protected readonly int FrameSize;
-    protected readonly int PropertyCount;
     protected readonly int PropertyIdBits;
+    protected readonly int PacketMaxPropertiesBits;
     protected readonly object[] PropertyObjects;
 
-    protected readonly int PacketMaxBits;
-    protected readonly int PacketMaxProperties;
-    protected readonly int PacketMaxPropertiesBits;
-
-    protected readonly Frame FrameDiffBuffer;
+    protected readonly Frame NullFrame;
+    protected readonly Frame DiffFrame;
+    protected readonly Frame SendFrame;
     protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
+    protected readonly Dictionary<string, Action<IState, int[]>> Callbacks = new Dictionary<string, Action<IState, int[]>>();
 
-    protected abstract Frame GetNullFrame();
-
-    protected abstract BitArray GetFullMask();
-    protected abstract BitArray GetDiffMask();
-    protected abstract BitArray GetControllerMask();
-    protected abstract BitArray GetFilterMask(Filter filter);
-
-    protected abstract TypeId GetTypeId();
-    protected abstract Priority[] GetTemporaryPriorityArray();
-    protected abstract PropertySerializer[] GetPropertySerializersArray();
-
-    protected State(int frameSize, int objectCount, int propertyCount, int packetMaxBits, int packetMaxProperties) {
-      FrameSize = frameSize;
-      FrameDiffBuffer = AllocFrame(-1);
-
-      PropertyCount = propertyCount;
-      PropertyIdBits = BoltMath.BitsRequired(propertyCount - 1);
-      PropertyObjects = new object[objectCount];
-
-      PacketMaxBits = packetMaxBits;
-      PacketMaxProperties = Math.Max(Math.Min(packetMaxProperties, 255), 1);
-      PacketMaxPropertiesBits = BoltMath.BitsRequired(PacketMaxProperties);
-    }
-
-    BitArray Diff(Frame a, Frame b) {
-      BitArray array = GetDiffMask();
-      PropertySerializer[] serializers = GetPropertySerializersArray();
-
-      array.Clear();
-
-      // calculate diff mask
-      for (int i = 0; i < serializers.Length; ++i) {
-        PropertySerializer s = serializers[i];
-
-        if (Blit.Diff(a.Data, b.Data, s.ByteOffset, s.ByteLength)) {
-          array.Set(i);
-        }
-      }
-
-      return array;
-    }
-
-    protected Frame AllocFrame(int number) {
-      Frame f;
-
-      f = new Frame(number, FrameSize);
-      f.Objects = PropertyObjects;
-
-      return f;
-    }
-
-    protected void FreeFrame(Frame frame) {
-
-    }
-
-    protected BitArray CalculateFilterPermutation(Filter filter, BitArray[] filters, Dictionary<Filter, BitArray> permutations) {
-      if ((filter.Bits & 1) == 1) {
-        return GetFullMask();
-      }
-
-      BitArray permutation;
-
-      if (permutations.TryGetValue(filter, out permutation) == false) {
-        permutation = BitArray.CreateClear(PropertyCount);
-
-        for (int i = 0; i < 32; ++i) {
-          long b = 1 << i;
-
-          if ((filter.Bits & b) == b) {
-            permutation.OrAssign(filters[i]);
-          }
-        }
-
-        permutations.Add(filter, permutation);
-      }
-
-      return permutation;
-    }
-
-    #region Serializer
+    protected readonly BitArray FullMask;
+    protected readonly BitArray DiffMask;
+    protected readonly Priority[] TempPriority;
+    protected readonly StateMetaData MetaData;
 
     public TypeId TypeId {
-      get { return GetTypeId(); }
+      get { return MetaData.TypeId; }
+    }
+
+    protected State(StateMetaData meta) {
+      meta.PacketMaxProperties = Math.Max(Math.Min(meta.PacketMaxProperties, 255), 1);
+
+      MetaData = meta;
+      DiffFrame = AllocFrame(-1);
+      NullFrame = AllocFrame(-1);
+      SendFrame = AllocFrame(-1);
+
+      FullMask = BitArray.CreateSet(meta.PropertyCount);
+      DiffMask = BitArray.CreateClear(meta.PropertyCount);
+      TempPriority = new Priority[meta.PropertyCount];
+
+      PropertyIdBits = BoltMath.BitsRequired(meta.PropertyCount - 1);
+      PropertyObjects = new object[meta.ObjectCount];
+      PacketMaxPropertiesBits = BoltMath.BitsRequired(meta.PacketMaxProperties);
     }
 
     public virtual float CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
@@ -162,12 +118,11 @@ namespace Bolt {
     }
 
     public BitArray GetDefaultMask() {
-      // this calculates the mask for a new proxy
-      return Diff(Frames.first, GetNullFrame()).Clone();
+      return Diff(Frames.first, NullFrame).Clone();
     }
 
     public void InitProxy(EntityProxy p) {
-      p.PropertyPriority = new Priority[PropertyCount];
+      p.PropertyPriority = new Priority[MetaData.PropertyCount];
     }
 
     public void OnPrepareSend() {
@@ -200,8 +155,10 @@ namespace Bolt {
 
     public void OnSimulateAfter() {
       if (Entity.IsOwner) {
+        //Stopwatch sw = Stopwatch.StartNew();
+
         // calculate diff mask
-        BitArray diff = Diff(Frames.first, FrameDiffBuffer);
+        BitArray diff = Diff(Frames.first, DiffFrame);
 
         // combine with existing masks for proxies
         var it = Entity.Proxies.GetIterator();
@@ -213,18 +170,21 @@ namespace Bolt {
         // raise local changed events
         for (int i = 0; i < diff.Size; ++i) {
           if (diff.IsSet(i)) {
-            GetPropertySerializersArray()[i].Changed(this);
+            //GetPropertySerializersArray()[i].Changed(this);
           }
         }
 
         // copy data from latest frame to diff buffer
-        Array.Copy(Frames.first.Data, 0, FrameDiffBuffer.Data, 0, Frames.first.Data.Length);
+        Buffer.BlockCopy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
+
+        //sw.Stop();
+        //BoltLog.Info("Elapsed {0}", sw.Elapsed);
       }
       else {
         // if we have any properties to call events for
         if (Frames.first.ReadProperties.Count > 0) {
           for (int i = 0; i < Frames.first.ReadProperties.Count; ++i) {
-            GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
+            //GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
           }
 
           Frames.first.ReadProperties.Clear();
@@ -234,18 +194,17 @@ namespace Bolt {
 
     public int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env) {
       BitArray filter = GetFilter(connection, env.Proxy);
-      PropertySerializer[] serializers = GetPropertySerializersArray();
 
       int tempCount = 0;
 
-      Priority[] tempPriority = GetTemporaryPriorityArray();
+      Priority[] tempPriority = TempPriority;
       Priority[] proxyPriority = env.Proxy.PropertyPriority;
 
       for (int i = 0; i < proxyPriority.Length; ++i) {
         // if this property is set both in our filter and the proxy mask we can consider it for sending
         if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
           // increment priority for this property
-          proxyPriority[i].PriorityValue += serializers[proxyPriority[i].PropertyIndex].Priority;
+          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[proxyPriority[i].PropertyIndex].Data.Priority;
 
           // copy to our temp array
           tempPriority[tempCount] = proxyPriority[i];
@@ -281,7 +240,7 @@ namespace Bolt {
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
       // how many bits can we write at the most
-      int bits = Math.Min(PacketMaxBits, stream.Size - stream.Position);
+      int bits = Math.Min(MetaData.PacketMaxBits, stream.Size - stream.Position);
 
       for (int i = 0; i < priorityCount; ++i) {
 
@@ -291,12 +250,12 @@ namespace Bolt {
         }
 
         // we have written enough properties
-        if (env.Written.Count == PacketMaxProperties) {
+        if (env.Written.Count == MetaData.PacketMaxProperties) {
           break;
         }
 
         Priority p = priority[i];
-        PropertySerializer s = GetPropertySerializersArray()[p.PropertyIndex];
+        PropertySerializer s = MetaData.PropertySerializers[p.PropertyIndex];
 
         if (p.PriorityValue == 0) {
           break;
@@ -321,7 +280,7 @@ namespace Bolt {
       }
 
       // gotta be less then 256
-      Assert.True(env.Written.Count <= PacketMaxProperties);
+      Assert.True(env.Written.Count <= MetaData.PacketMaxProperties);
 
       // write the amount of properties
       UdpStream.WriteByteAt(stream.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
@@ -340,7 +299,7 @@ namespace Bolt {
 
       while (--count >= 0) {
         int property = stream.ReadInt(PropertyIdBits);
-        var serializer = GetPropertySerializersArray()[property];
+        var serializer = MetaData.PropertySerializers[property];
 
         // read data into frame
         serializer.Read(frame, connection, stream);
@@ -354,13 +313,70 @@ namespace Bolt {
 
     public BitArray GetFilter(BoltConnection connection, EntityProxy proxy) {
       if (Entity.IsController(connection)) {
-        return GetControllerMask();
+        return MetaData.PropertyControllerFilter;
       }
 
-      return GetFilterMask(proxy.Filter);
+      return CalculateFilter(proxy.Filter);
     }
 
-    #endregion
 
+    BitArray Diff(Frame a, Frame b) {
+      DiffMask.Clear();
+
+      unsafe {
+        fixed (byte* aptr = a.Data)
+        fixed (byte* bptr = b.Data) {
+          int L = MetaData.PropertySerializers.Length;
+
+          for (int i = 0; i < L; ++i) {
+            PropertySerializer s = MetaData.PropertySerializers[i];
+
+            if (Blit.Diff(aptr, bptr, s.Data.ByteOffset, s.Data.ByteLength)) {
+              DiffMask.Set(i);
+            }
+          }
+        }
+
+      }
+
+      return DiffMask;
+    }
+
+    Frame AllocFrame(int number) {
+      Frame f;
+
+      f = new Frame(number, MetaData.FrameSize);
+      f.Objects = PropertyObjects;
+
+      return f;
+    }
+
+    void FreeFrame(Frame frame) {
+
+    }
+
+    BitArray CalculateFilter(Filter filter) {
+      if ((filter.Bits & 1) == 1) {
+        return FullMask;
+      }
+
+      BitArray permutation;
+
+      if (MetaData.PropertyFilterCache.TryGetValue(filter, out permutation) == false) {
+        permutation = BitArray.CreateClear(MetaData.PropertyCount);
+
+        for (int i = 0; i < 32; ++i) {
+          long b = 1 << i;
+
+          if ((filter.Bits & b) == b) {
+            permutation.OrAssign(MetaData.PropertyFilters[i]);
+          }
+        }
+
+        MetaData.PropertyFilterCache.Add(filter, permutation);
+      }
+
+      return permutation;
+    }
   }
 }

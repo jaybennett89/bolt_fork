@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CubeBehaviour : MonoBehaviour, Bolt.IEntityBehaviour {
   void Bolt.IEntityBehaviour.Attached() {
-    GetComponent<BoltEntity>().GetState<IPlayer>().HealthChanged += HealthChanged;
+
   }
 
   void Bolt.IEntityBehaviour.ControlGained() {

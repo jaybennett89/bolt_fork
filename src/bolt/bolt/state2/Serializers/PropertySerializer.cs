@@ -5,17 +5,22 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  internal abstract class PropertySerializer {
-    public readonly int ByteOffset;
-    public readonly int ByteLength;
-    public readonly int ObjectOffset;
-    public readonly int Priority;
+  internal struct PropertyMetaData {
+    public int ByteOffset;
+    public int ByteLength;
 
-    protected PropertySerializer(int byteOffset, int byteLength, int objectOffset, int priority) {
-      ByteOffset = byteOffset;
-      ByteLength = byteLength;
-      ObjectOffset = objectOffset;
-      Priority = Math.Max(1, priority);
+    public int Priority;
+    public int ObjectOffset;
+
+    public String  CallbackPath;
+    public Int32[] CallbackIndices;
+  }
+
+  internal abstract class PropertySerializer {
+    public readonly PropertyMetaData Data;
+
+    protected PropertySerializer(PropertyMetaData data) {
+      Data = data;
     }
 
     public virtual void Changed(State state) {

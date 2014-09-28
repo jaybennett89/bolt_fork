@@ -13,26 +13,6 @@ namespace Bolt.Compiler {
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
 
-    public string ChangedCallbackName {
-      get { return Definition.Name + "Changed"; }
-    }
-
-    public bool EmitChangedCallback {
-      get {
-        return
-          (
-            (DefiningAsset is StructDecorator) ||
-            (DefiningAsset is StateDecorator)
-          )
-          &&
-          Definition.StateAssetSettings.Callback
-          &&
-          Definition.PropertyType.IsValue
-          &&
-          Definition.PropertyType.CallbackAllowed;
-      }
-    }
-
     public abstract string ClrType {
       get;
     }
@@ -42,13 +22,7 @@ namespace Bolt.Compiler {
     }
 
     public virtual int ObjectSize {
-      get {
-        if (EmitChangedCallback) {
-          return 1;
-        }
-
-        return 0;
-      }
+      get { return 0; }
     }
 
     public abstract PropertyCodeEmitter CreateEmitter();
@@ -68,8 +42,16 @@ namespace Bolt.Compiler {
       return decorator;
     }
 
-    public virtual void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
-      all.Add(new StateProperty { Decorator = this, Index = all.Count, Filters = (Definition.Filters & filterMask), Controller = (Definition.Controller && controller) });
+    public virtual void FindAllProperties(List<StateProperty> all, StateProperty p) {
+      p.Decorator = this;
+
+      // update values
+      p.Index = all.Count;
+      p.Filters = Definition.Filters & p.Filters;
+      p.Controller = Definition.Controller && p.Controller;
+      p.CallbackPath = p.CallbackPath + "." + Definition.Name;
+
+      all.Add(p);
     }
   }
 

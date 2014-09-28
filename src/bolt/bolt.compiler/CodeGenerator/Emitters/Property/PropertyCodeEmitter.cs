@@ -12,26 +12,23 @@ namespace Bolt.Compiler {
       get { return Decorator.Generator; }
     }
 
-    public virtual CodeExpression CreatePropertyArrayInitializerExpression(int byteOffset, int objectOffset) {
-      throw new NotImplementedException();
+    public virtual CodeExpression CreatePropertyArrayInitializerExpression(StateProperty p) {
+      return @"new Bolt.PropertySerializerFloat(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, CallbackPath = ""{4}"", CallbackIndices = {5} }})".Expr(
+        p.OffsetBytes, // {0}
+        Decorator.ByteSize, // {1}
+        p.OffsetObjects, // {2}
+        Decorator.Definition.Priority, // {3}
+        p.CallbackPath, // {4}
+        p.CreateIndicesExpr() // {5}
+      );
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       EmitSimpleIntefaceMember(type, true, false);
-      EmitChangedCallbackProperty(type, true);
     }
 
     public virtual void EmitStateClassMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       EmitForwardStateMember(decorator, type);
-
-      var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (Decorator.EmitChangedCallback) {
-        type.DeclareProperty(CallbackDelegateType, Decorator.ChangedCallbackName, (get) => {
-          get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.ChangedCallbackName);
-        }, (set) => {
-          set.Expr("(new {0}(Frames.first, 0, 0)).{1} = value", decorator.RootStruct.Name, Decorator.ChangedCallbackName);
-        });
-      }
     }
 
     public virtual void EmitShimMembers(CodeTypeDeclaration type) {
@@ -62,21 +59,6 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
         get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.Name);
       });
-    }
-
-    protected void EmitChangedCallbackProperty(CodeTypeDeclaration type, bool code) {
-      var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (Decorator.EmitChangedCallback) {
-        type.DeclareProperty(CallbackDelegateType, Decorator.ChangedCallbackName, (get) => {
-          if (code) {
-            get.Expr("return ({0}) frame.Objects[offsetObjects + {1}]", CallbackDelegateType, Decorator.ObjectOffset);
-          }
-        }, (set) => {
-          if (code) {
-            set.Expr("frame.Objects[offsetObjects + {0}] = value;", Decorator.ObjectOffset);
-          }
-        });
-      }
     }
 
     protected string CallbackDelegateType {

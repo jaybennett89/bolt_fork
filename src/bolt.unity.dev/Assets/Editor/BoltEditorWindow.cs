@@ -55,7 +55,8 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void Editor() {
-    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) != false)) {
+
+    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) == false)) {
       SelectedAsset = (AssetDefinition)Selected;
     }
 
@@ -71,6 +72,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditState(StateDefinition def) {
+
     EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, () => {
       // separator
       GUILayout.Label(":", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.ExpandWidth(false));
@@ -208,7 +210,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(100));
+    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
 
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
@@ -234,23 +236,11 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUILayout.EndVertical();
   }
 
-
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
     EditFilters(p);
 
     if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), p.Controller)) {
       p.Controller = !p.Controller;
-    }
-
-    if (p.PropertyType.IsValue) {
-      if (p.PropertyType.CallbackAllowed) {
-        if (BoltEditorGUI.IconButton("boltico_fx".ToContent("Receive a callback when this property changes"), p.StateAssetSettings.Callback)) {
-          p.StateAssetSettings.Callback = (!p.StateAssetSettings.Callback) && p.PropertyType.CallbackAllowed;
-        }
-      }
-    }
-    else {
-      BoltEditorGUI.IconButton("cross-script".ToContent());
     }
   }
 
@@ -268,7 +258,7 @@ public class BoltEditorWindow : BoltWindow {
       menuRect = GUILayoutUtility.GetLastRect();
       menuRect.x += 85;
 
-      if (GUILayout.Button("", s, GUILayout.Width(200))) {
+      if (GUILayout.Button("", s, GUILayout.MinWidth(200))) {
         GenericMenu menu = new GenericMenu();
 
         foreach (FilterDefinition f in Project.EnabledFilters) {

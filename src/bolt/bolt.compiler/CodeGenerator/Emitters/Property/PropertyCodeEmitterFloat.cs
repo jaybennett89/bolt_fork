@@ -16,10 +16,6 @@ namespace Bolt.Compiler {
       };
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
-
-      if (Decorator.EmitChangedCallback) {
-        EmitChangedCallbackProperty(type, true);
-      }
     }
 
     public override void EmitShimMembers(CodeTypeDeclaration type) {
@@ -30,8 +26,6 @@ namespace Bolt.Compiler {
       DeclareProperty(type, true);
     }
 
-    public override CodeExpression CreatePropertyArrayInitializerExpression(int byteOffset, int objectOffset) {
-      return "new Bolt.PropertySerializerFloat({0}, {1}, {2}, {3})".Expr(byteOffset, Decorator.ByteSize, objectOffset, Decorator.Definition.Priority);
-    }
   }
 }
+ 

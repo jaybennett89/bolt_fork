@@ -140,7 +140,6 @@ partial class BoltEntityChannel : BoltChannel {
     _outgoingProxiesByInstanceId[entity.InstanceId] = proxy;
 
     BoltLog.Debug("created {0} on {1}", proxy, connection);
-
     return true;
   }
 
@@ -348,12 +347,6 @@ partial class BoltEntityChannel : BoltChannel {
       // increment priority
       env.Proxy.PropertyPriority[p.PriorityValue].PriorityValue += p.PriorityValue;
     }
-  }
-
-  enum PackResult {
-    Sent,
-    Next,
-    Abort
   }
 
   bool PackUpdate(BoltPacket packet, EntityProxy proxy) {

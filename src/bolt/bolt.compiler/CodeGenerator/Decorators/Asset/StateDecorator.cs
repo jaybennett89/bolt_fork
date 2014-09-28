@@ -8,8 +8,23 @@ namespace Bolt.Compiler {
   public struct StateProperty {
     public int Index;
     public int Filters;
+
+    public int OffsetBytes;
+    public int OffsetObjects;
+
+    public string CallbackPath;
+    public int[] CallbackIndices;
+
     public bool Controller;
     public PropertyDecorator Decorator;
+
+    public string CreateIndicesExpr() {
+      if (CallbackIndices == null || CallbackIndices.Length == 0) {
+        return "new int[0]";
+      }
+
+      return string.Format("new int[{0}] {{ {1} }}", CallbackIndices.Length, CallbackIndices.Join(", "));
+    }
   }
 
   public class StateDecorator : AssetDecorator<StateDefinition> {

@@ -6,9 +6,6 @@ using System.Text;
 namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyDefinitionStateAssetSettings : PropertyDefinitionAssetSettings {
-    [ProtoMember(4)]
-    public bool Callback;
-
     [ProtoMember(5)]
     public StateInterpolationMode InterpMode;
   }

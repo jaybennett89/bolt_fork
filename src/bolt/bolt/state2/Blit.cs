@@ -8,7 +8,21 @@ namespace Bolt {
       Assert.True(b != null);
       Assert.True(a.Length == b.Length);
 
-      int count = a.Length;
+      while (length > 0) {
+        if (a[offset] != b[offset]) {
+          return true;
+        }
+
+        ++offset;
+        --length;
+      }
+
+      return false;
+    }
+
+    unsafe public static bool Diff(byte* a, byte* b, int offset, int length) {
+      Assert.True(a != null);
+      Assert.True(b != null);
 
       while (length > 0) {
         if (a[offset] != b[offset]) {

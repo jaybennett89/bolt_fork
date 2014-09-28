@@ -32,9 +32,9 @@ namespace Bolt.Compiler {
       return string.Format("[Struct {0}]", Name);
     }
 
-    public void FindAllProperties(List<StateProperty> all, int filterMask, bool controller) {
+    public void FindAllProperties(List<StateProperty> all, StateProperty p) {
       for (int i = 0; i < Properties.Count; ++i) {
-        Properties[i].FindAllProperties(all, filterMask, controller);
+        Properties[i].FindAllProperties(all, p);
       }
     }
 
