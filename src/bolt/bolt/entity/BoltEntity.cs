@@ -1,30 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using UdpKit;
-using UnityEngine;
+using UE = UnityEngine;
 
 /// <summary>
 /// Enables a game object to be tracked by Bolt over the network
 /// </summary>
 [BoltExecutionOrder(-2500)]
-public class BoltEntity : MonoBehaviour, IBoltListNode {
-  [SerializeField]
+public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
+  [UE.SerializeField]
   internal int _prefabId = -1;
 
-  [SerializeField]
+  [UE.SerializeField]
   internal int _updateRate = 1;
 
-  [SerializeField]
+  [UE.SerializeField]
   internal int _defaultSerializerTypeId = 0;
 
-  [SerializeField]
+  [UE.SerializeField]
   internal bool _clientPredicted = true;
 
-  [SerializeField]
+  [UE.SerializeField]
   internal bool _allowInstantiateOnClient = true;
 
-  [SerializeField]
+  [UE.SerializeField]
   internal bool _persistThroughSceneLoads = false;
+
+  [UE.SerializeField]
+  internal UE.Object[] _objects;
 
   // our link to Bolts internal entity object
   internal Bolt.EntityObject Entity;
@@ -162,7 +165,7 @@ public class BoltEntity : MonoBehaviour, IBoltListNode {
   }
 
   void OnDrawGizmos() {
-    Gizmos.DrawIcon(transform.position, "BoltEntity Gizmo", true);
+    UE.Gizmos.DrawIcon(transform.position, "BoltEntity Gizmo", true);
   }
 
   void Update() {

@@ -21,7 +21,6 @@ namespace Bolt {
 
   }
 
-
   internal abstract class State : IState, IEntitySerializer {
     protected struct StateMetaData {
       public TypeId TypeId;
@@ -106,13 +105,13 @@ namespace Bolt {
       NullFrame = AllocFrame(-1);
       SendFrame = AllocFrame(-1);
 
-      FullMask = BitArray.CreateSet(meta.PropertyCount);
-      DiffMask = BitArray.CreateClear(meta.PropertyCount);
-      TempPriority = new Priority[meta.PropertyCount];
+      FullMask = BitArray.CreateSet(MetaData.PropertyCount);
+      DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
+      TempPriority = new Priority[MetaData.PropertyCount];
 
-      PropertyIdBits = BoltMath.BitsRequired(meta.PropertyCount - 1);
-      PropertyObjects = new object[meta.ObjectCount];
-      PacketMaxPropertiesBits = BoltMath.BitsRequired(meta.PacketMaxProperties);
+      PropertyIdBits = BoltMath.BitsRequired(MetaData.PropertyCount - 1);
+      PropertyObjects = new object[MetaData.ObjectCount];
+      PacketMaxPropertiesBits = BoltMath.BitsRequired(MetaData.PacketMaxProperties);
     }
 
     public void AddCallback(string path, StateCallback callback) {
@@ -155,6 +154,16 @@ namespace Bolt {
     }
 
     public void OnInitialized() {
+      if (Entity.UnityObject._objects != null) {
+        if (Entity.UnityObject._objects.Length != MetaData.ObjectCount) {
+          BoltLog.Warn("Object count on the unity object ({0}) did not match meta data count ({1})", Entity.UnityObject._objects.Length, MetaData.ObjectCount);
+        }
+
+        for (int i = 0; i < UE.Mathf.Min(MetaData.ObjectCount, Entity.UnityObject._objects.Length); ++i) {
+          PropertyObjects[i] = Entity.UnityObject._objects[i];
+        }
+      }
+
       if (Entity.IsOwner) {
         Frames.AddLast(AllocFrame(BoltCore.frame));
       }

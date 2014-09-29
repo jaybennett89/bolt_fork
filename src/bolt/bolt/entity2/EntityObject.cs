@@ -75,6 +75,10 @@ namespace Bolt {
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
 
+    public override string ToString() {
+      return string.Format("[Entity {0} {1} {2}]", InstanceId, PrefabId, Serializer);
+    }
+
     internal EntityProxy CreateProxy() {
       EntityProxy p;
 
@@ -172,6 +176,8 @@ namespace Bolt {
     }
 
     internal void Initialize() {
+      Assert.True(InstanceId.Value == 0);
+
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
 
@@ -400,7 +406,6 @@ namespace Bolt {
       return count;
     }
 
-
     internal static EntityObject CreateFrom(BoltEntity entity, TypeId serializerId) {
       EntityObject eo;
 
@@ -420,7 +425,5 @@ namespace Bolt {
     public static implicit operator bool(EntityObject entity) {
       return entity != null;
     }
-
-
   }
 }
