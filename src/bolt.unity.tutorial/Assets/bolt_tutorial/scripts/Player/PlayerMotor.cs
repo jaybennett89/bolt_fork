@@ -43,6 +43,17 @@ public class PlayerMotor : MonoBehaviour {
     }
   }
 
+  Vector3 feetPosition {
+    get {
+      Vector3 p;
+
+      p = transform.position;
+      p = p + _cc.center;
+
+      return p;
+    }
+  }
+
   float rayDistance {
     get {
       return _cc.center.y + (skinWidth * 2f);
@@ -95,7 +106,6 @@ public class PlayerMotor : MonoBehaviour {
   }
 
   public PlayerCommand.State Move(PlayerCommand.Input input) {
-
     var moving = false;
     var movingDir = Vector3.zero;
 
@@ -112,41 +122,40 @@ public class PlayerMotor : MonoBehaviour {
       movingDir = Vector3.Normalize(Quaternion.Euler(0, input.yaw, 0) * movingDir);
     }
 
-    // find ground (if any)
-    var hits =
-      FindGround(new Vector3(0, 0, _cc.radius), 8)
-        .Concat(FindGround(new Vector3(0, 0, _cc.radius * 0.5f), 4))
-        .Concat(FindGround(new Vector3(0, 0, 0), 1))
-        .OrderBy(x => x.distance)
-        .ToList();
+    //// find ground (if any)
+    //var hits =
+    //  FindGround(new Vector3(0, 0, _cc.radius), 8)
+    //    .Concat(FindGround(new Vector3(0, 0, _cc.radius * 0.5f), 4))
+    //    .Concat(FindGround(new Vector3(0, 0, 0), 1))
+    //    .OrderBy(x => x.distance)
+    //    .ToList();
 
+    //// if we had any ray hits, we are grounded
+    //if (hits.Count > 0) {
+    //  // if we were not grounded before, zero out or velocity
+    //  if (!_state.isGrounded) {
+    //    _state.velocity.x = 0f;
+    //    _state.velocity.y = 0f;
+    //    _state.velocity.z = 0f;
+    //  }
 
-    // if we had any ray hits, we are grounded
-    if (hits.Count > 0) {
-      // if we were not grounded before, zero out or velocity
-      if (!_state.isGrounded) {
-        _state.velocity.x = 0f;
-        _state.velocity.y = 0f;
-        _state.velocity.z = 0f;
-      }
+    //  if (_state.jumpFrames < (jumpTotalFrames / 2)) {
+    //    Vector3 p;
 
-      if (_state.jumpFrames < (jumpTotalFrames / 2)) {
-        Vector3 p;
+    //    p = transform.position;
+    //    p.y = (hits[0].point.y + skinWidth);
 
-        p = transform.position;
-        p.y = (hits[0].point.y + skinWidth);
+    //    transform.position = p;
+    //  }
 
-        transform.position = p;
-      }
-
-      _state.isGrounded = true;
-    }
-    else {
-      _state.isGrounded = false;
-    }
+    //  _state.isGrounded = true;
+    //}
+    //else {
+    //  _state.isGrounded = false;
+    //}
 
     //
-    if (_state.isGrounded) {
+    if (_state.isGrounded && (_state.jumpFrames == 0)) {
       if (input.jump && _state.jumpFrames == 0) {
         _state.jumpFrames = (byte)jumpTotalFrames;
         _state.velocity += movingDir * movingSpeed;
@@ -154,7 +163,6 @@ public class PlayerMotor : MonoBehaviour {
 
       if (moving) {
         _cc.Move(movingDir * movingSpeed * BoltNetwork.frameDeltaTime);
-        _state.position = transform.localPosition;
       }
     }
     else {
@@ -193,6 +201,17 @@ public class PlayerMotor : MonoBehaviour {
     // update position
     _state.position = transform.localPosition;
 
+    // if we are not grounded but the _cc thinks we are, means we just hit ground
+    if (_cc.isGrounded && !_state.isGrounded) {
+      _state.velocity.x = 0f;
+      _state.velocity.y = 0f;
+      _state.velocity.z = 0f;
+      _state.jumpFrames = 0;
+    }
+
+    // update grounded state
+    _state.isGrounded = _cc.isGrounded;
+
     // done
     return _state;
   }
@@ -207,5 +226,9 @@ public class PlayerMotor : MonoBehaviour {
     }
 
     return value;
+  }
+
+  void OnDrawGizmos() {
+    Gizmos.DrawWireSphere()
   }
 }
