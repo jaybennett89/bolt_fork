@@ -200,7 +200,7 @@ namespace Bolt {
       // copy data from latest frame to diff buffer
       Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
 
-      //sw.Stop();
+      //sw.Stop(); 
       //BoltLog.Info("Elapsed {0}", sw.Elapsed);
       //}
       //else {

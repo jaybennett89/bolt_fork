@@ -68,6 +68,7 @@
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltBinaryAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="entity2\EntityBehaviour.cs" />
     <Compile Include="entity2\EntityObject.cs" />
     <Compile Include="entity2\EntityInterfaces.cs" />
     <Compile Include="state2\BitArray.cs" />
