@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Bolt {
   public class BitArray {
@@ -26,6 +27,12 @@ namespace Bolt {
       this.size = size;
       this.bits = new int[length];
     }
+
+#if BOLT_DLL
+    public override string ToString() {
+      return string.Join(" / ", bits.Select(x => BitUtils.UIntToString((uint)x)).ToArray());
+    }
+#endif
 
     public BitArray Clone() {
       // create a new array of equal size
@@ -77,7 +84,8 @@ namespace Bolt {
     }
 
     public bool IsSet(int bit) {
-      return ((bits[bit / 32] & (bit % 32)) == (bit % 32));
+      int b = 1 << (bit % 32);
+      return (bits[bit / 32] & b) == b;
     }
 
     //public void XOrAssign(BitArray that) {

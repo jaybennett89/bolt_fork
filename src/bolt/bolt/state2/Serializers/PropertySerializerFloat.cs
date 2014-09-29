@@ -10,11 +10,11 @@ namespace Bolt {
     }
 
     public override void Pack(State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteFloat(Blit.ReadF32(frame.Data, Data.ByteOffset));
+      stream.WriteFloat(Blit.ReadF32(frame.Data, MetaData.ByteOffset));
     }
 
     public override void Read(State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackF32(frame.Data, Data.ByteOffset, stream.ReadFloat());
+      Blit.PackF32(frame.Data, MetaData.ByteOffset, stream.ReadFloat());
     }
 
     public PropertySerializerFloat(PropertyMetaData info)

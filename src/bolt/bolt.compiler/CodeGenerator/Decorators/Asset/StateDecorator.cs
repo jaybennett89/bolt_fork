@@ -5,32 +5,10 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  public struct StateProperty {
-    public int Index;
-    public int Filters;
-
-    public int OffsetBytes;
-    public int OffsetObjects;
-
-    public string CallbackPath;
-    public int[] CallbackIndices;
-
-    public bool Controller;
-    public PropertyDecorator Decorator;
-
-    public string CreateIndicesExpr() {
-      if (CallbackIndices == null || CallbackIndices.Length == 0) {
-        return "new int[0]";
-      }
-
-      return string.Format("new int[{0}] {{ {1} }}", CallbackIndices.Length, CallbackIndices.Join(", "));
-    }
-  }
-
   public class StateDecorator : AssetDecorator<StateDefinition> {
     public int BitCount = 0;
     public StructDecorator RootStruct;
-    public List<StateProperty> AllProperties = new List<StateProperty>();
+    public List<StateDecoratorProperty> AllProperties = new List<StateDecoratorProperty>();
     public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
 
     public bool HasParent {
@@ -67,6 +45,36 @@ namespace Bolt.Compiler {
 
         yield break;
       }
+    }
+  }
+
+  public struct StateDecoratorProperty {
+    public int Index;
+    public int Filters;
+
+    public int OffsetBytes;
+    public int OffsetObjects;
+
+    public int[] CallbackIndices;
+    public string[] CallbackPaths;
+
+    public bool Controller;
+    public PropertyDecorator Decorator;
+
+    public string CallbackPathsExpression() {
+      if (CallbackPaths == null || CallbackPaths.Length == 0 || CallbackPaths.Length == 1) {
+        return "new string[0]";
+      }
+
+      return string.Format("new string[{0}] {{ {1} }}", CallbackPaths.Length - 1, CallbackPaths.Skip(1).Select(x => '"' + x + '"').Join(", "));
+    }
+
+    public string CreateIndicesExpr() {
+      if (CallbackIndices == null || CallbackIndices.Length == 0) {
+        return "new int[0]";
+      }
+
+      return string.Format("new int[{0}] {{ {1} }}", CallbackIndices.Length, CallbackIndices.Join(", "));
     }
   }
 }

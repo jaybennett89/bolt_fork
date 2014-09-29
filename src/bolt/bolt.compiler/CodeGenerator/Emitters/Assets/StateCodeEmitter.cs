@@ -154,7 +154,7 @@ namespace Bolt.Compiler {
         p.OffsetObjects = objectOffset;
 
         // emit init expression
-        ctor.Statements.Comment(p.CallbackPath);
+        ctor.Statements.Comment(p.CallbackPaths.Join("; "));
         ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), PropertyCodeEmitter.Create(p.Decorator).CreatePropertyArrayInitializerExpression(p));
 
         // increase byte offset

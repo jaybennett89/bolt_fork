@@ -37,18 +37,18 @@ namespace Bolt.Compiler {
       return new PropertyCodeEmitterArray();
     }
 
-    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
+    public override void FindAllProperties(List<StateDecoratorProperty> all, StateDecoratorProperty p) {
       var structType = PropertyType.ElementType as PropertyTypeStruct;
 
       if ((structType != null) && (structType.StructGuid != Guid.Empty)) {
         StructDecorator dec = Generator.FindStruct(structType.StructGuid);
 
         for (int i = 0; i < PropertyType.ElementCount; ++i) {
-          StateProperty p_ = p;
+          StateDecoratorProperty p_ = p;
 
           p_.Filters = Definition.Filters & p.Filters;
           p_.Controller = Definition.Controller && p.Controller;
-          p_.CallbackPath = p.CallbackPath + "." + Definition.Name + "[]";
+          p_.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name + "[]");
           p_.CallbackIndices = p.CallbackIndices.Add(i);
 
           dec.FindAllProperties(all, p_);

@@ -80,6 +80,7 @@ namespace Bolt {
 
       p = new EntityProxy();
       p.Entity = this;
+      p.Mask = Serializer.GetDefaultMask();
 
       // add to list
       Proxies.AddLast(p);

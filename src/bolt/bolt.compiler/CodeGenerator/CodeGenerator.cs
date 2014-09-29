@@ -286,10 +286,10 @@ namespace Bolt.Compiler {
 
       // calculate absolute property indexes and filters for all properties
       foreach (var state in States) {
-        StateProperty p = new StateProperty();
+        StateDecoratorProperty p = new StateDecoratorProperty();
         p.Filters = -1;
         p.Controller = true;
-        p.CallbackPath = "";
+        p.CallbackPaths = new string[] { "" };
         p.CallbackIndices = new int[0];
 
         state.RootStruct.FindAllProperties(state.AllProperties, p);

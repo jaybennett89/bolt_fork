@@ -32,7 +32,7 @@ namespace Bolt.Compiler {
       return string.Format("[Struct {0}]", Name);
     }
 
-    public void FindAllProperties(List<StateProperty> all, StateProperty p) {
+    public void FindAllProperties(List<StateDecoratorProperty> all, StateDecoratorProperty p) {
       for (int i = 0; i < Properties.Count; ++i) {
         Properties[i].FindAllProperties(all, p);
       }

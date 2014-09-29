@@ -42,14 +42,14 @@ namespace Bolt.Compiler {
       return decorator;
     }
 
-    public virtual void FindAllProperties(List<StateProperty> all, StateProperty p) {
+    public virtual void FindAllProperties(List<StateDecoratorProperty> all, StateDecoratorProperty p) {
       p.Decorator = this;
 
       // update values
       p.Index = all.Count;
       p.Filters = Definition.Filters & p.Filters;
       p.Controller = Definition.Controller && p.Controller;
-      p.CallbackPath = p.CallbackPath + "." + Definition.Name;
+      p.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name);
 
       all.Add(p);
     }

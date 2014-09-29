@@ -7,8 +7,10 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  public interface IState {
+  public delegate void StateCallback(IState state, string path, int[] indices);
 
+  public interface IState {
+    void AddCallback(string path, StateCallback callback);
   }
 
   public interface IStateModifier : IDisposable {
@@ -85,7 +87,7 @@ namespace Bolt {
     protected readonly Frame DiffFrame;
     protected readonly Frame SendFrame;
     protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
-    protected readonly Dictionary<string, Action<IState, int[]>> Callbacks = new Dictionary<string, Action<IState, int[]>>();
+    protected readonly Dictionary<string, List<StateCallback>> Callbacks = new Dictionary<string, List<StateCallback>>();
 
     protected readonly BitArray FullMask;
     protected readonly BitArray DiffMask;
@@ -113,16 +115,35 @@ namespace Bolt {
       PacketMaxPropertiesBits = BoltMath.BitsRequired(meta.PacketMaxProperties);
     }
 
+    public void AddCallback(string path, StateCallback callback) {
+      List<StateCallback> callbacksList;
+
+      if (Callbacks.TryGetValue(path, out callbacksList) == false) {
+        Callbacks[path] = callbacksList = new List<StateCallback>(32);
+      }
+
+      callbacksList.Add(callback);
+    }
+
     public virtual float CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
       return skipped;
     }
 
     public BitArray GetDefaultMask() {
+      if (Frames.count == 0) {
+        return BitArray.CreateClear(MetaData.PropertyCount);
+      }
+
       return Diff(Frames.first, NullFrame).Clone();
     }
 
     public void InitProxy(EntityProxy p) {
       p.PropertyPriority = new Priority[MetaData.PropertyCount];
+
+      // store indexes
+      for (int i = 0; i < p.PropertyPriority.Length; ++i) {
+        p.PropertyPriority[i].PropertyIndex = i;
+      }
     }
 
     public void OnPrepareSend() {
@@ -148,46 +169,60 @@ namespace Bolt {
         return;
       }
 
+      //BoltLog.Info("frame {0} - {1}", Frames.first.Number, Frames.count);
+
       while ((Entity.Frame > Frames.first.Number) && (Frames.count > 1)) {
         FreeFrame(Frames.RemoveFirst());
       }
     }
 
     public void OnSimulateAfter() {
-      if (Entity.IsOwner) {
-        //Stopwatch sw = Stopwatch.StartNew();
+      //if (Entity.IsOwner) {
+      //Stopwatch sw = Stopwatch.StartNew();
 
-        // calculate diff mask
-        BitArray diff = Diff(Frames.first, DiffFrame);
+      // calculate diff mask
+      BitArray diff = Diff(Frames.first, DiffFrame);
 
-        // combine with existing masks for proxies
-        var it = Entity.Proxies.GetIterator();
+      // combine with existing masks for proxies
+      var it = Entity.Proxies.GetIterator();
 
-        while (it.Next()) {
-          it.val.Mask.OrAssign(diff);
-        }
-
-        // raise local changed events
-        for (int i = 0; i < diff.Size; ++i) {
-          if (diff.IsSet(i)) {
-            //GetPropertySerializersArray()[i].Changed(this);
-          }
-        }
-
-        // copy data from latest frame to diff buffer
-        Buffer.BlockCopy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
-
-        //sw.Stop();
-        //BoltLog.Info("Elapsed {0}", sw.Elapsed);
+      while (it.Next()) {
+        it.val.Mask.OrAssign(diff);
       }
-      else {
-        // if we have any properties to call events for
-        if (Frames.first.ReadProperties.Count > 0) {
-          for (int i = 0; i < Frames.first.ReadProperties.Count; ++i) {
-            //GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
-          }
 
-          Frames.first.ReadProperties.Clear();
+      // raise local changed events
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        if (diff.IsSet(i)) {
+          InvokeCallbacks(MetaData.PropertySerializers[i]);
+        }
+      }
+
+      // copy data from latest frame to diff buffer
+      Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
+
+      //sw.Stop();
+      //BoltLog.Info("Elapsed {0}", sw.Elapsed);
+      //}
+      //else {
+      //  // if we have any properties to call events for
+      //  if (Frames.first.ReadProperties.Count > 0) {
+      //    for (int i = 0; i < Frames.first.ReadProperties.Count; ++i) {
+      //      //GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
+      //    }
+
+      //    Frames.first.ReadProperties.Clear();
+      //  }
+      //}
+    }
+
+    void InvokeCallbacks(PropertySerializer p) {
+      for (int i = 0; i < p.MetaData.CallbackPaths.Length; ++i) {
+        List<StateCallback> callbacksList;
+
+        if (Callbacks.TryGetValue(p.MetaData.CallbackPaths[i], out callbacksList)) {
+          for (int n = 0; n < callbacksList.Count; ++n) {
+            callbacksList[n](this, p.MetaData.PropertyPath, p.MetaData.CallbackIndices);
+          }
         }
       }
     }
@@ -201,10 +236,13 @@ namespace Bolt {
       Priority[] proxyPriority = env.Proxy.PropertyPriority;
 
       for (int i = 0; i < proxyPriority.Length; ++i) {
+        Assert.True(proxyPriority[i].PropertyIndex == i, "{0} == {1}", proxyPriority[i].PropertyIndex, i);
+
         // if this property is set both in our filter and the proxy mask we can consider it for sending
         if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
+
           // increment priority for this property
-          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[proxyPriority[i].PropertyIndex].Data.Priority;
+          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].MetaData.Priority;
 
           // copy to our temp array
           tempPriority[tempCount] = proxyPriority[i];
@@ -323,20 +361,14 @@ namespace Bolt {
     BitArray Diff(Frame a, Frame b) {
       DiffMask.Clear();
 
-      unsafe {
-        fixed (byte* aptr = a.Data)
-        fixed (byte* bptr = b.Data) {
-          int L = MetaData.PropertySerializers.Length;
+      int L = MetaData.PropertySerializers.Length;
 
-          for (int i = 0; i < L; ++i) {
-            PropertySerializer s = MetaData.PropertySerializers[i];
+      for (int i = 0; i < L; ++i) {
+        PropertySerializer s = MetaData.PropertySerializers[i];
 
-            if (Blit.Diff(aptr, bptr, s.Data.ByteOffset, s.Data.ByteLength)) {
-              DiffMask.Set(i);
-            }
-          }
+        if (Blit.Diff(a.Data, b.Data, s.MetaData.ByteOffset, s.MetaData.ByteLength)) {
+          DiffMask.Set(i);
         }
-
       }
 
       return DiffMask;

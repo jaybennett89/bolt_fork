@@ -12,14 +12,15 @@ namespace Bolt.Compiler {
       get { return Decorator.Generator; }
     }
 
-    public virtual CodeExpression CreatePropertyArrayInitializerExpression(StateProperty p) {
-      return @"new Bolt.PropertySerializerFloat(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, CallbackPath = ""{4}"", CallbackIndices = {5} }})".Expr(
+    public virtual CodeExpression CreatePropertyArrayInitializerExpression(StateDecoratorProperty p) {
+      return @"new Bolt.PropertySerializerFloat(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6} }})".Expr(
         p.OffsetBytes, // {0}
         Decorator.ByteSize, // {1}
         p.OffsetObjects, // {2}
         Decorator.Definition.Priority, // {3}
-        p.CallbackPath, // {4}
-        p.CreateIndicesExpr() // {5}
+        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
+        p.CallbackPathsExpression(), // {5}
+        p.CreateIndicesExpr() // {6}
       );
     }
 
