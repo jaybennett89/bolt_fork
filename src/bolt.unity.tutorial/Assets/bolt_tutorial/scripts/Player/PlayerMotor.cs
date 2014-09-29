@@ -43,7 +43,7 @@ public class PlayerMotor : MonoBehaviour {
     }
   }
 
-  Vector3 feetPosition {
+  Vector3 fee {
     get {
       Vector3 p;
 
