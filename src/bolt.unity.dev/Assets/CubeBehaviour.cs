@@ -3,17 +3,16 @@ using System.Collections;
 
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
-    state.AddCallback(".Health", HealthChanged);
   }
 
   public override void SimulateOwner() {
-    using (var s = state.Modify()) {
-      //s.Health += 1;
-    }
+
+    transform.position = (Quaternion.Euler(0, Time.time * 20f, 0) * (Vector3.forward * 10f));
+
   }
 
-  void HealthChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {
-    BoltLog.Info("Health changed to {0}", state.Health);
+  void TransformChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {
+    //BoltLog.Info("Transform Changed");
   }
 
   //void Bolt.IEntityBehaviour.Attached() {

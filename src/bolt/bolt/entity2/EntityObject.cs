@@ -412,7 +412,7 @@ namespace Bolt {
       eo.Flags = entity._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
       // create serializer
-      eo.Serializer = BoltFactory.CreateSerializer(serializerId);
+      eo.Serializer = BoltFactory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
 
       return eo;

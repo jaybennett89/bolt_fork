@@ -161,7 +161,6 @@
     <Compile Include="event\BoltEventReceiver.cs" />
     <Compile Include="event\internal\BoltEventInternalServerReceiver.cs" />
     <Compile Include="event\internal\BoltEventInternalClientReceiver.cs" />
-    <Compile Include="state\BoltStateFrame.cs" />
     <Compile Include="state\BoltStateProperty.cs" />
     <Compile Include="state\Transform\BoltStateTransformInterpolatedSnapshots.cs" />
     <Compile Include="state\BoltState.cs" />

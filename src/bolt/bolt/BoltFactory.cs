@@ -6,10 +6,8 @@ using System.Collections.Generic;
 /// Responsible for creating events and commands during runtime
 /// </summary>
 public static class BoltFactory {
-  static Dictionary<Type, IBoltStateFactory> _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>();
-
-  static Dictionary<Type, Bolt.IEntitySerializerFactory> _state2FactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>();
-  static Dictionary<TypeId, Bolt.IEntitySerializerFactory> _state2FactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(TypeId.EqualityComparer.Instance);
+  static Dictionary<Type, Bolt.IEntitySerializerFactory> _serializerFactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>();
+  static Dictionary<TypeId, Bolt.IEntitySerializerFactory> _serializerFactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(TypeId.EqualityComparer.Instance);
 
   static Dictionary<Type, IBoltEventFactory> _eventFactoryByType = new Dictionary<Type, IBoltEventFactory>();
   static Dictionary<ushort, IBoltEventFactory> _eventFactoryById = new Dictionary<ushort, IBoltEventFactory>();
@@ -19,9 +17,8 @@ public static class BoltFactory {
   public static bool IsEmpty {
     get {
       return
-        _state2FactoryByType.Count == 0 &&
-        _state2FactoryById.Count == 0 &&
-        _stateFactoryByType.Count == 0 &&
+        _serializerFactoryByType.Count == 0 &&
+        _serializerFactoryById.Count == 0 &&
         _eventFactoryByType.Count == 0 &&
         _eventFactoryById.Count == 0 &&
         _cmdFactoryByType.Count == 0 &&
@@ -51,10 +48,6 @@ public static class BoltFactory {
   /// </example>
   public static T NewCommand<T>() where T : BoltCommand {
     return (T)NewCommand(typeof(T));
-  }
-
-  internal static T NewState<T>() where T : IBoltState {
-    return (T)NewState(typeof(T));
   }
 
   /// <summary>
@@ -94,24 +87,10 @@ public static class BoltFactory {
     throw new BoltException("unknown command type {0}", t);
   }
 
-  internal static IBoltState NewState(Type t) {
-    IBoltStateFactory f;
-
-    if (_stateFactoryByType.TryGetValue(t, out f)) {
-      return f.Create();
-    }
-
-    throw new BoltException("unknown state type {0}", t);
-  }
-
-
-  internal static void Register(IBoltStateFactory factory) {
-    _stateFactoryByType.Add(factory.stateType, factory);
-  }
 
   internal static void Register(Bolt.IEntitySerializerFactory factory) {
-    _state2FactoryById.Add(factory.TypeId, factory);
-    _state2FactoryByType.Add(factory.TypeObject, factory);
+    _serializerFactoryById.Add(factory.TypeId, factory);
+    _serializerFactoryByType.Add(factory.TypeObject, factory);
   }
 
   /// <summary>
@@ -183,8 +162,8 @@ public static class BoltFactory {
     return _cmdFactoryById[id];
   }
 
-  internal static Bolt.IEntitySerializer CreateSerializer(Bolt.TypeId id) {
-    return _state2FactoryById[id].Create();
+  internal static Bolt.IEntitySerializer NewSerializer(Bolt.TypeId id) {
+    return _serializerFactoryById[id].Create();
   }
 
   internal static void UnregisterAll() {
@@ -200,14 +179,11 @@ public static class BoltFactory {
     _cmdFactoryById.Clear();
     _cmdFactoryById = new Dictionary<ushort, IBoltCommandFactory>(128);
 
-    _stateFactoryByType.Clear();
-    _stateFactoryByType = new Dictionary<Type, IBoltStateFactory>(128);
+    _serializerFactoryByType.Clear();
+    _serializerFactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>(128);
 
-    _state2FactoryByType.Clear();
-    _state2FactoryByType = new Dictionary<Type, Bolt.IEntitySerializerFactory>(128);
-
-    _state2FactoryById.Clear();
-    _state2FactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(128, TypeId.EqualityComparer.Instance);
+    _serializerFactoryById.Clear();
+    _serializerFactoryById = new Dictionary<TypeId, Bolt.IEntitySerializerFactory>(128, TypeId.EqualityComparer.Instance);
   }
 
 }

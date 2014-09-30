@@ -177,7 +177,7 @@ namespace Bolt {
 
     public void OnSimulateBefore() {
       if (!Entity.IsOwner) {
-        while ((Entity.Frame > Frames.first.Number) && (Frames.count > 1)) {
+        while ((Frames.count > 1) && (Entity.Frame >= Frames.Next(Frames.first).Number)) {
           FreeFrame(Frames.RemoveFirst());
         }
       }
@@ -189,32 +189,30 @@ namespace Bolt {
 
     public void OnSimulateAfter() {
       //if (Entity.IsOwner) {
-      Stopwatch sw = Stopwatch.StartNew();
+      //Stopwatch sw = Stopwatch.StartNew();
 
       // calculate diff mask
       var diff = Diff(Frames.first, DiffFrame);
 
-      if (false) {
-        // combine with existing masks for proxies
-        var it = Entity.Proxies.GetIterator();
+      // combine with existing masks for proxies
+      var it = Entity.Proxies.GetIterator();
 
-        while (it.Next()) {
-          it.val.Mask.OrAssign(diff);
-        }
+      while (it.Next()) {
+        it.val.Mask.OrAssign(diff);
+      }
 
-        // raise local changed events
-        for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-          if (diff.IsSet(i)) {
-            InvokeCallbacks(MetaData.PropertySerializers[i]);
-          }
+      // raise local changed events
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        if (diff.IsSet(i)) {
+          InvokeCallbacks(MetaData.PropertySerializers[i]);
         }
       }
 
       // copy data from latest frame to diff buffer
       Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
 
-      sw.Stop();
-      BoltLog.Info("Elapsed {0}", sw.Elapsed);
+      //sw.Stop();
+      //BoltLog.Info("Elapsed {0}", sw.Elapsed);
 
       //}
       //else {
