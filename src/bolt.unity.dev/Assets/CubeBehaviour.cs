@@ -3,6 +3,7 @@ using System.Collections;
 
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
+    state.Transform = transform;
   }
 
   public override void SimulateOwner() {
