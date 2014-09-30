@@ -4,12 +4,12 @@ using System.Collections;
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
     state.AddCallback(".Health", HealthChanged);
-    state.AddCallback(".Inventory[].Enchant[].Value", EnchantValueChanged);
   }
 
-  void EnchantValueChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {
-    var newValue = state.Inventory[propertyIndices[0]].Enchant[propertyIndices[1]].Value;
-    BoltLog.Info("Enchant Value of Item:{0}'s Enchant:{1} changed to {0}", propertyIndices[0], propertyIndices[1], newValue);
+  public override void SimulateOwner() {
+    using (var s = state.Modify()) {
+      //s.Health += 1;
+    }
   }
 
   void HealthChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {

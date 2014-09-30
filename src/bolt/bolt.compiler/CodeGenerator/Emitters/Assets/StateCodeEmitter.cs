@@ -92,7 +92,7 @@ namespace Bolt.Compiler {
       type.DeclareConstructor(ctor => { ctor.BaseConstructorArgs.Add("_Meta".Expr()); });
 
       foreach (PropertyDecorator p in Decorator.RootStruct.Properties) {
-        PropertyCodeEmitter.Create(p).EmitStateClassMembers(Decorator, type);
+        PropertyCodeEmitter.Create(p).EmitStateMembers(Decorator, type);
       }
 
       foreach (StateDecorator parent in Decorator.ParentList) {

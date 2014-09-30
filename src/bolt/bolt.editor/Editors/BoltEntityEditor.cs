@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -43,18 +42,17 @@ public class BoltEntityEditor : Editor {
     EditorGUI.EndDisabledGroup();
 
     if (entity._prefabId < 0) {
-      EditorGUILayout.HelpBox("Prefab Id not set, run the Bolt/Compile command to correct", MessageType.Error);
+      EditorGUILayout.HelpBox("Prefab Id not set, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
     }
 
     if (prefabType == PrefabType.Prefab) {
       if (BoltRuntimeSettings.ContainsPrefab(entity) == false) {
-        EditorGUILayout.HelpBox("Prefab lookup not valid, run the Bolt/Compile command to correct", MessageType.Error);
+        EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
       }
     }
 
     // Serializer
     int selectedIndex;
-
     selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity._defaultSerializerTypeId) + 1);
     selectedIndex = EditorGUILayout.Popup("Serializer", selectedIndex, serializerNames);
 
@@ -91,25 +89,31 @@ public class BoltEntityEditor : Editor {
 
   void RuntimeInfoGUI(BoltEntity entity) {
     GUILayout.Label("Runtime Info", EditorStyles.boldLabel);
-
     EditorGUILayout.Toggle("Is Attached", entity.isAttached);
-    EditorGUILayout.Toggle("Is Owner", entity.isOwner);
 
-    if (entity.source != null) {
-      EditorGUILayout.LabelField("Source", entity.source.remoteEndPoint.ToString());
-    }
-    else {
-      EditorGUILayout.LabelField("Source", "Local");
-    }
+    if (entity.isAttached) {
+      EditorGUILayout.Toggle("Is Owner", entity.isOwner);
 
-    if (entity.controller != null) {
-      EditorGUILayout.LabelField("Controller", entity.controller.remoteEndPoint.ToString());
-    }
-    else {
-      EditorGUILayout.LabelField("Controller", entity.hasControl ? "Local" : "None");
-    }
+      if (entity.source != null) {
+        EditorGUILayout.LabelField("Source", entity.source.remoteEndPoint.ToString());
+      }
+      else {
+        EditorGUILayout.LabelField("Source", "Local");
+      }
 
-    EditorGUILayout.LabelField("Serializer", entity.Entity.Serializer.GetType().Name);
+      if (entity.controller != null) {
+        EditorGUILayout.LabelField("Controller", entity.controller.remoteEndPoint.ToString());
+      }
+      else {
+        EditorGUILayout.LabelField("Controller", entity.hasControl ? "Local" : "None");
+      }
+
+      EditorGUILayout.LabelField("Proxy Count", entity.Entity.Proxies.count.ToString());
+      EditorGUILayout.LabelField("Serializer", entity.Entity.Serializer.GetType().Name);
+
+      GUILayout.Label("Serializer Debug Info", EditorStyles.boldLabel);
+      entity.Entity.Serializer.DebugInfo();
+    }
   }
 }
 

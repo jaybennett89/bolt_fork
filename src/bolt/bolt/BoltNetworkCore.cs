@@ -443,28 +443,26 @@ internal static class BoltCore {
     _udpSocket.DisableLanBroadcast();
   }
 
-  static void StepRemoteFrames() {
-    BoltConnection cn;
-    BoltIterator<BoltConnection> cnIter;
-
+  static void AdjustEstimatedRemoteFrames() {
     if (hasSocket) {
-      cn = null;
-      cnIter = _connections.GetIterator();
+      BoltIterator<BoltConnection> it = _connections.GetIterator();
 
-      while (cnIter.Next(out cn)) {
-        cn.AdjustRemoteFrame();
+      while (it.Next()) {
+        it.val.AdjustRemoteFrame();
       }
+    }
+  }
 
+  static void StepNonControlledRemoteEntities() {
+    if (hasSocket) {
       bool retry;
 
       do {
         retry = false;
+        BoltIterator<BoltConnection> it = _connections.GetIterator();
 
-        cn = null;
-        cnIter = _connections.GetIterator();
-
-        while (cnIter.Next(out cn)) {
-          if (cn.StepRemoteFrame()) {
+        while (it.Next()) {
+          if (it.val.StepRemoteFrame()) {
             retry = true;
           }
         }
@@ -588,7 +586,8 @@ internal static class BoltCore {
     if (hasSocket) {
       BoltPhysics.SnapshotWorld();
 
-      if (_frame % framesPerSecond == 0) {
+      // switch perf counters
+      if ((_frame % framesPerSecond) == 0) {
         var it = _connections.GetIterator();
 
         while (it.Next()) {
@@ -597,20 +596,11 @@ internal static class BoltCore {
       }
 
       if ((_frame % localSendRate) == 0) {
-        // prepare all proxies for sending
-        var proxyIter = _entities.GetIterator();
-
-        while (proxyIter.Next()) {
-          if (proxyIter.val && proxyIter.val.IsOwner) {
-            proxyIter.val.PrepareSend();
-          }
-        }
-
         // send data on all connections
-        var connIter = _connections.GetIterator();
+        var it = _connections.GetIterator();
 
-        while (connIter.Next()) {
-          connIter.val.Send();
+        while (it.Next()) {
+          it.val.Send();
         }
       }
     }
@@ -623,14 +613,17 @@ internal static class BoltCore {
       // first thing we do is to poll the network
       BoltCore.PollNetwork();
 
-      // step remote rpcs and entities which depends on remote esimate frame numbers
-      BoltCore.StepRemoteFrames();
+      // adjust estimated frame numbers for connections
+      BoltCore.AdjustEstimatedRemoteFrames();
+
+      // step remote events and entities which depends on remote estimated frame numbers
+      BoltCore.StepNonControlledRemoteEntities();
 
       // step entities which we in some way are controlling locally
       var iter = _entities.GetIterator();
 
       while (iter.Next()) {
-        if (iter.val.IsOwner || iter.val.HasControl) {
+        if (iter.val.IsOwner || (iter.val.HasControl && iter.val.ClientPrediction)) {
           iter.val.Simulate();
         }
       }

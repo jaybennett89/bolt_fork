@@ -29,7 +29,7 @@ namespace Bolt.Compiler {
       DeclareShimConstructor(str);
 
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitShimMembers(str);
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitStructMembers(str);
       }
 
       str.DeclareMethod(Decorator.ModifierInterfaceName, "Modify", method => {

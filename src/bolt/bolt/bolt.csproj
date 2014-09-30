@@ -77,6 +77,7 @@
     <Compile Include="state2\Serializers\PropertySerializer.cs" />
     <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state2\Serializers\PropertySerializerString.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -99,7 +100,6 @@
     <Compile Include="collections\BoltIterator.cs" />
     <Compile Include="collections\STuple.cs" />
     <Compile Include="entity\BoltEntityCallbacks.cs" />
-    <Compile Include="entity\BoltEntityPersistanceMode.cs" />
     <Compile Include="entity\BoltEntityUpdateInfo.cs" />
     <Compile Include="event\IBoltEventProperty.cs" />
     <Compile Include="event\internal\BoltEventLoadMapDone.cs" />
@@ -148,10 +148,8 @@
     <Compile Include="command\BoltCommandFactory.cs" />
     <Compile Include="entity\BoltEntityBehaviour.cs" />
     <Compile Include="entity\BoltEntity.cs" />
-    <Compile Include="entity\BoltEntitySerializer.cs" />
     <Compile Include="entity\BoltEntityChannel.cs" />
     <Compile Include="entity\BoltEntityProxy.cs" />
-    <Compile Include="entity\BoltEntitySerializerState.cs" />
     <Compile Include="event\BoltEvent.cs" />
     <Compile Include="event\BoltEventChannel.cs" />
     <Compile Include="event\BoltEventDispatcher.cs" />

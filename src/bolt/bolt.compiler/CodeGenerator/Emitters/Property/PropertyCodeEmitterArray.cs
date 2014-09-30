@@ -20,7 +20,7 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
     }
 
-    public override void EmitShimMembers(CodeTypeDeclaration type) {
+    public override void EmitStructMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, false);
     }
 
@@ -28,7 +28,7 @@ namespace Bolt.Compiler {
       DeclareProperty(type, true);
     }
 
-    public override void EmitStateClassMembers(StateDecorator decorator, CodeTypeDeclaration type) {
+    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       EmitForwardStateMember(decorator, type);
     }
 

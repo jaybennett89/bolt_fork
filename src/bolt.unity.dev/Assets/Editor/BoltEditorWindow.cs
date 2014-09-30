@@ -87,9 +87,9 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);
+    // GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);
 
-    //BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);

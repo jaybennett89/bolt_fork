@@ -28,7 +28,6 @@ namespace Bolt {
     void OnRender();
     void OnInitialized();
     void OnCreated(EntityObject entity);
-    void OnPrepareSend();
 
     void OnSimulateBefore();
     void OnSimulateAfter();
@@ -38,6 +37,7 @@ namespace Bolt {
     BitArray GetDefaultMask();
     BitArray GetFilter(BoltConnection connection, EntityProxy proxy);
 
+    void DebugInfo();
     void InitProxy(EntityProxy p);
 
     int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);

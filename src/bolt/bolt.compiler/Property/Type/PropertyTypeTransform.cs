@@ -17,5 +17,9 @@ namespace Bolt.Compiler {
     public override bool CallbackAllowed {
       get { return false; }
     }
+
+    public override PropertyDecorator CreateDecorator() {
+      return new PropertyDecoratorTransform();
+    }
   }
 }

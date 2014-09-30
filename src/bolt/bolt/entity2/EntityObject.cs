@@ -171,10 +171,6 @@ namespace Bolt {
       Serializer.OnRender();
     }
 
-    internal void PrepareSend() {
-      Serializer.OnPrepareSend();
-    }
-
     internal void Initialize() {
       Assert.True(InstanceId.Value == 0);
 
@@ -307,10 +303,10 @@ namespace Bolt {
     }
 
     internal void Simulate() {
+      Serializer.OnSimulateBefore();
+
       BoltCommand cmd;
       BoltIterator<BoltCommand> itr;
-
-      Serializer.OnSimulateBefore();
 
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {

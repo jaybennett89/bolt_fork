@@ -28,7 +28,6 @@ public class BoltConnection : BoltObject {
 
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
-
   internal SceneLoadState _remoteMapLoadState;
   internal BoltEventChannel _eventChannel;
   internal BoltEntityChannel _entityChannel;
@@ -44,6 +43,7 @@ public class BoltConnection : BoltObject {
   public int id {
     get { return _id; }
   }
+
 
   /// <summary>
   /// The underlying UdpKit connection for this connection

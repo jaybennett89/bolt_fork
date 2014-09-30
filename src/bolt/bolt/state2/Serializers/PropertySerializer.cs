@@ -29,5 +29,13 @@ namespace Bolt {
     public abstract int CalculateBits(byte[] data);
     public abstract void Pack(State.Frame frame, BoltConnection connection, UdpStream stream);
     public abstract void Read(State.Frame frame, BoltConnection connection, UdpStream stream);
+
+    public virtual void OnSimulateBefore(State state) {
+
+    }
+
+    public virtual void OnSimulateAfter(State state) {
+      
+    }
   }
 }

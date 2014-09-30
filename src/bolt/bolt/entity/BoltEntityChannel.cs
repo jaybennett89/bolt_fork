@@ -128,7 +128,6 @@ partial class BoltEntityChannel : BoltChannel {
     }
 
     EntityProxy proxy;
-
     proxy = entity.CreateProxy();
     proxy.NetId = id;
     proxy.Flags = ProxyFlags.CREATE_REQUESTED;
@@ -138,17 +137,18 @@ partial class BoltEntityChannel : BoltChannel {
     _outgoingProxiesByNetId[proxy.NetId] = proxy;
     _outgoingProxiesByInstanceId[entity.InstanceId] = proxy;
 
-    BoltLog.Debug("created {0} on {1}", proxy, connection);
+    BoltLog.Debug("Created {0} on {1}", proxy, connection);
     return true;
   }
 
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incommingProxiesByInstanceId.Values) {
-      // skip ones we are in control of
-      if (proxy.Entity.Flags & EntityFlags.HAS_CONTROL) {
+      // skip ones we are in control of and that are client predicted
+      if (proxy.Entity.HasControl && proxy.Entity.ClientPrediction) {
         continue;
       }
 
+      // simulate this entity
       proxy.Entity.Simulate();
     }
   }

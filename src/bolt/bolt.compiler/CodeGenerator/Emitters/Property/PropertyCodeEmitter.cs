@@ -13,26 +13,18 @@ namespace Bolt.Compiler {
     }
 
     public virtual CodeExpression CreatePropertyArrayInitializerExpression(StateDecoratorProperty p) {
-      return @"new Bolt.PropertySerializerFloat(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6} }})".Expr(
-        p.OffsetBytes, // {0}
-        Decorator.ByteSize, // {1}
-        p.OffsetObjects, // {2}
-        Decorator.Definition.Priority, // {3}
-        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
-        p.CallbackPathsExpression(), // {5}
-        p.CreateIndicesExpr() // {6}
-      );
+      return CreateSerializerExpression("PropertySerializer" + GetType().Name.Replace("PropertyCodeEmitter", "").Trim(), p);
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       EmitSimpleIntefaceMember(type, true, false);
     }
 
-    public virtual void EmitStateClassMembers(StateDecorator decorator, CodeTypeDeclaration type) {
+    public virtual void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       EmitForwardStateMember(decorator, type);
     }
 
-    public virtual void EmitShimMembers(CodeTypeDeclaration type) {
+    public virtual void EmitStructMembers(CodeTypeDeclaration type) {
       throw new NotImplementedException();
     }
 
@@ -68,6 +60,18 @@ namespace Bolt.Compiler {
         ? String.Format("Action<{0}>", ((StateDecorator)Decorator.DefiningAsset).InterfaceName)
         : String.Format("Action<{0}>", Decorator.DefiningAsset.Definition.Name);
       }
+    }
+
+    protected CodeExpression CreateSerializerExpression(string type, StateDecoratorProperty p) {
+      return (@"new Bolt." + type + @"(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6} }})").Expr(
+        p.OffsetBytes, // {0}
+        Decorator.ByteSize, // {1}
+        p.OffsetObjects, // {2}
+        Decorator.Definition.Priority, // {3}
+        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
+        p.CallbackPathsExpression(), // {5}
+        p.CreateIndicesExpr() // {6}
+      );
     }
 
     public static PropertyCodeEmitter Create(PropertyDecorator decorator) {

@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
 using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  public delegate void StateCallback(IState state, string path, int[] indices);
+  public delegate void PropertyCallback(IState state, string path, int[] indices);
 
   public interface IState {
-    void AddCallback(string path, StateCallback callback);
+    void AddCallback(string path, PropertyCallback callback);
   }
 
   public interface IStateModifier : IDisposable {
@@ -22,7 +24,7 @@ namespace Bolt {
   }
 
   internal abstract class State : IState, IEntitySerializer {
-    protected struct StateMetaData {
+    internal struct StateMetaData {
       public TypeId TypeId;
 
       public int FrameSize;
@@ -78,20 +80,20 @@ namespace Bolt {
 
     internal EntityObject Entity;
 
-    protected readonly int PropertyIdBits;
-    protected readonly int PacketMaxPropertiesBits;
-    protected readonly object[] PropertyObjects;
+    internal readonly int PropertyIdBits;
+    internal readonly int PacketMaxPropertiesBits;
+    internal readonly object[] PropertyObjects;
 
-    protected readonly Frame NullFrame;
-    protected readonly Frame DiffFrame;
-    protected readonly Frame SendFrame;
-    protected readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
-    protected readonly Dictionary<string, List<StateCallback>> Callbacks = new Dictionary<string, List<StateCallback>>();
+    internal readonly Frame NullFrame;
+    internal readonly Frame DiffFrame;
+    internal readonly Frame SendFrame;
+    internal readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
+    internal readonly Dictionary<string, List<PropertyCallback>> Callbacks = new Dictionary<string, List<PropertyCallback>>();
 
-    protected readonly BitArray FullMask;
-    protected readonly BitArray DiffMask;
-    protected readonly Priority[] TempPriority;
-    protected readonly StateMetaData MetaData;
+    internal readonly BitArray FullMask;
+    internal readonly BitArray DiffMask;
+    internal readonly Priority[] TempPriority;
+    internal readonly StateMetaData MetaData;
 
     public TypeId TypeId {
       get { return MetaData.TypeId; }
@@ -114,11 +116,15 @@ namespace Bolt {
       PacketMaxPropertiesBits = BoltMath.BitsRequired(MetaData.PacketMaxProperties);
     }
 
-    public void AddCallback(string path, StateCallback callback) {
-      List<StateCallback> callbacksList;
+    public void DebugInfo() {
+      BoltGUI.LabelText("Frame Buffer", Frames.count.ToString());
+    }
+
+    public void AddCallback(string path, PropertyCallback callback) {
+      List<PropertyCallback> callbacksList;
 
       if (Callbacks.TryGetValue(path, out callbacksList) == false) {
-        Callbacks[path] = callbacksList = new List<StateCallback>(32);
+        Callbacks[path] = callbacksList = new List<PropertyCallback>(32);
       }
 
       callbacksList.Add(callback);
@@ -143,10 +149,6 @@ namespace Bolt {
       for (int i = 0; i < p.PropertyPriority.Length; ++i) {
         p.PropertyPriority[i].PropertyIndex = i;
       }
-    }
-
-    public void OnPrepareSend() {
-
     }
 
     public void OnRender() {
@@ -174,43 +176,46 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
-      if (Entity.IsOwner) {
-        return;
+      if (!Entity.IsOwner) {
+        while ((Entity.Frame > Frames.first.Number) && (Frames.count > 1)) {
+          FreeFrame(Frames.RemoveFirst());
+        }
       }
 
-      //BoltLog.Info("frame {0} - {1}", Frames.first.Number, Frames.count);
-
-      while ((Entity.Frame > Frames.first.Number) && (Frames.count > 1)) {
-        FreeFrame(Frames.RemoveFirst());
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnSimulateBefore(this);
       }
     }
 
     public void OnSimulateAfter() {
       //if (Entity.IsOwner) {
-      //Stopwatch sw = Stopwatch.StartNew();
+      Stopwatch sw = Stopwatch.StartNew();
 
       // calculate diff mask
-      BitArray diff = Diff(Frames.first, DiffFrame);
+      var diff = Diff(Frames.first, DiffFrame);
 
-      // combine with existing masks for proxies
-      var it = Entity.Proxies.GetIterator();
+      if (false) {
+        // combine with existing masks for proxies
+        var it = Entity.Proxies.GetIterator();
 
-      while (it.Next()) {
-        it.val.Mask.OrAssign(diff);
-      }
+        while (it.Next()) {
+          it.val.Mask.OrAssign(diff);
+        }
 
-      // raise local changed events
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        if (diff.IsSet(i)) {
-          InvokeCallbacks(MetaData.PropertySerializers[i]);
+        // raise local changed events
+        for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+          if (diff.IsSet(i)) {
+            InvokeCallbacks(MetaData.PropertySerializers[i]);
+          }
         }
       }
 
       // copy data from latest frame to diff buffer
       Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
 
-      //sw.Stop(); 
-      //BoltLog.Info("Elapsed {0}", sw.Elapsed);
+      sw.Stop();
+      BoltLog.Info("Elapsed {0}", sw.Elapsed);
+
       //}
       //else {
       //  // if we have any properties to call events for
@@ -222,11 +227,15 @@ namespace Bolt {
       //    Frames.first.ReadProperties.Clear();
       //  }
       //}
+
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnSimulateAfter(this);
+      }
     }
 
     void InvokeCallbacks(PropertySerializer p) {
       for (int i = 0; i < p.MetaData.CallbackPaths.Length; ++i) {
-        List<StateCallback> callbacksList;
+        List<PropertyCallback> callbacksList;
 
         if (Callbacks.TryGetValue(p.MetaData.CallbackPaths[i], out callbacksList)) {
           for (int n = 0; n < callbacksList.Count; ++n) {
@@ -365,7 +374,6 @@ namespace Bolt {
 
       return CalculateFilter(proxy.Filter);
     }
-
 
     BitArray Diff(Frame a, Frame b) {
       DiffMask.Clear();
