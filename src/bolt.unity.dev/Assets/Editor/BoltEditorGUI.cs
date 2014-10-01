@@ -227,7 +227,7 @@ public static class BoltEditorGUI {
 
   public static void WithLabel(string label, Action gui) {
     GUILayout.BeginHorizontal();
-    EditorGUILayout.LabelField(label, GUILayout.Width(100));
+    EditorGUILayout.LabelField(label, GUILayout.Width(200));
 
     gui();
 
@@ -345,27 +345,83 @@ public static class BoltEditorGUI {
     }
   }
 
+  public static float FloatFieldOverlay(float value, string overlay) {
+    value = EditorGUILayout.FloatField(value);
+
+    GUIStyle s = new GUIStyle("Label");
+    s.alignment = TextAnchor.MiddleRight;
+    s.normal.textColor = Color.gray;
+
+    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
+    return value;
+  }
+
+  public static int IntFieldOverlay(int value, string overlay) {
+    value = EditorGUILayout.IntField(value);
+
+    GUIStyle s = new GUIStyle("Label");
+    s.alignment = TextAnchor.MiddleRight;
+    s.normal.textColor = Color.gray;
+
+    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
+    return value;
+  }
+
+  public static FloatCompression EditFloatCompression(FloatCompression c) {
+    return EditFloatCompression("Range", c);
+  }
+
+  public static FloatCompression EditFloatCompression(string label, FloatCompression c) {
+    if (c == null) {
+      c = FloatCompression.Default();
+    }
+
+    var bits = BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions);
+    var accuracy = (1f / c.Fractions);
+
+    WithLabel(string.Format(label + " (Bits:{0}, Acc:{1})", bits, accuracy), () => { 
+      c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
+      c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
+      c.Fractions = Mathf.Clamp(IntFieldOverlay(c.Fractions, "Fractions"), 1, 10000);
+    });
+
+
+    return c;
+  }
+
+  public static void EditAxes(string label, Axis[] axis) {
+
+    WithLabel(label, () => {
+      EditorGUILayout.BeginVertical();
+
+      for (int i = 0; i < axis.Length; ++i) {
+        EditAxis(axis[i]);
+      }
+
+      EditorGUILayout.EndVertical();
+    });
+
+  }
+
+  public static void EditAxis(Axis axis) {
+    EditorGUILayout.BeginHorizontal();
+
+    axis.Enabled = GUILayout.Toggle(axis.Enabled, " " + axis.Component.ToString(), GUILayout.Width(38));
+
+    EditorGUILayout.BeginVertical();
+    EditorGUI.BeginDisabledGroup(!axis.Enabled);
+    EditFloatCompression(axis.Compression);
+    EditorGUI.EndDisabledGroup();
+    EditorGUILayout.EndVertical();
+
+    EditorGUILayout.EndHorizontal();
+  }
+
   static void MakeClickable(System.Action onClick) {
     Rect r = GUILayoutUtility.GetLastRect();
 
     if (Event.current.type == EventType.MouseDown && r.Contains(Event.current.mousePosition)) {
       onClick();
     }
-  }
-
-  internal static FloatCompression EditFloatCompression(FloatCompression c) {
-    if (c == null) {
-      c = FloatCompression.Default();
-    }
-
-    WithLabel("Min Value", () => { c.MinValue = Mathf.Min(EditorGUILayout.IntField(c.MinValue), c.MaxValue - 1); });
-    WithLabel("Max Value", () => { c.MaxValue = Mathf.Max(EditorGUILayout.IntField(c.MaxValue), c.MinValue + 1); });
-    WithLabel("Fractions", () => { c.Fractions = Mathf.Clamp(EditorGUILayout.IntField(c.Fractions), 1, 10000); });
-    WithLabel("Info", () => {
-      EditorGUILayout.LabelField("Bits: " + BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions).ToString());
-      EditorGUILayout.LabelField("Accuracy: " + (1f / c.Fractions));
-    });
-
-    return c;
   }
 }

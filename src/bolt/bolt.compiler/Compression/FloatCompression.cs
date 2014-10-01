@@ -23,5 +23,13 @@ namespace Bolt.Compiler {
         Fractions = 100
       };
     }
+
+    public static FloatCompression DefaultAngle() {
+      return new FloatCompression {
+        MinValue = 0,
+        MaxValue = 360,
+        Fractions = 100
+      };
+    }
   }
 }

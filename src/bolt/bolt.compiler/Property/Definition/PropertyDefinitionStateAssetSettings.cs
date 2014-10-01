@@ -7,6 +7,9 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyDefinitionStateAssetSettings : PropertyDefinitionAssetSettings {
     [ProtoMember(5)]
-    public StateInterpolationMode InterpMode;
+    public StateEstimationAlgorithm EstimationAlgorithm;
+
+    [ProtoMember(6)]
+    public float DeadReckoningErrorTolerance = 0.1f;
   }
 }

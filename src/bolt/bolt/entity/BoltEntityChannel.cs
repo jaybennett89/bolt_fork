@@ -358,14 +358,6 @@ partial class BoltEntityChannel : BoltChannel {
     packet.stream.WriteNetworkId(proxy.NetId);
 
     if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED) == false) {
-      //packet.stream.WriteBool(proxy.entity._teleportFlip);
-
-      //// info struct
-      //BoltEntityUpdateInfo info = new BoltEntityUpdateInfo();
-      //info.connection = connection;
-      //info.frame = packet.frame;
-      //info.first = packet.stream.WriteBool(proxy.flags & BoltEntityProxy.FLAG_CREATE);
-
       // if the remote is the controller or not
       packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
 

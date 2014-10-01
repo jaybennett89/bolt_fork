@@ -227,6 +227,11 @@ public class BoltEditorWindow : BoltWindow {
 
       EditorGUILayout.BeginVertical();
       EditorGUILayout.LabelField("Settings", BoltEditorGUI.SmallWhiteText);
+
+      if (p.PropertyType.InterpolateAllowed && IsStateOrStruct(def)) {
+        EditStateAssetSettings(p);
+      }
+
       PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
       EditorGUILayout.EndVertical();
 
@@ -234,6 +239,20 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     EditorGUILayout.EndVertical();
+  }
+
+  void EditStateAssetSettings(PropertyDefinition p) {
+    BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+      p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
+
+      if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
+        p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
+      }
+    });
+  }
+
+  bool IsStateOrStruct(AssetDefinition def) {
+    return (def is StateDefinition) || (def is StructDefinition);
   }
 
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {

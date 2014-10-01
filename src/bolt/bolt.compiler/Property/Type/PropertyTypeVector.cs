@@ -27,7 +27,7 @@ namespace Bolt.Compiler {
 
   [ProtoContract]
   public class PropertyTypeVector : PropertyType {
-    [ProtoMember(1)]
+    [ProtoMember(1, OverwriteList = true)]
     public Axis[] Axes = new[] {
       new Axis { Component = VectorComponents.X, Compression = FloatCompression.Default(), Enabled = true },
       new Axis { Component = VectorComponents.Y, Compression = FloatCompression.Default(), Enabled = true },
