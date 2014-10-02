@@ -12,8 +12,24 @@ namespace Bolt.Compiler {
       get { return Decorator.Generator; }
     }
 
-    public virtual CodeExpression CreatePropertyArrayInitializerExpression(StateDecoratorProperty p) {
-      return CreateSerializerExpression("PropertySerializer" + GetType().Name.Replace("PropertyCodeEmitter", "").Trim(), p);
+    public virtual string SerializerClassName {
+      get { return "PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
+    }
+
+    public CodeExpression EmitSerializerCreateExpression(StateDecoratorProperty p) {
+      return (@"new Bolt." + SerializerClassName + @"(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6} }})").Expr(
+        p.OffsetBytes, // {0}
+        Decorator.ByteSize, // {1}
+        p.OffsetObjects, // {2}
+        Decorator.Definition.Priority, // {3}
+        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
+        p.CallbackPathsExpression(), // {5}
+        p.CreateIndicesExpr() // {6}
+      );
+    }
+
+    public virtual CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
+      return null;
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
@@ -60,18 +76,6 @@ namespace Bolt.Compiler {
         ? String.Format("Action<{0}>", ((StateDecorator)Decorator.DefiningAsset).InterfaceName)
         : String.Format("Action<{0}>", Decorator.DefiningAsset.Definition.Name);
       }
-    }
-
-    protected CodeExpression CreateSerializerExpression(string type, StateDecoratorProperty p) {
-      return (@"new Bolt." + type + @"(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6} }})").Expr(
-        p.OffsetBytes, // {0}
-        Decorator.ByteSize, // {1}
-        p.OffsetObjects, // {2}
-        Decorator.Definition.Priority, // {3}
-        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
-        p.CallbackPathsExpression(), // {5}
-        p.CreateIndicesExpr() // {6}
-      );
     }
 
     public static PropertyCodeEmitter Create(PropertyDecorator decorator) {

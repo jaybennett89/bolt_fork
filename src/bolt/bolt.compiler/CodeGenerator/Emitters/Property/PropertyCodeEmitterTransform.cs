@@ -10,6 +10,10 @@ namespace Bolt.Compiler {
 
     }
 
+    public override CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
+      return expression;  
+    }
+
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       type.DeclareProperty("UE.Transform", Decorator.Definition.Name, get => {
         get.Expr("return Frames.first.Objects[{0}] as UE.Transform", Decorator.ObjectOffset);
@@ -30,8 +34,13 @@ namespace Bolt.Compiler {
 
     }
 
-    public override CodeExpression CreatePropertyArrayInitializerExpression(StateDecoratorProperty p) {
-      return base.CreatePropertyArrayInitializerExpression(p);
-    }
+    //internal struct TransformConfiguration {
+    //  public Axis[] PositionAxes;
+    //  public Axis[] RotationAxes;
+    //  public TransformModes TransformMode;
+    //  public TransformSpaces Space;
+    //  public TransformRotationMode RotationMode;
+    //  public FloatCompression QuaternionCompression;
+    //}
   }
 }

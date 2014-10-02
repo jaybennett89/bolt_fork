@@ -7,14 +7,15 @@ namespace Bolt.Compiler {
   public class PropertyDecoratorTransform : PropertyDecorator<PropertyTypeTransform> {
     public override int ByteSize {
       get {
-        if (Definition.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
-          // position + rotation + velocity + acceleration
-          return 12 + 16 + 12 + 4;
-        }
-        else {
-          // position + rotation
-          return 12 + 16;
-        }
+        // position + rotation
+        return 12 + 16;
+
+        //if (Definition.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
+        //  // position + rotation + velocity + acceleration
+        //  return 12 + 16 + 12 + 4;
+        //}
+        //else {
+        //}
       }
     }
 

@@ -149,20 +149,25 @@ namespace Bolt.Compiler {
         // grab property
         var p = Decorator.AllProperties[i];
         var s = Generator.FindStruct(p.Decorator.DefiningAsset.Guid);
+        var emitter = PropertyCodeEmitter.Create(p.Decorator);
 
         p.OffsetBytes = byteOffset;
         p.OffsetObjects = objectOffset;
 
         // emit init expression
         ctor.Statements.Comment(p.CallbackPaths.Join("; "));
-        ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), PropertyCodeEmitter.Create(p.Decorator).CreatePropertyArrayInitializerExpression(p));
+        ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), emitter.EmitSerializerCreateExpression(p));
+
+        //var init = emitter.EmitCustomSerializerInitilization("(({0}) _Meta.PropertySerializers[{1}])".Expr(emitter.SerializerClassName, p.Index));
+        //if (init != null) {
+        //  ctor.Statements.Add(init);
+        //}
 
         // increase byte offset
         byteOffset += p.Decorator.ByteSize;
         objectOffset += p.Decorator.ObjectSize;
       }
     }
-
 
     string[] CalulateInterfaceBaseTypes() {
       if (Decorator.HasParent) {
