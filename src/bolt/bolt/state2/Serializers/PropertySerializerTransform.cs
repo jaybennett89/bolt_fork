@@ -6,9 +6,16 @@ namespace Bolt {
   internal struct TransformConfiguration {
     public Axis[] PositionAxes;
     public Axis[] RotationAxes;
+    public TransformMode TransformMode;
     public TransformSpace Space;
     public TransformRotationMode RotationMode;
     public FloatCompression QuaternionCompression;
+  }
+
+  internal enum TransformMode {
+    None = 0,
+    Interpolate = 1,
+    Extrapolate = 2
   }
 
   internal enum TransformSpace {
@@ -53,31 +60,19 @@ namespace Bolt {
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[MetaData.ObjectOffset];
       if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ClientPrediction)) {
-        var f0 = state.Frames.first;
-        UE.Vector3 p0 = f0.Data.ReadVector3(MetaData.ByteOffset);
-        UE.Quaternion r0 = f0.Data.ReadQuaternion(MetaData.ByteOffset + 12);
 
-        if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
-          //BoltLog.Info("frame: {0}, f0.number={1}", state.Entity.Frame, f0.Number);
+        switch (config.TransformMode) {
+          case TransformMode.None:
+            PerformNone(td, state);
+            break;
 
-          PositionSet(td.Simulate, p0);
-          RotationGet(td.Simulate, r0);
-        }
-        else {
-          var f1 = state.Frames.Next(f0);
-          UE.Vector3 p1 = f1.Data.ReadVector3(MetaData.ByteOffset);
-          UE.Quaternion r1 = f1.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+          case TransformMode.Interpolate:
+            PerformInterpolation(td, state);
+            break;
 
-          Assert.True(f1.Number > f0.Number);
-          Assert.True(f1.Number > state.Entity.Frame);
-
-          float t = f1.Number - f0.Number;
-          float d = state.Entity.Frame - f0.Number;
-
-          //BoltLog.Info("frame: {0}, f0.number={1}, f1.number={2}, d/t={3}", state.Entity.Frame, f0.Number, f1.Number, d / t);
-
-          PositionSet(td.Simulate, UE.Vector3.Lerp(p0, p1, d / t));
-          RotationGet(td.Simulate, UE.Quaternion.Lerp(r0, r1, d / t));
+          case TransformMode.Extrapolate:
+            PerformExtrapolation(td, state);
+            break;
         }
       }
     }
@@ -159,8 +154,50 @@ namespace Bolt {
       if (config.Space == TransformSpace.World) { t.position = pos; } else { t.localPosition = pos; }
     }
 
-    void RotationGet(UE.Transform t, UE.Quaternion rot) {
+    void RotationSet(UE.Transform t, UE.Quaternion rot) {
       if (config.Space == TransformSpace.World) { t.rotation = rot; } else { t.localRotation = rot; }
+    }
+
+    void PerformNone(TransformData td, State state) {
+      var f0 = state.Frames.first;
+      UE.Vector3 p0 = f0.Data.ReadVector3(MetaData.ByteOffset);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+
+      PositionSet(td.Simulate, p0);
+      RotationSet(td.Simulate, r0);
+    }
+
+    void PerformInterpolation(TransformData td, State state) {
+      var f0 = state.Frames.first;
+      UE.Vector3 p0 = f0.Data.ReadVector3(MetaData.ByteOffset);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+
+      if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
+        //BoltLog.Info("frame: {0}, f0.number={1}", state.Entity.Frame, f0.Number);
+
+        PositionSet(td.Simulate, p0);
+        RotationSet(td.Simulate, r0);
+      }
+      else {
+        var f1 = state.Frames.Next(f0);
+        UE.Vector3 p1 = f1.Data.ReadVector3(MetaData.ByteOffset);
+        UE.Quaternion r1 = f1.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+
+        Assert.True(f1.Number > f0.Number);
+        Assert.True(f1.Number > state.Entity.Frame);
+
+        float t = f1.Number - f0.Number;
+        float d = state.Entity.Frame - f0.Number;
+
+        //BoltLog.Info("frame: {0}, f0.number={1}, f1.number={2}, d/t={3}", state.Entity.Frame, f0.Number, f1.Number, d / t);
+
+        PositionSet(td.Simulate, UE.Vector3.Lerp(p0, p1, d / t));
+        RotationSet(td.Simulate, UE.Quaternion.Lerp(r0, r1, d / t));
+      }
+    }
+
+    void PerformExtrapolation(TransformData td, State state) {
+
     }
   }
 }
