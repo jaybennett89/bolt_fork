@@ -30,7 +30,15 @@ namespace Bolt {
     public abstract void Pack(State.Frame frame, BoltConnection connection, UdpStream stream);
     public abstract void Read(State.Frame frame, BoltConnection connection, UdpStream stream);
 
+    public virtual void OnInit(State state) {
+
+    }
+
     public virtual void OnSimulateBefore(State state) {
+
+    }
+
+    public virtual void OnRender(State state, State.Frame frame) {
 
     }
 

@@ -7,12 +7,22 @@ using Bolt.Compiler;
 using System.Collections.Generic;
 
 public static class BoltEditorGUI {
+  public static string Tooltip = "";
+
   public static readonly Color Blue = new Color(0 / 255f, 162f / 255f, 232f / 255f);
   public static readonly Color LightBlue = new Color(0f / 255f, 232f / 255f, 226f / 255f);
   public static readonly Color Orange = new Color(255f / 255f, 127f / 255f, 39f / 255f);
   public static readonly Color LightGreen = new Color(105f / 255f, 251f / 255f, 9f / 255f);
   public static readonly Color DarkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color LightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
+
+  public static void SetTooltip(string tooltip) {
+    Rect r = GUILayoutUtility.GetLastRect();
+
+    if (r.Contains(Event.current.mousePosition)) {
+      Tooltip = tooltip;
+    }
+  }
 
   public static GUIStyle ImageButtonStyle {
     get {
@@ -82,6 +92,12 @@ public static class BoltEditorGUI {
       s.normal.textColor = Color.white;
       return s;
     }
+  }
+
+  public static void Disabled(Action gui) {
+    EditorGUI.BeginDisabledGroup(true);
+    gui();
+    EditorGUI.EndDisabledGroup();
   }
 
   public static GUIStyle PropertiesAddTextStyle {
@@ -345,8 +361,8 @@ public static class BoltEditorGUI {
     }
   }
 
-  public static float FloatFieldOverlay(float value, string overlay) {
-    value = EditorGUILayout.FloatField(value);
+  public static float FloatFieldOverlay(float value, string overlay, params GUILayoutOption[] options) {
+    value = EditorGUILayout.FloatField(value, options);
 
     GUIStyle s = new GUIStyle("Label");
     s.alignment = TextAnchor.MiddleRight;
@@ -356,8 +372,8 @@ public static class BoltEditorGUI {
     return value;
   }
 
-  public static int IntFieldOverlay(int value, string overlay) {
-    value = EditorGUILayout.IntField(value);
+  public static int IntFieldOverlay(int value, string overlay, params GUILayoutOption[] options) {
+    value = EditorGUILayout.IntField(value, options);
 
     GUIStyle s = new GUIStyle("Label");
     s.alignment = TextAnchor.MiddleRight;

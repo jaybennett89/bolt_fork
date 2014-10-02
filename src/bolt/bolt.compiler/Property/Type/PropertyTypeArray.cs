@@ -17,7 +17,12 @@ namespace Bolt.Compiler {
       get {
         yield return typeof(PropertyTypeFloat);
         yield return typeof(PropertyTypeStruct);
+        yield return typeof(PropertyTypeTransform);
       }
+    }
+
+    public override bool HasPriority {
+      get { return ElementType != null && ElementType.GetType() != typeof(PropertyTypeStruct); }
     }
 
     public override bool IsValue {

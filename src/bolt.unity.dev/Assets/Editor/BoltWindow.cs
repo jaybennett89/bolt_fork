@@ -59,6 +59,8 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void OnGUI() {
+    BoltEditorGUI.Tooltip = "";
+
     LoadProject();
 
     if (Event.current.type == EventType.Repaint) {

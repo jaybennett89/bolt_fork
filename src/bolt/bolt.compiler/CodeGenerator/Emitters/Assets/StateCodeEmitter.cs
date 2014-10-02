@@ -159,7 +159,7 @@ namespace Bolt.Compiler {
 
         // increase byte offset
         byteOffset += p.Decorator.ByteSize;
-        objectOffset += p.Decorator.ObjectOffset;
+        objectOffset += p.Decorator.ObjectSize;
       }
     }
 

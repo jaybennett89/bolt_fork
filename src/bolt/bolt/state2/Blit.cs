@@ -107,6 +107,31 @@ namespace Bolt {
       return new UE.Vector3(x.Float32, y.Float32, z.Float32);
     }
 
+    public static void PackVector3(this byte[] data, int offset, UE.Vector3 value) {
+      BitUnion x = default(BitUnion);
+      BitUnion y = default(BitUnion);
+      BitUnion z = default(BitUnion);
+
+      x.Float32 = value.x;
+      y.Float32 = value.y;
+      z.Float32 = value.z;
+
+      data[offset + 0] = x.Byte0;
+      data[offset + 1] = x.Byte1;
+      data[offset + 2] = x.Byte2;
+      data[offset + 3] = x.Byte3;
+
+      data[offset + 4] = y.Byte0;
+      data[offset + 5] = y.Byte1;
+      data[offset + 6] = y.Byte2;
+      data[offset + 7] = y.Byte3;
+
+      data[offset + 8] = z.Byte0;
+      data[offset + 9] = z.Byte1;
+      data[offset + 10] = z.Byte2;
+      data[offset + 11] = z.Byte3;
+    }
+
     public static UE.Quaternion ReadQuaternion(this byte[] data, int offset) {
       BitUnion x = default(BitUnion);
       x.Byte0 = data[offset + 0];
@@ -133,6 +158,38 @@ namespace Bolt {
       w.Byte3 = data[offset + 15];
 
       return new UE.Quaternion(x.Float32, y.Float32, z.Float32, w.Float32);
+    }
+
+    public static void PackQuaternion(this byte[] data, int offset, UE.Quaternion value) {
+      BitUnion x = default(BitUnion);
+      BitUnion y = default(BitUnion);
+      BitUnion z = default(BitUnion);
+      BitUnion w = default(BitUnion);
+
+      x.Float32 = value.x;
+      y.Float32 = value.y;
+      z.Float32 = value.z;
+      w.Float32 = value.w;
+
+      data[offset + 0] = x.Byte0;
+      data[offset + 1] = x.Byte1;
+      data[offset + 2] = x.Byte2;
+      data[offset + 3] = x.Byte3;
+
+      data[offset + 4] = y.Byte0;
+      data[offset + 5] = y.Byte1;
+      data[offset + 6] = y.Byte2;
+      data[offset + 7] = y.Byte3;
+
+      data[offset + 8] = z.Byte0;
+      data[offset + 9] = z.Byte1;
+      data[offset + 10] = z.Byte2;
+      data[offset + 11] = z.Byte3;
+
+      data[offset + 12] = w.Byte0;
+      data[offset + 13] = w.Byte1;
+      data[offset + 14] = w.Byte2;
+      data[offset + 15] = w.Byte3;
     }
 
     public static void PackBytes(byte[] data, int offset, byte[] bytes) {

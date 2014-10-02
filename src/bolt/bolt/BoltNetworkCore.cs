@@ -128,6 +128,10 @@ internal static class BoltCore {
     get { return Time.fixedDeltaTime; }
   }
 
+  public static float frameAlpha {
+    get { return Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime); }
+  }
+
   public static bool isClient {
     get { return hasSocket && _mode == BoltNetworkModes.Client; }
   }

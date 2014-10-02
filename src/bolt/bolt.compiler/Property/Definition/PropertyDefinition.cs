@@ -13,6 +13,9 @@ namespace Bolt.Compiler {
     public bool Deleted;
 
     [ProtoIgnore]
+    public bool IsArrayElement;
+
+    [ProtoIgnore]
     public Project Context;
 
     [ProtoMember(1)]
@@ -34,7 +37,7 @@ namespace Bolt.Compiler {
     public string Comment;
 
     [ProtoMember(9)]
-    public float Priority;
+    public int Priority;
 
     [ProtoMember(2)]
     public PropertyType PropertyType;

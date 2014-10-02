@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
+
   [ProtoContract]
   public class PropertyTypeTransformDeadReckoningSettings {
     [ProtoMember(1)]

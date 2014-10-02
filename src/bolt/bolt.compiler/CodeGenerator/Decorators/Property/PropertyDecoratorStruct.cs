@@ -41,7 +41,6 @@ namespace Bolt.Compiler {
       p.Filters = p.Filters & Definition.Filters;
       p.Controller = p.Controller && Definition.Controller;
       p.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name);
-
       Struct.FindAllProperties(all, p);
     }
   }

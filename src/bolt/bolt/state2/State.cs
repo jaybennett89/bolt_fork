@@ -145,25 +145,20 @@ namespace Bolt {
     public void InitProxy(EntityProxy p) {
       p.PropertyPriority = new Priority[MetaData.PropertyCount];
 
-      // store indexes
       for (int i = 0; i < p.PropertyPriority.Length; ++i) {
         p.PropertyPriority[i].PropertyIndex = i;
       }
     }
 
     public void OnRender() {
-
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnRender(this, this.Frames.first);
+      }
     }
 
     public void OnInitialized() {
-      if (Entity.UnityObject._objects != null) {
-        if (Entity.UnityObject._objects.Length != MetaData.ObjectCount) {
-          BoltLog.Warn("Object count on the unity object ({0}) did not match meta data count ({1})", Entity.UnityObject._objects.Length, MetaData.ObjectCount);
-        }
-
-        for (int i = 0; i < UE.Mathf.Min(MetaData.ObjectCount, Entity.UnityObject._objects.Length); ++i) {
-          PropertyObjects[i] = Entity.UnityObject._objects[i];
-        }
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnInit(this);
       }
 
       if (Entity.IsOwner) {

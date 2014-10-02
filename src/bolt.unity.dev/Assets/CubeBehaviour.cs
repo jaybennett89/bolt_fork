@@ -7,9 +7,8 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   }
 
   public override void SimulateOwner() {
-
-    transform.position = (Quaternion.Euler(0, Time.time * 20f, 0) * (Vector3.forward * 10f));
-
+    transform.position = new Vector3(Mathf.PingPong(Time.time * 2.5f, 10f) - 5f, 0, 0);
+    //transform.position = (Quaternion.Euler(0, Time.time * 20f, 0) * (Vector3.forward * 10f));
   }
 
   void TransformChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {

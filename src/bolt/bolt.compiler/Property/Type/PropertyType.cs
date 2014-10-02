@@ -21,6 +21,9 @@ namespace Bolt.Compiler {
     public virtual bool IsValue { get { return true; } }
 
     [ProtoIgnore]
+    public virtual bool HasPriority { get { return true; } }
+
+    [ProtoIgnore]
     public virtual bool CallbackAllowed { get { return true; } }
 
     [ProtoIgnore]

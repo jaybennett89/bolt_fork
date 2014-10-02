@@ -49,7 +49,7 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginHorizontal(BoltEditorGUI.WhiteTextureBackgroundStyle);
     GUI.color = Color.white;
 
-    GUILayout.Label(GUI.tooltip);
+    GUILayout.Label(BoltEditorGUI.Tooltip ?? "");
 
     GUILayout.EndHorizontal();
   }
@@ -199,21 +199,37 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUILayout.BeginHorizontal();
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      if (BoltEditorGUI.IconButton("boltico_x".ToContent("Delete this property"))) {
+      if (BoltEditorGUI.IconButton("boltico_x".ToContent())) {
         p.Deleted = true;
       }
     }
     else {
-      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent("Collapse this property"), "boltico_arrow_right".ToContent("Expand this property"), p.Expanded)) {
+      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded)) {
         p.Expanded = !p.Expanded;
       }
     }
 
+    // edit priority
+    if (p.PropertyType.HasPriority) {
+      int priorityIndex;
+      priorityIndex = Mathf.Max(Array.IndexOf(PrimeList.Below1000, p.Priority), 0);
+      priorityIndex = EditorGUILayout.Popup(priorityIndex, PrimeList.Below1000Names, GUILayout.Width(45));
+      p.Priority = PrimeList.Below1000[priorityIndex];
+      BoltEditorGUI.SetTooltip("Property Priority. Has to be a prime number below 1000, a higher value means the property is more likely to be sent.");
+    }
+    else {
+      BoltEditorGUI.Disabled(() => {
+        EditorGUILayout.Popup(0, new string[] { "-" }, GUILayout.Width(45));
+      });
+    }
+
     // edit name
     p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
+    BoltEditorGUI.SetTooltip("Property Name. Has to be a valid C# property name.");
 
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
+    BoltEditorGUI.SetTooltip("Property Type.");
 
     if (toolbar != null) {
       toolbar(def, p);

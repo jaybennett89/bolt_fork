@@ -71,7 +71,10 @@
     <Compile Include="entity2\EntityBehaviour.cs" />
     <Compile Include="entity2\EntityObject.cs" />
     <Compile Include="entity2\EntityInterfaces.cs" />
+    <Compile Include="state2\Arrays\FloatArray.cs" />
+    <Compile Include="state2\Arrays\TransformArray.cs" />
     <Compile Include="state2\BitArray.cs" />
+    <Compile Include="state2\DoubleBuffer.cs" />
     <Compile Include="state2\Filter.cs" />
     <Compile Include="state2\Priority.cs" />
     <Compile Include="state2\Serializers\PropertySerializer.cs" />

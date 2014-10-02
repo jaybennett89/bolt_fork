@@ -49,7 +49,10 @@ namespace Bolt.Compiler {
       p.Index = all.Count;
       p.Filters = Definition.Filters & p.Filters;
       p.Controller = Definition.Controller && p.Controller;
-      p.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name);
+
+      if (!Definition.IsArrayElement) {
+        p.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name);
+      }
 
       all.Add(p);
     }
