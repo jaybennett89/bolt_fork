@@ -375,8 +375,9 @@ public static class BoltEditorGUI {
   public static int IntFieldOverlay(int value, string overlay, params GUILayoutOption[] options) {
     value = EditorGUILayout.IntField(value, options);
 
-    GUIStyle s = new GUIStyle("Label");
+    GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
     s.alignment = TextAnchor.MiddleRight;
+    s.contentOffset = new Vector2(-2, 0);
     s.normal.textColor = Color.gray;
 
     GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);

@@ -13,6 +13,10 @@ namespace Bolt {
     public int Priority;
     public int ObjectOffset;
 
+    public bool Mecanim;
+    public float MecanimDamping;
+
+    public String PropertyName;
     public String PropertyPath;
     public String[] CallbackPaths;
     public Int32[] CallbackIndices;
