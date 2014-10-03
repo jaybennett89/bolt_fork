@@ -41,6 +41,7 @@ namespace Bolt {
 
     public class Frame : IBoltListNode {
       public int Number;
+      public State State;
       public object[] Objects;
       public readonly byte[] Data;
       public readonly List<int> ReadProperties;
@@ -56,6 +57,7 @@ namespace Bolt {
 
         f = new Frame(frameNumber, Data.Length);
         f.Objects = Objects;
+        f.State = State;
 
         Array.Copy(Data, 0, f.Data, 0, Data.Length);
 
@@ -157,12 +159,12 @@ namespace Bolt {
     }
 
     public void OnInitialized() {
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        MetaData.PropertySerializers[i].OnInit(this);
-      }
-
       if (Entity.IsOwner) {
         Frames.AddLast(AllocFrame(BoltCore.frame));
+      }
+
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnInit(this);
       }
     }
 
@@ -171,7 +173,10 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
-      if (!Entity.IsOwner) {
+      if (Entity.IsOwner) {
+        Frames.first.Number = BoltCore.frame;
+      }
+      else {
         while ((Frames.count > 1) && (Entity.Frame >= Frames.Next(Frames.first).Number)) {
           FreeFrame(Frames.RemoveFirst());
         }
@@ -183,8 +188,10 @@ namespace Bolt {
     }
 
     public void OnSimulateAfter() {
-      //if (Entity.IsOwner) {
-      //Stopwatch sw = Stopwatch.StartNew();
+      // invoke simulate after on properties
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnSimulateAfter(this);
+      }
 
       // calculate diff mask
       var diff = Diff(Frames.first, DiffFrame);
@@ -205,28 +212,11 @@ namespace Bolt {
 
       // copy data from latest frame to diff buffer
       Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
-
-      //sw.Stop();
-      //BoltLog.Info("Elapsed {0}", sw.Elapsed);
-
-      //}
-      //else {
-      //  // if we have any properties to call events for
-      //  if (Frames.first.ReadProperties.Count > 0) {
-      //    for (int i = 0; i < Frames.first.ReadProperties.Count; ++i) {
-      //      //GetPropertySerializersArray()[Frames.first.ReadProperties[i]].Changed(this);
-      //    }
-
-      //    Frames.first.ReadProperties.Clear();
-      //  }
-      //}
-
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        MetaData.PropertySerializers[i].OnSimulateAfter(this);
-      }
     }
 
     void InvokeCallbacks(PropertySerializer p) {
+      p.OnChanged(this, Frames.first);
+
       for (int i = 0; i < p.MetaData.CallbackPaths.Length; ++i) {
         List<PropertyCallback> callbacksList;
 
@@ -247,7 +237,7 @@ namespace Bolt {
       Priority[] proxyPriority = env.Proxy.PropertyPriority;
 
       for (int i = 0; i < proxyPriority.Length; ++i) {
-        Assert.True(proxyPriority[i].PropertyIndex == i, "{0} == {1}", proxyPriority[i].PropertyIndex, i);
+        Assert.True(proxyPriority[i].PropertyIndex == i);
 
         // if this property is set both in our filter and the proxy mask we can consider it for sending
         if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
@@ -310,7 +300,7 @@ namespace Bolt {
           break;
         }
 
-        int b = PropertyIdBits + s.CalculateBits(Frames.first.Data);
+        int b = PropertyIdBits + s.CalculateBits(this, Frames.first);
         int ptr = stream.Ptr;
 
         if (bits >= b) {
@@ -318,7 +308,7 @@ namespace Bolt {
           stream.WriteInt(p.PropertyIndex, PropertyIdBits);
 
           // write data into stream
-          s.Pack(Frames.first, connection, stream);
+          s.Pack(this, Frames.first, connection, stream);
 
           // use up bits
           bits -= b;
@@ -343,7 +333,13 @@ namespace Bolt {
         frame = AllocFrame(frameNumber);
       }
       else {
-        frame = Frames.last.Duplicate(frameNumber);
+        if (Entity.HasControl && Entity.ControllerLocalPrediction) {
+          frame = Frames.first;
+          frame.Number = BoltCore.frame;
+        }
+        else {
+          frame = Frames.last.Duplicate(frameNumber);
+        }
       }
 
       while (--count >= 0) {
@@ -351,7 +347,7 @@ namespace Bolt {
         var serializer = MetaData.PropertySerializers[property];
 
         // read data into frame
-        serializer.Read(frame, connection, stream);
+        serializer.Read(this, frame, connection, stream);
 
         // put property index into updated list
         frame.ReadProperties.Add(property);
@@ -389,6 +385,7 @@ namespace Bolt {
 
       f = new Frame(number, MetaData.FrameSize);
       f.Objects = PropertyObjects;
+      f.State = this;
 
       return f;
     }

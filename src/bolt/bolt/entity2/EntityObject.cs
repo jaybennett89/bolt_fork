@@ -27,23 +27,12 @@ namespace Bolt {
     internal IEntityBehaviour[] Behaviours;
 
     internal int UpdateRate;
-    internal bool ClientPrediction;
+    internal bool ControllerLocalPrediction;
     internal ushort CommandSequence = 0;
 
     internal BoltEventDispatcher EventDispatcher = new BoltEventDispatcher();
     internal BoltDoubleList<BoltCommand> CommandQueue = new BoltDoubleList<BoltCommand>();
     internal BoltDoubleList<EntityProxy> Proxies = new BoltDoubleList<EntityProxy>();
-
-    internal int SendRate {
-      get {
-        if (IsOwner) {
-          return UpdateRate * BoltCore.localSendRate;
-        }
-        else {
-          return UpdateRate * BoltCore.remoteSendRate;
-        }
-      }
-    }
 
     internal int Frame {
       get {
@@ -51,8 +40,8 @@ namespace Bolt {
           return BoltCore.frame;
         }
 
-        if (HasControl && ClientPrediction) {
-          return Source.remoteFrameLatest;
+        if (HasControl && ControllerLocalPrediction) {
+          return BoltCore.frame;
         }
 
         return Source.remoteFrame;
@@ -408,7 +397,7 @@ namespace Bolt {
       eo = new EntityObject();
       eo.PrefabId = new PrefabId(entity._prefabId);
       eo.UpdateRate = entity._updateRate;
-      eo.ClientPrediction = entity._clientPredicted;
+      eo.ControllerLocalPrediction = entity._clientPredicted;
       eo.Flags = entity._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
       // create serializer

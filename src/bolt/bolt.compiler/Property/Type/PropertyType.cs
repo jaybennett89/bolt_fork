@@ -29,6 +29,9 @@ namespace Bolt.Compiler {
     [ProtoIgnore]
     public virtual bool InterpolateAllowed { get { return false; } }
 
+    [ProtoIgnore]
+    public virtual bool HasSettings { get { return true; } }
+
     public virtual PropertyDecorator CreateDecorator() {
       throw new NotImplementedException();
     }

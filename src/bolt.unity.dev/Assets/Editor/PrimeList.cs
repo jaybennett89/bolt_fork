@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 
 static class PrimeList {
-  public static readonly int[] Below1000;
-  public static readonly string[] Below1000Names;
+  public static readonly int[] Below1000Except2;
+  public static readonly string[] Below1000Except2Names;
 
   static PrimeList() {
-    Below1000 = new int[] {
-          2,      3,      5,      7,     11,     13,     17,     19,     23,     29, 
+    Below1000Except2 = new int[] {
+          3,      5,      7,     11,     13,     17,     19,     23,     29, 
          31,     37,     41,     43,     47,     53,     59,     61,     67,     71, 
          73,     79,     83,     89,     97,    101,    103,    107,    109,    113, 
         127,    131,    137,    139,    149,    151,    157,    163,    167,    173, 
@@ -28,7 +28,7 @@ static class PrimeList {
         947,    953,    967,    971,    977,    983,    991,    997, 
     };
 
-    Below1000Names = Below1000.Select(x => x.ToString()).ToArray();
+    Below1000Except2Names = Below1000Except2.Select(x => x.ToString()).ToArray();
   }
 }
 

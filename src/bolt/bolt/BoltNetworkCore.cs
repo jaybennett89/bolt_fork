@@ -627,7 +627,7 @@ internal static class BoltCore {
       var iter = _entities.GetIterator();
 
       while (iter.Next()) {
-        if (iter.val.IsOwner || (iter.val.HasControl && iter.val.ClientPrediction)) {
+        if (iter.val.IsOwner || (iter.val.HasControl && iter.val.ControllerLocalPrediction)) {
           iter.val.Simulate();
         }
       }

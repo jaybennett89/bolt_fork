@@ -4,11 +4,20 @@ using System.Collections;
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
     state.Transform = transform;
+    state.Attack += Attack;
   }
 
   public override void SimulateOwner() {
     transform.position = new Vector3(Mathf.PingPong(Time.time * 2.5f, 10f) - 5f, 0, 0);
     //transform.position = (Quaternion.Euler(0, Time.time * 20f, 0) * (Vector3.forward * 10f));
+
+    if ((BoltNetwork.frame % 60) == 0) {
+      state.Modify().Attack();
+    }
+  }
+
+  void Attack() {
+    BoltLog.Info("ATTACK TRIGGERED");
   }
 
   void TransformChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {

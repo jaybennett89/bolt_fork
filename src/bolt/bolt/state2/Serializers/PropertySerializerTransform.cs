@@ -34,14 +34,14 @@ namespace Bolt {
     internal DoubleBuffer<UE.Vector3> RenderDoubleBuffer;
   }
 
-  internal class PropertySerializerTransform : PropertySerializer {
+  class PropertySerializerTransform : PropertySerializer {
     //internal TransformConfiguration Config;
 
     public PropertySerializerTransform(PropertyMetaData info)
       : base(info) {
     }
 
-    public override int CalculateBits(byte[] data) {
+    public override int CalculateBits(State state, State.Frame frame) {
       return (12 + 16) * 4;
     }
 
@@ -58,7 +58,7 @@ namespace Bolt {
 
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[MetaData.ObjectOffset];
-      if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ClientPrediction)) {
+      if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ControllerLocalPrediction)) {
         PerformInterpolation(td, state);
 
         //switch (Config.TransformMode) {
@@ -90,7 +90,7 @@ namespace Bolt {
       }
     }
 
-    public override void Pack(State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+    public override void Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       UE.Vector3 p = frame.Data.ReadVector3(MetaData.ByteOffset);
       UE.Quaternion r = frame.Data.ReadQuaternion(MetaData.ByteOffset + 12);
 
@@ -126,7 +126,7 @@ namespace Bolt {
       //}
     }
 
-    public override void Read(State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+    public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       UE.Vector3 p = new UE.Vector3();
       UE.Quaternion r = new UE.Quaternion();
 

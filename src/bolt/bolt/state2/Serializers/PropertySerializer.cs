@@ -6,7 +6,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  internal struct PropertyMetaData {
+  struct PropertyMetaData {
     public int ByteOffset;
     public int ByteLength;
 
@@ -18,7 +18,7 @@ namespace Bolt {
     public Int32[] CallbackIndices;
   }
 
-  internal abstract class PropertySerializer {
+  abstract class PropertySerializer {
     public readonly PropertyMetaData MetaData;
 
     protected PropertySerializer(PropertyMetaData md) {
@@ -26,13 +26,14 @@ namespace Bolt {
       MetaData.Priority = UE.Mathf.Max(1, MetaData.Priority);
     }
 
-    public abstract int CalculateBits(byte[] data);
-    public abstract void Pack(State.Frame frame, BoltConnection connection, UdpStream stream);
-    public abstract void Read(State.Frame frame, BoltConnection connection, UdpStream stream);
+    public abstract int CalculateBits(State state, State.Frame frame);
+    public abstract void Pack(State state, State.Frame frame, BoltConnection connection, UdpStream stream);
+    public abstract void Read(State state, State.Frame frame, BoltConnection connection, UdpStream stream);
 
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }
     public virtual void OnSimulateAfter(State state) { }
     public virtual void OnRender(State state, State.Frame frame) { }
+    public virtual void OnChanged(State state, State.Frame frame) { }
   }
 }

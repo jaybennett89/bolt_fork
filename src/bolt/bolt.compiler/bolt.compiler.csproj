@@ -57,6 +57,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorFloat.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorStruct.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTransform.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTrigger.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterString.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTrigger.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="NamedAsset.cs" />
     <Compile Include="Project.cs" />

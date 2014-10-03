@@ -253,11 +253,13 @@ namespace Bolt.Compiler {
       for (int i = 0; i < Structs.Count; ++i) {
         StructDecorator decorator = Structs[i];
         // properties are sorted in this order:
-        // 1. Value Properties
-        // 2. Sub-Structs
-        // 3. Sub-Arrays
+        // - Values
+        // - Triggers
+        // - Structs
+        // - Arrays
         decorator.Properties =
           decorator.Properties.Where(x => x.Definition.PropertyType.IsValue)
+            .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeTrigger))
             .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeStruct))
             .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeArray))
             .ToList();

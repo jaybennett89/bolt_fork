@@ -204,7 +204,7 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
     else {
-      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded)) {
+      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded && p.PropertyType.HasSettings)) {
         p.Expanded = !p.Expanded;
       }
     }
@@ -212,10 +212,10 @@ public class BoltEditorWindow : BoltWindow {
     // edit priority
     if (p.PropertyType.HasPriority) {
       int priorityIndex;
-      priorityIndex = Mathf.Max(Array.IndexOf(PrimeList.Below1000, p.Priority), 0);
-      priorityIndex = EditorGUILayout.Popup(priorityIndex, PrimeList.Below1000Names, GUILayout.Width(45));
-      p.Priority = PrimeList.Below1000[priorityIndex];
-      BoltEditorGUI.SetTooltip("Property Priority. Has to be a prime number below 1000, a higher value means the property is more likely to be sent.");
+      priorityIndex = Mathf.Max(Array.IndexOf(PrimeList.Below1000Except2, p.Priority), 0);
+      priorityIndex = EditorGUILayout.Popup(priorityIndex, PrimeList.Below1000Except2Names, GUILayout.Width(45));
+      p.Priority = PrimeList.Below1000Except2[priorityIndex];
+      BoltEditorGUI.SetTooltip("Property Priority. Has to be a prime number below 1000 other than 2, a higher value means the property is more likely to be sent.");
     }
     else {
       BoltEditorGUI.Disabled(() => {
@@ -237,14 +237,14 @@ public class BoltEditorWindow : BoltWindow {
 
     EditorGUILayout.EndHorizontal();
 
-    if (p.Expanded) {
+    if (p.Expanded && p.PropertyType.HasSettings) {
       EditorGUILayout.BeginHorizontal();
       GUILayout.Space(20);
 
       EditorGUILayout.BeginVertical();
       EditorGUILayout.LabelField("Settings", BoltEditorGUI.SmallWhiteText);
 
-      if (p.PropertyType.InterpolateAllowed && IsStateOrStruct(def)) {
+      if (IsStateOrStruct(def)) {
         EditStateAssetSettings(p);
       }
 
@@ -258,13 +258,15 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStateAssetSettings(PropertyDefinition p) {
-    BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-      p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
+    if (p.PropertyType.InterpolateAllowed) {
+      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+        p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
 
-      if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
-        p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
-      }
-    });
+        if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
+          p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
+        }
+      });
+    }
   }
 
   bool IsStateOrStruct(AssetDefinition def) {

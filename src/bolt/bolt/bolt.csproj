@@ -83,6 +83,8 @@
     <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state2\Serializers\PropertySerializerString.cs" />
     <Compile Include="state2\Serializers\PropertySerializerTransform.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerTrigger.cs" />
+    <Compile Include="state2\Trigger.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

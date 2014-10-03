@@ -144,7 +144,7 @@ partial class BoltEntityChannel : BoltChannel {
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incommingProxiesByInstanceId.Values) {
       // skip ones we are in control of and that are client predicted
-      if (proxy.Entity.HasControl && proxy.Entity.ClientPrediction) {
+      if (proxy.Entity.HasControl && proxy.Entity.ControllerLocalPrediction) {
         continue;
       }
 
@@ -452,6 +452,11 @@ partial class BoltEntityChannel : BoltChannel {
         entity = BoltCore.CreateEntity(prefab, serializerId);
         entity.Source = connection;
 
+        // handle case where we are given control (it needs to be true during the initialize, read and attached callbacks)
+        if (isController) {
+          entity.Flags |= EntityFlags.HAS_CONTROL;
+        }
+
         // initialize entity
         entity.Initialize();
 
@@ -463,11 +468,6 @@ partial class BoltEntityChannel : BoltChannel {
         // register proxy
         _incommingProxiesByNetId.Add(netId, proxy);
         _incommingProxiesByInstanceId.Add(proxy.Entity.InstanceId, proxy);
-
-        // handle case where we are given control (it needs to be true during the read and attached callbacks)
-        if (isController) {
-          entity.Flags |= EntityFlags.HAS_CONTROL;
-        }
 
         // read packet
         entity.Serializer.Read(connection, packet.stream, packet.frame);

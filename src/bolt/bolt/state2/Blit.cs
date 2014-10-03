@@ -192,6 +192,35 @@ namespace Bolt {
       data[offset + 15] = w.Byte3;
     }
 
+    public static void SetTrigger(this byte[] bytes, int frameNew, int offset, bool set) {
+      int frame = bytes.ReadI32(offset);
+      int bits = bytes.ReadI32(offset + 4);
+
+      UpdateTrigger(ref frame, ref bits, frameNew, set);
+
+      bytes.PackI32(offset, frame);
+      bytes.PackI32(offset + 4, bits);
+    }
+
+
+    static void UpdateTrigger(ref int frameOld, ref int bits, int frameNew, bool newTrigger) {
+      if (frameOld != frameNew) {
+        Assert.True(frameNew > frameOld);
+
+        int diff = frameNew - frameOld;
+
+        // update bits
+        bits = diff < 32 ? bits << diff : 0;
+
+        // flag current frame
+        if (newTrigger) {
+          bits |= 1;
+        }
+
+        frameOld = frameNew;
+      }
+    }
+
     public static void PackBytes(byte[] data, int offset, byte[] bytes) {
       Array.Copy(bytes, 0, data, offset, bytes.Length);
     }

@@ -5,16 +5,6 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-
-  [ProtoContract]
-  public class PropertyTypeTransformDeadReckoningSettings {
-    [ProtoMember(1)]
-    public bool InferVelocity;
-
-    [ProtoMember(2)]
-    public bool InferAcceleration;
-  }
-
   [ProtoContract]
   public class PropertyTypeTransform : PropertyType {
     [ProtoMember(1)]
