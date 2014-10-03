@@ -442,6 +442,9 @@ public static class UdpStreamExtensions {
   }
 
   public static void WriteNetworkId(this UdpStream stream, NetId id) {
+    Assert.True(id.Value >= 0);
+    Assert.True(id.Value < EntityProxy.MAX_COUNT);
+
     stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
   }
 

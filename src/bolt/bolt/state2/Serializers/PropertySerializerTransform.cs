@@ -90,7 +90,7 @@ namespace Bolt {
       }
     }
 
-    public override void Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       UE.Vector3 p = frame.Data.ReadVector3(MetaData.ByteOffset);
       UE.Quaternion r = frame.Data.ReadQuaternion(MetaData.ByteOffset + 12);
 
@@ -102,6 +102,8 @@ namespace Bolt {
       stream.WriteFloat(r.y);
       stream.WriteFloat(r.z);
       stream.WriteFloat(r.w);
+
+      return true;
 
       //if (Config.PositionAxes[Axis.X].Enabled) Config.PositionAxes[Axis.X].Compression.Pack(stream, p.x);
       //if (Config.PositionAxes[Axis.Y].Enabled) Config.PositionAxes[Axis.Y].Compression.Pack(stream, p.y);

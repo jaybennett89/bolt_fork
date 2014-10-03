@@ -1,5 +1,6 @@
 ﻿using Bolt;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -313,13 +314,13 @@ partial class BoltEntityChannel : BoltChannel {
   }
 
   public override void Disconnected() {
-    foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values) {
+    foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values.ToArray()) {
       if (proxy) {
         DestroyOutgoingProxy(proxy);
       }
     }
 
-    foreach (EntityProxy proxy in _incommingProxiesByNetId.Values) {
+    foreach (EntityProxy proxy in _incommingProxiesByNetId.Values.ToArray()) {
       if (proxy) {
         DestroyIncommingProxy(proxy);
       }

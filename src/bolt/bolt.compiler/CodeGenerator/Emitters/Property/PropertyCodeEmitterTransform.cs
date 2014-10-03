@@ -15,15 +15,15 @@ namespace Bolt.Compiler {
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      type.DeclareProperty("UE.Transform", Decorator.Definition.Name, get => {
-        get.Expr("return Frames.first.Objects[{0}] as UE.Transform", Decorator.ObjectOffset);
+      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
+        get.Expr("return (Bolt.TransformData) Frames.first.Objects[{0}]", Decorator.ObjectOffset);
       }, set => {
         set.Expr("Frames.first.Objects[{0}] = value", Decorator.ObjectOffset);
       });
     }
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty("UE.Transform", Decorator.Definition.Name, get => {
+      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
 
       }, (set) => {
 

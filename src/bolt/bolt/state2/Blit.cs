@@ -196,29 +196,24 @@ namespace Bolt {
       int frame = bytes.ReadI32(offset);
       int bits = bytes.ReadI32(offset + 4);
 
-      UpdateTrigger(ref frame, ref bits, frameNew, set);
+      if (frame != frameNew) {
+        Assert.True(frameNew > frame);
 
-      bytes.PackI32(offset, frame);
-      bytes.PackI32(offset + 4, bits);
-    }
-
-
-    static void UpdateTrigger(ref int frameOld, ref int bits, int frameNew, bool newTrigger) {
-      if (frameOld != frameNew) {
-        Assert.True(frameNew > frameOld);
-
-        int diff = frameNew - frameOld;
+        int diff = frameNew - frame;
 
         // update bits
         bits = diff < 32 ? bits << diff : 0;
 
         // flag current frame
-        if (newTrigger) {
+        if (set) {
           bits |= 1;
         }
 
-        frameOld = frameNew;
+        frame = frameNew;
       }
+
+      bytes.PackI32(offset, frame);
+      bytes.PackI32(offset + 4, bits);
     }
 
     public static void PackBytes(byte[] data, int offset, byte[] bytes) {

@@ -80,6 +80,7 @@
     <Compile Include="state2\FloatCompression.cs" />
     <Compile Include="state2\Priority.cs" />
     <Compile Include="state2\Serializers\PropertySerializer.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerEntity.cs" />
     <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state2\Serializers\PropertySerializerString.cs" />
     <Compile Include="state2\Serializers\PropertySerializerTransform.cs" />
@@ -156,7 +157,7 @@
     <Compile Include="entity\BoltEntityBehaviour.cs" />
     <Compile Include="entity\BoltEntity.cs" />
     <Compile Include="entity\BoltEntityChannel.cs" />
-    <Compile Include="entity\BoltEntityProxy.cs" />
+    <Compile Include="entity2\EntityProxy.cs" />
     <Compile Include="event\BoltEvent.cs" />
     <Compile Include="event\BoltEventChannel.cs" />
     <Compile Include="event\BoltEventDispatcher.cs" />

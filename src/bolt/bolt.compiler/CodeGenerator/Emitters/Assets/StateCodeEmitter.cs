@@ -90,6 +90,9 @@ namespace Bolt.Compiler {
       });
 
       type.DeclareConstructor(ctor => { ctor.BaseConstructorArgs.Add("_Meta".Expr()); });
+      type.DeclareMethod(typeof(string).FullName, "ToString", method => {
+        method.Statements.Expr(string.Format(@"return string.Format(""[Serializer {0}]"")", Decorator.InterfaceName));
+      }).Attributes = MemberAttributes.Override | MemberAttributes.Public;
 
       foreach (PropertyDecorator p in Decorator.RootStruct.Properties) {
         PropertyCodeEmitter.Create(p).EmitStateMembers(Decorator, type);

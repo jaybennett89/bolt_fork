@@ -22,13 +22,14 @@ namespace Bolt {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }
 
-    public override void Pack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
       int triggerFrame = frame.Data.ReadI32(SendOffset);
       int triggerBits = frame.Data.ReadI32(SendOffset + 4);
 
-      Assert.True(triggerFrame == BoltCore.frame);
+      Assert.True(triggerFrame == BoltCore.frame, "{0} == {1}", triggerFrame, BoltCore.frame);
 
       stream.WriteInt(triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
+      return true;
     }
 
     public override void Read(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {

@@ -9,9 +9,10 @@ namespace Bolt {
       return 32 + (Blit.ReadI32(frame.Data, MetaData.ByteOffset) * 8);
     }
 
-    public override void Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       stream.WriteInt(Blit.ReadI32(frame.Data, MetaData.ByteOffset));
       stream.WriteByteArray(frame.Data, MetaData.ByteOffset + 4, Blit.ReadI32(frame.Data, MetaData.ByteOffset));
+      return true;
     }
 
     public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {

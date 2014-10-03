@@ -318,6 +318,18 @@ internal static class BoltCore {
     return BoltRuntimeSettings.FindPrefab(name);
   }
 
+  public static Bolt.EntityObject FindEntity(InstanceId id) {
+    var it = _entities.GetIterator();
+
+    while (it.Next()) {
+      if (it.val.InstanceId == id) {
+        return it.val;
+      }
+    }
+
+    return null;
+  }
+
   public static void LoadMap(string name) {
     if (isServer == false) {
       BoltLog.Error("only server can initiate a map load");

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
-    state.Transform = transform;
+    state.Transform.Simulate = transform;
     state.Attack += Attack;
   }
 
@@ -17,7 +17,7 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   }
 
   void Attack() {
-    BoltLog.Info("ATTACK TRIGGERED");
+    BoltLog.Info("ATTACK TRIGGERED:" + entity.GetInstanceID());
   }
 
   void TransformChanged(Bolt.IState character, string propertyPath, int[] propertyIndices) {

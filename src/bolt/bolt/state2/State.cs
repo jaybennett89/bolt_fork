@@ -308,13 +308,23 @@ namespace Bolt {
           stream.WriteInt(p.PropertyIndex, PropertyIdBits);
 
           // write data into stream
-          s.Pack(this, Frames.first, connection, stream);
+          if (s.Pack(this, Frames.first, connection, stream)) {
+#if DEBUG
+            int totalBits = PropertyIdBits + (stream.Position - ptr);
+            if (totalBits != b) {
+              BoltLog.Warn("Property of type {0} did not write the correct amount of bits, written: {1}, expected: {2}", p, totalBits, b);
+            }
+#endif
+            // use up bits
+            bits -= b;
 
-          // use up bits
-          bits -= b;
-
-          // add to written list
-          env.Written.Add(p);
+            // add to written list
+            env.Written.Add(p);
+          }
+          else {
+            // reset position
+            stream.Ptr = ptr;
+          }
         }
       }
 

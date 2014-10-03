@@ -14,11 +14,11 @@ internal class EntityProxyEnvelope : BoltObject, IDisposable {
 
     Written.Clear();
 
-    BoltEntityProxyEnvelopePool.Release(this);
+    EntityProxyEnvelopePool.Release(this);
   }
 }
 
-static class BoltEntityProxyEnvelopePool {
+static class EntityProxyEnvelopePool {
   static readonly Stack<EntityProxyEnvelope> pool = new Stack<EntityProxyEnvelope>();
 
   internal static EntityProxyEnvelope Acquire() {
@@ -42,6 +42,7 @@ static class BoltEntityProxyEnvelopePool {
     pool.Push(obj);
   }
 }
+
 internal partial class EntityProxy : BoltObject {
   public class PriorityComparer : IComparer<EntityProxy> {
     public static readonly PriorityComparer Instance = new PriorityComparer();
@@ -54,27 +55,6 @@ internal partial class EntityProxy : BoltObject {
       return y.Priority.CompareTo(x.Priority);
     }
   }
-
-  // ################### OLD
-
-
-  //public const uint FLAG_CREATE = 1;
-  //public const uint FLAG_CREATE_IN_PROGRESS = 2;
-  //public const uint FLAG_DESTROY = 4;
-  //public const uint FLAG_DESTROY_IN_PROGRESS = 8;
-  //public const uint FLAG_IDLE = 16;
-  //public const uint FLAG_FORCE_SYNC = 32;
-
-  //public float priority = 0;
-  //public uint networkId = 0;
-  //public uint skipped = 0;
-  //public Bits mask = 0;
-  //public Bits flags = 0;
-
-  //public bool destroyed = false;
-  //public BoltEntity entity = null;
-  //public BoltConnection connection = null;
-  //public BoltRingBuffer<BoltEntityProxyEnvelope> envelopes;
 
   public const int ID_BIT_COUNT = 10;
   public const int MAX_COUNT = 1 << ID_BIT_COUNT;
@@ -102,7 +82,7 @@ internal partial class EntityProxy : BoltObject {
   }
 
   public EntityProxyEnvelope CreateEnvelope() {
-    EntityProxyEnvelope env = BoltEntityProxyEnvelopePool.Acquire();
+    EntityProxyEnvelope env = EntityProxyEnvelopePool.Acquire();
     env.Flags = Flags;
     env.Proxy = this;
     return env;
