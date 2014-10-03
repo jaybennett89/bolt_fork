@@ -54,8 +54,11 @@ namespace Bolt {
 
     bool InvokeForFrame(State state, State.Frame f) {
       var cb = (System.Action)state.Frames.first.Objects[MetaData.ObjectOffset];
+      var mecanim = state.Animator && MetaData.Mecanim;
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
+
+      
 
       for (int i = 31; i >= 0; --i) {
         if (frame - i > state.Entity.Frame) {
@@ -69,6 +72,11 @@ namespace Bolt {
 
           // push to send index
           state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
+
+          // apply to mecanim
+          if (mecanim) {
+            state.Animator.SetTrigger(MetaData.PropertyName);
+          }
 
           // perform callback
           if (cb != null) {

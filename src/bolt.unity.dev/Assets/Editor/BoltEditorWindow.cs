@@ -86,8 +86,8 @@ public class BoltEditorWindow : BoltWindow {
       }
     }, () => {
 
-      def.PacketMaxBits = BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet");
-      def.PacketMaxProperties = BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet");
+      def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
+      def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
 
     });
 
@@ -153,7 +153,6 @@ public class BoltEditorWindow : BoltWindow {
     def.Comment = EditorGUILayout.TextArea(def.Comment);
     GUILayout.EndHorizontal();
 
-
     foreach (Action r in rows) {
       GUILayout.BeginHorizontal();
       GUILayout.Space(23);
@@ -218,7 +217,7 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
     else {
-      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded && p.PropertyType.HasSettings)) {
+      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded && (p.PropertyType.HasSettings || p.PropertyType.MecanimApplicable))) {
         p.Expanded = !p.Expanded;
       }
     }
@@ -230,7 +229,7 @@ public class BoltEditorWindow : BoltWindow {
     }
     else {
       BoltEditorGUI.Disabled(() => {
-        EditorGUILayout.Popup(0, new string[] { "-" }, GUILayout.Width(45));
+        EditorGUILayout.TextField("---", GUILayout.Width(32));
       });
     }
 
@@ -248,25 +247,49 @@ public class BoltEditorWindow : BoltWindow {
 
     EditorGUILayout.EndHorizontal();
 
-    if (p.Expanded && p.PropertyType.HasSettings) {
-      EditorGUILayout.BeginHorizontal();
-      GUILayout.Space(20);
+    if (p.Expanded) {
 
-      EditorGUILayout.BeginVertical();
-      EditorGUILayout.LabelField("Settings", BoltEditorGUI.SmallWhiteText);
+      if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
+        SettingsSection("Mecanim", () => {
+          BoltEditorGUI.WithLabel("Auto Apply", () => {
+            p.StateAssetSettings.Mecanim = EditorGUILayout.Toggle(p.StateAssetSettings.Mecanim);
+          });
 
-      if (IsStateOrStruct(def)) {
-        EditStateAssetSettings(p);
+          if (p.PropertyType is PropertyTypeFloat) {
+            BoltEditorGUI.WithLabel("Damping Time", () => {
+              p.StateAssetSettings.MecanimDamping = EditorGUILayout.FloatField(p.StateAssetSettings.MecanimDamping);
+            });
+          }
+        });
       }
 
-      PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
-      EditorGUILayout.EndVertical();
+      if (p.PropertyType.HasSettings) {
+        SettingsSection("Settings", () => {
+          if (IsStateOrStruct(def)) {
+            EditStateAssetSettings(p);
+          }
 
-      GUILayout.Space(20);
-      EditorGUILayout.EndHorizontal();
+          PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
+        });
+      }
     }
 
     EditorGUILayout.EndVertical();
+  }
+
+  void SettingsSection(string label, Action gui) {
+    EditorGUILayout.BeginHorizontal();
+    GUILayout.Space(20);
+
+    EditorGUILayout.BeginVertical();
+    EditorGUILayout.LabelField(label, BoltEditorGUI.SmallWhiteText);
+
+    gui();
+
+    EditorGUILayout.EndVertical();
+
+    GUILayout.Space(20);
+    EditorGUILayout.EndHorizontal();
   }
 
   void EditStateAssetSettings(PropertyDefinition p) {
@@ -290,10 +313,6 @@ public class BoltEditorWindow : BoltWindow {
 
     if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), p.Controller)) {
       p.Controller = !p.Controller;
-    }
-
-    if (def is StateDefinition && p.PropertyType.MecanimApplicable) {
-      BoltEditorGUI.IconButton("mecanim".ToContent("This property should be replicated to the controller"), true);
     }
   }
 

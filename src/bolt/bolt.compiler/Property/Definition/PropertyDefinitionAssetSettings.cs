@@ -8,6 +8,5 @@ namespace Bolt.Compiler {
   [ProtoInclude(100, typeof(PropertyDefinitionStateAssetSettings))]
   [ProtoInclude(200, typeof(PropertyDefinitionEventAssetSettings))]
   public abstract class PropertyDefinitionAssetSettings {
-
   }
 }

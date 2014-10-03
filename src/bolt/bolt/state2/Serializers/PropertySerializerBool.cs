@@ -13,6 +13,12 @@ namespace Bolt {
       return 1;
     }
 
+    public override void OnSimulateAfter(State state) {
+      if (state.Animator && MetaData.Mecanim) {
+        state.Animator.SetBool(MetaData.PropertyName, state.Frames.first.Data.ReadI32(MetaData.ByteOffset) != 0);
+      }
+    }
+
     public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       stream.WriteBool(frame.Data.ReadI32(MetaData.ByteOffset) != 0);
       return true;
