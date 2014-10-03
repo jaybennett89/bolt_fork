@@ -13,6 +13,10 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
+    public override bool MecanimApplicable {
+      get { return true; }
+    }
+
     public override bool InterpolateAllowed {
       get { return true; }
     }

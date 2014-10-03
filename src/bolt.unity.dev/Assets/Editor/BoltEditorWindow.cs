@@ -84,6 +84,11 @@ public class BoltEditorWindow : BoltWindow {
       if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
         def.IsAbstract = !def.IsAbstract;
       }
+    }, () => {
+
+      def.PacketMaxBits = BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet");
+      def.PacketMaxProperties = BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet");
+
     });
 
     // add button
@@ -121,7 +126,7 @@ public class BoltEditorWindow : BoltWindow {
 
   }
 
-  void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action) {
+  void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
     GUI.color = color;
     GUILayout.BeginVertical(style);
     GUI.color = Color.white;
@@ -133,7 +138,6 @@ public class BoltEditorWindow : BoltWindow {
 
     if (def is StateDefinition) {
       BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 2, 0));
-
     }
 
     // edit asset name
@@ -148,6 +152,16 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.Label("//", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.Width(15));
     def.Comment = EditorGUILayout.TextArea(def.Comment);
     GUILayout.EndHorizontal();
+
+
+    foreach (Action r in rows) {
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(23);
+
+      r();
+
+      GUILayout.EndHorizontal();
+    }
 
     GUILayout.EndVertical();
   }
@@ -211,11 +225,8 @@ public class BoltEditorWindow : BoltWindow {
 
     // edit priority
     if (p.PropertyType.HasPriority) {
-      int priorityIndex;
-      priorityIndex = Mathf.Max(Array.IndexOf(PrimeList.Below1000Except2, p.Priority), 0);
-      priorityIndex = EditorGUILayout.Popup(priorityIndex, PrimeList.Below1000Except2Names, GUILayout.Width(45));
-      p.Priority = PrimeList.Below1000Except2[priorityIndex];
-      BoltEditorGUI.SetTooltip("Property Priority. Has to be a prime number below 1000 other than 2, a higher value means the property is more likely to be sent.");
+      p.Priority = Mathf.Clamp(EditorGUILayout.IntField(p.Priority, GUILayout.Width(32)), 1, 999);
+      BoltEditorGUI.SetTooltip("Property Priority. An integer between 1 and 999. Higher values means a property is more likely to be sent.");
     }
     else {
       BoltEditorGUI.Disabled(() => {
@@ -224,7 +235,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(151));
+    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(164));
     BoltEditorGUI.SetTooltip("Property Name. Has to be a valid C# property name.");
 
     // edit property type
@@ -279,6 +290,10 @@ public class BoltEditorWindow : BoltWindow {
 
     if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), p.Controller)) {
       p.Controller = !p.Controller;
+    }
+
+    if (def is StateDefinition && p.PropertyType.MecanimApplicable) {
+      BoltEditorGUI.IconButton("mecanim".ToContent("This property should be replicated to the controller"), true);
     }
   }
 

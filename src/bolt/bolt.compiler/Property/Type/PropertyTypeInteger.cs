@@ -17,6 +17,10 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
+    public override bool MecanimApplicable {
+      get { return true; }
+    }
+
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorInteger();
     }

@@ -12,6 +12,7 @@ namespace Bolt {
   public delegate void PropertyCallback(IState state, string path, int[] indices);
 
   public interface IState {
+    void SetAnimator(UE.Animator animator);
     void AddCallback(string path, PropertyCallback callback);
   }
 
@@ -81,6 +82,7 @@ namespace Bolt {
     }
 
     internal EntityObject Entity;
+    internal UE.Animator Animator;
 
     internal readonly int PropertyIdBits;
     internal readonly int PacketMaxPropertiesBits;
@@ -88,7 +90,6 @@ namespace Bolt {
 
     internal readonly Frame NullFrame;
     internal readonly Frame DiffFrame;
-    internal readonly Frame SendFrame;
     internal readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
     internal readonly Dictionary<string, List<PropertyCallback>> Callbacks = new Dictionary<string, List<PropertyCallback>>();
 
@@ -107,7 +108,6 @@ namespace Bolt {
       MetaData = meta;
       DiffFrame = AllocFrame(-1);
       NullFrame = AllocFrame(-1);
-      SendFrame = AllocFrame(-1);
 
       FullMask = BitArray.CreateSet(MetaData.PropertyCount);
       DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
@@ -120,6 +120,10 @@ namespace Bolt {
 
     public void DebugInfo() {
       BoltGUI.LabelText("Frame Buffer", Frames.count.ToString());
+    }
+
+    public void SetAnimator(UE.Animator animator) {
+      Animator = animator;
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
@@ -405,27 +409,8 @@ namespace Bolt {
     }
 
     BitArray CalculateFilter(Filter filter) {
-      if ((filter.Bits & 1) == 1) {
-        return FullMask;
-      }
-
-      BitArray permutation;
-
-      if (MetaData.PropertyFilterCache.TryGetValue(filter, out permutation) == false) {
-        permutation = BitArray.CreateClear(MetaData.PropertyCount);
-
-        for (int i = 0; i < 32; ++i) {
-          long b = 1 << i;
-
-          if ((filter.Bits & b) == b) {
-            permutation.OrAssign(MetaData.PropertyFilters[i]);
-          }
-        }
-
-        MetaData.PropertyFilterCache.Add(filter, permutation);
-      }
-
-      return permutation;
+      return FullMask;
     }
+
   }
 }
