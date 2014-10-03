@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  class PropertyCodeEmitterBool : PropertyCodeEmitter<PropertyDecoratorBool> {
+  class PropertyCodeEmitterInteger : PropertyCodeEmitter<PropertyDecoratorInteger> {
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return Bolt.Blit.ReadI32(frame.Data, offsetBytes + {0}) != 0", Decorator.ByteOffset);
+        get.Expr("return Bolt.Blit.ReadI32(frame.Data, offsetBytes + {0})", Decorator.ByteOffset);
       };
 
       Action<CodeStatementCollection> setter = set => {
-        set.Expr("Bolt.Blit.PackI32(frame.Data, offsetBytes + {0}, value ? 1 : 0)", Decorator.ByteOffset);
+        set.Expr("Bolt.Blit.PackI32(frame.Data, offsetBytes + {0}, value)", Decorator.ByteOffset);
       };
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);

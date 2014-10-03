@@ -22,16 +22,16 @@ public class BoltFilterWindow : BoltWindow {
     return new Type[0];
   }
 
-  [MenuItem("Window/Bolt Filters")]
-  public static void Open() {
-    BoltFilterWindow w;
+  //[MenuItem("Window/Bolt Filters")]
+  //public static void Open() {
+  //  BoltFilterWindow w;
 
-    w = EditorWindow.GetWindow<BoltFilterWindow>(FindInspectorWindowType());
-    w.title = "Bolt Filters";
-    w.name = "Bolt Filters";
-    w.minSize = new Vector2(200, 400);
-    w.Show();
-  }
+  //  w = EditorWindow.GetWindow<BoltFilterWindow>(FindInspectorWindowType());
+  //  w.title = "Bolt Filters";
+  //  w.name = "Bolt Filters";
+  //  w.minSize = new Vector2(200, 400);
+  //  w.Show();
+  //}
 
   Vector2 scroll;
 

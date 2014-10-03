@@ -80,11 +80,14 @@
     <Compile Include="state2\FloatCompression.cs" />
     <Compile Include="state2\Priority.cs" />
     <Compile Include="state2\Serializers\PropertySerializer.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerBool.cs" />
     <Compile Include="state2\Serializers\PropertySerializerEntity.cs" />
     <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerInteger.cs" />
     <Compile Include="state2\Serializers\PropertySerializerString.cs" />
     <Compile Include="state2\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="state2\Serializers\PropertySerializerTrigger.cs" />
+    <Compile Include="state2\Serializers\PropertySerializerVector.cs" />
     <Compile Include="state2\Trigger.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>

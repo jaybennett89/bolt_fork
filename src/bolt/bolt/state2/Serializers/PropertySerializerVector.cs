@@ -4,22 +4,22 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  class PropertySerializerFloat : PropertySerializer {
-    public PropertySerializerFloat(PropertyMetaData info)
+  class PropertySerializerVector : PropertySerializer {
+    public PropertySerializerVector(PropertyMetaData info)
       : base(info) {
     }
 
     public override int CalculateBits(State state, State.Frame frame) {
-      return 32;
+      return 32 * 8;
     }
 
     public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteFloat(Blit.ReadF32(frame.Data, MetaData.ByteOffset));
+      stream.WriteVector3(frame.Data.ReadVector3(MetaData.ByteOffset));
       return true;
     }
 
     public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackF32(frame.Data, MetaData.ByteOffset, stream.ReadFloat());
+      frame.Data.PackVector3(MetaData.ByteOffset, stream.ReadVector3());
     }
   }
 }

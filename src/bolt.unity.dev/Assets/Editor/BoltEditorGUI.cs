@@ -250,12 +250,12 @@ public static class BoltEditorGUI {
     GUILayout.EndHorizontal();
   }
 
-  public static void PropertyTypePopup(AssetDefinition asset, PropertyDefinition definition) {
+  public static void PropertyTypePopup(AssetDefinition asset, PropertyDefinition definition, params GUILayoutOption[] options) {
     if (!asset.AllowedPropertyTypes.Contains(definition.PropertyType.GetType())) {
       definition.PropertyType = new PropertyTypeFloat();
     }
 
-    definition.PropertyType = PropertyTypePopup(asset.AllowedPropertyTypes, definition.PropertyType);
+    definition.PropertyType = PropertyTypePopup(asset.AllowedPropertyTypes, definition.PropertyType, options);
   }
 
   public static PropertyType PropertyTypePopup(IEnumerable<Type> allTypes, PropertyType current, params GUILayoutOption[] options) {
@@ -263,7 +263,7 @@ public static class BoltEditorGUI {
       current = (PropertyType)Activator.CreateInstance(allTypes.First());
     }
 
-    var types = allTypes.ToArray();
+    var types = allTypes.OrderBy(x => x.Name.Replace("PropertyType", "")).ToArray();
     var typesNames = types.Select(x => x.Name.Replace("PropertyType", "")).ToArray();
     var selected = Array.IndexOf(types, current.GetType());
     var selectedNew = EditorGUILayout.Popup(selected, typesNames, options);
@@ -400,7 +400,6 @@ public static class BoltEditorGUI {
       c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
       c.Fractions = Mathf.Clamp(IntFieldOverlay(c.Fractions, "Fractions"), 1, 10000);
     });
-
 
     return c;
   }

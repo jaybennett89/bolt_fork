@@ -25,7 +25,7 @@ namespace Bolt.Compiler {
     }
 
     public bool UseFilters {
-      get { return EnabledFilters.Count() > 0; }
+      get { return false; }
     }
 
     public StateDefinition FindState(Guid guid) {

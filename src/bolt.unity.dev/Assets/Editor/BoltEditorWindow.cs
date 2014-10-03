@@ -224,7 +224,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
+    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(151));
     BoltEditorGUI.SetTooltip("Property Name. Has to be a valid C# property name.");
 
     // edit property type
@@ -251,6 +251,7 @@ public class BoltEditorWindow : BoltWindow {
       PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
       EditorGUILayout.EndVertical();
 
+      GUILayout.Space(20);
       EditorGUILayout.EndHorizontal();
     }
 

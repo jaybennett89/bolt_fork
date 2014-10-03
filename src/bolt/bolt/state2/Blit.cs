@@ -85,6 +85,40 @@ namespace Bolt {
       return c.Float32;
     }
 
+    public static UE.Vector2 ReadVector2(this byte[] data, int offset) {
+      BitUnion x = default(BitUnion);
+      x.Byte0 = data[offset + 0];
+      x.Byte1 = data[offset + 1];
+      x.Byte2 = data[offset + 2];
+      x.Byte3 = data[offset + 3];
+
+      BitUnion y = default(BitUnion);
+      y.Byte0 = data[offset + 4];
+      y.Byte1 = data[offset + 5];
+      y.Byte2 = data[offset + 6];
+      y.Byte3 = data[offset + 7];
+
+      return new UE.Vector2(x.Float32, y.Float32);
+    }
+
+    public static void PackVector2(this byte[] data, int offset, UE.Vector2 value) {
+      BitUnion x = default(BitUnion);
+      BitUnion y = default(BitUnion);
+
+      x.Float32 = value.x;
+      y.Float32 = value.y;
+
+      data[offset + 0] = x.Byte0;
+      data[offset + 1] = x.Byte1;
+      data[offset + 2] = x.Byte2;
+      data[offset + 3] = x.Byte3;
+
+      data[offset + 4] = y.Byte0;
+      data[offset + 5] = y.Byte1;
+      data[offset + 6] = y.Byte2;
+      data[offset + 7] = y.Byte3;
+    }
+
     public static UE.Vector3 ReadVector3(this byte[] data, int offset) {
       BitUnion x = default(BitUnion);
       x.Byte0 = data[offset + 0];
@@ -130,6 +164,66 @@ namespace Bolt {
       data[offset + 9] = z.Byte1;
       data[offset + 10] = z.Byte2;
       data[offset + 11] = z.Byte3;
+    }
+
+    public static UE.Vector4 ReadVector4(this byte[] data, int offset) {
+      BitUnion x = default(BitUnion);
+      x.Byte0 = data[offset + 0];
+      x.Byte1 = data[offset + 1];
+      x.Byte2 = data[offset + 2];
+      x.Byte3 = data[offset + 3];
+
+      BitUnion y = default(BitUnion);
+      y.Byte0 = data[offset + 4];
+      y.Byte1 = data[offset + 5];
+      y.Byte2 = data[offset + 6];
+      y.Byte3 = data[offset + 7];
+
+      BitUnion z = default(BitUnion);
+      z.Byte0 = data[offset + 8];
+      z.Byte1 = data[offset + 9];
+      z.Byte2 = data[offset + 10];
+      z.Byte3 = data[offset + 11];
+
+      BitUnion w = default(BitUnion);
+      w.Byte0 = data[offset + 12];
+      w.Byte1 = data[offset + 13];
+      w.Byte2 = data[offset + 14];
+      w.Byte3 = data[offset + 15];
+
+      return new UE.Vector4(x.Float32, y.Float32, z.Float32, w.Float32);
+    }
+
+    public static void PackVector4(this byte[] data, int offset, UE.Vector4 value) {
+      BitUnion x = default(BitUnion);
+      BitUnion y = default(BitUnion);
+      BitUnion z = default(BitUnion);
+      BitUnion w = default(BitUnion);
+
+      x.Float32 = value.x;
+      y.Float32 = value.y;
+      z.Float32 = value.z;
+      w.Float32 = value.w;
+
+      data[offset + 0] = x.Byte0;
+      data[offset + 1] = x.Byte1;
+      data[offset + 2] = x.Byte2;
+      data[offset + 3] = x.Byte3;
+
+      data[offset + 4] = y.Byte0;
+      data[offset + 5] = y.Byte1;
+      data[offset + 6] = y.Byte2;
+      data[offset + 7] = y.Byte3;
+
+      data[offset + 8] = z.Byte0;
+      data[offset + 9] = z.Byte1;
+      data[offset + 10] = z.Byte2;
+      data[offset + 11] = z.Byte3;
+
+      data[offset + 12] = w.Byte0;
+      data[offset + 13] = w.Byte1;
+      data[offset + 14] = w.Byte2;
+      data[offset + 15] = w.Byte3;
     }
 
     public static UE.Quaternion ReadQuaternion(this byte[] data, int offset) {

@@ -25,7 +25,6 @@ namespace Bolt.Compiler {
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, true);
     }
-
   }
 }
  

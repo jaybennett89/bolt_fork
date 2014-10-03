@@ -46,6 +46,7 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypeTransform);
       yield return typeof(PropertyTypeBool);
       yield return typeof(PropertyTypeEntity);
+      yield return typeof(PropertyTypeVector);
     }
   }
 }

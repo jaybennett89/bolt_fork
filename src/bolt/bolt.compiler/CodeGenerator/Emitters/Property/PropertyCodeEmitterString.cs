@@ -13,7 +13,7 @@ namespace Bolt.Compiler {
 
       Action<CodeStatementCollection> setter = set => {
         // clamp length
-        set.Expr("if (value.Length > {0}) value = value.SubString(0, {0})", Decorator.PropertyType.MaxLength);
+        set.Expr("if (value.Length > {0}) value = value.Substring(0, {0})", Decorator.PropertyType.MaxLength);
 
         // pack byte length
         set.Expr("Bolt.Blit.PackI32(frame.Data, offsetBytes + {0}, Encoding.{1}.GetByteCount(value))", Decorator.ByteOffset, Decorator.PropertyType.Encoding);

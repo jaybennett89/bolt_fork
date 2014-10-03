@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  class PropertySerializerFloat : PropertySerializer {
-    public PropertySerializerFloat(PropertyMetaData info)
+  class PropertySerializerInteger : PropertySerializer {
+    public PropertySerializerInteger(PropertyMetaData info)
       : base(info) {
     }
 
@@ -14,12 +14,12 @@ namespace Bolt {
     }
 
     public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteFloat(Blit.ReadF32(frame.Data, MetaData.ByteOffset));
+      stream.WriteFloat(Blit.ReadI32(frame.Data, MetaData.ByteOffset));
       return true;
     }
 
     public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackF32(frame.Data, MetaData.ByteOffset, stream.ReadFloat());
+      Blit.PackI32(frame.Data, MetaData.ByteOffset, stream.ReadInt());
     }
   }
 }

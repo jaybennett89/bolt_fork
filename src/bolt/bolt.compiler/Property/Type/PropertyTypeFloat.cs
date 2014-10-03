@@ -9,6 +9,10 @@ namespace Bolt.Compiler {
     [ProtoMember(1)]
     public FloatCompression Compression;
 
+    public override bool HasSettings {
+      get { return false; }
+    }
+
     public override bool InterpolateAllowed {
       get { return true; }
     }

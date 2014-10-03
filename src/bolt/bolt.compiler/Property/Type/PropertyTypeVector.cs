@@ -35,12 +35,16 @@ namespace Bolt.Compiler {
       new Axis { Component = VectorComponents.W, Compression = FloatCompression.Default(), Enabled = false },
     };
 
-    //public override int ByteSize {
-    //  get { return 16; }
-    //}
-
     public override bool InterpolateAllowed {
       get { return true; }
+    }
+
+    public override bool HasSettings {
+      get { return false; }
+    }
+
+    public override PropertyDecorator CreateDecorator() {
+      return new PropertyDecoratorVector();
     }
 
     public Axis this[VectorComponents component] {
@@ -54,19 +58,5 @@ namespace Bolt.Compiler {
         throw new ArgumentOutOfRangeException();
       }
     }
-
-    //public override string ClrType {
-    //  get {
-    //    if (this[VectorComponents.W].Enabled) {
-    //      return "UE.Vector4";
-    //    }
-
-    //    if (this[VectorComponents.Z].Enabled) {
-    //      return "UE.Vector3";
-    //    }
-
-    //    return "UE.Vector2";
-    //  }
-    //}
   }
 }
