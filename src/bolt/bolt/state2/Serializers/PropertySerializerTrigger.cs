@@ -58,8 +58,6 @@ namespace Bolt {
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 
-      
-
       for (int i = 31; i >= 0; --i) {
         if (frame - i > state.Entity.Frame) {
           return false;

@@ -3,6 +3,8 @@ using System.Collections;
 
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   public override void Attached() {
+    state.SetAnimator(GetComponent<Animator>());
+
     state.Transform.Simulate = transform;
     state.Attack += Attack;
   }
@@ -17,6 +19,8 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   }
 
   void Attack() {
+
+
     BoltLog.Info("ATTACK TRIGGERED:" + entity.GetInstanceID());
   }
 
