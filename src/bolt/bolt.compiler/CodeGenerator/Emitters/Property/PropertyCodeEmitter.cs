@@ -25,7 +25,7 @@ namespace Bolt.Compiler {
         p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
         p.CallbackPathsExpression(), // {5}
         p.CreateIndicesExpr(), // {6}
-        Decorator.Definition.Name, // {7}
+        Decorator.Definition.Name, // {7} 
         Decorator.Definition.StateAssetSettings.Mecanim.ToString().ToLower(), // {8}
         Decorator.Definition.PropertyType is PropertyTypeFloat ? Decorator.Definition.StateAssetSettings.MecanimDamping + "f" : "0f" // {9}
       );
