@@ -85,6 +85,7 @@
     <Compile Include="Compression\FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
     <Compile Include="FilterDefinition.cs" />
+    <Compile Include="Property\Definition\PropertyCommandSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
