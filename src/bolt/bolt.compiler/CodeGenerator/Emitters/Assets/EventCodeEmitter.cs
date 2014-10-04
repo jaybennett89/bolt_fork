@@ -12,9 +12,12 @@ namespace Bolt.Compiler {
     }
 
     public void EmitEventClass() {
+
+
       CodeTypeDeclaration type;
 
       type = Generator.DeclareClass(Decorator.Definition.Name);
+      type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
       type.BaseTypes.Add("Bolt.Event");
 
       type.DeclareConstructor(ctor => {

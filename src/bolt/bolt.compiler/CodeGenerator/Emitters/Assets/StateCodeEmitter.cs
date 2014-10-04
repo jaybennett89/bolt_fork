@@ -14,6 +14,7 @@ namespace Bolt.Compiler {
 
     public void EmitInterface() {
       CodeTypeDeclaration type = Generator.DeclareInterface(Decorator.InterfaceName, CalulateInterfaceBaseTypes());
+      type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
 
       foreach (PropertyDecorator property in Decorator.Properties) {
         if (property.DefiningAsset.Guid == Decorator.Guid) {

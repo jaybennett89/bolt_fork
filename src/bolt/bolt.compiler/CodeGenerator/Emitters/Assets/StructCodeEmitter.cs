@@ -17,22 +17,19 @@ namespace Bolt.Compiler {
         return;
       }
 
-      CodeTypeDeclaration str;
+      CodeTypeDeclaration type;
 
-      str = Generator.DeclareStruct(Decorator.Name);
-      str.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
-      str.CommentSummary(m => {
-        m.CommentDoc(Decorator.Definition.Comment);
-        m.CommentDoc("(Properties={0} ByteSize={1})", Decorator.Properties.Count, Decorator.ByteSize);
-      });
+      type = Generator.DeclareStruct(Decorator.Name);
+      type.TypeAttributes = Decorator.BasedOnState ? TypeAttributes.NotPublic : TypeAttributes.Public;
+      type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
 
-      DeclareShimConstructor(str);
+      DeclareShimConstructor(type);
 
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitStructMembers(str);
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitStructMembers(type);
       }
 
-      str.DeclareMethod(Decorator.ModifierInterfaceName, "Modify", method => {
+      type.DeclareMethod(Decorator.ModifierInterfaceName, "Modify", method => {
         method.Statements.Expr("return new {0}(frame, offsetBytes, offsetObjects)", Decorator.ModifierName);
       });
     }
@@ -42,16 +39,16 @@ namespace Bolt.Compiler {
         return;
       }
 
-      CodeTypeDeclaration arr;
+      CodeTypeDeclaration type;
 
-      arr = Generator.DeclareStruct(Decorator.ArrayName);
-      arr.TypeAttributes = TypeAttributes.Public;
-      arr.DeclareField("Bolt.State.Frame", "frame");
-      arr.DeclareField("System.Int32", "offsetBytes");
-      arr.DeclareField("System.Int32", "offsetObjects");
-      arr.DeclareField("System.Int32", "length");
+      type = Generator.DeclareStruct(Decorator.ArrayName);
+      type.TypeAttributes = TypeAttributes.Public;
+      type.DeclareField("Bolt.State.Frame", "frame");
+      type.DeclareField("System.Int32", "offsetBytes");
+      type.DeclareField("System.Int32", "offsetObjects");
+      type.DeclareField("System.Int32", "length");
 
-      arr.DeclareConstructor(ctor => {
+      type.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
 
         ctor.DeclareParameter("Bolt.State.Frame", "frame");
@@ -65,11 +62,11 @@ namespace Bolt.Compiler {
         ctor.Statements.Assign("this.length".Expr(), "length".Expr());
       });
 
-      arr.DeclareProperty(typeof(int).FullName, "Length", get => {
+      type.DeclareProperty(typeof(int).FullName, "Length", get => {
         get.Expr("return length");
       });
 
-      arr.DeclareProperty(Decorator.Name, "Item", get => {
+      type.DeclareProperty(Decorator.Name, "Item", get => {
         get.Expr("if (index < 0 || index >= length) throw new IndexOutOfRangeException()");
         get.Expr("return new {0}(frame, offsetBytes + (index * {1}), offsetObjects + (index * {2}))", Decorator.Name, Decorator.ByteSize, Decorator.ObjectSize);
       }).DeclareParameter(typeof(int).FullName, "index");
@@ -106,20 +103,20 @@ namespace Bolt.Compiler {
         return;
       }
 
-      CodeTypeDeclaration mod;
+      CodeTypeDeclaration type;
 
-      mod = Generator.DeclareClass(Decorator.ModifierName);
-      mod.TypeAttributes = TypeAttributes.NotPublic;
-      mod.BaseTypes.Add(Decorator.ModifierInterfaceName);
+      type = Generator.DeclareClass(Decorator.ModifierName);
+      type.TypeAttributes = TypeAttributes.NotPublic;
+      type.BaseTypes.Add(Decorator.ModifierInterfaceName);
 
-      DeclareShimConstructor(mod);
+      DeclareShimConstructor(type);
 
       // dispose method
-      mod.DeclareMethod(typeof(void).FullName, "Dispose", method => { }).Attributes = MemberAttributes.Public;
+      type.DeclareMethod(typeof(void).FullName, "Dispose", method => { }).Attributes = MemberAttributes.Public;
 
       // other stuff
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitModifierMembers(mod);
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitModifierMembers(type);
       }
     }
 

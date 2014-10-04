@@ -462,15 +462,16 @@ public class BoltProjectWindow : BoltWindow {
       BoltEditorGUI.LabelClickable(asset.Name, label, () => { Select(asset); });
     }
 
-    //
-    //BoltEditorGUI.Icon("new");
-
     GUILayout.FlexibleSpace();
+
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       BoltEditorGUI.IconClickable("boltico_x", r, () => {
         asset.Deleted = true;
       });
+    }
+    else {
+      //BoltEditorGUI.IconClickable("exclamation", r);
     }
 
     GUILayout.EndHorizontal();

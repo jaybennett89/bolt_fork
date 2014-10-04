@@ -48,6 +48,16 @@ public static class BoltEditorGUI {
     }
   }
 
+  public static GUIStyle StructHeaderStyle {
+    get {
+      GUIStyle style;
+      style = NodeStyle(2);
+      style.padding = new RectOffset(0, 0, 0, 3);
+      style.margin = new RectOffset(5, 5, 5, 5);
+      return style;
+    }
+  }
+
   public static GUIStyle StateHeaderStyle {
     get {
       GUIStyle style;
@@ -72,7 +82,7 @@ public static class BoltEditorGUI {
   public static GUIStyle CommandHeaderStyle {
     get {
       GUIStyle style;
-      style = NodeStyle(6);
+      style = NodeStyle(4);
       style.padding = new RectOffset(0, 0, 0, 3);
       style.margin = new RectOffset(5, 5, 5, 5);
       return style;
@@ -109,15 +119,15 @@ public static class BoltEditorGUI {
   }
 
   public static Color StructHeaderColor {
-    get { return ColorInt(200, 89, 200); }
+    get { return ColorInt(125, 125, 255); }
   }
-
+   
   public static Color EventHeaderColor {
-    get { return LightOrange; }
+    get { return LightGreen; }
   }
 
   public static Color CommandHeaderColor {
-    get { return LightOrange; }
+    get { return Color.yellow; }
   }
 
   public static GUIStyle SmallWhiteText {

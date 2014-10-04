@@ -93,7 +93,7 @@ public class BoltEditorWindow : BoltWindow {
       if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
         def.IsAbstract = !def.IsAbstract;
       }
-    }, new string[] { "edit-decimal" }, () => {
+    }, new string[] { "compile" }, () => {
 
       def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
       def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
@@ -123,7 +123,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStruct(StructDefinition def) {
-    EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StructHeaderColor, () => {
+    EditHeader(def, BoltEditorGUI.StructHeaderStyle, BoltEditorGUI.StructHeaderColor, () => {
 
     });
 
@@ -222,10 +222,6 @@ public class BoltEditorWindow : BoltWindow {
 
     GUILayout.EndHorizontal();
 
-    GUILayout.BeginHorizontal();
-    GUILayout.Label("//", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.Width(15));
-    def.Comment = EditorGUILayout.TextArea(def.Comment);
-    GUILayout.EndHorizontal();
 
     for (int i = 0; i < rows.Length; ++i) {
       GUILayout.BeginHorizontal();
@@ -239,6 +235,12 @@ public class BoltEditorWindow : BoltWindow {
       rows[i]();
       GUILayout.EndHorizontal();
     }
+
+    GUILayout.Label("Comment", BoltEditorGUI.SmallWhiteText);
+
+    GUILayout.BeginHorizontal();
+    def.Comment = EditorGUILayout.TextArea(def.Comment);
+    GUILayout.EndHorizontal();
 
     GUILayout.EndVertical();
   }
@@ -314,6 +316,9 @@ public class BoltEditorWindow : BoltWindow {
     if (toolbar != null) {
       toolbar(def, p);
     }
+    else {
+      GUILayout.Space(20);
+    }
 
     EditorGUILayout.EndHorizontal();
 
@@ -335,6 +340,16 @@ public class BoltEditorWindow : BoltWindow {
             });
           }
         });
+      }
+
+      if (def is CommandDefinition) {
+        if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {
+          SettingsSection("Corrections", () => {
+            BoltEditorGUI.WithLabel("Smooth Corrections", () => {
+              p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
+            });
+          });
+        }
       }
 
       if (p.PropertyType.HasSettings) {

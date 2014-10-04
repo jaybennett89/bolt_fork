@@ -191,6 +191,12 @@ namespace Bolt.Compiler {
         emitter.EmitEventClass();
       }
 
+      var s2 = DeclareStruct("Test2");
+      s2.BaseTypes.Add("System.IDisposable");
+      s2.DeclareMethod(typeof(void).FullName, "Dispose", method => {
+        method.Statements.Expr("using (var t = new Test2()) {{ t.Dispose(); }}");
+      });
+
       //EmitFilters();
     }
 
