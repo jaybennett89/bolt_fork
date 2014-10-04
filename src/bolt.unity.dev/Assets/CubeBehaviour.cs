@@ -9,6 +9,10 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
     state.Attack += Attack;
   }
 
+  public override void ControlGained() {
+    BoltLog.Info("Control Of {0} Gained", gameObject.name + gameObject.GetInstanceID());
+  }
+
   public override void SimulateOwner() {
     transform.position = new Vector3(Mathf.PingPong(Time.time * 2.5f, 10f) - 5f, 0, 0);
     //transform.position = (Quaternion.Euler(0, Time.time * 20f, 0) * (Vector3.forward * 10f));

@@ -14,6 +14,7 @@ namespace Bolt.Compiler {
 
     public List<StateDecorator> States;
     public List<StructDecorator> Structs;
+    public List<EventDecorator> Events;
 
     public CodeNamespace CodeNamespace;
     public CodeCompileUnit CodeCompileUnit;
@@ -25,6 +26,7 @@ namespace Bolt.Compiler {
     public CodeGenerator() {
       States = new List<StateDecorator>();
       Structs = new List<StructDecorator>();
+      Events = new List<EventDecorator>();
     }
 
     public void Run(Project context, string file) {
@@ -92,10 +94,24 @@ namespace Bolt.Compiler {
 
         Structs.Add(decorator);
       }
+
+      foreach (EventDefinition def in Context.Events) {
+        EventDecorator decorator;
+
+        decorator = new EventDecorator();
+        decorator.Definition = def;
+        decorator.Generator = this;
+
+        Events.Add(decorator);
+      }
     }
 
     void AssignTypeIds() {
-      uint typeId = 1;
+      uint typeId = 0;
+
+      foreach (EventDecorator decorator in Events) {
+        decorator.TypeId = ++typeId;
+      }
 
       foreach (StateDecorator decorator in States) {
         decorator.TypeId = ++typeId;
@@ -168,7 +184,14 @@ namespace Bolt.Compiler {
         emitter.EmitFactoryClass();
       }
 
-      EmitFilters();
+      foreach (EventDecorator d in Events) {
+        EventCodeEmitter emitter;
+        emitter = new EventCodeEmitter();
+        emitter.Decorator = d;
+        emitter.EmitEventClass();
+      }
+
+      //EmitFilters();
     }
 
     void EmitFilters() {
@@ -184,8 +207,12 @@ namespace Bolt.Compiler {
     void DecorateProperties() {
       // Structs
       foreach (StructDecorator s in Structs) {
-        // decorate own properties
         s.Properties = PropertyDecorator.Decorate(s.Definition.Properties, s);
+      }
+
+      // Events
+      foreach (EventDecorator d in Events) {
+        d.Properties = PropertyDecorator.Decorate(d.Definition.Properties, d);
       }
 
       // States
@@ -252,6 +279,7 @@ namespace Bolt.Compiler {
       // sort, index and assign bits for properties
       for (int i = 0; i < Structs.Count; ++i) {
         StructDecorator decorator = Structs[i];
+
         // properties are sorted in this order:
         // - Values
         // - Triggers

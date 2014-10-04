@@ -5,22 +5,22 @@ using System.Text;
 
 namespace Bolt {
   class PropertySerializerString : PropertySerializer {
-    public override int CalculateBits(State state, State.Frame frame) {
-      return 32 + (Blit.ReadI32(frame.Data, MetaData.ByteOffset) * 8);
+    public override int StateBits(State state, State.Frame frame) {
+      return 32 + (Blit.ReadI32(frame.Data, StateData.ByteOffset) * 8);
     }
 
-    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteInt(Blit.ReadI32(frame.Data, MetaData.ByteOffset));
-      stream.WriteByteArray(frame.Data, MetaData.ByteOffset + 4, Blit.ReadI32(frame.Data, MetaData.ByteOffset));
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      stream.WriteInt(Blit.ReadI32(frame.Data, StateData.ByteOffset));
+      stream.WriteByteArray(frame.Data, StateData.ByteOffset + 4, Blit.ReadI32(frame.Data, StateData.ByteOffset));
       return true;
     }
 
-    public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackI32(frame.Data, MetaData.ByteOffset, stream.ReadInt());
-      Blit.PackBytes(frame.Data, MetaData.ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(frame.Data, MetaData.ByteOffset)));
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      Blit.PackI32(frame.Data, StateData.ByteOffset, stream.ReadInt());
+      Blit.PackBytes(frame.Data, StateData.ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(frame.Data, StateData.ByteOffset)));
     }
 
-    public PropertySerializerString(PropertyMetaData info)
+    public PropertySerializerString(StatePropertyMetaData info)
       : base(info) {
     }
   }

@@ -4,9 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bolt.Compiler {
+namespace Bolt.Compiler { 
+  /// <summary>
+  /// Asset Folder
+  /// </summary>
   [ProtoContract]
   public class AssetFolder : INamedAsset {
+    [ProtoIgnore]
+    public bool Deleted;
+
     [ProtoMember(1)]
     public string Name;
 
@@ -18,7 +24,7 @@ namespace Bolt.Compiler {
 
     [ProtoMember(4)]
     public AssetDefinition[] Assets = new AssetDefinition[0];
-
+     
     [ProtoMember(5)]
     public Guid Guid;
 
@@ -44,6 +50,26 @@ namespace Bolt.Compiler {
       }
 
       return null;
+    }
+
+    public List<INamedAsset> Flatten() {
+      List<INamedAsset> result = new List<INamedAsset>();
+      Flatten(result);
+      return result;
+    }
+
+    public void Flatten(List<INamedAsset> result) {
+      result.Add(this);
+
+      if (Expanded) {
+        foreach (var folder in Folders.OrderBy(x => x.Name)) {
+          folder.Flatten(result);
+        }
+
+        foreach (var asset in Assets.OrderBy(x => x.Name)) {
+          result.Add(asset);
+        }
+      }
     }
 
     public INamedAsset FindPrevSibling(INamedAsset asset) {

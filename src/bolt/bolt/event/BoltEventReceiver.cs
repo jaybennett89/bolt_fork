@@ -2,7 +2,7 @@
 
 internal class BoltEventGlobalReceiverInternal : MonoBehaviour {
   protected void OnEnable () {
-    BoltCore._globalEventDispatcher.Register(this);
+    BoltCore._globalEventDispatcher.Add(this);
   }
 
   protected void OnDisable () {

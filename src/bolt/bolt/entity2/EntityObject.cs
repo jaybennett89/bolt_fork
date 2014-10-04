@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  internal class EntityObject : IBoltListNode {
+  partial class EntityObject : IBoltListNode {
     internal const int COMMAND_SEQ_BITS = 8;
     internal const int COMMAND_SEQ_SHIFT = 16 - COMMAND_SEQ_BITS;
     internal const int COMMAND_SEQ_MASK = (1 << COMMAND_SEQ_BITS) - 1;
@@ -139,17 +140,12 @@ namespace Bolt {
       BoltLog.Debug("Detached {0}", this);
     }
 
-    internal void TakeControl() {
-      if (!IsOwner) {
-        BoltLog.Error("can't take control of {0}, it is proxied", this);
-        return;
-      }
+    internal void AddEventListener(UE.MonoBehaviour behaviour) {
+      EventDispatcher.Add(behaviour);
+    }
 
-      // revoke any existing control
-      RevokeControl();
-
-      // take control locally
-      TakeControlInternal();
+    internal void RemoveEventListener(UE.MonoBehaviour behaviour) {
+      EventDispatcher.Remove(behaviour);
     }
 
     internal bool IsController(BoltConnection connection) {
@@ -176,103 +172,14 @@ namespace Bolt {
       Serializer.OnInitialized();
     }
 
-    internal void TakeControlInternal() {
-      Assert.True(!(Flags & EntityFlags.HAS_CONTROL));
 
-      CommandQueue.Clear();
-      CommandSequence = 0;
-
-      // raise user event
-      BoltCallbacksBase.ControlOfEntityGainedInvoke(UnityObject);
-
-      // call to user behaviours
-      foreach (IEntityBehaviour eb in Behaviours) {
-        eb.ControlGained();
-      }
-    }
-
-    internal void ReleaseControl() {
-      Assert.True(Flags & EntityFlags.HAS_CONTROL);
-
-      Flags &= ~EntityFlags.HAS_CONTROL;
-      CommandQueue.Clear();
-      CommandSequence = 0;
-
-      // call to user behaviours
-      foreach (IEntityBehaviour eb in Behaviours) {
-        eb.ControlLost();
-      }
-
-      // call user event
-      BoltCallbacksBase.ControlOfEntityLostInvoke(UnityObject);
-    }
-
-    internal void GiveControl(BoltConnection cn) {
-      throw new NotImplementedException();
-      //if (_flags & BoltEntity.FLAG_IS_PROXY) {
-      //  BoltLog.Error("can't give control of {0} to {1}, it is proxied", this, cn);
-      //  return;
-      //}
-
-      //if (cn._entityChannel.CreateOnRemote(this)) {
-      //  _flags |= BoltEntity.FLAG_REMOTE_CONTROLLED;
-      //  _commands.Clear();
-      //  _commandSequence = 0;
-      //  _remoteController = cn;
-      //  _remoteController._entityChannel.ForceSync(this);
-
-      //}
-      //else {
-      //  BoltLog.Error("couldn't create {0} on {1}, control not given", this, cn);
-      //}
-    }
-
-    internal void RevokeControl() {
-      throw new NotImplementedException();
-      //if (_flags & BoltEntity.FLAG_IS_PROXY) {
-      //  BoltLog.Error("can't revoke control of {0}, it is proxied", this);
-      //  return;
-      //}
-
-      //if (_remoteController) {
-      //  BoltConnection cn = _remoteController;
-
-      //  _flags &= ~BoltEntity.FLAG_REMOTE_CONTROLLED;
-      //  _commands.Clear();
-      //  _commandSequence = 0;
-      //  _remoteController = null;
-
-      //  cn._entityChannel.ForceSync(this);
-      //}
-    }
-
-    internal bool QueueCommand(BoltCommand cmd) {
-      throw new NotImplementedException();
-      //if (hasControl == false) {
-      //  BoltLog.Error("queue of {0} to {1} failed, you are not controlling this entity", cmd, this);
-      //  return false;
-      //}
-
-      //if (_commands.count > BoltCore._config.commandQueueSize) {
-      //  return false;
-      //}
-
-      //cmd._serverFrame = BoltCore.serverFrame;
-      //cmd._sequence = _commandSequence = UdpMath.SeqNext(_commandSequence, COMMAND_SEQ_MASK);
-
-      //// put on command buffer
-      //_commands.AddLast(cmd);
-
-      //return true;
-    }
-
-    internal void SetIdle(BoltConnection cn, bool idle) {
-      if (ReferenceEquals(cn, Controller)) {
-        BoltLog.Error("can't idle an entity on the connection which is controlling it");
+    internal void SetIdle(BoltConnection connection, bool idle) {
+      if (IsController(connection)) {
+        BoltLog.Error("Can't idle {0} on {1}, it is the controller for this entity", this, connection);
         return;
       }
 
-      cn._entityChannel.SetIdle(this, idle);
+      connection._entityChannel.SetIdle(this, idle);
     }
 
     internal void Raise(IBoltEvent ev) {
@@ -410,5 +317,6 @@ namespace Bolt {
     public static implicit operator bool(EntityObject entity) {
       return entity != null;
     }
+
   }
 }

@@ -37,27 +37,27 @@ namespace Bolt {
   class PropertySerializerTransform : PropertySerializer {
     //internal TransformConfiguration Config;
 
-    public PropertySerializerTransform(PropertyMetaData info)
+    public PropertySerializerTransform(StatePropertyMetaData info)
       : base(info) {
     }
 
-    public override int CalculateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.Frame frame) {
       return (12 + 16) * 4;
     }
 
     public override void OnInit(State state) {
-      state.PropertyObjects[MetaData.ObjectOffset] = new TransformData();
+      state.PropertyObjects[StateData.ObjectOffset] = new TransformData();
     }
 
     public override void OnRender(State state, State.Frame frame) {
-      var td = (TransformData)state.Frames.first.Objects[MetaData.ObjectOffset];
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Render) {
         PositionSet(td.Render, UE.Vector3.Lerp(td.RenderDoubleBuffer.Value0, td.RenderDoubleBuffer.Value1, BoltCore.frameAlpha));
       }
     }
 
     public override void OnSimulateBefore(State state) {
-      var td = (TransformData)state.Frames.first.Objects[MetaData.ObjectOffset];
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ControllerLocalPrediction)) {
         PerformInterpolation(td, state);
 
@@ -77,11 +77,11 @@ namespace Bolt {
       }
     }
     public override void OnSimulateAfter(State state) {
-      var td = (TransformData)state.Frames.first.Objects[MetaData.ObjectOffset];
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
         if (state.Entity.IsOwner) {
-          state.Frames.first.Data.PackVector3(MetaData.ByteOffset, td.Simulate.position);
-          state.Frames.first.Data.PackQuaternion(MetaData.ByteOffset + 12, td.Simulate.rotation);
+          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.position);
+          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.rotation);
         }
 
         if (td.Render) {
@@ -90,9 +90,9 @@ namespace Bolt {
       }
     }
 
-    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      UE.Vector3 p = frame.Data.ReadVector3(MetaData.ByteOffset);
-      UE.Quaternion r = frame.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      UE.Vector3 p = frame.Data.ReadVector3(StateData.ByteOffset);
+      UE.Quaternion r = frame.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
       stream.WriteFloat(p.x);
       stream.WriteFloat(p.y);
@@ -128,7 +128,7 @@ namespace Bolt {
       //}
     }
 
-    public override void Read(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       UE.Vector3 p = new UE.Vector3();
       UE.Quaternion r = new UE.Quaternion();
 
@@ -164,8 +164,8 @@ namespace Bolt {
       //    break;
       //}
 
-      frame.Data.PackVector3(MetaData.ByteOffset, p);
-      frame.Data.PackQuaternion(MetaData.ByteOffset + 12, r);
+      frame.Data.PackVector3(StateData.ByteOffset, p);
+      frame.Data.PackQuaternion(StateData.ByteOffset + 12, r);
     }
 
     UE.Vector3 PositionGet(UE.Transform t) {
@@ -190,8 +190,8 @@ namespace Bolt {
 
     void PerformNone(TransformData td, State state) {
       var f0 = state.Frames.first;
-      UE.Vector3 p0 = f0.Data.ReadVector3(MetaData.ByteOffset);
-      UE.Quaternion r0 = f0.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
       PositionSet(td.Simulate, p0);
       RotationSet(td.Simulate, r0);
@@ -199,8 +199,8 @@ namespace Bolt {
 
     void PerformInterpolation(TransformData td, State state) {
       var f0 = state.Frames.first;
-      UE.Vector3 p0 = f0.Data.ReadVector3(MetaData.ByteOffset);
-      UE.Quaternion r0 = f0.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
       if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
         //BoltLog.Info("frame: {0}, f0.number={1}", state.Entity.Frame, f0.Number);
@@ -210,8 +210,8 @@ namespace Bolt {
       }
       else {
         var f1 = state.Frames.Next(f0);
-        UE.Vector3 p1 = f1.Data.ReadVector3(MetaData.ByteOffset);
-        UE.Quaternion r1 = f1.Data.ReadQuaternion(MetaData.ByteOffset + 12);
+        UE.Vector3 p1 = f1.Data.ReadVector3(StateData.ByteOffset);
+        UE.Quaternion r1 = f1.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > state.Entity.Frame);

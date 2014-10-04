@@ -13,7 +13,7 @@ namespace Bolt.Compiler {
     public List<PropertyDefinition> Result = new List<PropertyDefinition>();
 
     public override IEnumerable<Type> AllowedPropertyTypes {
-      get { yield break; }
+      get { return EventDefinition.AllowedEventAndCommandPropertyTypes(); }
     }
   }
 }

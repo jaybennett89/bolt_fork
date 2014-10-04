@@ -21,6 +21,19 @@ namespace Bolt.Compiler {
       }
     }
 
+    public override bool Compilable {
+      get {
+        if (ElementType == null)
+          return false;
+
+        if (ElementType is PropertyTypeStruct) {
+          return ((PropertyTypeStruct)ElementType).StructGuid != Guid.Empty;
+        }
+
+        return true;
+      }
+    }
+
     public override bool HasPriority {
       get { return ElementType != null && ElementType.GetType() != typeof(PropertyTypeStruct); }
     }

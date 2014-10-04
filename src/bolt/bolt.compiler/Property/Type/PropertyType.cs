@@ -20,6 +20,9 @@ namespace Bolt.Compiler {
     public Project Context;
 
     [ProtoIgnore]
+    public virtual bool Compilable { get { return true; } }
+
+    [ProtoIgnore]
     public virtual bool IsValue { get { return true; } }
 
     [ProtoIgnore]

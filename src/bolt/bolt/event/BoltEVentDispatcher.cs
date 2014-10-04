@@ -40,7 +40,7 @@ class BoltEventDispatcher {
     }
   }
 
-  public void Register (MonoBehaviour behaviour) {
+  public void Add (MonoBehaviour behaviour) {
 #if DEBUG
     if (_targets.Contains(behaviour)) {
       BoltLog.Warn("behaviour already registered for this dispatcher");

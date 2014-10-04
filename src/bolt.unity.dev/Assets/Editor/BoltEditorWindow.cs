@@ -68,8 +68,13 @@ public class BoltEditorWindow : BoltWindow {
       if (SelectedAsset is StructDefinition) {
         EditStruct((StructDefinition)SelectedAsset);
       }
+
+      if (SelectedAsset is EventDefinition) {
+        EditEvent((EventDefinition)SelectedAsset);
+      }
     }
   }
+
 
   void EditState(StateDefinition def) {
 
@@ -84,7 +89,7 @@ public class BoltEditorWindow : BoltWindow {
       if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
         def.IsAbstract = !def.IsAbstract;
       }
-    }, () => {
+    }, new string[] { "edit-decimal" }, () => {
 
       def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
       def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
@@ -126,11 +131,54 @@ public class BoltEditorWindow : BoltWindow {
 
   }
 
+  private void EditEvent(EventDefinition def) {
+    EditHeader(def, BoltEditorGUI.EventHeaderStyle, BoltEditorGUI.EventHeaderColor, () => {
+      def.Priority = BoltEditorGUI.EditPriority(def.Priority, !def.Global);
+
+      if (BoltEditorGUI.LabelButton(def.Global ? "global (reliable)" : "entity (unreliable)", true, 0.5f, GUILayout.Width(92))) {
+        def.Global = !def.Global;
+      }
+    }, new string[] { "upload" }, () => {
+      if (def.Global) {
+        def.GlobalSenders = (GlobalEventSenders)EditorGUILayout.EnumPopup(def.GlobalSenders);
+      }
+      else {
+        def.EntitySenders = (EntityEventSenders)EditorGUILayout.EnumPopup(def.EntitySenders);
+      }
+
+      BoltEditorGUI.SetTooltip("Senders, who can send this event?");
+
+      if (def.Global) {
+        def.GlobalTargets = (GlobalEventTargets)EditorGUILayout.EnumMaskField(def.GlobalTargets);
+      }
+      else {
+        def.EntityTargets = (EntityEventTargets)EditorGUILayout.EnumPopup(def.EntityTargets);
+      }
+
+      BoltEditorGUI.SetTooltip("Receivers, who will receive this event?");
+      BoltEditorGUI.Icon("download", new RectOffset(0, +3, +2, 0));
+    });
+
+    // add button
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionEventAssetSettings());
+
+    // list properties
+    EditPropertyList(def, def.Properties, null);
+  }
+
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
+    EditHeader(def, style, color, action, new string[0], rows);
+  }
+    
+  void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, string[] icons, params Action[] rows) {
     GUI.color = color;
     GUILayout.BeginVertical(style);
     GUI.color = Color.white;
     GUILayout.BeginHorizontal();
+
+    if (def is EventDefinition) {
+      BoltEditorGUI.Icon("boltico_event2", new RectOffset(3, 0, 2, 0));
+    }
 
     if (def is StructDefinition) {
       BoltEditorGUI.Icon("boltico_object", new RectOffset(3, 0, 2, 0));
@@ -153,12 +201,16 @@ public class BoltEditorWindow : BoltWindow {
     def.Comment = EditorGUILayout.TextArea(def.Comment);
     GUILayout.EndHorizontal();
 
-    foreach (Action r in rows) {
+    for (int i = 0; i < rows.Length; ++i) {
       GUILayout.BeginHorizontal();
-      GUILayout.Space(23);
+      if (icons != null && i < icons.Length) {
+        BoltEditorGUI.Icon(icons[i], new RectOffset(3, 0, 2, 0));
+      }
+      else {
+        GUILayout.Space(23);
+      }
 
-      r();
-
+      rows[i]();
       GUILayout.EndHorizontal();
     }
 
@@ -223,15 +275,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     // edit priority
-    if (p.PropertyType.HasPriority) {
-      p.Priority = Mathf.Clamp(EditorGUILayout.IntField(p.Priority, GUILayout.Width(32)), 1, 999);
-      BoltEditorGUI.SetTooltip("Property Priority. An integer between 1 and 999. Higher values means a property is more likely to be sent.");
-    }
-    else {
-      BoltEditorGUI.Disabled(() => {
-        EditorGUILayout.TextField("---", GUILayout.Width(32));
-      });
-    }
+    p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
 
     // edit name
     p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(164));
@@ -248,6 +292,10 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (p.Expanded) {
+
+      SettingsSection("Comment", () => {
+        p.Comment = EditorGUILayout.TextField(p.Comment);
+      });
 
       if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
         SettingsSection("Mecanim", () => {

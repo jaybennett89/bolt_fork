@@ -24,6 +24,10 @@ namespace Bolt.Compiler {
       get { return RootFolder.AssetsAll.Where(x => x is StructDefinition).Cast<StructDefinition>(); }
     }
 
+    public IEnumerable<EventDefinition> Events {
+      get { return RootFolder.AssetsAll.Where(x => x is EventDefinition).Cast<EventDefinition>(); }
+    }
+
     public bool UseFilters {
       get { return false; }
     }

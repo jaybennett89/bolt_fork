@@ -9,26 +9,48 @@ namespace Bolt.Compiler {
     [ProtoMember(50)]
     public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
 
-    [ProtoMember(51)]
-    public EventTypes EventType;
-
-    [ProtoMember(56)]
-    public ReliableModes DeliveryMode;
-
     [ProtoMember(52)]
-    public ReplicationTargets EntityTargets;
+    public EntityEventTargets EntityTargets;
 
     [ProtoMember(53)]
-    public EntityReplicationSenders EntitySenders;
+    public EntityEventSenders EntitySenders;
 
     [ProtoMember(54)]
-    public GlobalReplicationTargets GlobalTargets;
+    int _globalTargets;
 
     [ProtoMember(55)]
-    public GlobalReplicationSenders GlobalSenders;
+    public GlobalEventSenders GlobalSenders;
+
+    [ProtoMember(56)]
+    public bool Global;
+
+    [ProtoMember(57)]
+    public int Filters;
+
+    [ProtoMember(58)]
+    public int Priority;
+
+    [ProtoIgnore]
+    public GlobalEventTargets GlobalTargets {
+      get { return (GlobalEventTargets)_globalTargets; }
+      set { _globalTargets = (int)value; }
+    }
+
+    public bool Entity {
+      get { return !Global; }
+    }
 
     public override IEnumerable<Type> AllowedPropertyTypes {
-      get { yield break; }
+      get { return AllowedEventAndCommandPropertyTypes(); }
+    }
+
+    internal static IEnumerable<Type> AllowedEventAndCommandPropertyTypes() {
+      yield return typeof(PropertyTypeEntity);
+      yield return typeof(PropertyTypeFloat);
+      yield return typeof(PropertyTypeBool);
+      yield return typeof(PropertyTypeInteger);
+      yield return typeof(PropertyTypeString);
+      yield return typeof(PropertyTypeVector);
     }
   }
 }

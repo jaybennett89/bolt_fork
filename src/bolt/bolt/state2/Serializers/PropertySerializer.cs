@@ -6,7 +6,13 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  struct PropertyMetaData {
+  struct EventPropertyMetaData {
+    public int ByteOffset;
+    public int ByteLength;
+    public String PropertyName;
+  }
+
+  struct StatePropertyMetaData {
     public int ByteOffset;
     public int ByteLength;
 
@@ -23,16 +29,25 @@ namespace Bolt {
   }
 
   abstract class PropertySerializer {
-    public readonly PropertyMetaData MetaData;
+    public readonly EventPropertyMetaData EventData;
+    public readonly StatePropertyMetaData StateData;
 
-    protected PropertySerializer(PropertyMetaData md) {
-      MetaData = md;
-      MetaData.Priority = UE.Mathf.Max(1, MetaData.Priority);
+    protected PropertySerializer(StatePropertyMetaData stateData) {
+      StateData = stateData;
+      StateData.Priority = UE.Mathf.Max(1, StateData.Priority);
     }
 
-    public abstract int CalculateBits(State state, State.Frame frame);
-    public abstract bool Pack(State state, State.Frame frame, BoltConnection connection, UdpStream stream);
-    public abstract void Read(State state, State.Frame frame, BoltConnection connection, UdpStream stream);
+    protected PropertySerializer(EventPropertyMetaData eventData) {
+      EventData = eventData;
+    }
+
+    public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
+    public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+
+    public virtual int EventBits(Event data) { throw new NotSupportedException(); }
+    public virtual bool EventPack(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual void EventRead(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
 
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }

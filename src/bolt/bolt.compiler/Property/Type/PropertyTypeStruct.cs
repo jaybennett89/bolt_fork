@@ -10,6 +10,10 @@ namespace Bolt.Compiler {
     [ProtoMember(50)]
     public Guid StructGuid;
 
+    public override bool Compilable {
+      get { return StructGuid != Guid.Empty; }
+    }
+
     public override bool HasPriority {
       get { return false; }
     }

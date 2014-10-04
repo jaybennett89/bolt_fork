@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Bolt.Compiler;
 using System.Collections.Generic;
+using System.Reflection;
 
 public static class BoltEditorGUI {
   public static string Tooltip = "";
@@ -15,6 +16,10 @@ public static class BoltEditorGUI {
   public static readonly Color LightGreen = new Color(105f / 255f, 251f / 255f, 9f / 255f);
   public static readonly Color DarkGreen = new Color(34f / 255f, 177f / 255f, 76f / 255f);
   public static readonly Color LightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
+
+  public static void SetWindowTitle(this EditorWindow editor, string title, Texture icon) {
+    typeof(EditorWindow).GetField("m_CachedTitleContent", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(editor, new GUIContent(title, icon));
+  }
 
   public static void SetTooltip(string tooltip) {
     Rect r = GUILayoutUtility.GetLastRect();
@@ -47,6 +52,16 @@ public static class BoltEditorGUI {
     get {
       GUIStyle style;
       style = NodeStyle(2);
+      style.padding = new RectOffset(0, 0, 0, 3);
+      style.margin = new RectOffset(5, 5, 5, 5);
+      return style;
+    }
+  }
+
+  public static GUIStyle EventHeaderStyle {
+    get {
+      GUIStyle style;
+      style = NodeStyle(3);
       style.padding = new RectOffset(0, 0, 0, 3);
       style.margin = new RectOffset(5, 5, 5, 5);
       return style;
@@ -86,6 +101,10 @@ public static class BoltEditorGUI {
     get { return ColorInt(200, 89, 200); }
   }
 
+  public static Color EventHeaderColor {
+    get { return LightOrange; }
+  }
+
   public static GUIStyle SmallWhiteText {
     get {
       GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
@@ -123,6 +142,7 @@ public static class BoltEditorGUI {
       GUIStyle s;
       s = new GUIStyle(EditorStyles.miniLabel);
       s.normal.textColor = Color.white;
+      s.alignment = TextAnchor.MiddleRight;
       return s;
     }
   }
@@ -147,11 +167,11 @@ public static class BoltEditorGUI {
   }
 
   public static bool IsLeftClick {
-    get { return Event.current.type == EventType.MouseDown && Event.current.button == 0 && Event.current.clickCount > 0; }
+    get { return Event.current.type == EventType.MouseDown && Event.current.button == 0; }
   }
 
   public static bool IsRightClick {
-    get { return Event.current.type == EventType.MouseDown && Event.current.button == 1 && Event.current.clickCount > 0; }
+    get { return Event.current.type == EventType.MouseDown && Event.current.button == 1; }
   }
 
   public static bool WasKeyPressed(KeyCode key) {
@@ -340,6 +360,20 @@ public static class BoltEditorGUI {
     return result;
   }
 
+  public static int EditPriority(int priority, bool enabled) {
+    if (enabled) {
+      priority = Mathf.Clamp(EditorGUILayout.IntField(priority, GUILayout.Width(32)), 1, 999);
+      BoltEditorGUI.SetTooltip("Priority. An integer between 1 and 999. Higher values means this is more likely to be sent.");
+    }
+    else {
+      BoltEditorGUI.Disabled(() => {
+        EditorGUILayout.TextField("---", GUILayout.Width(32));
+      });
+    }
+
+    return priority;
+  }
+
   public static bool LabelButton(string label, bool enabled, float opacity, params GUILayoutOption[] options) {
     bool result = false;
 
@@ -396,7 +430,7 @@ public static class BoltEditorGUI {
     var bits = BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions);
     var accuracy = (1f / c.Fractions);
 
-    WithLabel(string.Format(label + " (Bits:{0}, Acc:{1})", bits, accuracy), () => { 
+    WithLabel(string.Format(label + " (Bits:{0}, Acc:{1})", bits, accuracy), () => {
       c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
       c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
       c.Fractions = Mathf.Clamp(IntFieldOverlay(c.Fractions, "Fractions"), 1, 10000);
@@ -436,8 +470,9 @@ public static class BoltEditorGUI {
   static void MakeClickable(System.Action onClick) {
     Rect r = GUILayoutUtility.GetLastRect();
 
-    if (Event.current.type == EventType.MouseDown && r.Contains(Event.current.mousePosition)) {
+    if (IsLeftClick && r.Contains(Event.current.mousePosition)) {
       onClick();
+      UseEvent();
     }
   }
 }

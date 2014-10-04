@@ -49,6 +49,7 @@
     <Compile Include="AssetFolder.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
+    <Compile Include="CodeGenerator\Decorators\Asset\EventDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\StateDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\AssetDecorator.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTrigger.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorVector.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\EventCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\StateCodeEmitter.cs" />

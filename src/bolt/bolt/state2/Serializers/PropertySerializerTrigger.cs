@@ -7,22 +7,22 @@ using UdpKit;
 namespace Bolt {
   class PropertySerializerTrigger : PropertySerializer {
     int LocalOffset {
-      get { return MetaData.ByteOffset; }
+      get { return StateData.ByteOffset; }
     }
 
     int SendOffset {
-      get { return MetaData.ByteOffset + 8; }
+      get { return StateData.ByteOffset + 8; }
     }
 
-    public PropertySerializerTrigger(PropertyMetaData meta)
+    public PropertySerializerTrigger(StatePropertyMetaData meta)
       : base(meta) {
     }
 
-    public override int CalculateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.Frame frame) {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }
 
-    public override bool Pack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
       int triggerFrame = frame.Data.ReadI32(SendOffset);
       int triggerBits = frame.Data.ReadI32(SendOffset + 4);
 
@@ -32,7 +32,7 @@ namespace Bolt {
       return true;
     }
 
-    public override void Read(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
       int triggerBits = stream.ReadInt(BoltCore.remoteSendRate * state.Entity.UpdateRate);
 
       frame.Data.PackI32(LocalOffset, frame.Number);
@@ -53,8 +53,8 @@ namespace Bolt {
     }
 
     bool InvokeForFrame(State state, State.Frame f) {
-      var cb = (System.Action)state.Frames.first.Objects[MetaData.ObjectOffset];
-      var mecanim = state.Animator && MetaData.Mecanim;
+      var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
+      var mecanim = state.Animator && StateData.Mecanim;
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 
@@ -73,7 +73,7 @@ namespace Bolt {
 
           // apply to mecanim
           if (mecanim) {
-            state.Animator.SetTrigger(MetaData.PropertyName);
+            state.Animator.SetTrigger(StateData.PropertyName);
           }
 
           // perform callback

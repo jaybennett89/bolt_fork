@@ -28,7 +28,7 @@ namespace Bolt.Compiler {
     public abstract PropertyCodeEmitter CreateEmitter();
 
     public static List<PropertyDecorator> Decorate(IEnumerable<PropertyDefinition> definitions, AssetDecorator asset) {
-      return definitions.Select(p => Decorate(p, asset)).ToList();
+      return definitions.Where(x => x.PropertyType.Compilable).Select(p => Decorate(p, asset)).ToList();
     }
 
     public static PropertyDecorator Decorate(PropertyDefinition definition, AssetDecorator asset) {

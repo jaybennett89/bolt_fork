@@ -3,35 +3,7 @@ using UnityEditor;
 using Bolt.Compiler;
 
 public static class BoltMenuItems {
-  [MenuItem("Assets/Create/Bolt/State (Legacy)")]
-  public static void NewStateAsset() {
-    BoltEditorUtils.CreateAsset<BoltStateAsset>("BoltState_Legacy");
-  }
-
-  [MenuItem("Assets/Create/Bolt/State")]
-  public static void NewStateAsset2() {
-    BoltEditorUtils.CreateAsset<BoltBinaryAsset>("BoltState", asset => {
-      asset.Type = BoltBinaryAssetTypes.State;
-      asset.Data = Bolt.Compiler.StateDefinition.Default().ToByteArray();
-    });
-  }
-
-  [MenuItem("Assets/Create/Bolt/Event")]
-  public static void NewEventAsset() {
-    BoltEditorUtils.CreateAsset<BoltEventAsset>("BoltEvent");
-  }
-
-  [MenuItem("Assets/Create/Bolt/Command")]
-  public static void NewCommandAsset() {
-    BoltEditorUtils.CreateAsset<BoltCommandAsset>("BoltCommand");
-  }
-
-  [MenuItem("Assets/Create/Bolt/Mecanim")]
-  public static void NewMecanimAsset() {
-    BoltEditorUtils.CreateAsset<BoltMecanimAsset>("BoltMecanim");
-  }
-
-  [MenuItem("Assets/Bolt Engine/Compile Assets", priority = 0)]
+  [MenuItem("Assets/Compile Bolt Assets")]
   public static void RunCompiler() {
     try {
       BoltUserAssemblyCompiler.Run();
@@ -41,7 +13,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Assets/Bolt Engine/Install", priority = 1)]
+  [MenuItem("Edit/Install Bolt")]
   public static void Install() {
     int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");
     if (opt < 2) {

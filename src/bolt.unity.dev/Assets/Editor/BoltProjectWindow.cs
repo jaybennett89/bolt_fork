@@ -74,12 +74,27 @@ public class BoltProjectWindow : BoltWindow {
     BeginEditName();
   }
 
-
   void NewStruct() {
     StructDefinition def;
     def = new StructDefinition();
     def.Guid = Guid.NewGuid();
     def.Name = "NewStruct";
+
+    // add to parent
+    ArrayUtility.Add(ref ParentForNewAsset.Assets, def);
+
+    // select it
+    Select(def);
+
+    // begin editing name
+    BeginEditName();
+  }
+
+  void NewEvent() {
+    EventDefinition def;
+    def = new EventDefinition();
+    def.Guid = Guid.NewGuid();
+    def.Name = "NewEvent";
 
     // add to parent
     ArrayUtility.Add(ref ParentForNewAsset.Assets, def);
@@ -104,6 +119,7 @@ public class BoltProjectWindow : BoltWindow {
         m.AddItem(new GUIContent("New Folder"), false, NewFolder);
         m.AddItem(new GUIContent("New State"), false, NewState);
         m.AddItem(new GUIContent("New Struct"), false, NewStruct);
+        m.AddItem(new GUIContent("New Event"), false, NewEvent);
         m.ShowAsContext();
       }
     }
@@ -196,28 +212,27 @@ public class BoltProjectWindow : BoltWindow {
     return ReferenceEquals(obj, Selected);
   }
 
+  void Step(int direction) {
+    var flatten = Project.RootFolder.Flatten();
+    int index = flatten.FindIndex(x => ReferenceEquals(x, Selected));
+    int newIndex = index + direction;
+
+    if ((index >= 0) && (index < flatten.Count) && (newIndex >= 0) && (newIndex < flatten.Count)) {
+      Select(flatten[newIndex]);
+    }
+  }
+
   void ArrowKeys() {
     if (Selected != null) {
       if (Event.current.isKey) {
         AssetFolder folder = Selected as AssetFolder;
 
         if (BoltEditorGUI.WasKeyPressed(KeyCode.UpArrow)) {
-          // try previous sibling
-          if (!SelectPrevSibling()) {
-            // if fail, go to parent
-            SelectParentFolder();
-          }
+          Step(-1);
         }
 
         if (BoltEditorGUI.WasKeyPressed(KeyCode.DownArrow)) {
-          if (folder != null && folder.Expanded) {
-            if (!SelectFirstChild()) {
-              SelectNextSibling();
-            }
-          }
-          else {
-            SelectNextSibling();
-          }
+          Step(+1);
         }
 
         if (folder != null) {
@@ -231,12 +246,12 @@ public class BoltProjectWindow : BoltWindow {
             }
           }
           else {
-            if (BoltEditorGUI.WasKeyPressed(KeyCode.LeftArrow)) {
-              SelectParentFolder();
-            }
-
             if (BoltEditorGUI.WasKeyPressed(KeyCode.RightArrow)) {
               folder.Expanded = true;
+            }
+
+            if (BoltEditorGUI.WasKeyPressed(KeyCode.LeftArrow)) {
+              SelectParentFolder();
             }
           }
         }
@@ -303,8 +318,14 @@ public class BoltProjectWindow : BoltWindow {
     }
 
     RectOffset r = new RectOffset(3 + (indent * 11), 0, 0, 0);
-    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_arrow_down_8px" : "boltico_arrow_right_8px", r, () => { if (BoltEditorGUI.IsLeftClick) Expand(folder); }, 9);
-    BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_folder_open" : "boltico_folder_closed", () => { SelectOrExpand(folder); });
+
+    if (!isRoot) {
+      BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_arrow_down_8px" : "boltico_arrow_right_8px", r, () => { if (BoltEditorGUI.IsLeftClick) Expand(folder); }, 9);
+      BoltEditorGUI.IconClickable(folder.Expanded ? "boltico_folder_open" : "boltico_folder_closed", () => { SelectOrExpand(folder); });
+    }
+    else {
+      BoltEditorGUI.IconClickable("boltico_logo_light", () => { });
+    }
 
     GUIStyle label = new GUIStyle(GUI.skin.label);
     label.margin = new RectOffset();
@@ -321,18 +342,36 @@ public class BoltProjectWindow : BoltWindow {
       });
     }
 
+    GUILayout.FlexibleSpace();
+
+    if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control && folder.Folders.Length == 0 && folder.Assets.Length == 0) {
+      BoltEditorGUI.IconClickable("boltico_x", r, () => {
+        folder.Deleted = true;
+      });
+    }
+
     GUILayout.EndHorizontal();
 
     GUILayout.BeginVertical();
 
     if (folder.Expanded || isRoot) {
-      foreach (AssetFolder subFolder in folder.Folders.OrderBy(x => x.Name)) {
+      foreach (AssetFolder subFolder in folder.Folders.OrderBy(x => x.Name).ToArray()) {
         Folder(subFolder, indent + 1);
       }
 
-      foreach (AssetDefinition asset in folder.Assets.OrderBy(x => x.Name)) {
+      foreach (AssetDefinition asset in folder.Assets.OrderBy(x => x.Name).ToArray()) {
         Asset(asset, indent + 1);
       }
+    }
+
+    if (folder.Assets.Count(x => x.Deleted) > 0) {
+      folder.Assets = folder.Assets.Where(x => !x.Deleted).ToArray();
+      Save();
+    }
+
+    if (folder.Folders.Count(x => x.Deleted) > 0) {
+      folder.Folders = folder.Folders.Where(x => !x.Deleted).ToArray();
+      Save();
     }
 
     GUILayout.EndVertical();
@@ -344,14 +383,13 @@ public class BoltProjectWindow : BoltWindow {
       menu = true;
 
       // repaint twice
-      Repaints = 2;
+      Repaints = 10;
 
       if (folder != null) {
         Select(folder);
       }
-      else {
-        BoltEditorGUI.UseEvent();
-      }
+
+      BoltEditorGUI.UseEvent();
     }
   }
 
@@ -388,6 +426,7 @@ public class BoltProjectWindow : BoltWindow {
 
     if (asset is StateDefinition) { icon = "boltico_replistate2"; }
     if (asset is StructDefinition) { icon = "boltico_object"; }
+    if (asset is EventDefinition) { icon = "boltico_event2"; }
 
     RectOffset r = new RectOffset(12 + (indent * 11), 0, 0, 0);
     BoltEditorGUI.IconClickable(icon, r, () => { Select(asset); });
@@ -404,8 +443,16 @@ public class BoltProjectWindow : BoltWindow {
       BoltEditorGUI.LabelClickable(asset.Name, label, () => { Select(asset); });
     }
 
-    //GUILayout.FlexibleSpace();
+    //
     //BoltEditorGUI.Icon("new");
+
+    GUILayout.FlexibleSpace();
+
+    if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
+      BoltEditorGUI.IconClickable("boltico_x", r, () => {
+        asset.Deleted = true;
+      });
+    }
 
     GUILayout.EndHorizontal();
   }

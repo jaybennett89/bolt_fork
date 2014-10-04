@@ -221,12 +221,12 @@ namespace Bolt {
     void InvokeCallbacks(PropertySerializer p) {
       p.OnChanged(this, Frames.first);
 
-      for (int i = 0; i < p.MetaData.CallbackPaths.Length; ++i) {
+      for (int i = 0; i < p.StateData.CallbackPaths.Length; ++i) {
         List<PropertyCallback> callbacksList;
 
-        if (Callbacks.TryGetValue(p.MetaData.CallbackPaths[i], out callbacksList)) {
+        if (Callbacks.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
           for (int n = 0; n < callbacksList.Count; ++n) {
-            callbacksList[n](this, p.MetaData.PropertyPath, p.MetaData.CallbackIndices);
+            callbacksList[n](this, p.StateData.PropertyPath, p.StateData.CallbackIndices);
           }
         }
       }
@@ -247,7 +247,7 @@ namespace Bolt {
         if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
 
           // increment priority for this property
-          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].MetaData.Priority;
+          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].StateData.Priority;
 
           // copy to our temp array
           tempPriority[tempCount] = proxyPriority[i];
@@ -304,7 +304,7 @@ namespace Bolt {
           break;
         }
 
-        int b = PropertyIdBits + s.CalculateBits(this, Frames.first);
+        int b = PropertyIdBits + s.StateBits(this, Frames.first);
         int ptr = stream.Ptr;
 
         if (bits >= b) {
@@ -312,7 +312,7 @@ namespace Bolt {
           stream.WriteInt(p.PropertyIndex, PropertyIdBits);
 
           // write data into stream
-          if (s.Pack(this, Frames.first, connection, stream)) {
+          if (s.StatePack(this, Frames.first, connection, stream)) {
 #if DEBUG
             int totalBits = PropertyIdBits + (stream.Position - ptr);
             if (totalBits != b) {
@@ -361,7 +361,7 @@ namespace Bolt {
         var serializer = MetaData.PropertySerializers[property];
 
         // read data into frame
-        serializer.Read(this, frame, connection, stream);
+        serializer.StateRead(this, frame, connection, stream);
 
         // put property index into updated list
         frame.ReadProperties.Add(property);
@@ -386,7 +386,7 @@ namespace Bolt {
       for (int i = 0; i < L; ++i) {
         PropertySerializer s = MetaData.PropertySerializers[i];
 
-        if (Blit.Diff(a.Data, b.Data, s.MetaData.ByteOffset, s.MetaData.ByteLength)) {
+        if (Blit.Diff(a.Data, b.Data, s.StateData.ByteOffset, s.StateData.ByteLength)) {
           DiffMask.Set(i);
         }
       }

@@ -11,32 +11,34 @@ namespace Bolt.Compiler {
   }
 
   [ProtoContract]
-  public enum ReliableModes {
-    Reliable = 0,
-    Unreliable = 1
+  public enum EntityEventSenders {
+    Everyone = 0,
+    OnlyOwner = 1,
+    OnlyController = 2,
   }
 
   [ProtoContract]
-  public enum GlobalReplicationTargets {
+  public enum EntityEventTargets {
     Everyone = 0,
-    Others = 1,
-    Server = 2,
-    Client = 3,
+    EveryoneExceptController = 1,
+    OnlyController = 6
+  }
+
+  [Flags]
+  [ProtoContract]
+  public enum GlobalEventTargets {
+    Everyone = 1 << 0,
+    Others = 1 << 1,
+    Server = 1 << 2,
+    Client = 1 << 3,
+    AllClients = 1 << 4,
   }
 
   [ProtoContract]
-  public enum GlobalReplicationSenders {
+  public enum GlobalEventSenders {
     Everyone = 0,
-    ServerOnly = 1,
-    ClientOnly = 2
-  }
-
-  [ProtoContract]
-  public enum EntityReplicationSenders {
-    Everyone = 0,
-    OwnerOnly = 1,
-    ControllerOnly = 2,
-    OwnerAndController = 3
+    OnlyServer = 1,
+    OnlyClients = 2
   }
 
   [ProtoContract]
