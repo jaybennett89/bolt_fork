@@ -49,6 +49,10 @@ namespace Bolt {
     public virtual bool EventPack(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
     public virtual void EventRead(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
 
+    public virtual int CommandsBits(Command data) { throw new NotSupportedException(); }
+    public virtual bool EventPack(Command data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual void EventRead(Command data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }
     public virtual void OnSimulateAfter(State state) { }

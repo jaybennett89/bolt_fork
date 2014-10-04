@@ -43,6 +43,10 @@ namespace Bolt.Compiler {
       get { return false; }
     }
 
+    public override bool CanSmoothCorrections {
+      get { return true; }
+    }
+
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorVector();
     }

@@ -12,8 +12,9 @@ namespace Bolt {
 
   public enum GlobalTargets : byte {
     Everyone = 0,
-    EveryoneExceptSender = 1,
-    OnlyServer = 2,
-    OnlyClients = 3
+    Others = 1,
+    Server = 2,
+    Client = 3,
+    AllClients = 4,
   }
 }

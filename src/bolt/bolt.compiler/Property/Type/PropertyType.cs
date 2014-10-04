@@ -40,6 +40,9 @@ namespace Bolt.Compiler {
     [ProtoIgnore]
     public virtual bool MecanimApplicable { get { return false; } }
 
+    [ProtoIgnore]
+    public virtual bool CanSmoothCorrections { get { return false; } }
+
     public virtual PropertyDecorator CreateDecorator() {
       throw new NotImplementedException();
     }

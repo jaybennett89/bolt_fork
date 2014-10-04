@@ -407,6 +407,7 @@ public class BoltProjectWindow : BoltWindow {
     Selected = asset;
     EndEditName(false);
     BoltEditorGUI.UseEvent();
+    BoltEditorWindow.Open();
   }
 
   void Expand(AssetFolder folder) {

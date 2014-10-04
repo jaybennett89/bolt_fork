@@ -34,6 +34,22 @@ namespace Bolt {
     internal DoubleBuffer<UE.Vector3> RenderDoubleBuffer;
   }
 
+  public class TransformDataRigidbody : TransformData {
+    public UE.Rigidbody Rigidbody;
+  }
+
+  public class TransformDataRigidbody2D : TransformData {
+    public UE.Rigidbody2D Rigidbody;
+  }
+
+  public class TransformDataCharacterController : TransformData {
+    public UE.CharacterController CharacterController;
+  }
+
+  public class TransformDataVelocity : TransformData {
+    public UE.Vector3 Velocity;
+  }
+
   class PropertySerializerTransform : PropertySerializer {
     //internal TransformConfiguration Config;
 

@@ -19,7 +19,7 @@ namespace Bolt.Compiler {
 
       type.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Private;
-        ctor.BaseConstructorArgs.Add(Decorator.ByteSize.ToString().Expr());
+        ctor.BaseConstructorArgs.Add("default(Bolt.EventMetaData)".Expr());
       });
 
       if (Decorator.Definition.Global) {
@@ -33,22 +33,20 @@ namespace Bolt.Compiler {
     void EmitEntityMembers(CodeTypeDeclaration type) {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-
         method.DeclareParameter("BoltEntity", "entity");
-        method.DeclareParameter("Bolt.EntityTargets", "targets");
 
         method.Statements.Expr("if (!entity) throw new System.ArgumentNullException(\"entity\")");
-        method.Statements.Expr("if (!entity.IsAttached) throw new BoltException(\"You can not raise events on entities which are not attached\")");
+        method.Statements.Expr("if (!entity.isAttached) throw new BoltException(\"You can not raise events on entities which are not attached\")");
 
         switch (Decorator.Definition.EntitySenders) {
-          case EntityEventSenders.OnlyOwner: method.Statements.Expr("if (!entity.IsOwner) throw new BoltException(\"You are not the owner of {{0}}, you can not raise this event\", entity)"); break;
-          case EntityEventSenders.OnlyController: method.Statements.Expr("if (!entity.HasControl) throw new BoltException(\"You are not the controller of {{0}}, you can not raise this event\", entity)"); break;
+          case EntityEventSenders.OnlyOwner: method.Statements.Expr("if (!entity.isOwner) throw new BoltException(\"You are not the owner of {{0}}, you can not raise this event\", entity)"); break;
+          case EntityEventSenders.OnlyController: method.Statements.Expr("if (!entity.hasControl) throw new BoltException(\"You are not the controller of {{0}}, you can not raise this event\", entity)"); break;
         }
 
         method.Statements.Expr("{0} evt", Decorator.Definition.Name);
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
         method.Statements.Expr("evt.EntityTargets = Bolt.EntityTargets.{0}", Decorator.Definition.EntityTargets);
-        method.Statements.Expr("evt.Entity = entity");
+        method.Statements.Expr("evt.Entity = entity.Entity");
         method.Statements.Expr("return evt");
       });
     }
@@ -62,7 +60,7 @@ namespace Bolt.Compiler {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
 
         if (methodBody == null) {
-          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0})", target);
+          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0}, null)", target);
         }
         else {
           methodBody(method);
@@ -82,6 +80,7 @@ namespace Bolt.Compiler {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Private | MemberAttributes.Static;
         method.DeclareParameter("Bolt.GlobalTargets", "targets");
+        method.DeclareParameter("BoltConnection", "connection");
 
         switch (Decorator.Definition.GlobalSenders) {
           case GlobalEventSenders.OnlyServer: EmitGlobalServerCheck(method); break;
@@ -90,6 +89,7 @@ namespace Bolt.Compiler {
 
         method.Statements.Expr("{0} evt", Decorator.Definition.Name);
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
+        method.Statements.Expr("evt.Connection = connection");
         method.Statements.Expr("evt.GlobalTargets = targets");
         method.Statements.Expr("return evt");
       });
@@ -109,7 +109,7 @@ namespace Bolt.Compiler {
       if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.Server) == GlobalEventTargets.Server) {
         EmitGlobalRaiseMethod(type, GlobalEventTargets.Server, method => {
           EmitGlobalClientCheck(method);
-          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0})", GlobalEventTargets.Server);
+          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0}, null)", GlobalEventTargets.Server);
         });
       }
 

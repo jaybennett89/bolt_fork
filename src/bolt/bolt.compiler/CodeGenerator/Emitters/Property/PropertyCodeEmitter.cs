@@ -17,7 +17,7 @@ namespace Bolt.Compiler {
     }
 
     public CodeExpression EmitSerializerCreateExpression(StateDecoratorProperty p) {
-      return (@"new Bolt." + SerializerClassName + @"(new Bolt.PropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"", Mecanim = {8}, MecanimDamping = {9} }})").Expr(
+      return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"", Mecanim = {8}, MecanimDamping = {9} }})").Expr(
         p.OffsetBytes, // {0}
         Decorator.ByteSize, // {1}
         p.OffsetObjects, // {2}

@@ -67,6 +67,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="command2\Command.cs" />
     <Compile Include="entity2\EntityBehaviour.cs" />
     <Compile Include="entity2\EntityObject.Control.cs" />
     <Compile Include="entity2\EntityObject.cs" />

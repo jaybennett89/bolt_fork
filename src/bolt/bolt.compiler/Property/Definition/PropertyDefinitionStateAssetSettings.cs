@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyDefinitionStateAssetSettings : PropertyDefinitionAssetSettings {
+  public class PropertyStateSettings : PropertyAssetSettings {
     [ProtoMember(5)]
     public StateEstimationAlgorithm EstimationAlgorithm;
 

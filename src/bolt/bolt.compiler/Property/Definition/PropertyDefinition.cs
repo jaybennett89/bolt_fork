@@ -43,17 +43,21 @@ namespace Bolt.Compiler {
     public PropertyType PropertyType;
 
     [ProtoMember(6)]
-    public PropertyDefinitionAssetSettings AssetSettings;
+    public PropertyAssetSettings AssetSettings;
 
     [ProtoMember(8)]
     public int Filters;
 
-    public PropertyDefinitionStateAssetSettings StateAssetSettings {
-      get { return (PropertyDefinitionStateAssetSettings)AssetSettings; }
+    public PropertyStateSettings StateAssetSettings {
+      get { return (PropertyStateSettings)AssetSettings; }
     }
 
-    public PropertyDefinitionEventAssetSettings EventAssetSettings {
-      get { return (PropertyDefinitionEventAssetSettings)AssetSettings; }
+    public PropertyEventSettings EventAssetSettings {
+      get { return (PropertyEventSettings)AssetSettings; }
+    }
+
+    public PropertyCommandSettings CommandAssetSettings {
+      get { return (PropertyCommandSettings)AssetSettings; }
     }
   }
 }
