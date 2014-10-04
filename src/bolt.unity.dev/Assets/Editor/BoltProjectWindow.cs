@@ -106,6 +106,22 @@ public class BoltProjectWindow : BoltWindow {
     BeginEditName();
   }
 
+  void NewCommand() {
+    CommandDefinition def;
+    def = new CommandDefinition();
+    def.Guid = Guid.NewGuid();
+    def.Name = "NewCommand";
+
+    // add to parent
+    ArrayUtility.Add(ref ParentForNewAsset.Assets, def);
+
+    // select it
+    Select(def);
+
+    // begin editing name
+    BeginEditName();
+  }
+
   void ContextMenu() {
     if (Event.current.type != EventType.Repaint) {
       return;
@@ -120,6 +136,7 @@ public class BoltProjectWindow : BoltWindow {
         m.AddItem(new GUIContent("New State"), false, NewState);
         m.AddItem(new GUIContent("New Struct"), false, NewStruct);
         m.AddItem(new GUIContent("New Event"), false, NewEvent);
+        m.AddItem(new GUIContent("New Command"), false, NewCommand);
         m.ShowAsContext();
       }
     }
@@ -428,6 +445,7 @@ public class BoltProjectWindow : BoltWindow {
     if (asset is StateDefinition) { icon = "boltico_replistate2"; }
     if (asset is StructDefinition) { icon = "boltico_object"; }
     if (asset is EventDefinition) { icon = "boltico_event2"; }
+    if (asset is CommandDefinition) { icon = "boltico_playcom2"; }
 
     RectOffset r = new RectOffset(12 + (indent * 11), 0, 0, 0);
     BoltEditorGUI.IconClickable(icon, r, () => { Select(asset); });

@@ -68,6 +68,17 @@ public static class BoltEditorGUI {
     }
   }
 
+
+  public static GUIStyle CommandHeaderStyle {
+    get {
+      GUIStyle style;
+      style = NodeStyle(6);
+      style.padding = new RectOffset(0, 0, 0, 3);
+      style.margin = new RectOffset(5, 5, 5, 5);
+      return style;
+    }
+  }
+
   public static GUIStyle WhiteTextureBackgroundStyle {
     get {
       GUIStyle bg;
@@ -102,6 +113,10 @@ public static class BoltEditorGUI {
   }
 
   public static Color EventHeaderColor {
+    get { return LightOrange; }
+  }
+
+  public static Color CommandHeaderColor {
     get { return LightOrange; }
   }
 
@@ -295,7 +310,7 @@ public static class BoltEditorGUI {
     return current;
   }
 
-  public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyDefinitionAssetSettings> newSettings) {
+  public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
 
 
     EditorGUILayout.BeginHorizontal();

@@ -72,6 +72,10 @@ public class BoltEditorWindow : BoltWindow {
       if (SelectedAsset is EventDefinition) {
         EditEvent((EventDefinition)SelectedAsset);
       }
+
+      if (SelectedAsset is CommandDefinition) {
+        EditCommand((CommandDefinition)SelectedAsset);
+      }
     }
   }
 
@@ -99,7 +103,7 @@ public class BoltEditorWindow : BoltWindow {
     // add button
     // GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);
 
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
@@ -124,14 +128,14 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionStateAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
 
   }
 
-  private void EditEvent(EventDefinition def) {
+  void EditEvent(EventDefinition def) {
     EditHeader(def, BoltEditorGUI.EventHeaderStyle, BoltEditorGUI.EventHeaderColor, () => {
       def.Priority = BoltEditorGUI.EditPriority(def.Priority, !def.Global);
 
@@ -160,16 +164,34 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyDefinitionEventAssetSettings());
+    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyEventSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, null);
   }
 
+  void EditCommand(CommandDefinition def) {
+    EditHeader(def, BoltEditorGUI.CommandHeaderStyle, BoltEditorGUI.CommandHeaderColor, () => {
+
+    });
+
+    // add button
+    BoltEditorGUI.AddButton("Input", def.Input, () => new PropertyCommandSettings());
+
+    // list properties
+    EditPropertyList(def, def.Input, null);
+
+    // add button
+    BoltEditorGUI.AddButton("Result", def.Result, () => new PropertyCommandSettings());
+
+    // list properties
+    EditPropertyList(def, def.Result, null);
+  }
+
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
     EditHeader(def, style, color, action, new string[0], rows);
   }
-    
+
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, string[] icons, params Action[] rows) {
     GUI.color = color;
     GUILayout.BeginVertical(style);
@@ -186,6 +208,10 @@ public class BoltEditorWindow : BoltWindow {
 
     if (def is StateDefinition) {
       BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 2, 0));
+    }
+
+    if (def is CommandDefinition) {
+      BoltEditorGUI.Icon("boltico_playcom2", new RectOffset(3, 0, 2, 0));
     }
 
     // edit asset name
@@ -312,7 +338,7 @@ public class BoltEditorWindow : BoltWindow {
       }
 
       if (p.PropertyType.HasSettings) {
-        SettingsSection("Settings", () => {
+        SettingsSection("Compression", () => {
           if (IsStateOrStruct(def)) {
             EditStateAssetSettings(p);
           }
