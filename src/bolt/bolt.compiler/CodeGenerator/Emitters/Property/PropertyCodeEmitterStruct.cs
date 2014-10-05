@@ -8,7 +8,7 @@ namespace Bolt.Compiler {
   public class PropertyCodeEmitterStruct : PropertyCodeEmitter<PropertyDecoratorStruct> {
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return new {0}(frame.Data, offsetBytes + {1}, offsetObjects + {2})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset);
+        get.Expr("return new {0}(frame, offsetBytes + {1}, offsetObjects + {2})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset);
       };
 
       Action<CodeStatementCollection> setter = set => {

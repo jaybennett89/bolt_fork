@@ -36,10 +36,13 @@ public static partial class BoltNetwork {
   /// <summary>
   /// The current server simulation frame number
   /// </summary>
+  public static IEnumerable<BoltEntity> entities {
+    get { return BoltCore.entities; }
+  }
+
   public static int serverFrame {
     get { return BoltCore.serverFrame; }
   }
-
 
   /// <summary>
   /// The current server simulation time

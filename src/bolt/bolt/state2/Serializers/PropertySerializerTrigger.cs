@@ -7,15 +7,17 @@ using UdpKit;
 namespace Bolt {
   class PropertySerializerTrigger : PropertySerializer {
     int LocalOffset {
-      get { return StateData.ByteOffset; }
+      get { return StateData.ByteOffset + 8; }
     }
 
     int SendOffset {
-      get { return StateData.ByteOffset + 8; }
+      get { return StateData.ByteOffset; }
     }
 
     public PropertySerializerTrigger(StatePropertyMetaData meta)
       : base(meta) {
+        Assert.True(meta.ByteLength == 16);
+        meta.ByteLength = 8;
     }
 
     public override int StateBits(State state, State.Frame frame) {
@@ -49,7 +51,7 @@ namespace Bolt {
       }
 
       // make sure we always shift our send data according to our local frame
-      state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
+      // state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
     }
 
     bool InvokeForFrame(State state, State.Frame f) {

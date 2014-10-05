@@ -111,8 +111,8 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// controlling a proxied entity the command will also be sent to the server.
   /// </summary>
   /// <param name="command">The command to queue</param>
-  public bool QueueCommand(Bolt.Command command) {
-    return Entity.QueueCommand(command);
+  public bool QueueInput(Bolt.ICommandInput command) {
+    return Entity.QueueCommand((Bolt.Command)(object)command);
   }
 
   /// <summary>

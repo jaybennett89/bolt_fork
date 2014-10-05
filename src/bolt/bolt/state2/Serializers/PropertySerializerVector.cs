@@ -42,6 +42,9 @@ namespace Bolt {
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
       var v0 = from.ReadVector3(CommandData.ByteOffset);
       var v1 = to.ReadVector3(CommandData.ByteOffset);
+
+      //BoltLog.Info("Interpolating {0}-{1}={2} t={3}", v0, v1, UE.Vector3.Lerp(v0, v1, t), t);
+
       into.PackVector3(CommandData.ByteOffset, UE.Vector3.Lerp(v0, v1, t));
     }
   }

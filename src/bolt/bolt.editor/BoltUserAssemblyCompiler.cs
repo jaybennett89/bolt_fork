@@ -93,13 +93,13 @@ class BoltUserAssemblyCompiler {
   static string sourceFileList {
     get {
       return
-        "\"" + eventsFile + "\" " +
+        //"\"" + eventsFile + "\" " +
         "\"" + networkFile + "\" " +
         //"\"" + statesFile + "\" " +
         "\"" + prefabsFile + "\" " +
         "\"" + mapsFile + "\" " +
         //"\"" + mecanimFile + "\" " +
-        "\"" + commandsFile + "\" " +
+        //"\"" + commandsFile + "\" " +
         "\"" + projectFile + "\" " +
         "\"" + assemblyInfoFile + "\" ";
     }

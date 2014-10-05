@@ -367,6 +367,9 @@ partial class BoltEntityChannel : BoltChannel {
         proxy.Entity.PrefabId.Pack(packet.stream, 32);
         proxy.Entity.Serializer.TypeId.Pack(packet.stream, 32);
 
+        packet.stream.WriteVector3Half(proxy.Entity.UnityObject.transform.position);
+        packet.stream.WriteQuaternionHalf(proxy.Entity.UnityObject.transform.rotation);
+
         //packet.stream.WriteVector3Half(proxy.entity.transform.position);
         //if (BoltCore._config.globalUniqueIds) {
         //  packet.stream.WriteUniqueId(proxy.entity._uniqueId);
@@ -439,6 +442,8 @@ partial class BoltEntityChannel : BoltChannel {
         GameObject prefab = null;
         PrefabId prefabId = PrefabId.Read(packet.stream, 32);
         TypeId serializerId = TypeId.Read(packet.stream, 32);
+        Vector3 spawnPosition = packet.stream.ReadVector3Half();
+        Quaternion spawnRotation = packet.stream.ReadQuaternionHalf();
 
         if (BoltRuntimeSettings.prefabs.TryGetIndex(prefabId.Value, out prefab)) {
           if (BoltCore.isServer && !prefab.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
@@ -452,6 +457,8 @@ partial class BoltEntityChannel : BoltChannel {
         // create entity
         entity = BoltCore.CreateEntity(prefab, serializerId);
         entity.Source = connection;
+        entity.UnityObject.transform.position = spawnPosition;
+        entity.UnityObject.transform.rotation = spawnRotation;
 
         // handle case where we are given control (it needs to be true during the initialize, read and attached callbacks)
         if (isController) {
@@ -493,18 +500,18 @@ partial class BoltEntityChannel : BoltChannel {
           throw new BoltException("couldn't find proxy with id {0}", netId);
         }
 
-        // read update
-        proxy.Entity.Serializer.Read(connection, packet.stream, packet.frame);
-
         // update control state yes/no
         if (proxy.Entity.HasControl ^ isController) {
           if (isController) {
             proxy.Entity.TakeControlInternal();
           }
           else {
-            proxy.Entity.ReleaseControl();
+            proxy.Entity.ReleaseControlInternal();
           }
         }
+
+        // read update
+        proxy.Entity.Serializer.Read(connection, packet.stream, packet.frame);
       }
 
     }

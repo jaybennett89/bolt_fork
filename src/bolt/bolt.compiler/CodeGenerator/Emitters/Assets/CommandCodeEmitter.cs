@@ -57,7 +57,8 @@ namespace Bolt.Compiler {
         ctor.BaseConstructorArgs.Add("_meta".Expr());
       });
 
-      type.DeclareMethod(Decorator.Definition.Name, "Create", method => {
+      type.DeclareMethod(Decorator.InputInterfaceName, "Create", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.Statements.Expr("return new {0}()", Decorator.Definition.Name);
       });
 
@@ -72,6 +73,7 @@ namespace Bolt.Compiler {
 
     void EmitInputInterface() {
       CodeTypeDeclaration type = Generator.DeclareInterface(Decorator.InputInterfaceName);
+      type.BaseTypes.Add("Bolt.ICommandInput");
 
       for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
         PropertyCodeEmitter.Create(Decorator.InputProperties[i]).EmitSimpleIntefaceMember(type, true, true);

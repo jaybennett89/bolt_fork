@@ -169,13 +169,19 @@ partial class BoltEntityChannel {
           }
 
           if (cmd) {
-            cmd.SmoothTo = cmd.ResultData.CloneArray();
-            cmd.SmoothFrom = cmd.ResultData.CloneArray();
+            if (cmd.Meta.SmoothFrames > 0) {
+              cmd.SmoothTo = cmd.ResultData.CloneArray();
+              cmd.SmoothFrom = cmd.ResultData.CloneArray();
 
-            cmd.SmoothStart = BoltCore.frame;
-            cmd.SmoothEnd = cmd.SmoothStart + cmd.Meta.SmoothFrames;
+              cmd.SmoothStart = BoltCore.frame;
+              cmd.SmoothEnd = cmd.SmoothStart + cmd.Meta.SmoothFrames;
 
-            cmd.ReadResult(connection, cmd.SmoothTo, packet.stream);
+              cmd.ReadResult(connection, cmd.SmoothTo, packet.stream);
+            }
+            else {
+              cmd.ReadResult(connection, cmd.ResultData, packet.stream);
+            }
+
             cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
           }
           else {

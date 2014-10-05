@@ -29,9 +29,25 @@ namespace Bolt {
   //}
 
   public class TransformData {
-    public UE.Transform Render;
-    public UE.Transform Simulate;
+
+    internal UE.Transform Simulate;
+    internal UE.Transform Render;
     internal DoubleBuffer<UE.Vector3> RenderDoubleBuffer;
+
+    public void SetTransforms(UE.Transform simulate) {
+      SetTransforms(simulate, null, UE.Vector3.zero);
+    }
+
+    public void SetTransforms(UE.Transform simulate, UE.Transform render) {
+      SetTransforms(simulate, render, simulate.position);
+    }
+
+    void SetTransforms(UE.Transform simulate, UE.Transform render, UE.Vector3 start) {
+      Render = render;
+      RenderDoubleBuffer = DoubleBuffer<UE.Vector3>.InitBuffer(start);
+
+      Simulate = simulate;
+    }
   }
 
   public class TransformDataRigidbody : TransformData {
@@ -68,7 +84,12 @@ namespace Bolt {
     public override void OnRender(State state, State.Frame frame) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Render) {
-        PositionSet(td.Render, UE.Vector3.Lerp(td.RenderDoubleBuffer.Value0, td.RenderDoubleBuffer.Value1, BoltCore.frameAlpha));
+        var p = td.RenderDoubleBuffer.Previous;
+        var c = td.RenderDoubleBuffer.Current;
+
+        //PositionSet(td.Render, (c * BoltCore.frameAlpha) + (p * (1f - BoltCore.frameAlpha)));
+
+        PositionSet(td.Render, UE.Vector3.Lerp(p, c, BoltCore.frameAlpha));
       }
     }
 
@@ -100,9 +121,7 @@ namespace Bolt {
           state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.rotation);
         }
 
-        if (td.Render) {
-          td.RenderDoubleBuffer = td.RenderDoubleBuffer.Shift(td.Simulate.position);
-        }
+        td.RenderDoubleBuffer = td.RenderDoubleBuffer.Shift(td.Simulate.position);
       }
     }
 
@@ -186,21 +205,21 @@ namespace Bolt {
 
     UE.Vector3 PositionGet(UE.Transform t) {
       //return Config.Space == TransformSpaces.World ? t.position : t.localPosition; 
-      return t.localPosition;
+      return t.position;
     }
 
     UE.Quaternion RotationGet(UE.Transform t) {
       //return Config.Space == TransformSpaces.World ? t.rotation : t.localRotation;
-      return t.localRotation;
+      return t.rotation;
     }
 
     void PositionSet(UE.Transform t, UE.Vector3 pos) {
-      t.localPosition = pos;
+      t.position = pos;
       //if (Config.Space == TransformSpaces.World) { t.position = pos; } else { t.localPosition = pos; }
     }
 
     void RotationSet(UE.Transform t, UE.Quaternion rot) {
-      t.localRotation = rot;
+      t.rotation = rot;
       //if (Config.Space == TransformSpaces.World) { t.rotation = rot; } else { t.localRotation = rot; }
     }
 

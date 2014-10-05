@@ -15,6 +15,10 @@ namespace Bolt {
     internal PropertySerializer[] ResultSerializers;
   }
 
+  public interface ICommandInput {
+
+  }
+
   public abstract class Command : IBoltListNode {
     internal const int SEQ_BITS = 8;
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;
@@ -108,8 +112,8 @@ namespace Bolt {
 
     internal void SmoothCorrection() {
       if (SmoothFrom != null && SmoothTo != null) {
-        float max = SmoothStart - SmoothEnd;
-        float current = BoltCore.frame - SmoothEnd;
+        float max = SmoothEnd - SmoothStart;
+        float current = BoltCore.frame - SmoothStart;
         float t = UE.Mathf.Clamp01(current / max);
 
         for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {

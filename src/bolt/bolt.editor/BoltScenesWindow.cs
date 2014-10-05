@@ -87,7 +87,7 @@ public class BoltScenesWindow : EditorWindow {
   }
 
   BuildOptions buildOptions {
-    get { return BuildOptions.Development | BuildOptions.AllowDebugging; }
+    get { return BuildOptions.None; }
   }
 
   void BuildPlayer() {
@@ -146,9 +146,11 @@ end tell'";
       int clientCount = BoltRuntimeSettings.instance.debugClientCount;
 
       // starting server player
+      if (BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.Client || BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.None) {
+        if (BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.Client) {
+          clientCount -= 1;
+        }
 
-      if (BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.Client) {
-        clientCount -= 1;
         Process p = new Process();
         p.StartInfo.FileName = playerPathExecutable;
         p.StartInfo.Arguments = "--bolt-debugstart-server";

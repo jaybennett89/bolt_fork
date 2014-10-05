@@ -290,7 +290,7 @@ internal static class BoltCore {
     // create with default serializer
     return CreateEntity(prefab, new TypeId(ec._defaultSerializerTypeId));
   }
-
+  
   internal static EntityObject CreateEntity(GameObject prefab, TypeId serializerId) {
     // prefab entity component
     BoltEntity ec;

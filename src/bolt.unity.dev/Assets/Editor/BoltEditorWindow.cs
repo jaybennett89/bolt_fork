@@ -172,7 +172,7 @@ public class BoltEditorWindow : BoltWindow {
 
   void EditCommand(CommandDefinition def) {
     EditHeader(def, BoltEditorGUI.CommandHeaderStyle, BoltEditorGUI.CommandHeaderColor, () => {
-
+      def.SmoothFrames = BoltEditorGUI.IntFieldOverlay(def.SmoothFrames, "Correction Interpolation Frames");
     });
 
     // add button

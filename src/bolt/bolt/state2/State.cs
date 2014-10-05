@@ -12,6 +12,7 @@ namespace Bolt {
   public delegate void PropertyCallback(IState state, string path, int[] indices);
 
   public interface IState {
+    IDisposable Predict(int frames);
     void SetAnimator(UE.Animator animator);
     void AddCallback(string path, PropertyCallback callback);
   }
@@ -347,14 +348,18 @@ namespace Bolt {
 
       if (Frames.count == 0) {
         frame = AllocFrame(frameNumber);
+        Frames.AddLast(frame);
       }
       else {
         if (Entity.HasControl && Entity.ControllerLocalPrediction) {
+          Assert.True(Frames.count == 1);
+
           frame = Frames.first;
           frame.Number = BoltCore.frame;
         }
         else {
           frame = Frames.last.Duplicate(frameNumber);
+          Frames.AddLast(frame);
         }
       }
 
@@ -368,8 +373,6 @@ namespace Bolt {
         // put property index into updated list
         frame.ReadProperties.Add(property);
       }
-
-      Frames.AddLast(frame);
     }
 
     public BitArray GetFilter(BoltConnection connection, EntityProxy proxy) {
@@ -414,5 +417,8 @@ namespace Bolt {
       return FullMask;
     }
 
+    public IDisposable Predict(int frames) {
+      throw new NotImplementedException();
+    }
   }
 }

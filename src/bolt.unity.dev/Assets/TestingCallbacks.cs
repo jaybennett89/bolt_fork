@@ -4,10 +4,17 @@ using System.Collections;
 [BoltGlobalBehaviour(BoltNetworkModes.Server)]
 public class TestingCallbacks : BoltCallbacksBase {
   public override void SceneLoadLocalDone(string map) {
-
+    Invoke("TakeAwayControl", 5);
   }
 
   public override void SceneLoadRemoteDone(BoltConnection connection, string map) {
-    BoltNetwork.Instantiate(BoltPrefabs.Cube, new Vector3(Random.Range(-16f, 16f), 10, Random.Range(-16f, 16f)), Quaternion.identity).AssignControl(connection);
+    BoltEntity entity = BoltNetwork.Instantiate(BoltPrefabs.Cube, new Vector3(-50, 20, 0), Quaternion.identity);
+    entity.AssignControl(connection);
+  }
+
+  void TakeAwayControl() {
+    foreach (BoltEntity entity in BoltNetwork.entities) {
+      //entity.RevokeControl();
+    }
   }
 }
