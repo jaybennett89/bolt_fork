@@ -55,9 +55,17 @@ namespace Bolt {
 	public void Pack(UdpKit.UdpStream stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
 
 	public static NetId Read(UdpKit.UdpStream stream, int bits) {
 		return new NetId(stream.ReadInt(bits));
+	}
+	
+	public static NetId Read(UdpKit.UdpStream stream) {
+		return new NetId(stream.ReadInt());
 	}
 
     public static bool operator ==(NetId a, NetId b) {
@@ -125,9 +133,17 @@ namespace Bolt {
 	public void Pack(UdpKit.UdpStream stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
 
 	public static InstanceId Read(UdpKit.UdpStream stream, int bits) {
 		return new InstanceId(stream.ReadInt(bits));
+	}
+	
+	public static InstanceId Read(UdpKit.UdpStream stream) {
+		return new InstanceId(stream.ReadInt());
 	}
 
     public static bool operator ==(InstanceId a, InstanceId b) {
@@ -195,9 +211,17 @@ namespace Bolt {
 	public void Pack(UdpKit.UdpStream stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
 
 	public static PrefabId Read(UdpKit.UdpStream stream, int bits) {
 		return new PrefabId(stream.ReadInt(bits));
+	}
+	
+	public static PrefabId Read(UdpKit.UdpStream stream) {
+		return new PrefabId(stream.ReadInt());
 	}
 
     public static bool operator ==(PrefabId a, PrefabId b) {
@@ -265,9 +289,17 @@ namespace Bolt {
 	public void Pack(UdpKit.UdpStream stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
 
 	public static TypeId Read(UdpKit.UdpStream stream, int bits) {
 		return new TypeId(stream.ReadInt(bits));
+	}
+	
+	public static TypeId Read(UdpKit.UdpStream stream) {
+		return new TypeId(stream.ReadInt());
 	}
 
     public static bool operator ==(TypeId a, TypeId b) {

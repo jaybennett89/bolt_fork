@@ -109,11 +109,11 @@ namespace Bolt {
       }
     }
 
-    internal bool QueueCommand(BoltCommand cmd) {
+    internal bool QueueCommand(Command cmd) {
       if (HasControl) {
         if (CommandQueue.count < BoltCore._config.commandQueueSize) {
-          cmd._serverFrame = BoltCore.serverFrame;
-          cmd._sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, COMMAND_SEQ_MASK);
+          cmd.Frame = BoltCore.serverFrame;
+          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
 
           CommandQueue.AddLast(cmd);
           return true;

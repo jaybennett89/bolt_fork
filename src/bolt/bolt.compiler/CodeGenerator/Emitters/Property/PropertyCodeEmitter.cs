@@ -16,7 +16,7 @@ namespace Bolt.Compiler {
       get { return "PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
-    public CodeExpression EmitSerializerCreateExpression(StateDecoratorProperty p) {
+    public CodeExpression EmitStatePropertyInitializer(StateDecoratorProperty p) {
       return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"", Mecanim = {8}, MecanimDamping = {9} }})").Expr(
         p.OffsetBytes, // {0}
         Decorator.ByteSize, // {1}
@@ -28,6 +28,14 @@ namespace Bolt.Compiler {
         Decorator.Definition.Name, // {7} 
         Decorator.Definition.StateAssetSettings.Mecanim.ToString().ToLower(), // {8}
         Decorator.Definition.PropertyType is PropertyTypeFloat ? Decorator.Definition.StateAssetSettings.MecanimDamping + "f" : "0f" // {9}
+      );
+    }
+
+    public CodeExpression EmitCommandPropertyInitializer() {
+      return (@"new Bolt.{0}(new Bolt.CommandPropertyMetaData {{ ByteOffset = {1}, PropertyName = ""{2}"" }})").Expr(
+        SerializerClassName,
+        Decorator.ByteOffset,
+        Decorator.Definition.Name
       );
     }
 
@@ -55,7 +63,11 @@ namespace Bolt.Compiler {
       EmitSimpleIntefaceMember(type, true, true);
     }
 
-    protected void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {
+    public virtual void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
+
+    }
+
+    public void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {
       if (get && set) {
         type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, (_) => { }, (_) => { });
       }
@@ -89,6 +101,7 @@ namespace Bolt.Compiler {
 
       return emitter;
     }
+
   }
 
   public abstract class PropertyCodeEmitter<T> : PropertyCodeEmitter where T : PropertyDecorator {

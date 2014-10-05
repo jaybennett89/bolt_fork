@@ -67,7 +67,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
-    <Compile Include="command2\Command.cs" />
+    <Compile Include="command\Command.cs" />
     <Compile Include="entity2\EntityBehaviour.cs" />
     <Compile Include="entity2\EntityObject.Control.cs" />
     <Compile Include="entity2\EntityObject.cs" />
@@ -158,9 +158,8 @@
     <Compile Include="BoltSerializer.cs" />
     <Compile Include="BoltFrameInterpolator.cs" />
     <Compile Include="collections\BoltListNode.cs" />
-    <Compile Include="command\BoltCommand.cs" />
-    <Compile Include="command\BoltCommandChannel.cs" />
-    <Compile Include="command\BoltCommandFactory.cs" />
+    <Compile Include="command\CommandChannel.cs" />
+    <Compile Include="command\CommandFactory.cs" />
     <Compile Include="entity\BoltEntityBehaviour.cs" />
     <Compile Include="entity\BoltEntity.cs" />
     <Compile Include="entity\BoltEntityChannel.cs" />

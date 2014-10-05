@@ -33,7 +33,7 @@ namespace Bolt {
     public virtual void SimulateController() { }
     public virtual void ControlGained() { }
     public virtual void ControlLost() { }
-    public virtual void ExecuteCommand(BoltCommand command, bool resetState) { }
+    public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
   }
 
   public class EntityBehaviour<TState> : EntityBehaviour where TState : IState {

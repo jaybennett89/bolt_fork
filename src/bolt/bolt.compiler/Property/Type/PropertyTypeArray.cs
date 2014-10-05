@@ -23,8 +23,9 @@ namespace Bolt.Compiler {
 
     public override bool Compilable {
       get {
-        if (ElementType == null)
+        if (ElementType == null) {
           return false;
+        }
 
         if (ElementType is PropertyTypeStruct) {
           return ((PropertyTypeStruct)ElementType).StructGuid != Guid.Empty;

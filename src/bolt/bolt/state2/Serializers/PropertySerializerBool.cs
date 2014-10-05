@@ -9,6 +9,14 @@ namespace Bolt {
       : base(info) {
     }
 
+    public PropertySerializerBool(EventPropertyMetaData meta)
+      : base(meta) {
+    }
+
+    public PropertySerializerBool(CommandPropertyMetaData meta)
+      : base(meta) {
+    }
+
     public override int StateBits(State state, State.Frame frame) {
       return 1;
     }
@@ -25,12 +33,19 @@ namespace Bolt {
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      if (stream.ReadBool()) {
-        Blit.PackI32(frame.Data, StateData.ByteOffset, 1);
-      }
-      else {
-        Blit.PackI32(frame.Data, StateData.ByteOffset, 0);
-      }
+      frame.Data.PackI32(CommandData.ByteOffset, stream.ReadBool() ? 1 : 0);
+    }
+
+    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
+      stream.WriteBool(data.ReadI32(CommandData.ByteOffset) != 0);
+    }
+
+    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
+      data.PackI32(CommandData.ByteOffset, stream.ReadBool() ? 1 : 0);
+    }
+
+    public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
+
     }
   }
 }

@@ -378,14 +378,4 @@ class BoltUserAssemblyCompiler {
       }
     }
   }
-
-  static Type FindCommandType() {
-    foreach (Type t in typeof(BoltCommand).FindSubtypes()) {
-      if (t.HasPublicDefaultConstructor()) {
-        return t;
-      }
-    }
-
-    return null;
-  }
 }

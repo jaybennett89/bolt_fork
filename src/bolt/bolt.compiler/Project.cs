@@ -28,6 +28,10 @@ namespace Bolt.Compiler {
       get { return RootFolder.AssetsAll.Where(x => x is EventDefinition).Cast<EventDefinition>(); }
     }
 
+    public IEnumerable<CommandDefinition> Commands {
+      get { return RootFolder.AssetsAll.Where(x => x is CommandDefinition).Cast<CommandDefinition>(); }
+    }
+
     public bool UseFilters {
       get { return false; }
     }

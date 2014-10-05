@@ -61,9 +61,17 @@ namespace Bolt {
 	public void Pack(UdpKit.UdpStream stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
 
 	public static <#=id#> Read(UdpKit.UdpStream stream, int bits) {
 		return new <#=id#>(stream.ReadInt(bits));
+	}
+	
+	public static <#=id#> Read(UdpKit.UdpStream stream) {
+		return new <#=id#>(stream.ReadInt());
 	}
 
     public static bool operator ==(<#=id#> a, <#=id#> b) {

@@ -10,6 +10,14 @@ namespace Bolt {
       : base(info) {
     }
 
+    public PropertySerializerEntity(EventPropertyMetaData meta)
+      : base(meta) {
+    }
+
+    public PropertySerializerEntity(CommandPropertyMetaData meta)
+      : base(meta) {
+    }
+
     public override int StateBits(State state, State.Frame frame) {
       return EntityProxy.ID_BIT_COUNT + 1;
     }

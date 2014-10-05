@@ -10,27 +10,29 @@ using System.Reflection;
 
 namespace Bolt.Compiler {
   public partial class CodeGenerator {
-    Project Context;
+    Project Project;
 
     public List<StateDecorator> States;
     public List<StructDecorator> Structs;
     public List<EventDecorator> Events;
+    public List<CommandDecorator> Commands;
 
     public CodeNamespace CodeNamespace;
     public CodeCompileUnit CodeCompileUnit;
 
     public IEnumerable<FilterDefinition> Filters {
-      get { return Context.EnabledFilters; }
+      get { return Project.EnabledFilters; }
     }
 
     public CodeGenerator() {
       States = new List<StateDecorator>();
       Structs = new List<StructDecorator>();
       Events = new List<EventDecorator>();
+      Commands = new List<CommandDecorator>();
     }
 
     public void Run(Project context, string file) {
-      Context = context;
+      Project = context;
 
       CodeNamespace = new CodeNamespace();
       CodeCompileUnit = new CodeCompileUnit();
@@ -75,7 +77,7 @@ namespace Bolt.Compiler {
     }
 
     void DecorateDefinitions() {
-      foreach (StateDefinition def in Context.States) {
+      foreach (StateDefinition def in Project.States) {
         StateDecorator decorator;
 
         decorator = new StateDecorator();
@@ -85,7 +87,7 @@ namespace Bolt.Compiler {
         States.Add(decorator);
       }
 
-      foreach (StructDefinition def in Context.Structs) {
+      foreach (StructDefinition def in Project.Structs) {
         StructDecorator decorator;
 
         decorator = new StructDecorator();
@@ -95,7 +97,7 @@ namespace Bolt.Compiler {
         Structs.Add(decorator);
       }
 
-      foreach (EventDefinition def in Context.Events) {
+      foreach (EventDefinition def in Project.Events) {
         EventDecorator decorator;
 
         decorator = new EventDecorator();
@@ -104,10 +106,24 @@ namespace Bolt.Compiler {
 
         Events.Add(decorator);
       }
+
+      foreach (CommandDefinition def in Project.Commands) {
+        CommandDecorator decorator;
+
+        decorator = new CommandDecorator();
+        decorator.Definition = def;
+        decorator.Generator = this;
+
+        Commands.Add(decorator);
+      }
     }
 
     void AssignTypeIds() {
       uint typeId = 0;
+
+      foreach (CommandDecorator decorator in Commands) {
+        decorator.TypeId = ++typeId;
+      }
 
       foreach (EventDecorator decorator in Events) {
         decorator.TypeId = ++typeId;
@@ -191,11 +207,13 @@ namespace Bolt.Compiler {
         emitter.EmitEventClass();
       }
 
-      var s2 = DeclareStruct("Test2");
-      s2.BaseTypes.Add("System.IDisposable");
-      s2.DeclareMethod(typeof(void).FullName, "Dispose", method => {
-        method.Statements.Expr("using (var t = new Test2()) {{ t.Dispose(); }}");
-      });
+
+      foreach (CommandDecorator d in Commands) {
+        CommandCodeEmitter emitter;
+        emitter = new CommandCodeEmitter();
+        emitter.Decorator = d;
+        emitter.EmitTypes();
+      }
 
       //EmitFilters();
     }
@@ -219,6 +237,12 @@ namespace Bolt.Compiler {
       // Events
       foreach (EventDecorator d in Events) {
         d.Properties = PropertyDecorator.Decorate(d.Definition.Properties, d);
+      }
+
+      // Events
+      foreach (CommandDecorator d in Commands) {
+        d.InputProperties = PropertyDecorator.Decorate(d.Definition.Input, d);
+        d.ResultProperties = PropertyDecorator.Decorate(d.Definition.Result, d);
       }
 
       // States
@@ -280,7 +304,23 @@ namespace Bolt.Compiler {
     }
 
     void CreateCompilationModel() {
-      OrderStructsByDependancies();
+      // Calculate size for commands
+      for (int i = 0; i < Commands.Count; ++i) {
+        CommandDecorator decorator = Commands[i];
+
+        for (int n = 0; n < decorator.InputProperties.Count; ++n) {
+          decorator.InputProperties[n].ByteOffset = decorator.InputByteSize;
+          decorator.InputByteSize += decorator.InputProperties[n].ByteSize;
+        }
+
+        for (int n = 0; n < decorator.ResultProperties.Count; ++n) {
+          decorator.ResultProperties[n].ByteOffset = decorator.ResultByteSize;
+          decorator.ResultByteSize += decorator.ResultProperties[n].ByteSize;
+        }
+      }
+
+        // order all structs by their dependancies
+        OrderStructsByDependancies();
 
       // sort, index and assign bits for properties
       for (int i = 0; i < Structs.Count; ++i) {

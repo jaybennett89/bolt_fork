@@ -10,11 +10,11 @@ partial class BoltEntityChannel {
     #region sequence
 
     static void WriteSequence(UdpStream stream, ushort sequence) {
-      stream.WriteUShort(sequence, EntityObject.COMMAND_SEQ_BITS);
+      stream.WriteUShort(sequence, Command.SEQ_BITS);
     }
 
     static ushort ReadSequence(UdpStream stream) {
-      return stream.ReadUShort(EntityObject.COMMAND_SEQ_BITS);
+      return stream.ReadUShort(Command.SEQ_BITS);
     }
 
     #endregion
@@ -45,24 +45,23 @@ partial class BoltEntityChannel {
     public override void Pack(BoltPacket packet) {
       int pos = packet.stream.Position;
 
-      PackStates(packet);
-      PackCommands(packet);
+      PackResult(packet);
+      PackInput(packet);
 
       packet.info.commandBits = packet.stream.Position - pos;
     }
 
     public override void Read(BoltPacket packet) {
-      ReadStates(packet);
-      ReadCommands(packet);
+      ReadResult(packet);
+      ReadInput(packet);
     }
 
 
     bool EntityHasUnsentState(EntityObject entity) {
-      BoltCommand cmd = null;
-      var cmdIter = entity.CommandQueue.GetIterator();
+      var it = entity.CommandQueue.GetIterator();
 
-      while (cmdIter.Next(out cmd)) {
-        if (cmd._hasExecuted == true && cmd._stateSent == false) {
+      while (it.Next()) {
+        if (it.val.Flags & CommandFlags.SEND_STATE) {
           return true;
         }
       }
@@ -70,43 +69,58 @@ partial class BoltEntityChannel {
       return false;
     }
 
-    void PackStates(BoltPacket packet) {
+    void PackResult(BoltPacket packet) {
       foreach (EntityProxy proxy in outgoingProxiesByEntityId.Values) {
         EntityObject entity = proxy.Entity;
 
-        if ((entity != null) && ReferenceEquals(entity.Controller, connection) && EntityHasUnsentState(entity)) {
+        // four conditions have to hold
+        // 1) Entity must exist locally (not null)
+        // 2) The connection must be the controller
+        // 3) The entity must exist remotely
+        // 4) The entity has to have unsent states
+
+        if ((entity != null) && ReferenceEquals(entity.Controller, connection) && connection._entityChannel.ExistsOnRemote(entity) && EntityHasUnsentState(entity)) {
+          Assert.True(entity.IsOwner);
+
           int proxyPos = packet.stream.Position;
+          int cmdWriteCount = 0;
 
           packet.stream.WriteBool(true);
           packet.stream.WriteNetworkId(proxy.NetId);
 
-          //packet.stream.WriteInt(!entity._origin ? 0 : BoltCore.resolveTransformId(entity._origin));
+          var it = entity.CommandQueue.GetIterator();
 
-          BoltCommand cmd = null;
-          var cmdIter = entity.CommandQueue.GetIterator();
+          while (it.Next()) {
+            if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
+              if (it.val.Flags & CommandFlags.SEND_STATE) {
+                int cmdPos = packet.stream.Position;
 
-          while (cmdIter.Next(out cmd)) {
-            if (cmd._hasExecuted && cmd._stateSent == false) {
-              int cmdPos = packet.stream.Position;
-              packet.stream.WriteBool(true);
-              packet.stream.WriteUShort(cmd._id);
-              WriteSequence(packet.stream, cmd._sequence);
-              cmd.PackState(connection, packet.stream);
+                packet.stream.WriteBool(true);
 
-              if (packet.stream.Overflowing) {
-                packet.stream.Position = cmdPos;
-                break;
-              }
-              else {
-                cmd._stateSent = true;
+                it.val.Meta.TypeId.Pack(packet.stream);
+
+                WriteSequence(packet.stream, it.val.Sequence);
+
+                it.val.PackResult(connection, packet.stream);
+
+                if (packet.stream.Overflowing) {
+                  packet.stream.Position = cmdPos;
+                  break;
+                }
+                else {
+                  cmdWriteCount += 1;
+
+                  it.val.Flags &= ~CommandFlags.SEND_STATE;
+                  it.val.Flags |= CommandFlags.SEND_STATE_PERFORMED;
+                }
               }
             }
           }
 
-          if (packet.stream.Overflowing) {
+          // we wrote too much or nothing at all
+          if (packet.stream.Overflowing || (cmdWriteCount == 0)) {
             packet.stream.Position = proxyPos;
             break;
-
           }
           else {
             // stop marker for states
@@ -114,8 +128,8 @@ partial class BoltEntityChannel {
           }
 
           // dipose commands we dont need anymore
-          while (entity.CommandQueue.count > 1 && entity.CommandQueue.first._hasExecuted && entity.CommandQueue.first._stateSent) {
-            entity.CommandQueue.RemoveFirst().Dispose();
+          while ((entity.CommandQueue.count > 1) && (entity.CommandQueue.first.Flags & CommandFlags.SEND_STATE_PERFORMED)) {
+            entity.CommandQueue.RemoveFirst().Free();
           }
         }
       }
@@ -124,64 +138,63 @@ partial class BoltEntityChannel {
       packet.stream.WriteStopMarker();
     }
 
-    void ReadStates(BoltPacket packet) {
+    void ReadResult(BoltPacket packet) {
       while (packet.stream.CanRead()) {
         if (packet.stream.ReadBool() == false) { break; }
 
-        NetId networkId = packet.stream.ReadNetworkId();
-        EntityProxy proxy = incommingProxiesByNetworkId[networkId];
+        NetId netId = packet.stream.ReadNetworkId();
+        EntityProxy proxy = incommingProxiesByNetworkId[netId];
         EntityObject entity = proxy.Entity;
-
 
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
 
-          ushort commandId = packet.stream.ReadUShort();
+          TypeId typeId = TypeId.Read(packet.stream);
           ushort sequence = ReadSequence(packet.stream);
 
-          BoltCommand cmd = null;
+          Command cmd = null;
 
           if (entity != null) {
-            BoltCommand c = null;
-            var cIter = entity.CommandQueue.GetIterator();
+            var it = entity.CommandQueue.GetIterator();
 
-            while (cIter.Next(out c)) {
-              int dist = UdpMath.SeqDistance(c._sequence, sequence, EntityObject.COMMAND_SEQ_SHIFT);
-
+            while (it.Next()) {
+              int dist = UdpMath.SeqDistance(it.val.Sequence, sequence, Command.SEQ_SHIFT);
               if (dist > 0) { break; }
-              if (dist < 0) { c._dispose = true; }
+              if (dist < 0) { it.val.Flags |= CommandFlags.DISPOSE; }
               if (dist == 0) {
-                cmd = c;
+                cmd = it.val;
                 break;
               }
             }
           }
 
           if (cmd) {
-            cmd.ReadState(connection, packet.stream);
-            cmd._stateRecv = true;
-            ////BoltLog.Debug("command for frame {0} got state, queue size: {1}", cmd._frame, proxy.commands.count);
+            cmd.SmoothTo = cmd.ResultData.CloneArray();
+            cmd.SmoothFrom = cmd.ResultData.CloneArray();
 
+            cmd.SmoothStart = BoltCore.frame;
+            cmd.SmoothEnd = cmd.SmoothStart + cmd.Meta.SmoothFrames;
+
+            cmd.ReadResult(connection, cmd.SmoothTo, packet.stream);
+            cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
           }
           else {
-            cmd = BoltFactory.NewCommand(commandId);
-            cmd._sequence = sequence;
-            cmd.ReadState(connection, packet.stream);
-            cmd.Dispose();
+            cmd = BoltFactory.NewCommand(typeId);
+            cmd.ReadResult(connection, cmd.ResultData, packet.stream);
+            cmd.Free();
           }
         }
 
         // remove all disposable commands
-
         if (entity != null) {
-          while (entity.CommandQueue.count > 1 && entity.CommandQueue.first._dispose) {
-            entity.CommandQueue.RemoveFirst().Dispose();
+          while ((entity.CommandQueue.count > 1) && (entity.CommandQueue.first.Flags & CommandFlags.DISPOSE)) {
+            entity.CommandQueue.RemoveFirst().Free();
           }
         }
       }
     }
 
-    void PackCommands(BoltPacket packet) {
+    void PackInput(BoltPacket packet) {
       foreach (EntityProxy proxy in incommingProxiesByNetworkId.Values) {
         EntityObject entity = proxy.Entity;
 
@@ -195,7 +208,7 @@ partial class BoltEntityChannel {
           packet.stream.WriteBool(true);
           packet.stream.WriteNetworkId(proxy.NetId);
 
-          BoltCommand cmd = entity.CommandQueue.last;
+          Command cmd = entity.CommandQueue.last;
 
           // how many commands we should send at most
           int redundancy = Mathf.Min(entity.CommandQueue.count, BoltCore._config.commandRedundancy);
@@ -212,9 +225,12 @@ partial class BoltEntityChannel {
             int cmdPos = packet.stream.Position;
 
             packet.stream.WriteBool(true);
-            packet.stream.WriteUShort(cmd._id);
-            WriteSequence(packet.stream, cmd._sequence);
-            packet.stream.WriteInt(cmd._serverFrame);
+
+            cmd.Meta.TypeId.Pack(packet.stream);
+
+            WriteSequence(packet.stream, cmd.Sequence);
+
+            packet.stream.WriteInt(cmd.ServerFrame);
 
             ////BoltLog.Debug("packing cmd sequence {0}", cmd._sequence);
 
@@ -243,7 +259,7 @@ partial class BoltEntityChannel {
       packet.stream.WriteStopMarker();
     }
 
-    void ReadCommands(BoltPacket packet) {
+    void ReadInput(BoltPacket packet) {
       int maxFrame = BoltCore._frame;
       int minFrame = maxFrame - (BoltCore._config.commandDelayAllowed + pingFrames);
 
@@ -256,9 +272,9 @@ partial class BoltEntityChannel {
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
 
-          BoltCommand cmd = BoltFactory.NewCommand(packet.stream.ReadUShort());
-          cmd._sequence = ReadSequence(packet.stream);
-          cmd._serverFrame = packet.stream.ReadInt();
+          Bolt.Command cmd = BoltFactory.NewCommand(TypeId.Read(packet.stream));
+          cmd.Sequence = ReadSequence(packet.stream);
+          cmd.Frame = packet.stream.ReadInt();
           cmd.ReadInput(connection, packet.stream);
 
           // no proxy or entity
@@ -270,11 +286,11 @@ partial class BoltEntityChannel {
           if (ReferenceEquals(entity.Controller, connection) == false) { continue; }
 
           // sequence is old
-          if (UdpMath.SeqDistance(cmd._sequence, entity.CommandSequence, EntityObject.COMMAND_SEQ_SHIFT) <= 0) { continue; }
+          if (UdpMath.SeqDistance(cmd.Sequence, entity.CommandSequence, Command.SEQ_SHIFT) <= 0) { continue; }
 
           // put on command queue
           entity.CommandQueue.AddLast(cmd);
-          entity.CommandSequence = cmd._sequence;
+          entity.CommandSequence = cmd.Sequence;
         }
       }
     }

@@ -160,7 +160,7 @@ namespace Bolt.Compiler {
 
         // emit init expression
         ctor.Statements.Comment(p.CallbackPaths.Join("; "));
-        ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), emitter.EmitSerializerCreateExpression(p));
+        ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), emitter.EmitStatePropertyInitializer(p));
 
         //var init = emitter.EmitCustomSerializerInitilization("(({0}) _Meta.PropertySerializers[{1}])".Expr(emitter.SerializerClassName, p.Index));
         //if (init != null) {

@@ -6,11 +6,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  partial class EntityObject : IBoltListNode {
-    internal const int COMMAND_SEQ_BITS = 8;
-    internal const int COMMAND_SEQ_SHIFT = 16 - COMMAND_SEQ_BITS;
-    internal const int COMMAND_SEQ_MASK = (1 << COMMAND_SEQ_BITS) - 1;
-
+  partial class EntityObject : IBoltListNode, IEntityPriorityCalculator {
     static int _instanceIdCounter;
 
     internal PrefabId PrefabId;
@@ -26,13 +22,14 @@ namespace Bolt {
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
+    internal Bolt.IEntityPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
     internal bool ControllerLocalPrediction;
     internal ushort CommandSequence = 0;
 
     internal BoltEventDispatcher EventDispatcher = new BoltEventDispatcher();
-    internal BoltDoubleList<BoltCommand> CommandQueue = new BoltDoubleList<BoltCommand>();
+    internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
     internal BoltDoubleList<EntityProxy> Proxies = new BoltDoubleList<EntityProxy>();
 
     internal int Frame {
@@ -161,6 +158,12 @@ namespace Bolt {
 
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
+      PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IEntityPriorityCalculator)) as IEntityPriorityCalculator;
+
+      // use the default priority calculator if none is available
+      if (PriorityCalculator == null) {
+        PriorityCalculator = this;
+      }
 
       // set instance id
       InstanceId = new InstanceId(++_instanceIdCounter);
@@ -184,25 +187,12 @@ namespace Bolt {
 
     internal void Raise(IBoltEvent ev) {
       throw new NotImplementedException();
-      //BoltEventBase evnt = (BoltEventBase)ev;
-
-      //if (evnt._isEntityEvent == false) {
-      //  throw new BoltException("you can't send global events to entities"); ;
-      //}
-
-      //if (evnt._deliveryMode == BoltEventDeliveryMode.Reliable) {
-      //  throw new BoltException("you can't send reliable events to entities");
-      //}
-
-      //evnt._entity = this;
-      //BoltEventBase.Invoke(evnt);
     }
 
     internal void Simulate() {
       Serializer.OnSimulateBefore();
 
-      BoltCommand cmd;
-      BoltIterator<BoltCommand> itr;
+      BoltIterator<Command> it;
 
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {
@@ -214,14 +204,18 @@ namespace Bolt {
         Assert.Null(Controller);
 
         // execute all old commands (in order)
-        cmd = null;
-        itr = CommandQueue.GetIterator();
+        it = CommandQueue.GetIterator();
 
-        while (itr.Next(out cmd)) {
-          Assert.True(cmd._hasExecuted);
+        while (it.Next()) {
+          Assert.True(it.val.Flags & CommandFlags.HAS_EXECUTED);
+
+          var resetState = ReferenceEquals(it.val, CommandQueue.first);
+          if (resetState) {
+            it.val.SmoothCorrection();
+          }
 
           // exec old command
-          ExecuteCommand(cmd, ReferenceEquals(cmd, CommandQueue.first));
+          ExecuteCommand(it.val, resetState);
         }
 
         foreach (IEntityBehaviour eb in Behaviours) {
@@ -229,21 +223,21 @@ namespace Bolt {
         }
 
         // execute all new commands (in order)
-        cmd = null;
-        itr = CommandQueue.GetIterator();
+        it = CommandQueue.GetIterator();
 
-        while (itr.Next(out cmd)) {
-          if (cmd._hasExecuted == false) {
-            ExecuteCommand(cmd, false);
-            Assert.True(cmd._hasExecuted);
+        while (it.Next()) {
+          if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
+            continue;
           }
+
+          ExecuteCommand(it.val, false);
         }
 
         // if this is a local entity we are controlling
         // we should dispose all commands except one
         if (IsOwner) {
           while (CommandQueue.count > 0) {
-            CommandQueue.RemoveFirst().Dispose();
+            CommandQueue.RemoveFirst().Free();
           }
         }
       }
@@ -252,19 +246,18 @@ namespace Bolt {
           Assert.True(IsOwner);
 
           do {
-            cmd = null;
-            itr = CommandQueue.GetIterator();
+            it = CommandQueue.GetIterator();
 
-            while (itr.Next(out cmd)) {
-              if (cmd._hasExecuted == false) {
-                try {
-                  ExecuteCommand(cmd, false);
-                  break;
+            while (it.Next()) {
+              if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
+                continue;
+              }
 
-                }
-                finally {
-                  cmd._stateSent = false;
-                }
+              try {
+                ExecuteCommand(it.val, false);
+              }
+              finally {
+                it.val.Flags |= CommandFlags.SEND_STATE;
               }
             }
           } while (UnexecutedCommandCount() > BoltCore._config.commandDejitterDelay);
@@ -274,14 +267,14 @@ namespace Bolt {
       Serializer.OnSimulateAfter();
     }
 
-    void ExecuteCommand(BoltCommand cmd, bool resetState) {
+    void ExecuteCommand(Command cmd, bool resetState) {
       try {
         foreach (IEntityBehaviour eb in Behaviours) {
           eb.ExecuteCommand(cmd, resetState);
         }
       }
       finally {
-        cmd._hasExecuted = true;
+        cmd.Flags |= CommandFlags.HAS_EXECUTED;
       }
     }
 
@@ -290,7 +283,7 @@ namespace Bolt {
       var it = CommandQueue.GetIterator();
 
       while (it.Next()) {
-        if (it.val._hasExecuted == false) {
+        if (it.val.IsFirstExecution) {
           count += 1;
         }
       }
@@ -318,5 +311,8 @@ namespace Bolt {
       return entity != null;
     }
 
+    float IEntityPriorityCalculator.CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
+      return skipped;
+    }
   }
 }

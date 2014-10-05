@@ -28,5 +28,16 @@ namespace Bolt.Compiler {
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, true);
     }
+
+    public override void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
+      var property =
+        type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+          get.Expr("return Bolt.Blit.ReadVector3({0}, {1})", bytes, Decorator.ByteOffset);
+        }, set => {
+          set.Expr("Bolt.Blit.PackVector3({0}, {1}, value)", bytes, Decorator.ByteOffset);
+        });
+
+      property.PrivateImplementationType = new CodeTypeReference(implType);
+    }
   }
 }

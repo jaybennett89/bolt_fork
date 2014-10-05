@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 
 public class BoltEditorWindow : BoltWindow {
-  [MenuItem("Window/Bolt Editor")]
+  [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
   public static void Open() {
     BoltEditorWindow w;
 
@@ -303,10 +303,15 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     // edit priority
-    p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
+    if (IsStateOrStruct(def)) {
+      p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(164));
+      p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
+    }
+    else {
+      p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
+    }
 
     // edit name
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(164));
     BoltEditorGUI.SetTooltip("Property Name. Has to be a valid C# property name.");
 
     // edit property type

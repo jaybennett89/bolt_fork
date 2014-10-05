@@ -191,7 +191,7 @@ partial class BoltEntityChannel : BoltChannel {
           if (proxy.Mask.AndCheck(proxy.Entity.Serializer.GetFilter(connection, proxy)) == false) { continue; }
 
           // calculate priority
-          proxy.Priority = Mathf.Clamp(proxy.Entity.Serializer.CalculatePriority(connection, proxy.Mask, proxy.Skipped), 0, 1 << 15);
+          proxy.Priority = Mathf.Clamp(proxy.Entity.PriorityCalculator.CalculatePriority(connection, proxy.Mask, proxy.Skipped), 0, 1 << 15);
         }
       }
 

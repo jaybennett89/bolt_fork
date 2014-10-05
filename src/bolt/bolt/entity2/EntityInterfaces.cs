@@ -15,7 +15,11 @@ namespace Bolt {
     void ControlGained();
     void ControlLost();
 
-    void ExecuteCommand(BoltCommand command, bool resetState);
+    void ExecuteCommand(Bolt.Command command, bool resetState);
+  }
+
+  public interface IEntityPriorityCalculator {
+    float CalculatePriority(BoltConnection connection, BitArray mask, int skipped);
   }
 
   public interface IEntityBehaviour<TState> : IEntityBehaviour where TState : IState {
@@ -31,8 +35,6 @@ namespace Bolt {
 
     void OnSimulateBefore();
     void OnSimulateAfter();
-
-    float CalculatePriority(BoltConnection connection, BitArray mask, int skipped);
 
     BitArray GetDefaultMask();
     BitArray GetFilter(BoltConnection connection, EntityProxy proxy);

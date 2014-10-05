@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class BoltProjectWindow : BoltWindow {
-  [MenuItem("Window/Bolt Project")]
+  [MenuItem("Window/Bolt Engine/Project", priority = -100)]
   public static void Open() {
     BoltProjectWindow w;
 
