@@ -37,6 +37,7 @@ partial class BoltCallbacksBase {
 
   <# foreach (var cb in callbacks) { #> 
   internal static void <#= cb.Item1 #>Invoke(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { 
+    BoltLog.Debug("Invoking callback <#= cb.Item1 #>");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.<#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : ("arg") #>);
     }

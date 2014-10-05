@@ -27,60 +27,70 @@ partial class BoltCallbacksBase {
 
    
   internal static void ConnectFailedInvoke(UdpEndPoint arg) { 
+    BoltLog.Debug("Invoking callback ConnectFailed");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ConnectFailed(arg);
     }
   }
    
   internal static void ConnectRefusedInvoke(UdpEndPoint arg) { 
+    BoltLog.Debug("Invoking callback ConnectRefused");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ConnectRefused(arg);
     }
   }
    
   internal static void ConnectedToServerInvoke(BoltConnection arg) { 
+    BoltLog.Debug("Invoking callback ConnectedToServer");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ConnectedToServer(arg);
     }
   }
    
   internal static void DisconnectedFromServerInvoke(BoltConnection arg) { 
+    BoltLog.Debug("Invoking callback DisconnectedFromServer");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.DisconnectedFromServer(arg);
     }
   }
    
   internal static void ClientConnectedInvoke(BoltConnection arg) { 
+    BoltLog.Debug("Invoking callback ClientConnected");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ClientConnected(arg);
     }
   }
    
   internal static void ClientDisconnectedInvoke(BoltConnection arg) { 
+    BoltLog.Debug("Invoking callback ClientDisconnected");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ClientDisconnected(arg);
     }
   }
    
   internal static void EntityAttachedInvoke(BoltEntity arg) { 
+    BoltLog.Debug("Invoking callback EntityAttached");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.EntityAttached(arg);
     }
   }
    
   internal static void EntityDetachedInvoke(BoltEntity arg) { 
+    BoltLog.Debug("Invoking callback EntityDetached");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.EntityDetached(arg);
     }
   }
    
   internal static void ControlOfEntityGainedInvoke(BoltEntity arg) { 
+    BoltLog.Debug("Invoking callback ControlOfEntityGained");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ControlOfEntityGained(arg);
     }
   }
    
   internal static void ControlOfEntityLostInvoke(BoltEntity arg) { 
+    BoltLog.Debug("Invoking callback ControlOfEntityLost");
     foreach (BoltCallbacksBase cb in callbacks) {
       cb.ControlOfEntityLost(arg);
     }

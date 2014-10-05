@@ -15,12 +15,13 @@ static partial class BoltCompiler {
 
   public static void Run (BoltCompilerOperation op) {
     //CompileMecanim(op);
-    CompileEvents(op);
+    //CompileEvents(op);
     //CompileStates(op);
+    //CompileCommands(op);
+
+    CompileMaps(op);
     CompilePrefabs(op);
     CompileNetwork(op);
-    CompileMaps(op);
-    CompileCommands(op);
     CompileAssemblyInfo(op);
 
     op.project.GenerateCode(op.projectFile);

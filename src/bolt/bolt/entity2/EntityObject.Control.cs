@@ -25,8 +25,9 @@ namespace Bolt {
     }
 
     internal void TakeControlInternal() {
-      Assert.True(!(Flags & EntityFlags.HAS_CONTROL));
+      Assert.False(Flags & EntityFlags.HAS_CONTROL);
 
+      Flags |= EntityFlags.HAS_CONTROL;
       CommandQueue.Clear();
       CommandSequence = 0;
 

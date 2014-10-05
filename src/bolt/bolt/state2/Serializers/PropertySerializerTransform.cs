@@ -58,7 +58,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return (12 + 16) * 4;
+      return (12 + 16) * 8;
     }
 
     public override void OnInit(State state) {

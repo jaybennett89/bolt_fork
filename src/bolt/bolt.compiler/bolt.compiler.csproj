@@ -89,9 +89,9 @@
     <Compile Include="FilterDefinition.cs" />
     <Compile Include="Property\Definition\PropertyCommandSettings.cs" />
     <Compile Include="Property\Definition\PropertyDefinition.cs" />
-    <Compile Include="Property\Definition\PropertyDefinitionAssetSettings.cs" />
-    <Compile Include="Property\Definition\PropertyDefinitionEventAssetSettings.cs" />
-    <Compile Include="Property\Definition\PropertyDefinitionStateAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyAssetSettings.cs" />
+    <Compile Include="Property\Definition\PropertyEventSettings.cs" />
+    <Compile Include="Property\Definition\PropertyStateSettings.cs" />
     <Compile Include="Property\PropertyEnums.cs" />
     <Compile Include="Property\Type\PropertyTypeArray.cs" />
     <Compile Include="Property\Type\PropertyTypeBool.cs" />

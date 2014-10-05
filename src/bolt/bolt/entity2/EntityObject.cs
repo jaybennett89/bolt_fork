@@ -177,7 +177,7 @@ namespace Bolt {
 
 
     internal void SetIdle(BoltConnection connection, bool idle) {
-      if (IsController(connection)) {
+      if (idle && IsController(connection)) {
         BoltLog.Error("Can't idle {0} on {1}, it is the controller for this entity", this, connection);
         return;
       }

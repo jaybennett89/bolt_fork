@@ -479,7 +479,7 @@ partial class BoltEntityChannel : BoltChannel {
         // again for the given control case, we need to clear out the HAS_CONTROL flag or .TakeControl will complain
         if (isController) {
           proxy.Entity.Flags &= ~EntityFlags.HAS_CONTROL;
-          proxy.Entity.TakeControl();
+          proxy.Entity.TakeControlInternal();
         }
 
         // log debug info
@@ -499,7 +499,7 @@ partial class BoltEntityChannel : BoltChannel {
         // update control state yes/no
         if (proxy.Entity.HasControl ^ isController) {
           if (isController) {
-            proxy.Entity.TakeControl();
+            proxy.Entity.TakeControlInternal();
           }
           else {
             proxy.Entity.ReleaseControl();

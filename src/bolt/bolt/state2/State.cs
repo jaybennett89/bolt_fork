@@ -308,15 +308,17 @@ namespace Bolt {
         int ptr = stream.Ptr;
 
         if (bits >= b) {
+          BoltLog.Info("Serializing {0}", s.StateData.PropertyName);
+
           // write property id
           stream.WriteInt(p.PropertyIndex, PropertyIdBits);
 
           // write data into stream
           if (s.StatePack(this, Frames.first, connection, stream)) {
 #if DEBUG
-            int totalBits = PropertyIdBits + (stream.Position - ptr);
+            int totalBits = stream.Position - ptr;
             if (totalBits != b) {
-              BoltLog.Warn("Property of type {0} did not write the correct amount of bits, written: {1}, expected: {2}", p, totalBits, b);
+              BoltLog.Warn("Property of type {0} did not write the correct amount of bits, written: {1}, expected: {2}", s, totalBits, b);
             }
 #endif
             // use up bits
