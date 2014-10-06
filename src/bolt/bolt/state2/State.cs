@@ -82,7 +82,7 @@ namespace Bolt {
       }
     }
 
-    internal EntityObject Entity;
+    internal Entity Entity;
     internal UE.Animator Animator;
 
     internal readonly int PropertyIdBits;
@@ -173,7 +173,7 @@ namespace Bolt {
       }
     }
 
-    public void OnCreated(EntityObject entity) {
+    public void OnCreated(Entity entity) {
       Entity = entity;
     }
 

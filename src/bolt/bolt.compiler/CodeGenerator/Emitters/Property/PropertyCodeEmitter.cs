@@ -39,6 +39,14 @@ namespace Bolt.Compiler {
       );
     }
 
+    public CodeExpression EmitEventPropertyInitializer() {
+      return (@"new Bolt.{0}(new Bolt.EventPropertyMetaData {{ ByteOffset = {1}, PropertyName = ""{2}"" }})").Expr(
+        SerializerClassName,
+        Decorator.ByteOffset,
+        Decorator.Definition.Name
+      );
+    }
+
     public virtual CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
       return null;
     }
@@ -64,7 +72,11 @@ namespace Bolt.Compiler {
     }
 
     public virtual void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
+      throw new NotImplementedException();
+    }
 
+    public virtual void EmitEventMembers(CodeTypeDeclaration type) {
+      throw new NotImplementedException();
     }
 
     public void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {
@@ -108,4 +120,45 @@ namespace Bolt.Compiler {
     public new T Decorator { get { return (T)base.Decorator; } }
   }
 
+
+  public abstract class PropertyCodeEmitterSimple<T> : PropertyCodeEmitter<T> where T : PropertyDecorator {
+    public abstract string ReadMethod {
+      get;
+    }
+
+    public abstract string PackMethod {
+      get;
+    }
+
+    string Get(object data, object offset) {
+      return string.Format("return Bolt.Blit.{2}({0}, {1})", data, offset, ReadMethod);
+    }
+
+    string Set(object data, object offset) {
+      return string.Format("Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
+    }
+
+    void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
+      var offset = "offsetBytes + " + Decorator.ByteOffset;
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("frame.Data", offset), emitSetter ? Set("frame.Data", offset) : null);
+    }
+
+    public override void EmitStructMembers(CodeTypeDeclaration type) {
+      DeclareProperty(type, false);
+    }
+
+    public override void EmitModifierMembers(CodeTypeDeclaration type) {
+      DeclareProperty(type, true);
+    }
+
+    public override void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
+      CodeMemberProperty property;
+      property = type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get(bytes, Decorator.ByteOffset), Set(bytes, Decorator.ByteOffset));
+      property.PrivateImplementationType = new CodeTypeReference(implType);
+    }
+
+    public override void EmitEventMembers(CodeTypeDeclaration type) {
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", Decorator.ByteOffset), Set("Data", Decorator.ByteOffset));
+    }
+  }
 }

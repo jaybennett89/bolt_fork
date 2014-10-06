@@ -452,7 +452,7 @@ public static class UdpStreamExtensions {
     return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
   }
 
-  public static void WriteEntity(this UdpStream stream, BoltEntity en, BoltConnection cn) {
+  internal static void WriteEntity(this UdpStream stream, Entity en, BoltConnection cn) {
     if (en == null) {
       stream.WriteBool(false);
       return;
@@ -466,19 +466,19 @@ public static class UdpStreamExtensions {
       // if it's an incomming that means the sourceConnection is the same as this connection
       // if it's an outgoing that means the sourceConnection is either null (it's local) 
       // or it's a connection which which we received this object from
-      stream.WriteBool(ReferenceEquals(en.Entity.Source, cn));
+      stream.WriteBool(ReferenceEquals(en.Source, cn));
 
       // the actual network id
       stream.WriteNetworkId(id);
     }
   }
 
-  public static BoltEntity ReadEntity(this UdpStream stream, BoltConnection cn) {
+  internal static Entity ReadEntity(this UdpStream stream, BoltConnection cn) {
     NetId networkId;
     return ReadEntity(stream, cn, out networkId);
   }
 
-  public static BoltEntity ReadEntity(this UdpStream stream, BoltConnection cn, out NetId networkId) {
+  internal static Entity ReadEntity(this UdpStream stream, BoltConnection cn, out NetId networkId) {
     if (stream.ReadBool()) {
       // if this bool reads true, that means that the
       // other end of the connection classifices this 
@@ -509,6 +509,12 @@ public static class UdpStreamExtensions {
     uint peerId = stream.ReadUInt();
     uint entityId = stream.ReadUInt();
     return new BoltUniqueId(peerId, entityId);
+  }
+
+  public static void WriteContinueMarker(this UdpStream stream) {
+    if (stream.CanWrite()) {
+      stream.WriteBool(true);
+    }
   }
 
   public static void WriteStopMarker(this UdpStream stream) {

@@ -5,16 +5,14 @@ using System.Text;
 
 namespace Bolt {
   public enum EntityTargets : byte {
-    Everyone = 0,
-    EveryoneExceptController = 1,
-    OnlyController = 2,
+    Everyone = Event.ENTITY_EVERYONE,
+    EveryoneExceptController = Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER
   }
 
   public enum GlobalTargets : byte {
-    Everyone = 0,
-    Others = 1,
-    Server = 2,
-    Client = 3,
-    AllClients = 4,
+    Everyone = Event.GLOBAL_EVERYONE,
+    Others = Event.GLOBAL_OTHERS,
+    Server = Event.GLOBAL_SERVER,
+    AllClients = Event.GLOBAL_ALL_CLIENTS
   }
 }

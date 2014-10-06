@@ -38,19 +38,19 @@ namespace Bolt.Compiler {
 
       type = Generator.DeclareClass(Decorator.FactoryName);
       type.TypeAttributes = TypeAttributes.NotPublic;
-      type.BaseTypes.Add("Bolt.IEntitySerializerFactory");
+      type.BaseTypes.Add("Bolt.IFactory");
 
-      type.DeclareProperty("Type", "Bolt.IEntitySerializerFactory.TypeObject", get => {
+      type.DeclareProperty("Type", "TypeObject", get => {
         get.Expr("return typeof({0})", Decorator.InterfaceName);
-      }).Attributes = default(MemberAttributes);
+      });
 
-      type.DeclareProperty("Bolt.TypeId", "Bolt.IEntitySerializerFactory.TypeId", get => {
+      type.DeclareProperty("Bolt.TypeId", "TypeId", get => {
         get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
-      }).Attributes = default(MemberAttributes);
+      });
 
-      type.DeclareMethod("Bolt.IEntitySerializer", "Bolt.IEntitySerializerFactory.Create", methoid => {
+      type.DeclareMethod(typeof(object).FullName, "Create", methoid => {
         methoid.Statements.Expr("return new {0}()", Decorator.ClassName);
-      }).Attributes = default(MemberAttributes);
+      });
     }
 
     public void EmitImplementationClass() {

@@ -57,7 +57,7 @@ partial class BoltEntityChannel {
     }
 
 
-    bool EntityHasUnsentState(EntityObject entity) {
+    bool EntityHasUnsentState(Entity entity) {
       var it = entity.CommandQueue.GetIterator();
 
       while (it.Next()) {
@@ -71,7 +71,7 @@ partial class BoltEntityChannel {
 
     void PackResult(BoltPacket packet) {
       foreach (EntityProxy proxy in outgoingProxiesByEntityId.Values) {
-        EntityObject entity = proxy.Entity;
+        Entity entity = proxy.Entity;
 
         // four conditions have to hold
         // 1) Entity must exist locally (not null)
@@ -144,7 +144,7 @@ partial class BoltEntityChannel {
 
         NetId netId = packet.stream.ReadNetworkId();
         EntityProxy proxy = incommingProxiesByNetworkId[netId];
-        EntityObject entity = proxy.Entity;
+        Entity entity = proxy.Entity;
 
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
@@ -185,7 +185,7 @@ partial class BoltEntityChannel {
             cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
           }
           else {
-            cmd = BoltFactory.NewCommand(typeId);
+            cmd = Factory.NewCommand(typeId);
             cmd.ReadResult(connection, cmd.ResultData, packet.stream);
             cmd.Free();
           }
@@ -202,7 +202,7 @@ partial class BoltEntityChannel {
 
     void PackInput(BoltPacket packet) {
       foreach (EntityProxy proxy in incommingProxiesByNetworkId.Values) {
-        EntityObject entity = proxy.Entity;
+        Entity entity = proxy.Entity;
 
         ////BoltLog.Debug("count: {0}", incommingProxiesByEntityId.Count);
         ////BoltLog.Debug("packing cmd for {0}: {1}/{2}/{3}", entity, (bool) (entity), (bool) (entity._flags & BoltEntity.FLAG_IS_CONTROLLING), (bool) (entity._commands.count > 0));
@@ -278,7 +278,7 @@ partial class BoltEntityChannel {
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
 
-          Bolt.Command cmd = BoltFactory.NewCommand(TypeId.Read(packet.stream));
+          Bolt.Command cmd = Factory.NewCommand(TypeId.Read(packet.stream));
           cmd.Sequence = ReadSequence(packet.stream);
           cmd.Frame = packet.stream.ReadInt();
           cmd.ReadInput(connection, packet.stream);
@@ -286,7 +286,7 @@ partial class BoltEntityChannel {
           // no proxy or entity
           if (!proxy || !proxy.Entity) { continue; }
 
-          EntityObject entity = proxy.Entity;
+          Entity entity = proxy.Entity;
 
           // remote is not controller
           if (ReferenceEquals(entity.Controller, connection) == false) { continue; }
@@ -301,4 +301,5 @@ partial class BoltEntityChannel {
       }
     }
   }
+
 }

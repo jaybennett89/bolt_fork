@@ -1,11 +1,11 @@
 ﻿using System;
 
 class BoltEventReliable : BoltObject, IBoltSequenced, IDisposable {
-  public uint sequence { get; set; }
+  public uint Sequence { get; set; }
   public BoltEventBase evnt { get; set; }
 
   public void Dispose () {
-    sequence = 0;
+    Sequence = 0;
 
     if (evnt) {
       evnt.Dispose();

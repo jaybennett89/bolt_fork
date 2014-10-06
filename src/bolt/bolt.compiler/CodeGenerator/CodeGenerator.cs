@@ -204,7 +204,7 @@ namespace Bolt.Compiler {
         EventCodeEmitter emitter;
         emitter = new EventCodeEmitter();
         emitter.Decorator = d;
-        emitter.EmitEventClass();
+        emitter.EmitTypes();
       }
 
 
@@ -304,6 +304,16 @@ namespace Bolt.Compiler {
     }
 
     void CreateCompilationModel() {
+      // Calculate size for events
+      for (int i = 0; i < Events.Count; ++i) {
+        EventDecorator  decorator = Events[i];
+
+        for (int n = 0; n < decorator.Properties.Count; ++n) {
+          decorator.Properties[n].ByteOffset = decorator.ByteSize;
+          decorator.ByteSize += decorator.Properties[n].ByteSize;
+        }
+      }
+
       // Calculate size for commands
       for (int i = 0; i < Commands.Count; ++i) {
         CommandDecorator decorator = Commands[i];

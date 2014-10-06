@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UdpKit;
 
 internal class BoltPacketInfo {
@@ -16,13 +17,13 @@ internal class BoltPacket : IDisposable {
   internal volatile bool pooled = true;
   internal BoltPacketInfo info = null;
   internal BoltSingleList<EntityProxyEnvelope> envelopes = new BoltSingleList<EntityProxyEnvelope>();
-  internal BoltSingleList<BoltEventReliable> eventReliable = new BoltSingleList<BoltEventReliable>();
+  internal List<Bolt.EventReliable> eventReliable = new List<Bolt.EventReliable>();
 
   public int frame { get; internal set; }
   public UdpStream stream { get; internal set; }
   public IDisposable userToken { get; set; }
 
-  void IDisposable.Dispose () {
+  void IDisposable.Dispose() {
     BoltPacketPool.Dispose(this);
   }
 }

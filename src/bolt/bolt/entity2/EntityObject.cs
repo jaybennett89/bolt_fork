@@ -6,7 +6,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  partial class EntityObject : IBoltListNode, IEntityPriorityCalculator {
+  partial class Entity : IBoltListNode, IPriorityCalculator {
     static int _instanceIdCounter;
 
     internal PrefabId PrefabId;
@@ -22,13 +22,13 @@ namespace Bolt {
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
-    internal Bolt.IEntityPriorityCalculator PriorityCalculator;
+    internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
     internal bool ControllerLocalPrediction;
     internal ushort CommandSequence = 0;
 
-    internal BoltEventDispatcher EventDispatcher = new BoltEventDispatcher();
+    internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
     internal BoltDoubleList<EntityProxy> Proxies = new BoltDoubleList<EntityProxy>();
 
@@ -158,7 +158,7 @@ namespace Bolt {
 
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
-      PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IEntityPriorityCalculator)) as IEntityPriorityCalculator;
+      PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;
 
       // use the default priority calculator if none is available
       if (PriorityCalculator == null) {
@@ -291,28 +291,40 @@ namespace Bolt {
       return count;
     }
 
-    internal static EntityObject CreateFrom(BoltEntity entity, TypeId serializerId) {
-      EntityObject eo;
+    internal static Entity CreateFrom(BoltEntity entity, TypeId serializerId) {
+      Entity eo;
 
-      eo = new EntityObject();
+      eo = new Entity();
       eo.PrefabId = new PrefabId(entity._prefabId);
       eo.UpdateRate = entity._updateRate;
       eo.ControllerLocalPrediction = entity._clientPredicted;
       eo.Flags = entity._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
       // create serializer
-      eo.Serializer = BoltFactory.NewSerializer(serializerId);
+      eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
 
       return eo;
     }
 
-    public static implicit operator bool(EntityObject entity) {
+    public static implicit operator bool(Entity entity) {
       return entity != null;
     }
 
-    float IEntityPriorityCalculator.CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
+    float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {
       return skipped;
+    }
+
+    float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, Event evnt) {
+      if (HasControl) {
+        return 3;
+      }
+
+      if (IsController(connection)) {
+        return 2;
+      }
+
+      return 1;
     }
   }
 }

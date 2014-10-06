@@ -23,7 +23,7 @@ namespace Bolt {
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
-      Bolt.EntityObject entity = BoltCore.FindEntity(new InstanceId(frame.Data.ReadI32(StateData.ByteOffset)));
+      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(frame.Data.ReadI32(StateData.ByteOffset)));
 
       if (stream.WriteBool(entity != null)) {
         if (connection._entityChannel.ExistsOnRemote(entity)) {

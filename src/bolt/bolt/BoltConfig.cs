@@ -30,6 +30,7 @@ public sealed class BoltConfig
     public bool globalUniqueIds = false;
     public byte[] applicationGuid;
     public bool useAssemblyChecksum = true;
+    public int packetMaxEventSize = 512;
     public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
     public int clientSendRate;

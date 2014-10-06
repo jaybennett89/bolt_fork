@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  interface IEventInfo {
-    TypeId TypeId { get; }
-    PropertySerializer[] Properties { get; }
+  public interface IGlobalEventListener {
+    bool PeristBetweenStartupAndShutdown();
   }
 }

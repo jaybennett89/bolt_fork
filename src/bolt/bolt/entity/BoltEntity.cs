@@ -30,7 +30,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal UE.Object[] _objects;
 
   // our link to Bolts internal entity object
-  internal Bolt.EntityObject Entity;
+  internal Bolt.Entity Entity;
 
   object IBoltListNode.prev { get; set; }
   object IBoltListNode.next { get; set; }
@@ -102,7 +102,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// Checks if this entity is being controlled by the connection
   /// </summary>
   /// <param name="connection">The connection to check</param>
-  public bool IsControlledBy(BoltConnection connection) {
+  public bool IsController(BoltConnection connection) {
     return ReferenceEquals(Entity.Controller, connection);
   }
 

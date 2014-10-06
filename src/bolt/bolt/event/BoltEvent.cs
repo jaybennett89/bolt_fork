@@ -65,7 +65,7 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
   internal bool _entityIsOutgoing;
   internal NetId _entityNetworkId;
 
-  internal EntityObject _entity;
+  internal Entity _entity;
   internal BoltConnection _connection;
   internal BoltEventDeliveryMode _deliveryMode;
 
@@ -138,9 +138,9 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
   internal void GrabEntity (BoltConnection connection) {
     if (_isEntityEvent) {
       if (_entityIsOutgoing) {
-        _entity = connection.GetOutgoingEntity(_entityNetworkId).Entity;
+        _entity = connection.GetOutgoingEntity(_entityNetworkId);
       } else {
-        _entity = connection.GetIncommingEntity(_entityNetworkId).Entity;
+        _entity = connection.GetIncommingEntity(_entityNetworkId);
       }
     }
   }
@@ -162,7 +162,7 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
     }
 
     while (connections.Next()) {
-      connections.val.Raise(evnt);
+      //connections.val.Raise(evnt);
     }
 
     evnt.Dispose();
@@ -177,22 +177,22 @@ public abstract class BoltEventBase : BoltObject, IDisposable, IBoltEvent {
     }
 
     foreach (BoltConnection cn in connections) {
-      cn.Raise(evnt);
+      //cn.Raise(evnt);
     }
 
     evnt.Dispose();
   }
 
   static void Call (BoltEventBase evnt) {
-    Assert.True(evnt._refCount > 0);
-    IBoltEventFactory handler = BoltFactory.GetEventFactory(evnt._id);
+    //Assert.True(evnt._refCount > 0);
+    //IBoltEventFactory handler = BoltFactory.GetEventFactory(evnt._id);
 
-    if (evnt._isEntityEvent) {
-      if (evnt._entity) {
-        evnt._entity.EventDispatcher.Dispatch(evnt, handler);
-      }
-    } else {
-      BoltCore._globalEventDispatcher.Dispatch(evnt, handler);
-    }
+    //if (evnt._isEntityEvent) {
+    //  if (evnt._entity) {
+    //    evnt._entity.EventDispatcher.Dispatch(evnt, handler);
+    //  }
+    //} else {
+    //  BoltCore._globalEventDispatcher.Dispatch(evnt, handler);
+    //}
   }
 }

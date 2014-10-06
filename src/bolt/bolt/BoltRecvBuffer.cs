@@ -1,5 +1,5 @@
 ﻿internal interface IBoltSequenced {
-  uint sequence { get; set; }
+  uint Sequence { get; set; }
 }
 
 internal enum RecvBufferAddResult {
@@ -41,7 +41,7 @@ internal class BoltRecvBuffer<T> where T : IBoltSequenced {
       tail += 1;
       tail &= mask;
 
-      sequenceNext = value.sequence + 1u;
+      sequenceNext = value.Sequence + 1u;
       sequenceNext &= sequenceMask;
     } else {
       value = default(T);
@@ -51,7 +51,7 @@ internal class BoltRecvBuffer<T> where T : IBoltSequenced {
   }
 
   public RecvBufferAddResult TryEnqueue (T value) {
-    int distance = BoltMath.SequenceDistance(value.sequence, sequenceNext, sequenceShift);
+    int distance = BoltMath.SequenceDistance(value.Sequence, sequenceNext, sequenceShift);
     int index = (tail + distance) & mask;
 
     if (distance <= -nodes.Length || distance >= nodes.Length) {

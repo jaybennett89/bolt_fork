@@ -66,7 +66,7 @@ internal class BoltSendBuffer<T> where T : IBoltSequenced {
     }
 
     nodes[index].Value = value;
-    nodes[index].Value.sequence = generator.Next();
+    nodes[index].Value.Sequence = generator.Next();
     nodes[index].State = State.Send;
 
     count += 1;
@@ -117,7 +117,7 @@ internal class BoltSendBuffer<T> where T : IBoltSequenced {
       return;
     }
 
-    int distance = SequenceDistance(value.sequence, nodes[tail].Value.sequence);
+    int distance = SequenceDistance(value.Sequence, nodes[tail].Value.Sequence);
     if (distance < 0 || distance >= count) {
       return;
     }

@@ -9,9 +9,26 @@ partial class BoltCompiler {
     using (BoltSourceFile file = new BoltSourceFile(op.networkFilePath)) {
       string src = Assembly.GetExecutingAssembly().GetResourceText("bolt.editor.Resources.BoltNetwork.cs");
 
+      // command registration
+      src = src.Replace("//COMMANDS",
+        op.project.Commands.Select(x => {
+          CommandDecorator dec = new CommandDecorator();
+          dec.Definition = x;
+
+          return string.Format("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+
+        }).Join("\r\n")
+      );
+
       // event registration
       src = src.Replace("//EVENTS",
-        op.events.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
+        op.project.Events.Select(x => {
+          EventDecorator dec = new EventDecorator();
+          dec.Definition = x;
+
+          return string.Format("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+
+        }).Join("\r\n")
       );
 
       // state registration
@@ -20,22 +37,9 @@ partial class BoltCompiler {
           StateDecorator dec = new StateDecorator();
           dec.Definition = x;
 
-          return string.Format("BoltFactory.Register(new {0}());", dec.FactoryName);
+          return string.Format("Bolt.Factory.Register(new {0}());", dec.FactoryName);
 
         }).Join("\r\n")
-        //op.states.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
-      );
-
-      // command registration
-      src = src.Replace("//COMMANDS",
-        op.project.Commands.Select(x => {
-          CommandDecorator dec = new CommandDecorator();
-          dec.Definition = x;
-
-          return string.Format("BoltFactory.Register(new {0}());", dec.FactoryName);
-
-        }).Join("\r\n")
-        //op.commands.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
       );
 
       file.Emit(src);

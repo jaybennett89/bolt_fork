@@ -58,14 +58,14 @@ class BoltEventChannel : BoltChannel {
     {
       BoltEventReliable reliable;
 
-      while (_reliableSend.TryNext(out reliable)) {
-        if (PackReliableEvent(packet, reliable.evnt, reliable.sequence)) {
-          packet.eventReliable.AddLast(reliable);
-        } else {
-          _reliableSend.SetSend(reliable);
-          break;
-        }
-      }
+      //while (_reliableSend.TryNext(out reliable)) {
+      //  if (PackReliableEvent(packet, reliable.evnt, reliable.Sequence)) {
+      //    packet.eventReliable.AddLast(reliable);
+      //  } else {
+      //    _reliableSend.SetSend(reliable);
+      //    break;
+      //  }
+      //}
 
       packet.stream.WriteStopMarker();
     }
@@ -166,32 +166,32 @@ class BoltEventChannel : BoltChannel {
   }
 
   public override void Lost (BoltPacket packet) {
-    // mark all lost events
-    while (packet.eventReliable.count > 0) {
-      BoltEventReliable reliable = packet.eventReliable.RemoveFirst();
-      Assert.True(reliable.evnt._refCount > 0);
-      _reliableSend.SetSend(reliable);
-      //BoltLog.Debug("lost {0} ... resending", reliable);
-    }
+    //// mark all lost events
+    //while (packet.eventReliable.count > 0) {
+    //  BoltEventReliable reliable = packet.eventReliable.RemoveFirst();
+    //  Assert.True(reliable.evnt._refCount > 0);
+    //  _reliableSend.SetSend(reliable);
+    //  //BoltLog.Debug("lost {0} ... resending", reliable);
+    //}
   }
 
   public override void Delivered (BoltPacket packet) {
-    // mark all delivered events
-    while (packet.eventReliable.count > 0) {
-      BoltEventReliable reliable = packet.eventReliable.RemoveFirst();
-      Assert.True(reliable.evnt._refCount > 0);
-      _reliableSend.SetDelivered(reliable);
-    }
+    //// mark all delivered events
+    //while (packet.eventReliable.count > 0) {
+    //  BoltEventReliable reliable = packet.eventReliable.RemoveFirst();
+    //  Assert.True(reliable.evnt._refCount > 0);
+    //  _reliableSend.SetDelivered(reliable);
+    //}
 
-    // dipose all events which have been delivered in order
-    {
-      BoltEventReliable reliable;
+    //// dipose all events which have been delivered in order
+    //{
+    //  BoltEventReliable reliable;
 
-      while (_reliableSend.TryRemove(out reliable)) {
-        //BoltLog.Debug("delivered {0}", reliable);
-        reliable.Dispose();
-      }
-    }
+    //  while (_reliableSend.TryRemove(out reliable)) {
+    //    //BoltLog.Debug("delivered {0}", reliable);
+    //    reliable.Dispose();
+    //  }
+    //}
   }
 
   public override void ReadDone () {
@@ -303,31 +303,33 @@ class BoltEventChannel : BoltChannel {
   }
 
   bool ReadUnreliableEvent (BoltPacket packet, out BoltEventBase evnt) {
-    Assert.False(packet.stream.Overflowing);
+    evnt = null;
 
-    if (packet.stream.ReadBool() == false) {
-      evnt = null;
-      return false;
-    }
+    //Assert.False(packet.stream.Overflowing);
 
-    Assert.False(packet.stream.Overflowing);
+    //if (packet.stream.ReadBool() == false) {
+    //  evnt = null;
+    //  return false;
+    //}
 
-    // create event object
-    evnt = BoltFactory.NewEvent(packet.stream.ReadUShort());
+    //Assert.False(packet.stream.Overflowing);
 
-    if (evnt._isEntityEvent) {
-      evnt._entityIsOutgoing = packet.stream.ReadBool();
-      evnt._entityNetworkId = packet.stream.ReadNetworkId();
-    }
+    //// create event object
+    ////evnt = BoltFactory.NewEvent(packet.stream.ReadUShort());
 
-    if (evnt._deliveryMode == BoltEventDeliveryMode.UnreliableSynced) {
-      evnt._frame = packet.frame - packet.stream.ReadByte();
-    }
+    //if (evnt._isEntityEvent) {
+    //  evnt._entityIsOutgoing = packet.stream.ReadBool();
+    //  evnt._entityNetworkId = packet.stream.ReadNetworkId();
+    //}
 
-    Assert.False(packet.stream.Overflowing);
-    evnt._connection = connection;
-    evnt.Read(packet.stream, connection);
-    Assert.False(packet.stream.Overflowing);
+    //if (evnt._deliveryMode == BoltEventDeliveryMode.UnreliableSynced) {
+    //  evnt._frame = packet.frame - packet.stream.ReadByte();
+    //}
+
+    //Assert.False(packet.stream.Overflowing);
+    //evnt._connection = connection;
+    //evnt.Read(packet.stream, connection);
+    //Assert.False(packet.stream.Overflowing);
 
     return true;
   }
@@ -354,21 +356,23 @@ class BoltEventChannel : BoltChannel {
   }
 
   bool ReadReliableEvent (BoltPacket packet, out BoltEventReliable reliable) {
-    if (packet.stream.ReadBool() == false) {
-      reliable = null;
-      return false;
-    }
+    reliable = null;
 
-    ushort eventid = packet.stream.ReadUShort();
-    uint sequence = packet.stream.ReadUInt();
+    //if (packet.stream.ReadBool() == false) {
+    //  reliable = null;
+    //  return false;
+    //}
 
-    reliable = new BoltEventReliable();
-    reliable.sequence = sequence;
-    reliable.evnt = BoltFactory.NewEvent(eventid);
-    reliable.evnt._connection = connection;
-    reliable.evnt.Read(packet.stream, connection);
+    //ushort eventid = packet.stream.ReadUShort();
+    //uint sequence = packet.stream.ReadUInt();
 
-    Assert.True(reliable.evnt._refCount > 0);
+    //reliable = new BoltEventReliable();
+    //reliable.Sequence = sequence;
+    //reliable.evnt = BoltFactory.NewEvent(eventid);
+    //reliable.evnt._connection = connection;
+    //reliable.evnt.Read(packet.stream, connection);
+
+    //Assert.True(reliable.evnt._refCount > 0);
     return true;
   }
 }

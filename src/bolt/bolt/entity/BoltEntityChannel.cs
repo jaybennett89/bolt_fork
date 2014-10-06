@@ -30,7 +30,7 @@ partial class BoltEntityChannel : BoltChannel {
     _incommingProxiesByInstanceId = new Dictionary<Bolt.InstanceId, EntityProxy>(1024, Bolt.InstanceId.EqualityComparer.Instance);
   }
 
-  public Bolt.EntityObject GetIncommingEntity(Bolt.NetId proxyId) {
+  public Bolt.Entity GetIncommingEntity(Bolt.NetId proxyId) {
     if (_incommingProxiesByNetId[proxyId] != null) {
       return _incommingProxiesByNetId[proxyId].Entity;
     }
@@ -38,7 +38,7 @@ partial class BoltEntityChannel : BoltChannel {
     return null;
   }
 
-  public Bolt.EntityObject GetOutgoingEntity(Bolt.NetId proxyId) {
+  public Bolt.Entity GetOutgoingEntity(Bolt.NetId proxyId) {
     if (_incommingProxiesByNetId[proxyId] != null) {
       return _incommingProxiesByNetId[proxyId].Entity;
     }
@@ -46,7 +46,7 @@ partial class BoltEntityChannel : BoltChannel {
     return null;
   }
 
-  public void ForceSync(Bolt.EntityObject en) {
+  public void ForceSync(Bolt.Entity en) {
     EntityProxy proxy;
 
     if (_outgoingProxiesByInstanceId.TryGetValue(en.InstanceId, out proxy)) {
@@ -54,7 +54,7 @@ partial class BoltEntityChannel : BoltChannel {
     }
   }
 
-  public void SetIdle(Bolt.EntityObject entity, bool idle) {
+  public void SetIdle(Bolt.Entity entity, bool idle) {
     EntityProxy proxy;
 
     if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
@@ -67,7 +67,7 @@ partial class BoltEntityChannel : BoltChannel {
     }
   }
 
-  public NetId GetNetworkId(Bolt.EntityObject entity) {
+  public NetId GetNetworkId(Entity entity) {
     EntityProxy proxy;
 
     if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) { return proxy.NetId; }
@@ -76,7 +76,7 @@ partial class BoltEntityChannel : BoltChannel {
     return new NetId(int.MaxValue);
   }
 
-  public bool ExistsOnRemote(Bolt.EntityObject entity) {
+  public bool ExistsOnRemote(Entity entity) {
     if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
 
     EntityProxy proxy;
@@ -92,11 +92,11 @@ partial class BoltEntityChannel : BoltChannel {
     return false;
   }
 
-  public bool MightExistOnRemote(Bolt.EntityObject entity) {
+  public bool MightExistOnRemote(Bolt.Entity entity) {
     return _incommingProxiesByInstanceId.ContainsKey(entity.InstanceId) || _outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId);
   }
 
-  public void DestroyOnRemote(Bolt.EntityObject entity, BoltEntityDestroyMode mode) {
+  public void DestroyOnRemote(Bolt.Entity entity, BoltEntityDestroyMode mode) {
     EntityProxy proxy;
 
     if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
@@ -117,7 +117,7 @@ partial class BoltEntityChannel : BoltChannel {
     }
   }
 
-  public bool CreateOnRemote(Bolt.EntityObject entity) {
+  public bool CreateOnRemote(Bolt.Entity entity) {
     if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
     if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
 
@@ -191,7 +191,7 @@ partial class BoltEntityChannel : BoltChannel {
           if (proxy.Mask.AndCheck(proxy.Entity.Serializer.GetFilter(connection, proxy)) == false) { continue; }
 
           // calculate priority
-          proxy.Priority = Mathf.Clamp(proxy.Entity.PriorityCalculator.CalculatePriority(connection, proxy.Mask, proxy.Skipped), 0, 1 << 15);
+          proxy.Priority = Mathf.Clamp(proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped), 0, 1 << 15);
         }
       }
 
@@ -327,7 +327,7 @@ partial class BoltEntityChannel : BoltChannel {
     }
   }
 
-  public int GetSkippedUpdates(EntityObject en) {
+  public int GetSkippedUpdates(Entity en) {
     EntityProxy proxy;
 
     if (_outgoingProxiesByInstanceId.TryGetValue(en.InstanceId, out proxy)) {
@@ -435,7 +435,7 @@ partial class BoltEntityChannel : BoltChannel {
       bool isController = packet.stream.ReadBool();
       bool createRequested = packet.stream.ReadBool();
 
-      EntityObject entity = null;
+      Entity entity = null;
       EntityProxy proxy = null;
 
       if (createRequested) {

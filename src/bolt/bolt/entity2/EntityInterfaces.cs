@@ -18,8 +18,9 @@ namespace Bolt {
     void ExecuteCommand(Bolt.Command command, bool resetState);
   }
 
-  public interface IEntityPriorityCalculator {
-    float CalculatePriority(BoltConnection connection, BitArray mask, int skipped);
+  public interface IPriorityCalculator {
+    float CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped);
+    float CalculateEventPriority(BoltConnection connection, Event evnt);
   }
 
   public interface IEntityBehaviour<TState> : IEntityBehaviour where TState : IState {
@@ -31,7 +32,7 @@ namespace Bolt {
 
     void OnRender();
     void OnInitialized();
-    void OnCreated(EntityObject entity);
+    void OnCreated(Entity entity);
 
     void OnSimulateBefore();
     void OnSimulateAfter();
@@ -48,11 +49,5 @@ namespace Bolt {
 
   internal interface IEntitySerializer<TState> : IEntitySerializer where TState : IState {
     TState state { get; }
-  }
-
-  internal interface IEntitySerializerFactory {
-    Type TypeObject { get; }
-    TypeId TypeId { get; }
-    IEntitySerializer Create();
   }
 }

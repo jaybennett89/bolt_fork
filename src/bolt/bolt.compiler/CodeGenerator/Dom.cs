@@ -64,6 +64,19 @@ namespace Bolt.Compiler {
       return DeclareProperty(type, propertyType, propertyName, getter, null);
     }
 
+    public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, string getter) {
+      return DeclareProperty(type, propertyType, propertyName, get => get.Expr(getter), null);
+    }
+
+    public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, string getter, string setter) {
+      if (setter != null) {
+        return DeclareProperty(type, propertyType, propertyName, get => get.Expr(getter), set => set.Expr(setter));
+      }
+      else {
+        return DeclareProperty(type, propertyType, propertyName, get => get.Expr(getter), null);
+      }
+    }
+
     public static CodeMemberProperty DeclareProperty(this CodeTypeDeclaration type, string propertyType, string propertyName, Action<CodeStatementCollection> getter, Action<CodeStatementCollection> setter) {
       CodeMemberProperty prop;
 

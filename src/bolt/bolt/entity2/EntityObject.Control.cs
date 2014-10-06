@@ -5,7 +5,7 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  partial class EntityObject {
+  partial class Entity {
     internal void TakeControl() {
       if (IsOwner) {
         if (HasControl) {

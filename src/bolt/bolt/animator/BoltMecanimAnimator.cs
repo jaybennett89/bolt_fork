@@ -33,7 +33,7 @@ internal abstract class BoltMecanimAnimator<T> : IBoltStateProperty where T : Bo
 
     _layerWeights[layer] = weight;
     _animator.SetLayerWeight(layer, weight);
-    _state.PropertyChanged(this);
+    //_state.PropertyChanged(this);
   }
 
   protected float GetLayerWeight (int layer) {

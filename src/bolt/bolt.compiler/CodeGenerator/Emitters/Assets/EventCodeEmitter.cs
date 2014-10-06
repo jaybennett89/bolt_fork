@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Bolt.Compiler {
@@ -11,8 +12,40 @@ namespace Bolt.Compiler {
       set { base.Decorator = value; }
     }
 
-    public void EmitEventClass() {
+    public void EmitTypes() {
+      EmitClass();
+      EmitFactory();
+      EmitListenerInterface();
+    }
 
+    void EmitListenerInterface() {
+      CodeTypeDeclaration type;
+
+      type = Generator.DeclareInterface(Decorator.ListenerName);
+      type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {
+        method.DeclareParameter(Decorator.Name, "evnt");
+      });
+    }
+
+    void EmitFactory() {
+      CodeTypeDeclaration type;
+
+      type = Generator.DeclareClass(Decorator.FactoryName);
+      type.TypeAttributes = TypeAttributes.NotPublic;
+      type.BaseTypes.Add("Bolt.IEventFactory");
+
+      type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
+      type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
+
+      type.DeclareMethod(typeof(object).FullName, "Create", method => method.Statements.Expr("return new {0}()", Decorator.Name));
+      type.DeclareMethod(typeof(void).FullName, "Dispatch", method => {
+        method.DeclareParameter("Bolt.Event", "ev");
+        method.DeclareParameter(typeof(object).FullName, "target");
+        method.Statements.Expr("if (target is {0}) (({0})target).OnEvent(({1})ev)", Decorator.ListenerName, Decorator.Name);
+      });
+    }
+
+    void EmitClass() {
 
       CodeTypeDeclaration type;
 
@@ -20,23 +53,33 @@ namespace Bolt.Compiler {
       type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
       type.BaseTypes.Add("Bolt.Event");
 
-      type.DeclareConstructor(ctor => {
-        ctor.Attributes = MemberAttributes.Private;
-        ctor.BaseConstructorArgs.Add("default(Bolt.EventMetaData)".Expr());
+      type.DeclareField("Bolt.EventMetaData", "_meta").Attributes = MemberAttributes.Static;
+      type.DeclareConstructorStatic(ctor => {
+        ctor.Statements.Expr("_meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
+        ctor.Statements.Expr("_meta.ByteSize = {0}", Decorator.ByteSize);
+        ctor.Statements.Expr("_meta.PropertySerializers = new Bolt.PropertySerializer[{0}]", Decorator.Properties.Count);
+
+        for (int i = 0; i < Decorator.Properties.Count; ++i) {
+          CodeExpression expr = PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitEventPropertyInitializer();
+          ctor.Statements.Assign("_meta.PropertySerializers[{0}]".Expr(i), expr);
+        }
       });
 
-      if (Decorator.Definition.Global) {
-        EmitGlobalMembers(type);
-      }
-      else {
-        EmitEntityMembers(type);
-      }
-    }
+      type.DeclareConstructor(ctor => {
+        ctor.Attributes = MemberAttributes.Assembly;
+        ctor.BaseConstructorArgs.Add("_meta".Expr());
+      });
 
-    void EmitEntityMembers(CodeTypeDeclaration type) {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltEntity", "entity");
+        method.Statements.Expr("return Raise(entity, Bolt.EntityTargets.Everyone)");
+      });
+
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.DeclareParameter("BoltEntity", "entity");
+        method.DeclareParameter("Bolt.EntityTargets", "targets");
 
         method.Statements.Expr("if (!entity) throw new System.ArgumentNullException(\"entity\")");
         method.Statements.Expr("if (!entity.isAttached) throw new BoltException(\"You can not raise events on entities which are not attached\")");
@@ -48,83 +91,47 @@ namespace Bolt.Compiler {
 
         method.Statements.Expr("{0} evt", Decorator.Definition.Name);
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
-        method.Statements.Expr("evt.EntityTargets = Bolt.EntityTargets.{0}", Decorator.Definition.EntityTargets);
-        method.Statements.Expr("evt.Entity = entity.Entity");
+        method.Statements.Expr("evt.Targets = (byte) targets", Decorator.Definition.EntityTargets);
+        method.Statements.Expr("evt.TargetEntity = entity.Entity");
         method.Statements.Expr("return evt");
       });
-    }
 
-    void EmitGlobalRaiseMethod(CodeTypeDeclaration type, GlobalEventTargets target) {
-      EmitGlobalRaiseMethod(type, target, null);
-    }
-
-    void EmitGlobalRaiseMethod(CodeTypeDeclaration type, GlobalEventTargets target, Action<CodeMemberMethod> methodBody) {
-      type.DeclareMethod(Decorator.Definition.Name, string.Format("RaiseTo{0}", target), method => {
-        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-
-        if (methodBody == null) {
-          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0}, null)", target);
-        }
-        else {
-          methodBody(method);
-        }
-      });
-    }
-
-    void EmitGlobalServerCheck(CodeMemberMethod method) {
-      method.Statements.Expr("if (BoltCore.isClient) throw new BoltException(\"You are not the server, you can not raise this event\")"); 
-    }
-
-    void EmitGlobalClientCheck(CodeMemberMethod method) {
-      method.Statements.Expr("if (BoltCore.isServer) throw new BoltException(\"You are not a client, you can not raise this event\")");
-    }
-
-    void EmitGlobalMembers(CodeTypeDeclaration type) {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Private | MemberAttributes.Static;
-        method.DeclareParameter("Bolt.GlobalTargets", "targets");
+        method.DeclareParameter(typeof(byte).FullName, "targets");
         method.DeclareParameter("BoltConnection", "connection");
 
         switch (Decorator.Definition.GlobalSenders) {
-          case GlobalEventSenders.OnlyServer: EmitGlobalServerCheck(method); break;
-          case GlobalEventSenders.OnlyClients: EmitGlobalClientCheck(method); break;
+          case GlobalEventSenders.OnlyServer: method.Statements.Expr("if (!BoltCore.isServer) throw new BoltException(\"You are not the server of, you can not raise this event\")"); break;
+          case GlobalEventSenders.OnlyClients: method.Statements.Expr("if (!BoltCore.isClient) throw new BoltException(\"You are not the a client, you can not raise this event\")"); break;
         }
 
         method.Statements.Expr("{0} evt", Decorator.Definition.Name);
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
-        method.Statements.Expr("evt.Connection = connection");
-        method.Statements.Expr("evt.GlobalTargets = targets");
+        method.Statements.Expr("evt.Targets = targets");
+        method.Statements.Expr("evt.TargetConnection = connection");
         method.Statements.Expr("return evt");
       });
 
-      if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.Everyone) == GlobalEventTargets.Everyone) {
-        EmitGlobalRaiseMethod(type, GlobalEventTargets.Everyone);
-      }
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.DeclareParameter("Bolt.GlobalTargets", "targets");
+        method.Statements.Expr("return Raise((byte) targets, null)");
+      });
 
-      if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.Others) == GlobalEventTargets.Others) {
-        EmitGlobalRaiseMethod(type, GlobalEventTargets.Others);
-      }
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.DeclareParameter("BoltConnection", "connection");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection)");
+      });
 
-      if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.AllClients) == GlobalEventTargets.AllClients) {
-        EmitGlobalRaiseMethod(type, GlobalEventTargets.AllClients);
-      }
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null)");
+      });
 
-      if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.Server) == GlobalEventTargets.Server) {
-        EmitGlobalRaiseMethod(type, GlobalEventTargets.Server, method => {
-          EmitGlobalClientCheck(method);
-          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0}, null)", GlobalEventTargets.Server);
-        });
-      }
-
-      if ((Decorator.Definition.GlobalTargets & GlobalEventTargets.Client) == GlobalEventTargets.Client) {
-        EmitGlobalRaiseMethod(type, GlobalEventTargets.Client, method => {
-          method.DeclareParameter("BoltConnection", "connection");
-
-          EmitGlobalServerCheck(method);
-
-          method.Statements.Expr("if (connection == null) throw new System.ArgumentNullException(\"connection\")");
-          method.Statements.Expr("return Raise(Bolt.GlobalTargets.{0}, connection)", GlobalEventTargets.Client);
-        });
+      for (int i = 0; i < Decorator.Properties.Count; ++i) {
+        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitEventMembers(type);
       }
     }
   }

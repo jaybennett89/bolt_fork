@@ -68,7 +68,7 @@ internal partial class EntityProxy : BoltObject {
   public Bolt.ProxyFlags Flags;
   public Bolt.Priority[] PropertyPriority;
 
-  public Bolt.EntityObject Entity;
+  public Bolt.Entity Entity;
   public BoltConnection Connection;
   public BoltRingBuffer<EntityProxyEnvelope> Envelopes;
 

@@ -33,14 +33,5 @@ namespace Bolt.Compiler {
     public override void EmitStructMembers(CodeTypeDeclaration type) {
 
     }
-
-    //internal struct TransformConfiguration {
-    //  public Axis[] PositionAxes;
-    //  public Axis[] RotationAxes;
-    //  public TransformModes TransformMode;
-    //  public TransformSpaces Space;
-    //  public TransformRotationMode RotationMode;
-    //  public FloatCompression QuaternionCompression;
-    //}
   }
 }

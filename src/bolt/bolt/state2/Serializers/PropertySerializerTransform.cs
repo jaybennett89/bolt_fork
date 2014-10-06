@@ -29,7 +29,6 @@ namespace Bolt {
   //}
 
   public class TransformData {
-
     internal UE.Transform Simulate;
     internal UE.Transform Render;
     internal DoubleBuffer<UE.Vector3> RenderDoubleBuffer;

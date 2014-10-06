@@ -29,12 +29,9 @@ internal static class BoltCore {
   static internal BoltConfig _config = null;
   static internal UdpConfig _udpConfig = null;
 
+  static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
-
-  static internal BoltDoubleList<EntityProxy> _proxies = new BoltDoubleList<EntityProxy>();
-  static internal BoltDoubleList<EntityObject> _entities = new BoltDoubleList<EntityObject>();
-
-  static internal BoltEventDispatcher _globalEventDispatcher = new BoltEventDispatcher();
+  static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -228,7 +225,7 @@ internal static class BoltCore {
     DestroyForce(entity.Entity);
   }
 
-  internal static void DestroyForce(Bolt.EntityObject entity) {
+  internal static void DestroyForce(Bolt.Entity entity) {
     // detach
     entity.Detach();
 
@@ -260,7 +257,7 @@ internal static class BoltCore {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
-    EntityObject eo;
+    Entity eo;
 
     eo = CreateEntity(prefab);
     eo.UnityObject.transform.position = position;
@@ -274,15 +271,15 @@ internal static class BoltCore {
   public static BoltEntity Attach(BoltEntity entity) {
     Assert.Null(entity.Entity);
 
-    EntityObject eo;
-    eo = EntityObject.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
+    Entity eo;
+    eo = Entity.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
     eo.Initialize();
     eo.Attach();
 
     return eo.UnityObject;
   }
 
-  internal static EntityObject CreateEntity(GameObject prefab) {
+  internal static Entity CreateEntity(GameObject prefab) {
     // prefab entity component
     BoltEntity ec;
     ec = prefab.GetComponent<BoltEntity>();
@@ -291,7 +288,7 @@ internal static class BoltCore {
     return CreateEntity(prefab, new TypeId(ec._defaultSerializerTypeId));
   }
   
-  internal static EntityObject CreateEntity(GameObject prefab, TypeId serializerId) {
+  internal static Entity CreateEntity(GameObject prefab, TypeId serializerId) {
     // prefab entity component
     BoltEntity ec;
     ec = prefab.GetComponent<BoltEntity>();
@@ -302,8 +299,8 @@ internal static class BoltCore {
     go = (GameObject)GameObject.Instantiate(prefab);
 
     // entity object
-    EntityObject eo;
-    eo = EntityObject.CreateFrom(ec, serializerId);
+    Entity eo;
+    eo = Entity.CreateFrom(ec, serializerId);
     eo.UnityObject = go.GetComponent<BoltEntity>();
 
     return eo;
@@ -318,7 +315,7 @@ internal static class BoltCore {
     return BoltRuntimeSettings.FindPrefab(name);
   }
 
-  public static Bolt.EntityObject FindEntity(InstanceId id) {
+  public static Bolt.Entity FindEntity(InstanceId id) {
     var it = _entities.GetIterator();
 
     while (it.Next()) {
@@ -364,22 +361,13 @@ internal static class BoltCore {
           connection.Disconnect();
         }
 
-        foreach (Bolt.EntityObject entity in _entities.ToArray()) {
+        foreach (Bolt.Entity entity in _entities.ToArray()) {
           DestroyForce(entity);
         }
 
-        _proxies.Clear();
         _entities.Clear();
         _connections.Clear();
-
-        foreach (var callback in _globalEventDispatcher._targets.ToArray()) {
-          if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown()) {
-            continue;
-          }
-
-          _globalEventDispatcher._targets.Remove(callback);
-        }
-
+        _globalEventDispatcher.Clear();
         _globalBehaviours.Clear();
 
         if (_globalBehaviourObject) {
@@ -392,7 +380,7 @@ internal static class BoltCore {
         _udpSocket.Close();
         _udpSocket = null;
 
-        BoltFactory.UnregisterAll();
+        Factory.UnregisterAll();
         BoltLog.RemoveAll();
 
       }
@@ -675,7 +663,7 @@ internal static class BoltCore {
       }
     }
 
-    foreach (EntityObject eo in _entities) {
+    foreach (Entity eo in _entities) {
       cn._entityChannel.CreateOnRemote(eo);
     }
   }
@@ -705,45 +693,6 @@ internal static class BoltCore {
       }
     }
   }
-
-  //static void UpdateScope() {
-  //  BoltConnection cn;
-  //  var cnIter = _connections.GetIterator();
-
-  //  while (cnIter.Next(out cn)) {
-  //    // if this connection isn't allowed to proxy objects, skip it
-  //    if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
-  //      continue;
-  //    }
-
-  //    BoltEntity en = null;
-  //    var enIter = _entities.GetIterator();
-
-  //    while (enIter.Next(out en)) {
-  //      // if proxying is disabled for this object, skip it
-  //      if (en._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
-
-  //      // if this object originates from this connection, skip it
-  //      if (ReferenceEquals(en._source, en)) { continue; }
-
-  //      // a controlling connection is always considered in scope
-  //      bool scope = en.boltSerializer.InScope(cn) || ReferenceEquals(en._remoteController, cn);
-  //      bool exists = cn._entityChannel.ExistsOnRemote(en);
-
-  //      // if we DO exists on remote but ARE NOT in scope
-  //      // anymore, we should mark the proxy for deletion
-  //      if (exists && !scope) {
-  //        cn._entityChannel.DestroyOnRemote(en, BoltEntityDestroyMode.OutOfScope);
-  //      }
-
-  //      // if we DO NOT exist on remote but ARE in scope
-  //      // we should create a new proxy on this connection
-  //      if (!exists && scope) {
-  //        cn._entityChannel.CreateOnRemote(en);
-  //      }
-  //    }
-  //  }
-  //}
 
   static internal void UpdateActiveGlobalBehaviours(string map) {
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
@@ -857,7 +806,7 @@ internal static class BoltCore {
     UdpLog.SetWriter(UdpLogWriter);
 
     // :)
-    BoltLog.Debug("bolt starting at {0} fps / {1} frametime", config.framesPerSecond, Time.fixedDeltaTime);
+    BoltLog.Debug("Starting at {0} fps ({1} fixed frame delta)", config.framesPerSecond, Time.fixedDeltaTime);
 
     // locate global object types
     _userAssemblyHash = BoltRuntimeReflection.GetUserAssemblyHash();
@@ -873,11 +822,7 @@ internal static class BoltCore {
     GameObject.DontDestroyOnLoad(_globalBehaviourObject);
 
     // unregister all handlers
-    Assert.True(BoltFactory.IsEmpty);
-
-    // register our handlers
-    BoltFactory.Register(new LoadMapFactory());
-    BoltFactory.Register(new LoadMapDoneFactory());
+    Assert.True(Factory.IsEmpty);
 
     // setup autogen and mode
     _mode = mode;

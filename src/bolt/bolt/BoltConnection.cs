@@ -29,7 +29,7 @@ public class BoltConnection : BoltObject {
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
   internal SceneLoadState _remoteMapLoadState;
-  internal BoltEventChannel _eventChannel;
+  internal EventChannel _eventChannel;
   internal BoltEntityChannel _entityChannel;
   internal BoltEntityChannel.CommandChannel _commandChannel;
 
@@ -120,7 +120,7 @@ public class BoltConnection : BoltObject {
     _remoteFrameAdjust = false;
 
     _channels = new BoltChannel[] {
-      _eventChannel = new BoltEventChannel(),
+      _eventChannel = new EventChannel(),
       _commandChannel = new BoltEntityChannel.CommandChannel(),
       _entityChannel = new BoltEntityChannel(),
     };
@@ -145,27 +145,8 @@ public class BoltConnection : BoltObject {
     return _entityChannel.GetSkippedUpdates(en.Entity);
   }
 
-  internal NetId GetNetworkId (BoltEntity en) {
-    return _entityChannel.GetNetworkId(en.Entity);
-  }
-
-  /// <summary>
-  /// Raise an event on the remote end of this connection
-  /// </summary>
-  /// <param name="event">The event to raise</param>
-  public void Raise (IBoltEvent @event) {
-    _eventChannel.Queue((BoltEventBase) @event);
-  }
-
-  ///// <summary>
-  ///// Raise an event of type T on the remote end of this connection
-  ///// </summary>
-  ///// <typeparam name="T">Type of the event</typeparam>
-  ///// <param name="init">Function called to setup the event before its sent of</param>
-  internal void Raise<T> (Action<T> init) where T : IBoltEvent {
-    T evnt = BoltFactory.NewEvent<T>();
-    init(evnt);
-    Raise(evnt);
+  internal NetId GetNetworkId (Entity en) {
+    return _entityChannel.GetNetworkId(en);
   }
 
   public override bool Equals (object obj) {
@@ -180,12 +161,12 @@ public class BoltConnection : BoltObject {
     return string.Format("[Connection addr={0} port={1}]", _udp.RemoteEndPoint.Address, _udp.RemoteEndPoint.Port);
   }
 
-  internal BoltEntity GetIncommingEntity (NetId networkId) {
-    return _entityChannel.GetIncommingEntity(networkId).UnityObject as BoltEntity;
+  internal Entity GetIncommingEntity (NetId networkId) {
+    return _entityChannel.GetIncommingEntity(networkId);
   }
 
-  internal BoltEntity GetOutgoingEntity(NetId networkId) {
-    return _entityChannel.GetOutgoingEntity(networkId).UnityObject as BoltEntity;
+  internal Entity GetOutgoingEntity(NetId networkId) {
+    return _entityChannel.GetOutgoingEntity(networkId);
   }
 
   internal void DisconnectedInternal () {
@@ -212,19 +193,19 @@ public class BoltConnection : BoltObject {
   }
 
   internal void SendMapLoadDoneToRemote () {
-    Assert.True(BoltCore._mapLoadState.stage >= SceneLoadStage.Callback);
-    Assert.True(BoltCore._mapLoadState.scene == _remoteMapLoadState.scene);
+    //Assert.True(BoltCore._mapLoadState.stage >= SceneLoadStage.Callback);
+    //Assert.True(BoltCore._mapLoadState.scene == _remoteMapLoadState.scene);
 
-    Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.scene);
+    //Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.scene);
   }
 
   internal void SendMapLoadToRemote () {
-    Assert.True(udpConnection.IsServer);
-    Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.scene);
+    //Assert.True(udpConnection.IsServer);
+    //Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.scene);
 
-    if (BoltCore._mapLoadState.stage == SceneLoadStage.CallbackDone) {
-      SendMapLoadDoneToRemote();
-    }
+    //if (BoltCore._mapLoadState.stage == SceneLoadStage.CallbackDone) {
+    //  SendMapLoadDoneToRemote();
+    //}
   }
 
   internal void TriggerRemoteMapDoneCallbacks () {
