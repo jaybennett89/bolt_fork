@@ -87,8 +87,6 @@ namespace Bolt {
         var p = td.RenderDoubleBuffer.Previous;
         var c = td.RenderDoubleBuffer.Current;
 
-        //PositionSet(td.Render, (c * BoltCore.frameAlpha) + (p * (1f - BoltCore.frameAlpha)));
-
         PositionSet(td.Render, UE.Vector3.Lerp(p, c, BoltCore.frameAlpha));
       }
     }

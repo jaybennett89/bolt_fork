@@ -81,8 +81,7 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void EditState(StateDefinition def) {
-
-    EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, () => {
+    Action gui = () => {
       // separator
       GUILayout.Label(":", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.ExpandWidth(false));
 
@@ -93,12 +92,20 @@ public class BoltEditorWindow : BoltWindow {
       if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
         def.IsAbstract = !def.IsAbstract;
       }
-    }, new string[] { "compile" }, () => {
+    };
 
-      def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
-      def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
+    if (def.IsAbstract) {
+      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui);
+    }
+    else {
+      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui, new string[] { "compile" }, () => {
 
-    });
+        def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
+        def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
+
+      });
+    }
+
 
     // add button
     // GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);

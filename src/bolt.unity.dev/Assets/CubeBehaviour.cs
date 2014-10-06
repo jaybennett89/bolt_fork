@@ -3,15 +3,15 @@ using System.Collections;
 
 public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   [SerializeField]
-  Transform mesh;
+  Transform render;
 
   public override void Attached() {
     if (entity.hasControl) {
-      mesh.renderer.material.color = Color.green;
+      render.renderer.material.color = Color.green;
     }
 
     state.SetAnimator(GetComponent<Animator>());
-    state.Transform.SetTransforms(transform, mesh, transform.position);
+    state.Transform.SetTransforms(transform, render);
   }
 
   public override void SimulateController() {
@@ -48,6 +48,6 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
   }
 
   public override void ControlLost() {
-    mesh.renderer.material.color = Color.red;
+    render.renderer.material.color = Color.red;
   }
 }

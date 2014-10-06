@@ -50,18 +50,20 @@ public static class BoltEditorGUI {
 
   public static GUIStyle StructHeaderStyle {
     get {
-      GUIStyle style;
-      style = NodeStyle(2);
-      style.padding = new RectOffset(0, 0, 0, 3);
-      style.margin = new RectOffset(5, 5, 5, 5);
-      return style;
+      return StateHeaderStyle;
+
+      //GUIStyle style;
+      //style = NodeStyle(2);
+      //style.padding = new RectOffset(0, 0, 0, 3);
+      //style.margin = new RectOffset(5, 5, 5, 5);
+      //return style;
     }
   }
 
   public static GUIStyle StateHeaderStyle {
     get {
       GUIStyle style;
-      style = NodeStyle(2);
+      style = NodeStyle(1);
       style.padding = new RectOffset(0, 0, 0, 3);
       style.margin = new RectOffset(5, 5, 5, 5);
       return style;
@@ -70,11 +72,12 @@ public static class BoltEditorGUI {
 
   public static GUIStyle EventHeaderStyle {
     get {
-      GUIStyle style;
-      style = NodeStyle(3);
-      style.padding = new RectOffset(0, 0, 0, 3);
-      style.margin = new RectOffset(5, 5, 5, 5);
-      return style;
+      return CommandHeaderStyle;
+      //GUIStyle style;
+      //style = NodeStyle(4);
+      //style.padding = new RectOffset(0, 0, 0, 3);
+      //style.margin = new RectOffset(5, 5, 5, 5);
+      //return style;
     }
   }
 
@@ -115,19 +118,21 @@ public static class BoltEditorGUI {
   }
 
   public static Color StateHeaderColor {
-    get { return Blue; }
+    get { return ColorInt(225, 255, 225); }
   }
 
   public static Color StructHeaderColor {
-    get { return ColorInt(125, 125, 255); }
+    get { return StateHeaderColor; }
+    //get { return ColorInt(225, 255, 225); }
   }
    
   public static Color EventHeaderColor {
-    get { return LightGreen; }
+    get { return CommandHeaderColor; }
+    //get { return ColorInt(255, 75, 75); }
   }
 
   public static Color CommandHeaderColor {
-    get { return Color.yellow; }
+    get { return Orange; }
   }
 
   public static GUIStyle SmallWhiteText {
