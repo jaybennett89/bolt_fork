@@ -58,10 +58,15 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BoltEditorGUI.cs" />
+    <Compile Include="BoltEditorWindow.cs" />
+    <Compile Include="BoltFilterWindow.cs" />
     <Compile Include="BoltInstaller.cs" />
+    <Compile Include="BoltProjectWindow.cs" />
     <Compile Include="BoltScenesWindow.cs" />
     <Compile Include="BoltSettingsWindow.cs" />
     <Compile Include="BoltConnectionsWindow.cs" />
+    <Compile Include="BoltWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
@@ -82,6 +87,14 @@
     <Compile Include="Compiler\BoltCompilerOperation.cs" />
     <Compile Include="BoltReflectionUtils.cs" />
     <Compile Include="Compiler\BoltSourceFile.cs" />
+    <Compile Include="PropertyEditors\PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorArray.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorFloat.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorInteger.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorString.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
