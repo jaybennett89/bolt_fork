@@ -57,7 +57,6 @@ namespace UdpKit {
 
     int handshakeSize = 0;
     byte[] handshakeBuffer = null;
-    uint connectionNumberCounter = 1;
 
     volatile int frame;
     volatile UdpSocketMode mode;
