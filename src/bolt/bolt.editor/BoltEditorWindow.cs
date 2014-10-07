@@ -98,11 +98,13 @@ public class BoltEditorWindow : BoltWindow {
       EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui);
     }
     else {
-      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui, new string[] { "compile" }, () => {
+      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui, () => {
+        GUILayout.Label("Bandwidth", BoltEditorGUI.SmallWhiteText);
 
+        GUILayout.BeginHorizontal();
         def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
         def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
-
+        GUILayout.EndHorizontal();
       });
     }
 
@@ -144,30 +146,22 @@ public class BoltEditorWindow : BoltWindow {
 
   void EditEvent(EventDefinition def) {
     EditHeader(def, BoltEditorGUI.EventHeaderStyle, BoltEditorGUI.EventHeaderColor, () => {
-      def.Priority = BoltEditorGUI.EditPriority(def.Priority, !def.Global);
 
-      if (BoltEditorGUI.LabelButton(def.Global ? "global (reliable)" : "entity (unreliable)", true, 0.5f, GUILayout.Width(92))) {
-        def.Global = !def.Global;
-      }
-    }, new string[] { "upload" }, () => {
-      if (def.Global) {
-        def.GlobalSenders = (GlobalEventSenders)EditorGUILayout.EnumPopup(def.GlobalSenders);
-      }
-      else {
-        def.EntitySenders = (EntityEventSenders)EditorGUILayout.EnumPopup(def.EntitySenders);
-      }
+    }, () => {
 
-      BoltEditorGUI.SetTooltip("Senders, who can send this event?");
+      GUILayout.BeginHorizontal();
+      GUILayout.Label("Global Senders", BoltEditorGUI.SmallWhiteText);
+      GUILayout.FlexibleSpace();
+      GUILayout.Label("Entity Senders", BoltEditorGUI.SmallWhiteText);
+      GUILayout.EndHorizontal();
 
-      if (def.Global) {
-        def.GlobalTargets = (GlobalEventTargets)EditorGUILayout.EnumMaskField(def.GlobalTargets);
-      }
-      else {
-        def.EntityTargets = (EntityEventTargets)EditorGUILayout.EnumPopup(def.EntityTargets);
-      }
+      GUILayout.BeginHorizontal();
+      def.GlobalSenders = (GlobalEventSenders)EditorGUILayout.EnumPopup(def.GlobalSenders);
+      BoltEditorGUI.SetTooltip("Global Senders, who can send this as an global event?");
 
-      BoltEditorGUI.SetTooltip("Receivers, who will receive this event?");
-      BoltEditorGUI.Icon("download", new RectOffset(0, +3, +2, 0));
+      def.EntitySenders = (EntityEventSenders)EditorGUILayout.EnumPopup(def.EntitySenders);
+      BoltEditorGUI.SetTooltip("Entity Senders, who can send this as an entity event?");
+      GUILayout.EndHorizontal();
     });
 
     // add button
@@ -196,10 +190,6 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
-    EditHeader(def, style, color, action, new string[0], rows);
-  }
-
-  void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, string[] icons, params Action[] rows) {
     GUI.color = color;
     GUILayout.BeginVertical(style);
     GUI.color = Color.white;
@@ -229,25 +219,15 @@ public class BoltEditorWindow : BoltWindow {
 
     GUILayout.EndHorizontal();
 
+    GUILayout.Label("Comment", BoltEditorGUI.SmallWhiteText);
+    def.Comment = EditorGUILayout.TextArea(def.Comment);
 
     for (int i = 0; i < rows.Length; ++i) {
-      GUILayout.BeginHorizontal();
-      if (icons != null && i < icons.Length) {
-        BoltEditorGUI.Icon(icons[i], new RectOffset(3, 0, 2, 0));
-      }
-      else {
-        GUILayout.Space(23);
-      }
-
+      GUILayout.BeginVertical();
       rows[i]();
-      GUILayout.EndHorizontal();
+      GUILayout.EndVertical();
     }
 
-    GUILayout.Label("Comment", BoltEditorGUI.SmallWhiteText);
-
-    GUILayout.BeginHorizontal();
-    def.Comment = EditorGUILayout.TextArea(def.Comment);
-    GUILayout.EndHorizontal();
 
     GUILayout.EndVertical();
   }

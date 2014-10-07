@@ -191,6 +191,9 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box-uncheck.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\globe-green.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
