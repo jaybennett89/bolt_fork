@@ -68,11 +68,21 @@ namespace Bolt {
     }
 
     internal void SetUniqueId(UniqueId id) {
-      if (UniqueId.IsNone) {
-        UniqueId = id;
+      if (IsOwner) {
+        if (Proxies.count == 0) {
+          if (UniqueId.IsNone) {
+            UniqueId = id;
+          }
+          else {
+            BoltLog.Error("You can not change the UniqueId of {0} after it has been set.", this);
+          }
+        }
+        else {
+          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other computers.", this);
+        }
       }
       else {
-        BoltLog.Error("You can not change the UniqueId of an entity after it has been set once");
+        BoltLog.Error("You can not set UniqueId of {0}, you are not the owner of this entity.", this);
       }
     }
 

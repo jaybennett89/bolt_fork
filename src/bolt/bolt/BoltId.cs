@@ -20,6 +20,16 @@ namespace Bolt {
     [FieldOffset(3)]
     uint uint3;
 
+    public string IdString {
+      get {
+        if (IsNone) {
+          return "NONE";
+        }
+
+        return guid.ToString();
+      }
+    }
+
     public bool IsNone {
       get { return guid == Guid.Empty; }
     }
@@ -29,6 +39,14 @@ namespace Bolt {
       stream.WriteUInt(uint1);
       stream.WriteUInt(uint2);
       stream.WriteUInt(uint3);
+    }
+
+    public override string ToString() {
+      if (IsNone) {
+        return "[UniqueId NONE]";
+      }
+
+      return string.Format("[UniqueId {0}]", guid.ToString());
     }
 
     public static UniqueId None {
@@ -44,6 +62,19 @@ namespace Bolt {
       return id;
     }
 
+    public static UniqueId Parse(string text) {
+      if (text == "NONE") {
+        return None;
+      }
+
+      UniqueId id;
+
+      id = default(UniqueId);
+      id.guid = new Guid(text);
+
+      return id;
+    }
+
     public static UniqueId Read(UdpStream stream) {
       UniqueId id;
 
@@ -54,6 +85,14 @@ namespace Bolt {
       id.uint3 = stream.ReadUInt();
 
       return id;
+    }
+
+    public static bool operator ==(UniqueId a, UniqueId b) {
+      return a.guid == b.guid;
+    }
+
+    public static bool operator !=(UniqueId a, UniqueId b) {
+      return a.guid != b.guid;
     }
   }
 

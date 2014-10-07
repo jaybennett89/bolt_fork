@@ -139,6 +139,24 @@ public static class BoltNetwork {
     get { return BoltCore.globalObject; }
   }
 
+  public static BoltEntity FindEntity(Bolt.UniqueId id) {
+    if (id.IsNone) {
+      BoltLog.Error("You can't look up entities with the 'None' id value");
+      return null;
+    }
+
+    var it = BoltCore._entities.GetIterator();
+
+    while (it.Next()) {
+      if (it.val.UniqueId == id) {
+        return it.val.UnityObject;
+      }
+    }
+
+    BoltLog.Warn("Could not find entity with {0}", id);
+    return null;
+  }
+
   public static void SetInstantiateDestroyCallbacks(Func<GameObject, Vector3, Quaternion, GameObject> instantiate, Action<GameObject> destroy) {
     if (instantiate == null)
       throw new System.ArgumentNullException("instantiate");

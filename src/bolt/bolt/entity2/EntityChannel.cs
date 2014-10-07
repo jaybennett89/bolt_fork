@@ -356,6 +356,10 @@ partial class EntityChannel : BoltChannel {
 
         packet.stream.WriteVector3Half(proxy.Entity.UnityObject.transform.position);
         packet.stream.WriteQuaternionHalf(proxy.Entity.UnityObject.transform.rotation);
+
+        if (packet.stream.WriteBool(proxy.Entity.UniqueId.IsNone == false)) {
+          proxy.Entity.UniqueId.Pack(packet.stream);
+        }
       }
 
       packCount = proxy.Entity.Serializer.Pack(connection, packet.stream, env);
@@ -420,12 +424,17 @@ partial class EntityChannel : BoltChannel {
       TypeId serializerId = new TypeId();
       Vector3 spawnPosition = new Vector3();
       Quaternion spawnRotation = new Quaternion();
+      UniqueId uniqueId = UniqueId.None;
 
       if (createRequested) {
         prefabId = PrefabId.Read(packet.stream, 32);
         serializerId = TypeId.Read(packet.stream, 32);
         spawnPosition = packet.stream.ReadVector3Half();
         spawnRotation = packet.stream.ReadQuaternionHalf();
+
+        if (packet.stream.ReadBool()) {
+          uniqueId = UniqueId.Read(packet.stream);
+        }
       }
 
       Entity entity = null;
@@ -446,6 +455,7 @@ partial class EntityChannel : BoltChannel {
         // create entity
         entity = BoltCore.CreateEntity(prefab, serializerId);
         entity.Source = connection;
+        entity.UniqueId = uniqueId;
         entity.UnityObject.transform.position = spawnPosition;
         entity.UnityObject.transform.rotation = spawnRotation;
 
