@@ -21,7 +21,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Window/Bolt Remotes", priority = 22)]
+  [MenuItem("Window/Bolt Engine/Remotes", priority = 22)]
   public static void OpenInfoPanel() {
     BoltConnectionsWindow window = EditorWindow.GetWindow<BoltConnectionsWindow>();
     window.title = "Bolt Remotes";
@@ -29,7 +29,7 @@ public static class BoltMenuItems {
     window.Show();
   }
 
-  [MenuItem("Window/Bolt Settings", priority = 21)]
+  [MenuItem("Window/Bolt Engine/Settings", priority = 21)]
   public static void OpenBoltSettings() {
     BoltSettingsWindow window = EditorWindow.GetWindow<BoltSettingsWindow>();
     window.title = "Bolt Settings";
@@ -37,7 +37,7 @@ public static class BoltMenuItems {
     window.Show();
   }
 
-  [MenuItem("Window/Bolt Scenes", priority = 20)]
+  [MenuItem("Window/Bolt Engine/Scenes", priority = 20)]
   public static void OpenBoltScenes() {
     BoltScenesWindow window = EditorWindow.GetWindow<BoltScenesWindow>();
     window.title = "Bolt Scenes";
