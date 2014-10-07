@@ -88,13 +88,11 @@ public struct EntityFlags {
 public struct ProxyFlags {
     public static readonly ProxyFlags ZERO = new ProxyFlags(0);
     public static readonly ProxyFlags CREATE_REQUESTED = new ProxyFlags(1);
-    public static readonly ProxyFlags CREATE_IN_PROGRESS = new ProxyFlags(2);
-    public static readonly ProxyFlags CREATE_DONE = new ProxyFlags(4);
-    public static readonly ProxyFlags DESTROY_REQUESTED = new ProxyFlags(8);
-    public static readonly ProxyFlags DESTROY_IN_PROGRESS = new ProxyFlags(16);
-    public static readonly ProxyFlags DESTROY_DONE = new ProxyFlags(32);
-    public static readonly ProxyFlags IDLE = new ProxyFlags(64);
-    public static readonly ProxyFlags FORCE_SYNC = new ProxyFlags(128);
+    public static readonly ProxyFlags CREATE_DONE = new ProxyFlags(2);
+    public static readonly ProxyFlags DESTROY_REQUESTED = new ProxyFlags(4);
+    public static readonly ProxyFlags DESTROY_PENDING = new ProxyFlags(8);
+    public static readonly ProxyFlags IDLE = new ProxyFlags(16);
+    public static readonly ProxyFlags FORCE_SYNC = new ProxyFlags(32);
     
     readonly int bits;
 
@@ -128,24 +126,18 @@ public struct ProxyFlags {
 			sb.Append(" CREATE_REQUESTED");
 		}
 			if((bits & 2) == 2) {
-			sb.Append(" CREATE_IN_PROGRESS");
-		}
-			if((bits & 4) == 4) {
 			sb.Append(" CREATE_DONE");
 		}
-			if((bits & 8) == 8) {
+			if((bits & 4) == 4) {
 			sb.Append(" DESTROY_REQUESTED");
 		}
+			if((bits & 8) == 8) {
+			sb.Append(" DESTROY_PENDING");
+		}
 			if((bits & 16) == 16) {
-			sb.Append(" DESTROY_IN_PROGRESS");
-		}
-			if((bits & 32) == 32) {
-			sb.Append(" DESTROY_DONE");
-		}
-			if((bits & 64) == 64) {
 			sb.Append(" IDLE");
 		}
-			if((bits & 128) == 128) {
+			if((bits & 32) == 32) {
 			sb.Append(" FORCE_SYNC");
 		}
 	

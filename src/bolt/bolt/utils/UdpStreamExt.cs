@@ -500,30 +500,19 @@ public static class UdpStreamExtensions {
     }
   }
 
-  public static void WriteUniqueId(this UdpStream stream, BoltUniqueId id) {
-    stream.WriteUInt(id.peer);
-    stream.WriteUInt(id.entity);
-  }
-
-  public static BoltUniqueId ReadUniqueId(this UdpStream stream) {
-    uint peerId = stream.ReadUInt();
-    uint entityId = stream.ReadUInt();
-    return new BoltUniqueId(peerId, entityId);
-  }
-
-  public static void WriteContinueMarker(this UdpStream stream) {
+  internal static void WriteContinueMarker(this UdpStream stream) {
     if (stream.CanWrite()) {
       stream.WriteBool(true);
     }
   }
 
-  public static void WriteStopMarker(this UdpStream stream) {
+  internal static void WriteStopMarker(this UdpStream stream) {
     if (stream.CanWrite()) {
       stream.WriteBool(false);
     }
   }
 
-  public static bool ReadStopMarker(this UdpStream stream) {
+  internal static bool ReadStopMarker(this UdpStream stream) {
     if (stream.CanRead()) {
       return stream.ReadBool();
     }

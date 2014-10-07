@@ -4,7 +4,7 @@ using System.Linq;
 using UdpKit;
 using UnityEngine;
 
-partial class BoltEntityChannel {
+partial class EntityChannel {
   public class CommandChannel : BoltChannel {
 
     #region sequence

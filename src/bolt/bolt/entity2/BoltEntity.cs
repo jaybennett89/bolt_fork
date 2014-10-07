@@ -8,6 +8,8 @@ using UE = UnityEngine;
 /// </summary>
 [BoltExecutionOrder(-2500)]
 public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
+  internal Bolt.Entity _entity;
+
   [UE.SerializeField]
   internal int _prefabId = -1;
 
@@ -30,11 +32,23 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal UE.Object[] _objects;
 
   // our link to Bolts internal entity object
-  internal Bolt.Entity Entity;
+  internal Bolt.Entity Entity {
+    get {
+      if (_entity == null) {
+        throw new BoltException("You can't access any Bolt specific methods or properties on an entity which is detached");
+      }
+
+      return _entity;
+    }
+  }
 
   object IBoltListNode.prev { get; set; }
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
+
+  public Bolt.UniqueId uniqueId {
+    get { return Entity.UniqueId; }
+  }
 
   public BoltConnection source {
     get { return Entity.Source; }
@@ -72,6 +86,14 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   public void ReleaseControl() {
     Entity.ReleaseControl();
+  }
+
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="id"></param>
+  public void SetUniqueId(Bolt.UniqueId id) {
+    Entity.SetUniqueId(id);
   }
 
   /// <summary>
@@ -134,15 +156,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// Raises an event on this entity. The event will be sent to all valid connections which has a proxy or
-  /// is the owner of this entity
-  /// </summary>
-  /// <param name="ev">The event to raise</param>
-  public void Raise(IBoltEvent ev) {
-    Entity.Raise(ev);
-  }
-
-  /// <summary>
   /// Add an event listener to this entity.
   /// </summary>
   /// <param name="behaviour">The behaviour to invoke event callbacks on</param>
@@ -184,13 +197,13 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void OnDestroy() {
-    if (Entity) {
+    if (_entity) {
       // log that his is happening
       BoltLog.Warn("{0} is being destroyed or disabled without being detached, forcing detach", Entity);
 
       // force detach
-      Entity.Detach();
-      Entity = null;
+      _entity.Detach();
+      _entity = null;
     }
   }
 

@@ -120,13 +120,13 @@ partial class BoltCallbacksBase {
   }
 
   
-  public virtual void SceneLoadRemoteDone(BoltConnection connection, string map) { 
+  public virtual void SceneLoadRemoteDone(BoltConnection connection) { 
   }
 
-  internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, string map) { 
+  internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) { 
     BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
     foreach (BoltCallbacksBase cb in callbacks) {
-        cb.SceneLoadRemoteDone(connection, map);
+        cb.SceneLoadRemoteDone(connection);
     }
   }
 

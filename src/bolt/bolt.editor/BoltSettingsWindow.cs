@@ -1,12 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Process = System.Diagnostics.Process;
 
 public class BoltSettingsWindow : EditorWindow {
   float _lastRepaint;
@@ -22,7 +16,6 @@ public class BoltSettingsWindow : EditorWindow {
       Repaint();
     }
   }
-
 
   void Replication () {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
@@ -145,36 +138,6 @@ public class BoltSettingsWindow : EditorWindow {
       Save();
     }
 
-    BoltAssetEditorGUI.Label("Application Identifier", () => {
-      Guid g;
-      g = new Guid(settings._config.applicationGuid);
-      g = new Guid(EditorGUILayout.TextField(g.ToString().ToUpperInvariant()));
-
-      settings._config.applicationGuid = g.ToByteArray();
-
-      if (GUILayout.Button("Generate", EditorStyles.miniButton)) {
-        settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
-        Save();
-      }
-    });
-
-    EditorGUI.BeginDisabledGroup(settings._config.useAssemblyChecksum == false);
-
-    BoltAssetEditorGUI.Label("Assembly Checksum", () => {
-      byte[] hash = null;
-
-      try {
-        hash = BoltRuntimeReflection.GetUserAssemblyHash();
-      } catch {
-        hash = new byte[] { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
-      }
-
-      GUILayout.Label(string.Join("-", hash.Select(x => string.Format("{0:x2}", x).ToUpperInvariant()).ToArray()));
-      EditorGUI.EndDisabledGroup();
-
-      settings._config.useAssemblyChecksum = EditorGUILayout.Toggle(settings._config.useAssemblyChecksum, GUILayout.Width(17));
-    });
-
     BoltAssetEditorGUI.Label("Editor Highlight Color", () => {
       settings.highlightColor = EditorGUILayout.ColorField(settings.highlightColor);
     });
@@ -217,7 +180,7 @@ public class BoltSettingsWindow : EditorWindow {
     Simulation();
 
     BoltAssetEditorGUI.Header("settings", "Miscellaneous");
-    Miscellaneous();
+    Miscellaneous();  
 
     BoltAssetEditorGUI.Header("console", "Console");
     Console();

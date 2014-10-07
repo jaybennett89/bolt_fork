@@ -51,13 +51,6 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="animator\BoltMecanimFloat.cs" />
-    <Compile Include="animator\BoltMecanimAnimator.cs" />
-    <Compile Include="animator\BoltMecanimBoolean.cs" />
-    <Compile Include="animator\BoltMecanimFrame.cs" />
-    <Compile Include="animator\BoltMecanimInteger.cs" />
-    <Compile Include="animator\BoltMecanimReflectionExtensions.cs" />
-    <Compile Include="animator\BoltMecanimTrigger.cs" />
     <Compile Include="assets\BoltAssetEnums.cs" />
     <Compile Include="assets\BoltAssetProperty.cs" />
     <Compile Include="assets\BoltAssetPropertyGroup.cs" />
@@ -67,10 +60,13 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="BoltLog.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="command\Command.cs" />
     <Compile Include="entity2\EntityBehaviour.cs" />
-    <Compile Include="entity2\EntityObject.Control.cs" />
-    <Compile Include="entity2\EntityObject.cs" />
+    <Compile Include="entity2\Entity.Control.cs" />
+    <Compile Include="entity2\Entity.cs" />
     <Compile Include="entity2\EntityInterfaces.cs" />
     <Compile Include="event2\Event.cs" />
     <Compile Include="event2\EventChannel.cs" />
@@ -80,6 +76,7 @@
     <Compile Include="event2\ReliableBuffers\EventReliableRecvBuffer.cs" />
     <Compile Include="event2\ReliableBuffers\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state2\Arrays\FloatArray.cs" />
     <Compile Include="state2\Arrays\TransformArray.cs" />
     <Compile Include="state2\Axis.cs" />
@@ -113,23 +110,15 @@
     <Compile Include="BoltGlobalBehaviour.cs" />
     <Compile Include="BoltId.cs" />
     <Compile Include="BoltGUI.cs" />
-    <Compile Include="BoltLog2.cs" />
     <Compile Include="BoltNetwork.cs" />
     <Compile Include="BoltObjectPool.cs" />
     <Compile Include="BoltOrigin.cs" />
     <Compile Include="collections\BoltIterator.cs" />
     <Compile Include="collections\STuple.cs" />
-    <Compile Include="entity\BoltEntityCallbacks.cs" />
-    <Compile Include="entity\BoltEntityUpdateInfo.cs" />
-    <Compile Include="event\IBoltEventProperty.cs" />
-    <Compile Include="event\internal\BoltEventLoadMapDone.cs" />
     <Compile Include="hitbox\BoltHitboxWorldSnapshotPool.cs" />
     <Compile Include="hitbox\BoltPhysics.cs" />
     <Compile Include="BoltSingletonPrefab.cs" />
-    <Compile Include="BoltConsoleCommand.cs" />
-    <Compile Include="BoltSceneLoader.cs" />
-    <Compile Include="BoltFloatCompression.cs" />
-    <Compile Include="BoltNetworkInterface.cs" />
+    <Compile Include="SceneLoader.cs" />
     <Compile Include="hitbox\BoltHitbox.cs" />
     <Compile Include="hitbox\BoltHitboxBodySnapshot.cs" />
     <Compile Include="hitbox\BoltHitboxShape.cs" />
@@ -137,11 +126,9 @@
     <Compile Include="hitbox\BoltHitboxType.cs" />
     <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
-    <Compile Include="MapLoadState.cs" />
+    <Compile Include="SceneLoadState.cs" />
     <Compile Include="state2\Blit.cs" />
     <Compile Include="state2\State.cs" />
-    <Compile Include="state\BoltStateFactory.cs" />
-    <Compile Include="state\Transform\BoltStateTransform.cs" />
     <Compile Include="t4\BoltIds.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -161,41 +148,22 @@
     <Compile Include="BoltPoll.cs" />
     <Compile Include="BoltSend.cs" />
     <Compile Include="BoltSerializer.cs" />
-    <Compile Include="BoltFrameInterpolator.cs" />
     <Compile Include="collections\BoltListNode.cs" />
     <Compile Include="command\CommandChannel.cs" />
-    <Compile Include="entity\BoltEntityBehaviour.cs" />
-    <Compile Include="entity\BoltEntity.cs" />
-    <Compile Include="entity\BoltEntityChannel.cs" />
+    <Compile Include="entity2\BoltEntity.cs" />
+    <Compile Include="entity2\EntityChannel.cs" />
     <Compile Include="entity2\EntityProxy.cs" />
-    <Compile Include="event\BoltEvent.cs" />
-    <Compile Include="event\BoltEventChannel.cs" />
-    <Compile Include="event\BoltEventEnums.cs" />
-    <Compile Include="event\BoltEventFactory.cs" />
-    <Compile Include="event\BoltEventInterface.cs" />
-    <Compile Include="event\BoltEventReliable.cs" />
-    <Compile Include="event\internal\BoltEventLoadMap.cs" />
-    <Compile Include="event\BoltEventReceiver.cs" />
-    <Compile Include="event\internal\BoltEventInternalServerReceiver.cs" />
-    <Compile Include="event\internal\BoltEventInternalClientReceiver.cs" />
-    <Compile Include="state\BoltStateProperty.cs" />
-    <Compile Include="state\Transform\BoltStateTransformInterpolatedSnapshots.cs" />
-    <Compile Include="state\BoltState.cs" />
-    <Compile Include="state\Transform\BoltStateTransformDeadReckoning.cs" />
+    <Compile Include="event2\Legacy\BoltEventEnums.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />
     <Compile Include="BoltExtensions.cs" />
-    <Compile Include="BoltIdPool.cs" />
+    <Compile Include="state2\NetIdPool.cs" />
     <Compile Include="collections\BoltSingleList.cs" />
     <Compile Include="BoltMath.cs" />
-    <Compile Include="BoltRecvBuffer.cs" />
     <Compile Include="collections\BoltRingBuffer.cs" />
-    <Compile Include="BoltSendBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="utils\BitUtils.cs" />
-    <Compile Include="BoltComponentExtensions.cs" />
-    <Compile Include="BoltRuntimeReflection.cs" />
     <Compile Include="utils\UdpStreamExt.cs" />
   </ItemGroup>
   <ItemGroup>

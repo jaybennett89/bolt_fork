@@ -9,6 +9,7 @@ namespace Bolt {
   partial class Entity : IBoltListNode, IPriorityCalculator {
     static int _instanceIdCounter;
 
+    internal UniqueId UniqueId;
     internal PrefabId PrefabId;
     internal InstanceId InstanceId;
     internal EntityFlags Flags;
@@ -64,6 +65,15 @@ namespace Bolt {
 
     public override string ToString() {
       return string.Format("[Entity {0} {1} {2}]", InstanceId, PrefabId, Serializer);
+    }
+
+    internal void SetUniqueId(UniqueId id) {
+      if (UniqueId.IsNone) {
+        UniqueId = id;
+      }
+      else {
+        BoltLog.Error("You can not change the UniqueId of an entity after it has been set once");
+      }
     }
 
     internal EntityProxy CreateProxy() {
@@ -131,7 +141,7 @@ namespace Bolt {
       BoltCore._entities.Remove(this);
 
       // clear from unity object
-      UnityObject.Entity = null;
+      UnityObject._entity = null;
 
       // log
       BoltLog.Debug("Detached {0}", this);
@@ -169,7 +179,7 @@ namespace Bolt {
       InstanceId = new InstanceId(++_instanceIdCounter);
 
       // assign usertokens
-      UnityObject.Entity = this;
+      UnityObject._entity = this;
 
       // call into serializer
       Serializer.OnInitialized();
@@ -178,15 +188,11 @@ namespace Bolt {
 
     internal void SetIdle(BoltConnection connection, bool idle) {
       if (idle && IsController(connection)) {
-        BoltLog.Error("Can't idle {0} on {1}, it is the controller for this entity", this, connection);
+        BoltLog.Error("You can not idle {0} on {1}, as it is the controller for this entity", this, connection);
         return;
       }
 
       connection._entityChannel.SetIdle(this, idle);
-    }
-
-    internal void Raise(IBoltEvent ev) {
-      throw new NotImplementedException();
     }
 
     internal void Simulate() {
@@ -255,6 +261,7 @@ namespace Bolt {
 
               try {
                 ExecuteCommand(it.val, false);
+                break;
               }
               finally {
                 it.val.Flags |= CommandFlags.SEND_STATE;

@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices;
-using System.Text;
 using UdpKit;
 using UE = UnityEngine;
 
@@ -309,8 +304,6 @@ namespace Bolt {
         int ptr = stream.Ptr;
 
         if (bits >= b) {
-          BoltLog.Info("Serializing {0}", s.StateData.PropertyName);
-
           // write property id
           stream.WriteInt(p.PropertyIndex, PropertyIdBits);
 

@@ -6,12 +6,12 @@ using UnityEngine;
 
 [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
 public sealed class BoltGlobalBehaviourAttribute : Attribute {
-  public BoltNetworkModes mode {
+  public BoltNetworkModes Mode {
     get;
     private set;
   }
 
-  public string[] maps {
+  public int[] Scenes {
     get;
     private set;
   }
@@ -21,15 +21,15 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
   }
 
   public BoltGlobalBehaviourAttribute (BoltNetworkModes mode)
-    : this(mode, new string[0]) {
+    : this(mode, new int[0]) {
   }
 
-  public BoltGlobalBehaviourAttribute (params string[] maps)
-    : this(BoltNetworkModes.Server | BoltNetworkModes.Client, maps) {
+  public BoltGlobalBehaviourAttribute(params int[] scenes)
+    : this(BoltNetworkModes.Server | BoltNetworkModes.Client, scenes) {
   }
 
-  public BoltGlobalBehaviourAttribute (BoltNetworkModes mode, params string[] maps) {
-    this.mode = mode;
-    this.maps = maps;
+  public BoltGlobalBehaviourAttribute(BoltNetworkModes mode, params int[] scenes) {
+    this.Mode = mode;
+    this.Scenes = scenes;
   }
 }

@@ -33,18 +33,28 @@ namespace Bolt {
     internal static Event NewEvent(TypeId id) {
       Event ev;
 
-      ev = (Event)_factories[id].Create();
+      ev = (Event)Create(id);
       ev.IncrementRefs();
 
       return ev;
     }
 
     internal static Command NewCommand(TypeId id) {
-      return (Command)_factories[id].Create();
+      return (Command)Create(id);
     }
 
     internal static IEntitySerializer NewSerializer(Bolt.TypeId id) {
-      return (IEntitySerializer)_factories[id].Create();
+      return (IEntitySerializer)Create(id);
+    }
+
+    static object Create(TypeId id) {
+#if DEBUG
+      if (_factories.ContainsKey(id) == false) {
+        BoltLog.Error("Unknown {0}", id);
+      }
+#endif
+
+      return _factories[id].Create();
     }
 
     internal static void UnregisterAll() {

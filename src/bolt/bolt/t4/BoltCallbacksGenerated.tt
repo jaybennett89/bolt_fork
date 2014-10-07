@@ -9,7 +9,7 @@
 Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
 cbs.Add("SceneLoadLocalBegin", new[] { "string", "map" });
 cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
-cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection", "string", "map" });
+cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });
 
 cbs.Add("Connected", new[] { "BoltConnection", "connection" });
 cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });

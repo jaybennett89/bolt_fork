@@ -29,18 +29,7 @@ public class CubeBehaviour : Bolt.EntityBehaviour<IPlayer> {
     }
     else {
       Vector3 move = new Vector3(10f * BoltNetwork.frameDeltaTime, 0, 0);
-
-      if (BoltNetwork.isServer) {
-        if (BoltNetwork.frame % 30 == 0) {
-          transform.Translate(move * 0f, Space.Self);
-        }
-        else {
-          transform.Translate(move, Space.Self);
-        }
-      }
-      else {
-        transform.Translate(move, Space.Self);
-      }
+      transform.Translate(move, Space.Self);
 
       // save position
       cmd.Result.Position = transform.position;

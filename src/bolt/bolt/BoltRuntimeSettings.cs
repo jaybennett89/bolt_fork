@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 public enum BoltEditorStartMode {
@@ -17,7 +16,7 @@ public class BoltRuntimeSettings : ScriptableObject {
         _instance = (BoltRuntimeSettings)Resources.Load(typeof(BoltRuntimeSettings).Name, typeof(BoltRuntimeSettings));
 
         if (_instance == null) {
-          BoltLog.Error("could not find {0} asset", typeof(BoltRuntimeSettings));
+          BoltLog.Error("Could not find resource: '{0}' ", typeof(BoltRuntimeSettings));
         }
       }
 
