@@ -132,7 +132,7 @@ public static class BoltEditorGUI {
   }
 
   public static Color CommandHeaderColor {
-    get { return Orange; }
+    get { return LightOrange; }
   }
 
   public static GUIStyle SmallWhiteText {

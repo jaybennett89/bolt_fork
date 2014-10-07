@@ -58,10 +58,15 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BoltEditorGUI.cs" />
+    <Compile Include="BoltEditorWindow.cs" />
+    <Compile Include="BoltFilterWindow.cs" />
     <Compile Include="BoltInstaller.cs" />
+    <Compile Include="BoltProjectWindow.cs" />
     <Compile Include="BoltScenesWindow.cs" />
     <Compile Include="BoltSettingsWindow.cs" />
     <Compile Include="BoltConnectionsWindow.cs" />
+    <Compile Include="BoltWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
@@ -82,6 +87,14 @@
     <Compile Include="Compiler\BoltCompilerOperation.cs" />
     <Compile Include="BoltReflectionUtils.cs" />
     <Compile Include="Compiler\BoltSourceFile.cs" />
+    <Compile Include="PropertyEditors\PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorArray.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorFloat.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorInteger.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorString.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +160,39 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_down.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_down_8px.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_left.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_right.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_right_8px.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_up.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_event2.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_folder_closed.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_folder_open.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_fx.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_dark.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_grey.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_light.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_object.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_playcom2.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_plus.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_replistate2.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings2.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings3.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings4.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_x.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\category.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\compile.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\cross-script.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\edit-decimal.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\exclamation.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box-uncheck.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\globe-green.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
