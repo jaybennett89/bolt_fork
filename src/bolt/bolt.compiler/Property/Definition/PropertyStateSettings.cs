@@ -12,10 +12,22 @@ namespace Bolt.Compiler {
     [ProtoMember(6)]
     public float DeadReckoningErrorTolerance = 0.1f;
 
-    [ProtoMember(7)]
-    public bool Mecanim;
-
     [ProtoMember(8)]
+    public MecanimMode MecanimMode;
+
+    [ProtoMember(9)]
+    public MecanimDirection MecanimOwnerDirection;
+
+    [ProtoMember(11)]
+    public MecanimDirection MecanimControllerDirection;
+
+    [ProtoMember(15)]
+    public MecanimDirection MecanimOthersDirection;
+
+    [ProtoMember(12)]
     public float MecanimDamping;
+
+    [ProtoMember(14)]
+    public int MecanimLayer;
   }
 }

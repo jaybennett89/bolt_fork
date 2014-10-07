@@ -43,4 +43,29 @@ namespace Bolt {
     QuaternionComponents = 0,
     EulerAngles = 1,
   }
+
+  
+#if BOLT_COMPILER_DLL
+  [ProtoContract]
+  public
+#else
+  internal
+#endif
+ enum MecanimMode {
+    None,
+    Property,
+    LayerWeight
+  }
+
+#if BOLT_COMPILER_DLL
+  [ProtoContract]
+  public
+#else
+  internal
+#endif
+ enum MecanimDirection {
+    None,
+    Push,
+    Pull,
+  }
 }

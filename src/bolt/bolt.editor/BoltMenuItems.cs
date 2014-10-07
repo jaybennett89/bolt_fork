@@ -3,16 +3,25 @@ using UnityEditor;
 using Bolt.Compiler;
 
 public static class BoltMenuItems {
-  [MenuItem("Assets/Compile Bolt Assets")]
+  [MenuItem("Assets/Compile Bolt Assets (All)")]
   public static void RunCompiler() {
     try {
-      BoltUserAssemblyCompiler.Run();
+      BoltUserAssemblyCompiler.Run(true);
     }
     catch {
 
     }
   }
 
+  [MenuItem("Assets/Compile Bolt Assets (Code Only)")]
+  public static void RunCompilerProjectOnly() {
+    try {
+      BoltUserAssemblyCompiler.Run(false);
+    }
+    catch {
+
+    }
+  } 
   [MenuItem("Edit/Install Bolt")]
   public static void Install() {
     int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");

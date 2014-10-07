@@ -128,6 +128,10 @@ public static class BoltNetwork {
     get { return BoltCore.isClient; }
   }
 
+  public static bool isRunning {
+    get { return isServer || isClient; }
+  }
+
   /// <summary>
   /// Returns true if Bolt was compiled in debug mode
   /// </summary>

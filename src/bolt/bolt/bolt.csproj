@@ -86,6 +86,7 @@
     <Compile Include="state2\Filter.cs" />
     <Compile Include="state2\FloatCompression.cs" />
     <Compile Include="state2\Priority.cs" />
+    <Compile Include="state2\Serializers\PropertyMecanimData.cs" />
     <Compile Include="state2\Serializers\PropertySerializer.cs" />
     <Compile Include="state2\Serializers\PropertySerializerBool.cs" />
     <Compile Include="state2\Serializers\PropertySerializerEntity.cs" />

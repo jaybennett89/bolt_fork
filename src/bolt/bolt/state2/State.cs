@@ -8,6 +8,7 @@ namespace Bolt {
 
   public interface IState {
     IDisposable Predict(int frames);
+    void SetDynamic(string property, object value);
     void SetAnimator(UE.Animator animator);
     void AddCallback(string path, PropertyCallback callback);
   }
@@ -112,6 +113,14 @@ namespace Bolt {
       PropertyIdBits = BoltMath.BitsRequired(MetaData.PropertyCount - 1);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = BoltMath.BitsRequired(MetaData.PacketMaxProperties);
+    }
+
+    public void SetDynamic(string property, object value) {
+      for(int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        if (MetaData.PropertySerializers[i].StateData.PropertyName == property) {
+          MetaData.PropertySerializers[i].SetDynamic(this, value);
+        }
+      }
     }
 
     public void DebugInfo() {
@@ -413,5 +422,6 @@ namespace Bolt {
     public IDisposable Predict(int frames) {
       throw new NotImplementedException();
     }
+
   }
 }

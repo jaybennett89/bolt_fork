@@ -23,9 +23,6 @@ namespace Bolt {
     public int Priority;
     public int ObjectOffset;
 
-    public bool Mecanim;
-    public float MecanimDamping;
-
     public String PropertyName;
     public String PropertyPath;
     public String[] CallbackPaths;
@@ -50,6 +47,8 @@ namespace Bolt {
       CommandData = commandData;
     }
 
+    public virtual void SetDynamic(State state, object value) { throw new NotSupportedException(); }
+
     public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
     public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
     public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
@@ -68,5 +67,62 @@ namespace Bolt {
     public virtual void OnSimulateAfter(State state) { }
     public virtual void OnRender(State state, State.Frame frame) { }
     public virtual void OnChanged(State state, State.Frame frame) { }
+  }
+
+  abstract class PropertySerializerMecanim : PropertySerializer {
+    protected PropertyMecanimData MecanimData;
+    
+    public PropertySerializerMecanim(StatePropertyMetaData info)
+      : base(info) {
+    }
+
+    public PropertySerializerMecanim(EventPropertyMetaData meta)
+      : base(meta) {
+    }
+
+    public PropertySerializerMecanim(CommandPropertyMetaData meta)
+      : base(meta) {
+    }
+
+    public void SetPropertyData(PropertyMecanimData mecanimData) {
+      MecanimData = mecanimData;
+    }
+
+    public override void OnSimulateAfter(State state) {
+      if ((MecanimData.Mode != MecanimMode.None) && state.Animator) {
+        MecanimDirection direction =
+            (state.Entity.IsOwner || state.Entity.HasControl)
+            ? MecanimData.OwnerDirection
+            : MecanimData.OthersDirection;
+
+        switch (MecanimData.Mode) {
+          case MecanimMode.LayerWeight:
+            switch (direction) {
+              case MecanimDirection.Pull: PullMecanimLayer(state); break;
+              case MecanimDirection.Push: PushMecanimLayer(state); break;
+            }
+            break;
+
+          case MecanimMode.Property:
+            switch (direction) {
+              case MecanimDirection.Pull: PullMecanimValue(state); break;
+              case MecanimDirection.Push: PushMecanimValue(state); break;
+            }
+            break;
+        }
+      }
+    }
+
+    protected virtual void PullMecanimValue(State state) { }
+    protected virtual void PushMecanimValue(State state) { }
+
+    void PullMecanimLayer(State state) {
+      state.Frames.first.Data.PackF32(StateData.ByteOffset, state.Animator.GetLayerWeight(MecanimData.Layer));
+    }
+
+    void PushMecanimLayer(State state) {
+      state.Animator.SetLayerWeight(MecanimData.Layer, state.Frames.first.Data.ReadF32(StateData.ByteOffset));
+    }
+
   }
 }

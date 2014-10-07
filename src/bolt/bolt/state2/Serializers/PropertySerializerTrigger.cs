@@ -5,7 +5,7 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  class PropertySerializerTrigger : PropertySerializer {
+  class PropertySerializerTrigger : PropertySerializerMecanim {
     int LocalOffset {
       get { return StateData.ByteOffset + 8; }
     }
@@ -16,8 +16,14 @@ namespace Bolt {
 
     public PropertySerializerTrigger(StatePropertyMetaData meta)
       : base(meta) {
-        Assert.True(meta.ByteLength == 16);
-        meta.ByteLength = 8;
+      Assert.True(meta.ByteLength == 16);
+      meta.ByteLength = 8;
+    }
+
+    public override void SetDynamic(State state, object value) {
+      if (value == null || ((value is bool) && (bool)value)) {
+        state.Frames.first.Data.SetTrigger(BoltCore.frame, LocalOffset, true);
+      }
     }
 
     public override int StateBits(State state, State.Frame frame) {
@@ -56,7 +62,7 @@ namespace Bolt {
 
     bool InvokeForFrame(State state, State.Frame f) {
       var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
-      var mecanim = state.Animator && StateData.Mecanim;
+      var mecanim = state.Animator && MecanimData.Mode == MecanimMode.Property;
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using UE = UnityEngine;
 
 namespace Bolt {
-  class PropertySerializerFloat : PropertySerializer {
+
+  class PropertySerializerFloat : PropertySerializerMecanim {
     public PropertySerializerFloat(StatePropertyMetaData info)
       : base(info) {
     }
@@ -22,10 +24,16 @@ namespace Bolt {
       return 32;
     }
 
-    public override void OnSimulateAfter(State state) {
-      if (state.Animator && StateData.Mecanim) {
-        state.Animator.SetFloat(StateData.PropertyName, Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset), StateData.MecanimDamping, BoltCore.frameDeltaTime);
-      }
+    public override void SetDynamic(State state, object value) {
+      state.Frames.first.Data.PackF32(CommandData.ByteOffset, (float)value);
+    }
+
+    protected override void PullMecanimValue(State state) {
+      state.Frames.first.Data.PackF32(StateData.ByteOffset, state.Animator.GetFloat(StateData.PropertyName));
+    }
+
+    protected override void PushMecanimValue(State state) {
+      state.Animator.SetFloat(StateData.PropertyName, Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset), MecanimData.Damping, BoltCore.frameDeltaTime);
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {

@@ -149,11 +149,11 @@ class BoltUserAssemblyCompiler {
     }
   }
 
-  public static ManualResetEvent Run() {
-    return Run(false);
+  public static ManualResetEvent Run(bool all) {
+    return Run(false, all);
   }
 
-  public static ManualResetEvent Run(bool force) {
+  public static ManualResetEvent Run(bool force, bool all) {
     ManualResetEvent evnt = new ManualResetEvent(false);
 
     try {
@@ -183,11 +183,13 @@ class BoltUserAssemblyCompiler {
       op.scenesFilePath = mapsFile;
 
       // prefabs config
-      op.prefabsFilePath = prefabsFile;
-      op.prefabs = FindPrefabs().ToList();
+      if (all) {
+        op.prefabsFilePath = prefabsFile;
+        op.prefabs = FindPrefabs().ToList();
+      }
 
       // run code emitter
-      BoltCompiler.Run(op);
+      BoltCompiler.Run(op, all);
       RunCSharpCompiler(op, evnt);
 
     }

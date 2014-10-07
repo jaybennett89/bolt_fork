@@ -5,7 +5,7 @@ using System.Text;
 using UE = UnityEngine;
 
 namespace Bolt {
-  class PropertySerializerInteger : PropertySerializer {
+  class PropertySerializerInteger : PropertySerializerMecanim {
     public PropertySerializerInteger(StatePropertyMetaData info)
       : base(info) {
     }
@@ -22,10 +22,16 @@ namespace Bolt {
       return 32;
     }
 
-    public override void OnSimulateAfter(State state) {
-      if (state.Animator && StateData.Mecanim) {
-        state.Animator.SetInteger(StateData.PropertyName, Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset));
-      }
+    public override void SetDynamic(State state, object value) {
+      state.Frames.first.Data.PackI32(CommandData.ByteOffset, (int)value);
+    }
+
+    protected override void PushMecanimValue(State state) {
+      state.Animator.SetInteger(StateData.PropertyName, Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset));
+    }
+
+    protected override void PullMecanimValue(State state) {
+      Blit.PackI32(state.Frames.first.Data, StateData.ByteOffset, state.Animator.GetInteger(StateData.PropertyName));
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {

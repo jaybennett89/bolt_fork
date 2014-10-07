@@ -17,7 +17,7 @@ namespace Bolt.Compiler {
     }
 
     public CodeExpression EmitStatePropertyInitializer(StateDecoratorProperty p) {
-      return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"", Mecanim = {8}, MecanimDamping = {9} }})").Expr(
+      return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"" }})").Expr(
         p.OffsetBytes, // {0}
         Decorator.ByteSize, // {1}
         p.OffsetObjects, // {2}
@@ -25,9 +25,7 @@ namespace Bolt.Compiler {
         p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
         p.CallbackPathsExpression(), // {5}
         p.CreateIndicesExpr(), // {6}
-        Decorator.Definition.Name, // {7} 
-        Decorator.Definition.StateAssetSettings.Mecanim.ToString().ToLower(), // {8}
-        Decorator.Definition.PropertyType is PropertyTypeFloat ? Decorator.Definition.StateAssetSettings.MecanimDamping + "f" : "0f" // {9}
+        Decorator.Definition.Name // {7} 
       );
     }
 

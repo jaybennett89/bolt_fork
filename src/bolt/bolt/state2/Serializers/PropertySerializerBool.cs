@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  class PropertySerializerBool : PropertySerializer {
+  class PropertySerializerBool : PropertySerializerMecanim {
     public PropertySerializerBool(StatePropertyMetaData info)
       : base(info) {
     }
@@ -21,10 +21,16 @@ namespace Bolt {
       return 1;
     }
 
-    public override void OnSimulateAfter(State state) {
-      if (state.Animator && StateData.Mecanim) {
-        state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadI32(StateData.ByteOffset) != 0);
-      }
+    public override void SetDynamic(State state, object value) {
+      state.Frames.first.Data.PackI32(CommandData.ByteOffset, ((bool)value) ? 1 : 0);
+    }
+
+    protected override void PullMecanimValue(State state) {
+      state.Frames.first.Data.PackI32(StateData.ByteOffset, state.Animator.GetBool(StateData.PropertyName) ? 1 : 0);
+    }
+
+    protected override void PushMecanimValue(State state) {
+      state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadI32(StateData.ByteOffset) != 0);
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
