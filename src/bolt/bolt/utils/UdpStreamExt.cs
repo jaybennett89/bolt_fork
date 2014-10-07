@@ -1,3 +1,4 @@
+using Bolt;
 using UdpKit;
 using UnityEngine;
 
@@ -440,41 +441,44 @@ public static class UdpStreamExtensions {
     return stream.ReadUInt(bits);
   }
 
-  public static void WriteNetworkId(this UdpStream stream, uint networkId) {
-    stream.WriteUInt(networkId, BoltEntityProxy.ID_BIT_COUNT);
+  public static void WriteNetworkId(this UdpStream stream, NetId id) {
+    Assert.True(id.Value >= 0);
+    Assert.True(id.Value < EntityProxy.MAX_COUNT);
+
+    stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
   }
 
-  public static uint ReadNetworkId(this UdpStream stream) {
-    return stream.ReadUInt(BoltEntityProxy.ID_BIT_COUNT);
+  public static NetId ReadNetworkId(this UdpStream stream) {
+    return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
   }
 
-  public static void WriteEntity(this UdpStream stream, BoltEntity en, BoltConnection cn) {
+  internal static void WriteEntity(this UdpStream stream, Entity en, BoltConnection cn) {
     if (en == null) {
       stream.WriteBool(false);
       return;
     }
 
-    uint id = cn.GetNetworkId(en);
+    NetId id = cn.GetNetworkId(en);
 
     // one bit if we have it or not, at all
-    if (stream.WriteBool(id != ushort.MaxValue)) {
+    if (stream.WriteBool(id.Value != int.MaxValue)) {
       // one bit which significes if this is an outgoing or incomming proxy
       // if it's an incomming that means the sourceConnection is the same as this connection
       // if it's an outgoing that means the sourceConnection is either null (it's local) 
       // or it's a connection which which we received this object from
-      stream.WriteBool(ReferenceEquals(en.boltSource, cn));
+      stream.WriteBool(ReferenceEquals(en.Source, cn));
 
       // the actual network id
       stream.WriteNetworkId(id);
     }
   }
 
-  public static BoltEntity ReadEntity(this UdpStream stream, BoltConnection cn) {
-    uint networkId;
+  internal static Entity ReadEntity(this UdpStream stream, BoltConnection cn) {
+    NetId networkId;
     return ReadEntity(stream, cn, out networkId);
   }
 
-  public static BoltEntity ReadEntity(this UdpStream stream, BoltConnection cn, out uint networkId) {
+  internal static Entity ReadEntity(this UdpStream stream, BoltConnection cn, out NetId networkId) {
     if (stream.ReadBool()) {
       // if this bool reads true, that means that the
       // other end of the connection classifices this 
@@ -491,29 +495,24 @@ public static class UdpStreamExtensions {
       }
     }
     else {
-      networkId = uint.MaxValue;
+      networkId = new NetId(int.MaxValue);
       return null;
     }
   }
 
-  public static void WriteUniqueId(this UdpStream stream, BoltUniqueId id) {
-    stream.WriteUInt(id.peer);
-    stream.WriteUInt(id.entity);
+  internal static void WriteContinueMarker(this UdpStream stream) {
+    if (stream.CanWrite()) {
+      stream.WriteBool(true);
+    }
   }
 
-  public static BoltUniqueId ReadUniqueId(this UdpStream stream) {
-    uint peerId = stream.ReadUInt();
-    uint entityId = stream.ReadUInt();
-    return new BoltUniqueId(peerId, entityId);
-  }
-
-  public static void WriteStopMarker(this UdpStream stream) {
+  internal static void WriteStopMarker(this UdpStream stream) {
     if (stream.CanWrite()) {
       stream.WriteBool(false);
     }
   }
 
-  public static bool ReadStopMarker(this UdpStream stream) {
+  internal static bool ReadStopMarker(this UdpStream stream) {
     if (stream.CanRead()) {
       return stream.ReadBool();
     }

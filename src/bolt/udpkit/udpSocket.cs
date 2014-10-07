@@ -595,11 +595,6 @@ namespace UdpKit {
       UdpConnection cn;
       cn = new UdpConnection(this, mode, endpoint);
 
-      if (mode == UdpConnectionMode.Server) {
-        cn.id = ++connectionNumberCounter;
-        UdpLog.Debug("created connection with id {0}", cn.id);
-      }
-
       connLookup.Add(endpoint, cn);
       connList.Add(cn);
 

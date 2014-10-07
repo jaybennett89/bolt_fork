@@ -8,9 +8,7 @@ class BoltPrefab {
 }
 
 partial class BoltCompiler {
-  static void CompilePrefabs (BoltCompilerOperation op) {
-    mode = BoltCompilerMode.Prefabs;
-
+  static void CompilePrefabs(BoltCompilerOperation op) {
     // update prefabs lookup table
     GameObject[] prefabsArray = new GameObject[op.prefabs.Count];
 

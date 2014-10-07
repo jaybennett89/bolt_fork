@@ -13,7 +13,7 @@ public abstract partial class BoltCallbacksBase : MonoBehaviour, IBoltListNode
 
     protected void OnEnable()
     {
-        BoltCore._globalEventDispatcher.Register(this);
+        BoltCore._globalEventDispatcher.Add(this);
         callbacks.AddLast(this);
     }
 

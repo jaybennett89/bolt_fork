@@ -1,38 +1,60 @@
-﻿public struct BoltUniqueId {
-  public readonly uint peer;
-  public readonly uint entity;
+﻿using System;
+using System.Runtime.InteropServices;
+using UdpKit;
 
-  internal BoltUniqueId(uint peer, uint entity) {
-    this.peer = peer;
-    this.entity = entity;
-  }
+namespace Bolt {
+  [StructLayout(LayoutKind.Explicit)]
+  public struct UniqueId {
+    [FieldOffset(0)]
+    Guid guid;
 
-  public override int GetHashCode() {
-    return (int)(this.peer ^ this.entity);
-  }
+    [FieldOffset(0)]
+    uint uint0;
 
-  public override bool Equals(object obj) {
-    if (obj is BoltUniqueId) {
-      return this == ((BoltUniqueId)obj);
+    [FieldOffset(1)]
+    uint uint1;
+
+    [FieldOffset(2)]
+    uint uint2;
+
+    [FieldOffset(3)]
+    uint uint3;
+
+    public bool IsNone {
+      get { return guid == Guid.Empty; }
     }
 
-    return false;
-  }
-
-  public override string ToString() {
-    if (peer == 0) {
-      Assert.True(entity == 0);
-      return "[Id NULL]";
+    public void Pack(UdpStream stream) {
+      stream.WriteUInt(uint0);
+      stream.WriteUInt(uint1);
+      stream.WriteUInt(uint2);
+      stream.WriteUInt(uint3);
     }
 
-    return string.Format("[Id peer={0} entity={1}]", peer, entity);
+    public static UniqueId None {
+      get { return default(UniqueId); }
+    }
+
+    public static UniqueId New() {
+      UniqueId id;
+
+      id = default(UniqueId);
+      id.guid = Guid.NewGuid();
+
+      return id;
+    }
+
+    public static UniqueId Read(UdpStream stream) {
+      UniqueId id;
+
+      id = default(UniqueId);
+      id.uint0 = stream.ReadUInt();
+      id.uint1 = stream.ReadUInt();
+      id.uint2 = stream.ReadUInt();
+      id.uint3 = stream.ReadUInt();
+
+      return id;
+    }
   }
 
-  public static bool operator ==(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer == r.peer && l.entity == r.entity;
-  }
-
-  public static bool operator !=(BoltUniqueId l, BoltUniqueId r) {
-    return l.peer != r.peer || l.entity != r.entity;
-  }
 }

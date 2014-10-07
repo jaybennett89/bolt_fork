@@ -106,6 +106,8 @@ Target "InstallBolt" (fun _ ->
 
   CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
 )
 
@@ -129,6 +131,7 @@ Target "InstallBoltDebugFiles" (fun _ ->
   // copy files into unity folder
   CopyFile (unityDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll.mdb")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll.mdb")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll.mdb")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
 )
 

@@ -46,7 +46,7 @@ namespace UdpKit {
         }
 
         public override string ToString () {
-            return string.Format("{0}.{1}.{2}.{3}:{4}", Address.Byte3, Address.Byte2, Address.Byte1, Address.Byte0, Port);
+            return string.Format("[EndPoint {0}.{1}.{2}.{3}:{4}]", Address.Byte3, Address.Byte2, Address.Byte1, Address.Byte0, Port);
         }
 
         public static UdpEndPoint Parse (string endpoint) {

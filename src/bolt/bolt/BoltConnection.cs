@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
@@ -7,12 +8,10 @@ using UnityEngine;
 /// Represents a connection from a remote host
 /// </summary>
 public class BoltConnection : BoltObject {
-  static int _idCounter;
 
   UdpConnection _udp;
   BoltChannel[] _channels;
 
-  int _id;
   int _framesToStep;
   int _packetsReceived;
   int _packetCounter;
@@ -27,21 +26,19 @@ public class BoltConnection : BoltObject {
 
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
+  internal EventChannel _eventChannel;
+  internal SceneLoadChannel _sceneLoadChannel;
+  internal EntityChannel _entityChannel;
+  internal EntityChannel.CommandChannel _commandChannel;
 
-  internal SceneLoadState _remoteMapLoadState;
-  internal BoltEventChannel _eventChannel;
-  internal BoltEntityChannel _entityChannel;
-  internal BoltEntityChannel.CommandChannel _commandChannel;
+  internal SceneLoadState _remoteSceneLoading;
 
   public bool isLoadingMap {
-    get { return _remoteMapLoadState.stage != SceneLoadStage.CallbackDone; }
-  }
-
-  /// <summary>
-  /// Unique id for this connection
-  /// </summary>
-  public int id {
-    get { return _id; }
+    get {
+      return
+        (_remoteSceneLoading.Scene != BoltCore._localSceneLoading.Scene) ||
+        (_remoteSceneLoading.State != SceneLoadState.STATE_CALLBACK_INVOKED);
+    }
   }
 
   /// <summary>
@@ -109,20 +106,21 @@ public class BoltConnection : BoltObject {
     set;
   }
 
-  internal BoltConnection (UdpConnection udp) {
+  internal BoltConnection(UdpConnection udp) {
     userToken = udp.UserToken;
 
     _udp = udp;
     _udp.UserToken = this;
 
-    _id = ++_idCounter;
-    _remoteFrameAdjust = false;
-
     _channels = new BoltChannel[] {
-      _eventChannel = new BoltEventChannel(),
-      _commandChannel = new BoltEntityChannel.CommandChannel(),
-      _entityChannel = new BoltEntityChannel(),
+      _sceneLoadChannel = new SceneLoadChannel(),
+      _eventChannel = new EventChannel(),
+      _commandChannel = new EntityChannel.CommandChannel(),
+      _entityChannel = new EntityChannel(),
     };
+
+    _remoteFrameAdjust = false;
+    _remoteSceneLoading = SceneLoadState.DefaultRemote();
 
     // set channels connection
     for (int i = 0; i < _channels.Length; ++i) {
@@ -133,61 +131,42 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// Disconnect this connection
   /// </summary>
-  public void Disconnect () {
+  public void Disconnect() {
     _udp.Disconnect();
   }
 
   /// <summary>
   /// How many updates have been skipped for the entity to this connection
   /// </summary>
-  public uint GetSkippedUpdates (BoltEntity en) {
-    return _entityChannel.GetSkippedUpdates(en);
+  public int GetSkippedUpdates(BoltEntity en) {
+    return _entityChannel.GetSkippedUpdates(en.Entity);
   }
 
-  internal uint GetNetworkId (BoltEntity en) {
+  internal NetId GetNetworkId(Entity en) {
     return _entityChannel.GetNetworkId(en);
   }
 
-  /// <summary>
-  /// Raise an event on the remote end of this connection
-  /// </summary>
-  /// <param name="event">The event to raise</param>
-  public void Raise (IBoltEvent @event) {
-    _eventChannel.Queue((BoltEventBase) @event);
-  }
-
-  ///// <summary>
-  ///// Raise an event of type T on the remote end of this connection
-  ///// </summary>
-  ///// <typeparam name="T">Type of the event</typeparam>
-  ///// <param name="init">Function called to setup the event before its sent of</param>
-  internal void Raise<T> (Action<T> init) where T : IBoltEvent {
-    T evnt = BoltFactory.NewEvent<T>();
-    init(evnt);
-    Raise(evnt);
-  }
-
-  public override bool Equals (object obj) {
+  public override bool Equals(object obj) {
     return ReferenceEquals(this, obj);
   }
 
-  public override int GetHashCode () {
+  public override int GetHashCode() {
     return _udp.GetHashCode();
   }
 
-  public override string ToString () {
-    return string.Format("[Connection addr={0} port={1}]", _udp.RemoteEndPoint.Address, _udp.RemoteEndPoint.Port);
+  public override string ToString() {
+    return string.Format("[Connection {0}]", _udp.RemoteEndPoint);
   }
 
-  internal BoltEntity GetIncommingEntity (uint networkId) {
+  internal Entity GetIncommingEntity(NetId networkId) {
     return _entityChannel.GetIncommingEntity(networkId);
   }
 
-  internal BoltEntity GetOutgoingEntity (uint networkId) {
+  internal Entity GetOutgoingEntity(NetId networkId) {
     return _entityChannel.GetOutgoingEntity(networkId);
   }
 
-  internal void DisconnectedInternal () {
+  internal void DisconnectedInternal() {
     for (int i = 0; i < _channels.Length; ++i) {
       _channels[i].Disconnected();
     }
@@ -201,47 +180,7 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void LoadMapOnClient (Scene map) {
-    Assert.True(udpConnection.IsServer);
-    _remoteMapLoadState = _remoteMapLoadState.BeginLoad(map);
-
-    if (_remoteMapLoadState.stage == SceneLoadStage.Load) {
-      SendMapLoadToRemote();
-    }
-  }
-
-  internal void SendMapLoadDoneToRemote () {
-    Assert.True(BoltCore._mapLoadState.stage >= SceneLoadStage.Callback);
-    Assert.True(BoltCore._mapLoadState.scene == _remoteMapLoadState.scene);
-
-    Raise<ILoadMapDone>(evt => evt.map = BoltCore._mapLoadState.scene);
-  }
-
-  internal void SendMapLoadToRemote () {
-    Assert.True(udpConnection.IsServer);
-    Raise<ILoadMap>(evt => evt.map = _remoteMapLoadState.scene);
-
-    if (BoltCore._mapLoadState.stage == SceneLoadStage.CallbackDone) {
-      SendMapLoadDoneToRemote();
-    }
-  }
-
-  internal void TriggerRemoteMapDoneCallbacks () {
-    _remoteMapLoadState = _remoteMapLoadState.BeginCallback(BoltCore._mapLoadState);
-
-    if (_remoteMapLoadState.stage == SceneLoadStage.Callback) {
-      // invoke
-      BoltCallbacksBase.SceneLoadRemoteDoneInvoke(this, _remoteMapLoadState.scene.name);
-
-      // done!
-      _remoteMapLoadState = _remoteMapLoadState.FinishCallback(BoltCore._mapLoadState.scene);
-
-      // this gotta be true now
-      Assert.True(_remoteMapLoadState.stage == SceneLoadStage.CallbackDone);
-    }
-  }
-
-  internal bool StepRemoteFrame () {
+  internal bool StepRemoteFrame() {
     if (_framesToStep > 0) {
       _framesToStep -= 1;
       _remoteFrameEstimated += 1;
@@ -254,7 +193,7 @@ public class BoltConnection : BoltObject {
     return _framesToStep > 0;
   }
 
-  internal void AdjustRemoteFrame () {
+  internal void AdjustRemoteFrame() {
     if (_packetsReceived == 0)
       return;
 
@@ -315,12 +254,13 @@ public class BoltConnection : BoltObject {
       else {
         _framesToStep = 1;
       }
-    } else {
+    }
+    else {
       _remoteFrameEstimated = _remoteFrameActual - (rate - 1);
     }
   }
 
-  internal void SwitchPerfCounters () {
+  internal void SwitchPerfCounters() {
     _bitsSecondOut = _bitsSecondOutAcc;
     _bitsSecondOutAcc = 0;
 
@@ -328,7 +268,7 @@ public class BoltConnection : BoltObject {
     _bitsSecondInAcc = 0;
   }
 
-  internal void Send () {
+  internal void Send() {
     try {
       BoltPacket packet = BoltPacketPool.Acquire();
       packet.info = new BoltPacketInfo();
@@ -344,28 +284,20 @@ public class BoltConnection : BoltObject {
 
       _bitsSecondOutAcc += packet.stream.Position;
       _udp.Send(packet);
-
-      //BoltLog.Info(
-      //    "Sent packet of {0} bits, cmd: {1}, entity: {2}, events: {3}",
-      //    packet.stream.Position,
-      //    packet.info.commandBits,
-      //    packet.info.entityBits,
-      //    packet.info.eventBits
-      //);
-
-    } catch (Exception exn) {
+    }
+    catch (Exception exn) {
       BoltLog.Exception(exn);
       throw;
     }
   }
 
-  internal void PacketSent (BoltPacket packet) {
+  internal void PacketSent(BoltPacket packet) {
     for (int i = 0; i < _channels.Length; ++i) {
       _channels[i].Sent(packet);
     }
   }
 
-  internal void PacketReceived (BoltPacket packet) {
+  internal void PacketReceived(BoltPacket packet) {
     try {
       packet.frame = packet.stream.ReadInt();
       //BoltLog.Info("PACKET-FRAME: {0}", packet.frame);
@@ -387,7 +319,8 @@ public class BoltConnection : BoltObject {
       }
 
       Assert.False(packet.stream.Overflowing);
-    } catch (Exception exn) {
+    }
+    catch (Exception exn) {
       BoltLog.Exception(exn);
       BoltLog.Error("exception thrown while unpacking data from {0}, disconnecting", udpConnection.RemoteEndPoint);
 
@@ -395,19 +328,19 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketDelivered (BoltPacket packet) {
+  internal void PacketDelivered(BoltPacket packet) {
     for (int i = 0; i < _channels.Length; ++i) {
       _channels[i].Delivered(packet);
     }
   }
 
-  internal void PacketLost (BoltPacket packet) {
+  internal void PacketLost(BoltPacket packet) {
     for (int i = 0; i < _channels.Length; ++i) {
       _channels[i].Lost(packet);
     }
   }
 
-  public static implicit operator bool (BoltConnection cn) {
+  public static implicit operator bool(BoltConnection cn) {
     return cn != null;
   }
 

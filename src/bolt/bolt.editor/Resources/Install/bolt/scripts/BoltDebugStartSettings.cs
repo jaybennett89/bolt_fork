@@ -124,8 +124,8 @@ class BoltDebugStartSettings {
       EnumWindows(Window, IntPtr.Zero);
 
       if (unityHandle.Wrapper != null) {
-        int ww = 640;
-        int wh = 360;
+        int ww = UnityEngine.Screen.width;
+        int wh = UnityEngine.Screen.height;
 
         int x = 0;
         int y = 0;
@@ -153,6 +153,7 @@ class BoltDebugStartSettings {
   }
 #else
   public static void PositionWindow () {
+    
   }
 #endif
 }

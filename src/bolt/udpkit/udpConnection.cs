@@ -111,13 +111,6 @@
       get { return stats; }
     }
 
-    /// <summary>
-    /// Unique id for this connection
-    /// </summary>
-    public uint uid {
-      get { return id; }
-    }
-
     int mtu;
     float networkRtt = 0.1f;
     float aliasedRtt = 0.1f;
@@ -136,7 +129,6 @@
     uint connectTimeout;
     uint connectAttempts;
 
-    internal uint id;
     internal byte[] token;
     internal UdpSocket socket;
     internal UdpConnectionState state;
@@ -355,7 +347,6 @@
       if (CheckCanSend(true) == UdpSendFailReason.None) {
         UdpStream stream = socket.GetWriteStream(mtu << 3, UdpSocket.HeaderBitSize);
         stream.WriteByte((byte) UdpCommandType.Accepted, 8);
-        stream.WriteUInt(id);
 
         WriteCommandHeaderAndSend(stream, socket);
       }
@@ -546,12 +537,10 @@
 
     void OnCommandAccepted (UdpStream buffer) {
       if (IsClient) {
-        uint remoteId = buffer.ReadUInt();
-
         if (CheckState(UdpConnectionState.Connecting)) {
-          UdpLog.Debug("connection to {0} accepted with id {1}", RemoteEndPoint, remoteId);
+          UdpLog.Debug("Connection to {0} was accepted", RemoteEndPoint);
 
-          id = remoteId;
+          // done!
           ChangeState(UdpConnectionState.Connected);
         }
       } else {

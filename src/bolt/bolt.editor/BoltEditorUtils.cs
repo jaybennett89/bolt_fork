@@ -16,23 +16,23 @@ static class BoltEditorUtils {
     get { return UnityEditorInternal.InternalEditorUtility.HasPro(); }
   }
 
-  public static string EnumFlagsToString (this Enum value) {
+  public static string EnumFlagsToString(this Enum value) {
     return value.GetType().CSharpName() + "." + value.ToString().Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries).Join(" | " + value.GetType() + ".");
   }
 
-  public static string CSharpIdentifier (this string value) {
+  public static string CSharpIdentifier(this string value) {
     if (Char.IsDigit(value[0])) {
-      value = "_" + value; 
+      value = "_" + value;
     }
 
     return Regex.Replace(value, "[^a-zA-Z0-9_]+", "_");
   }
 
-  public static string MakePath (params string[] parts) {
+  public static string MakePath(params string[] parts) {
     return String.Join(Path.DirectorySeparatorChar.ToString(), parts.Select(x => x.TrimEnd('/', '\\').TrimStart('\\')).ToArray()).Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
   }
 
-  public static string MakeAssetPath (params string[] parts) {
+  public static string MakeAssetPath(params string[] parts) {
     string path;
 
     path = MakePath(parts);
@@ -43,15 +43,15 @@ static class BoltEditorUtils {
 
   }
 
-  public static string Join<T> (this IEnumerable<T> items, string seperator) {
+  public static string Join<T>(this IEnumerable<T> items, string seperator) {
     return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
   }
 
-  public static string GetResourceText (string path) {
+  public static string GetResourceText(string path) {
     return Assembly.GetExecutingAssembly().GetResourceText(path);
   }
 
-  public static string GetResourceText (this Assembly asm, string path) {
+  public static string GetResourceText(this Assembly asm, string path) {
     using (Stream s = asm.GetManifestResourceStream(path)) {
       using (StreamReader r = new StreamReader(s)) {
         return r.ReadToEnd();
@@ -59,11 +59,11 @@ static class BoltEditorUtils {
     }
   }
 
-  public static byte[] GetResourceBytes (string path) {
+  public static byte[] GetResourceBytes(string path) {
     return Assembly.GetExecutingAssembly().GetResourceBytes(path);
   }
 
-  public static byte[] GetResourceBytes (this Assembly asm, string path) {
+  public static byte[] GetResourceBytes(this Assembly asm, string path) {
     using (var stream = asm.GetManifestResourceStream(path)) {
       byte[] buffer = new byte[stream.Length];
       stream.Read(buffer, 0, buffer.Length);
@@ -86,9 +86,9 @@ static class BoltEditorUtils {
     }
   }
 
-  public static ScriptableObject GetSingletonAssetAtPath (string path, Type t) {
+  public static ScriptableObject GetSingletonAssetAtPath(string path, Type t) {
     path = path + "/" + t + ".asset";
-    ScriptableObject asset = (ScriptableObject) AssetDatabase.LoadAssetAtPath(path, t);
+    ScriptableObject asset = (ScriptableObject)AssetDatabase.LoadAssetAtPath(path, t);
 
     if (!asset) {
       asset = ScriptableObject.CreateInstance(t);
@@ -99,9 +99,9 @@ static class BoltEditorUtils {
     return asset;
   }
 
-  public static T GetSingletonAsset<T> () where T : ScriptableObject {
+  public static T GetSingletonAsset<T>() where T : ScriptableObject {
     string path = "Assets/bolt/resources/" + typeof(T).FullName + ".asset";
-    T asset = (T) AssetDatabase.LoadAssetAtPath(path, typeof(T));
+    T asset = (T)AssetDatabase.LoadAssetAtPath(path, typeof(T));
 
     if (!asset) {
       asset = ScriptableObject.CreateInstance<T>();
@@ -112,8 +112,8 @@ static class BoltEditorUtils {
     return asset;
   }
 
-  public static void SynchronizeWithController (BoltMecanimAsset asset) {
-    AnimatorController ac = (AnimatorController) asset.controller;
+  public static void SynchronizeWithController(BoltMecanimAsset asset) {
+    AnimatorController ac = (AnimatorController)asset.controller;
     AnimatorControllerParameter[] parameters = GetParameters(ac);
 
     // verify we have a property for all parameters
@@ -133,7 +133,7 @@ static class BoltEditorUtils {
   }
 
 
-  static bool PropertyExists (AnimatorControllerParameter[] parameters, BoltAssetProperty prop) {
+  static bool PropertyExists(AnimatorControllerParameter[] parameters, BoltAssetProperty prop) {
     for (int i = 0; i < parameters.Length; ++i) {
       AnimatorControllerParameter param = parameters[i];
 
@@ -161,7 +161,7 @@ static class BoltEditorUtils {
     return false;
   }
 
-  static BoltAssetProperty[] CreateProperty (BoltAssetProperty[] properties, AnimatorControllerParameter param) {
+  static BoltAssetProperty[] CreateProperty(BoltAssetProperty[] properties, AnimatorControllerParameter param) {
     for (int i = 0; i < properties.Length; ++i) {
       BoltAssetProperty prop = properties[i];
 
@@ -204,7 +204,7 @@ static class BoltEditorUtils {
     return properties;
   }
 
-  static AnimatorControllerParameter[] GetParameters (AnimatorController ac) {
+  static AnimatorControllerParameter[] GetParameters(AnimatorController ac) {
     AnimatorControllerParameter[] parameters = new AnimatorControllerParameter[ac.parameterCount];
 
     for (int i = 0; i < ac.parameterCount; ++i) {
@@ -214,7 +214,12 @@ static class BoltEditorUtils {
     return parameters;
   }
 
-  public static void CreateAsset<T> (string name) where T : ScriptableObject {
+
+  public static void CreateAsset<T>(string name) where T : ScriptableObject {
+    CreateAsset<T>(name, null);
+  }
+
+  public static void CreateAsset<T>(string name, Action<T> init) where T : ScriptableObject {
     var asset = ScriptableObject.CreateInstance<T>();
     var path = AssetDatabase.GetAssetPath(Selection.activeObject);
 
@@ -225,6 +230,10 @@ static class BoltEditorUtils {
       path = path.Replace(Path.GetFileName(path), "");
     }
 
+    if (init != null) {
+      init(asset);
+    }
+
     AssetDatabase.CreateAsset(asset, AssetDatabase.GenerateUniqueAssetPath(path + "/New" + name + ".asset"));
     AssetDatabase.SaveAssets();
 
@@ -233,24 +242,25 @@ static class BoltEditorUtils {
     Selection.activeObject = asset;
   }
 
-  public static void InstallAsset (string file, Func<byte[]> data) {
+  public static void InstallAsset(string file, Func<byte[]> data) {
     if (!File.Exists(file)) {
       InstallAsset(file, data());
     }
   }
 
-  public static void InstallAsset (string file, byte[] data) {
+  public static void InstallAsset(string file, byte[] data) {
     string path = Path.GetDirectoryName(file);
 
     try {
       Directory.CreateDirectory(path);
-    } catch { }
+    }
+    catch { }
 
     File.WriteAllBytes(file, data);
     AssetDatabase.ImportAsset(file, ImportAssetOptions.ForceUpdate);
   }
 
-  public static List<IPAddress> FindEditorLanAddresses () {
+  public static List<IPAddress> FindEditorLanAddresses() {
     List<IPAddress> addresses = new List<IPAddress>();
 
     foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces()) {

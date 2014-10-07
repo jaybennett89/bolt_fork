@@ -17,7 +17,6 @@ public static class BoltAssetEditorGUI {
     var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
 
     GUIStyle bg;
-
     bg = new GUIStyle(GUIStyle.none);
     bg.normal.background = EditorGUIUtility.whiteTexture;
 
