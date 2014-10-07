@@ -162,6 +162,12 @@ namespace Bolt.Compiler {
         ctor.Statements.Comment(p.CallbackPaths.Join("; "));
         ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), emitter.EmitStatePropertyInitializer(p));
 
+        // property data expression
+        var dataSetterArgument = emitter.EmitSetPropertyDataArgument();
+        if (dataSetterArgument != null) {
+          ctor.Statements.Expr("((Bolt.{0})_Meta.PropertySerializers[{1}]).SetPropertyData({2})", emitter.SerializerClassName, p.Index, dataSetterArgument);
+        }
+
         //var init = emitter.EmitCustomSerializerInitilization("(({0}) _Meta.PropertySerializers[{1}])".Expr(emitter.SerializerClassName, p.Index));
         //if (init != null) {
         //  ctor.Statements.Add(init);

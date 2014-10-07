@@ -5,9 +5,15 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
+  struct PropertySerializerEntityData {
+    public bool IsParent;
+  }
+
   class PropertySerializerEntity : PropertySerializer {
-    public PropertySerializerEntity(StatePropertyMetaData info)
-      : base(info) {
+    PropertySerializerEntityData PropertyData;
+
+    public PropertySerializerEntity(StatePropertyMetaData meta)
+      : base(meta) {
     }
 
     public PropertySerializerEntity(EventPropertyMetaData meta)
@@ -18,8 +24,26 @@ namespace Bolt {
       : base(meta) {
     }
 
+    public void SetPropertyData(PropertySerializerEntityData propertyData) {
+      PropertyData = propertyData;
+    }
+
     public override int StateBits(State state, State.Frame frame) {
       return EntityProxy.ID_BIT_COUNT + 1;
+    }
+
+    public override void OnSimulateAfter(State state) {
+      if (PropertyData.IsParent) {
+        InstanceId id = new InstanceId(state.Frames.first.Data.ReadI32(StateData.ByteOffset));
+        Entity en = BoltCore.FindEntity(id);
+
+        if (en) {
+          state.Entity.UnityObject.transform.parent = en.UnityObject.transform.parent;
+        }
+        else {
+          state.Entity.UnityObject.transform.parent = null;
+        }
+      }
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {

@@ -31,6 +31,10 @@ namespace Bolt.Compiler {
       );
     }
 
+    public virtual string EmitSetPropertyDataArgument() {
+      return null;
+    }
+
     public CodeExpression EmitCommandPropertyInitializer() {
       return (@"new Bolt.{0}(new Bolt.CommandPropertyMetaData {{ ByteOffset = {1}, PropertyName = ""{2}"" }})").Expr(
         SerializerClassName,

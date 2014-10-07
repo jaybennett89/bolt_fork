@@ -43,11 +43,9 @@ public static class PropertyEditorRegistry {
       editorLookup = new Dictionary<Type, Type>();
 
       foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
-        if (asm.GetName().Name.Contains("CSharp")) {
-          foreach (Type type in asm.GetTypes()) {
-            if (typeof(PropertyEditor).IsAssignableFrom(type) && !type.IsAbstract) {
-              editorLookup.Add(type.BaseType.GetGenericArguments()[0], type); 
-            }
+        foreach (Type type in asm.GetTypes()) {
+          if (typeof(PropertyEditor).IsAssignableFrom(type) && !type.IsAbstract) {
+            editorLookup.Add(type.BaseType.GetGenericArguments()[0], type);
           }
         }
       }

@@ -79,6 +79,7 @@
     <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state2\Arrays\FloatArray.cs" />
     <Compile Include="state2\Arrays\TransformArray.cs" />
+    <Compile Include="state2\Auxiliary\Enums.cs" />
     <Compile Include="state2\Axis.cs" />
     <Compile Include="state2\BitArray.cs" />
     <Compile Include="state2\DoubleBuffer.cs" />
@@ -190,6 +191,7 @@
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

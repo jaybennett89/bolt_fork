@@ -10,6 +10,10 @@ namespace Bolt.Compiler {
 
     }
 
+    public override string EmitSetPropertyDataArgument() {
+      return string.Format("new Bolt.PropertySerializerTransformData {{ Space = Bolt.TransformSpaces.{0} }}", Decorator.PropertyType.Space);
+    }
+
     public override CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
       return expression;  
     }

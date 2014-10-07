@@ -89,6 +89,7 @@
     <Compile Include="Compiler\BoltSourceFile.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorArray.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorEntity.cs" />
     <Compile Include="PropertyEditors\PropertyEditorFloat.cs" />
     <Compile Include="PropertyEditors\PropertyEditorInteger.cs" />
     <Compile Include="PropertyEditors\PropertyEditorString.cs" />

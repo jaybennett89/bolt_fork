@@ -345,7 +345,7 @@ public class BoltEditorWindow : BoltWindow {
       }
 
       if (p.PropertyType.HasSettings) {
-        SettingsSection("Compression", () => {
+        SettingsSection("Settings", () => {
           if (IsStateOrStruct(def)) {
             EditStateAssetSettings(p);
           }
@@ -374,15 +374,15 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStateAssetSettings(PropertyDefinition p) {
-    if (p.PropertyType.InterpolateAllowed) {
-      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-        p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
+    //if (p.PropertyType.InterpolateAllowed) {
+    //  BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+    //    p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
 
-        if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
-          p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
-        }
-      });
-    }
+    //    if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
+    //      p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
+    //    }
+    //  });
+    //}
   }
 
   bool IsStateOrStruct(AssetDefinition def) {

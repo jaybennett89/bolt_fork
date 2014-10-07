@@ -65,11 +65,19 @@ namespace Bolt {
     public UE.Vector3 Velocity;
   }
 
+  struct PropertySerializerTransformData {
+    public TransformSpaces Space;
+  }
+
   class PropertySerializerTransform : PropertySerializer {
-    //internal TransformConfiguration Config;
+    PropertySerializerTransformData PropertyData;
 
     public PropertySerializerTransform(StatePropertyMetaData info)
       : base(info) {
+    }
+
+    public void SetPropertyData(PropertySerializerTransformData propertyData) {
+      PropertyData = propertyData;
     }
 
     public override int StateBits(State state, State.Frame frame) {
@@ -85,8 +93,7 @@ namespace Bolt {
       if (td.Render) {
         var p = td.RenderDoubleBuffer.Previous;
         var c = td.RenderDoubleBuffer.Current;
-
-        PositionSet(td.Render, UE.Vector3.Lerp(p, c, BoltCore.frameAlpha));
+        td.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
       }
     }
 
@@ -201,23 +208,19 @@ namespace Bolt {
     }
 
     UE.Vector3 PositionGet(UE.Transform t) {
-      //return Config.Space == TransformSpaces.World ? t.position : t.localPosition; 
-      return t.position;
+      return (PropertyData.Space == TransformSpaces.World) ? t.position : t.localPosition;
     }
 
     UE.Quaternion RotationGet(UE.Transform t) {
-      //return Config.Space == TransformSpaces.World ? t.rotation : t.localRotation;
-      return t.rotation;
+      return (PropertyData.Space == TransformSpaces.World) ? t.rotation : t.localRotation;
     }
 
     void PositionSet(UE.Transform t, UE.Vector3 pos) {
-      t.position = pos;
-      //if (Config.Space == TransformSpaces.World) { t.position = pos; } else { t.localPosition = pos; }
+      if (PropertyData.Space == TransformSpaces.World) { t.position = pos; } else { t.localPosition = pos; }
     }
 
     void RotationSet(UE.Transform t, UE.Quaternion rot) {
-      t.rotation = rot;
-      //if (Config.Space == TransformSpaces.World) { t.rotation = rot; } else { t.localRotation = rot; }
+      if (PropertyData.Space == TransformSpaces.World) { t.rotation = rot; } else { t.localRotation = rot; }
     }
 
     void PerformNone(TransformData td, State state) {
