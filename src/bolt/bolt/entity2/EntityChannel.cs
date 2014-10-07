@@ -99,9 +99,6 @@ partial class EntityChannel : BoltChannel {
       // remove lookup by instance id
       _outgoingProxiesByInstanceId.Remove(entity.InstanceId);
 
-      // clear entity from proxy
-      proxy.Entity = null;
-
       // if we dont have any pending sends for this and we have not created it
       if (proxy.Envelopes.count == 0 && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
         DestroyOutgoingProxy(proxy);

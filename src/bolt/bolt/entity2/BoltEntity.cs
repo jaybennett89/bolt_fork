@@ -59,7 +59,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   public bool isAttached {
-    get { return Entity != null; }
+    get { return _entity != null; }
   }
 
   public bool isOwner {

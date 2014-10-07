@@ -247,10 +247,11 @@ internal static class BoltCore {
   }
 
   public static BoltEntity Attach(BoltEntity entity) {
-    Assert.Null(entity.Entity);
+    Assert.Null(entity._entity);
 
     Entity eo;
     eo = Entity.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
+    eo.UnityObject = entity;
     eo.Initialize();
     eo.Attach();
 

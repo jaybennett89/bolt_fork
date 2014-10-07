@@ -74,6 +74,8 @@ class BoltSceneLoader : MonoBehaviour {
   }
 
   internal static void Enqueue(Bolt.Scene scene) {
+    BoltLog.Debug("Loading {0}", scene);
+
     _delay = 0;
     _loadOps.AddLast(new LoadOp { scene = scene });
   }
