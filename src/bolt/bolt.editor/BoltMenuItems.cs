@@ -1,26 +1,8 @@
-﻿using UnityEditor;
+﻿using ProtoBuf;
+using UnityEditor;
+using Bolt.Compiler;
 
 public static class BoltMenuItems {
-  [MenuItem("Assets/Create/Bolt/State")]
-  public static void NewStateAsset() {
-    BoltEditorUtils.CreateAsset<BoltStateAsset>("BoltState");
-  }
-
-  [MenuItem("Assets/Create/Bolt/Event")]
-  public static void NewEventAsset() {
-    BoltEditorUtils.CreateAsset<BoltEventAsset>("BoltEvent");
-  }
-
-  [MenuItem("Assets/Create/Bolt/Command")]
-  public static void NewCommandAsset() {
-    BoltEditorUtils.CreateAsset<BoltCommandAsset>("BoltCommand");
-  }
-
-  [MenuItem("Assets/Create/Bolt/Mecanim")]
-  public static void NewMecanimAsset() {
-    BoltEditorUtils.CreateAsset<BoltMecanimAsset>("BoltMecanim");
-  }
-
   [MenuItem("Assets/Compile Bolt Assets")]
   public static void RunCompiler() {
     try {

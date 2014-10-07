@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-static class BoltMath {
+public static class BoltMath {
     public static uint Bit (int shift) {
         return 1u << shift;
     }
@@ -59,5 +59,25 @@ static class BoltMath {
 
     public static int BytesRequired (int bits) {
         return (bits + 7) >> 3;
+    }
+
+    public static int BitsRequired(int number) {
+      if (number < 0) {
+        return 32;
+      }
+
+      if (number == 0) {
+        return 1;
+      }
+
+      for (int i = 31; i >= 0; --i) {
+        int b = 1 << i;
+
+        if ((number & b) == b) {
+          return i + 1;
+        }
+      }
+
+      throw new Exception();
     }
 }

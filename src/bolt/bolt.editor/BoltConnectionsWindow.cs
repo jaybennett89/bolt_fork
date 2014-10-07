@@ -31,7 +31,7 @@ public class BoltConnectionsWindow : EditorWindow {
 
     if (detailsLabel == null) {
       detailsLabel = new GUIStyle(GUI.skin.label);
-      detailsLabel.normal.textColor = BoltGUI.lightBlue;
+      detailsLabel.normal.textColor = new Color(0f / 255f, 232f / 255f, 226f / 255f);
     }
 
     _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);

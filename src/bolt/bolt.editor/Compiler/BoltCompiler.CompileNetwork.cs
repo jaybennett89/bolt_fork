@@ -1,36 +1,48 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using Bolt.Compiler;
+using System.Linq;
 
 partial class BoltCompiler {
-  static void CompileNetwork (BoltCompilerOperation op) {
-    mode = BoltCompilerMode.Network;
-
+  static void CompileNetwork(BoltCompilerOperation op) {
     using (BoltSourceFile file = new BoltSourceFile(op.networkFilePath)) {
-      string src = Assembly.GetExecutingAssembly().GetResourceText("bolt.editor.Resources.BoltNetwork.cs");
+      file.EmitScope("namespace BoltInternal", () => {
+        file.EmitScope("public static class BoltNetworkInternal_User", () => {
+          file.EmitScope("public static void EnvironmentSetup()", () => {
+            // Commands
+            foreach (var def in op.project.Commands) {
+              CommandDecorator dec;
 
-      // map loader
-      if (BoltEditorUtils.hasPro) {
-        src = src.Replace("//MAPLOADER", "return typeof(BoltMapLoaderPro);");
-      } else {
-        src = src.Replace("//MAPLOADER", "return typeof(BoltMapLoaderFree);");
-      }
+              dec = new CommandDecorator();
+              dec.Definition = def;
 
-      // event registration
-      src = src.Replace("//EVENTS",
-        op.events.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
-      );
+              file.EmitLine("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+            }
 
-      // state registration
-      src = src.Replace("//STATE",
-        op.states.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
-      );
+            // Events
+            foreach (var def in op.project.Events) {
+              EventDecorator dec;
 
-      // command registration
-      src = src.Replace("//COMMANDS",
-        op.commands.Select(x => string.Format("BoltFactory.Register(new {0}());", x.factoryName)).Join("\r\n")
-      );
+              dec = new EventDecorator();
+              dec.Definition = def;
 
-      file.Emit(src);
+              file.EmitLine("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+            }
+
+            // State
+            foreach (var def in op.project.States.Where(x => !x.IsAbstract)) {
+              StateDecorator dec;
+
+              dec = new StateDecorator();
+              dec.Definition = def;
+
+              file.EmitLine("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+            }
+          });
+
+          file.EmitScope("public static void EnvironmentReset()", () => {
+
+          });
+        });
+      });
     }
   }
 }

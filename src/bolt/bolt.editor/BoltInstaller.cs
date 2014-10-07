@@ -275,6 +275,8 @@ public static class BoltInstaller {
     var file = ResourceToFilePath(resource);
     var asset = ResourceToAssetPath(resource);
 
+    Debug.Log("installing:" + file);
+
     // delete existing asset
     AssetDatabase.DeleteAsset(asset);
 

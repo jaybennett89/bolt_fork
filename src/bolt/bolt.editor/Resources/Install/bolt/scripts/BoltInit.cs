@@ -24,10 +24,10 @@ public class BoltInit : MonoBehaviour {
     serverPort = BoltRuntimeSettings.instance.debugStartPort;
   }
 
-  void OnGUI () {
+  void OnGUI() {
     Rect tex = new Rect(10, 10, 140, 75);
     Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
-    
+
     GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
     GUILayout.BeginArea(area);
 
@@ -42,7 +42,7 @@ public class BoltInit : MonoBehaviour {
     GUILayout.EndArea();
   }
 
-  private void State_EnterServerIp () {
+  private void State_EnterServerIp() {
     GUILayout.BeginHorizontal();
 
     GUILayout.Label("Server IP: ");
@@ -56,7 +56,7 @@ public class BoltInit : MonoBehaviour {
   }
 
 
-  void State_SelectMode () {
+  void State_SelectMode() {
     if (ExpandButton("Server")) {
       state = State.SelectMap;
     }
@@ -65,8 +65,8 @@ public class BoltInit : MonoBehaviour {
     }
   }
 
-  void State_SelectMap () {
-    foreach (string value in Enum.GetNames(typeof(BoltMapNames))) {
+  void State_SelectMap() {
+    foreach (string value in BoltScenes.AllScenes) {
       if (Application.loadedLevelName != value) {
         if (ExpandButton(value)) {
           map = value;
@@ -76,19 +76,19 @@ public class BoltInit : MonoBehaviour {
     }
   }
 
-  void State_StartServer () {
-    BoltNetwork.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort) serverPort));
-    BoltNetwork.LoadMap(map);
+  void State_StartServer() {
+    BoltLauncher.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort)serverPort));
+    BoltNetwork.LoadScene(map);
     state = State.Started;
   }
 
-  void State_StartClient () {
-    BoltNetwork.StartClient(UdpEndPoint.Any);
-    BoltNetwork.Connect(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort) serverPort));
+  void State_StartClient() {
+    BoltLauncher.StartClient(UdpEndPoint.Any);
+    BoltNetwork.Connect(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort)serverPort));
     state = State.Started;
   }
 
-  bool ExpandButton (string text) {
+  bool ExpandButton(string text) {
     return GUILayout.Button(text, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
   }
 }

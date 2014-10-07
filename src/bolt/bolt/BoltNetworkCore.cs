@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UdpKit;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
@@ -15,23 +15,17 @@ public enum BoltNetworkModes {
 
 internal static class BoltCore {
   static UdpSocket _udpSocket;
-  static internal SceneLoadState _mapLoadState;
-
-  static internal uint _uid;
-  static internal uint _uidEntityCounter;
+  static internal SceneLoadState _localSceneLoading;
 
   static internal int _frame = 0;
-  static internal byte[] _userAssemblyHash = null;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
-  static internal IBoltNetwork _autogen = null;
 
   static internal BoltConfig _config = null;
   static internal UdpConfig _udpConfig = null;
 
+  static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
-  static internal BoltDoubleList<BoltEntityProxy> _proxies = new BoltDoubleList<BoltEntityProxy>();
-  static internal BoltDoubleList<BoltEntity> _entities = new BoltDoubleList<BoltEntity>();
-  static internal BoltEventDispatcher _globalEventDispatcher = new BoltEventDispatcher();
+  static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -65,16 +59,12 @@ internal static class BoltCore {
     get { return BoltRuntimeSettings.prefabs; }
   }
 
-  public static bool isUnityPro {
-    get { return _autogen.isUnityPro; }
+  public static int loadedScene {
+    get { return _localSceneLoading.Scene.Index; }
   }
 
-  public static string loadedMap {
-    get { return _mapLoadState.scene.name; }
-  }
-
-  public static byte[] userAssemblyHash {
-    get { return _userAssemblyHash; }
+  public static string loadedSceneName {
+    get { return BoltNetworkInternal.GetSceneName(_localSceneLoading.Scene.Index); }
   }
 
   public static GameObject globalObject {
@@ -82,7 +72,7 @@ internal static class BoltCore {
   }
 
   public static IEnumerable<BoltEntity> entities {
-    get { return _entities; }
+    get { return _entities.Select(x => x.UnityObject); }
   }
 
   public static IEnumerable<BoltConnection> connections {
@@ -125,16 +115,16 @@ internal static class BoltCore {
     get { return Time.fixedDeltaTime; }
   }
 
+  public static float frameAlpha {
+    get { return Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime); }
+  }
+
   public static bool isClient {
     get { return hasSocket && _mode == BoltNetworkModes.Client; }
   }
 
   public static bool isServer {
     get { return hasSocket && _mode == BoltNetworkModes.Server; }
-  }
-
-  public static byte[] GetUserAssemblyHash() {
-    return BoltRuntimeReflection.GetUserAssemblyHash();
   }
 
   internal static int localSendRate {
@@ -199,29 +189,26 @@ internal static class BoltCore {
     get { return _udpSocket != null; }
   }
 
-  public static void InitializeServer(UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
-    Initialize(BoltNetworkModes.Server, endpoint, autogen, config);
-  }
-
-  public static void InitializeClient(UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
-    Initialize(BoltNetworkModes.Client, endpoint, autogen, config);
-  }
-
   public static void Destroy(BoltEntity entity) {
     if (!entity.isOwner) {
       BoltLog.Warn("Only the owner can destroy an entity, ignoring call to Destroy().");
       return;
     }
 
-    DestroyForce(entity);
+    if (!entity.isAttached) {
+      BoltLog.Warn("Entity is not attached, ignoring call to Destroy().");
+      return;
+    }
+
+    DestroyForce(entity.Entity);
   }
 
-  internal static void DestroyForce(BoltEntity entity) {
-    // detach it
+  internal static void DestroyForce(Bolt.Entity entity) {
+    // detach
     entity.Detach();
 
-    // destroy it
-    _destroy(entity.gameObject);
+    // destroy
+    GameObject.Destroy(entity.UnityObject.gameObject);
   }
 
   public static void Destroy(GameObject go) {
@@ -235,82 +222,106 @@ internal static class BoltCore {
     }
   }
 
-  public static void Detach(BoltEntity entity) {
-    entity.Detach();
-  }
-
   public static BoltEntity Instantiate(GameObject prefab) {
     return Instantiate(prefab, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    prefab.GetComponent<BoltEntity>()._sceneObject = false;
-    GameObject go = _instantiate(prefab, position, rotation);
-    BoltEntity en = go.GetComponent<BoltEntity>();
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position) {
+    return Instantiate(prefab, position, Quaternion.identity);
+  }
 
-    if (isClient && (en._allowInstantiateOnClient == false)) {
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    if (isClient && (prefab.GetComponent<BoltEntity>()._allowInstantiateOnClient == false)) {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
-    return Attach(en, null, Bits.zero, GenerateUniqueId());
+    Entity eo;
+
+    eo = CreateEntity(prefab);
+    eo.UnityObject.transform.position = position;
+    eo.UnityObject.transform.rotation = rotation;
+    eo.Initialize();
+    eo.Attach();
+
+    return eo.UnityObject;
   }
 
   public static BoltEntity Attach(BoltEntity entity) {
-    entity.Attach(null, Bits.zero, GenerateUniqueId());
-    return entity;
+    Assert.Null(entity.Entity);
+
+    Entity eo;
+    eo = Entity.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
+    eo.Initialize();
+    eo.Attach();
+
+    return eo.UnityObject;
   }
 
-  public static BoltUniqueId GenerateUniqueId() {
-    BoltUniqueId id = new BoltUniqueId();
+  internal static Entity CreateEntity(GameObject prefab) {
+    // prefab entity component
+    BoltEntity ec;
+    ec = prefab.GetComponent<BoltEntity>();
 
-    if (_config.globalUniqueIds) {
-      id = new BoltUniqueId(_uid, ++_uidEntityCounter);
-    }
-
-    return id;
+    // create with default serializer
+    return CreateEntity(prefab, new TypeId(ec._defaultSerializerTypeId));
   }
 
-  internal static BoltEntity Attach(BoltEntity entity, BoltConnection source, Bits flags, BoltUniqueId uniqueId) {
-    entity.enabled = true;
-    entity.Attach(source, flags, uniqueId);
+  internal static Entity CreateEntity(GameObject prefab, TypeId serializerId) {
+    // prefab entity component
+    BoltEntity ec;
+    ec = prefab.GetComponent<BoltEntity>();
+    //ec._sceneObject = false;
 
-    return entity;
+    // instance of prefab
+    GameObject go;
+    go = (GameObject)GameObject.Instantiate(prefab);
+
+    // entity object
+    Entity eo;
+    eo = Entity.CreateFrom(ec, serializerId);
+    eo.UnityObject = go.GetComponent<BoltEntity>();
+
+    return eo;
   }
 
-  public static void DontDestroyOnMapLoad(BoltEntity entity) {
-    entity._flags |= BoltEntity.FLAG_PERSIST_ON_MAP_LOAD;
+  public static void Detach(BoltEntity entity) {
+    Assert.NotNull(entity.Entity);
+    entity.Entity.Detach();
   }
 
   public static GameObject FindPrefab(string name) {
     return BoltRuntimeSettings.FindPrefab(name);
   }
 
-  public static void LoadMap(string name) {
-    if (isServer == false) {
-      BoltLog.Error("only server can initiate a map load");
-      return;
-    }
+  public static Bolt.Entity FindEntity(InstanceId id) {
+    var it = _entities.GetIterator();
 
-    LoadMapInternal(new Scene(name, _mapLoadState.scene.token + 1));
-  }
-
-
-  internal static void LoadMapInternal(Scene map) {
-    foreach (BoltEntity entity in entities) {
-      if (entity.isOwner) {
-        if (entity._flags & BoltEntity.FLAG_PERSIST_ON_MAP_LOAD) { continue; }
-
-        // pop!
-        DestroyForce(entity);
+    while (it.Next()) {
+      if (it.val.InstanceId == id) {
+        return it.val;
       }
     }
 
-    if (_mapLoadState.scene != map) {
-      _mapLoadState = _mapLoadState.BeginLoad(map);
+    return null;
+  }
 
-      // start loading
-      BoltSceneLoader.Enqueue(_mapLoadState.scene);
+  public static void LoadScene(int index) {
+    if (isServer == false) {
+      BoltLog.Error("You are not the server, only the server can initiate a scene load");
+      return;
     }
+
+    // pass to internal call
+    LoadSceneInternal(_localSceneLoading.BeginLoad(index));
+  }
+
+
+  internal static void LoadSceneInternal(SceneLoadState loading) {
+    // update
+    _localSceneLoading = loading;
+
+    // begin loading
+    BoltSceneLoader.Enqueue(_localSceneLoading.Scene);
   }
 
   public static void Shutdown() {
@@ -320,43 +331,31 @@ internal static class BoltCore {
       try {
         // 
         _mode = BoltNetworkModes.None;
-        _uid = 0;
-        _mapLoadState = new SceneLoadState();
 
         // disconnect from everywhere
         foreach (BoltConnection connection in _connections) {
           connection.Disconnect();
         }
 
-        foreach (BoltEntity entity in entities.ToArray()) {
+        foreach (Bolt.Entity entity in _entities.ToArray()) {
           DestroyForce(entity);
         }
 
-        _proxies.Clear();
         _entities.Clear();
         _connections.Clear();
-
-        foreach (var callback in _globalEventDispatcher._targets.ToArray()) {
-          if (callback is BoltCallbacksBase && ((BoltCallbacksBase)callback).PersistBetweenStartupAndShutdown()) {
-            continue;
-          }
-
-          _globalEventDispatcher._targets.Remove(callback);
-        }
-
+        _globalEventDispatcher.Clear();
         _globalBehaviours.Clear();
 
         if (_globalBehaviourObject) {
           GameObject.Destroy(_globalBehaviourObject);
         }
 
-        _autogen.Reset();
-        _autogen = null;
+        BoltNetworkInternal.EnvironmentReset();
 
         _udpSocket.Close();
         _udpSocket = null;
 
-        BoltFactory.UnregisterAll();
+        Factory.UnregisterAll();
         BoltLog.RemoveAll();
 
       }
@@ -389,18 +388,6 @@ internal static class BoltCore {
     _udpSocket.Connect(endpoint, token);
   }
 
-  public static void Raise(IBoltEvent evnt) {
-    BoltEventBase.Invoke((BoltEventBase)evnt);
-  }
-
-  public static void Raise(IBoltEvent evnt, IEnumerable connections) {
-    BoltEventBase.Invoke((BoltEventBase)evnt, connections);
-  }
-
-  public static void Raise(IBoltEvent evnt, params BoltConnection[] connections) {
-    BoltEventBase.Invoke((BoltEventBase)evnt, connections);
-  }
-
   public static void SetSessionData(string serverName, string userData) {
     if (BoltCore.isServer == false) {
       BoltLog.Error("Only the server can call SetSessionData");
@@ -423,28 +410,26 @@ internal static class BoltCore {
     _udpSocket.DisableLanBroadcast();
   }
 
-  static void StepRemoteFrames() {
-    BoltConnection cn;
-    BoltIterator<BoltConnection> cnIter;
-
+  static void AdjustEstimatedRemoteFrames() {
     if (hasSocket) {
-      cn = null;
-      cnIter = _connections.GetIterator();
+      BoltIterator<BoltConnection> it = _connections.GetIterator();
 
-      while (cnIter.Next(out cn)) {
-        cn.AdjustRemoteFrame();
+      while (it.Next()) {
+        it.val.AdjustRemoteFrame();
       }
+    }
+  }
 
+  static void StepNonControlledRemoteEntities() {
+    if (hasSocket) {
       bool retry;
 
       do {
         retry = false;
+        BoltIterator<BoltConnection> it = _connections.GetIterator();
 
-        cn = null;
-        cnIter = _connections.GetIterator();
-
-        while (cnIter.Next(out cn)) {
-          if (cn.StepRemoteFrame()) {
+        while (it.Next()) {
+          if (it.val.StepRemoteFrame()) {
             retry = true;
           }
         }
@@ -510,12 +495,12 @@ internal static class BoltCore {
 
   public static void AcceptConnection(UdpEndPoint endpoint, object userToken) {
     if (!isServer) {
-      BoltLog.Error("AcceptConnection: can only be called on the server");
+      BoltLog.Error("AcceptConnection can only be called on the server");
       return;
     }
 
     if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
-      BoltLog.Warn("AcceptConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      BoltLog.Warn("AcceptConnection can only be called BoltConnectionAcceptMode is set to Manual");
       return;
     }
 
@@ -524,51 +509,24 @@ internal static class BoltCore {
 
   public static void RefuseConnection(UdpEndPoint endpoint) {
     if (!isServer) {
-      BoltLog.Error("RefuseConnection: can only be called on the server");
+      BoltLog.Error("RefuseConnection can only be called on the server");
       return;
     }
 
     if (_config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual) {
-      BoltLog.Warn("RefuseConnection: can only be called if BoltConnectionAcceptMode is set to Manual");
+      BoltLog.Warn("RefuseConnection can only be called BoltConnectionAcceptMode is set to Manual");
       return;
     }
 
     _udpSocket.Refuse(endpoint);
   }
 
-  public static bool HasEntity(BoltUniqueId id) {
-    var it = _entities.GetIterator();
-
-    while (it.Next()) {
-      if (it.val._uniqueId == id) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static BoltEntity FindEntity(BoltUniqueId id) {
-    if (_config.globalUniqueIds == false) {
-      throw new BoltException("can only call 'FindEntity(BoltUniqueId id)' if the 'Use Globally Unique Ids' options has been turned on");
-    }
-
-    var it = _entities.GetIterator();
-
-    while (it.Next()) {
-      if (it.val._uniqueId == id) {
-        return it.val;
-      }
-    }
-
-    return null;
-  }
-
   internal static void Send() {
     if (hasSocket) {
       BoltPhysics.SnapshotWorld();
 
-      if (_frame % framesPerSecond == 0) {
+      // switch perf counters
+      if ((_frame % framesPerSecond) == 0) {
         var it = _connections.GetIterator();
 
         while (it.Next()) {
@@ -577,38 +535,11 @@ internal static class BoltCore {
       }
 
       if ((_frame % localSendRate) == 0) {
-        // update the scope for all connections/entities
-        BoltCore.UpdateScope();
+        // send data on all connections
+        var it = _connections.GetIterator();
 
-        // copy all bitmasks from entities to proxies
-        BoltEntityProxy proxy = null;
-        var proxyIter = _proxies.GetIterator();
-
-        while (proxyIter.Next(out proxy)) {
-          if (proxy.entity) {
-            if (proxy.entity.IsControlledBy(proxy.connection)) {
-              proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.controllerMask);
-            }
-            else {
-              proxy.mask |= (proxy.entity._mask & proxy.entity.boltSerializer.proxyMask);
-            }
-          }
-        }
-
-        // clear all masks on entities
-        BoltEntity entity = null;
-        var entityIter = _entities.GetIterator();
-
-        while (entityIter.Next(out entity)) {
-          entity._mask = Bits.zero;
-        }
-
-        // send out updates to all connections
-        BoltConnection cn;
-        var cnIter = _connections.GetIterator();
-
-        while (cnIter.Next(out cn)) {
-          cn.Send();
+        while (it.Next()) {
+          it.val.Send();
         }
       }
     }
@@ -621,20 +552,40 @@ internal static class BoltCore {
       // first thing we do is to poll the network
       BoltCore.PollNetwork();
 
-      // step remote rpcs and entities which depends on remote esimate frame numbers
-      BoltCore.StepRemoteFrames();
+      // do things!
+      BoltCore.InvokeRemoteSceneCallbacks();
+
+      // adjust estimated frame numbers for connections
+      BoltCore.AdjustEstimatedRemoteFrames();
+
+      // step remote events and entities which depends on remote estimated frame numbers
+      BoltCore.StepNonControlledRemoteEntities();
 
       // step entities which we in some way are controlling locally
-      BoltEntity entity = null;
-      var entityIter = _entities.GetIterator();
+      var iter = _entities.GetIterator();
 
-      while (entityIter.Next(out entity)) {
-        if (entity.isOwner) {
-          entity.SimulateStep();
+      while (iter.Next()) {
+        if (iter.val.IsOwner || (iter.val.HasControl && iter.val.ControllerLocalPrediction)) {
+          iter.val.Simulate();
         }
-        else {
-          if (entity.hasControl) {
-            entity.SimulateStep();
+      }
+    }
+  }
+
+  static void InvokeRemoteSceneCallbacks() {
+    if (_localSceneLoading.State == Bolt.SceneLoadState.STATE_LOADING_DONE) {
+      var it = _connections.GetIterator();
+
+      while (it.Next()) {
+        var sameScene = it.val._remoteSceneLoading.Scene == _localSceneLoading.Scene;
+        var loadingDone = it.val._remoteSceneLoading.State == Bolt.SceneLoadState.STATE_LOADING_DONE;
+
+        if (sameScene && loadingDone) {
+          try {
+            BoltCallbacksBase.SceneLoadRemoteDoneInvoke(it.val);
+          }
+          finally {
+            it.val._remoteSceneLoading.State = Bolt.SceneLoadState.STATE_CALLBACK_INVOKED;
           }
         }
       }
@@ -642,13 +593,6 @@ internal static class BoltCore {
   }
 
   static void HandleConnected(UdpConnection udp) {
-    Assert.True(udp.uid > 1);
-
-    if (isClient) {
-      _uid = udp.uid;
-      BoltLog.Debug("connected as connection uid {0}", udp.uid);
-    }
-
     BoltConnection cn = new BoltConnection(udp);
 
     // put on connection list
@@ -660,14 +604,9 @@ internal static class BoltCore {
     // invoke callback depending on connection type
     if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientConnectedInvoke(cn); } else { BoltCallbacksBase.ConnectedToServerInvoke(cn); }
 
-    // load map on clients which connect
-    if (isServer) {
-      if (_mapLoadState.scene.name != null) {
-        cn.LoadMapOnClient(_mapLoadState.scene);
-      }
-      else {
-        BoltLog.Warn("{0} connected without server having a map loading or loaded", cn);
-      }
+    // spawn entities
+    foreach (Entity eo in _entities) {
+      cn._entityChannel.CreateOnRemote(eo);
     }
   }
 
@@ -697,46 +636,7 @@ internal static class BoltCore {
     }
   }
 
-  static void UpdateScope() {
-    BoltConnection cn;
-    var cnIter = _connections.GetIterator();
-
-    while (cnIter.Next(out cn)) {
-      // if this connection isn't allowed to proxy objects, skip it
-      if (cn._remoteMapLoadState.stage != SceneLoadStage.CallbackDone) {
-        continue;
-      }
-
-      BoltEntity en = null;
-      var enIter = _entities.GetIterator();
-
-      while (enIter.Next(out en)) {
-        // if proxying is disabled for this object, skip it
-        if (en._flags & BoltEntity.FLAG_DISABLE_PROXYING) { continue; }
-
-        // if this object originates from this connection, skip it
-        if (ReferenceEquals(en._source, en)) { continue; }
-
-        // a controlling connection is always considered in scope
-        bool scope = en.boltSerializer.InScope(cn) || ReferenceEquals(en._remoteController, cn);
-        bool exists = cn._entityChannel.ExistsOnRemote(en);
-
-        // if we DO exists on remote but ARE NOT in scope
-        // anymore, we should mark the proxy for deletion
-        if (exists && !scope) {
-          cn._entityChannel.DestroyOnRemote(en, BoltEntityDestroyMode.OutOfScope);
-        }
-
-        // if we DO NOT exist on remote but ARE in scope
-        // we should create a new proxy on this connection
-        if (!exists && scope) {
-          cn._entityChannel.CreateOnRemote(en);
-        }
-      }
-    }
-  }
-
-  static internal void UpdateActiveGlobalBehaviours(string map) {
+  static internal void UpdateActiveGlobalBehaviours(int index) {
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
       BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
@@ -754,20 +654,10 @@ internal static class BoltCore {
     CreateGlobalBehaviour(typeof(BoltSend));
     CreateGlobalBehaviour(typeof(BoltSceneLoader));
 
-    if (isServer) {
-      CreateGlobalBehaviour(typeof(BoltEventServerReceiver));
-      DeleteGlobalBehaviour(typeof(BoltEventClientReceiver));
-    }
-    else {
-      DeleteGlobalBehaviour(typeof(BoltEventServerReceiver));
-      CreateGlobalBehaviour(typeof(BoltEventClientReceiver));
-    }
-
     foreach (var pair in _globalBehaviours) {
-      if ((pair.item0.mode & _mode) == _mode) {
-        var anyMap = pair.item0.maps.Length == 0;
-        var matchesMap = Array.IndexOf(pair.item0.maps, map) != -1;
-
+      if ((pair.item0.Mode & _mode) == _mode) {
+        var anyMap = pair.item0.Scenes.Length == 0;
+        var matchesMap = Array.IndexOf<int>(pair.item0.Scenes, index) != -1;
         if (anyMap || matchesMap) {
           CreateGlobalBehaviour(pair.item1);
         }
@@ -787,7 +677,7 @@ internal static class BoltCore {
       var shouldCreate = !component;
 
       if (shouldCreate) {
-        BoltLog.Debug("creating '{0}'", t);
+        BoltLog.Debug("Creating Global Behaviour: '{0}'", t);
         return _globalBehaviourObject.AddComponent(t);
       }
     }
@@ -801,22 +691,18 @@ internal static class BoltCore {
       var shouldDelete = !!component;
 
       if (shouldDelete) {
-        BoltLog.Debug("deleting '{0}'", t);
+        BoltLog.Debug("Deleting Global Behaviour: '{0}'", t);
         Component.Destroy(component);
       }
     }
   }
 
-  static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, IBoltNetwork autogen, BoltConfig config) {
+  internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
     // close any existing socket
     Shutdown();
-
-    if (isServer) {
-      _uid = 1;
-    }
 
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
@@ -848,32 +734,25 @@ internal static class BoltCore {
     UdpLog.SetWriter(UdpLogWriter);
 
     // :)
-    BoltLog.Debug("bolt starting at {0} fps / {1} frametime", config.framesPerSecond, Time.fixedDeltaTime);
-
-    // locate global object types
-    _userAssemblyHash = BoltRuntimeReflection.GetUserAssemblyHash();
+    BoltLog.Debug("Starting at {0} fps ({1} fixed frame delta)", config.framesPerSecond, Time.fixedDeltaTime);
 
     // create the gflobal 'Bolt' unity object
     if (_globalBehaviourObject) {
       GameObject.Destroy(_globalBehaviourObject);
     }
 
-    _globalBehaviours = BoltRuntimeReflection.FindGlobalObjectTypes();
+    _globalBehaviours = BoltNetworkInternal.GetGlobalBehaviourTypes();
     _globalBehaviourObject = new GameObject("Bolt");
 
     GameObject.DontDestroyOnLoad(_globalBehaviourObject);
 
-    // unregister all handlers
-    Assert.True(BoltFactory.IsEmpty);
-
-    // register our handlers
-    BoltFactory.Register(new LoadMapFactory());
-    BoltFactory.Register(new LoadMapDoneFactory());
+    // verify all handlers are unregistered
+    Assert.True(Factory.IsEmpty);
 
     // setup autogen and mode
     _mode = mode;
-    _autogen = autogen;
-    _autogen.Setup();
+
+    BoltNetworkInternal.EnvironmentSetup();
 
     // setup udpkit configuration
     _udpConfig = new UdpConfig();
@@ -912,11 +791,13 @@ internal static class BoltCore {
     //}
 
     // create and start socket
-    _udpSocket = UdpSocket.Create(BoltRuntimeReflection.InvokeCreatePlatformMethod(), () => new BoltSerializer(), _udpConfig);
+    _localSceneLoading = SceneLoadState.DefaultLocal();
+
+    _udpSocket = UdpSocket.Create(BoltNetworkInternal.CreateUdpPlatform(), () => new BoltSerializer(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
-    UpdateActiveGlobalBehaviours(null);
+    UpdateActiveGlobalBehaviours(-1);
   }
 
   static UdpNoise CreatePerlinNoise() {
@@ -954,54 +835,31 @@ internal static class BoltCore {
     }
   }
 
-  internal static void LoadMapBeginInternal(Scene map) {
-    {
-      var it = _entities.GetIterator();
+  internal static void SceneLoadBegin(Scene scene) {
+    var it = _entities.GetIterator();
 
-      while (it.Next()) {
-        if (it.val.isOwner && (it.val._persistanceMode == BoltEntityPersistanceMode.DestroyOnLoad)) {
-          DestroyForce(it.val);
-        }
-      }
-    }
-
-    if (isServer) {
-      var it = _connections.GetIterator();
-
-      while (it.Next()) {
-        it.val.LoadMapOnClient(map);
+    while (it.Next()) {
+      if (it.val.IsOwner && (it.val.PersistsOnSceneLoad == false)) {
+        DestroyForce(it.val);
       }
     }
 
     // update behaviours
-    UpdateActiveGlobalBehaviours(map.name);
+    UpdateActiveGlobalBehaviours(scene.Index);
 
     // call out to user code
-    BoltCallbacksBase.SceneLoadLocalBeginInvoke(map.name);
+    BoltCallbacksBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 
-  internal static void LoadMapDoneInternal(Scene map) {
-    Assert.True(_mapLoadState.stage == SceneLoadStage.Load);
-    _mapLoadState = _mapLoadState.FinishLoad(_mapLoadState.scene, _mapLoadState.scene);
-    Assert.True(_mapLoadState.stage == SceneLoadStage.LoadDone);
-    _mapLoadState = _mapLoadState.BeginCallback(_mapLoadState);
-    Assert.True(_mapLoadState.stage == SceneLoadStage.Callback);
-    _mapLoadState = _mapLoadState.FinishCallback(_mapLoadState.scene);
-    Assert.True(_mapLoadState.stage == SceneLoadStage.CallbackDone);
+  internal static void SceneLoadDone(Scene scene) {
+    // verify state
+    Assert.True(_localSceneLoading.Scene == scene);
+    Assert.True(_localSceneLoading.State == SceneLoadState.STATE_LOADING);
 
-    BoltIterator<BoltConnection> it;
+    // switch local state
+    _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
 
-    it = _connections.GetIterator();
-    while (it.Next()) {
-      it.val.SendMapLoadDoneToRemote();
-    }
-
-    // call out to sure code
-    BoltCallbacksBase.SceneLoadLocalDoneInvoke(map.name);
-
-    it = _connections.GetIterator();
-    while (it.Next()) {
-      it.val.TriggerRemoteMapDoneCallbacks();
-    }
+    // call out to user code
+    BoltCallbacksBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 }
