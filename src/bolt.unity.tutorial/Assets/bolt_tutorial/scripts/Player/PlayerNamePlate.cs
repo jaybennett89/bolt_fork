@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class PlayerNamePlate : BoltEntityBehaviour<IPlayerState> {
+public class PlayerNamePlate : Bolt.EntityBehaviour<IPlayerState> {
   [SerializeField]
   Vector3 offset;
 
@@ -34,7 +34,7 @@ public class PlayerNamePlate : BoltEntityBehaviour<IPlayerState> {
   }
 
   public override void Attached() {
-    state.nameChanged += NameChanged;
-    state.teamChanged += TeamChanged;
+    state.AddCallback(".name", NameChanged);
+    state.AddCallback(".team", TeamChanged);
   }
 }

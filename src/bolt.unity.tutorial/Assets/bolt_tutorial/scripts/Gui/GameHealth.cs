@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameHealth : BoltCallbacks {
+public class GameHealth : BoltGlobalEventListener {
   BoltEntity me;
   IPlayerState meState;
 
@@ -9,18 +9,18 @@ public class GameHealth : BoltCallbacks {
   TypogenicText text;
 
   public override void ControlOfEntityGained(BoltEntity arg) {
-    if (arg.boltSerializer is PlayerSerializer) {
+    if (arg.GetComponent<PlayerController>()) {
       me = arg;
-      meState = me.GetBoltState<IPlayerState>();
-      meState.healthChanged = HealthChanged;
+      meState = me.GetState<IPlayerState>();
+      meState.AddCallback(".health", HealthChanged);
 
       HealthChanged();
     }
   }
 
   public override void ControlOfEntityLost(BoltEntity arg) {
-    if (arg.boltSerializer is PlayerSerializer) {
-      meState.healthChanged -= HealthChanged;
+    if (arg.GetComponent<PlayerController>()) {
+      meState.RemoveCallback(".health", HealthChanged);
 
       me = null;
       meState = null;

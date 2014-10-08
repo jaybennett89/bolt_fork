@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 public class PlayerMotor : MonoBehaviour {
 
+  public struct State {
+    public Vector3 position;
+    public Vector3 velocity;
+    public bool isGrounded;
+    public int jumpFrames;
+  }
+
+  State _state;
   CharacterController _cc;
-  PlayerCommand.State _state;
 
   [SerializeField]
   float skinWidth = 0.08f;
@@ -57,13 +64,16 @@ public class PlayerMotor : MonoBehaviour {
 
   void Awake() {
     _cc = GetComponent<CharacterController>();
-    _state = new PlayerCommand.State();
+    _state = new State();
     _state.position = transform.localPosition;
   }
 
-  public void SetState(PlayerCommand.State state) {
+  public void SetState(IPlayerCommandResult result) {
     // assign new state
-    _state = state;
+    _state.position = result.position;
+    _state.velocity = result.velocity;
+    _state.jumpFrames = result.jumpFrames;
+    _state.isGrounded = result.isGrounded;
 
     // assign local position
     transform.localPosition = _state.position;
@@ -94,7 +104,7 @@ public class PlayerMotor : MonoBehaviour {
     yield break;
   }
 
-  public PlayerCommand.State Move(PlayerCommand.Input input) {
+  public State Move(IPlayerCommandInput input) {
 
     var moving = false;
     var movingDir = Vector3.zero;

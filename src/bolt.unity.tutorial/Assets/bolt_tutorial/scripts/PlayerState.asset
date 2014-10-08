@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: -467024293, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: PlayerState
   m_EditorClassIdentifier: 
-  compile: 0
+  compile: 1
   tranform:
     name: transform
     enabled: 1

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerIK : BoltEntityBehaviour<IPlayerState> {
+public class PlayerIK : Bolt.EntityBehaviour<IPlayerState> {
   // weight blending
   float weight = 0f;
   float weightto = 0f;
@@ -27,7 +27,7 @@ public class PlayerIK : BoltEntityBehaviour<IPlayerState> {
     _animator.SetLookAtWeight(1f);
 
     if (_aiming) {
-      if (state.mecanim.Aiming == false) {
+      if (state.Aiming == false) {
         weightacc = 0f;
         weightfrom = weight;
         weightto = 0f;
@@ -35,26 +35,12 @@ public class PlayerIK : BoltEntityBehaviour<IPlayerState> {
       }
     }
     else {
-      if (state.mecanim.Aiming) {
+      if (state.Aiming) {
         weightacc = 0f;
         weightfrom = weight;
         weightto = 1f;
         _aiming = true;
       }
     }
-
-    // need to re-enable this
-
-    //weightacc += Time.deltaTime;
-    //weight = Mathf.Lerp(weightfrom, weightto, weightacc / 0.4f);
-
-    //Vector3 pos = transform.position + transform.forward + new Vector3(0, 1.5f + pitchOffsetArm, 0) + (transform.right * 0.3f);
-    //Quaternion rot = transform.parent.rotation * Quaternion.Euler(state.pitch, 0, -90);
-
-    //_animator.SetIKPosition(AvatarIKGoal.RightHand, pos);
-    //_animator.SetIKRotation(AvatarIKGoal.RightHand, rot);
-
-    //_animator.SetIKPositionWeight(AvatarIKGoal.RightHand, weight);
-    //_animator.SetIKRotationWeight(AvatarIKGoal.RightHand, weight);
   }
 }

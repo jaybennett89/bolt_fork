@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerSfx : BoltEntityBehaviour<IPlayerState> {
+public class PlayerSfx : Bolt.EntityBehaviour<IPlayerState> {
   int prevHealth;
   float playTime;
 
@@ -23,7 +23,7 @@ public class PlayerSfx : BoltEntityBehaviour<IPlayerState> {
   void Update() {
     playTime += Time.deltaTime;
 
-    if (state.mecanim.animator.GetFloat("Feets") > 2f) {
+    if (GetComponentInChildren<Animator>().GetFloat("Feets") > 2f) {
       if (playTime > 0.2f) {
         _sourceFootSteps.PlayOneShot(footSteps[Random.Range(0, footSteps.Length)]);
         playTime = 0f;
@@ -35,11 +35,11 @@ public class PlayerSfx : BoltEntityBehaviour<IPlayerState> {
     prevHealth = 100;
 
     // assign callback
-    state.healthChanged += HealthChanged;
+    state.AddCallback(".health",  HealthChanged);
   }
 
   public override void ControlLost() {
-    state.healthChanged -= HealthChanged;
+    state.RemoveCallback(".health",  HealthChanged);
   }
 
   void HealthChanged() {

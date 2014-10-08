@@ -14,7 +14,7 @@ public partial class Player : IDisposable {
   public BoltConnection connection;
 
   public IPlayerState state {
-    get { return entity.GetBoltState<IPlayerState>(); }
+    get { return entity.GetState<IPlayerState>(); }
   }
 
   public bool isServer {
@@ -27,26 +27,26 @@ public partial class Player : IDisposable {
 
   public void Kill() {
     if (entity) {
-      state.dead = true;
-      state.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
+      using (var mod = state.Modify()) {
+        mod.Dead = true;
+        mod.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
+      }
 
-      ILogEvent ev;
-
-      ev = BoltFactory.NewEvent<ILogEvent>();
-      ev.message = name + " died";
-
-      BoltNetwork.Raise(ev);
+      using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
+        ev.message = name + " died";
+      }
     }
   }
 
   internal void Spawn() {
     if (entity) {
-      // not dead anymore
-      state.dead = false;
-      state.health = 100;
+      using (var mod = state.Modify()) {
+        mod.Dead = false;
+        mod.health = 100;
+      }
 
       // teleport
-      entity.Teleport(RandomSpawn(), Quaternion.identity);
+      entity.transform.position = RandomSpawn();
     }
   }
   public void Dispose() {
@@ -62,12 +62,12 @@ public partial class Player : IDisposable {
       if (redPlayers.Count() < bluePlayers.Count()) {
         var player = bluePlayers.First();
         player.Kill();
-        player.state.team = TEAM_RED;
+        player.state.Modify().team = TEAM_RED;
       }
       else {
         var player = redPlayers.First();
         player.Kill();
-        player.state.team = TEAM_BLUE;
+        player.state.Modify().team = TEAM_BLUE;
       }
     }
   }
@@ -77,7 +77,7 @@ public partial class Player : IDisposable {
       entity.TakeControl();
     }
     else {
-      entity.GiveControl(connection);
+      entity.AssignControl(connection);
     }
   }
 
@@ -86,28 +86,28 @@ public partial class Player : IDisposable {
     float z = UE.Random.Range(-32f, +32f);
 
     entity = BoltNetwork.Instantiate(BoltPrefabs.Player, RandomSpawn(), Quaternion.identity);
-    entity.GetBoltState<IPlayerState>().name = name;
 
-    state.team =
-      redPlayers.Count() >= bluePlayers.Count()
-      ? TEAM_BLUE
-      : TEAM_RED;
+    using (var mod = state.Modify()) {
+      mod.name = name;
+      mod.team =
+        redPlayers.Count() >= bluePlayers.Count()
+        ? TEAM_BLUE
+        : TEAM_RED;
 
-    if (isServer) {
-      entity.TakeControl();
-    }
-    else {
-      entity.GiveControl(connection);
+      if (isServer) {
+        entity.TakeControl();
+      }
+      else {
+        entity.AssignControl(connection);
+      }
     }
 
     Spawn();
 
-    ILogEvent ev;
 
-    ev = BoltFactory.NewEvent<ILogEvent>();
-    ev.message = name + " joined the game";
-
-    BoltNetwork.Raise(ev);
+    using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
+      ev.message = name + " joined the game";
+    }
   }
 
 }

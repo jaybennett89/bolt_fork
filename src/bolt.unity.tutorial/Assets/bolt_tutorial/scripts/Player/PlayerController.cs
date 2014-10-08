@@ -1,10 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : BoltEntityBehaviour<IPlayerState> {
+public class PlayerController : Bolt.EntityBehaviour<IPlayerState> {
   const float MOUSE_SENSEITIVITY = 2f;
 
-  PlayerCommand.Input _input;
+  bool forward;
+  bool backward;
+  bool left;
+  bool right;
+  bool jump;
+  bool aiming;
+  bool fire;
+
+  int weapon;
+
+  float yaw;
+  float pitch;
+
   PlayerMotor _motor;
 
   [SerializeField]
@@ -26,32 +38,45 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
   }
 
   void PollKeys(bool mouse) {
-    _input.forward = Input.GetKey(KeyCode.W);
-    _input.backward = Input.GetKey(KeyCode.S);
-    _input.left = Input.GetKey(KeyCode.A);
-    _input.right = Input.GetKey(KeyCode.D);
-    _input.jump = Input.GetKey(KeyCode.Space);
-    _input.aiming = Input.GetMouseButton(1);
-    _input.fire = Input.GetMouseButton(0);
+    forward = Input.GetKey(KeyCode.W);
+    backward = Input.GetKey(KeyCode.S);
+    left = Input.GetKey(KeyCode.A);
+    right = Input.GetKey(KeyCode.D);
+    jump = Input.GetKey(KeyCode.Space);
+    aiming = Input.GetMouseButton(1);
+    fire = Input.GetMouseButton(0);
 
     if (Input.GetKeyDown(KeyCode.Alpha1)) {
-      _input.weapon = 0;
+      weapon = 0;
     }
     else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-      _input.weapon = 1;
+      weapon = 1;
     }
 
     if (mouse) {
-      _input.yaw += (Input.GetAxisRaw("Mouse X") * MOUSE_SENSEITIVITY);
-      _input.yaw %= 360f;
+      yaw += (Input.GetAxisRaw("Mouse X") * MOUSE_SENSEITIVITY);
+      yaw %= 360f;
 
-      _input.pitch += (-Input.GetAxisRaw("Mouse Y") * MOUSE_SENSEITIVITY);
-      _input.pitch = Mathf.Clamp(_input.pitch, -85f, +85f);
+      pitch += (-Input.GetAxisRaw("Mouse Y") * MOUSE_SENSEITIVITY);
+      pitch = Mathf.Clamp(pitch, -85f, +85f);
     }
   }
 
-  void DeadChanged() {
-    state.mecanim.Dead = state.dead;
+  public override void Attached() {
+    Animator animator = GetComponentInChildren<Animator>();
+
+    state.transform.SetTransforms(transform);
+    state.SetAnimator(animator);
+
+    // setting layerweights 
+    animator.SetLayerWeight(0, 1);
+    animator.SetLayerWeight(1, 1);
+
+    state.Fire += OnFire;
+    state.AddCallback(".weapon", WeaponChanged);
+
+    // setup weapon
+    WeaponChanged();
   }
 
   void WeaponChanged() {
@@ -74,95 +99,127 @@ public class PlayerController : BoltEntityBehaviour<IPlayerState> {
     activeWeapon.fireFrame = BoltNetwork.serverFrame;
   }
 
-  public override void Attached() {
-    // callbacks
-    state.deadChanged += DeadChanged;
-    state.weaponChanged += WeaponChanged;
-    state.mecanim.onFire += OnFire;
 
-    // setup weapon
-    WeaponChanged();
+
+  public void ApplyDamage(byte damage) {
+    if (!state.Dead) {
+
+      using (var mod = state.Modify()) {
+        mod.health -= damage;
+
+        if (mod.health > 100 && mod.health < 0) {
+          mod.health = 0;
+        }
+      }
+
+      if (state.health == 0) {
+        entity.controller.GetPlayer().Kill();
+      }
+    }
   }
 
   public override void SimulateOwner() {
-    if ((BoltNetwork.frame % 5) == 0 && (state.dead == false)) {
-      state.health = (byte)Mathf.Clamp(state.health + 1, 0, 100);
+    if ((BoltNetwork.frame % 5) == 0 && (state.Dead == false)) {
+      using (var mod = state.Modify()) {
+        mod.health = (byte)Mathf.Clamp(mod.health + 1, 0, 100);
+      }
     }
   }
 
   public override void SimulateController() {
     PollKeys(false);
 
-    PlayerCommand cmd;
+    IPlayerCommandInput input =  PlayerCommand.Create();
 
-    cmd = BoltFactory.NewCommand<PlayerCommand>();
-    cmd.input = this._input;
+    input.forward = forward;
+    input.backward = backward;
+    input.left = left;
+    input.right = right;
+    input.jump = jump;
 
-    entity.QueueCommand(cmd);
+    input.aiming = aiming;
+    input.fire = fire;
+
+    input.yaw = yaw;
+    input.pitch = pitch;
+
+    input.weapon = weapon;
+
+    entity.QueueInput(input);
   }
 
-  public override void ExecuteCommand(BoltCommand c, bool resetState) {
-    if (state.mecanim.Dead) {
+  public override void ExecuteCommand(Bolt.Command c, bool resetState) {
+    if (state.Dead) {
       return;
     }
 
     PlayerCommand cmd = (PlayerCommand)c;
 
     if (resetState) {
-      _motor.SetState(cmd.state);
+      _motor.SetState(cmd.Result);
     }
     else {
       // move and save the resulting state
-      cmd.state = _motor.Move(cmd.input);
+      var result = _motor.Move(cmd.Input);
 
-      if (cmd.isFirstExecution) {
+      cmd.Result.position = result.position;
+      cmd.Result.velocity = result.velocity;
+      cmd.Result.jumpFrames = result.jumpFrames;
+      cmd.Result.isGrounded = result.isGrounded;
+
+      if (cmd.IsFirstExecution) {
         // animation
         AnimatePlayer(cmd);
 
         // set state pitch
-        state.pitch = cmd.input.pitch;
-        state.weapon = cmd.input.weapon;
-        state.mecanim.Aiming = cmd.input.aiming;
+        using (var mod = state.Modify()) {
+          mod.pitch = cmd.Input.pitch;
+          mod.weapon = cmd.Input.weapon;
+          mod.Aiming = cmd.Input.aiming;
 
-        // deal with weapons
-        if (cmd.input.aiming && cmd.input.fire) {
-          FireWeapon(cmd);
+          // deal with weapons
+          if (cmd.Input.aiming && cmd.Input.fire) {
+            FireWeapon(cmd);
+          }
         }
       }
     }
   }
 
   void AnimatePlayer(PlayerCommand cmd) {
-    // FWD <> BWD movement
-    if (cmd.input.forward ^ cmd.input.backward) {
-      state.mecanim.MoveZ = cmd.input.forward ? 1 : -1;
-    }
-    else {
-      state.mecanim.MoveZ = 0;
-    }
+    using (var mod = state.Modify()) {
+      // FWD <> BWD movement
+      if (cmd.Input.forward ^ cmd.Input.backward) {
+        mod.MoveZ = cmd.Input.forward ? 1 : -1;
+      }
+      else {
+        mod.MoveZ = 0;
+      }
 
-    // LEFT <> RIGHT movement
-    if (cmd.input.left ^ cmd.input.right) {
-      state.mecanim.MoveX = cmd.input.right ? 1 : -1;
-    }
-    else {
-      state.mecanim.MoveX = 0;
-    }
+      // LEFT <> RIGHT movement
+      if (cmd.Input.left ^ cmd.Input.right) {
+        mod.MoveX = cmd.Input.right ? 1 : -1;
+      }
+      else {
+        mod.MoveX = 0;
+      }
 
-    // JUMP
-    if (_motor.jumpStartedThisFrame) {
-      state.mecanim.Jump();
+      // JUMP
+      if (_motor.jumpStartedThisFrame) {
+        mod.Jump();
+      }
     }
   }
 
   void FireWeapon(PlayerCommand cmd) {
     if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
-      // this gets replicated to all proxies
-      state.mecanim.Fire();
+      using (var mod = state.Modify()) {
+        mod.Fire();
 
-      // if we are the owner and the active weapon is a hitscan weapon, do logic
-      if (entity.isOwner) {
-        activeWeapon.OnOwner(cmd, entity);
+        // if we are the owner and the active weapon is a hitscan weapon, do logic
+        if (entity.isOwner) {
+          activeWeapon.OnOwner(cmd, entity);
+        }
       }
     }
   }

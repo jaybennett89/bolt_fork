@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameCrosshair : BoltCallbacks {
+public class GameCrosshair : BoltGlobalEventListener {
   BoltEntity me;
   IPlayerState meState;
 
@@ -21,7 +21,7 @@ public class GameCrosshair : BoltCallbacks {
 
   public override void ControlOfEntityGained(BoltEntity arg) {
     me = arg;
-    meState = arg.GetBoltState<IPlayerState>();
+    meState = arg.GetState<IPlayerState>();
   }
 
   public override void ControlOfEntityLost(BoltEntity arg) {
@@ -30,7 +30,7 @@ public class GameCrosshair : BoltCallbacks {
   }
 
   void Update() {
-    if (me && meState != null && meState.mecanim.Aiming) {
+    if (me && meState != null && meState.Aiming) {
       Left.gameObject.SetActive(true);
       Right.gameObject.SetActive(true);
       Top.gameObject.SetActive(true);
