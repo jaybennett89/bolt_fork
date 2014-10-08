@@ -42,10 +42,10 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state2\Auxiliary\Enums.cs">
+    <Compile Include="..\bolt\state\Auxiliary\Enums.cs">
       <Link>Auxiliary\Enums.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state2\BitArray.cs">
+    <Compile Include="..\bolt\state\BitArray.cs">
       <Link>BitArray.cs</Link>
     </Compile>
     <Compile Include="Assert.cs" />

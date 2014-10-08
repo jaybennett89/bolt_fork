@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using UE = UnityEngine;
 
 namespace Bolt {
@@ -46,11 +47,11 @@ namespace Bolt {
     }
 
     public static void PackBool(this byte[] data, int offset, bool value) {
-      data[offset] = (value ? (byte)1 : (byte)0);
+      data.PackI32(offset, value ? 1 : 0);
     }
 
     public static bool ReadBool(this byte[] data, int offset) {
-      return data[offset] == 1;
+      return data.ReadI32(offset) == 1;
     }
 
     public static void PackI32(this byte[] data, int offset, int value) {
@@ -292,6 +293,23 @@ namespace Bolt {
       data[offset + 13] = w.Byte1;
       data[offset + 14] = w.Byte2;
       data[offset + 15] = w.Byte3;
+    }
+
+    public static void PackString(this byte[] data, int offset, Encoding encoding, string value, int maxLength, int maxBytes) {
+      if (value.Length > maxLength) { value = value.Substring(0, maxLength); }
+
+      int bytes = encoding.GetByteCount(value);
+      if (bytes > maxBytes) {
+        throw new BoltException("Byte count did not match string length");
+      }
+
+      data.PackI32(offset, bytes);
+
+      encoding.GetBytes(value, 0, value.Length, data, offset + 4);
+    }
+
+    public static string ReadString(this byte[] data, int offset, Encoding encoding) {
+      return encoding.GetString(data, offset + 4, data.ReadI32(offset));
     }
 
     public static void SetTrigger(this byte[] bytes, int frameNew, int offset, bool set) {

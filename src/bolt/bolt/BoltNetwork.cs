@@ -4,6 +4,7 @@ using UdpKit;
 using UnityEngine;
 
 public static class BoltNetworkInternal {
+  public static int SceneIndexOffset;
   public static bool UsingUnityPro;
 
   public static Action EnvironmentSetup;

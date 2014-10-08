@@ -161,15 +161,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// Gives control of this entity to a connection
-  /// </summary>
-  /// <param name="connection">The connection to give control to</param>
-  [Obsolete("Use BoltEntity.AssignControl instead")]
-  public void GiveControl(BoltConnection connection) {
-    Entity.AssignControl(connection);
-  }
-
-  /// <summary>
   /// Assigns control of this entity to a connection
   /// </summary>
   /// <param name="connection">The connection to assign control to</param>

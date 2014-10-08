@@ -628,7 +628,7 @@ internal static class BoltCore {
     foreach (var pair in _globalBehaviours) {
       if ((pair.item0.Mode & _mode) == _mode) {
         var anyMap = pair.item0.Scenes.Length == 0;
-        var matchesMap = Array.IndexOf<int>(pair.item0.Scenes, index) != -1;
+        var matchesMap = Array.IndexOf<int>(pair.item0.Scenes, index + BoltNetworkInternal.SceneIndexOffset) != -1;
         if (anyMap || matchesMap) {
           CreateGlobalBehaviour(pair.item1);
         }

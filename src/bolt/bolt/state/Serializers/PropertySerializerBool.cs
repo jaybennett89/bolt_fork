@@ -21,33 +21,41 @@ namespace Bolt {
       return 1;
     }
 
-    public override void SetDynamic(State state, object value) {
-      state.Frames.first.Data.PackI32(CommandData.ByteOffset, ((bool)value) ? 1 : 0);
+    public override void DisplayDebugValue(State state) {
+      BoltGUI.Label(state.Frames.first.Data.ReadBool(StateData.ByteOffset));
     }
 
     protected override void PullMecanimValue(State state) {
-      state.Frames.first.Data.PackI32(StateData.ByteOffset, state.Animator.GetBool(StateData.PropertyName) ? 1 : 0);
+      state.Frames.first.Data.PackBool(StateData.ByteOffset, state.Animator.GetBool(StateData.PropertyName));
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadI32(StateData.ByteOffset) != 0);
+      state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadBool(StateData.ByteOffset));
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteBool(frame.Data.ReadI32(StateData.ByteOffset) != 0);
+      stream.WriteBool(frame.Data.ReadBool(StateData.ByteOffset));
+
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadI32(StateData.ByteOffset) != 0, 1);
+#endif
       return true;
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      frame.Data.PackI32(CommandData.ByteOffset, stream.ReadBool() ? 1 : 0);
+      frame.Data.PackBool(CommandData.ByteOffset, stream.ReadBool());
+
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadI32(StateData.ByteOffset) != 0, 1);
+#endif
     }
 
     public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteBool(data.ReadI32(CommandData.ByteOffset) != 0);
+      stream.WriteBool(data.ReadBool(CommandData.ByteOffset));
     }
 
     public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      data.PackI32(CommandData.ByteOffset, stream.ReadBool() ? 1 : 0);
+      data.PackBool(CommandData.ByteOffset, stream.ReadBool());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

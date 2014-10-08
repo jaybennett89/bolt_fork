@@ -24,6 +24,10 @@ namespace Bolt {
       return 32;
     }
 
+    public override void DisplayDebugValue(State state) {
+      BoltGUI.Label(Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset));
+    }
+
     public override void SetDynamic(State state, object value) {
       state.Frames.first.Data.PackF32(CommandData.ByteOffset, (float)value);
     }
@@ -34,15 +38,22 @@ namespace Bolt {
 
     protected override void PushMecanimValue(State state) {
       state.Animator.SetFloat(StateData.PropertyName, Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset), MecanimData.Damping, BoltCore.frameDeltaTime);
+
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       stream.WriteFloat(Blit.ReadF32(frame.Data, StateData.ByteOffset));
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, Blit.ReadI32(frame.Data, StateData.ByteOffset), 32);
+#endif
       return true;
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       Blit.PackF32(frame.Data, StateData.ByteOffset, stream.ReadFloat());
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, Blit.ReadI32(frame.Data, StateData.ByteOffset), 32);
+#endif
     }
 
     public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {

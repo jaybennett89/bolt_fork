@@ -6,26 +6,24 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterString : PropertyCodeEmitter<PropertyDecoratorString> {
+
+    string Get(object data, object offset) {
+      return string.Format("return Bolt.Blit.ReadString({0}, {1}, System.Text.Encoding.{2})", data, offset, Decorator.PropertyType.Encoding);
+    }
+
+    string Set(object data, object offset) {
+      return string.Format("Bolt.Blit.PackString({0}, {1}, System.Text.Encoding.{2}, value, {3}, {4})",
+        data,
+        offset,
+        Decorator.PropertyType.Encoding,
+        Decorator.PropertyType.MaxLength,
+        Decorator.PropertyType.EncodingClass.GetMaxByteCount(Decorator.PropertyType.MaxLength)
+      );
+    }
+
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
-      Action<CodeStatementCollection> getter = get => {
-        get.Expr("return Encoding.{0}.GetString(frame.Data, offsetBytes + 4 + {1}, Bolt.Blit.ReadI32(frame.Data, offsetBytes + {1}))", Decorator.PropertyType.Encoding, Decorator.ByteOffset);
-      };
-
-      Action<CodeStatementCollection> setter = set => {
-        // clamp length
-        set.Expr("if (value.Length > {0}) value = value.Substring(0, {0})", Decorator.PropertyType.MaxLength);
-
-        // pack byte length
-        set.Expr("Bolt.Blit.PackI32(frame.Data, offsetBytes + {0}, Encoding.{1}.GetByteCount(value))", Decorator.ByteOffset, Decorator.PropertyType.Encoding);
-
-        // pack string data
-        set.Expr("int bytes = Encoding.{1}.GetBytes(value, 0, value.Length, frame.Data, offsetBytes + 4 + {0})", Decorator.ByteOffset, Decorator.PropertyType.Encoding);
-
-        // verify size
-        set.Expr("Assert.True(bytes >= 0 && bytes <= {0})", Decorator.PropertyType.EncodingClass.GetMaxByteCount(Decorator.PropertyType.MaxLength));
-      };
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
+      var offset = "offsetBytes + " + Decorator.ByteOffset;
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("frame.Data", offset), emitSetter ? Set("frame.Data", offset) : null);
     }
 
     public override void EmitStructMembers(CodeTypeDeclaration type) {
@@ -34,6 +32,11 @@ namespace Bolt.Compiler {
 
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, true);
+    }
+
+    public override void EmitEventMembers(CodeTypeDeclaration type) {
+      var offset = Decorator.ByteOffset;
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", offset), Set("Data", offset));
     }
   }
 }

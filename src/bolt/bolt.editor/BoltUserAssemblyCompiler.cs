@@ -173,7 +173,7 @@ class BoltUserAssemblyCompiler {
       BoltCompilerOperation op = new BoltCompilerOperation();
 
       op.projectFilePath = projectFile;
-      op.project = File.ReadAllBytes("Assets/bolt/project.bytes").ToObject<Project>();
+      op.project = File.Exists("Assets/bolt/project.bytes") ? File.ReadAllBytes("Assets/bolt/project.bytes").ToObject<Project>() : new Project();
 
       // network config
       op.networkFilePath = networkFile;

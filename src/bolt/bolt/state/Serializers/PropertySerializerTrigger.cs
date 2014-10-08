@@ -31,12 +31,17 @@ namespace Bolt {
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+      // shift data so it aligns with our local frame
+      state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
+
       int triggerFrame = frame.Data.ReadI32(SendOffset);
       int triggerBits = frame.Data.ReadI32(SendOffset + 4);
 
-      Assert.True(triggerFrame == BoltCore.frame, "{0} == {1}", triggerFrame, BoltCore.frame);
-
       stream.WriteInt(triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
+
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
+#endif
       return true;
     }
 
@@ -45,6 +50,10 @@ namespace Bolt {
 
       frame.Data.PackI32(LocalOffset, frame.Number);
       frame.Data.PackI32(LocalOffset + 4, triggerBits);
+
+#if BOLT_PROPERTY_TRACE
+      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
+#endif
     }
 
     public override void OnSimulateAfter(State state) {
@@ -55,9 +64,6 @@ namespace Bolt {
           break;
         }
       }
-
-      // make sure we always shift our send data according to our local frame
-      // state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
     }
 
     bool InvokeForFrame(State state, State.Frame f) {

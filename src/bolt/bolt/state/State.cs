@@ -5,12 +5,18 @@ using UE = UnityEngine;
 
 namespace Bolt {
   public delegate void PropertyCallback(IState state, string path, int[] indices);
+  public delegate void PropertyCallbackSimple();
 
   public interface IState {
     IDisposable Predict(int frames);
     void SetDynamic(string property, object value);
     void SetAnimator(UE.Animator animator);
+
     void AddCallback(string path, PropertyCallback callback);
+    void AddCallback(string path, PropertyCallbackSimple callback);
+
+    void RemoveCallback(string path, PropertyCallback callback);
+    void RemoveCallback(string path, PropertyCallbackSimple callback);
   }
 
   public interface IStateModifier : IDisposable {
@@ -42,24 +48,22 @@ namespace Bolt {
       public State State;
       public object[] Objects;
       public readonly byte[] Data;
-      public readonly List<int> ReadProperties;
 
       public Frame(int number, int size) {
         Number = number;
         Data = new byte[size];
-        ReadProperties = new List<int>();
       }
 
       public Frame Duplicate(int frameNumber) {
-        Frame f;
+        Frame clone;
 
-        f = new Frame(frameNumber, Data.Length);
-        f.Objects = Objects;
-        f.State = State;
+        clone = new Frame(frameNumber, Data.Length);
+        clone.Objects = Objects;
+        clone.State = State;
 
-        Array.Copy(Data, 0, f.Data, 0, Data.Length);
+        Array.Copy(Data, 0, clone.Data, 0, Data.Length);
 
-        return f;
+        return clone;
       }
 
       object IBoltListNode.prev {
@@ -89,6 +93,7 @@ namespace Bolt {
     internal readonly Frame DiffFrame;
     internal readonly BoltDoubleList<Frame> Frames = new BoltDoubleList<Frame>();
     internal readonly Dictionary<string, List<PropertyCallback>> Callbacks = new Dictionary<string, List<PropertyCallback>>();
+    internal readonly Dictionary<string, List<PropertyCallbackSimple>> CallbacksSimple = new Dictionary<string, List<PropertyCallbackSimple>>();
 
     internal readonly BitArray FullMask;
     internal readonly BitArray DiffMask;
@@ -110,13 +115,13 @@ namespace Bolt {
       DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
       TempPriority = new Priority[MetaData.PropertyCount];
 
-      PropertyIdBits = BoltMath.BitsRequired(MetaData.PropertyCount - 1);
+      PropertyIdBits = 16; //BoltMath.BitsRequired(MetaData.PropertyCount - 1);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = BoltMath.BitsRequired(MetaData.PacketMaxProperties);
     }
 
     public void SetDynamic(string property, object value) {
-      for(int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         if (MetaData.PropertySerializers[i].StateData.PropertyName == property) {
           MetaData.PropertySerializers[i].SetDynamic(this, value);
         }
@@ -125,10 +130,27 @@ namespace Bolt {
 
     public void DebugInfo() {
       BoltGUI.LabelText("Frame Buffer", Frames.count.ToString());
+
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        UE.GUILayout.BeginHorizontal();
+        UE.GUILayout.Label(MetaData.PropertySerializers[i].StateData.PropertyPath);
+        MetaData.PropertySerializers[i].DisplayDebugValue(this);
+        UE.GUILayout.EndHorizontal();
+      }
     }
 
     public void SetAnimator(UE.Animator animator) {
       Animator = animator;
+    }
+
+    public void AddCallback(string path, PropertyCallbackSimple callback) {
+      List<PropertyCallbackSimple> callbacksList;
+
+      if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
+        CallbacksSimple[path] = callbacksList = new List<PropertyCallbackSimple>(32);
+      }
+
+      callbacksList.Add(callback);
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
@@ -139,6 +161,22 @@ namespace Bolt {
       }
 
       callbacksList.Add(callback);
+    }
+
+    public void RemoveCallback(string path, PropertyCallback callback) {
+      List<PropertyCallback> callbacksList;
+
+      if (Callbacks.TryGetValue(path, out callbacksList) == false) {
+        callbacksList.Remove(callback);
+      }
+    }
+
+    public void RemoveCallback(string path, PropertyCallbackSimple callback) {
+      List<PropertyCallbackSimple> callbacksList;
+
+      if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
+        callbacksList.Remove(callback);
+      }
     }
 
     public virtual float CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
@@ -182,7 +220,7 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
-      if (Entity.IsOwner) {
+      if (Entity.IsOwner || (Entity.HasControl && Entity.ControllerLocalPrediction)) {
         Frames.first.Number = BoltCore.frame;
       }
       else {
@@ -215,6 +253,7 @@ namespace Bolt {
       // raise local changed events
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         if (diff.IsSet(i)) {
+          //BoltLog.Info("property changed {0}", MetaData.PropertySerializers[i].StateData.PropertyName);
           InvokeCallbacks(MetaData.PropertySerializers[i]);
         }
       }
@@ -227,11 +266,22 @@ namespace Bolt {
       p.OnChanged(this, Frames.first);
 
       for (int i = 0; i < p.StateData.CallbackPaths.Length; ++i) {
-        List<PropertyCallback> callbacksList;
+        {
+          List<PropertyCallback> callbacksList;
 
-        if (Callbacks.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
-          for (int n = 0; n < callbacksList.Count; ++n) {
-            callbacksList[n](this, p.StateData.PropertyPath, p.StateData.CallbackIndices);
+          if (Callbacks.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
+            for (int n = 0; n < callbacksList.Count; ++n) {
+              callbacksList[n](this, p.StateData.PropertyPath, p.StateData.CallbackIndices);
+            }
+          }
+        }
+        {
+          List<PropertyCallbackSimple> callbacksList;
+
+          if (CallbacksSimple.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
+            for (int n = 0; n < callbacksList.Count; ++n) {
+              callbacksList[n]();
+            }
           }
         }
       }
@@ -371,9 +421,6 @@ namespace Bolt {
 
         // read data into frame
         serializer.StateRead(this, frame, connection, stream);
-
-        // put property index into updated list
-        frame.ReadProperties.Add(property);
       }
     }
 
@@ -422,6 +469,8 @@ namespace Bolt {
     public IDisposable Predict(int frames) {
       throw new NotImplementedException();
     }
+
+
 
   }
 }
