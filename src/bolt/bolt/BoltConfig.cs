@@ -1,6 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
+namespace Bolt {
+  public enum ScopeMode {
+    Automatic = 0,
+    Manual = 1
+  }
+}
+
 public enum BoltRandomFunction {
   PerlinNoise,
   SystemRandom
@@ -27,6 +34,8 @@ public sealed class BoltConfig {
   public byte[] applicationGuid;
   public bool useAssemblyChecksum = true;
   public int packetMaxEventSize = 512;
+  public Bolt.ScopeMode scopeMode = Bolt.ScopeMode.Automatic;
+  public bool scopeModeHideWarningInGui = false;
   public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
   public int clientSendRate;
