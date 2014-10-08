@@ -2,7 +2,7 @@
 using UnityEngine;
 using Process = System.Diagnostics.Process;
 
-public partial class BoltDebugStart : BoltCallbacksBase {
+public partial class BoltDebugStart : BoltGlobalEventListener {
   void Awake() {
     DontDestroyOnLoad(gameObject);
   }
