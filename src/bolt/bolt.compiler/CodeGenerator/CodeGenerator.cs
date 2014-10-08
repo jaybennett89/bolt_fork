@@ -215,7 +215,44 @@ namespace Bolt.Compiler {
         emitter.EmitTypes();
       }
 
+      EmitEventBaseClasses();
+
       //EmitFilters();
+    }
+
+    void EmitEventBaseClasses() {
+      var globalListener = DeclareClass("BoltGlobalEventListener");
+      var entityListener = DeclareClass("BoltEntityEventListener");
+
+      var entityListenerGeneric = DeclareClass("BoltEntityEventListener");
+      entityListenerGeneric.TypeParameters.Add(new CodeTypeParameter("TState"));
+
+      globalListener.BaseTypes.Add("BoltGlobalEventListenerBase");
+      entityListener.BaseTypes.Add("Bolt.EntityBehaviour");
+      entityListenerGeneric.BaseTypes.Add("Bolt.EntityBehaviour<TState>");
+
+      EmitEntityEventListenerRegistration(entityListener);
+      EmitEntityEventListenerRegistration(entityListenerGeneric);
+
+      foreach (EventDecorator d in Events) {
+        EmitEventMethodOverride(globalListener, d);
+        EmitEventMethodOverride(entityListener, d);
+        EmitEventMethodOverride(entityListenerGeneric, d);
+      }
+    }
+
+    void EmitEventMethodOverride(CodeTypeDeclaration type, EventDecorator d) {
+      type.BaseTypes.Add(d.ListenerName);
+
+      type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {
+        method.DeclareParameter(d.Name, "evnt");
+      }).Attributes = MemberAttributes.Public;
+    }
+
+    void EmitEntityEventListenerRegistration(CodeTypeDeclaration type) {
+      type.DeclareMethod(typeof(void).FullName, "Attached", body => {
+        body.Statements.Expr("entity.AddEventListener(this)");
+      }).Attributes = MemberAttributes.Override | MemberAttributes.Public;
     }
 
     void EmitFilters() {
@@ -306,7 +343,7 @@ namespace Bolt.Compiler {
     void CreateCompilationModel() {
       // Calculate size for events
       for (int i = 0; i < Events.Count; ++i) {
-        EventDecorator  decorator = Events[i];
+        EventDecorator decorator = Events[i];
 
         for (int n = 0; n < decorator.Properties.Count; ++n) {
           decorator.Properties[n].ByteOffset = decorator.ByteSize;
@@ -329,8 +366,8 @@ namespace Bolt.Compiler {
         }
       }
 
-        // order all structs by their dependancies
-        OrderStructsByDependancies();
+      // order all structs by their dependancies
+      OrderStructsByDependancies();
 
       // sort, index and assign bits for properties
       for (int i = 0; i < Structs.Count; ++i) {

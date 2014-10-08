@@ -48,7 +48,7 @@ public static class BoltAssetEditorGUI {
     }
 
     if (GUILayout.Button("Compile", compileButton)) {
-      BoltUserAssemblyCompiler.Run();
+      BoltUserAssemblyCompiler.Run(true);
     }
 
     GUI.color = Color.white;

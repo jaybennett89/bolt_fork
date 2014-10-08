@@ -5,19 +5,19 @@ using UnityEngine;
 public class BoltSettingsWindow : EditorWindow {
   float _lastRepaint;
 
-  void OnEnable () {
+  void OnEnable() {
     name = title = "Bolt Settings";
     _lastRepaint = 0f;
   }
 
-  void Update () {
+  void Update() {
     if (_lastRepaint + 0.1f < Time.realtimeSinceStartup) {
       _lastRepaint = Time.realtimeSinceStartup;
       Repaint();
     }
   }
 
-  void Replication () {
+  void Replication() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
@@ -34,13 +34,32 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.serverDejitterDelayMax = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
     });
 
+    BoltAssetEditorGUI.Label("Scoping Mode", () => {
+      Bolt.ScopeMode previous = settings._config.scopeMode;
+      settings._config.scopeMode = (Bolt.ScopeMode)EditorGUILayout.EnumPopup(settings._config.scopeMode);
+
+      if (previous != settings._config.scopeMode) {
+        settings._config.scopeModeHideWarningInGui = false;
+        Save();
+      }
+    });
+
+    if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings._config.scopeModeHideWarningInGui == false)) {
+      EditorGUILayout.HelpBox("When manual scoping is enabled you are required to call BoltEntity.SetScope for each connection that should receive a replicated copy of the entity.", MessageType.Warning);
+
+      if (GUILayout.Button("I understand, hide this warning", EditorStyles.miniButton)) {
+        settings._config.scopeModeHideWarningInGui = true;
+        Save();
+      }
+    }
+
     settings._config.clientSendRate = settings._config.serverSendRate;
     settings._config.clientDejitterDelay = settings._config.serverDejitterDelay;
     settings._config.clientDejitterDelayMin = settings._config.serverDejitterDelayMin;
     settings._config.clientDejitterDelayMax = settings._config.serverDejitterDelayMax;
   }
 
-  void Connection () {
+  void Connection() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("Limit", () => {
@@ -60,7 +79,7 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltAssetEditorGUI.Label("Accept Mode", () => {
-      settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode) EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
+      settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode)EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
     });
 
     EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
@@ -71,14 +90,13 @@ public class BoltSettingsWindow : EditorWindow {
 
     EditorGUI.EndDisabledGroup();
 
-    BoltAssetEditorGUI.Label("Packet Size", () =>
-    {
+    BoltAssetEditorGUI.Label("Packet Size", () => {
 
-        settings._config.packetSize = BoltAssetEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
+      settings._config.packetSize = BoltAssetEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
     });
   }
 
-  void Simulation () {
+  void Simulation() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
     EditorGUILayout.BeginVertical();
 
@@ -89,7 +107,7 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.BeginDisabledGroup(BoltCore.isDebugMode == false);
 
     BoltAssetEditorGUI.Label("Enabled", () => {
-        settings._config.useNetworkSimulation = EditorGUILayout.Toggle(settings._config.useNetworkSimulation);
+      settings._config.useNetworkSimulation = EditorGUILayout.Toggle(settings._config.useNetworkSimulation);
     });
 
     EditorGUI.EndDisabledGroup();
@@ -110,14 +128,14 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltAssetEditorGUI.Label("Noise Function", () => {
-      settings._config.simulatedRandomFunction = (BoltRandomFunction) EditorGUILayout.EnumPopup(settings._config.simulatedRandomFunction);
+      settings._config.simulatedRandomFunction = (BoltRandomFunction)EditorGUILayout.EnumPopup(settings._config.simulatedRandomFunction);
     });
 
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
   }
 
-  void Miscellaneous () {
+  void Miscellaneous() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("Compiler Warn Level", () => {
@@ -130,7 +148,7 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltAssetEditorGUI.Label("Log Targets", () => {
-      settings._config.logTargets = (BoltConfigLogTargets) EditorGUILayout.EnumMaskField(settings._config.logTargets);
+      settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
 
     if (settings._config.applicationGuid == null || settings._config.applicationGuid.Length != 16) {
@@ -143,7 +161,7 @@ public class BoltSettingsWindow : EditorWindow {
     });
   }
 
-  void Console () {
+  void Console() {
 
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
@@ -153,7 +171,7 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUILayout.BeginVertical();
 
     BoltAssetEditorGUI.Label("Toggle Key", () => {
-      settings.consoleToggleKey = (KeyCode) EditorGUILayout.EnumPopup(settings.consoleToggleKey);
+      settings.consoleToggleKey = (KeyCode)EditorGUILayout.EnumPopup(settings.consoleToggleKey);
     });
 
     BoltAssetEditorGUI.Label("Visible By Default", () => {
@@ -166,7 +184,7 @@ public class BoltSettingsWindow : EditorWindow {
 
   Vector2 scrollPos = Vector2.zero;
 
-  void OnGUI () {
+  void OnGUI() {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
@@ -180,7 +198,7 @@ public class BoltSettingsWindow : EditorWindow {
     Simulation();
 
     BoltAssetEditorGUI.Header("settings", "Miscellaneous");
-    Miscellaneous();  
+    Miscellaneous();
 
     BoltAssetEditorGUI.Header("console", "Console");
     Console();
@@ -201,7 +219,7 @@ public class BoltSettingsWindow : EditorWindow {
     }
   }
 
-  void Save () {
+  void Save() {
     EditorUtility.SetDirty(BoltRuntimeSettings.instance);
     AssetDatabase.SaveAssets();
   }

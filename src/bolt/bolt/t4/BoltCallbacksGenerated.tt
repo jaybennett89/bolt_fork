@@ -18,10 +18,6 @@ cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("ConnectFailed", "UdpEndPoint"));
 callbacks.Add(Tuple.Create<string, string>("ConnectRefused", "UdpEndPoint"));
-callbacks.Add(Tuple.Create<string, string>("ConnectedToServer", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("DisconnectedFromServer", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("ClientConnected", "BoltConnection"));
-callbacks.Add(Tuple.Create<string, string>("ClientDisconnected", "BoltConnection"));
 callbacks.Add(Tuple.Create<string, string>("EntityAttached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("EntityDetached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("ControlOfEntityGained", "BoltEntity"));
@@ -30,7 +26,7 @@ callbacks.Add(Tuple.Create<string, string>("ControlOfEntityLost", "BoltEntity"))
 using UdpKit;
 using UnityEngine;
 
-partial class BoltCallbacksBase {
+partial class BoltGlobalEventListenerBase {
   <# foreach (var cb in callbacks) { #> 
   public virtual void <#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { }
   <# } #> 
@@ -38,7 +34,7 @@ partial class BoltCallbacksBase {
   <# foreach (var cb in callbacks) { #> 
   internal static void <#= cb.Item1 #>Invoke(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { 
     BoltLog.Debug("Invoking callback <#= cb.Item1 #>");
-    foreach (BoltCallbacksBase cb in callbacks) {
+    foreach (BoltGlobalEventListenerBase cb in callbacks) {
       cb.<#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : ("arg") #>);
     }
   }
@@ -55,7 +51,7 @@ partial class BoltCallbacksBase {
 
   internal static void <#= cb.Key #>Invoke(<#= args #>) { 
     BoltLog.Debug("Invoking callback <#= cb.Key #>");
-    foreach (BoltCallbacksBase cb in callbacks) {
+    foreach (BoltGlobalEventListenerBase cb in callbacks) {
         cb.<#= cb.Key #>(<#= callArgs #>);
     }
   }

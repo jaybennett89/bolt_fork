@@ -1,10 +1,14 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 static partial class BoltCompiler {
-  public static void Run(BoltCompilerOperation op) {
-    CompileMaps(op);
-    CompilePrefabs(op);
+  public static void Run(BoltCompilerOperation op, bool all) {
+    if (all) {
+      CompileMaps(op);
+      CompilePrefabs(op);
+    }
+
     CompileNetwork(op);
     CompileAssemblyInfo(op);
 

@@ -37,6 +37,10 @@
       return ((Scene)obj) == this;
     }
 
+    public override string ToString() {
+      return string.Format("[Scene Index={0} Token={1}]", Index, Token);
+    }
+
     public static bool operator ==(Scene a, Scene b) {
       return a.Index == b.Index && a.Token == b.Token;
     }

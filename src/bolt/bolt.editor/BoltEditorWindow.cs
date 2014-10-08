@@ -322,14 +322,29 @@ public class BoltEditorWindow : BoltWindow {
 
       if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
         SettingsSection("Mecanim", () => {
-          BoltEditorGUI.WithLabel("Auto Apply", () => {
-            p.StateAssetSettings.Mecanim = EditorGUILayout.Toggle(p.StateAssetSettings.Mecanim);
-          });
-
           if (p.PropertyType is PropertyTypeFloat) {
-            BoltEditorGUI.WithLabel("Damping Time", () => {
-              p.StateAssetSettings.MecanimDamping = EditorGUILayout.FloatField(p.StateAssetSettings.MecanimDamping);
+            BoltEditorGUI.WithLabel("Mode", () => {
+              p.StateAssetSettings.MecanimMode = (MecanimMode)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimMode);
             });
+
+            switch (p.StateAssetSettings.MecanimMode) {
+              case MecanimMode.Property: BoltEditorGUI.WithLabel("Damping Time", () => { p.StateAssetSettings.MecanimDamping = EditorGUILayout.FloatField(p.StateAssetSettings.MecanimDamping); }); break;
+              case MecanimMode.LayerWeight: BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); }); break;
+            }
+          }
+          else {
+            BoltEditorGUI.WithLabel("Enabled", () => {
+              switch (EditorGUILayout.Toggle(p.StateAssetSettings.MecanimMode == MecanimMode.Property)) {
+                case true: p.StateAssetSettings.MecanimMode = MecanimMode.Property; break;
+                case false: p.StateAssetSettings.MecanimMode = MecanimMode.None; break;
+              }
+            });
+          }
+
+          if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
+            BoltEditorGUI.WithLabel("Owner", () => { p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection); });
+            BoltEditorGUI.WithLabel("Controller", () => { p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection); });
+            BoltEditorGUI.WithLabel("Others", () => { p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection); });
           }
         });
       }
@@ -345,7 +360,7 @@ public class BoltEditorWindow : BoltWindow {
       }
 
       if (p.PropertyType.HasSettings) {
-        SettingsSection("Compression", () => {
+        SettingsSection("Settings", () => {
           if (IsStateOrStruct(def)) {
             EditStateAssetSettings(p);
           }
@@ -374,15 +389,15 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStateAssetSettings(PropertyDefinition p) {
-    if (p.PropertyType.InterpolateAllowed) {
-      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-        p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
+    //if (p.PropertyType.InterpolateAllowed) {
+    //  BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+    //    p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
 
-        if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
-          p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
-        }
-      });
-    }
+    //    if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
+    //      p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
+    //    }
+    //  });
+    //}
   }
 
   bool IsStateOrStruct(AssetDefinition def) {

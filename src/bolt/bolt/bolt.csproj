@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_DLL;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
@@ -64,37 +64,40 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="command\Command.cs" />
-    <Compile Include="entity2\EntityBehaviour.cs" />
-    <Compile Include="entity2\Entity.Control.cs" />
-    <Compile Include="entity2\Entity.cs" />
-    <Compile Include="entity2\EntityInterfaces.cs" />
-    <Compile Include="event2\Event.cs" />
-    <Compile Include="event2\EventChannel.cs" />
-    <Compile Include="event2\EventDispatcher.cs" />
-    <Compile Include="event2\EventEnums.cs" />
-    <Compile Include="event2\EventInterfaces.cs" />
-    <Compile Include="event2\ReliableBuffers\EventReliableRecvBuffer.cs" />
-    <Compile Include="event2\ReliableBuffers\EventReliableSendBuffer.cs" />
+    <Compile Include="entity\EntityBehaviour.cs" />
+    <Compile Include="entity\Entity.Control.cs" />
+    <Compile Include="entity\Entity.cs" />
+    <Compile Include="entity\EntityInterfaces.cs" />
+    <Compile Include="event\Event.cs" />
+    <Compile Include="event\EventChannel.cs" />
+    <Compile Include="event\EventDispatcher.cs" />
+    <Compile Include="event\EventEnums.cs" />
+    <Compile Include="event\EventInterfaces.cs" />
+    <Compile Include="event\ReliableBuffers\EventReliableRecvBuffer.cs" />
+    <Compile Include="event\ReliableBuffers\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
-    <Compile Include="state2\Arrays\FloatArray.cs" />
-    <Compile Include="state2\Arrays\TransformArray.cs" />
-    <Compile Include="state2\Axis.cs" />
-    <Compile Include="state2\BitArray.cs" />
-    <Compile Include="state2\DoubleBuffer.cs" />
-    <Compile Include="state2\Filter.cs" />
-    <Compile Include="state2\FloatCompression.cs" />
-    <Compile Include="state2\Priority.cs" />
-    <Compile Include="state2\Serializers\PropertySerializer.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerBool.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerEntity.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerFloat.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerInteger.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerString.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerTransform.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerTrigger.cs" />
-    <Compile Include="state2\Serializers\PropertySerializerVector.cs" />
-    <Compile Include="state2\Trigger.cs" />
+    <Compile Include="state\Arrays\FloatArray.cs" />
+    <Compile Include="state\Arrays\TransformArray.cs" />
+    <Compile Include="state\Auxiliary\Enums.cs" />
+    <Compile Include="state\Axis.cs" />
+    <Compile Include="state\BitArray.cs" />
+    <Compile Include="state\DoubleBuffer.cs" />
+    <Compile Include="state\Filter.cs" />
+    <Compile Include="state\FloatCompression.cs" />
+    <Compile Include="state\Priority.cs" />
+    <Compile Include="state\Serializers\PropertyMecanimData.cs" />
+    <Compile Include="state\Serializers\PropertySerializer.cs" />
+    <Compile Include="state\Serializers\PropertySerializerBool.cs" />
+    <Compile Include="state\Serializers\PropertySerializerEntity.cs" />
+    <Compile Include="state\Serializers\PropertySerializerFloat.cs" />
+    <Compile Include="state\Serializers\PropertySerializerInteger.cs" />
+    <Compile Include="state\Serializers\PropertySerializerString.cs" />
+    <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
+    <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
+    <Compile Include="state\Serializers\PropertySerializerVector.cs" />
+    <Compile Include="state\Trigger.cs" />
     <Compile Include="t4\BoltCallbacksGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -127,8 +130,8 @@
     <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
     <Compile Include="SceneLoadState.cs" />
-    <Compile Include="state2\Blit.cs" />
-    <Compile Include="state2\State.cs" />
+    <Compile Include="state\Blit.cs" />
+    <Compile Include="state\State.cs" />
     <Compile Include="t4\BoltIds.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -141,7 +144,7 @@
     <Compile Include="BoltException.cs" />
     <Compile Include="BoltExecutionOrder.cs" />
     <Compile Include="BoltRuntimeSettings.cs" />
-    <Compile Include="BoltNetworkCore.cs" />
+    <Compile Include="BoltCore.cs" />
     <Compile Include="BoltObject.cs" />
     <Compile Include="BoltPacket.cs" />
     <Compile Include="BoltPacketPool.cs" />
@@ -150,15 +153,15 @@
     <Compile Include="BoltSerializer.cs" />
     <Compile Include="collections\BoltListNode.cs" />
     <Compile Include="command\CommandChannel.cs" />
-    <Compile Include="entity2\BoltEntity.cs" />
-    <Compile Include="entity2\EntityChannel.cs" />
-    <Compile Include="entity2\EntityProxy.cs" />
-    <Compile Include="event2\Legacy\BoltEventEnums.cs" />
+    <Compile Include="BoltEntity.cs" />
+    <Compile Include="entity\EntityChannel.cs" />
+    <Compile Include="entity\EntityProxy.cs" />
+    <Compile Include="event\Legacy\BoltEventEnums.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />
     <Compile Include="BoltExtensions.cs" />
-    <Compile Include="state2\NetIdPool.cs" />
+    <Compile Include="state\NetIdPool.cs" />
     <Compile Include="collections\BoltSingleList.cs" />
     <Compile Include="BoltMath.cs" />
     <Compile Include="collections\BoltRingBuffer.cs" />
@@ -167,7 +170,7 @@
     <Compile Include="utils\UdpStreamExt.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="event2\EventDispatcher.Queue.cs" />
+    <Compile Include="event\EventDispatcher.Queue.cs" />
     <None Include="t4\BoltCallbacksGenerated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BoltCallbacksGenerated.cs</LastGenOutput>
@@ -190,6 +193,7 @@
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

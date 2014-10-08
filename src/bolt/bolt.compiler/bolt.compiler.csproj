@@ -42,7 +42,10 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state2\BitArray.cs">
+    <Compile Include="..\bolt\state\Auxiliary\Enums.cs">
+      <Link>Auxiliary\Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\bolt\state\BitArray.cs">
       <Link>BitArray.cs</Link>
     </Compile>
     <Compile Include="Assert.cs" />
@@ -84,7 +87,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="NamedAsset.cs" />
     <Compile Include="Project.cs" />
-    <Compile Include="Compression\FloatCompression.cs" />
+    <Compile Include="FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
     <Compile Include="FilterDefinition.cs" />
     <Compile Include="Property\Definition\PropertyCommandSettings.cs" />

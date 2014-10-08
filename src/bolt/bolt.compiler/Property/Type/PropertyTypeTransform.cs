@@ -39,7 +39,7 @@ namespace Bolt.Compiler {
     }
 
     public override bool HasSettings {
-      get { return false; }
+      get { return true; }
     }
 
     public override PropertyDecorator CreateDecorator() {

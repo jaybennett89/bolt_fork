@@ -31,25 +31,52 @@ public class BoltEntityEditor : Editor {
   public override void OnInspectorGUI() {
     BoltEntity entity = (BoltEntity)target;
     PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
+
+    bool canBeEdited = 
+      (Application.isPlaying == false) &&
+      (
+        prefabType == PrefabType.Prefab || 
+        prefabType == PrefabType.DisconnectedPrefabInstance || 
+        prefabType == PrefabType.None
+      );
+
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     GUILayout.Label("Settings", EditorStyles.boldLabel);
-    EditorGUI.BeginDisabledGroup((prefabType != PrefabType.Prefab) || Application.isPlaying);
+    EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
+
+    EditorGUI.BeginDisabledGroup(!canBeEdited);
 
     // Prefab Id
-    EditorGUI.BeginDisabledGroup(true);
-    EditorGUILayout.LabelField("Prefab Id", entity._prefabId.ToString());
-    EditorGUI.EndDisabledGroup();
+    switch (prefabType) {
+      case PrefabType.Prefab:
+      case PrefabType.PrefabInstance:
+        EditorGUI.BeginDisabledGroup(true);
+        EditorGUILayout.LabelField("Prefab Id", entity._prefabId.ToString());
+        EditorGUI.EndDisabledGroup();
 
-    if (entity._prefabId < 0) {
-      EditorGUILayout.HelpBox("Prefab Id not set, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
+        if (entity._prefabId < 0) {
+          EditorGUILayout.HelpBox("Prefab Id not set, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
+        }
+
+        if (prefabType == PrefabType.Prefab) {
+          if (BoltRuntimeSettings.ContainsPrefab(entity) == false) {
+            EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
+          }
+        }
+
+        break;
+
+      case PrefabType.None:
+      case PrefabType.DisconnectedPrefabInstance:
+        entity._prefabId = EditorGUILayout.IntField("Prefab Id", entity._prefabId);
+
+        if (entity._prefabId < 0) {
+          EditorGUILayout.HelpBox("Prefab Id not set", MessageType.Error);
+        }
+        break;
     }
 
-    if (prefabType == PrefabType.Prefab) {
-      if (BoltRuntimeSettings.ContainsPrefab(entity) == false) {
-        EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
-      }
-    }
 
     // Serializer
     int selectedIndex;
@@ -79,7 +106,7 @@ public class BoltEntityEditor : Editor {
       }
     }
     else {
-      if (prefabType == PrefabType.Prefab) {
+      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.None) {
         if (GUI.changed) {
           EditorUtility.SetDirty(entity);
         }

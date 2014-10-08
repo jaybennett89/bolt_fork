@@ -91,8 +91,9 @@ public struct ProxyFlags {
     public static readonly ProxyFlags CREATE_DONE = new ProxyFlags(2);
     public static readonly ProxyFlags DESTROY_REQUESTED = new ProxyFlags(4);
     public static readonly ProxyFlags DESTROY_PENDING = new ProxyFlags(8);
-    public static readonly ProxyFlags IDLE = new ProxyFlags(16);
-    public static readonly ProxyFlags FORCE_SYNC = new ProxyFlags(32);
+    public static readonly ProxyFlags DESTROY_IGNORE = new ProxyFlags(16);
+    public static readonly ProxyFlags IDLE = new ProxyFlags(32);
+    public static readonly ProxyFlags FORCE_SYNC = new ProxyFlags(64);
     
     readonly int bits;
 
@@ -135,9 +136,12 @@ public struct ProxyFlags {
 			sb.Append(" DESTROY_PENDING");
 		}
 			if((bits & 16) == 16) {
-			sb.Append(" IDLE");
+			sb.Append(" DESTROY_IGNORE");
 		}
 			if((bits & 32) == 32) {
+			sb.Append(" IDLE");
+		}
+			if((bits & 64) == 64) {
 			sb.Append(" FORCE_SYNC");
 		}
 	

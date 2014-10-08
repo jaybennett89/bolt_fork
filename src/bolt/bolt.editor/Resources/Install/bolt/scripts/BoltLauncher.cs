@@ -48,6 +48,10 @@ public static class BoltLauncher {
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
     if (_isFirstInitialize) {
       _hasDebugScene = Application.loadedLevelName == "BoltDebugScene";
+
+      if (_hasDebugScene) {
+        BoltNetworkInternal.SceneIndexOffset = -1;
+      }
     }
 
 #if UNITY_PRO_LICENSE

@@ -24,8 +24,6 @@ namespace UdpKit {
   public sealed class UdpPlatformManaged : UdpPlatform {
     Socket socket;
     EndPoint recvEndPoint;
-    IPAddress convertAddress;
-    IPEndPoint convertEndPoint;
     SocketError socketError;
 
     Socket broadcastSocket;
@@ -38,8 +36,6 @@ namespace UdpKit {
       SetConnReset(socket);
 
       recvEndPoint = new IPEndPoint(IPAddress.Any, 0);
-      convertEndPoint = new IPEndPoint(IPAddress.Any, 0);
-      convertAddress = new IPAddress(0L);
     }
 
     public override bool SupportsBroadcast {

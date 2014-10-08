@@ -16,12 +16,30 @@ namespace Bolt.Compiler {
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       // trigger method
       type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => {
-        method.Statements.Expr("Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset);
+        method.Statements.Expr("Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset + 8);
       });
     }
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
+    }
+
+    public override string EmitSetPropertyDataArgument() {
+      if (Decorator.DefiningAsset is StateDecorator || Decorator.DefiningAsset is StructDecorator) {
+        var s = Decorator.Definition.StateAssetSettings;
+        return string.Format(
+          "new Bolt.PropertyMecanimData {{ Mode = Bolt.MecanimMode.{0}, OwnerDirection = Bolt.MecanimDirection.{1}, ControllerDirection = Bolt.MecanimDirection.{2}, OthersDirection = Bolt.MecanimDirection.{3}, Layer = {4}, Damping = {5}f }}",
+          s.MecanimMode,
+          s.MecanimOwnerDirection,
+          s.MecanimControllerDirection,
+          s.MecanimOthersDirection,
+          s.MecanimLayer,
+          s.MecanimDamping
+        );
+      }
+      else {
+        return null;
+      }
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
