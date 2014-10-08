@@ -581,8 +581,10 @@ internal static class BoltCore {
     BoltGlobalEventListenerBase.ConnectedInvoke(cn);
 
     // spawn entities
-    foreach (Entity eo in _entities) {
-      cn._entityChannel.CreateOnRemote(eo);
+    if (_config.scopeMode == ScopeMode.Automatic) {
+      foreach (Entity eo in _entities) {
+        cn._entityChannel.CreateOnRemote(eo);
+      }
     }
   }
 
