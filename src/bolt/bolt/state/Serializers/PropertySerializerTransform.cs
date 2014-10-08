@@ -216,7 +216,7 @@ namespace Bolt {
     }
 
     void PositionSet(UE.Transform t, UE.Vector3 pos) {
-      BoltLog.Info("SETPOS: {0}", pos);
+      //BoltLog.Info("SETPOS: {0}", pos);
       if (PropertyData.Space == TransformSpaces.World) { t.position = pos; } else { t.localPosition = pos; }
     }
 

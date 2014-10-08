@@ -35,19 +35,11 @@ namespace Bolt {
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       stream.WriteBool(frame.Data.ReadBool(StateData.ByteOffset));
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadI32(StateData.ByteOffset) != 0, 1);
-#endif
       return true;
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      frame.Data.PackBool(CommandData.ByteOffset, stream.ReadBool());
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadI32(StateData.ByteOffset) != 0, 1);
-#endif
+      frame.Data.PackBool(StateData.ByteOffset, stream.ReadBool());
     }
 
     public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
