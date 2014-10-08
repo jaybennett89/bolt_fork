@@ -3,9 +3,9 @@
 /// <summary>
 /// Base class for all BoltCallbacks objects
 /// </summary>
-public abstract partial class BoltCallbacksBase : MonoBehaviour, IBoltListNode
+public abstract partial class BoltGlobalEventListenerBase : MonoBehaviour, IBoltListNode
 {
-    static readonly BoltDoubleList<BoltCallbacksBase> callbacks = new BoltDoubleList<BoltCallbacksBase>();
+    static readonly BoltDoubleList<BoltGlobalEventListenerBase> callbacks = new BoltDoubleList<BoltGlobalEventListenerBase>();
 
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }

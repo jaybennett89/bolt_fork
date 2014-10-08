@@ -76,6 +76,7 @@
     <Compile Include="event2\ReliableBuffers\EventReliableRecvBuffer.cs" />
     <Compile Include="event2\ReliableBuffers\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state2\Arrays\FloatArray.cs" />
     <Compile Include="state2\Arrays\TransformArray.cs" />
@@ -143,7 +144,7 @@
     <Compile Include="BoltException.cs" />
     <Compile Include="BoltExecutionOrder.cs" />
     <Compile Include="BoltRuntimeSettings.cs" />
-    <Compile Include="BoltNetworkCore.cs" />
+    <Compile Include="BoltCore.cs" />
     <Compile Include="BoltObject.cs" />
     <Compile Include="BoltPacket.cs" />
     <Compile Include="BoltPacketPool.cs" />
@@ -152,7 +153,7 @@
     <Compile Include="BoltSerializer.cs" />
     <Compile Include="collections\BoltListNode.cs" />
     <Compile Include="command\CommandChannel.cs" />
-    <Compile Include="entity2\BoltEntity.cs" />
+    <Compile Include="BoltEntity.cs" />
     <Compile Include="entity2\EntityChannel.cs" />
     <Compile Include="entity2\EntityProxy.cs" />
     <Compile Include="event2\Legacy\BoltEventEnums.cs" />

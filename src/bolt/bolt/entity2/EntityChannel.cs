@@ -67,6 +67,41 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
+  public void SetScope(Entity entity, bool inScope) {
+    if (BoltCore._config.scopeMode == Bolt.ScopeMode.Automatic) {
+      BoltLog.Warn("SetScope has no effect when Scope Mode is set to Automatic");
+      return;
+    }
+
+    if (inScope) {
+      if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) {
+        return;
+      }
+
+      EntityProxy proxy;
+
+      if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
+        if (proxy.Flags & Bolt.ProxyFlags.DESTROY_REQUESTED) {
+          if (proxy.Flags & Bolt.ProxyFlags.DESTROY_PENDING) {
+            proxy.Flags |= Bolt.ProxyFlags.DESTROY_IGNORE;
+          }
+          else {
+            proxy.Flags &= ~Bolt.ProxyFlags.DESTROY_IGNORE;
+            proxy.Flags &= ~Bolt.ProxyFlags.DESTROY_REQUESTED;
+          }
+        }
+      }
+      else {
+        CreateOnRemote(entity);
+      }
+    }
+    else {
+      if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) {
+        DestroyOnRemote(entity, BoltEntityDestroyMode.OutOfScope);
+      }
+    }
+  }
+
   public NetId GetNetworkId(Entity entity) {
     EntityProxy proxy;
 
@@ -255,15 +290,7 @@ partial class EntityChannel : BoltChannel {
       // if we failed to destroy this clear destroying flag
       if (env.Flags & ProxyFlags.DESTROY_PENDING) {
         Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_PENDING);
-        Assert.True(env.Proxy.Envelopes.count == 0);
         env.Proxy.Flags &= ~ProxyFlags.DESTROY_PENDING;
-      }
-
-      // if we failed to create this clear creating flag
-      else if (env.Flags & ProxyFlags.CREATE_REQUESTED) {
-        Assert.True(env.Proxy.Flags & ProxyFlags.CREATE_REQUESTED);
-        Assert.True(env.Proxy.Envelopes.count == 0);
-        env.Proxy.Flags &= ~ProxyFlags.CREATE_REQUESTED;
       }
 
       env.Dispose();
@@ -280,7 +307,6 @@ partial class EntityChannel : BoltChannel {
 
       if (env.Flags & ProxyFlags.DESTROY_PENDING) {
         Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_PENDING);
-        Assert.True(env.Proxy.Envelopes.count == 0);
 
         // delete proxy
         DestroyOutgoingProxy(env.Proxy);
@@ -410,8 +436,18 @@ partial class EntityChannel : BoltChannel {
 
     // we're destroying this proxy
     if (destroyRequested) {
-      Assert.NotNull(_incommingProxiesByNetId[netId]);
-      DestroyIncommingProxy(_incommingProxiesByNetId[netId]);
+      EntityProxy proxy;
+
+      if (_incommingProxiesByNetId.TryGetValue(netId, out proxy)) {
+        if (proxy.Entity.HasControl) {
+          proxy.Entity.ReleaseControlInternal();
+        }
+
+        DestroyIncommingProxy(proxy);
+      }
+      else {
+        BoltLog.Warn("Received destroy of {0} but no such proxy was found", netId);
+      }
     }
     else {
       bool isController = packet.stream.ReadBool();
@@ -438,23 +474,21 @@ partial class EntityChannel : BoltChannel {
       EntityProxy proxy = null;
 
       if (createRequested && (_incommingProxiesByNetId.ContainsKey(netId) == false)) {
-        GameObject prefab = null;
+        // prefab checks (if applicable)
+        {
+          GameObject go = BoltCore.PrefabPool.LoadPrefab(prefabId);
 
-        if (BoltRuntimeSettings.prefabs.TryGetIndex(prefabId.Value, out prefab)) {
-          if (BoltCore.isServer && !prefab.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
-            throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", prefab.name, connection.remoteEndPoint);
+          if (go) {
+            if (BoltCore.isServer && !go.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
+              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.remoteEndPoint);
+            }
           }
-        }
-        else {
-          throw new BoltException("Received entity with unknown {0}", prefabId);
         }
 
         // create entity
-        entity = BoltCore.CreateEntity(prefab, serializerId);
+        entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);
         entity.Source = connection;
         entity.UniqueId = uniqueId;
-        entity.UnityObject.transform.position = spawnPosition;
-        entity.UnityObject.transform.rotation = spawnRotation;
 
         // handle case where we are given control (it needs to be true during the initialize, read and attached callbacks)
         if (isController) {
@@ -519,6 +553,10 @@ partial class EntityChannel : BoltChannel {
     _outgoingProxiesByNetId.Remove(proxy.NetId);
     _outgoingProxiesNetworkIdPool.Release(proxy.NetId);
     _outgoingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
+
+    if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
+      CreateOnRemote(proxy.Entity);
+    }
   }
 
   void DestroyIncommingProxy(EntityProxy proxy) {

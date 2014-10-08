@@ -2,7 +2,7 @@
 using System.Collections;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server)]
-public class TestingCallbacks : BoltCallbacksBase {
+public class TestingCallbacks : BoltGlobalEventListener {
   public override void SceneLoadLocalDone(string map) {
     Invoke("TakeAwayControl", 5);
   }

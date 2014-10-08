@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum BoltEditorStartMode {
@@ -64,7 +65,10 @@ public class BoltRuntimeSettings : ScriptableObject {
     return _config.Clone();
   }
 
-  internal static GameObject[] prefabs {
+
+  static Dictionary<Bolt.PrefabId, GameObject> prefabLookup = null;
+
+  static GameObject[] prefabsArray {
     get {
       if (!instance)
         return new GameObject[0];
@@ -73,23 +77,41 @@ public class BoltRuntimeSettings : ScriptableObject {
     }
   }
 
-  internal static GameObject FindPrefab(string name) {
-    return prefabs.FirstOrDefault(x => x.name == name);
+  internal static GameObject FindPrefab(Bolt.PrefabId id) {
+    if (prefabLookup == null) {
+      prefabLookup = new Dictionary<Bolt.PrefabId, GameObject>();
+
+      for (int i = 0; i < prefabsArray.Length; ++i) {
+        Bolt.PrefabId prefabId = new Bolt.PrefabId(prefabsArray[i].GetComponent<BoltEntity>()._prefabId);
+        prefabLookup.Add(prefabId, prefabsArray[i]);
+      }
+    }
+
+    GameObject go;
+
+    if (prefabLookup.TryGetValue(id, out go)) {
+      return go;
+    }
+    else {
+      BoltLog.Error("Could not find game object for {0}", id);
+      return null;
+    }
   }
 
+
   internal static bool ContainsPrefab(BoltEntity entity) {
-    if (prefabs == null)
+    if (prefabsArray == null)
       return false;
 
     if (!entity)
       return false;
 
-    if (entity._prefabId >= BoltRuntimeSettings.prefabs.Length)
+    if (entity._prefabId >= BoltRuntimeSettings.prefabsArray.Length)
       return false;
 
     if (entity._prefabId < 0)
       return false;
 
-    return BoltRuntimeSettings.prefabs[entity._prefabId] == entity.gameObject;
+    return BoltRuntimeSettings.prefabsArray[entity._prefabId] == entity.gameObject;
   }
 }

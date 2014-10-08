@@ -86,6 +86,18 @@ namespace Bolt {
       }
     }
 
+    internal void SetScopeAll(bool inScope) {
+      var it = BoltCore._connections.GetIterator();
+
+      while (it.Next()) {
+        SetScope(it.val, inScope);
+      }
+    }
+
+    internal void SetScope(BoltConnection connection, bool inScope) {
+      connection._entityChannel.SetScope(this, inScope);
+    }
+
     internal EntityProxy CreateProxy() {
       EntityProxy p;
 
@@ -110,7 +122,7 @@ namespace Bolt {
       BoltCore._entities.AddLast(this);
 
       // call out to user
-      BoltCallbacksBase.EntityAttachedInvoke(this.UnityObject);
+      BoltGlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
 
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -121,10 +133,12 @@ namespace Bolt {
       BoltLog.Debug("Attached {0}", this);
 
       // create on all connections
-      var it = BoltCore._connections.GetIterator();
+      if (BoltCore._config.scopeMode == ScopeMode.Automatic) {
+        var it = BoltCore._connections.GetIterator();
 
-      while (it.Next()) {
-        it.val._entityChannel.CreateOnRemote(this);
+        while (it.Next()) {
+          it.val._entityChannel.CreateOnRemote(this);
+        }
       }
     }
 
@@ -145,7 +159,7 @@ namespace Bolt {
       }
 
       // call out to user
-      BoltCallbacksBase.EntityDetachedInvoke(this.UnityObject);
+      BoltGlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
 
       // remove from entities list
       BoltCore._entities.Remove(this);
@@ -308,19 +322,25 @@ namespace Bolt {
       return count;
     }
 
-    internal static Entity CreateFrom(BoltEntity entity, TypeId serializerId) {
+    internal static Entity CreateFor(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {
+      return CreateFor(BoltCore.PrefabPool.Instantiate(prefabId, position, rotation), prefabId, serializerId);
+    }
+
+    internal static Entity CreateFor(UE.GameObject instance, PrefabId prefabId, TypeId serializerId) {
       Entity eo;
 
       eo = new Entity();
-      eo.PrefabId = new PrefabId(entity._prefabId);
-      eo.UpdateRate = entity._updateRate;
-      eo.ControllerLocalPrediction = entity._clientPredicted;
-      eo.Flags = entity._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
+      eo.UnityObject = instance.GetComponent<BoltEntity>();
+      eo.PrefabId = prefabId;
+      eo.UpdateRate = eo.UnityObject._updateRate;
+      eo.ControllerLocalPrediction = eo.UnityObject._clientPredicted;
+      eo.Flags = eo.UnityObject._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
 
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
 
+      // done
       return eo;
     }
 

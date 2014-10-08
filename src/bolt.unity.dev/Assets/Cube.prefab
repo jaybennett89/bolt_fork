@@ -103,7 +103,6 @@ MonoBehaviour:
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
-  _objects: []
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UdpKit;
 using UnityEngine;
+using UE = UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 
 public enum BoltNetworkModes {
@@ -16,6 +17,8 @@ public enum BoltNetworkModes {
 internal static class BoltCore {
   static UdpSocket _udpSocket;
   static internal SceneLoadState _localSceneLoading;
+
+  static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
 
   static internal int _frame = 0;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;
@@ -54,10 +57,6 @@ internal static class BoltCore {
 
 
   public static Action ShutdownComplete;
-
-  public static GameObject[] prefabs {
-    get { return BoltRuntimeSettings.prefabs; }
-  }
 
   public static int loadedScene {
     get { return _localSceneLoading.Scene.Index; }
@@ -208,7 +207,7 @@ internal static class BoltCore {
     entity.Detach();
 
     // destroy
-    GameObject.Destroy(entity.UnityObject.gameObject);
+    PrefabPool.Destroy(entity.UnityObject.gameObject);
   }
 
   public static void Destroy(GameObject go) {
@@ -222,76 +221,53 @@ internal static class BoltCore {
     }
   }
 
-  public static BoltEntity Instantiate(GameObject prefab) {
-    return Instantiate(prefab, Vector3.zero, Quaternion.identity);
-  }
-
-  public static BoltEntity Instantiate(GameObject prefab, Vector3 position) {
-    return Instantiate(prefab, position, Quaternion.identity);
+  public static BoltEntity Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation) {
+    return Instantiate(PrefabPool.LoadPrefab(prefabId), position, rotation);
   }
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    if (isClient && (prefab.GetComponent<BoltEntity>()._allowInstantiateOnClient == false)) {
-      throw new BoltException("This prefab is not allowed to be instantiated on clients");
+    BoltEntity be = prefab.GetComponent<BoltEntity>();
+    return Instantiate(new PrefabId(be._prefabId), new TypeId(be._defaultSerializerTypeId), position, rotation);
+
+
+  }
+
+  public static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {
+    // prefab checks
+    {
+      GameObject prefab = PrefabPool.LoadPrefab(prefabId);
+      BoltEntity be = prefab.GetComponent<BoltEntity>();
+
+      if (isClient && (be._allowInstantiateOnClient == false)) {
+        throw new BoltException("This prefab is not allowed to be instantiated on clients");
+      }
+
+      if (be._prefabId != prefabId.Value) {
+        throw new BoltException("PrefabId for BoltEntity component did not return the same value as prefabId passed in as argument to Instantiate");
+      }
     }
 
     Entity eo;
-
-    eo = CreateEntity(prefab);
-    eo.UnityObject.transform.position = position;
-    eo.UnityObject.transform.rotation = rotation;
+    eo = Entity.CreateFor(prefabId, serializerId, position, rotation);
     eo.Initialize();
     eo.Attach();
 
     return eo.UnityObject;
   }
 
-  public static BoltEntity Attach(BoltEntity entity) {
-    Assert.Null(entity._entity);
-
-    Entity eo;
-    eo = Entity.CreateFrom(entity, new TypeId(entity._defaultSerializerTypeId));
-    eo.UnityObject = entity;
-    eo.Initialize();
-    eo.Attach();
-
-    return eo.UnityObject;
+  public static GameObject Attach(GameObject gameObject) {
+    BoltEntity be = gameObject.GetComponent<BoltEntity>();
+    return Entity.CreateFor(gameObject, new PrefabId(be._prefabId), new TypeId(be._defaultSerializerTypeId)).UnityObject.gameObject;
   }
 
-  internal static Entity CreateEntity(GameObject prefab) {
-    // prefab entity component
-    BoltEntity ec;
-    ec = prefab.GetComponent<BoltEntity>();
-
-    // create with default serializer
-    return CreateEntity(prefab, new TypeId(ec._defaultSerializerTypeId));
-  }
-
-  internal static Entity CreateEntity(GameObject prefab, TypeId serializerId) {
-    // prefab entity component
-    BoltEntity ec;
-    ec = prefab.GetComponent<BoltEntity>();
-    //ec._sceneObject = false;
-
-    // instance of prefab
-    GameObject go;
-    go = (GameObject)GameObject.Instantiate(prefab);
-
-    // entity object
-    Entity eo;
-    eo = Entity.CreateFrom(ec, serializerId);
-    eo.UnityObject = go.GetComponent<BoltEntity>();
-
-    return eo;
+  public static GameObject Attach(GameObject gameObject, TypeId serializerId) {
+    BoltEntity be = gameObject.GetComponent<BoltEntity>();
+    return Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId).UnityObject.gameObject;
   }
 
   public static void Detach(BoltEntity entity) {
     Assert.NotNull(entity.Entity);
     entity.Entity.Detach();
-  }
-
-  public static GameObject FindPrefab(string name) {
-    return BoltRuntimeSettings.FindPrefab(name);
   }
 
   public static Bolt.Entity FindEntity(InstanceId id) {
@@ -452,15 +428,15 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRequest:
-          BoltCallbacksBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
+          BoltGlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
           break;
 
         case UdpEventType.ConnectFailed:
-          BoltCallbacksBase.ConnectFailedInvoke(ev.EndPoint);
+          BoltGlobalEventListenerBase.ConnectFailedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.ConnectRefused:
-          BoltCallbacksBase.ConnectRefusedInvoke(ev.EndPoint);
+          BoltGlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.ObjectSent:
@@ -583,7 +559,7 @@ internal static class BoltCore {
 
         if (sameScene && loadingDone) {
           try {
-            BoltCallbacksBase.SceneLoadRemoteDoneInvoke(it.val);
+            BoltGlobalEventListenerBase.SceneLoadRemoteDoneInvoke(it.val);
           }
           finally {
             it.val._remoteSceneLoading.State = Bolt.SceneLoadState.STATE_CALLBACK_INVOKED;
@@ -600,10 +576,7 @@ internal static class BoltCore {
     _connections.AddLast(cn);
 
     // generic connected callback
-    BoltCallbacksBase.ConnectedInvoke(cn);
-
-    // invoke callback depending on connection type
-    if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientConnectedInvoke(cn); } else { BoltCallbacksBase.ConnectedToServerInvoke(cn); }
+    BoltGlobalEventListenerBase.ConnectedInvoke(cn);
 
     // spawn entities
     foreach (Entity eo in _entities) {
@@ -612,11 +585,8 @@ internal static class BoltCore {
   }
 
   static void HandleDisconnected(BoltConnection cn) {
-    // invoke callback depending on connection type
-    if (cn.udpConnection.IsServer) { BoltCallbacksBase.ClientDisconnectedInvoke(cn); } else { BoltCallbacksBase.DisconnectedFromServerInvoke(cn); }
-
     // generic disconnected callback
-    BoltCallbacksBase.DisconnectedInvoke(cn);
+    BoltGlobalEventListenerBase.DisconnectedInvoke(cn);
 
     if (hasSocket) {
       // cleanup                                                      
@@ -849,7 +819,7 @@ internal static class BoltCore {
     UpdateActiveGlobalBehaviours(scene.Index);
 
     // call out to user code
-    BoltCallbacksBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltGlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 
   internal static void SceneLoadDone(Scene scene) {
@@ -861,6 +831,6 @@ internal static class BoltCore {
     _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
 
     // call out to user code
-    BoltCallbacksBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltGlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 }

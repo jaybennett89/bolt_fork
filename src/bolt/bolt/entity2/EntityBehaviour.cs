@@ -36,7 +36,7 @@ namespace Bolt {
     public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
   }
 
-  public class EntityBehaviour<TState> : EntityBehaviour where TState : IState {
+  public class EntityBehaviour<TState> : EntityBehaviour {
     public TState state {
       get { return entity.GetState<TState>(); }
     }

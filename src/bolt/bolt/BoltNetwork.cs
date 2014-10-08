@@ -139,6 +139,10 @@ public static class BoltNetwork {
     get { return BoltCore.isDebugMode; }
   }
 
+  public static Bolt.ScopeMode scopeMode {
+    get { return BoltCore._config.scopeMode; }
+  }
+
   public static GameObject globalObject {
     get { return BoltCore.globalObject; }
   }
@@ -161,32 +165,12 @@ public static class BoltNetwork {
     return null;
   }
 
-  public static void SetInstantiateDestroyCallbacks(Func<GameObject, Vector3, Quaternion, GameObject> instantiate, Action<GameObject> destroy) {
-    if (instantiate == null)
-      throw new System.ArgumentNullException("instantiate");
-
-    if (destroy == null)
-      throw new System.ArgumentNullException("destroy");
-
-    BoltCore._instantiate = instantiate;
-    BoltCore._destroy = destroy;
-  }
-
-  /// <summary>
-  /// Instantiate a prefab and attach it to bolt
-  /// </summary>
-  /// <param name="prefab">Prefab to instantiate</param>
-  /// <returns>The entity instance of the instantiated prefab</returns>
-  public static BoltEntity Instantiate(GameObject prefab) {
-    return BoltCore.Instantiate(prefab);
-  }
-
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     return BoltCore.Instantiate(prefab, position, rotation);
   }
 
-  public static BoltEntity Instantiate(string prefab, Vector3 position, Quaternion rotation) {
-    return Instantiate(BoltCore.FindPrefab(prefab), position, rotation);
+  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position, Quaternion rotation) {
+    return BoltCore.Instantiate(prefabId, position, rotation);
   }
 
   public static BoltPhysicsHits RaycastAll(Ray ray) {
@@ -205,16 +189,16 @@ public static class BoltNetwork {
     return BoltPhysics.OverlapSphere(origin, radius, frame);
   }
 
-  public static BoltEntity Attach(BoltEntity entity) {
-    return BoltCore.Attach(entity);
-  }
-
-  public static void Detach(BoltEntity entity) {
-    BoltCore.Detach(entity);
-  }
-
   public static void Accept(UdpEndPoint ep) {
     Accept(ep, null);
+  }
+
+  public static void AddGlobalEventListener(MonoBehaviour mb) {
+    BoltCore._globalEventDispatcher.Add(mb);
+  }
+
+  public static void RemoveGlobalEventListener(MonoBehaviour mb) {
+    BoltCore._globalEventDispatcher.Remove(mb);
   }
 
   public static void Accept(UdpEndPoint ep, object userToken) {
@@ -223,10 +207,6 @@ public static class BoltNetwork {
 
   public static void Refuse(UdpEndPoint ep) {
     BoltCore.RefuseConnection(ep);
-  }
-
-  public static BoltEntity Instantiate(string prefab) {
-    return Instantiate(BoltCore.FindPrefab(prefab));
   }
 
   public static void Destroy(BoltEntity entity) {
