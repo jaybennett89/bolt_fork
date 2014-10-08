@@ -2,20 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UdpKit;
 
 namespace Bolt {
   class PropertySerializerBool : PropertySerializerMecanim {
-    public PropertySerializerBool(StatePropertyMetaData info)
-      : base(info) {
-    }
-
-    public PropertySerializerBool(EventPropertyMetaData meta)
-      : base(meta) {
-    }
-
-    public PropertySerializerBool(CommandPropertyMetaData meta)
-      : base(meta) {
-    }
+    public PropertySerializerBool(StatePropertyMetaData info) : base(info) { }
+    public PropertySerializerBool(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerBool(CommandPropertyMetaData meta) : base(meta) { }
 
     public override int StateBits(State state, State.Frame frame) {
       return 1;
@@ -33,21 +26,13 @@ namespace Bolt {
       state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadBool(StateData.ByteOffset));
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteBool(frame.Data.ReadBool(StateData.ByteOffset));
+    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      stream.WriteBool(Blit.ReadBool(data, offset));
       return true;
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      frame.Data.PackBool(StateData.ByteOffset, stream.ReadBool());
-    }
-
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteBool(data.ReadBool(CommandData.ByteOffset));
-    }
-
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      data.PackBool(CommandData.ByteOffset, stream.ReadBool());
+    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      Blit.PackBool(data, offset, stream.ReadBool());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

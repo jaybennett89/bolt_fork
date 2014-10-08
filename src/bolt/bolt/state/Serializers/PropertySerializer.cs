@@ -49,8 +49,6 @@ namespace Bolt {
 
     public virtual void DisplayDebugValue(State state) { }
 
-    public virtual void SetDynamic(State state, object value) { throw new NotSupportedException(); }
-
     public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
     public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
     public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
@@ -71,7 +69,40 @@ namespace Bolt {
     public virtual void OnChanged(State state, State.Frame frame) { }
   }
 
-  abstract class PropertySerializerMecanim : PropertySerializer {
+  abstract class PropertySerializerSimple : PropertySerializer {
+    public PropertySerializerSimple(StatePropertyMetaData info) : base(info) { }
+    public PropertySerializerSimple(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerSimple(CommandPropertyMetaData meta) : base(meta) { }
+
+    public override bool EventPack(Event data, BoltConnection connection, UdpStream stream) {
+      return Pack(data.Data, EventData.ByteOffset, connection, stream);
+    }
+
+    public override void EventRead(Event data, BoltConnection connection, UdpStream stream) {
+      Read(data.Data, EventData.ByteOffset, connection, stream);
+    }
+
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+      return Pack(frame.Data, StateData.ByteOffset, connection, stream);
+    }
+
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+      Read(frame.Data, StateData.ByteOffset, connection, stream);
+    }
+
+    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
+      Pack(data, CommandData.ByteOffset, connection, stream);
+    }
+
+    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
+      Read(data, CommandData.ByteOffset, connection, stream);
+    }
+
+    protected virtual bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    protected virtual void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+  }
+
+  abstract class PropertySerializerMecanim : PropertySerializerSimple {
     protected PropertyMecanimData MecanimData;
 
     public PropertySerializerMecanim(StatePropertyMetaData info)
@@ -95,9 +126,11 @@ namespace Bolt {
         //BoltLog.Info("MEC-1-{0}", StateData.PropertyPath);
 
         MecanimDirection direction =
-            (state.Entity.IsOwner || state.Entity.HasControl)
+            (state.Entity.IsOwner)
             ? MecanimData.OwnerDirection
-            : MecanimData.OthersDirection;
+            : (state.Entity.HasControl)
+              ? MecanimData.ControllerDirection
+              : MecanimData.OthersDirection;
 
         switch (MecanimData.Mode) {
           case MecanimMode.LayerWeight:

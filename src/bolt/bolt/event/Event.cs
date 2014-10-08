@@ -67,6 +67,7 @@ namespace Bolt {
 
     internal void IncrementRefs() {
       refs += 1;
+      BoltLog.Debug("{0} Ref Count = {1}", this, refs);
     }
 
     internal bool Pack(BoltConnection connection, UdpStream stream) {
@@ -94,9 +95,9 @@ namespace Bolt {
     }
 
     internal void DecrementRefs() {
-      refs -= 1;
+      VerifyIsActive();
 
-      if (refs == 0) {
+      if (--refs == 0) {
 
       }
     }

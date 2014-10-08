@@ -2,21 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerInteger : PropertySerializerMecanim {
-    public PropertySerializerInteger(StatePropertyMetaData info)
-      : base(info) {
-    }
-
-    public PropertySerializerInteger(EventPropertyMetaData meta)
-      : base(meta) {
-    }
-
-    public PropertySerializerInteger(CommandPropertyMetaData meta)
-      : base(meta) {
-    }
+    public PropertySerializerInteger(StatePropertyMetaData info) : base(info) { }
+    public PropertySerializerInteger(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerInteger(CommandPropertyMetaData meta) : base(meta) { }
 
     public override int StateBits(State state, State.Frame frame) {
       return 32;
@@ -24,10 +17,6 @@ namespace Bolt {
 
     public override void DisplayDebugValue(State state) {
       BoltGUI.Label(Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset));
-    }
-
-    public override void SetDynamic(State state, object value) {
-      state.Frames.first.Data.PackI32(CommandData.ByteOffset, (int)value);
     }
 
     protected override void PushMecanimValue(State state) {
@@ -38,29 +27,13 @@ namespace Bolt {
       Blit.PackI32(state.Frames.first.Data, StateData.ByteOffset, state.Animator.GetInteger(StateData.PropertyName));
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteInt(Blit.ReadI32(frame.Data, StateData.ByteOffset));
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, Blit.ReadI32(frame.Data, StateData.ByteOffset), 32);
-#endif
+    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      stream.WriteInt(Blit.ReadI32(data, offset));
       return true;
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackI32(frame.Data, StateData.ByteOffset, stream.ReadInt());
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, Blit.ReadI32(frame.Data, StateData.ByteOffset), 32);
-#endif
-    }
-
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteInt(data.ReadI32(CommandData.ByteOffset));
-    }
-
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      data.PackI32(CommandData.ByteOffset, stream.ReadInt());
+    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      Blit.PackI32(data, offset, stream.ReadInt());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

@@ -13,6 +13,7 @@ namespace Bolt {
 
     public static void DispatchAllEvents() {
       while (_dispatchQueue.Count > 0) {
+
         Dispatch(_dispatchQueue.Dequeue());
       }
     }
@@ -22,74 +23,134 @@ namespace Bolt {
 
       switch (ev.Targets) {
         case Event.ENTITY_EVERYONE:
-          if (ev.TargetEntity != null) {
-            while (it.Next()) {
-              it.val._eventChannel.Queue(ev);
-            }
-
-            RaiseLocal(ev);
-          }
+          Entity_Everyone(ev);
           break;
 
         case Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER:
-          if (ev.TargetEntity != null) {
-            while (it.Next()) {
-              if (ev.TargetEntity.IsController(it.val) == false) {
-                it.val._eventChannel.Queue(ev);
-              }
-            }
-
-            if (ev.TargetEntity.HasControl == false) {
-              RaiseLocal(ev);
-            }
-          }
+          Entity_Everyone_Except_Controller(ev);
           break;
 
         case Event.GLOBAL_EVERYONE:
-          while (it.Next()) {
-            it.val._eventChannel.Queue(ev);
-          }
-
-          RaiseLocal(ev);
+          Global_Everyone(ev);
           break;
 
         case Event.GLOBAL_OTHERS:
-          while (it.Next()) {
-            it.val._eventChannel.Queue(ev);
-          }
-
-          if (ev.IsFromLocalComputer == false) {
-            RaiseLocal(ev);
-          }
+          Global_Others(ev);
           break;
 
         case Event.GLOBAL_ALL_CLIENTS:
-          while (it.Next()) {
-            it.val._eventChannel.Queue(ev);
-          }
-
-          if (BoltCore.isClient) {
-            RaiseLocal(ev);
-          }
+          Global_All_Clients(ev);
           break;
 
         case Event.GLOBAL_SERVER:
-          if (BoltCore.isServer) {
-            RaiseLocal(ev);
-          }
-          else {
-            BoltCore.server._eventChannel.Queue(ev);
-          }
+          Global_Server(ev);
           break;
 
         case Event.GLOBAL_SPECIFIC_CONNECTION:
-          if (ev.IsFromLocalComputer) {
-            ev.TargetConnection._eventChannel.Queue(ev);
-          }
-          else {
-            RaiseLocal(ev);
-          }
+          Global_Specific_Connection(ev);
           break;
+      }
+    }
+
+    static void Global_Specific_Connection(Event ev) {
+      if (ev.IsFromLocalComputer) {
+        ev.TargetConnection._eventChannel.Queue(ev);
+      }
+      else {
+        RaiseLocal(ev);
+      }
+    }
+
+    static void Global_Server(Event ev) {
+      if (BoltCore.isServer) {
+        RaiseLocal(ev);
+      }
+      else {
+        BoltCore.server._eventChannel.Queue(ev);
+      }
+    }
+
+    static void Global_All_Clients(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      while (it.Next()) {
+        if (ReferenceEquals(it.val, ev.SourceConnection)) {
+          continue;
+        }
+
+        it.val._eventChannel.Queue(ev);
+      }
+
+      if (BoltCore.isClient) {
+        RaiseLocal(ev);
+      }
+    }
+
+    static void Global_Others(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      while (it.Next()) {
+        if (ReferenceEquals(it.val, ev.SourceConnection)) {
+          continue;
+        }
+
+        it.val._eventChannel.Queue(ev);
+      }
+
+      if (ev.IsFromLocalComputer == false) {
+        RaiseLocal(ev);
+      }
+    }
+
+    static void Global_Everyone(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      while (it.Next()) {
+        if (ReferenceEquals(it.val, ev.SourceConnection)) {
+          continue;
+        }
+
+        it.val._eventChannel.Queue(ev);
+      }
+
+      RaiseLocal(ev);
+    }
+
+    static void Entity_Everyone_Except_Controller(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      if (ev.TargetEntity != null) {
+        while (it.Next()) {
+          if (ev.TargetEntity.IsController(it.val)) {
+            continue;
+          }
+
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        if (ev.TargetEntity.HasControl == false) {
+          RaiseLocal(ev);
+        }
+      }
+    }
+
+    static void Entity_Everyone(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      if (ev.TargetEntity != null) {
+        while (it.Next()) {
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        RaiseLocal(ev);
       }
     }
 

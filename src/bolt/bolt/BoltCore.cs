@@ -546,6 +546,8 @@ internal static class BoltCore {
           iter.val.Simulate();
         }
       }
+
+      Bolt.EventDispatcher.DispatchAllEvents();
     }
   }
 

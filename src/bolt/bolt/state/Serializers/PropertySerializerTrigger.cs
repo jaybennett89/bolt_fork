@@ -20,12 +20,6 @@ namespace Bolt {
       meta.ByteLength = 8;
     }
 
-    public override void SetDynamic(State state, object value) {
-      if (value == null || ((value is bool) && (bool)value)) {
-        state.Frames.first.Data.SetTrigger(BoltCore.frame, LocalOffset, true);
-      }
-    }
-
     public override int StateBits(State state, State.Frame frame) {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }

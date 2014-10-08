@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  class PropertySerializerVector : PropertySerializer {
+  class PropertySerializerVector : PropertySerializerSimple {
     public PropertySerializerVector(StatePropertyMetaData info)
       : base(info) {
     }
@@ -26,27 +27,13 @@ namespace Bolt {
       return 32 * 8;
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteVector3(frame.Data.ReadVector3(StateData.ByteOffset));
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadVector3(StateData.ByteOffset), 4 * 3);
-#endif
+    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      stream.WriteVector3(Blit.ReadVector3(data, offset));
       return true;
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
-      frame.Data.PackVector3(StateData.ByteOffset, stream.ReadVector3());
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, frame.Data.ReadVector3(StateData.ByteOffset), 4 * 3);
-#endif
-    }
-
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteVector3(data.ReadVector3(CommandData.ByteOffset));
-    }
-
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
-      data.PackVector3(CommandData.ByteOffset, stream.ReadVector3());
+    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+      Blit.PackVector3(data, offset, stream.ReadVector3());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
