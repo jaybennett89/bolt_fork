@@ -137,7 +137,6 @@ public class BoltEntityEditor : Editor {
       }
 
       EditorGUILayout.LabelField("Proxy Count", entity.Entity.Proxies.count.ToString());
-      EditorGUILayout.LabelField("Serializer", entity.Entity.Serializer.GetType().Name);
 
       GUILayout.Label("Serializer Debug Info", EditorStyles.boldLabel);
       entity.Entity.Serializer.DebugInfo();

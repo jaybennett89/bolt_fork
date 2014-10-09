@@ -19,8 +19,8 @@ namespace Bolt {
       : base(meta) {
     }
 
-    public override void DisplayDebugValue(State state) {
-      BoltGUI.Label(Blit.ReadVector3(state.Frames.first.Data, StateData.ByteOffset));
+    public override object GetDebugValue(State state) {
+      return Blit.ReadVector3(state.Frames.first.Data, StateData.ByteOffset);
     }
 
     public override int StateBits(State state, State.Frame frame) {

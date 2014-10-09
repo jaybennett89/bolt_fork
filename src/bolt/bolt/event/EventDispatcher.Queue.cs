@@ -156,7 +156,7 @@ namespace Bolt {
 
     static void RaiseLocal(Event ev) {
       try {
-        BoltLog.Info("Raising {0}", ev);
+        BoltLog.Debug("Raising {0}", ev);
 
         if (ev.IsEntityEvent) {
           ev.TargetEntity.EventDispatcher.Raise(ev);

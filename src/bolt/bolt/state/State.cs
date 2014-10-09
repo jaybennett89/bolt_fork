@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UdpKit;
 using UE = UnityEngine;
@@ -119,13 +120,25 @@ namespace Bolt {
     }
 
     public void DebugInfo() {
-      BoltGUI.LabelText("Frame Buffer", Frames.count.ToString());
+      if (BoltNetworkInternal.DebugDrawer != null) {
+        BoltNetworkInternal.DebugDrawer.LabelField("State Type", Factory.GetFactory(TypeId).TypeObject);
+        BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count.ToString());
+        BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        UE.GUILayout.BeginHorizontal();
-        UE.GUILayout.Label(MetaData.PropertySerializers[i].StateData.PropertyPath);
-        MetaData.PropertySerializers[i].DisplayDebugValue(this);
-        UE.GUILayout.EndHorizontal();
+        for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+          string label = MetaData.PropertySerializers[i].StateData.PropertyPath.TrimStart('.');
+          object value = MetaData.PropertySerializers[i].GetDebugValue(this);
+          BoltNetworkInternal.DebugDrawer.Indent(label.Count(c => c == '.' || c == '['));
+
+          if (value != null) {
+            BoltNetworkInternal.DebugDrawer.LabelField(label, value.ToString());
+          }
+          else {
+            BoltNetworkInternal.DebugDrawer.LabelField(label, "N/A");
+          }
+
+          BoltNetworkInternal.DebugDrawer.Indent(0);
+        }
       }
     }
 

@@ -47,7 +47,7 @@ namespace Bolt {
       CommandData = commandData;
     }
 
-    public virtual void DisplayDebugValue(State state) { }
+    public virtual object GetDebugValue(State state) { return null; }
 
     public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
     public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }

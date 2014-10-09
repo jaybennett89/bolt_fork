@@ -1911,7 +1911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _prefabId: 0
   _updateRate: 1
-  _defaultSerializerTypeId: 3
+  _defaultSerializerTypeId: 5
   _clientPredicted: 1
   _allowInstantiateOnClient: 0
   _persistThroughSceneLoads: 0

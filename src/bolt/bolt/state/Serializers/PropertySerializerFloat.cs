@@ -17,8 +17,8 @@ namespace Bolt {
       return 32;
     }
 
-    public override void DisplayDebugValue(State state) {
-      BoltGUI.Label(Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset));
+    public override object GetDebugValue(State state) {
+      return Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset);
     }
 
     protected override void PullMecanimValue(State state) {

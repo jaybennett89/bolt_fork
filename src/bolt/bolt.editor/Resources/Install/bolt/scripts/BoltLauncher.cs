@@ -54,6 +54,10 @@ public static class BoltLauncher {
       }
     }
 
+#if UNITY_EDITOR
+    BoltNetworkInternal.DebugDrawer = new BoltInternal.UnityDebugDrawer();
+#endif
+
 #if UNITY_PRO_LICENSE
     BoltNetworkInternal.UsingUnityPro = true;
 #else
