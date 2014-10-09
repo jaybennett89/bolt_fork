@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
-public class ServerCallbacks : BoltCallbacks {
+[BoltGlobalBehaviour(BoltNetworkModes.Server, BoltScenes.Level1)]
+public class ServerCallbacks : BoltGlobalEventListener {
   public static bool ListenServer = true;
 
   void Awake() {
@@ -17,13 +17,13 @@ public class ServerCallbacks : BoltCallbacks {
   void FixedUpdate() {
     foreach (Player p in Player.allPlayers) {
       // if we have an entity, it's dead but our spawn frame has passed
-      if (p.entity && p.state.dead && p.state.respawnFrame <= BoltNetwork.serverFrame) {
+      if (p.entity && p.state.Dead && p.state.respawnFrame <= BoltNetwork.serverFrame) {
         p.Spawn();
       }
     }
   }
 
-  public override void SceneLoadRemoteDone(BoltConnection connection, string map) {
+  public override void SceneLoadRemoteDone(BoltConnection connection) {
     connection.GetPlayer().InstantiateEntity();
   }
 

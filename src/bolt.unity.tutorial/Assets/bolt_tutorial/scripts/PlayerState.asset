@@ -8,14 +8,202 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1601357315, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
-  m_Name: PlayerMecanim
+  m_Script: {fileID: -467024293, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Name: PlayerState
   m_EditorClassIdentifier: 
-  compile: 0
-  replicateLayerWeights: 0
-  controller: {fileID: 9100000, guid: bdc07fbc13eccb04cb7a7b6995a9cb32, type: 2}
-  properties:
-  - name: MoveZ
+  compile: 1
+  tranform:
+    name: transform
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 14
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 1
+      rotAxes: 2
+      rotCompression: 2
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  mecanim:
+    name: mecanim
+    enabled: 1
+    foldout: 1
+    syncMode: 0
+    syncTarget: 1
+    type: 15
+    options: 0
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 11400000, guid: 5ed15193118cb514d914398b4d68463b, type: 2}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  _properties:
+  - name: name
+    enabled: 1
+    foldout: 0
+    syncMode: 1
+    syncTarget: 3
+    type: 13
+    options: 1
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: 16
+      encoding: 0
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: team
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 3
+    type: 1
+    options: 1
+    intSettings:
+      byteBits: 2
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: pitch
     enabled: 1
     foldout: 0
     syncMode: 0
@@ -28,8 +216,8 @@ MonoBehaviour:
       intBits: 32
       longBits: 64
     floatSettings:
-      interpolate: 0
-      compression: 4
+      interpolate: 1
+      compression: 3
     vectorSettings:
       interpolate: 0
       compression: 0
@@ -59,24 +247,24 @@ MonoBehaviour:
       accMode: 2
       accCompression: 0
     assetSettingsMecanim:
-      interpolationTime: .0500000007
+      interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: MoveX
+  - name: weapon
     enabled: 1
     foldout: 0
     syncMode: 0
     syncTarget: 1
-    type: 5
-    options: 0
+    type: 1
+    options: 1
     intSettings:
-      byteBits: 8
+      byteBits: 3
       shortBits: 16
       intBits: 32
       longBits: 64
     floatSettings:
       interpolate: 0
-      compression: 4
+      compression: 0
     vectorSettings:
       interpolate: 0
       compression: 0
@@ -106,15 +294,15 @@ MonoBehaviour:
       accMode: 2
       accCompression: 0
     assetSettingsMecanim:
-      interpolationTime: .0500000007
+      interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: Jump
+  - name: kills
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
-    syncTarget: 1
-    type: 17
+    syncTarget: 3
+    type: 2
     options: 0
     intSettings:
       byteBits: 8
@@ -156,12 +344,12 @@ MonoBehaviour:
       interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: Fire
+  - name: deaths
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
-    syncTarget: 1
-    type: 17
+    syncTarget: 3
+    type: 2
     options: 0
     intSettings:
       byteBits: 8
@@ -203,13 +391,13 @@ MonoBehaviour:
       interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: Aiming
+  - name: dead
     enabled: 1
-    foldout: 1
+    foldout: 0
     syncMode: 0
-    syncTarget: 1
+    syncTarget: 3
     type: 0
-    options: 0
+    options: 1
     intSettings:
       byteBits: 8
       shortBits: 16
@@ -250,15 +438,62 @@ MonoBehaviour:
       interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: Dead
+  - name: respawnFrame
+    enabled: 1
+    foldout: 0
+    syncMode: 0
+    syncTarget: 2
+    type: 3
+    options: 1
+    intSettings:
+      byteBits: 8
+      shortBits: 16
+      intBits: 32
+      longBits: 64
+    floatSettings:
+      interpolate: 0
+      compression: 0
+    vectorSettings:
+      interpolate: 0
+      compression: 0
+      axes: 15
+    quaternionSettings:
+      interpolate: 0
+      compression: 0
+      axes: 7
+    stringSettings:
+      maxLength: -1
+      encoding: 1
+    mecanimSettings:
+      mecanimAsset: {fileID: 0}
+    transformSettings:
+      mode: 0
+      maxForwardExtrapolation: 2
+      maxInterpTime: 1
+      posAxes: 7
+      posCompression: 0
+      rotAxes: 7
+      rotCompression: 0
+      velZeroTolerance: .00999999978
+      velMode: 0
+      velCompression: 0
+      velAxes: 7
+      accZeroTolerance: .00999999978
+      accMode: 2
+      accCompression: 0
+    assetSettingsMecanim:
+      interpolationTime: 0
+    assetSettingsCommand:
+      synchronize: 1
+  - name: health
     enabled: 1
     foldout: 1
     syncMode: 0
-    syncTarget: 1
-    type: 0
-    options: 0
+    syncTarget: 2
+    type: 1
+    options: 1
     intSettings:
-      byteBits: 8
+      byteBits: 7
       shortBits: 16
       intBits: 32
       longBits: 64
@@ -297,50 +532,4 @@ MonoBehaviour:
       interpolationTime: 0
     assetSettingsCommand:
       synchronize: 1
-  - name: Feets
-    enabled: 0
-    foldout: 1
-    syncMode: 0
-    syncTarget: 1
-    type: 5
-    options: 0
-    intSettings:
-      byteBits: 8
-      shortBits: 16
-      intBits: 32
-      longBits: 64
-    floatSettings:
-      interpolate: 0
-      compression: 0
-    vectorSettings:
-      interpolate: 0
-      compression: 0
-      axes: 15
-    quaternionSettings:
-      interpolate: 0
-      compression: 0
-      axes: 7
-    stringSettings:
-      maxLength: -1
-      encoding: 1
-    mecanimSettings:
-      mecanimAsset: {fileID: 0}
-    transformSettings:
-      mode: 0
-      maxForwardExtrapolation: 2
-      maxInterpTime: 1
-      posAxes: 7
-      posCompression: 0
-      rotAxes: 7
-      rotCompression: 0
-      velZeroTolerance: .00999999978
-      velMode: 0
-      velCompression: 0
-      velAxes: 7
-      accZeroTolerance: .00999999978
-      accMode: 2
-      accCompression: 0
-    assetSettingsMecanim:
-      interpolationTime: 0
-    assetSettingsCommand:
-      synchronize: 1
+  _groups: []

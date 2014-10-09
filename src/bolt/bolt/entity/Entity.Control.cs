@@ -111,7 +111,7 @@ namespace Bolt {
     }
 
     internal bool QueueCommand(Command cmd) {
-      if (HasControl) {
+      if (_canQueueCommands) {
         if (CommandQueue.count < BoltCore._config.commandQueueSize) {
           cmd.Frame = BoltCore.serverFrame;
           cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
@@ -125,7 +125,7 @@ namespace Bolt {
         }
       }
       else {
-        BoltLog.Error("You can not queue commands to {0}, you are not the controller", this);
+        BoltLog.Error("You can not queue commands to {0}", this);
         return false;
       }
     }

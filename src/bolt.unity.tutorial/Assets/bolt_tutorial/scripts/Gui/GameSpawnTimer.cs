@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameSpawnTimer : BoltCallbacks {
+public class GameSpawnTimer : BoltGlobalEventListener {
   BoltEntity me;
   IPlayerState meState;
 
@@ -9,14 +9,14 @@ public class GameSpawnTimer : BoltCallbacks {
   TypogenicText timer;
 
   public override void ControlOfEntityGained(BoltEntity arg) {
-    if (arg.boltSerializer is PlayerSerializer) {
+    if (arg.GetComponent<PlayerController>()) {
       me = arg;
-      meState = me.GetBoltState<IPlayerState>();
+      meState = me.GetState<IPlayerState>();
     }
   }
 
   public override void ControlOfEntityLost(BoltEntity arg) {
-    if (arg.boltSerializer is PlayerSerializer) {
+    if (arg.GetComponent<PlayerController>()) {
       me = null;
       meState = null;
     }
@@ -28,7 +28,7 @@ public class GameSpawnTimer : BoltCallbacks {
 
     // update timer
     if (me && meState != null) {
-      if (meState.dead) {
+      if (meState.Dead) {
         timer.Set(Mathf.Max(0, (meState.respawnFrame - BoltNetwork.frame) / BoltNetwork.framesPerSecond).ToString());
       }
       else {

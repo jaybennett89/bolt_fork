@@ -58,12 +58,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _prefabId: 1
-  _serializer: {fileID: 0}
-  _persistanceMode: 0
   _updateRate: 1
-  _sceneObject: 0
+  _defaultSerializerTypeId: 0
   _clientPredicted: 0
   _allowInstantiateOnClient: 0
+  _persistThroughSceneLoads: 0
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1

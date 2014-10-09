@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameLog : BoltCallbacks {
+public class GameLog : BoltGlobalEventListener {
   struct Line {
     public float time;
     public string message;
@@ -34,7 +34,7 @@ public class GameLog : BoltCallbacks {
     }
   }
 
-  public override void OnEvent(ILogEvent evnt, BoltConnection cn) {
+  public override void OnEvent(LogEvent evnt) {
     buffer.Enqueue(new Line { time = Time.time, message = evnt.message });
     UpdateLines();
   }

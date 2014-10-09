@@ -50,5 +50,19 @@ namespace Bolt.Compiler {
       cg = new CodeGenerator();
       cg.Run(this, file);
     }
+
+    public IEnumerable<Guid> GetInheritanceTree(StateDefinition def) {
+      List<Guid> result = new List<Guid>();
+      GetInheritanceTree(def, result);
+      return result;
+    }
+
+    public void GetInheritanceTree(StateDefinition def, List<Guid> result) {
+      result.Add(def.Guid);
+
+      foreach (var state in States.Where(x => x.ParentGuid == def.Guid)) {
+        GetInheritanceTree(state, result);
+      }
+    }
   }
 }

@@ -7,14 +7,14 @@ using UnityEngine;
 public class BoltEntityEditor : Editor {
   static int[] serializerIds;
   static string[] serializerNames;
-  static Bolt.IFactory[] serializerFactories;
+  static Bolt.ISerializerFactory[] serializerFactories;
 
   static BoltEntityEditor() {
     serializerFactories =
-      typeof(Bolt.IFactory)
+      typeof(Bolt.ISerializerFactory)
         .FindInterfaceImplementations()
         .Select(x => Activator.CreateInstance(x))
-        .Cast<Bolt.IFactory>()
+        .Cast<Bolt.ISerializerFactory>()
         .ToArray();
 
     serializerNames =

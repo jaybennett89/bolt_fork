@@ -15,6 +15,7 @@ namespace Bolt {
     void ControlGained();
     void ControlLost();
 
+    void MissingCommand();
     void ExecuteCommand(Bolt.Command command, bool resetState);
   }
 

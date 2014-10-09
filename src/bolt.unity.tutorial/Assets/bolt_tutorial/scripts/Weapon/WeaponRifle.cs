@@ -4,7 +4,7 @@ using System.Collections;
 public class WeaponRifle : WeaponBase {
   public override void OnOwner(PlayerCommand cmd, BoltEntity entity) {
     if (entity.isOwner) {
-      IPlayerState state = entity.GetBoltState<IPlayerState>();
+      IPlayerState state = entity.GetState<IPlayerState>();
       PlayerController controller = entity.GetComponent<PlayerController>();
 
       Vector3 pos;
@@ -16,10 +16,10 @@ public class WeaponRifle : WeaponBase {
       // display debug
       Debug.DrawRay(pos, look * Vector3.forward);
 
-      using (var hits = BoltPhysics.Raycast(new Ray(pos, look * Vector3.forward), cmd.serverFrame)) {
+      using (var hits = BoltPhysics.Raycast(new Ray(pos, look * Vector3.forward), cmd.ServerFrame)) {
         for (int i = 0; i < hits.count; ++i) {
           var hit = hits.GetHit(i);
-          var serializer = hit.body.GetBoltSerializer() as PlayerSerializer;
+          var serializer = hit.body.GetComponent<PlayerController>();
 
           if ((serializer != null) && (serializer.state.team != state.team)) {
             serializer.ApplyDamage(controller.activeWeapon.damagePerBullet);
@@ -32,7 +32,7 @@ public class WeaponRifle : WeaponBase {
   public override void Fx(BoltEntity entity) {
     Vector3 pos;
     Quaternion rot;
-    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetBoltState<IPlayerState>().pitch, out pos, out rot);
+    PlayerCamera.instance.CalculateCameraAimTransform(entity.transform, entity.GetState<IPlayerState>().pitch, out pos, out rot);
 
     Ray r = new Ray(pos, rot * Vector3.forward);
     RaycastHit rh;
