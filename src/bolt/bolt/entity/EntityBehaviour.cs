@@ -27,6 +27,7 @@ namespace Bolt {
       }
     }
 
+    public virtual void Initialized() { }
     public virtual void Attached() { }
     public virtual void Detached() { }
     public virtual void SimulateOwner() { }

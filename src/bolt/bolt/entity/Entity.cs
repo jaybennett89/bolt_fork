@@ -214,8 +214,12 @@ namespace Bolt {
 
       // call into serializer
       Serializer.OnInitialized();
-    }
 
+      // call to behaviours (this happens BEFORE attached)
+      foreach (IEntityBehaviour eb in Behaviours) {
+        eb.Initialized();
+      }
+    }
 
     internal void SetIdle(BoltConnection connection, bool idle) {
       if (idle && IsController(connection)) {
@@ -385,6 +389,7 @@ namespace Bolt {
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
+
 
       // done
       return eo;

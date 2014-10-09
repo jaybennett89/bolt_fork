@@ -6,6 +6,8 @@ using UdpKit;
 
 namespace Bolt {
   public interface IEntityBehaviour {
+    void Initialized();
+
     void Attached();
     void Detached();
 
