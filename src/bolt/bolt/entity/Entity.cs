@@ -9,6 +9,8 @@ namespace Bolt {
   partial class Entity : IBoltListNode, IPriorityCalculator {
     static int _instanceIdCounter;
 
+    bool _canQueueCommands = false;
+
     internal UniqueId UniqueId;
     internal PrefabId PrefabId;
     internal InstanceId InstanceId;
@@ -248,8 +250,15 @@ namespace Bolt {
           ExecuteCommand(it.val, resetState);
         }
 
-        foreach (IEntityBehaviour eb in Behaviours) {
-          eb.SimulateController();
+        try {
+          _canQueueCommands = true;
+
+          foreach (IEntityBehaviour eb in Behaviours) {
+            eb.SimulateController();
+          }
+        }
+        finally {
+          _canQueueCommands = false;
         }
 
         // execute all new commands (in order)
@@ -274,6 +283,17 @@ namespace Bolt {
       else {
         if (Controller != null) {
           Assert.True(IsOwner);
+
+          if (CommandQueue.count == 0) {
+            try {
+              _canQueueCommands = true;
+
+
+            }
+            finally {
+              _canQueueCommands = false;
+            }
+          }
 
           do {
             it = CommandQueue.GetIterator();

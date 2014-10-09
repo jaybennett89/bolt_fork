@@ -15,6 +15,12 @@ namespace Bolt {
     void Dispatch(Event ev, object target);
   }
 
+  interface ISerializerFactory : IFactory {
+  }
+
+  interface ICommandFactory : IFactory {
+  }
+
   static class Factory {
     static Dictionary<TypeId, IFactory> _factories = new Dictionary<TypeId, IFactory>();
 

@@ -33,6 +33,7 @@ namespace Bolt {
     public virtual void SimulateController() { }
     public virtual void ControlGained() { }
     public virtual void ControlLost() { }
+    public virtual void MissingCommand() { }
     public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
   }
 

@@ -93,7 +93,7 @@ namespace Bolt.Compiler {
 
       type = Generator.DeclareClass(Decorator.FactoryName);
       type.TypeAttributes = System.Reflection.TypeAttributes.NotPublic;
-      type.BaseTypes.Add("Bolt.IFactory");
+      type.BaseTypes.Add("Bolt.ICommandFactory");
       type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
       type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
       type.DeclareMethod(typeof(object).FullName, "Create", method => method.Statements.Expr("return new {0}()", Decorator.Name));

@@ -38,7 +38,7 @@ namespace Bolt.Compiler {
 
       type = Generator.DeclareClass(Decorator.FactoryName);
       type.TypeAttributes = TypeAttributes.NotPublic;
-      type.BaseTypes.Add("Bolt.IFactory");
+      type.BaseTypes.Add("Bolt.ISerializerFactory");
 
       type.DeclareProperty("Type", "TypeObject", get => {
         get.Expr("return typeof({0})", Decorator.InterfaceName);

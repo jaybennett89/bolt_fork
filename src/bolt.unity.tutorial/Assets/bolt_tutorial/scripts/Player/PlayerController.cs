@@ -99,15 +99,13 @@ public class PlayerController : Bolt.EntityBehaviour<IPlayerState> {
     activeWeapon.fireFrame = BoltNetwork.serverFrame;
   }
 
-
-
   public void ApplyDamage(byte damage) {
     if (!state.Dead) {
 
       using (var mod = state.Modify()) {
         mod.health -= damage;
 
-        if (mod.health > 100 && mod.health < 0) {
+        if (mod.health > 100 || mod.health < 0) {
           mod.health = 0;
         }
       }

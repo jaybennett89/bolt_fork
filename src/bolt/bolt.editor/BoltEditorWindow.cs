@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using Bolt.Compiler;
-using System.Linq;
+﻿using Bolt.Compiler;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 public class BoltEditorWindow : BoltWindow {
   [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
@@ -50,12 +49,10 @@ public class BoltEditorWindow : BoltWindow {
     GUI.color = Color.white;
 
     GUILayout.Label(BoltEditorGUI.Tooltip ?? "");
-
     GUILayout.EndHorizontal();
   }
 
   void Editor() {
-
     if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) == false)) {
       SelectedAsset = (AssetDefinition)Selected;
     }
@@ -86,7 +83,7 @@ public class BoltEditorWindow : BoltWindow {
       GUILayout.Label(":", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.ExpandWidth(false));
 
       // inheritnace
-      def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, new Guid[] { });
+      def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
 
       // 
       if (BoltEditorGUI.LabelButton("abstract", def.IsAbstract, 0.25f, GUILayout.Width(45))) {
@@ -108,11 +105,7 @@ public class BoltEditorWindow : BoltWindow {
       });
     }
 
-
-    // add button
-    // GUILayout.Label("Defined Properties", BoltEditorGUI.MiniLabelButtonStyle);
-
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyStateSettings());
+    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
@@ -137,7 +130,7 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyStateSettings());
+    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, StateAndStructToolbar);
@@ -165,7 +158,7 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Defined Properties", def.Properties, () => new PropertyEventSettings());
+    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyEventSettings());
 
     // list properties
     EditPropertyList(def, def.Properties, null);
