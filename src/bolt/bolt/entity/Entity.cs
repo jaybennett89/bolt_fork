@@ -62,6 +62,10 @@ namespace Bolt {
       get { return Flags & EntityFlags.PERSIST_ON_LOAD; }
     }
 
+    internal bool CanQueueCommands {
+      get { return _canQueueCommands; }
+    }
+
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
@@ -233,7 +237,7 @@ namespace Bolt {
         }
       }
 
-        if (HasControl) {
+      if (HasControl) {
         Assert.Null(Controller);
 
         // execute all old commands (in order)
@@ -284,13 +288,12 @@ namespace Bolt {
       else {
         if (Controller != null) {
           int commands = ExecuteCommandsFromRemote();
-
           if (commands == 0) {
             if (CommandQueue.count > 0) {
-              ExecuteMissingCommand(CommandQueue.last);
+              MissingCommand(CommandQueue.last);
             }
             else {
-              ExecuteMissingCommand(null);
+              MissingCommand(null);
             }
 
             ExecuteCommandsFromRemote();
@@ -301,9 +304,16 @@ namespace Bolt {
       Serializer.OnSimulateAfter();
     }
 
-    void ExecuteMissingCommand(Command previous) {
-      for (int i = 0; i < Behaviours.Length; ++i) {
-        Behaviours[i].MissingCommand(previous);
+    void MissingCommand(Command previous) {
+      try {
+        _canQueueCommands = true;
+
+        for (int i = 0; i < Behaviours.Length; ++i) {
+          Behaviours[i].MissingCommand(previous);
+        }
+      }
+      finally {
+        _canQueueCommands = false;
       }
     }
 
