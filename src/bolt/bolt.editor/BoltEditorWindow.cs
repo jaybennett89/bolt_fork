@@ -334,10 +334,12 @@ public class BoltEditorWindow : BoltWindow {
             });
           }
 
-          if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
-            BoltEditorGUI.WithLabel("Owner", () => { p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection); });
-            BoltEditorGUI.WithLabel("Controller", () => { p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection); });
-            BoltEditorGUI.WithLabel("Others", () => { p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection); });
+          if (!(p.PropertyType is PropertyTypeTrigger)) {
+            if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
+              BoltEditorGUI.WithLabel("Owner", () => { p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection); });
+              BoltEditorGUI.WithLabel("Controller", () => { p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection); });
+              BoltEditorGUI.WithLabel("Others", () => { p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection); });
+            }
           }
         });
       }
