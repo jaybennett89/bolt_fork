@@ -189,7 +189,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="command">The command to queue</param>
   public bool QueueInput(Bolt.ICommandInput command) {
-    return Entity.QueueCommand((Bolt.Command)(object)command);
+    return Entity.QueueInput((Bolt.Command)(object)command);
   }
 
   /// <summary>
@@ -232,7 +232,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// <typeparam name="TState">The type of state to get</typeparam>
   /// <returns>The state</returns>
   public TState GetState<TState>() {
-    return (TState)(object)Entity.Serializer;
+    if (Entity.Serializer is TState) {
+      return (TState)(object)Entity.Serializer;
+    }
+
+    BoltLog.Error("You are trying to access the state of {0} as '{1}'", Entity, typeof(TState));
+    return default(TState);
   }
 
   public override string ToString() {

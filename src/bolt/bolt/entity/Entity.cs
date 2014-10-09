@@ -232,7 +232,7 @@ namespace Bolt {
         }
       }
 
-      if (HasControl) {
+        if (HasControl) {
         Assert.Null(Controller);
 
         // execute all old commands (in order)
@@ -283,17 +283,6 @@ namespace Bolt {
       else {
         if (Controller != null) {
           Assert.True(IsOwner);
-
-          if (CommandQueue.count == 0) {
-            try {
-              _canQueueCommands = true;
-
-
-            }
-            finally {
-              _canQueueCommands = false;
-            }
-          }
 
           do {
             it = CommandQueue.GetIterator();

@@ -20,8 +20,8 @@ namespace Bolt {
       PropertyData = propertyData;
     }
 
-    public override void DisplayDebugValue(State state) {
-      BoltGUI.Label(Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset));
+    public override object GetDebugValue(State state) {
+      return Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset);
     }
 
     public override int StateBits(State state, State.Frame frame) {

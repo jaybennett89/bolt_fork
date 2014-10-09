@@ -150,19 +150,9 @@ class BoltUserAssemblyCompiler {
   }
 
   public static ManualResetEvent Run(bool all) {
-    return Run(false, all);
-  }
-
-  public static ManualResetEvent Run(bool force, bool all) {
     ManualResetEvent evnt = new ManualResetEvent(false);
 
     try {
-      if (!force && EditorApplication.isCompiling) {
-        Debug.LogError("Can't compile Bolt while unity is compiling it's own resources.");
-        evnt.Set();
-        return evnt;
-      }
-
       // calculate source dir
       _sourceDir = BoltEditorUtils.MakePath(Path.GetDirectoryName(assetDir), "Temp", "bolt");
 

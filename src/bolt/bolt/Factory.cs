@@ -32,6 +32,10 @@ namespace Bolt {
       _factories.Add(factory.TypeId, factory);
     }
 
+    internal static Bolt.IFactory GetFactory(TypeId id) {
+      return _factories[id];
+    }
+
     internal static IEventFactory GetEventFactory(TypeId id) {
       return (IEventFactory)_factories[id];
     }
@@ -67,6 +71,7 @@ namespace Bolt {
       _factories.Clear();
       _factories = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
     }
+
   }
 
 }

@@ -3,12 +3,24 @@ using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
 
+
+namespace BoltInternal {
+  public interface IDebugDrawer {
+    void Indent(int adjust);
+    void Label(string text);
+    void LabelBold(string text);
+    void LabelField(string text, object value);
+    void Separator();
+  }
+}
+
 public static class BoltNetworkInternal {
   public static int SceneIndexOffset;
   public static bool UsingUnityPro;
 
   public static Action EnvironmentSetup;
   public static Action EnvironmentReset;
+  public static BoltInternal.IDebugDrawer DebugDrawer;
 
   public static Func<UdpPlatform> CreateUdpPlatform;
   public static Func<UdpIPv4Address> GetBroadcastAddress;

@@ -14,8 +14,8 @@ namespace Bolt {
       return 1;
     }
 
-    public override void DisplayDebugValue(State state) {
-      BoltGUI.Label(state.Frames.first.Data.ReadBool(StateData.ByteOffset));
+    public override object GetDebugValue(State state) {
+      return state.Frames.first.Data.ReadBool(StateData.ByteOffset);
     }
 
     protected override void PullMecanimValue(State state) {

@@ -84,6 +84,16 @@ namespace Bolt {
       return (12 + 16) * 8;
     }
 
+    public override object GetDebugValue(State state) {
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
+      if (td.Simulate) {
+        return string.Format("Pos: {0}, Rot: {1}", state.Frames.first.Data.ReadVector3(StateData.ByteOffset), state.Frames.first.Data.ReadQuaternion(StateData.ByteOffset + 12).eulerAngles);
+      }
+      else {
+        return "NOT ASSIGNED";
+      }
+    }
+
     public override void OnInit(State state) {
       state.PropertyObjects[StateData.ObjectOffset] = new TransformData();
     }

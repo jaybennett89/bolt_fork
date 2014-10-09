@@ -110,7 +110,7 @@ namespace Bolt {
       }
     }
 
-    internal bool QueueCommand(Command cmd) {
+    internal bool QueueInput(Command cmd) {
       if (_canQueueCommands) {
         if (CommandQueue.count < BoltCore._config.commandQueueSize) {
           cmd.Frame = BoltCore.serverFrame;

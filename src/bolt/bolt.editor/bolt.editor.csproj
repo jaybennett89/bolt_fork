@@ -96,6 +96,7 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltUnityDebugDrawer.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
