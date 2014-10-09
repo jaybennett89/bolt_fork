@@ -4,23 +4,23 @@ namespace Bolt {
   class SceneLoadChannel : BoltChannel {
     public override void Pack(BoltPacket packet) {
       var s = packet.stream;
-      s.WriteInt(BoltCore._localSceneLoading.Scene.Index, 8);
-      s.WriteInt(BoltCore._localSceneLoading.Scene.Token, 8);
-      s.WriteInt((int)BoltCore._localSceneLoading.State, 8);
+      s.WriteInt(BoltCore._localSceneLoading.Scene.Index, 32);
+      s.WriteInt(BoltCore._localSceneLoading.Scene.Token, 32);
+      s.WriteInt((int)BoltCore._localSceneLoading.State, 32);
     }
 
     public override void Read(BoltPacket packet) {
       var s = packet.stream;
 
-      Scene scene = new Scene(s.ReadInt(8), s.ReadInt(8));
+      Scene scene = new Scene(s.ReadInt(32), s.ReadInt(32));
 
       if (connection._remoteSceneLoading.Scene != scene) {
         connection._remoteSceneLoading.Scene = scene;
-        connection._remoteSceneLoading.State = s.ReadInt(8);
+        connection._remoteSceneLoading.State = s.ReadInt(32);
       }
       else {
         connection._remoteSceneLoading.Scene = scene;
-        connection._remoteSceneLoading.State = Math.Max(connection._remoteSceneLoading.State, s.ReadInt(8));
+        connection._remoteSceneLoading.State = Math.Max(connection._remoteSceneLoading.State, s.ReadInt(32));
       }
 
       if (BoltCore.isClient) {

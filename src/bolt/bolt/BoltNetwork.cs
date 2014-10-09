@@ -178,12 +178,44 @@ public static class BoltNetwork {
     return null;
   }
 
+  public static BoltEntity Instantiate(GameObject prefab) {
+    return BoltCore.Instantiate(prefab, Vector3.zero, Quaternion.identity);
+  }
+
+  public static BoltEntity Instantiate(GameObject prefab, Vector3 position) {
+    return BoltCore.Instantiate(prefab, position, Quaternion.identity);
+  }
+
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     return BoltCore.Instantiate(prefab, position, rotation);
   }
 
+  public static BoltEntity Instantiate(Bolt.PrefabId prefabId) {
+    return BoltCore.Instantiate(prefabId, Vector3.zero, Quaternion.identity);
+  }
+
+  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position) {
+    return BoltCore.Instantiate(prefabId, position, Quaternion.identity);
+  }
+
   public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position, Quaternion rotation) {
     return BoltCore.Instantiate(prefabId, position, rotation);
+  }
+
+  public static GameObject Attach(GameObject gameObject) {
+    return BoltCore.Attach(gameObject);
+  }
+
+  public static GameObject Attach(GameObject gameObject, Bolt.TypeId serializerTypeId) {
+    return BoltCore.Attach(gameObject, serializerTypeId);
+  }
+
+  public static void Detach(BoltEntity boltEntity) {
+    BoltCore.Detach(boltEntity);
+  }
+
+  public static void Detach(GameObject gameObject) {
+    BoltCore.Detach(gameObject.GetComponent<BoltEntity>());
   }
 
   public static BoltPhysicsHits RaycastAll(Ray ray) {

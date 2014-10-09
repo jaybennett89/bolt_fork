@@ -51,6 +51,11 @@ namespace Bolt {
       get { return Flags & CommandFlags.CORRECTION_RECEIVED; }
     }
 
+    public object UserToken {
+      get;
+      set;
+    }
+
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }

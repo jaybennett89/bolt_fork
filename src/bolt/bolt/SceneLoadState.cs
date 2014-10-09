@@ -12,7 +12,7 @@
     }
 
     public static SceneLoadState DefaultRemote() {
-      return new SceneLoadState() { Scene = new Scene(-1, -1), State = SceneLoadState.STATE_LOADING };
+      return new SceneLoadState() { Scene = new Scene(-1, -1), State = SceneLoadState.STATE_CALLBACK_INVOKED };
     }
 
     public static SceneLoadState DefaultLocal() {
