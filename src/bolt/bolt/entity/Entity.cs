@@ -30,6 +30,7 @@ namespace Bolt {
     internal int UpdateRate;
     internal bool ControllerLocalPrediction;
     internal ushort CommandSequence = 0;
+    internal Command CommandLastExecuted = null;
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
@@ -282,29 +283,55 @@ namespace Bolt {
       }
       else {
         if (Controller != null) {
-          Assert.True(IsOwner);
+          int commands = ExecuteCommandsFromRemote();
 
-          do {
-            it = CommandQueue.GetIterator();
-
-            while (it.Next()) {
-              if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
-                continue;
-              }
-
-              try {
-                ExecuteCommand(it.val, false);
-                break;
-              }
-              finally {
-                it.val.Flags |= CommandFlags.SEND_STATE;
-              }
+          if (commands == 0) {
+            if (CommandQueue.count > 0) {
+              ExecuteMissingCommand(CommandQueue.last);
             }
-          } while (UnexecutedCommandCount() > BoltCore._config.commandDejitterDelay);
+            else {
+              ExecuteMissingCommand(null);
+            }
+
+            ExecuteCommandsFromRemote();
+          }
         }
       }
 
       Serializer.OnSimulateAfter();
+    }
+
+    void ExecuteMissingCommand(Command previous) {
+      for (int i = 0; i < Behaviours.Length; ++i) {
+        Behaviours[i].MissingCommand(previous);
+      }
+    }
+
+    int ExecuteCommandsFromRemote() {
+      int commandExecuted = 0;
+
+      Assert.True(IsOwner);
+
+      do {
+        var it = CommandQueue.GetIterator();
+
+        while (it.Next()) {
+          if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
+            continue;
+          }
+
+          try {
+            ExecuteCommand(it.val, false);
+            commandExecuted += 1;
+            break;
+          }
+          finally {
+            it.val.Flags |= CommandFlags.SEND_STATE;
+          }
+        }
+      } while (UnexecutedCommandCount() > BoltCore._config.commandDejitterDelay);
+
+      return commandExecuted;
     }
 
     void ExecuteCommand(Command cmd, bool resetState) {

@@ -6,7 +6,12 @@ public class BoltEventAssetEditor : Editor {
 
   public override bool UseDefaultMargins () { return false; }
 
-  public override void OnInspectorGUI () {
+  public override void OnInspectorGUI() {
+    GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+    style.normal.textColor = Color.red;
+    GUILayout.Label("Use the new 'Bolt Project' window to add/edit assets", style);
+
+    EditorGUI.BeginDisabledGroup(true);
     BoltEventAsset asset = (BoltEventAsset) target;
 
     // event specific stuff editor
@@ -79,5 +84,6 @@ public class BoltEventAssetEditor : Editor {
 
     // compile button
     BoltAssetEditorGUI.CompileButton(asset);
+    EditorGUI.EndDisabledGroup();
   }
 }

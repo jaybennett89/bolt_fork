@@ -18,6 +18,7 @@ namespace Bolt.Compiler {
     public List<CommandDecorator> Commands;
 
     public CodeNamespace CodeNamespace;
+    public CodeNamespace CodeNamespaceInternal;
     public CodeCompileUnit CodeCompileUnit;
 
     public IEnumerable<FilterDefinition> Filters {
@@ -35,8 +36,11 @@ namespace Bolt.Compiler {
       Project = context;
 
       CodeNamespace = new CodeNamespace();
+      CodeNamespaceInternal = new CodeNamespace("BoltInternal");
+
       CodeCompileUnit = new CodeCompileUnit();
       CodeCompileUnit.Namespaces.Add(CodeNamespace);
+      CodeCompileUnit.Namespaces.Add(CodeNamespaceInternal);
 
       // resets all data on the context/assets
       DecorateDefinitions();
@@ -216,8 +220,28 @@ namespace Bolt.Compiler {
       }
 
       EmitEventBaseClasses();
+      EmitStateTypeIdLookup();
 
       //EmitFilters();
+    }
+
+    void EmitStateTypeIdLookup() {
+      CodeTypeDeclaration type;
+
+      type = new CodeTypeDeclaration("StateSerializerTypeIds");
+      type.TypeAttributes = TypeAttributes.Public | TypeAttributes.Abstract;
+      
+      foreach (StateDecorator s in States) {
+        if(s.Definition.IsAbstract) {
+          continue;
+        }
+
+        var field = type.DeclareField("Bolt.TypeId", s.InterfaceName);
+        field.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        field.InitExpression = new CodeSnippetExpression(string.Format("new Bolt.TypeId({0})", s.TypeId));
+      }
+
+      CodeNamespaceInternal.Types.Add(type);
     }
 
     void EmitEventBaseClasses() {

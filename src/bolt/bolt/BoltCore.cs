@@ -257,12 +257,18 @@ internal static class BoltCore {
 
   public static GameObject Attach(GameObject gameObject) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Entity.CreateFor(gameObject, new PrefabId(be._prefabId), new TypeId(be._defaultSerializerTypeId)).UnityObject.gameObject;
+    return Attach(gameObject, new TypeId(be._defaultSerializerTypeId));
   }
 
   public static GameObject Attach(GameObject gameObject, TypeId serializerId) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId).UnityObject.gameObject;
+
+    Entity en;
+    en = Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId);
+    en.Initialize();
+    en.Attach();
+    
+    return en.UnityObject.gameObject;
   }
 
   public static void Detach(BoltEntity entity) {
