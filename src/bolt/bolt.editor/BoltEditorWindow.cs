@@ -334,8 +334,11 @@ public class BoltEditorWindow : BoltWindow {
             });
           }
 
-          if (!(p.PropertyType is PropertyTypeTrigger)) {
-            if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
+          if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
+            if (p.PropertyType is PropertyTypeTrigger) {
+
+            }
+            else {
               BoltEditorGUI.WithLabel("Owner", () => { p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection); });
               BoltEditorGUI.WithLabel("Controller", () => { p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection); });
               BoltEditorGUI.WithLabel("Others", () => { p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection); });
