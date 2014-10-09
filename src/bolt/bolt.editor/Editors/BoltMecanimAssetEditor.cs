@@ -8,7 +8,12 @@ public class BoltMecanimAssetEditor : Editor {
     return false;
   }
 
-  public override void OnInspectorGUI () {
+  public override void OnInspectorGUI() {
+    GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+    style.normal.textColor = Color.red;
+    GUILayout.Label("Use the new 'Bolt Project' window to add/edit assets", style);
+
+    EditorGUI.BeginDisabledGroup(true);
     BoltMecanimAsset asset = (BoltMecanimAsset) target;
 
     BoltAssetEditorGUI.Header("settings", "Settings");
@@ -42,5 +47,6 @@ public class BoltMecanimAssetEditor : Editor {
     }
 
     BoltAssetEditorGUI.CompileButton(asset);
+    EditorGUI.EndDisabledGroup();
   }
 }

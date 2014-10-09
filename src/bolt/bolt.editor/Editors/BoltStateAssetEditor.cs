@@ -8,7 +8,12 @@ public class BoltStateAssetEditor : Editor {
     return false;
   }
 
-  public override void OnInspectorGUI () {
+  public override void OnInspectorGUI() {
+    GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+    style.normal.textColor = Color.red;
+    GUILayout.Label("Use the new 'Bolt Project' window to add/edit assets", style);
+
+    EditorGUI.BeginDisabledGroup(true);
     BoltStateAsset asset = (BoltStateAsset) target;
     
     BoltAssetEditorGUI.HeaderPropertyList("properties", "Properties", ref asset._properties);
@@ -21,6 +26,7 @@ public class BoltStateAssetEditor : Editor {
     //asset._groups = EditGroupArray(asset._groups);
 
     BoltAssetEditorGUI.CompileButton(asset);
+    EditorGUI.EndDisabledGroup();
   }
 
   BoltAssetPropertyGroup[] EditGroupArray (BoltAssetPropertyGroup[] ga) {
@@ -37,6 +43,7 @@ public class BoltStateAssetEditor : Editor {
     //}
 
     return ga;
+
   }
 
   BoltAssetPropertyGroup EditGroup (BoltAssetPropertyGroup g) {
