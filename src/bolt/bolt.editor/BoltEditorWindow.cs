@@ -339,9 +339,26 @@ public class BoltEditorWindow : BoltWindow {
 
             }
             else {
-              BoltEditorGUI.WithLabel("Owner", () => { p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection); });
-              BoltEditorGUI.WithLabel("Controller", () => { p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection); });
-              BoltEditorGUI.WithLabel("Others", () => { p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection); });
+              BoltEditorGUI.WithLabel("Value", () => {
+                EditorGUILayout.BeginHorizontal();
+
+                EditorGUILayout.BeginVertical();
+                GUILayout.Label("Owner", BoltEditorGUI.SmallWhiteText);
+                p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection);
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.BeginVertical();
+                GUILayout.Label("Controller", BoltEditorGUI.SmallWhiteText);
+                p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection);
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.BeginVertical();
+                GUILayout.Label("Others", BoltEditorGUI.SmallWhiteText);
+                p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection);
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.EndHorizontal();
+              });
             }
           }
         });
