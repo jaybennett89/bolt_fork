@@ -41,6 +41,18 @@ namespace Bolt {
       stream.WriteUInt(uint3);
     }
 
+    public override int GetHashCode() {
+      return guid.GetHashCode();
+    }
+
+    public override bool Equals(object obj) {
+      if (obj is UniqueId) {
+        return ((UniqueId)obj).guid == guid;
+      }
+
+      return false;
+    }
+
     public override string ToString() {
       if (IsNone) {
         return "[UniqueId NONE]";
