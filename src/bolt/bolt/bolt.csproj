@@ -103,7 +103,6 @@
       <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
-    <Compile Include="BoltFactory.cs" />
     <Compile Include="t4\BoltFlagsGenerated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -114,7 +113,6 @@
     <Compile Include="BoltGUI.cs" />
     <Compile Include="BoltNetwork.cs" />
     <Compile Include="BoltObjectPool.cs" />
-    <Compile Include="BoltOrigin.cs" />
     <Compile Include="collections\BoltIterator.cs" />
     <Compile Include="collections\STuple.cs" />
     <Compile Include="hitbox\BoltHitboxWorldSnapshotPool.cs" />
@@ -136,7 +134,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BoltIds.tt</DependentUpon>
     </Compile>
-    <Compile Include="utils\Bits.cs" />
     <Compile Include="BoltChannel.cs" />
     <Compile Include="BoltConnection.cs" />
     <Compile Include="BoltConsole.cs" />
