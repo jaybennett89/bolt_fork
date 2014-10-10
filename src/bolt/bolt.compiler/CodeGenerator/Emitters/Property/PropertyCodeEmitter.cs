@@ -22,7 +22,7 @@ namespace Bolt.Compiler {
         Decorator.ByteSize, // {1}
         p.OffsetObjects, // {2}
         Decorator.Definition.Priority, // {3}
-        p.CallbackPaths[p.CallbackPaths.Length - 1], // {4}
+        p.CallbackPaths[p.CallbackPaths.Length - 1].Trim('.'), // {4}
         p.CallbackPathsExpression(), // {5}
         p.CreateIndicesExpr(), // {6}
         Decorator.Definition.Name // {7} 
