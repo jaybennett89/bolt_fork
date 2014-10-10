@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : Bolt.EntityBehaviour<IPlayerState> {
+public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   const float MOUSE_SENSEITIVITY = 2f;
 
   bool forward;
@@ -27,6 +27,10 @@ public class PlayerController : Bolt.EntityBehaviour<IPlayerState> {
 
   public WeaponBase activeWeapon {
     get { return _weapons[state.weapon]; }
+  }
+
+  public override void OnEvent(LogEvent evnt) {
+    BoltLog.Info("EVENT:{0}", evnt.message);
   }
 
   void Awake() {
@@ -125,6 +129,13 @@ public class PlayerController : Bolt.EntityBehaviour<IPlayerState> {
   }
 
   public override void SimulateController() {
+
+    if (BoltNetwork.frame % 30 == 0) {
+      using (var ev = LogEvent.Raise(entity)) {
+        ev.message = string.Format("FROM:{0}", BoltNetwork.isServer ? "SERVER" : "CLIENT");
+      }
+    }
+
     PollKeys(false);
 
     IPlayerCommandInput input =  PlayerCommand.Create();
