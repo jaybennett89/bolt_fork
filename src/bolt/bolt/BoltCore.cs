@@ -506,6 +506,19 @@ internal static class BoltCore {
 
   internal static void Send() {
     if (hasSocket) {
+      // auto scope everything
+      if (BoltCore._config.scopeMode == ScopeMode.Automatic) {
+        var eo = _entities.GetIterator();
+
+        while (eo.Next()) {
+          var cn = _connections.GetIterator();
+
+          while (cn.Next()) {
+            cn.val._entityChannel.CreateOnRemote(eo.val);
+          }
+        }
+      }
+
       BoltPhysics.SnapshotWorld();
 
       // switch perf counters

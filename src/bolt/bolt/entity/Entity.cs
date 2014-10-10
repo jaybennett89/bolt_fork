@@ -138,15 +138,6 @@ namespace Bolt {
 
       // log
       BoltLog.Debug("Attached {0}", this);
-
-      // create on all connections
-      if (BoltCore._config.scopeMode == ScopeMode.Automatic) {
-        var it = BoltCore._connections.GetIterator();
-
-        while (it.Next()) {
-          it.val._entityChannel.CreateOnRemote(this);
-        }
-      }
     }
 
     internal void Detach() {
