@@ -31,7 +31,7 @@ partial class BoltCompiler {
       }
     }
 
-    foreach (var group in si.GroupBy(x => x.Identifier)) {
+    foreach (var group in si.Where(x => x.Enabled).GroupBy(x => x.Identifier)) {
       if (group.Count() > 1) {
         throw new BoltException("You have several scenes named '{0}' in the build settings.", group.Key);
       }

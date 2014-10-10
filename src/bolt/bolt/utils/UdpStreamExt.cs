@@ -433,22 +433,14 @@ public static class UdpStreamExtensions {
     return m;
   }
 
-  public static void WriteBits(this UdpStream stream, Bits value, int bits) {
-    stream.WriteUInt(value, bits);
-  }
-
-  public static Bits ReadBits(this UdpStream stream, int bits) {
-    return stream.ReadUInt(bits);
-  }
-
-  public static void WriteNetworkId(this UdpStream stream, NetId id) {
+  internal static void WriteNetworkId(this UdpStream stream, NetId id) {
     Assert.True(id.Value >= 0);
     Assert.True(id.Value < EntityProxy.MAX_COUNT);
 
     stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
   }
 
-  public static NetId ReadNetworkId(this UdpStream stream) {
+  internal static NetId ReadNetworkId(this UdpStream stream) {
     return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
   }
 

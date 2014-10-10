@@ -86,8 +86,12 @@ namespace Bolt {
       }
     }
 
-    void IDisposable.Dispose() {
+    public void Commit() {
       EventDispatcher.Enqueue(this);
+    }
+
+    void IDisposable.Dispose() {
+      Commit();
     }
 
     void VerifyIsActive() {

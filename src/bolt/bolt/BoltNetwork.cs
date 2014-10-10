@@ -103,6 +103,13 @@ public static class BoltNetwork {
   }
 
   /// <summary>
+  /// Normalized value of how much time have passed since the last FixedUpdate
+  /// </summary>
+  public static float frameAlpha {
+    get { return BoltCore.frameAlpha; }
+  }
+
+  /// <summary>
   /// All the connections connected to this host
   /// </summary>
   public static IEnumerable<BoltConnection> connections {

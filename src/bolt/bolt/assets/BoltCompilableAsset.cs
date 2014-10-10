@@ -4,6 +4,6 @@ public abstract class BoltCompilableAsset : ScriptableObject {
   public bool compile = true;
 
   public bool nameIsCSharpId {
-    get { return BoltUtils.IsCSharpIdentifier(name); }
+    get { return true; }
   }
 }

@@ -52,10 +52,6 @@ internal static class BoltCore {
   internal static Action<GameObject> _destroy =
     (go) => GameObject.Destroy(go);
 
-  public static Func<int, Transform> resolveTransform = BoltOrigin.ResolveTransform;
-  public static Func<Transform, int> resolveTransformId = BoltOrigin.ResolveTransformId;
-
-
   public static Action ShutdownComplete;
 
   public static int loadedScene {
