@@ -8,7 +8,7 @@ namespace Bolt {
   interface IFactory {
     Type TypeObject { get; }
     TypeId TypeId { get; }
-    //Guid TypeGuid { get; }
+    UniqueId TypeUniqueId { get; }
     object Create();
   }
 
@@ -23,7 +23,7 @@ namespace Bolt {
   }
 
   static class Factory {
-    static Dictionary<Guid, IFactory> _factoriesByGuid = new Dictionary<Guid, IFactory>();
+    static Dictionary<UniqueId, IFactory> _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>();
     static Dictionary<TypeId, IFactory> _factoriesByTypeId = new Dictionary<TypeId, IFactory>();
 
     internal static bool IsEmpty {
@@ -31,7 +31,7 @@ namespace Bolt {
     }
 
     internal static void Register(Bolt.IFactory factory) {
-      //_factoriesByGuid.Add(factory.TypeGuid, factory);
+      _factoriesByUniqueId.Add(factory.TypeUniqueId, factory);
       _factoriesByTypeId.Add(factory.TypeId, factory);
     }
 
@@ -39,16 +39,16 @@ namespace Bolt {
       return _factoriesByTypeId[id];
     }
 
-    internal static Bolt.IFactory GetFactory(Guid id) {
-      return _factoriesByGuid[id];
+    internal static Bolt.IFactory GetFactory(UniqueId id) {
+      return _factoriesByUniqueId[id];
     }
 
     internal static IEventFactory GetEventFactory(TypeId id) {
       return (IEventFactory)_factoriesByTypeId[id];
     }
 
-    internal static IEventFactory GetEventFactory(Guid id) {
-      return (IEventFactory)_factoriesByGuid[id];
+    internal static IEventFactory GetEventFactory(UniqueId id) {
+      return (IEventFactory)_factoriesByUniqueId[id];
     }
 
     internal static Event NewEvent(TypeId id) {
@@ -60,7 +60,7 @@ namespace Bolt {
       return ev;
     }
 
-    internal static Event NewEvent(Guid id) {
+    internal static Event NewEvent(UniqueId id) {
       Event ev;
 
       ev = (Event)Create(id);
@@ -74,7 +74,7 @@ namespace Bolt {
     }
 
 
-    internal static Command NewCommand(Guid id) {
+    internal static Command NewCommand(UniqueId id) {
       return (Command)Create(id);
     }
 
@@ -82,7 +82,7 @@ namespace Bolt {
       return (IEntitySerializer)Create(id);
     }
 
-    internal static IEntitySerializer NewSerializer(Guid guid) {
+    internal static IEntitySerializer NewSerializer(UniqueId guid) {
       return (IEntitySerializer)Create(guid);
     }
 
@@ -96,22 +96,22 @@ namespace Bolt {
       return _factoriesByTypeId[id].Create();
     }
 
-    static object Create(Guid id) {
+    static object Create(UniqueId id) {
 #if DEBUG
-      if (_factoriesByGuid.ContainsKey(id) == false) {
-        BoltLog.Error("Unknown [Guid {0}]", id);
+      if (_factoriesByUniqueId.ContainsKey(id) == false) {
+        BoltLog.Error("Unknown {0}", id);
       }
 #endif
 
-      return _factoriesByGuid[id].Create();
+      return _factoriesByUniqueId[id].Create();
     }
 
     internal static void UnregisterAll() {
-      _factoriesByGuid.Clear();
       _factoriesByTypeId.Clear();
+      _factoriesByUniqueId.Clear();
 
-      _factoriesByGuid = new Dictionary<Guid, IFactory>(128);
       _factoriesByTypeId = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
+      _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>(128, UniqueId.EqualityComparer.Instance);
     }
 
   }

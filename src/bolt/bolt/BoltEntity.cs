@@ -5,7 +5,7 @@ using UE = UnityEngine;
 
 public interface IBoltEntitySettingsModifier : IDisposable {
   Bolt.PrefabId prefabId { get; set; }
-  Bolt.TypeId defaultSerializerTypeId { get; set; }
+  Bolt.UniqueId defaultSerializerUniqueId { get; set; }
 
   int updateRate { get; set; }
 
@@ -32,9 +32,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
     }
 
-    Bolt.TypeId IBoltEntitySettingsModifier.defaultSerializerTypeId {
-      get { return new Bolt.TypeId(_entity._defaultSerializerTypeId); }
-      set { _entity.VerifyNotAttached(); _entity._defaultSerializerTypeId = value.Value; }
+    Bolt.UniqueId IBoltEntitySettingsModifier.defaultSerializerUniqueId {
+      get { return _entity.defaultSerializerUniqueId; }
+      set { _entity.VerifyNotAttached(); _entity.defaultSerializerUniqueId = value; }
     }
 
     int IBoltEntitySettingsModifier.updateRate {
@@ -74,7 +74,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal int _updateRate = 1;
 
   [UE.SerializeField]
-  internal int _defaultSerializerTypeId = 0;
+  int _defaultSerializerTypeId = 0;
 
   [UE.SerializeField]
   internal bool _clientPredicted = true;
@@ -96,13 +96,13 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     }
   }
 
-  internal Guid DefaultSerializerGuid {
+  internal Bolt.UniqueId defaultSerializerUniqueId {
     get {
       if (_defaultSerializerGuid == null || _defaultSerializerGuid.Length != 16) {
-        return Guid.Empty;
+        return Bolt.UniqueId.None;
       }
 
-      return new Guid(_defaultSerializerGuid);
+      return new Bolt.UniqueId(_defaultSerializerGuid);
     }
     set {
       _defaultSerializerGuid = value.ToByteArray();

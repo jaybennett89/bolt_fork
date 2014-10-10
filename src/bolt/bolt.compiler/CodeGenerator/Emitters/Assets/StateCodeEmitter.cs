@@ -48,6 +48,10 @@ namespace Bolt.Compiler {
         get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId);
       });
 
+      type.DeclareProperty("Bolt.UniqueId", "TypeUniqueId", get => {
+        get.Expr("return new Bolt.UniqueId({0})", Decorator.Definition.Guid.ToByteArray().Join(", "));
+      });
+
       type.DeclareMethod(typeof(object).FullName, "Create", methoid => {
         methoid.Statements.Expr("return new {0}()", Decorator.ClassName);
       });
