@@ -32,7 +32,7 @@ namespace Bolt {
       CommandSequence = 0;
 
       // raise user event
-      BoltGlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
+      BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -67,7 +67,7 @@ namespace Bolt {
       }
 
       // call user event
-      BoltGlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
+      BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
     }
 
     internal void AssignControl(BoltConnection connection) {

@@ -434,15 +434,15 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRequest:
-          BoltGlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
+          BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
           break;
 
         case UdpEventType.ConnectFailed:
-          BoltGlobalEventListenerBase.ConnectFailedInvoke(ev.EndPoint);
+          BoltInternal.GlobalEventListenerBase.ConnectFailedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.ConnectRefused:
-          BoltGlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
+          BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.ObjectSent:
@@ -567,7 +567,7 @@ internal static class BoltCore {
 
         if (sameScene && loadingDone) {
           try {
-            BoltGlobalEventListenerBase.SceneLoadRemoteDoneInvoke(it.val);
+            BoltInternal.GlobalEventListenerBase.SceneLoadRemoteDoneInvoke(it.val);
           }
           finally {
             it.val._remoteSceneLoading.State = Bolt.SceneLoadState.STATE_CALLBACK_INVOKED;
@@ -584,7 +584,7 @@ internal static class BoltCore {
     _connections.AddLast(cn);
 
     // generic connected callback
-    BoltGlobalEventListenerBase.ConnectedInvoke(cn);
+    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn);
 
     // spawn entities
     if (_config.scopeMode == ScopeMode.Automatic) {
@@ -596,7 +596,7 @@ internal static class BoltCore {
 
   static void HandleDisconnected(BoltConnection cn) {
     // generic disconnected callback
-    BoltGlobalEventListenerBase.DisconnectedInvoke(cn);
+    BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn);
 
     if (hasSocket) {
       // cleanup                                                      
@@ -829,7 +829,7 @@ internal static class BoltCore {
     UpdateActiveGlobalBehaviours(scene.Index);
 
     // call out to user code
-    BoltGlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltInternal.GlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 
   internal static void SceneLoadDone(Scene scene) {
@@ -841,6 +841,6 @@ internal static class BoltCore {
     _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
 
     // call out to user code
-    BoltGlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 }

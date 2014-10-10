@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Bolt.Compiler {
@@ -176,6 +177,43 @@ namespace Bolt.Compiler {
 
     public static CodeExpression Expr(this int integer) {
       return new CodeSnippetExpression(integer.ToString());
+    }
+
+    public static CodeTypeDeclaration DeclareInterface(this CodeNamespace ns, string name, params string[] inherits) {
+      CodeTypeDeclaration td;
+
+      td = new CodeTypeDeclaration(name);
+      td.IsInterface = true;
+      td.BaseTypes.AddRange(inherits.Select(x => new CodeTypeReference(x)).ToArray());
+      td.TypeAttributes = TypeAttributes.Public | TypeAttributes.Interface;
+
+      ns.Types.Add(td);
+
+      return td;
+    }
+
+    public static CodeTypeDeclaration DeclareStruct(this CodeNamespace ns, string name) {
+      CodeTypeDeclaration td;
+
+      td = new CodeTypeDeclaration(name);
+      td.IsStruct = true;
+      td.TypeAttributes = TypeAttributes.Public;
+
+      ns.Types.Add(td);
+
+      return td;
+    }
+
+    public static CodeTypeDeclaration DeclareClass(this CodeNamespace ns, string name) {
+      CodeTypeDeclaration td;
+
+      td = new CodeTypeDeclaration(name);
+      td.IsClass = true;
+      td.TypeAttributes = TypeAttributes.Public;
+
+      ns.Types.Add(td);
+
+      return td;
     }
   }
 }

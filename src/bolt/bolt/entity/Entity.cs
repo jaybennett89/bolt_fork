@@ -129,7 +129,7 @@ namespace Bolt {
       BoltCore._entities.AddLast(this);
 
       // call out to user
-      BoltGlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
+      BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
 
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -166,7 +166,7 @@ namespace Bolt {
       }
 
       // call out to user
-      BoltGlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
+      BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
 
       // remove from entities list
       BoltCore._entities.Remove(this);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server, BoltScenes.Level1)]
-public class ServerCallbacks : BoltGlobalEventListener {
+public class ServerCallbacks : Bolt.GlobalEventListener {
   public static bool ListenServer = true;
 
   void Awake() {
