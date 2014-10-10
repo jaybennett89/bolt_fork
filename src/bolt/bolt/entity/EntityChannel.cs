@@ -209,7 +209,6 @@ partial class EntityChannel : BoltChannel {
             continue;
           }
 
-          // if we dont have anything to send
           if ((proxy.Flags & ProxyFlags.CREATE_DONE) || proxy.Envelopes.count > 0) {
             var noDataToSend = proxy.Mask.AndCheck(proxy.Entity.Serializer.GetFilter(connection, proxy)) == false;
             if (noDataToSend) {
@@ -225,6 +224,12 @@ partial class EntityChannel : BoltChannel {
         }
       }
 
+      // if this is the controller give it the max priority
+      if (proxy.Entity.IsController(connection)) {
+        proxy.Priority = 1 << 30;
+      }
+
+      // push
       _outgoingProxiesByPriority[n++] = proxy;
     }
 
