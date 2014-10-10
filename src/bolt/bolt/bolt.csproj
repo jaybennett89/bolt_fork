@@ -73,8 +73,8 @@
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
     <Compile Include="event\EventInterfaces.cs" />
-    <Compile Include="event\ReliableBuffers\EventReliableRecvBuffer.cs" />
-    <Compile Include="event\ReliableBuffers\EventReliableSendBuffer.cs" />
+    <Compile Include="event\EventReliableRecvBuffer.cs" />
+    <Compile Include="event\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
@@ -97,7 +97,6 @@
     <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
-    <Compile Include="state\Trigger.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
