@@ -104,11 +104,6 @@ public partial class Player : IDisposable {
     }
 
     Spawn();
-
-
-    using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
-      ev.message = name + " joined the game";
-    }
   }
 
 }

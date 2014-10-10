@@ -31,26 +31,23 @@ namespace Bolt {
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
       Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, offset)));
 
-      if (stream.WriteBool(entity != null)) {
-        if (connection._entityChannel.ExistsOnRemote(entity)) {
-          stream.WriteNetworkId(connection._entityChannel.GetNetworkId(entity));
-        }
-        else {
-          return false;
-        }
+      if (connection._entityChannel.ExistsOnRemote(entity) == false) {
+        return false;
       }
 
+      stream.WriteEntity(entity, connection);
       return true;
     }
 
     protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      int instanceId = 0;
+      Bolt.Entity entity = stream.ReadEntity(connection);
 
-      if (stream.ReadBool()) {
-        instanceId = connection._entityChannel.GetIncommingEntity(stream.ReadNetworkId()).InstanceId.Value;
+      if (entity) {
+        Blit.PackI32(data, offset, entity.InstanceId.Value);
       }
-
-      Blit.PackI32(data, offset, instanceId);
+      else {
+        Blit.PackI32(data, offset, 0);
+      }
     }
   }
 }

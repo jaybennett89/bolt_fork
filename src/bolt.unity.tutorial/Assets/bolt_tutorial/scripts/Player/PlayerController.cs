@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   const float MOUSE_SENSEITIVITY = 2f;
@@ -89,6 +90,14 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void OnFire() {
+    if (BoltNetwork.entities.Count() > 1) {
+      using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
+        ev.message = name + " joined the game";
+        ev.sender = BoltNetwork.entities.First();
+        ev.sender2 = BoltNetwork.entities.Skip(1).First();
+      }
+    }
+
     // play sfx
     _weaponSfxSource.PlayOneShot(activeWeapon.fireSound);
 
