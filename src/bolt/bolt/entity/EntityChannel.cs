@@ -30,19 +30,21 @@ partial class EntityChannel : BoltChannel {
     _incommingProxiesByInstanceId = new Dictionary<Bolt.InstanceId, EntityProxy>(1024, Bolt.InstanceId.EqualityComparer.Instance);
   }
 
-  public Bolt.Entity GetIncommingEntity(Bolt.NetId proxyId) {
-    if (_incommingProxiesByNetId[proxyId] != null) {
-      return _incommingProxiesByNetId[proxyId].Entity;
+  public Bolt.Entity GetIncommingEntity(Bolt.NetId netId) {
+    if (_incommingProxiesByNetId.ContainsKey(netId)) {
+      return _incommingProxiesByNetId[netId].Entity;
     }
 
+    BoltLog.Warn("Unknown {0}", netId);
     return null;
   }
 
-  public Bolt.Entity GetOutgoingEntity(Bolt.NetId proxyId) {
-    if (_incommingProxiesByNetId[proxyId] != null) {
-      return _incommingProxiesByNetId[proxyId].Entity;
+  public Bolt.Entity GetOutgoingEntity(Bolt.NetId netId) {
+    if (_outgoingProxiesByNetId.ContainsKey(netId)) {
+      return _outgoingProxiesByNetId[netId].Entity;
     }
 
+    BoltLog.Warn("Unknown {0}", netId);
     return null;
   }
 
