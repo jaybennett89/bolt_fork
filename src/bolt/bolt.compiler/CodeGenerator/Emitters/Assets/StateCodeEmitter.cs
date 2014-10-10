@@ -88,6 +88,7 @@ namespace Bolt.Compiler {
         ctor.Statements.Expr("_Meta.PropertyFilters = new Bolt.BitArray[32]");
         ctor.Statements.Expr("_Meta.PropertyFilterCache = new Dictionary<Bolt.Filter, Bolt.BitArray>(128, Bolt.Filter.EqualityComparer.Instance)");
         ctor.Statements.Expr("_Meta.PropertySerializers = new Bolt.PropertySerializer[_Meta.PropertyCount]");
+        ctor.Statements.Expr("_Meta.PropertyCallbackPaths = new HashSet<string>(new string[] {{ {0} }})", Decorator.AllProperties.SelectMany(x => x.CallbackPaths).Distinct().Select(x => '"' + x.Trim('.') + '"').Join(", "));
 
         EmitFilters(ctor);
         EmitProperties(ctor);

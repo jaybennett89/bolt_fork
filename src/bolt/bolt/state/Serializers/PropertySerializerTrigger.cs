@@ -32,10 +32,6 @@ namespace Bolt {
       int triggerBits = frame.Data.ReadI32(SendOffset + 4);
 
       stream.WriteInt(triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("W-{0}: {1} - {2} bits", StateData.PropertyName, triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
-#endif
       return true;
     }
 
@@ -44,10 +40,6 @@ namespace Bolt {
 
       frame.Data.PackI32(LocalOffset, frame.Number);
       frame.Data.PackI32(LocalOffset + 4, triggerBits);
-
-#if BOLT_PROPERTY_TRACE
-      BoltLog.Debug("R-{0}: {1} - {2} bits", StateData.PropertyName, triggerBits, BoltCore.localSendRate * state.Entity.UpdateRate);
-#endif
     }
 
     public override void OnSimulateAfter(State state) {
@@ -60,9 +52,8 @@ namespace Bolt {
       }
     }
 
-    bool InvokeForFrame(State state, State.Frame f) {
+    bool MecanimPushOrNone(State state, State.Frame f, bool push) {
       var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
-      var mecanim = state.Animator && MecanimData.Mode == MecanimMode.Property;
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 
@@ -80,7 +71,7 @@ namespace Bolt {
           state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
 
           // apply to mecanim
-          if (mecanim) {
+          if (push) {
             state.Animator.SetTrigger(StateData.PropertyName);
           }
 
@@ -92,6 +83,33 @@ namespace Bolt {
       }
 
       return true;
+    }
+
+    bool InvokeForFrame(State state, State.Frame f) {
+      if (state.Animator && (MecanimData.Mode == MecanimMode.Property)) {
+        switch (GetMecanimDirection(state)) {
+          case MecanimDirection.Push:
+            return MecanimPushOrNone(state, f, true);
+
+          case MecanimDirection.Pull:
+            if ((state.Animator.GetBool(StateData.PropertyName) == true) && (state.Animator.IsInTransition(MecanimData.Layer) == false)) {
+              state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
+
+              var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
+
+              if (cb != null) {
+                cb();
+              }
+            }
+            return false;
+
+          default:
+            return MecanimPushOrNone(state, f, false);
+        }
+      }
+      else {
+        return MecanimPushOrNone(state, f, false);
+      }
     }
   }
 }

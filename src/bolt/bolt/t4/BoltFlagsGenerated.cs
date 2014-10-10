@@ -85,6 +85,88 @@ public struct EntityFlags {
   }
 
 
+public struct InstantiateFlags {
+    public static readonly InstantiateFlags ZERO = new InstantiateFlags(0);
+    public static readonly InstantiateFlags TAKE_CONTROL = new InstantiateFlags(1);
+    public static readonly InstantiateFlags ASSIGN_CONTROL = new InstantiateFlags(2);
+    
+    readonly int bits;
+
+    public bool IsZero {
+      get { return bits == 0; }
+    }
+
+    InstantiateFlags (int val) {
+      bits = val;
+    }
+	
+    public override int GetHashCode() {
+      return bits;
+    }
+
+    public override bool Equals(object obj) {
+      if (obj is InstantiateFlags) {
+        return bits == ((InstantiateFlags)obj).bits;
+      }
+
+      return false;
+    }
+
+    public override string ToString() {
+	  System.Text.StringBuilder sb = new System.Text.StringBuilder ();
+	  sb.Append("[");
+	  sb.Append("InstantiateFlags");
+
+	  
+    		if((bits & 1) == 1) {
+			sb.Append(" TAKE_CONTROL");
+		}
+			if((bits & 2) == 2) {
+			sb.Append(" ASSIGN_CONTROL");
+		}
+	
+	  sb.Append("]");
+	  return sb.ToString();
+    }
+
+    public static implicit operator bool (InstantiateFlags a) {
+      return a.bits != 0;
+    }
+
+    public static explicit operator int (InstantiateFlags a) {
+      return a.bits;
+    }
+	
+    public static explicit operator InstantiateFlags (int a) {
+      return new InstantiateFlags(a);
+    }
+
+    public static InstantiateFlags operator & (InstantiateFlags a, InstantiateFlags b) {
+      return new InstantiateFlags(a.bits & b.bits);
+    }
+
+    public static InstantiateFlags operator | (InstantiateFlags a, InstantiateFlags b) {
+      return new InstantiateFlags(a.bits | b.bits);
+    }
+
+    public static InstantiateFlags operator ^ (InstantiateFlags a, InstantiateFlags b) {
+      return new InstantiateFlags(a.bits ^ b.bits);
+    }
+
+    public static InstantiateFlags operator ~ (InstantiateFlags a) {
+      return new InstantiateFlags(~a.bits);
+    }
+	
+    public static bool operator ==(InstantiateFlags a, InstantiateFlags b) {
+      return a.bits == b.bits;
+    }
+
+    public static bool operator !=(InstantiateFlags a, InstantiateFlags b) {
+      return a.bits != b.bits;
+    }
+  }
+
+
 public struct ProxyFlags {
     public static readonly ProxyFlags ZERO = new ProxyFlags(0);
     public static readonly ProxyFlags CREATE_REQUESTED = new ProxyFlags(1);

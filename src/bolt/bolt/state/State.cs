@@ -40,6 +40,7 @@ namespace Bolt {
       public BitArray PropertyControllerFilter;
       public PropertySerializer[] PropertySerializers;
       public Dictionary<Filter, BitArray> PropertyFilterCache;
+      public HashSet<string> PropertyCallbackPaths;
     }
 
     public class Frame : IBoltListNode {
@@ -144,46 +145,63 @@ namespace Bolt {
 
     public void SetAnimator(UE.Animator animator) {
       Animator = animator;
+
+      if (Animator && (Animator.updateMode != UE.AnimatorUpdateMode.AnimatePhysics)) {
+        BoltLog.Warn("Animator for '{0}' is not set to 'AnimatePhysics', this might cause Bolt to miss values and triggers being updated.", animator.gameObject);
+      }
+    }
+
+    bool VerifyCallbackPath(string path) {
+      if (MetaData.PropertyCallbackPaths.Contains(path)) {
+        return true;
+      }
+
+      BoltLog.Error("No callback path '{0}' available on {1}", path, this);
+      return false;
     }
 
     public void AddCallback(string path, PropertyCallbackSimple callback) {
-      List<PropertyCallbackSimple> callbacksList;
+      if (VerifyCallbackPath(path)) {
+        List<PropertyCallbackSimple> callbacksList;
 
-      if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
-        CallbacksSimple[path] = callbacksList = new List<PropertyCallbackSimple>(32);
+        if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
+          CallbacksSimple[path] = callbacksList = new List<PropertyCallbackSimple>(32);
+        }
+
+        callbacksList.Add(callback);
       }
-
-      callbacksList.Add(callback);
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
-      List<PropertyCallback> callbacksList;
+      if (VerifyCallbackPath(path)) {
+        List<PropertyCallback> callbacksList;
 
-      if (Callbacks.TryGetValue(path, out callbacksList) == false) {
-        Callbacks[path] = callbacksList = new List<PropertyCallback>(32);
+        if (Callbacks.TryGetValue(path, out callbacksList) == false) {
+          Callbacks[path] = callbacksList = new List<PropertyCallback>(32);
+        }
+
+        callbacksList.Add(callback);
       }
-
-      callbacksList.Add(callback);
     }
 
     public void RemoveCallback(string path, PropertyCallback callback) {
-      List<PropertyCallback> callbacksList;
+      if (VerifyCallbackPath(path)) {
+        List<PropertyCallback> callbacksList;
 
-      if (Callbacks.TryGetValue(path, out callbacksList) == false) {
-        callbacksList.Remove(callback);
+        if (Callbacks.TryGetValue(path, out callbacksList) == false) {
+          callbacksList.Remove(callback);
+        }
       }
     }
 
     public void RemoveCallback(string path, PropertyCallbackSimple callback) {
-      List<PropertyCallbackSimple> callbacksList;
+      if (VerifyCallbackPath(path)) {
+        List<PropertyCallbackSimple> callbacksList;
 
-      if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
-        callbacksList.Remove(callback);
+        if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
+          callbacksList.Remove(callback);
+        }
       }
-    }
-
-    public virtual float CalculatePriority(BoltConnection connection, BitArray mask, int skipped) {
-      return skipped;
     }
 
     public BitArray GetDefaultMask() {

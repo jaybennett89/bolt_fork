@@ -17,7 +17,7 @@ Plugins.meta
 
 Bolt_DebugStart_Build
 Bolt_Log*
-
+/src/bolt.unity.samples/*
 **/Assets/bolt/resources
 **/Assets/bolt/resources.meta
 **/Assets/bolt/scripts

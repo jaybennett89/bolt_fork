@@ -78,7 +78,9 @@
     <Compile Include="Factory.cs" />
     <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
+    <Compile Include="state\Arrays\EntityArray.cs" />
     <Compile Include="state\Arrays\FloatArray.cs" />
+    <Compile Include="state\Arrays\IntegetArray.cs" />
     <Compile Include="state\Arrays\TransformArray.cs" />
     <Compile Include="state\Auxiliary\Enums.cs" />
     <Compile Include="state\Axis.cs" />
@@ -90,9 +92,11 @@
     <Compile Include="state\Serializers\PropertyMecanimData.cs" />
     <Compile Include="state\Serializers\PropertySerializer.cs" />
     <Compile Include="state\Serializers\PropertySerializerBool.cs" />
+    <Compile Include="state\Serializers\PropertySerializerColor.cs" />
     <Compile Include="state\Serializers\PropertySerializerEntity.cs" />
     <Compile Include="state\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state\Serializers\PropertySerializerInteger.cs" />
+    <Compile Include="state\Serializers\PropertySerializerQuaternion.cs" />
     <Compile Include="state\Serializers\PropertySerializerString.cs" />
     <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />

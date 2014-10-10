@@ -12,7 +12,7 @@ public class GameHealth : Bolt.GlobalEventListener {
     if (arg.GetComponent<PlayerController>()) {
       me = arg;
       meState = me.GetState<IPlayerState>();
-      meState.AddCallback(".health", HealthChanged);
+      meState.AddCallback("health", HealthChanged);
 
       HealthChanged();
     }
@@ -20,7 +20,7 @@ public class GameHealth : Bolt.GlobalEventListener {
 
   public override void ControlOfEntityLost(BoltEntity arg) {
     if (arg.GetComponent<PlayerController>()) {
-      meState.RemoveCallback(".health", HealthChanged);
+      meState.RemoveCallback("health", HealthChanged);
 
       me = null;
       meState = null;

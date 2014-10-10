@@ -35,11 +35,11 @@ public class PlayerSfx : Bolt.EntityBehaviour<IPlayerState> {
     prevHealth = 100;
 
     // assign callback
-    state.AddCallback(".health",  HealthChanged);
+    state.AddCallback("health",  HealthChanged);
   }
 
   public override void ControlLost() {
-    state.RemoveCallback(".health",  HealthChanged);
+    state.RemoveCallback("health",  HealthChanged);
   }
 
   void HealthChanged() {

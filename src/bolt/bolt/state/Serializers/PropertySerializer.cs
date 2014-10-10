@@ -105,6 +105,15 @@ namespace Bolt {
   abstract class PropertySerializerMecanim : PropertySerializerSimple {
     protected PropertyMecanimData MecanimData;
 
+    protected MecanimDirection GetMecanimDirection(State state) {
+      return
+        (state.Entity.IsOwner)
+        ? MecanimData.OwnerDirection
+        : (state.Entity.HasControl)
+          ? MecanimData.ControllerDirection
+          : MecanimData.OthersDirection;
+    }
+
     public PropertySerializerMecanim(StatePropertyMetaData info)
       : base(info) {
     }
@@ -125,17 +134,10 @@ namespace Bolt {
       if ((MecanimData.Mode != MecanimMode.None) && state.Animator) {
         //BoltLog.Info("MEC-1-{0}", StateData.PropertyPath);
 
-        MecanimDirection direction =
-            (state.Entity.IsOwner)
-            ? MecanimData.OwnerDirection
-            : (state.Entity.HasControl)
-              ? MecanimData.ControllerDirection
-              : MecanimData.OthersDirection;
-
         switch (MecanimData.Mode) {
           case MecanimMode.LayerWeight:
             //BoltLog.Info("MEC-2-{0}", StateData.PropertyPath);
-            switch (direction) {
+            switch (GetMecanimDirection(state)) {
               case MecanimDirection.Pull:
                 //BoltLog.Info("MEC-4-{0}", StateData.PropertyPath);
                 PullMecanimLayer(state); break;
@@ -147,7 +149,7 @@ namespace Bolt {
 
           case MecanimMode.Property:
             //BoltLog.Info("MEC-3-{0}", StateData.PropertyPath);
-            switch (direction) {
+            switch (GetMecanimDirection(state)) {
               case MecanimDirection.Pull:
                 //BoltLog.Info("MEC-6-{0}", StateData.PropertyPath);
                 PullMecanimValue(state); break;
@@ -170,6 +172,5 @@ namespace Bolt {
     void PushMecanimLayer(State state) {
       state.Animator.SetLayerWeight(MecanimData.Layer, state.Frames.first.Data.ReadF32(StateData.ByteOffset));
     }
-
   }
 }

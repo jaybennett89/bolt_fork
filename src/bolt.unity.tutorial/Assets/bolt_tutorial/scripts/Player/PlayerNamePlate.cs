@@ -34,7 +34,7 @@ public class PlayerNamePlate : Bolt.EntityBehaviour<IPlayerState> {
   }
 
   public override void Attached() {
-    state.AddCallback(".name", NameChanged);
-    state.AddCallback(".team", TeamChanged);
+    state.AddCallback("name", NameChanged);
+    state.AddCallback("team", TeamChanged);
   }
 }
