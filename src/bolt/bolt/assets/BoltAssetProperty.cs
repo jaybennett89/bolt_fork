@@ -120,7 +120,7 @@ public class BoltAssetProperty {
   public AssetSettingsCommand assetSettingsCommand = new AssetSettingsCommand();
 
   public bool nameIsCSharpId {
-    get { return BoltUtils.IsCSharpIdentifier(name); }
+    get { return true; }
   }
 
   public string backingFieldName {
