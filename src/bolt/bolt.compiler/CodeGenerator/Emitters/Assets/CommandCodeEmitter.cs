@@ -96,6 +96,11 @@ namespace Bolt.Compiler {
       type.BaseTypes.Add("Bolt.ICommandFactory");
       type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
       type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
+
+      type.DeclareProperty("Bolt.UniqueId", "TypeUniqueId", get => {
+        get.Expr("return new Bolt.UniqueId({0})", Decorator.Definition.Guid.ToByteArray().Join(", "));
+      });
+
       type.DeclareMethod(typeof(object).FullName, "Create", method => method.Statements.Expr("return new {0}()", Decorator.Name));
     }
   }

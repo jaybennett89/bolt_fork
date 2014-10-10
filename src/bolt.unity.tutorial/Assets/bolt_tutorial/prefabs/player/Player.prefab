@@ -1909,9 +1909,10 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _defaultSerializerGuid: 88e7c5d919311f43a329d0cf9b074721
   _prefabId: 0
   _updateRate: 1
-  _defaultSerializerTypeId: 5
+  _defaultSerializerTypeId: 3
   _clientPredicted: 1
   _allowInstantiateOnClient: 0
   _persistThroughSceneLoads: 0
@@ -1979,8 +1980,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _proximity: {fileID: 0}
-  _hitboxes:
-  - {fileID: 11400008}
+  _hitboxes: []
 --- !u!114 &11400012
 MonoBehaviour:
   m_ObjectHideFlags: 1

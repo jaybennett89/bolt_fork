@@ -223,9 +223,7 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     BoltEntity be = prefab.GetComponent<BoltEntity>();
-    return Instantiate(new PrefabId(be._prefabId), new TypeId(be._defaultSerializerTypeId), position, rotation);
-
-
+    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerUniqueId).TypeId, position, rotation);
   }
 
   public static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {
@@ -253,7 +251,7 @@ internal static class BoltCore {
 
   public static GameObject Attach(GameObject gameObject) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, new TypeId(be._defaultSerializerTypeId));
+    return Attach(gameObject, Factory.GetFactory(be.defaultSerializerUniqueId).TypeId);
   }
 
   public static GameObject Attach(GameObject gameObject, TypeId serializerId) {

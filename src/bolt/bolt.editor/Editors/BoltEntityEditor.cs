@@ -5,8 +5,8 @@ using UnityEngine;
 
 [CustomEditor(typeof(BoltEntity))]
 public class BoltEntityEditor : Editor {
-  static int[] serializerIds;
   static string[] serializerNames;
+  static Bolt.UniqueId[] serializerIds;
   static Bolt.ISerializerFactory[] serializerFactories;
 
   static BoltEntityEditor() {
@@ -24,7 +24,7 @@ public class BoltEntityEditor : Editor {
 
     serializerIds =
       serializerFactories
-        .Select(x => x.TypeId.Value)
+        .Select(x => x.TypeUniqueId)
         .ToArray();
   }
 
@@ -80,14 +80,14 @@ public class BoltEntityEditor : Editor {
 
     // Serializer
     int selectedIndex;
-    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity._defaultSerializerTypeId) + 1);
+    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.defaultSerializerUniqueId) + 1);
     selectedIndex = EditorGUILayout.Popup("Serializer", selectedIndex, serializerNames);
 
     if (selectedIndex == 0) {
-      entity._defaultSerializerTypeId = 0;
+      entity.defaultSerializerUniqueId = Bolt.UniqueId.None;
     }
     else {
-      entity._defaultSerializerTypeId = serializerIds[selectedIndex - 1];
+      entity.defaultSerializerUniqueId = serializerIds[selectedIndex - 1];
     }
 
     // Update Rate

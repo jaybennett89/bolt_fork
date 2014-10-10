@@ -13,7 +13,6 @@ namespace Bolt.Compiler {
     public abstract Guid Guid {
       get;
     }
-
   }
 
   public abstract class AssetDecorator<T> : AssetDecorator where T : AssetDefinition {
