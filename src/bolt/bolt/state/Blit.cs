@@ -43,7 +43,13 @@ namespace Bolt {
     }
 
     public static BoltEntity ReadEntity(this byte[] data, int offset) {
-      return BoltCore.FindEntity(new InstanceId(data.ReadI32(offset))).UnityObject;
+      Entity en = BoltCore.FindEntity(new InstanceId(data.ReadI32(offset)));
+
+      if (en) {
+        return en.UnityObject;
+      }
+
+      return null;
     }
 
     public static void PackBool(this byte[] data, int offset, bool value) {
