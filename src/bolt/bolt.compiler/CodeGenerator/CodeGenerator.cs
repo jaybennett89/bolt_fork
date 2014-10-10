@@ -18,7 +18,8 @@ namespace Bolt.Compiler {
     public List<CommandDecorator> Commands;
 
     public CodeNamespace CodeNamespace;
-    public CodeNamespace CodeNamespaceInternal;
+    public CodeNamespace CodeNamespaceBolt;
+    public CodeNamespace CodeNamespaceBoltInternal;
     public CodeCompileUnit CodeCompileUnit;
 
     public IEnumerable<FilterDefinition> Filters {
@@ -36,11 +37,13 @@ namespace Bolt.Compiler {
       Project = context;
 
       CodeNamespace = new CodeNamespace();
-      CodeNamespaceInternal = new CodeNamespace("BoltInternal");
+      CodeNamespaceBolt = new CodeNamespace("Bolt");
+      CodeNamespaceBoltInternal = new CodeNamespace("BoltInternal");
 
       CodeCompileUnit = new CodeCompileUnit();
       CodeCompileUnit.Namespaces.Add(CodeNamespace);
-      CodeCompileUnit.Namespaces.Add(CodeNamespaceInternal);
+      CodeCompileUnit.Namespaces.Add(CodeNamespaceBolt);
+      CodeCompileUnit.Namespaces.Add(CodeNamespaceBoltInternal);
 
       // resets all data on the context/assets
       DecorateDefinitions();
@@ -241,22 +244,17 @@ namespace Bolt.Compiler {
         field.InitExpression = new CodeSnippetExpression(string.Format("new Bolt.TypeId({0})", s.TypeId));
       }
 
-      CodeNamespaceInternal.Types.Add(type);
+      CodeNamespaceBoltInternal.Types.Add(type);
     }
 
     void EmitEventBaseClasses() {
-      var globalListener = DeclareClass("BoltGlobalEventListener");
-      var entityListener = DeclareClass("BoltEntityEventListener");
+      var globalListener = CodeNamespaceBolt.DeclareClass("GlobalEventListener");
+      var entityListener = CodeNamespaceBolt.DeclareClass("EntityEventListener");
+      var entityListenerGeneric = CodeNamespaceBolt.DeclareClass("EntityEventListener<TState>");
 
-      var entityListenerGeneric = DeclareClass("BoltEntityEventListener");
-      entityListenerGeneric.TypeParameters.Add(new CodeTypeParameter("TState"));
-
-      globalListener.BaseTypes.Add("BoltGlobalEventListenerBase");
-      entityListener.BaseTypes.Add("Bolt.EntityBehaviour");
-      entityListenerGeneric.BaseTypes.Add("Bolt.EntityBehaviour<TState>");
-
-      EmitEntityEventListenerRegistration(entityListener);
-      EmitEntityEventListenerRegistration(entityListenerGeneric);
+      globalListener.BaseTypes.Add("BoltInternal.GlobalEventListenerBase");
+      entityListener.BaseTypes.Add("BoltInternal.EntityEventListenerBase");
+      entityListenerGeneric.BaseTypes.Add("BoltInternal.EntityEventListenerBase<TState>");
 
       foreach (EventDecorator d in Events) {
         EmitEventMethodOverride(globalListener, d);
@@ -271,12 +269,6 @@ namespace Bolt.Compiler {
       type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {
         method.DeclareParameter(d.Name, "evnt");
       }).Attributes = MemberAttributes.Public;
-    }
-
-    void EmitEntityEventListenerRegistration(CodeTypeDeclaration type) {
-      type.DeclareMethod(typeof(void).FullName, "Attached", body => {
-        body.Statements.Expr("entity.AddEventListener(this)");
-      }).Attributes = MemberAttributes.Override | MemberAttributes.Public;
     }
 
     void EmitFilters() {

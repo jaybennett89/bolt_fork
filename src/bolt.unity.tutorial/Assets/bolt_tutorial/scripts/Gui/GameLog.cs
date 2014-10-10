@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameLog : BoltGlobalEventListener {
+public class GameLog : Bolt.GlobalEventListener {
   struct Line {
     public float time;
     public string message;

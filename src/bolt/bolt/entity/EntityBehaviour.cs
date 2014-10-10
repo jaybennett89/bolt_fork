@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UE = UnityEngine;
+﻿using UE = UnityEngine;
 
 namespace Bolt {
-  public class EntityBehaviour : UE.MonoBehaviour, IEntityBehaviour {
+  public abstract class EntityBehaviour : UE.MonoBehaviour, IEntityBehaviour {
     internal BoltEntity _entity;
 
     public BoltEntity entity {
@@ -27,6 +23,7 @@ namespace Bolt {
       }
     }
 
+    public virtual void Initialized() { }
     public virtual void Attached() { }
     public virtual void Detached() { }
     public virtual void SimulateOwner() { }
@@ -37,7 +34,22 @@ namespace Bolt {
     public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
   }
 
-  public class EntityBehaviour<TState> : EntityBehaviour {
+  public abstract class EntityBehaviour<TState> : EntityBehaviour {
+    public TState state {
+      get { return entity.GetState<TState>(); }
+    }
+  }
+
+}
+
+namespace BoltInternal {
+  public abstract class EntityEventListenerBase : Bolt.EntityBehaviour {
+    public sealed override void Initialized() {
+      entity.Entity.AddEventListener(this);
+    }
+  }
+
+  public abstract class EntityEventListenerBase<TState> : EntityEventListenerBase {
     public TState state {
       get { return entity.GetState<TState>(); }
     }

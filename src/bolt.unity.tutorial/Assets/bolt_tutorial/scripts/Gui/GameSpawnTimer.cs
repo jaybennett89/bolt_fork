@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameSpawnTimer : BoltGlobalEventListener {
+public class GameSpawnTimer : Bolt.GlobalEventListener {
   BoltEntity me;
   IPlayerState meState;
 

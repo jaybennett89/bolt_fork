@@ -59,7 +59,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
-    <Compile Include="BoltCallbacks.cs" />
+    <Compile Include="GlobalEventListenerBase.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -98,10 +98,10 @@
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
     <Compile Include="state\Trigger.cs" />
-    <Compile Include="t4\BoltCallbacksGenerated.cs">
+    <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BoltCallbacksGenerated.tt</DependentUpon>
+      <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
     <Compile Include="BoltFactory.cs" />
@@ -171,9 +171,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />
-    <None Include="t4\BoltCallbacksGenerated.tt">
+    <None Include="t4\GlobalEventListenerBase.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltCallbacksGenerated.cs</LastGenOutput>
+      <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>
     </None>
     <None Include="t4\BoltFlagsGenerated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

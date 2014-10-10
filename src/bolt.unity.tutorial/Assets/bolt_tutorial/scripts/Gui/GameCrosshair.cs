@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameCrosshair : BoltGlobalEventListener {
+public class GameCrosshair : Bolt.GlobalEventListener {
   BoltEntity me;
   IPlayerState meState;
 

@@ -2,7 +2,7 @@
 using System.Collections;
 
 [BoltGlobalBehaviour(BoltScenes.Level1)]
-public class PlayerCallbacks : BoltGlobalEventListener {
+public class PlayerCallbacks : Bolt.GlobalEventListener {
   public override void SceneLoadLocalDone(string map) {
     // ui
     GameUI.Instantiate();

@@ -62,6 +62,10 @@ namespace Bolt {
       get { return Flags & EntityFlags.PERSIST_ON_LOAD; }
     }
 
+    internal bool CanQueueCommands {
+      get { return _canQueueCommands; }
+    }
+
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
@@ -125,7 +129,7 @@ namespace Bolt {
       BoltCore._entities.AddLast(this);
 
       // call out to user
-      BoltGlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
+      BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
 
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -162,7 +166,7 @@ namespace Bolt {
       }
 
       // call out to user
-      BoltGlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
+      BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
 
       // remove from entities list
       BoltCore._entities.Remove(this);
@@ -210,8 +214,12 @@ namespace Bolt {
 
       // call into serializer
       Serializer.OnInitialized();
-    }
 
+      // call to behaviours (this happens BEFORE attached)
+      foreach (IEntityBehaviour eb in Behaviours) {
+        eb.Initialized();
+      }
+    }
 
     internal void SetIdle(BoltConnection connection, bool idle) {
       if (idle && IsController(connection)) {
@@ -233,7 +241,7 @@ namespace Bolt {
         }
       }
 
-        if (HasControl) {
+      if (HasControl) {
         Assert.Null(Controller);
 
         // execute all old commands (in order)
@@ -284,13 +292,12 @@ namespace Bolt {
       else {
         if (Controller != null) {
           int commands = ExecuteCommandsFromRemote();
-
           if (commands == 0) {
             if (CommandQueue.count > 0) {
-              ExecuteMissingCommand(CommandQueue.last);
+              MissingCommand(CommandQueue.last);
             }
             else {
-              ExecuteMissingCommand(null);
+              MissingCommand(null);
             }
 
             ExecuteCommandsFromRemote();
@@ -301,9 +308,16 @@ namespace Bolt {
       Serializer.OnSimulateAfter();
     }
 
-    void ExecuteMissingCommand(Command previous) {
-      for (int i = 0; i < Behaviours.Length; ++i) {
-        Behaviours[i].MissingCommand(previous);
+    void MissingCommand(Command previous) {
+      try {
+        _canQueueCommands = true;
+
+        for (int i = 0; i < Behaviours.Length; ++i) {
+          Behaviours[i].MissingCommand(previous);
+        }
+      }
+      finally {
+        _canQueueCommands = false;
       }
     }
 
@@ -375,6 +389,7 @@ namespace Bolt {
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
+
 
       // done
       return eo;

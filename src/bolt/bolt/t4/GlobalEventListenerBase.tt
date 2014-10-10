@@ -26,7 +26,9 @@ callbacks.Add(Tuple.Create<string, string>("ControlOfEntityLost", "BoltEntity"))
 using UdpKit;
 using UnityEngine;
 
-partial class BoltGlobalEventListenerBase {
+namespace BoltInternal {
+
+partial class GlobalEventListenerBase {
   <# foreach (var cb in callbacks) { #> 
   public virtual void <#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { }
   <# } #> 
@@ -34,7 +36,7 @@ partial class BoltGlobalEventListenerBase {
   <# foreach (var cb in callbacks) { #> 
   internal static void <#= cb.Item1 #>Invoke(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { 
     BoltLog.Debug("Invoking callback <#= cb.Item1 #>");
-    foreach (BoltGlobalEventListenerBase cb in callbacks) {
+    foreach (GlobalEventListenerBase cb in callbacks) {
       cb.<#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : ("arg") #>);
     }
   }
@@ -51,10 +53,11 @@ partial class BoltGlobalEventListenerBase {
 
   internal static void <#= cb.Key #>Invoke(<#= args #>) { 
     BoltLog.Debug("Invoking callback <#= cb.Key #>");
-    foreach (BoltGlobalEventListenerBase cb in callbacks) {
+    foreach (GlobalEventListenerBase cb in callbacks) {
         cb.<#= cb.Key #>(<#= callArgs #>);
     }
   }
 
   <# } #>
+}
 }

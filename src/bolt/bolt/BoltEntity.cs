@@ -125,6 +125,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.PersistsOnSceneLoad; }
   }
 
+  public bool canQueueCommands {
+    get { return Entity.CanQueueCommands; }
+  }
+
   public IBoltEntitySettingsModifier GetSettingsModifier() {
     VerifyNotAttached();
     return new SettingsModifier(this);

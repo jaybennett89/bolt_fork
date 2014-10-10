@@ -32,7 +32,7 @@ namespace Bolt {
       CommandSequence = 0;
 
       // raise user event
-      BoltGlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
+      BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
@@ -67,7 +67,7 @@ namespace Bolt {
       }
 
       // call user event
-      BoltGlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
+      BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
     }
 
     internal void AssignControl(BoltConnection connection) {
@@ -112,23 +112,32 @@ namespace Bolt {
 
     internal bool QueueInput(Command cmd) {
       if (_canQueueCommands) {
-        if (CommandQueue.count < BoltCore._config.commandQueueSize) {
+        // owner
+        if (IsOwner) {
           cmd.Frame = BoltCore.serverFrame;
           cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
-
-          CommandQueue.AddLast(cmd);
-          return true;
         }
+
+        // controller
+        else if (CommandQueue.count < BoltCore._config.commandQueueSize) {
+          cmd.Frame = BoltCore.serverFrame;
+          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
+        }
+
+        // not allowed
         else {
           BoltLog.Error("Command queue for {0} is full", this);
           return false;
         }
+
+        // queue!
+        CommandQueue.AddLast(cmd);
+        return true;
       }
       else {
         BoltLog.Error("You can not queue commands to {0}", this);
         return false;
       }
     }
-
   }
 }
