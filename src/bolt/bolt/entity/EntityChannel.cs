@@ -226,7 +226,7 @@ partial class EntityChannel : BoltChannel {
 
       // if this is the controller give it the max priority
       if (proxy.Entity.IsController(connection)) {
-        proxy.Priority = 1 << 30;
+        proxy.Priority = 1 << 30  ;
       }
 
       // push

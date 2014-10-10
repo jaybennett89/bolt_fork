@@ -33,10 +33,11 @@ namespace Bolt {
 
       if (stream.WriteBool(entity != null)) {
         if (connection._entityChannel.ExistsOnRemote(entity)) {
+          stream.WriteNetworkId(connection._entityChannel.GetNetworkId(entity));
+        }
+        else {
           return false;
         }
-
-        stream.WriteNetworkId(connection._entityChannel.GetNetworkId(entity));
       }
 
       return true;

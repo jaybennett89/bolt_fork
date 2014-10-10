@@ -65,6 +65,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal Bolt.Entity _entity;
 
   [UE.SerializeField]
+  byte[] _defaultSerializerGuid;
+
+  [UE.SerializeField]
   internal int _prefabId = -1;
 
   [UE.SerializeField]
@@ -90,6 +93,19 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       }
 
       return _entity;
+    }
+  }
+
+  internal Guid DefaultSerializerGuid {
+    get {
+      if (_defaultSerializerGuid == null || _defaultSerializerGuid.Length != 16) {
+        return Guid.Empty;
+      }
+
+      return new Guid(_defaultSerializerGuid);
+    }
+    set {
+      _defaultSerializerGuid = value.ToByteArray();
     }
   }
 

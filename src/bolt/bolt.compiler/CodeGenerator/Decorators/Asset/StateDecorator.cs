@@ -66,7 +66,7 @@ namespace Bolt.Compiler {
         return "new string[0]";
       }
 
-      return string.Format("new string[{0}] {{ {1} }}", CallbackPaths.Length - 1, CallbackPaths.Skip(1).Select(x => '"' + x + '"').Join(", "));
+      return string.Format("new string[{0}] {{ {1} }}", CallbackPaths.Length - 1, CallbackPaths.Skip(1).Select(x => '"' + x.Trim('.') + '"').Join(", "));
     }
 
     public string CreateIndicesExpr() {
