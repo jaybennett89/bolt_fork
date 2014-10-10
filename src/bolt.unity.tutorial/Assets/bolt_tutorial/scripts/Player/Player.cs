@@ -86,6 +86,7 @@ public partial class Player : IDisposable {
     float z = UE.Random.Range(-32f, +32f);
 
     entity = BoltNetwork.Instantiate(BoltPrefabs.Player, RandomSpawn(), Quaternion.identity);
+    entity.SetUniqueId(Bolt.UniqueId.New());
 
     using (var mod = state.Modify()) {
       mod.name = name;
