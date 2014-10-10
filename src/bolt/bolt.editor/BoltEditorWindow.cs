@@ -335,30 +335,29 @@ public class BoltEditorWindow : BoltWindow {
           }
 
           if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
+            BoltEditorGUI.WithLabel("Value", () => {
+              EditorGUILayout.BeginHorizontal();
+
+              EditorGUILayout.BeginVertical();
+              GUILayout.Label("Owner", BoltEditorGUI.SmallWhiteText);
+              p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection);
+              EditorGUILayout.EndVertical();
+
+              EditorGUILayout.BeginVertical();
+              GUILayout.Label("Controller", BoltEditorGUI.SmallWhiteText);
+              p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection);
+              EditorGUILayout.EndVertical();
+
+              EditorGUILayout.BeginVertical();
+              GUILayout.Label("Others", BoltEditorGUI.SmallWhiteText);
+              p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection);
+              EditorGUILayout.EndVertical();
+
+              EditorGUILayout.EndHorizontal();
+            });
+
             if (p.PropertyType is PropertyTypeTrigger) {
-
-            }
-            else {
-              BoltEditorGUI.WithLabel("Value", () => {
-                EditorGUILayout.BeginHorizontal();
-
-                EditorGUILayout.BeginVertical();
-                GUILayout.Label("Owner", BoltEditorGUI.SmallWhiteText);
-                p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection);
-                EditorGUILayout.EndVertical();
-
-                EditorGUILayout.BeginVertical();
-                GUILayout.Label("Controller", BoltEditorGUI.SmallWhiteText);
-                p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection);
-                EditorGUILayout.EndVertical();
-
-                EditorGUILayout.BeginVertical();
-                GUILayout.Label("Others", BoltEditorGUI.SmallWhiteText);
-                p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection);
-                EditorGUILayout.EndVertical();
-
-                EditorGUILayout.EndHorizontal();
-              });
+              BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); }); 
             }
           }
         });

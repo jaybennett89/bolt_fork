@@ -28,13 +28,13 @@ namespace Bolt {
             factory.Dispatch(ev, mb);
           }
           catch (Exception exn) {
-            BoltLog.Error("exception thrown while dispatching {0}", ev);
+            BoltLog.Error("User code throw exception when invoking {0}", ev);
             BoltLog.Exception(exn);
           }
 
         }
         else {
-          // remove event if this behaviour is destroyed
+          // remove callback if this behaviour is destroyed
           _targets.RemoveAt(i);
 
           // 
@@ -48,7 +48,7 @@ namespace Bolt {
     public void Add(UE.MonoBehaviour behaviour) {
 #if DEBUG
       if (_targets.Contains(behaviour)) {
-        BoltLog.Warn("Behaviour is already registered in this dispatcher, ignoring");
+        BoltLog.Warn("Behaviour is already registered in this dispatcher, ignoring call to Add.");
         return;
       }
 #endif
@@ -59,7 +59,7 @@ namespace Bolt {
     public void Remove(UE.MonoBehaviour behaviour) {
       var success = _targets.Remove(behaviour);
       if (success == false) {
-        BoltLog.Warn("Behaviour not available in this dispatcher");
+        BoltLog.Warn("Behaviour not available in this dispatcher, ignoring call to Remove.");
       }
     }
 

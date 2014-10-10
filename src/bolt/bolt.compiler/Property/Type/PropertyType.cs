@@ -15,6 +15,8 @@ namespace Bolt.Compiler {
   [ProtoInclude(800, typeof(PropertyTypeInteger))]
   [ProtoInclude(900, typeof(PropertyTypeEntity))]
   [ProtoInclude(1000, typeof(PropertyTypeBool))]
+  [ProtoInclude(1100, typeof(PropertyTypeColor))]
+  [ProtoInclude(1200, typeof(PropertyTypeQuaternion))]
   public abstract class PropertyType {
     [ProtoIgnore]
     public Project Context;

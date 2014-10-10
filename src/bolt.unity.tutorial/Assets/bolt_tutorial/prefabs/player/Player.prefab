@@ -1823,8 +1823,8 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 5114b5799b18f7d45a94b03417c9f7b8, type: 3}
   m_Controller: {fileID: 9100000, guid: bdc07fbc13eccb04cb7a7b6995a9cb32, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
+  m_CullingMode: 0
+  m_UpdateMode: 1
   m_ApplyRootMotion: 0
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1

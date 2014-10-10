@@ -24,7 +24,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return 32 * 8;
+      return 32 * 3;
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   const float MOUSE_SENSEITIVITY = 2f;
@@ -73,18 +74,10 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     animator.SetLayerWeight(1, 1);
 
     state.Fire += OnFire;
-    state.AddCallback(".weapon", WeaponChanged);
+    state.AddCallback("weapon", WeaponChanged);
 
     // setup weapon
     WeaponChanged();
-
-    if (BoltNetwork.isServer) {
-      Invoke("Despawn", 5f);
-    }
-  }
-
-  void Despawn() {
-    BoltNetwork.Destroy(gameObject);
   }
 
   void WeaponChanged() {
@@ -97,6 +90,14 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void OnFire() {
+    if (BoltNetwork.entities.Count() > 1) {
+      using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
+        ev.message = name + " joined the game";
+        ev.sender = BoltNetwork.entities.First();
+        ev.sender2 = BoltNetwork.entities.Skip(1).First();
+      }
+    }
+
     // play sfx
     _weaponSfxSource.PlayOneShot(activeWeapon.fireSound);
 
@@ -104,7 +105,6 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
     // 
     activeWeapon.Fx(entity);
-    activeWeapon.fireFrame = BoltNetwork.serverFrame;
   }
 
   public void ApplyDamage(byte damage) {
@@ -135,7 +135,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   public override void SimulateController() {
     PollKeys(false);
 
-    IPlayerCommandInput input =  PlayerCommand.Create();
+    IPlayerCommandInput input = PlayerCommand.Create();
 
     input.forward = forward;
     input.backward = backward;
@@ -218,14 +218,16 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void FireWeapon(PlayerCommand cmd) {
-    if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
-      using (var mod = state.Modify()) {
-        mod.Fire();
 
-        // if we are the owner and the active weapon is a hitscan weapon, do logic
-        if (entity.isOwner) {
-          activeWeapon.OnOwner(cmd, entity);
-        }
+    if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
+      activeWeapon.fireFrame = BoltNetwork.serverFrame;
+
+      //state.Modify().Fire();
+      GetComponentInChildren<Animator>().SetTrigger("Fire");
+
+      // if we are the owner and the active weapon is a hitscan weapon, do logic
+      if (entity.isOwner) {
+        activeWeapon.OnOwner(cmd, entity);
       }
     }
   }

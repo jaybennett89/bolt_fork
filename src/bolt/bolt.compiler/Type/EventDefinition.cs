@@ -51,6 +51,8 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypeInteger);
       yield return typeof(PropertyTypeString);
       yield return typeof(PropertyTypeVector);
+      yield return typeof(PropertyTypeQuaternion);
+      yield return typeof(PropertyTypeColor);
     }
   }
 }

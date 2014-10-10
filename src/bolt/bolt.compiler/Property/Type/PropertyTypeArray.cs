@@ -17,6 +17,8 @@ namespace Bolt.Compiler {
       get {
         yield return typeof(PropertyTypeFloat);
         yield return typeof(PropertyTypeStruct);
+        yield return typeof(PropertyTypeEntity);
+        yield return typeof(PropertyTypeInteger);
         yield return typeof(PropertyTypeTransform);
       }
     }

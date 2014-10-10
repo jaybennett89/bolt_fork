@@ -217,35 +217,35 @@ internal static class BoltCore {
     }
   }
 
+
   public static BoltEntity Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation) {
     return Instantiate(PrefabPool.LoadPrefab(prefabId), position, rotation);
   }
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     BoltEntity be = prefab.GetComponent<BoltEntity>();
-    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerUniqueId).TypeId, position, rotation);
+    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerUniqueId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
-  public static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {
+  static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
     // prefab checks
-    {
-      GameObject prefab = PrefabPool.LoadPrefab(prefabId);
-      BoltEntity be = prefab.GetComponent<BoltEntity>();
+    GameObject prefab = PrefabPool.LoadPrefab(prefabId);
+    BoltEntity be = prefab.GetComponent<BoltEntity>();
 
-      if (isClient && (be._allowInstantiateOnClient == false)) {
-        throw new BoltException("This prefab is not allowed to be instantiated on clients");
-      }
+    if (isClient && (be._allowInstantiateOnClient == false)) {
+      throw new BoltException("This prefab is not allowed to be instantiated on clients");
+    }
 
-      if (be._prefabId != prefabId.Value) {
-        throw new BoltException("PrefabId for BoltEntity component did not return the same value as prefabId passed in as argument to Instantiate");
-      }
+    if (be._prefabId != prefabId.Value) {
+      throw new BoltException("PrefabId for BoltEntity component did not return the same value as prefabId passed in as argument to Instantiate");
     }
 
     Entity eo;
     eo = Entity.CreateFor(prefabId, serializerId, position, rotation);
     eo.Initialize();
-    eo.Attach();
 
+    eo.Attach();
+    
     return eo.UnityObject;
   }
 
@@ -261,7 +261,7 @@ internal static class BoltCore {
     en = Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId);
     en.Initialize();
     en.Attach();
-    
+
     return en.UnityObject.gameObject;
   }
 

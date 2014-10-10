@@ -181,6 +181,53 @@ namespace Bolt {
       data[offset + 11] = z.Byte3;
     }
 
+    public static UE.Color ReadColor(this byte[] data, int offset) {
+      BitUnion r = default(BitUnion);
+      r.Byte0 = data[offset + 0];
+      r.Byte1 = data[offset + 1];
+      r.Byte2 = data[offset + 2];
+      r.Byte3 = data[offset + 3];
+
+      BitUnion g = default(BitUnion);
+      g.Byte0 = data[offset + 4];
+      g.Byte1 = data[offset + 5];
+      g.Byte2 = data[offset + 6];
+      g.Byte3 = data[offset + 7];
+
+      BitUnion b = default(BitUnion);
+      b.Byte0 = data[offset + 8];
+      b.Byte1 = data[offset + 9];
+      b.Byte2 = data[offset + 10];
+      b.Byte3 = data[offset + 11];
+
+      return new UE.Color(r.Float32, g.Float32, b.Float32);
+    }
+
+    public static void PackColor(this byte[] data, int offset, UE.Color value) {
+      BitUnion r = default(BitUnion);
+      BitUnion g = default(BitUnion);
+      BitUnion b = default(BitUnion);
+
+      r.Float32 = value.r;
+      g.Float32 = value.g;
+      b.Float32 = value.b;
+
+      data[offset + 0] = r.Byte0;
+      data[offset + 1] = r.Byte1;
+      data[offset + 2] = r.Byte2;
+      data[offset + 3] = r.Byte3;
+
+      data[offset + 4] = g.Byte0;
+      data[offset + 5] = g.Byte1;
+      data[offset + 6] = g.Byte2;
+      data[offset + 7] = g.Byte3;
+
+      data[offset + 8] = b.Byte0;
+      data[offset + 9] = b.Byte1;
+      data[offset + 10] = b.Byte2;
+      data[offset + 11] = b.Byte3;
+    }
+
     public static UE.Vector4 ReadVector4(this byte[] data, int offset) {
       BitUnion x = default(BitUnion);
       x.Byte0 = data[offset + 0];
