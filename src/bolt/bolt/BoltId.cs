@@ -11,13 +11,13 @@ namespace Bolt {
     [FieldOffset(0)]
     uint uint0;
 
-    [FieldOffset(1)]
+    [FieldOffset(4)]
     uint uint1;
 
-    [FieldOffset(2)]
+    [FieldOffset(8)]
     uint uint2;
 
-    [FieldOffset(3)]
+    [FieldOffset(12)]
     uint uint3;
 
     public string IdString {
