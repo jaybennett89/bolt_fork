@@ -19,8 +19,8 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyDescription("Networking middleware for Unity3D")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bolt AB")]
-[assembly: AssemblyProduct("bolt")]
+[assembly: AssemblyCompany("Bolt Engine AB")]
+[assembly: AssemblyProduct("Bolt")]
 [assembly: AssemblyCopyright("Copyright © Fredrik Holmstrom 2012 - 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
