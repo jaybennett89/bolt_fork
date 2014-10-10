@@ -29,10 +29,6 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     get { return _weapons[state.weapon]; }
   }
 
-  public override void OnEvent(LogEvent evnt) {
-    BoltLog.Info("EVENT:{0}", evnt.message);
-  }
-
   void Awake() {
     _motor = GetComponent<PlayerMotor>();
   }
@@ -81,6 +77,14 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
     // setup weapon
     WeaponChanged();
+
+    if (BoltNetwork.isServer) {
+      Invoke("Despawn", 5f);
+    }
+  }
+
+  void Despawn() {
+    BoltNetwork.Destroy(gameObject);
   }
 
   void WeaponChanged() {
@@ -129,13 +133,6 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   public override void SimulateController() {
-
-    if (BoltNetwork.frame % 30 == 0) {
-      using (var ev = LogEvent.Raise(entity)) {
-        ev.message = string.Format("FROM:{0}", BoltNetwork.isServer ? "SERVER" : "CLIENT");
-      }
-    }
-
     PollKeys(false);
 
     IPlayerCommandInput input =  PlayerCommand.Create();

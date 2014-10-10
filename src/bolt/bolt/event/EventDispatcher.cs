@@ -65,9 +65,9 @@ namespace Bolt {
 
     public void Clear() {
       for (int i = 0; i < _targets.Count; ++i) {
-        var mb = _targets[i] as IGlobalEventListener;
+        var mb = _targets[i] as BoltInternal.GlobalEventListenerBase;
         if (mb != null) {
-          if (mb.PeristBetweenStartupAndShutdown()) {
+          if (mb.PersistBetweenStartupAndShutdown()) {
             continue;
           }
         }
