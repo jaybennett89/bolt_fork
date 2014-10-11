@@ -111,6 +111,51 @@ namespace Bolt {
       }
     }
 
+    public override void OnParentChanged(State state, Entity newParent, Entity oldParent) {
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
+
+      if ((PropertyData.Space == TransformSpaces.Parent) && td.Simulate) {
+        if (newParent == null) {
+          td.Simulate.transform.parent = null;
+          UpdateTransformValues(state, oldParent.UnityObject.transform.localToWorldMatrix, UE.Matrix4x4.identity);
+        }
+        else if (oldParent == null) {
+          td.Simulate.transform.parent = newParent.UnityObject.transform;
+          UpdateTransformValues(state, UE.Matrix4x4.identity, newParent.UnityObject.transform.worldToLocalMatrix);
+        }
+        else {
+          td.Simulate.transform.parent = newParent.UnityObject.transform;
+          UpdateTransformValues(state, oldParent.UnityObject.transform.localToWorldMatrix, newParent.UnityObject.transform.worldToLocalMatrix);
+        }
+      }
+    }
+
+    void UpdateTransformValues(State state, UE.Matrix4x4 l2w, UE.Matrix4x4 w2l) {
+      var it = state.Frames.GetIterator();
+
+      while (it.Next()) {
+        UE.Vector3 p = it.val.Data.ReadVector3(StateData.ObjectOffset);
+        UE.Quaternion r = it.val.Data.ReadQuaternion(StateData.ObjectOffset + 12);
+
+        float angle;
+        UE.Vector3 axis;
+        r.ToAngleAxis(out angle, out axis);
+
+        // transform position
+        p = l2w.MultiplyPoint(p);
+        p = w2l.MultiplyPoint(p);
+
+        // transform rotation
+        axis = l2w.MultiplyVector(axis);
+        axis = w2l.MultiplyVector(axis);
+        r = UE.Quaternion.AngleAxis(angle, axis);
+
+        // put back into frame
+        it.val.Data.PackVector3(StateData.ObjectOffset, p);
+        it.val.Data.PackQuaternion(StateData.ObjectOffset + 12, r);
+      }
+    }
+
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ControllerLocalPrediction)) {
@@ -135,8 +180,24 @@ namespace Bolt {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
         if (state.Entity.IsOwner) {
-          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.position);
-          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.rotation);
+          //UE.Matrix4x4 matrix = UE.Matrix4x4.identity;
+
+          //switch (PropertyData.Space) {
+          //  case TransformSpaces.World:
+          //    matrix = state.Entity.UnityObject.transform.localToWorldMatrix;
+          //    break;
+
+          //  case TransformSpaces.Parent:
+          //    matrix = state.Entity.UnityObject.transform.localToWorldMatrix;
+
+          //    if (state.Entity.HasParent) {
+          //      matrix = matrix * state.Entity.Parent.UnityObject.transform.worldToLocalMatrix;
+          //    }
+          //    break;
+          //}
+
+          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.localPosition);
+          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.localRotation);
         }
 
         td.RenderDoubleBuffer = td.RenderDoubleBuffer.Shift(td.Simulate.position);
@@ -144,6 +205,20 @@ namespace Bolt {
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      if (PropertyData.Space == TransformSpaces.Parent) {
+        if (state.Entity.HasParent) {
+          if (connection._entityChannel.ExistsOnRemote(state.Entity.Parent)) {
+            stream.WriteEntity(state.Entity.Parent, connection);
+          }
+          else {
+            return false;
+          }
+        }
+        else {
+          stream.WriteEntity(null, connection);
+        }
+      }
+
       UE.Vector3 p = frame.Data.ReadVector3(StateData.ByteOffset);
       UE.Quaternion r = frame.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
@@ -182,6 +257,10 @@ namespace Bolt {
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      if (PropertyData.Space == TransformSpaces.Parent) {
+        state.Entity.SetParentInternal(stream.ReadEntity(connection));
+      }
+
       UE.Vector3 p = new UE.Vector3();
       UE.Quaternion r = new UE.Quaternion();
 

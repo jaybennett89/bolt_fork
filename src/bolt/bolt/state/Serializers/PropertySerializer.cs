@@ -68,6 +68,7 @@ namespace Bolt {
     public virtual void OnSimulateAfter(State state) { }
     public virtual void OnRender(State state, State.Frame frame) { }
     public virtual void OnChanged(State state, State.Frame frame) { }
+    public virtual void OnParentChanged(State state, Entity newParent, Entity oldParent) { }
   }
 
   abstract class PropertySerializerSimple : PropertySerializer {

@@ -143,10 +143,6 @@ public class BoltSettingsWindow : EditorWindow {
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
     });
 
-    BoltAssetEditorGUI.Label("Use Unique Ids", () => {
-      settings._config.globalUniqueIds = EditorGUILayout.Toggle(settings._config.globalUniqueIds);
-    });
-
     BoltAssetEditorGUI.Label("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });

@@ -80,14 +80,14 @@ public class BoltEntityEditor : Editor {
 
     // Serializer
     int selectedIndex;
-    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.defaultSerializerUniqueId) + 1);
+    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.defaultSerializerId) + 1);
     selectedIndex = EditorGUILayout.Popup("Serializer", selectedIndex, serializerNames);
 
     if (selectedIndex == 0) {
-      entity.defaultSerializerUniqueId = Bolt.UniqueId.None;
+      entity.defaultSerializerId = Bolt.UniqueId.None;
     }
     else {
-      entity.defaultSerializerUniqueId = serializerIds[selectedIndex - 1];
+      entity.defaultSerializerId = serializerIds[selectedIndex - 1];
     }
 
     // Update Rate

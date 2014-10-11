@@ -7,6 +7,7 @@ public struct EntityFlags {
     public static readonly EntityFlags ZERO = new EntityFlags(0);
     public static readonly EntityFlags HAS_CONTROL = new EntityFlags(1);
     public static readonly EntityFlags PERSIST_ON_LOAD = new EntityFlags(2);
+    public static readonly EntityFlags ATTACHED = new EntityFlags(4);
     
     readonly int bits;
 
@@ -41,6 +42,9 @@ public struct EntityFlags {
 		}
 			if((bits & 2) == 2) {
 			sb.Append(" PERSIST_ON_LOAD");
+		}
+			if((bits & 4) == 4) {
+			sb.Append(" ATTACHED");
 		}
 	
 	  sb.Append("]");

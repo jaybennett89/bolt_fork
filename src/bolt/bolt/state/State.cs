@@ -237,6 +237,12 @@ namespace Bolt {
       Entity = entity;
     }
 
+    public void OnParentChanging(Entity newParent, Entity oldParent) {
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        MetaData.PropertySerializers[i].OnParentChanged(this, newParent, oldParent);
+      }
+    }
+
     public void OnSimulateBefore() {
       if (Entity.IsOwner || (Entity.HasControl && Entity.ControllerLocalPrediction)) {
         Frames.first.Number = BoltCore.frame;
@@ -483,5 +489,7 @@ namespace Bolt {
     BitArray CalculateFilter(Filter filter) {
       return FullMask;
     }
+
+
   }
 }

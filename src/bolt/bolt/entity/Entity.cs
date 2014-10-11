@@ -19,6 +19,7 @@ namespace Bolt {
     internal UE.Vector3 SpawnPosition;
     internal UE.Quaternion SpawnRotation;
 
+    internal Entity Parent;
     internal BoltEntity UnityObject;
     internal BoltConnection Source;
     internal BoltConnection Controller;
@@ -50,12 +51,24 @@ namespace Bolt {
       }
     }
 
+    internal bool HasParent {
+      get { return Parent != null && Parent.IsAttached; }
+    }
+
+    internal bool IsAttached {
+      get { return Flags & EntityFlags.ATTACHED; }
+    }
+
     internal bool IsOwner {
       get { return ReferenceEquals(Source, null); }
     }
 
     internal bool HasControl {
       get { return Flags & EntityFlags.HAS_CONTROL; }
+    }
+
+    internal bool HasPredictedControl {
+      get { return HasControl && ControllerLocalPrediction; }
     }
 
     public bool PersistsOnSceneLoad {
@@ -72,6 +85,33 @@ namespace Bolt {
 
     public override string ToString() {
       return string.Format("[Entity {0} {1} {2}]", InstanceId, PrefabId, Serializer);
+    }
+
+    internal void SetParent(Entity entity) {
+      if (IsOwner || HasPredictedControl) {
+        SetParentInternal(entity);
+      }
+      else {
+        BoltLog.Error("You are not allowed to assign the parent of this entity, only the owner or a controller with local prediction can");
+      }
+    }
+
+    internal void SetParentInternal(Entity entity) {
+      if (entity != Parent) {
+        if ((entity != null) && (entity.IsAttached == false)) {
+          BoltLog.Error("You can't assign a detached entity as the parent of another entity");
+          return;
+        }
+
+        try {
+          // notify serializer
+          Serializer.OnParentChanging(entity, Parent);
+        }
+        finally {
+          // set parent
+          Parent = entity;
+        }
+      }
     }
 
     internal void SetUniqueId(UniqueId id) {
@@ -123,10 +163,14 @@ namespace Bolt {
 
     internal void Attach() {
       Assert.NotNull(UnityObject);
+      Assert.False(IsAttached);
       Assert.True(InstanceId.Value != 0);
 
       // add to entities list
       BoltCore._entities.AddLast(this);
+
+      // mark as attached
+      Flags |= EntityFlags.ATTACHED;
 
       // call out to user
       BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
@@ -142,6 +186,7 @@ namespace Bolt {
 
     internal void Detach() {
       Assert.NotNull(UnityObject);
+      Assert.True(IsAttached);
       Assert.True(InstanceId.Value != 0);
 
       // destroy on all connections
@@ -158,6 +203,9 @@ namespace Bolt {
 
       // call out to user
       BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
+
+      // clear out attached flag
+      Flags &= ~EntityFlags.ATTACHED;
 
       // remove from entities list
       BoltCore._entities.Remove(this);
@@ -388,6 +436,14 @@ namespace Bolt {
 
     public static implicit operator bool(Entity entity) {
       return entity != null;
+    }
+
+    public static bool operator ==(Entity a, Entity b) {
+      return ReferenceEquals(a, b);
+    }
+
+    public static bool operator !=(Entity a, Entity b) {
+      return ReferenceEquals(a, b) == false;
     }
 
     float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {

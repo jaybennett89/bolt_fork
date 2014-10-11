@@ -31,6 +31,7 @@ namespace Bolt {
  enum TransformSpaces {
     Local = 0,
     World = 1,
+    Parent = 2
   }
 
 #if BOLT_COMPILER_DLL

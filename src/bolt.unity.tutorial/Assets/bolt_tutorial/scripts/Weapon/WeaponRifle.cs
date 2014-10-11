@@ -22,7 +22,7 @@ public class WeaponRifle : WeaponBase {
           var serializer = hit.body.GetComponent<PlayerController>();
 
           if ((serializer != null) && (serializer.state.team != state.team)) {
-            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet); 
+            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet);
           }
         }
       }
@@ -52,7 +52,6 @@ public class WeaponRifle : WeaponBase {
         trail.SetPosition(0, muzzleFlash.position);
         trail.SetPosition(1, rh.point);
       }
-
     }
 
     GameObject go = (GameObject)GameObject.Instantiate(shellPrefab, shellEjector.position, shellEjector.rotation);
