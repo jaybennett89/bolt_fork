@@ -129,6 +129,7 @@ namespace Bolt {
         for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
           string label = MetaData.PropertySerializers[i].StateData.PropertyPath.TrimStart('.');
           object value = MetaData.PropertySerializers[i].GetDebugValue(this);
+
           BoltNetworkInternal.DebugDrawer.Indent(label.Count(c => c == '.' || c == '['));
 
           if (value != null) {

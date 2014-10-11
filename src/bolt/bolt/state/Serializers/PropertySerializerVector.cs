@@ -7,20 +7,13 @@ using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerVector : PropertySerializerSimple {
-    public PropertySerializerVector(StatePropertyMetaData info)
-      : base(info) {
-    }
-
-    public PropertySerializerVector(EventPropertyMetaData meta)
-      : base(meta) {
-    }
-
-    public PropertySerializerVector(CommandPropertyMetaData meta)
-      : base(meta) {
-    }
+    public PropertySerializerVector(StatePropertyMetaData info) : base(info) { }
+    public PropertySerializerVector(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerVector(CommandPropertyMetaData meta) : base(meta) { }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadVector3(state.Frames.first.Data, StateData.ByteOffset);
+      var v = Blit.ReadVector3(state.Frames.first.Data, StateData.ByteOffset);
+      return string.Format("X:{0} Y:{1} Z:{2}", v.x.ToString("F3"), v.y.ToString("F3"), v.z.ToString("F3"));
     }
 
     public override int StateBits(State state, State.Frame frame) {

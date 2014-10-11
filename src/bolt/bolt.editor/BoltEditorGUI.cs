@@ -85,7 +85,7 @@ public static class BoltEditorGUI {
   public static GUIStyle CommandHeaderStyle {
     get {
       GUIStyle style;
-      style = NodeStyle(4);
+      style = NodeStyle(2);
       style.padding = new RectOffset(0, 0, 0, 3);
       style.margin = new RectOffset(5, 5, 5, 5);
       return style;

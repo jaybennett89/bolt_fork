@@ -21,7 +21,13 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset);
+      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset)));
+
+      if (entity) {
+        return entity.ToString();
+      }
+
+      return "NULL";
     }
 
     public override int StateBits(State state, State.Frame frame) {
@@ -31,7 +37,7 @@ namespace Bolt {
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
       Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, offset)));
 
-      if (connection._entityChannel.ExistsOnRemote(entity) == false) {
+      if ((entity != null) && (connection._entityChannel.ExistsOnRemote(entity) == false)) {
         return false;
       }
 
