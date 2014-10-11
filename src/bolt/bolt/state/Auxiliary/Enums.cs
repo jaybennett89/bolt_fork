@@ -44,7 +44,7 @@ namespace Bolt {
     EulerAngles = 1,
   }
 
-  
+
 #if BOLT_COMPILER_DLL
   [ProtoContract]
   public
@@ -67,5 +67,15 @@ namespace Bolt {
     None,
     Push,
     Pull,
+  }
+#if BOLT_COMPILER_DLL
+  [ProtoContract]
+  public
+#else
+  internal
+#endif
+ enum StringEncodings {
+    ASCII = 0,
+    UTF8 = 1
   }
 }

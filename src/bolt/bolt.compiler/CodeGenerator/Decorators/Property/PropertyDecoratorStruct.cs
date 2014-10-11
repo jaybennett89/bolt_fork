@@ -37,11 +37,8 @@ namespace Bolt.Compiler {
       return new PropertyCodeEmitterStruct();
     }
 
-    public override void FindAllProperties(List<StateDecoratorProperty> all, StateDecoratorProperty p) {
-      p.Filters = p.Filters & Definition.Filters;
-      p.Controller = p.Controller && Definition.Controller;
-      p.CallbackPaths = p.CallbackPaths.Add(p.CallbackPaths[p.CallbackPaths.Length - 1] + "." + Definition.Name);
-      Struct.FindAllProperties(all, p);
+    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
+      Struct.FindAllProperties(all, p.Combine(Definition.Filters, Definition.Controller).AddCallbackPath(Definition.Name));
     }
   }
 }

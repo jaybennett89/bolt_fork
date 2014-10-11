@@ -22,7 +22,7 @@ public class WeaponRifle : WeaponBase {
           var serializer = hit.body.GetComponent<PlayerController>();
 
           if ((serializer != null) && (serializer.state.team != state.team)) {
-            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet);
+            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet); 
           }
         }
       }

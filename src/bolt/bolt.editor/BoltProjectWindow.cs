@@ -362,7 +362,7 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.FlexibleSpace();
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control && folder.Folders.Length == 0 && folder.Assets.Length == 0) {
-      BoltEditorGUI.IconClickable("boltico_x", r, () => {
+      BoltEditorGUI.IconClickable("cross-script", r, () => {
         folder.Deleted = true;
       });
     }
@@ -466,7 +466,7 @@ public class BoltProjectWindow : BoltWindow {
 
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      BoltEditorGUI.IconClickable("boltico_x", r, () => {
+      BoltEditorGUI.IconClickable("cross-script", r, () => {
         asset.Deleted = true;
       });
     }

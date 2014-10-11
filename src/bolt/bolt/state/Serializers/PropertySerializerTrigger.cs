@@ -20,6 +20,10 @@ namespace Bolt {
       meta.ByteLength = 8;
     }
 
+    public override object GetDebugValue(State state) {
+      return "TRIGGER";
+    }
+
     public override int StateBits(State state, State.Frame frame) {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }

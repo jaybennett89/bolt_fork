@@ -22,7 +22,7 @@ public class BoltEditorWindow : BoltWindow {
   new void OnGUI() {
     base.OnGUI();
 
-    GUILayout.BeginArea(new Rect(0, 5, position.width, position.height - 25));
+    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 20));
 
     scroll = GUILayout.BeginScrollView(scroll, false, false);
 
@@ -79,9 +79,6 @@ public class BoltEditorWindow : BoltWindow {
 
   void EditState(StateDefinition def) {
     Action gui = () => {
-      // separator
-      GUILayout.Label(":", BoltEditorGUI.InheritanceSeparatorStyle, GUILayout.ExpandWidth(false));
-
       // inheritnace
       def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
 
@@ -108,7 +105,7 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
-    EditPropertyList(def, def.Properties, StateAndStructToolbar);
+    EditPropertyList(def, def.Properties);
 
     Guid guid = def.ParentGuid;
 
@@ -117,7 +114,7 @@ public class BoltEditorWindow : BoltWindow {
       GUILayout.Label(string.Format("Inherited from {0}", parent.Name), BoltEditorGUI.MiniLabelButtonStyle);
 
       EditorGUI.BeginDisabledGroup(true);
-      EditPropertyList(parent, parent.Properties, StateAndStructToolbar);
+      EditPropertyList(parent, parent.Properties);
       EditorGUI.EndDisabledGroup();
 
       guid = parent.ParentGuid;
@@ -133,7 +130,7 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
 
     // list properties
-    EditPropertyList(def, def.Properties, StateAndStructToolbar);
+    EditPropertyList(def, def.Properties);
 
   }
 
@@ -161,7 +158,7 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyEventSettings());
 
     // list properties
-    EditPropertyList(def, def.Properties, null);
+    EditPropertyList(def, def.Properties);
   }
 
   void EditCommand(CommandDefinition def) {
@@ -173,13 +170,13 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.AddButton("Input", def.Input, () => new PropertyCommandSettings());
 
     // list properties
-    EditPropertyList(def, def.Input, null);
+    EditPropertyList(def, def.Input);
 
     // add button
     BoltEditorGUI.AddButton("Result", def.Result, () => new PropertyCommandSettings());
 
     // list properties
-    EditPropertyList(def, def.Result, null);
+    EditPropertyList(def, def.Result);
   }
 
   void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
@@ -187,22 +184,6 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginVertical(style);
     GUI.color = Color.white;
     GUILayout.BeginHorizontal();
-
-    if (def is EventDefinition) {
-      BoltEditorGUI.Icon("boltico_event2", new RectOffset(3, 0, 2, 0));
-    }
-
-    if (def is StructDefinition) {
-      BoltEditorGUI.Icon("boltico_object", new RectOffset(3, 0, 2, 0));
-    }
-
-    if (def is StateDefinition) {
-      BoltEditorGUI.Icon("boltico_replistate2", new RectOffset(3, 0, 2, 0));
-    }
-
-    if (def is CommandDefinition) {
-      BoltEditorGUI.Icon("boltico_playcom2", new RectOffset(3, 0, 2, 0));
-    }
 
     // edit asset name
     def.Name = EditorGUILayout.TextField(def.Name);
@@ -225,9 +206,9 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.EndVertical();
   }
 
-  void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list, Action<AssetDefinition, PropertyDefinition> toolbar) {
+  void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
     for (int i = 0; i < list.Count; ++i) {
-      EditProperty(def, list[i], toolbar);
+      EditProperty(def, list[i]);
     }
 
     // move nudged property
@@ -267,12 +248,12 @@ public class BoltEditorWindow : BoltWindow {
     }
   }
 
-  void EditProperty(AssetDefinition def, PropertyDefinition p, Action<AssetDefinition, PropertyDefinition> toolbar) {
+  void EditProperty(AssetDefinition def, PropertyDefinition p) {
     EditorGUILayout.BeginVertical(BoltEditorGUI.ParameterBackgroundStyle);
     EditorGUILayout.BeginHorizontal();
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      if (BoltEditorGUI.IconButton("boltico_x".ToContent())) {
+      if (BoltEditorGUI.IconButton("cross-script".ToContent())) {
         p.Deleted = true;
       }
     }
@@ -282,28 +263,27 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
-    // edit priority
     if (IsStateOrStruct(def)) {
-      p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(164));
+      p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(144));
+      BoltEditorGUI.SetTooltip("Name. The name of this property, has to be a valid C# property name.");
+
       p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
+      BoltEditorGUI.SetTooltip("Priority. A higher priority means this property is more likely to be sent.");
+
+      if (BoltEditorGUI.IconButton("joystick".ToContent(), p.Controller)) {
+        p.Controller = !p.Controller;
+      }
+
+      BoltEditorGUI.SetTooltip("Replicate To Controller. Enable if this property should be replicated from the Owner to the Controller");
     }
     else {
       p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
+      BoltEditorGUI.SetTooltip("Name. The name of this property, has to be a valid C# property name.");
     }
-
-    // edit name
-    BoltEditorGUI.SetTooltip("Property Name. Has to be a valid C# property name.");
 
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
-    BoltEditorGUI.SetTooltip("Property Type.");
-
-    if (toolbar != null) {
-      toolbar(def, p);
-    }
-    else {
-      GUILayout.Space(20);
-    }
+    BoltEditorGUI.SetTooltip("Type. The type of this property.");
 
     EditorGUILayout.EndHorizontal();
 
@@ -357,7 +337,8 @@ public class BoltEditorWindow : BoltWindow {
             });
 
             if (p.PropertyType is PropertyTypeTrigger) {
-              BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); }); 
+              BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); });
+              BoltEditorGUI.SetTooltip("Which layer index this trigger creates transitions on");
             }
           }
         });
@@ -397,8 +378,6 @@ public class BoltEditorWindow : BoltWindow {
     gui();
 
     EditorGUILayout.EndVertical();
-
-    GUILayout.Space(20);
     EditorGUILayout.EndHorizontal();
   }
 

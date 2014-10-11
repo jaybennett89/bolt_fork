@@ -1980,7 +1980,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _proximity: {fileID: 0}
-  _hitboxes: []
+  _hitboxes:
+  - {fileID: 11400008}
 --- !u!114 &11400012
 MonoBehaviour:
   m_ObjectHideFlags: 1

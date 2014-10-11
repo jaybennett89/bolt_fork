@@ -6,12 +6,6 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public enum StringEncodings {
-    ASCII = 0,
-    UTF8 = 1
-  }
-
-  [ProtoContract]
   public class PropertyTypeString : PropertyType {
     [ProtoMember(50)]
     public int MaxLength = 1;

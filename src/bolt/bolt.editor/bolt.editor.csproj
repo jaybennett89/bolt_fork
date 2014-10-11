@@ -196,6 +196,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\globe-green.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\joystick.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

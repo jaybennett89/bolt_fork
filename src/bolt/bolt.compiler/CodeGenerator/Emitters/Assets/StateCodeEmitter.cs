@@ -151,17 +151,11 @@ namespace Bolt.Compiler {
 
     void EmitProperties(CodeTypeConstructor ctor) {
       ctor.Statements.Comment("Init Serializers ");
-      int byteOffset = 0;
-      int objectOffset = 0;
-
       for (int i = 0; i < Decorator.AllProperties.Count; ++i) {
         // grab property
         var p = Decorator.AllProperties[i];
         var s = Generator.FindStruct(p.Decorator.DefiningAsset.Guid);
         var emitter = PropertyCodeEmitter.Create(p.Decorator);
-
-        p.OffsetBytes = byteOffset;
-        p.OffsetObjects = objectOffset;
 
         // emit init expression
         ctor.Statements.Comment(p.CallbackPaths.Join("; "));
@@ -172,15 +166,6 @@ namespace Bolt.Compiler {
         if (dataSetterArgument != null) {
           ctor.Statements.Expr("((Bolt.{0})_Meta.PropertySerializers[{1}]).SetPropertyData({2})", emitter.SerializerClassName, p.Index, dataSetterArgument);
         }
-
-        //var init = emitter.EmitCustomSerializerInitilization("(({0}) _Meta.PropertySerializers[{1}])".Expr(emitter.SerializerClassName, p.Index));
-        //if (init != null) {
-        //  ctor.Statements.Add(init);
-        //}
-
-        // increase byte offset
-        byteOffset += p.Decorator.ByteSize;
-        objectOffset += p.Decorator.ObjectSize;
       }
     }
 

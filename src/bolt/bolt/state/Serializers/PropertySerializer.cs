@@ -6,6 +6,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
+
   struct CommandPropertyMetaData {
     public int ByteOffset;
     public String PropertyName;
@@ -26,7 +27,7 @@ namespace Bolt {
     public String PropertyName;
     public String PropertyPath;
     public String[] CallbackPaths;
-    public Int32[] CallbackIndices;
+    public ArrayIndices CallbackIndices;
   }
 
   abstract class PropertySerializer {

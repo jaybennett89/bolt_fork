@@ -16,13 +16,13 @@ namespace Bolt.Compiler {
       get { return "PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
-    public CodeExpression EmitStatePropertyInitializer(StateDecoratorProperty p) {
+    public CodeExpression EmitStatePropertyInitializer(StateProperty p) {
       return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"" }})").Expr(
         p.OffsetBytes, // {0}
         Decorator.ByteSize, // {1}
         p.OffsetObjects, // {2}
         Decorator.Definition.Priority, // {3}
-        p.CallbackPaths[p.CallbackPaths.Length - 1].Trim('.'), // {4}
+        p.PropertyPath, // {4}
         p.CallbackPathsExpression(), // {5}
         p.CreateIndicesExpr(), // {6}
         Decorator.Definition.Name // {7} 

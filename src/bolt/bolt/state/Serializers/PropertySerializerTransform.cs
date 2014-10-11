@@ -87,7 +87,11 @@ namespace Bolt {
     public override object GetDebugValue(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
-        return string.Format("Pos: {0}, Rot: {1}", state.Frames.first.Data.ReadVector3(StateData.ByteOffset), state.Frames.first.Data.ReadQuaternion(StateData.ByteOffset + 12).eulerAngles);
+        var p = state.Frames.first.Data.ReadVector3(StateData.ByteOffset);
+        var r = state.Frames.first.Data.ReadQuaternion(StateData.ByteOffset + 12).eulerAngles;
+        var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F3"), p.y.ToString("F3"), p.z.ToString("F3"));
+        var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F3"), r.y.ToString("F3"), r.z.ToString("F3"));
+        return string.Format("{0} / {1}", pos, rot);
       }
       else {
         return "NOT ASSIGNED";
