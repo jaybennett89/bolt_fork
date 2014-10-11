@@ -173,7 +173,7 @@ partial class EntityChannel : BoltChannel {
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incommingProxiesByInstanceId.Values) {
       // skip ones we are in control of and that are client predicted
-      if (proxy.Entity.HasControl && proxy.Entity.ControllerLocalPrediction) {
+      if (proxy.Entity.HasPredictedControl) {
         continue;
       }
 
@@ -384,6 +384,10 @@ partial class EntityChannel : BoltChannel {
         packet.stream.WriteVector3Half(proxy.Entity.UnityObject.transform.position);
         packet.stream.WriteQuaternionHalf(proxy.Entity.UnityObject.transform.rotation);
 
+        if (packet.stream.WriteBool(proxy.Entity.IsSceneObject)) {
+          Assert.False(proxy.Entity.UniqueId.IsNone);
+        }
+
         if (packet.stream.WriteBool(proxy.Entity.UniqueId.IsNone == false)) {
           proxy.Entity.UniqueId.Pack(packet.stream);
         }
@@ -455,6 +459,7 @@ partial class EntityChannel : BoltChannel {
     }
     else {
       bool isController = packet.stream.ReadBool();
+      bool isSceneObject = false;
       bool createRequested = packet.stream.ReadBool();
 
       PrefabId prefabId = new PrefabId();
@@ -468,6 +473,7 @@ partial class EntityChannel : BoltChannel {
         serializerId = TypeId.Read(packet.stream, 32);
         spawnPosition = packet.stream.ReadVector3Half();
         spawnRotation = packet.stream.ReadQuaternionHalf();
+        isSceneObject = packet.stream.ReadBool();
 
         if (packet.stream.ReadBool()) {
           uniqueId = UniqueId.Read(packet.stream);
@@ -490,7 +496,13 @@ partial class EntityChannel : BoltChannel {
         }
 
         // create entity
-        entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);
+        if (isSceneObject) {
+          entity = Entity.CreateFor(BoltCore.FindSceneObject(uniqueId), prefabId, serializerId, EntityFlags.SCENE_OBJECT);
+        }
+        else {
+          entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);
+        }
+
         entity.Source = connection;
         entity.UniqueId = uniqueId;
 

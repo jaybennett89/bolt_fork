@@ -65,10 +65,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal Bolt.Entity _entity;
 
   [UE.SerializeField]
-  byte[] _sceneId;
+  internal byte[] _sceneId;
 
   [UE.SerializeField]
-  byte[] _defaultSerializerGuid;
+  internal byte[] _defaultSerializerGuid;
 
   [UE.SerializeField]
   internal int _prefabId = -1;
@@ -144,6 +144,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return (_entity != null) && _entity.IsAttached; }
   }
 
+  public bool isSceneObject {
+    get { return Entity.IsSceneObject; } 
+  }
+
   public bool isOwner {
     get { return Entity.IsOwner; }
   }
@@ -154,7 +158,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public bool hasControlWithPrediction {
     get { return Entity.HasPredictedControl; }
-  } 
+  }
 
   public bool persistsOnSceneLoad {
     get { return Entity.PersistsOnSceneLoad; }
@@ -164,7 +168,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.CanQueueCommands; }
   }
 
-  public IBoltEntitySettingsModifier GetSettingsModifier() {
+  public IBoltEntitySettingsModifier ModifySettings() {
     VerifyNotAttached();
     return new SettingsModifier(this);
   }
@@ -281,6 +285,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
     BoltLog.Error("You are trying to access the state of {0} as '{1}'", Entity, typeof(TState));
     return default(TState);
+  }
+
+  public bool StateIs<TState>() {
+    return Entity.Serializer is TState;
   }
 
   public override string ToString() {

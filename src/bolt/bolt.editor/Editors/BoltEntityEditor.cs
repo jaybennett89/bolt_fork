@@ -45,15 +45,23 @@ public class BoltEntityEditor : Editor {
     GUILayout.Label("Settings", EditorStyles.boldLabel);
     EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
 
+    if (prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance) {
+      EditorGUILayout.LabelField("Scene Id", entity.sceneId.ToString());
+
+      if (GUILayout.Button("Regenerate Scene Id", EditorStyles.miniButton) || (entity.sceneId == Bolt.UniqueId.None)) {
+        entity.sceneId = Bolt.UniqueId.New();
+        Save();
+      }
+    }
+
     EditorGUI.BeginDisabledGroup(!canBeEdited);
+
 
     // Prefab Id
     switch (prefabType) {
       case PrefabType.Prefab:
       case PrefabType.PrefabInstance:
-        EditorGUI.BeginDisabledGroup(true);
         EditorGUILayout.LabelField("Prefab Id", entity._prefabId.ToString());
-        EditorGUI.EndDisabledGroup();
 
         if (entity._prefabId < 0) {
           EditorGUILayout.HelpBox("Prefab Id not set, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
@@ -107,10 +115,14 @@ public class BoltEntityEditor : Editor {
     }
     else {
       if (prefabType == PrefabType.Prefab || prefabType == PrefabType.None) {
-        if (GUI.changed) {
-          EditorUtility.SetDirty(entity);
-        }
+        Save();
       }
+    }
+  }
+
+  void Save() {
+    if (!Application.isPlaying && GUI.changed) {
+      EditorUtility.SetDirty(target);
     }
   }
 

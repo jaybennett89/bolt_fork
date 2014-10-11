@@ -8,6 +8,8 @@ public struct EntityFlags {
     public static readonly EntityFlags HAS_CONTROL = new EntityFlags(1);
     public static readonly EntityFlags PERSIST_ON_LOAD = new EntityFlags(2);
     public static readonly EntityFlags ATTACHED = new EntityFlags(4);
+    public static readonly EntityFlags CONTROLLER_LOCAL_PREDICTION = new EntityFlags(8);
+    public static readonly EntityFlags SCENE_OBJECT = new EntityFlags(16);
     
     readonly int bits;
 
@@ -45,6 +47,12 @@ public struct EntityFlags {
 		}
 			if((bits & 4) == 4) {
 			sb.Append(" ATTACHED");
+		}
+			if((bits & 8) == 8) {
+			sb.Append(" CONTROLLER_LOCAL_PREDICTION");
+		}
+			if((bits & 16) == 16) {
+			sb.Append(" SCENE_OBJECT");
 		}
 	
 	  sb.Append("]");

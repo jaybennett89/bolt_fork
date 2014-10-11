@@ -29,7 +29,6 @@ namespace Bolt {
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
-    internal bool ControllerLocalPrediction;
     internal ushort CommandSequence = 0;
     internal Command CommandLastExecuted = null;
 
@@ -43,12 +42,16 @@ namespace Bolt {
           return BoltCore.frame;
         }
 
-        if (HasControl && ControllerLocalPrediction) {
+        if (HasPredictedControl) {
           return BoltCore.frame;
         }
 
         return Source.remoteFrame;
       }
+    }
+
+    internal bool IsSceneObject {
+      get { return Flags & EntityFlags.SCENE_OBJECT; }
     }
 
     internal bool HasParent {
@@ -68,7 +71,7 @@ namespace Bolt {
     }
 
     internal bool HasPredictedControl {
-      get { return HasControl && ControllerLocalPrediction; }
+      get { return HasControl && (Flags & EntityFlags.CONTROLLER_LOCAL_PREDICTION); }
     }
 
     public bool PersistsOnSceneLoad {
@@ -416,14 +419,20 @@ namespace Bolt {
     }
 
     internal static Entity CreateFor(UE.GameObject instance, PrefabId prefabId, TypeId serializerId) {
+      return CreateFor(instance, prefabId, serializerId, EntityFlags.ZERO);
+    }
+
+    internal static Entity CreateFor(UE.GameObject instance, PrefabId prefabId, TypeId serializerId, EntityFlags flags) {
       Entity eo;
 
       eo = new Entity();
       eo.UnityObject = instance.GetComponent<BoltEntity>();
       eo.PrefabId = prefabId;
       eo.UpdateRate = eo.UnityObject._updateRate;
-      eo.ControllerLocalPrediction = eo.UnityObject._clientPredicted;
-      eo.Flags = eo.UnityObject._persistThroughSceneLoads ? EntityFlags.PERSIST_ON_LOAD : EntityFlags.ZERO;
+      eo.Flags = flags;
+
+      if (eo.UnityObject._persistThroughSceneLoads) { eo.Flags |= EntityFlags.PERSIST_ON_LOAD; }
+      if (eo.UnityObject._clientPredicted) { eo.Flags |= EntityFlags.CONTROLLER_LOCAL_PREDICTION; }
 
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);

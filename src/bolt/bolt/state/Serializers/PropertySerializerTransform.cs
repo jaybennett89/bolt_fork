@@ -158,7 +158,7 @@ namespace Bolt {
 
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
-      if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ControllerLocalPrediction)) {
+      if (td.Simulate && !state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
         PerformInterpolation(td, state);
 
         //switch (Config.TransformMode) {

@@ -244,7 +244,7 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
-      if (Entity.IsOwner || (Entity.HasControl && Entity.ControllerLocalPrediction)) {
+      if (Entity.IsOwner || Entity.HasPredictedControl) {
         Frames.first.Number = BoltCore.frame;
       }
       else {
@@ -427,7 +427,7 @@ namespace Bolt {
         Frames.AddLast(frame);
       }
       else {
-        if (Entity.HasControl && Entity.ControllerLocalPrediction) {
+        if (Entity.HasPredictedControl) {
           Assert.True(Frames.count == 1);
 
           frame = Frames.first;
