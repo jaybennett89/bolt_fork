@@ -88,6 +88,7 @@
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\FloatCompression.cs" />
+    <Compile Include="state\Indices.cs" />
     <Compile Include="state\Priority.cs" />
     <Compile Include="state\Serializers\PropertyMecanimData.cs" />
     <Compile Include="state\Serializers\PropertySerializer.cs" />

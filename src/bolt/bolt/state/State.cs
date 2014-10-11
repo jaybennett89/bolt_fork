@@ -5,7 +5,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  public delegate void PropertyCallback(IState state, string path, int[] indices);
+  public delegate void PropertyCallback(IState state, string propertyPath, ArrayIndices arrayIndices);
   public delegate void PropertyCallbackSimple();
 
   public interface IState {
@@ -19,10 +19,6 @@ namespace Bolt {
   }
 
   public interface IStateModifier : IDisposable {
-
-  }
-
-  public interface IStatePredictor : IDisposable {
 
   }
 
