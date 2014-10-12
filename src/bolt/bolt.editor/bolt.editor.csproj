@@ -61,6 +61,7 @@
     <Compile Include="BoltEditorGUI.cs" />
     <Compile Include="BoltEditorWindow.cs" />
     <Compile Include="BoltFilterWindow.cs" />
+    <Compile Include="BoltFloatCompressionEditor.cs" />
     <Compile Include="BoltInstaller.cs" />
     <Compile Include="BoltProjectWindow.cs" />
     <Compile Include="BoltScenesWindow.cs" />

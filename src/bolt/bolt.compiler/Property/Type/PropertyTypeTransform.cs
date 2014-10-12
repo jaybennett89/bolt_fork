@@ -18,14 +18,14 @@ namespace Bolt.Compiler {
     };
 
     [ProtoMember(3, OverwriteList = true)]
-    public Axis[] RotationAxesEuler = new[] {
+    public Axis[] RotationAxes = new[] {
       new Axis { Component = VectorComponents.X, Compression = FloatCompression.DefaultAngle(), Enabled = true },
       new Axis { Component = VectorComponents.Y, Compression = FloatCompression.DefaultAngle(), Enabled = true },
       new Axis { Component = VectorComponents.Z, Compression = FloatCompression.DefaultAngle(), Enabled = true },
     };
 
     [ProtoMember(4)]
-    public FloatCompression RotationCompressionQuaternion = new FloatCompression { Fractions = 1000, MinValue = -1, MaxValue = +1 };
+    public FloatCompression RotationCompressionQuaternion = new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };
 
     [ProtoMember(5)]
     public TransformRotationMode RotationMode;

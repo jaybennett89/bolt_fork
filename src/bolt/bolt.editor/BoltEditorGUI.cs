@@ -449,7 +449,7 @@ public static class BoltEditorGUI {
   }
 
   public static FloatCompression EditFloatCompression(FloatCompression c) {
-    return EditFloatCompression("Range", c);
+    return EditFloatCompression("Value Range", c);
   }
 
   public static FloatCompression EditFloatCompression(string label, FloatCompression c) {
@@ -457,13 +457,17 @@ public static class BoltEditorGUI {
       c = FloatCompression.Default();
     }
 
-    var bits = BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions);
-    var accuracy = (1f / c.Fractions);
+    var bits = BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Bits);
+    var accuracy = (1f / c.Bits);
 
-    WithLabel(string.Format(label + " (Bits:{0}, Acc:{1})", bits, accuracy), () => {
+    WithLabel(label, () => {
       c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
       c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
-      c.Fractions = Mathf.Clamp(IntFieldOverlay(c.Fractions, "Fractions"), 1, 10000);
+      c.Bits = Mathf.Clamp(IntFieldOverlay(c.Bits, "Bits"), 1, 32);
+
+      if (IconButton("chart-pie-separate".ToContent())) {
+        BoltFloatCompressionEditor.Target = c;
+      }
     });
 
     return c;

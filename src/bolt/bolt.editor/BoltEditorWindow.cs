@@ -19,9 +19,17 @@ public class BoltEditorWindow : BoltWindow {
 
   Vector2 scroll;
 
+  new void Update() {
+    base.Update();
+
+    // call to compression editor
+    BoltFloatCompressionEditor.Update(Repaint);
+  }
+
   new void OnGUI() {
     base.OnGUI();
 
+    EditorGUI.BeginDisabledGroup(BoltFloatCompressionEditor.HasTarget);
     GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 20));
 
     scroll = GUILayout.BeginScrollView(scroll, false, false);
@@ -41,7 +49,13 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginArea(r);
     Footer(r);
     GUILayout.EndArea();
+    EditorGUI.EndDisabledGroup();
+
+    if (BoltFloatCompressionEditor.HasTarget) {
+      BoltFloatCompressionEditor.Draw(new Rect(0, 0, position.width, position.height));
+    }
   }
+
 
   void Footer(Rect r) {
     GUI.color = EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.45f, 0.45f, 0.45f);

@@ -14,13 +14,16 @@ namespace Bolt.Compiler {
     public int MaxValue;
 
     [ProtoMember(4)]
-    public int Fractions;
+    public int _UNUSED;
+
+    [ProtoMember(5)]
+    public float Accuracy;
 
     public static FloatCompression Default() {
       return new FloatCompression {
         MinValue = -2048,
         MaxValue = +2048,
-        Fractions = 100
+        Accuracy = 0.01f,
       };
     }
 
@@ -28,7 +31,7 @@ namespace Bolt.Compiler {
       return new FloatCompression {
         MinValue = 0,
         MaxValue = 360,
-        Fractions = 100
+        Accuracy = 0.1f,
       };
     }
   }

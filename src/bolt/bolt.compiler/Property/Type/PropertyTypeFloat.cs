@@ -10,7 +10,7 @@ namespace Bolt.Compiler {
     public FloatCompression Compression;
 
     public override bool HasSettings {
-      get { return false; }
+      get { return true; }
     }
 
     public override bool MecanimApplicable {
