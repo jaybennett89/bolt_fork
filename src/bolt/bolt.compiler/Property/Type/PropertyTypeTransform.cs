@@ -7,9 +7,6 @@ using System.Text;
 namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeTransform : PropertyType {
-    [ProtoMember(1)]
-    public TransformSpaces Space;
-
     [ProtoMember(2, OverwriteList = true)]
     public Axis[] PositionAxes = new[] {
       new Axis { Component = VectorComponents.X, Compression = FloatCompression.Default(), Enabled = true },
@@ -27,9 +24,6 @@ namespace Bolt.Compiler {
     [ProtoMember(4)]
     public FloatCompression RotationCompressionQuaternion = new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };
 
-    [ProtoMember(5)]
-    public TransformRotationMode RotationMode;
-
     public override bool InterpolateAllowed {
       get { return true; }
     }
@@ -42,6 +36,10 @@ namespace Bolt.Compiler {
       get { return true; }
     }
 
+    public Axis GetPositionAxis(VectorComponents component) {
+      return PositionAxes[(int)component];
+    }
+       
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorTransform();
     }

@@ -14,22 +14,22 @@ namespace Bolt.Compiler {
       get { return "PackF32"; }
     }
 
-    public override string EmitSetPropertyDataArgument() {
-      if (Decorator.DefiningAsset is StateDecorator || Decorator.DefiningAsset is StructDecorator) {
-        var s = Decorator.Definition.StateAssetSettings;
-        return string.Format(
-          "new Bolt.PropertyMecanimData {{ Mode = Bolt.MecanimMode.{0}, OwnerDirection = Bolt.MecanimDirection.{1}, ControllerDirection = Bolt.MecanimDirection.{2}, OthersDirection = Bolt.MecanimDirection.{3}, Layer = {4}, Damping = {5}f }}",
-          s.MecanimMode,
-          s.MecanimOwnerDirection,
-          s.MecanimControllerDirection,
-          s.MecanimOthersDirection,
-          s.MecanimLayer,
-          s.MecanimDamping
-        );
+    public override string[] EmitSetPropertyDataArgument() {
+      List<string> propertyData = new List<string>();
+
+      if (Decorator.DefiningAsset is StateDecorator) {
+        propertyData.Add(Decorator.Definition.StateAssetSettings.GetMecanimDataExpression());
+      }
+
+      var c = Decorator.PropertyType.Compression;
+      if (c.Enabled && c.BitsRequired != 32) {
+        propertyData.Add(string.Format("new Bolt.FloatCompression {{ Bits = {0}, Shift = {1}f, PackMultiplier = {2}f, ReadMultiplier = {3}f }}", c.BitsRequired, -c.MinValue, 1f / c.Accuracy, c.Accuracy));
       }
       else {
-        return null;
+        propertyData.Add(string.Format("new Bolt.FloatCompression {{ Bits = 32 }}"));
       }
+
+      return propertyData.ToArray();
     }
   }
 }

@@ -184,19 +184,19 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-    BoltAssetEditorGUI.Header("network", "Replication");
+    BoltAssetEditorGUI.Header("mc_state2", "Replication");
     Replication();
 
-    BoltAssetEditorGUI.Header("connection", "Connection");
+    BoltAssetEditorGUI.Header("mc_connection", "Connection");
     Connection();
 
-    BoltAssetEditorGUI.Header("latency", "Latency Simulation");
+    BoltAssetEditorGUI.Header("mc_latency", "Latency Simulation");
     Simulation();
 
-    BoltAssetEditorGUI.Header("settings", "Miscellaneous");
+    BoltAssetEditorGUI.Header("mc_settings", "Miscellaneous");
     Miscellaneous();
 
-    BoltAssetEditorGUI.Header("console", "Console");
+    BoltAssetEditorGUI.Header("mc_console", "Console");
     Console();
 
     GUILayout.Space(4);

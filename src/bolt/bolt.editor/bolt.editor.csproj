@@ -61,7 +61,6 @@
     <Compile Include="BoltEditorGUI.cs" />
     <Compile Include="BoltEditorWindow.cs" />
     <Compile Include="BoltFilterWindow.cs" />
-    <Compile Include="BoltFloatCompressionEditor.cs" />
     <Compile Include="BoltInstaller.cs" />
     <Compile Include="BoltProjectWindow.cs" />
     <Compile Include="BoltScenesWindow.cs" />
@@ -133,72 +132,33 @@
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltEntity Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\arrow_down.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\arrow_left.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\arrow_right.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\arrow_up.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\connection.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\console.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\controller.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\download.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\latency.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\minus.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\move_down.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\move_up.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\network.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\play.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\properties.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\properties_add.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\result.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\rtt.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\scenes.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\settings.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\setting_tools.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\status-offline.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\status.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\upload.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltLogo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_down.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_down_8px.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_left.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_right.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_right_8px.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_arrow_up.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_event2.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_folder_closed.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_folder_open.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_fx.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_dark.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_grey.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_logo_light.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_object.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_playcom2.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_plus.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_replistate2.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings2.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings3.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_settings4.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\boltico_x.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\category.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\compile.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\cross-script.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\edit-decimal.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\exclamation.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box-uncheck.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ui-check-box.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\globe-green.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\joystick.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_down.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_right.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_checkbox.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_checkbox_empty.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_connection.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_console.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_debugplay.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_download.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_event.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_folder.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_latency.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_minus.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_plus.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_replication.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_scenes.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_settings.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state2.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_struct.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_upload.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

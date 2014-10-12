@@ -39,8 +39,8 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", offset), Set("Data", offset));
     }
 
-    public override string EmitSetPropertyDataArgument() {
-      return string.Format("new Bolt.PropertySerializerStringData {{ Encoding = Bolt.StringEncodings.{0} }}", Decorator.PropertyType.Encoding);
+    public override string[] EmitSetPropertyDataArgument() {
+      return new[] { string.Format("new Bolt.PropertySerializerStringData {{ Encoding = Bolt.StringEncodings.{0} }}", Decorator.PropertyType.Encoding)};
     }
   }
 }

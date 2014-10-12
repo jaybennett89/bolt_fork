@@ -11,7 +11,7 @@ namespace Bolt {
 #endif
 
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal
@@ -23,7 +23,7 @@ namespace Bolt {
   }
 
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal
@@ -31,11 +31,10 @@ namespace Bolt {
  enum TransformSpaces {
     Local = 0,
     World = 1,
-    Parent = 2
   }
 
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal
@@ -47,30 +46,28 @@ namespace Bolt {
 
 
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal
 #endif
  enum MecanimMode {
-    None,
     Property,
     LayerWeight
   }
 
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal
 #endif
  enum MecanimDirection {
-    None,
     Push,
     Pull,
   }
 #if BOLT_COMPILER_DLL
-  [ProtoContract]
+  [ProtoContract(EnumPassthru = true)]
   public
 #else
   internal

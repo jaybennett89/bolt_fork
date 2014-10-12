@@ -81,7 +81,7 @@ public class BoltFilterWindow : BoltWindow {
   void EditFilter(FilterDefinition f) {
     EditorGUILayout.BeginHorizontal();
 
-    if (BoltEditorGUI.OnOffButton("ui-check-box".ToContent(), "ui-check-box-uncheck".ToContent(), f.Enabled)) {
+    if (BoltEditorGUI.Toggle("ui-check-box", "ui-check-box-uncheck", f.Enabled)) {
       f.Enabled = !f.Enabled;
     }
 

@@ -59,5 +59,6 @@ namespace Bolt.Compiler {
     public PropertyCommandSettings CommandAssetSettings {
       get { return (PropertyCommandSettings)AssetSettings; }
     }
+
   }
 }

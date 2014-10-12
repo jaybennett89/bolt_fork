@@ -14,7 +14,7 @@ public static class BoltInstaller {
   static Assembly Assembly {
     get { return Assembly.GetExecutingAssembly(); }
   }
-   
+
   static string CurrentVersion {
     get { return Assembly.GetName().Version.ToString(); }
   }
@@ -42,35 +42,30 @@ public static class BoltInstaller {
   }
 
 
-  public static void Run(bool force) {
-    if ((CurrentVersion != InstalledVersion) || force) {
-      Debug.Log(string.Format("Installing Bolt v{0}", CurrentVersion));
+  public static void Run() {
+    Debug.Log(string.Format("Installing Bolt v{0}", CurrentVersion));
 
-      try {
-        EditorApplication.LockReloadAssemblies();
+    try {
+      EditorApplication.LockReloadAssemblies();
 
-        EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "resources"));
+      EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "resources"));
 
-        CleanOldInstall();
-        InstallLogo();
-        InstallIcons();
-        InstallGizmos();
-        InstallRuntimeSettings();
-        CompileUserAssembly();
-        InstallScripts();
-        CreateDebugScene();
-        InstallPlugins();
+      CleanOldInstall();
+      InstallLogo();
+      InstallIcons();
+      InstallGizmos();
+      InstallRuntimeSettings();
+      CompileUserAssembly();
+      InstallScripts();
+      CreateDebugScene();
+      InstallPlugins();
 
-        // update
-        EditorPrefs.SetString(INSTALLED_VERSION_KEY, CurrentVersion);
-      }
-      finally {
-        EditorApplication.UnlockReloadAssemblies();
-        EditorUtility.ClearProgressBar();
-      }
+      // update
+      EditorPrefs.SetString(INSTALLED_VERSION_KEY, CurrentVersion);
     }
-    else {
-      EditorUtility.DisplayDialog("Already Installed", "Bolt is already installed", "Ok");
+    finally {
+      EditorApplication.UnlockReloadAssemblies();
+      EditorUtility.ClearProgressBar();
     }
   }
 

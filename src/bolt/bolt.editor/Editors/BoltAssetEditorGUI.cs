@@ -57,7 +57,7 @@ public static class BoltAssetEditorGUI {
 
   public static void Header(string icon, string text) {
     HeaderBackground(() => {
-      DrawIcon(icon, new RectOffset(6, 0, 0, 0));
+      DrawIconColorized(icon, new RectOffset(6, 0, 0, 0));
 
       GUIStyle label;
       label = new GUIStyle(EditorStyles.label);
@@ -94,8 +94,6 @@ public static class BoltAssetEditorGUI {
   public static void HeaderPropertyList(string icon, string text, ref BoltAssetProperty[] properties) {
     BeginHeaderBackground(2);
 
-    BoltAssetEditorGUI.DrawIcon(icon, new RectOffset(6, 0, 0, 0));
-
     GUIStyle label;
     label = new GUIStyle(EditorStyles.label);
     label.fontStyle = FontStyle.Bold;
@@ -103,39 +101,22 @@ public static class BoltAssetEditorGUI {
     label.contentOffset = new Vector2(0, 0);
     GUILayout.Label(text, label);
 
-    if (mode != BoltAssetPropertyEditMode.Mecanim) {
-      if (BoltAssetEditorGUI.IconButton("properties_add", new RectOffset(0, 6, 0, 0))) {
-        ArrayUtility.Add(ref properties, BoltAssetEditorGUI.CreateProperty());
-      }
-    }
-
     EndHeaderBackground(2);
   }
 
-  public static void DrawIcon(string name) {
-    DrawIcon(name, new RectOffset());
+  public static void DrawIconColorized(string name) {
+    DrawIconColorized(name, new RectOffset());
   }
 
-  public static void DrawIcon(string name, RectOffset offset) {
+  public static void DrawIconColorized(string name, RectOffset offset) {
     GUIStyle s;
 
     s = new GUIStyle(GUIStyle.none);
     s.margin = offset;
 
+    GUI.color = BoltRuntimeSettings.instance.highlightColor;
     GUILayout.Box(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
-  }
-
-  public static bool IconButton(string name) {
-    return IconButton(name, new RectOffset());
-  }
-
-  public static bool IconButton(string name, RectOffset offset) {
-    GUIStyle s;
-
-    s = new GUIStyle(GUIStyle.none);
-    s.margin = offset;
-
-    return GUILayout.Button(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
+    GUI.color = Color.white;
   }
 
   public static GUIStyle BoxStyle(int n) {
@@ -143,10 +124,6 @@ public static class BoltAssetEditorGUI {
     s.padding = new RectOffset();
     s.margin = new RectOffset();
     return s;
-  }
-
-  public static Texture2D Gradient(string name) {
-    return Resources.Load("gradients/" + name, typeof(Texture2D)) as Texture2D;
   }
 
   public static Texture2D Icon(string name) {
@@ -370,9 +347,6 @@ public static class BoltAssetEditorGUI {
   public static void EditPropertyDeleteButton(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
 
-    if (IconButton("minus", new RectOffset(0, 6, 2, 0))) {
-      p.delete = DeleteDialog();
-    }
 
     EditorGUI.EndDisabledGroup();
   }
@@ -399,9 +373,6 @@ public static class BoltAssetEditorGUI {
   public static void EditPropertyEnabled(BoltAssetProperty p) {
     GUI.color = p.enabled ? BoltRuntimeSettings.instance.highlightColor : Color.white;
 
-    if (IconButton(p.enabled ? "status" : "status-offline", new RectOffset(6, 0, 2, 0))) {
-      p.enabled = !p.enabled;
-    }
 
     GUI.color = Color.white;
   }
@@ -411,9 +382,6 @@ public static class BoltAssetEditorGUI {
 
     EditorGUI.BeginDisabledGroup(noFoldout);
 
-    if (IconButton((p.foldout && !noFoldout) ? "arrow_down" : "arrow_right", new RectOffset(0, 0, 2, 0))) {
-      p.foldout = !p.foldout;
-    }
 
     EditorGUI.EndDisabledGroup();
   }
@@ -635,8 +603,6 @@ public static class BoltAssetEditorGUI {
     BoltAssetEditorGUI.EditPropertyType(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);
 
     EditorGUI.BeginDisabledGroup(p.isDefault);
-    if (IconButton("move_down", new RectOffset(0, 4, 2, 0))) { p.shift = 1; }
-    if (IconButton("move_up", new RectOffset(0, 4, 2, 0))) { p.shift = -1; }
     EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.EditPropertyDeleteButton(p, mode == BoltAssetPropertyEditMode.Mecanim || p.isDefault);

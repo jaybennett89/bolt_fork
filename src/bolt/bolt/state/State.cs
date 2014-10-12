@@ -158,6 +158,7 @@ namespace Bolt {
     }
 
     public void AddCallback(string path, PropertyCallbackSimple callback) {
+
       if (VerifyCallbackPath(path)) {
         List<PropertyCallbackSimple> callbacksList;
 
@@ -167,9 +168,12 @@ namespace Bolt {
 
         callbacksList.Add(callback);
       }
+      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, CallbacksSimple.Select(x => x.Value.Count).Sum());
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
+      BoltLog.Debug("Adding callback for {0}", path);
+
       if (VerifyCallbackPath(path)) {
         List<PropertyCallback> callbacksList;
 
@@ -179,6 +183,8 @@ namespace Bolt {
 
         callbacksList.Add(callback);
       }
+
+      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, Callbacks.Select(x => x.Value.Count).Sum());
     }
 
     public void RemoveCallback(string path, PropertyCallback callback) {
@@ -244,6 +250,8 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
+      InvokeCallbacks();
+
       if (Entity.IsOwner || Entity.HasPredictedControl) {
         Frames.first.Number = BoltCore.frame;
       }
@@ -259,11 +267,14 @@ namespace Bolt {
     }
 
     public void OnSimulateAfter() {
-      // invoke simulate after on properties
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         MetaData.PropertySerializers[i].OnSimulateAfter(this);
       }
 
+      InvokeCallbacks();
+    }
+
+    void InvokeCallbacks() {
       // calculate diff mask
       var diff = Diff(Frames.first, DiffFrame);
 
@@ -278,7 +289,7 @@ namespace Bolt {
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         if (diff.IsSet(i)) {
           //BoltLog.Info("property changed {0}", MetaData.PropertySerializers[i].StateData.PropertyName);
-          InvokeCallbacks(MetaData.PropertySerializers[i]);
+          InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
         }
       }
 
@@ -286,9 +297,7 @@ namespace Bolt {
       Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
     }
 
-    void InvokeCallbacks(PropertySerializer p) {
-      p.OnChanged(this, Frames.first);
-
+    void InvokeCallbacksForProperty(PropertySerializer p) {
       for (int i = 0; i < p.StateData.CallbackPaths.Length; ++i) {
         {
           List<PropertyCallback> callbacksList;

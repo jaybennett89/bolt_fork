@@ -29,7 +29,7 @@ namespace Bolt.Compiler {
       );
     }
 
-    public virtual string EmitSetPropertyDataArgument() {
+    public virtual string[] EmitSetPropertyDataArgument() {
       return null;
     }
 
