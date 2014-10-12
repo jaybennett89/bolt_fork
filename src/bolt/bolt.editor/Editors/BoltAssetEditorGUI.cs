@@ -63,7 +63,7 @@ public static class BoltAssetEditorGUI {
       label = new GUIStyle(EditorStyles.label);
       label.fontStyle = FontStyle.Bold;
       label.alignment = TextAnchor.UpperLeft;
-      label.contentOffset = new Vector2(0, 0);
+      label.contentOffset = new Vector2(0, -2);
       GUILayout.Label(text, label, GUILayout.ExpandWidth(false));
     }, 2, 4);
   }
@@ -75,13 +75,13 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void BeginHeaderBackground(int topSpace) {
-    GUILayout.Space(topSpace);
-    GUI.color = EditorGUIUtility.isProSkin ? new Color(.15f, .15f, .15f) : new Color(.5f, .5f, .5f);
-    GUIStyle bg = new GUIStyle();
-    bg.normal.background = EditorGUIUtility.whiteTexture;
-    bg.padding = new RectOffset(0, 0, 2, 2);
-    GUILayout.BeginHorizontal(bg);
-    GUI.color = Color.white;
+    //GUILayout.Space(topSpace);
+    //GUI.color = EditorGUIUtility.isProSkin ? new Color(.15f, .15f, .15f) : new Color(.75f, .75f, .75f);
+    //GUIStyle bg = new GUIStyle();
+    //bg.normal.background = EditorGUIUtility.whiteTexture;
+    //bg.padding = new RectOffset(0, 0, 2, 2);
+    GUILayout.BeginHorizontal(GUIStyle.none);
+    //GUI.color = Color.white;
 
   }
 
@@ -486,27 +486,6 @@ public static class BoltAssetEditorGUI {
 
     if (s.mode == BoltAssetTransformModes.DeadReckoning) {
       s.velAxes = EditAxes(s.velAxes, BoltAssetPropertyType.Vector3, "Velocity", () => s.velCompression = FloatCompressionPopupNoLabel(s.velCompression));
-
-      Label(" ", () => {
-        s.velMode = (BoltAssetTransformVelocityMode)EditorGUILayout.EnumPopup(s.velMode);
-        s.velZeroTolerance = FloatFieldOverlay(s.velZeroTolerance, "Tolerance");
-      });
-
-      Label("Acceleration", () => {
-        s.accMode = (BoltAssetTransformAccelerationMode)EditorGUILayout.EnumPopup(s.accMode);
-        EditorGUI.BeginDisabledGroup(s.accMode == BoltAssetTransformAccelerationMode.DontUse);
-        s.accZeroTolerance = FloatFieldOverlay(s.accZeroTolerance, "Tolerance");
-        EditorGUI.EndDisabledGroup();
-      });
-
-      Label(" ", () => {
-        EditorGUI.BeginDisabledGroup(s.accMode == BoltAssetTransformAccelerationMode.DontUse);
-        s.accCompression = FloatCompressionPopupNoLabel(s.accCompression);
-        EditorGUI.EndDisabledGroup();
-      });
-
-      s.maxForwardExtrapolation = Label("Max Extrapolation", () => s.maxForwardExtrapolation = IntFieldOverlay(s.maxForwardExtrapolation, "Packets"));
-      s.maxInterpTime = Label("Smooth Time", () => s.maxInterpTime = IntFieldOverlay(s.maxInterpTime, "Packets"));
     }
 
     return s;
@@ -708,25 +687,25 @@ public static class BoltAssetEditorGUI {
     return result;
   }
 
-  public static float FloatFieldOverlay(float value, string overlay) {
-    value = EditorGUILayout.FloatField(value);
+  //public static float FloatFieldOverlay(float value, string overlay) {
+  //  value = EditorGUILayout.FloatField(value);
 
-    GUIStyle s = new GUIStyle("Label");
-    s.alignment = TextAnchor.MiddleRight;
-    s.normal.textColor = Color.gray;
+  //  GUIStyle s = new GUIStyle("Label");
+  //  s.alignment = TextAnchor.MiddleRight;
+  //  s.normal.textColor = Color.gray;
 
-    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
-    return value;
-  }
+  //  GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
+  //  return value;
+  //}
 
-  public static int IntFieldOverlay(int value, string overlay) {
-    value = EditorGUILayout.IntField(value);
+  //public static int IntFieldOverlay(int value, string overlay) {
+  //  value = EditorGUILayout.IntField(value);
 
-    GUIStyle s = new GUIStyle("Label");
-    s.alignment = TextAnchor.MiddleRight;
-    s.normal.textColor = Color.gray;
+  //  GUIStyle s = new GUIStyle("Label");
+  //  s.alignment = TextAnchor.MiddleRight;
+  //  s.normal.textColor = Color.gray;
 
-    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
-    return value;
-  }
+  //  GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
+  //  return value;
+  //}
 }

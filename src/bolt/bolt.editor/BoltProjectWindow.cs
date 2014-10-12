@@ -57,16 +57,42 @@ public class BoltProjectWindow : BoltWindow {
   }
 
   void DisplayAssetList(IEnumerable<AssetDefinition> assets) {
+    bool deleteMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
     foreach (var a in assets.OrderBy(x => x.Name)) {
+
       GUILayout.BeginHorizontal();
       GUIStyle style = new GUIStyle(EditorStyles.miniButton);
+      style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
         style.normal.textColor = BoltRuntimeSettings.instance.highlightColor;
       }
 
-      if (GUILayout.Button(a.Name, style)) {
-        Select(a);
+      GUILayout.Space(5);
+
+      if (GUILayout.Button(new GUIContent(a.Name), style)) {
+        if (deleteMode) {
+          a.Deleted = true;
+
+          if (IsSelected(a)) {
+            Select(null);
+          }
+        }
+        else {
+          Select(a);
+        }
+      }
+
+      if (deleteMode) {
+        Rect r = GUILayoutUtility.GetLastRect();
+        r.xMin = r.xMax - 16;
+        r.xMax = r.xMax - 2;
+        r.yMin = r.yMin;
+        r.yMax = r.yMax;
+
+        GUI.color = BoltRuntimeSettings.instance.highlightColor;
+        GUI.DrawTexture(r, BoltEditorGUI.LoadIcon("mc_minus"));
+        GUI.color = Color.white;
       }
 
       GUILayout.EndHorizontal();

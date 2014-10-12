@@ -21,17 +21,17 @@ public class BoltSettingsWindow : EditorWindow {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
-      settings._config.framesPerSecond = BoltAssetEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
+      settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
     });
 
     BoltAssetEditorGUI.Label("Packet Interval", () => {
-      settings._config.serverSendRate = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
+      settings._config.serverSendRate = BoltEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
     });
 
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
-      settings._config.serverDejitterDelayMin = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min");
-      settings._config.serverDejitterDelay = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");
-      settings._config.serverDejitterDelayMax = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
+      settings._config.serverDejitterDelayMin = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min");
+      settings._config.serverDejitterDelay = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");
+      settings._config.serverDejitterDelayMax = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
     });
 
     BoltAssetEditorGUI.Label("Scoping Mode", () => {
@@ -63,19 +63,19 @@ public class BoltSettingsWindow : EditorWindow {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     BoltAssetEditorGUI.Label("Limit", () => {
-      settings._config.serverConnectionLimit = BoltAssetEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
+      settings._config.serverConnectionLimit = BoltEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
     });
 
     BoltAssetEditorGUI.Label("Timeout", () => {
-      settings._config.connectionTimeout = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTimeout, "ms");
+      settings._config.connectionTimeout = BoltEditorGUI.IntFieldOverlay(settings._config.connectionTimeout, "ms");
     });
 
     BoltAssetEditorGUI.Label("Connect Timeout", () => {
-      settings._config.connectionRequestTimeout = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionRequestTimeout, "ms");
+      settings._config.connectionRequestTimeout = BoltEditorGUI.IntFieldOverlay(settings._config.connectionRequestTimeout, "ms");
     });
 
     BoltAssetEditorGUI.Label("Connect Attempts", () => {
-      settings._config.connectionRequestAttempts = BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionRequestAttempts, "");
+      settings._config.connectionRequestAttempts = BoltEditorGUI.IntFieldOverlay(settings._config.connectionRequestAttempts, "");
     });
 
     BoltAssetEditorGUI.Label("Accept Mode", () => {
@@ -85,14 +85,14 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
 
     BoltAssetEditorGUI.Label("Accept Token Size", () => {
-      settings._config.connectionTokenSize = Mathf.Clamp(BoltAssetEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, UdpKit.UdpSocket.MaxConnectionTokenSize);
+      settings._config.connectionTokenSize = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, UdpKit.UdpSocket.MaxConnectionTokenSize);
     });
 
     EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.Label("Packet Size", () => {
 
-      settings._config.packetSize = BoltAssetEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
+      settings._config.packetSize = BoltEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
     });
   }
 
@@ -117,14 +117,14 @@ public class BoltSettingsWindow : EditorWindow {
       int loss;
 
       loss = Mathf.Clamp(Mathf.RoundToInt(settings._config.simulatedLoss * 100), 0, 100);
-      loss = BoltAssetEditorGUI.IntFieldOverlay(loss, "Percent");
+      loss = BoltEditorGUI.IntFieldOverlay(loss, "Percent");
 
       settings._config.simulatedLoss = Mathf.Clamp01(loss / 100f);
     });
 
     BoltAssetEditorGUI.Label("Ping", () => {
-      settings._config.simulatedPingMean = BoltAssetEditorGUI.IntFieldOverlay(settings._config.simulatedPingMean, "Mean");
-      settings._config.simulatedPingJitter = BoltAssetEditorGUI.IntFieldOverlay(settings._config.simulatedPingJitter, "Jitter");
+      settings._config.simulatedPingMean = BoltEditorGUI.IntFieldOverlay(settings._config.simulatedPingMean, "Mean");
+      settings._config.simulatedPingJitter = BoltEditorGUI.IntFieldOverlay(settings._config.simulatedPingJitter, "Jitter");
     });
 
     BoltAssetEditorGUI.Label("Noise Function", () => {
@@ -158,7 +158,6 @@ public class BoltSettingsWindow : EditorWindow {
   }
 
   void Console() {
-
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     var consoleEnabled = (settings._config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
@@ -181,7 +180,8 @@ public class BoltSettingsWindow : EditorWindow {
   Vector2 scrollPos = Vector2.zero;
 
   void OnGUI() {
-    GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
+    GUILayout.Space(6);
+
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
     BoltAssetEditorGUI.Header("mc_state2", "Replication");
@@ -199,16 +199,7 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Header("mc_console", "Console");
     Console();
 
-    GUILayout.Space(4);
-
     EditorGUILayout.EndScrollView();
-    GUILayout.EndArea();
-
-    Rect r = new Rect(0, position.height - 20, position.width, 20);
-
-    GUILayout.BeginArea(r);
-    BoltAssetEditorGUI.Footer(r);
-    GUILayout.EndArea();
 
     if (GUI.changed) {
       Save();

@@ -457,7 +457,7 @@ end tell'";
   }
 
   void OnGUI() {
-    GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
+    GUILayout.Space(6);
 
     BoltAssetEditorGUI.Header("mc_debugplay", "Debug Start Settings");
     Settings();
@@ -465,14 +465,6 @@ end tell'";
     BoltAssetEditorGUI.Header("mc_scenes", "Scenes");
     GUILayout.Space(1);
     Scenes();
-
-    GUILayout.EndArea();
-
-    Rect r = new Rect(0, position.height - 20, position.width, 20);
-
-    GUILayout.BeginArea(r);
-    BoltAssetEditorGUI.Footer(r);
-    GUILayout.EndArea();
 
     if (GUI.changed) {
       EditorUtility.SetDirty(BoltRuntimeSettings.instance);

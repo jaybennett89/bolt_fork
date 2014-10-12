@@ -106,9 +106,10 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
-
-    // list properties
     EditPropertyList(def, def.Properties);
+
+    if (def.Properties.Count > 0)
+      BoltEditorGUI.AddButton("", def.Properties, () => new PropertyStateSettings());
 
     Guid guid = def.ParentGuid;
 
@@ -131,9 +132,10 @@ public class BoltEditorWindow : BoltWindow {
 
     // add button
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
-
-    // list properties
     EditPropertyList(def, def.Properties);
+
+    if (def.Properties.Count > 0)
+      BoltEditorGUI.AddButton("", def.Properties, () => new PropertyStateSettings());
 
   }
 
@@ -158,9 +160,10 @@ public class BoltEditorWindow : BoltWindow {
 
     // add button
     BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyEventSettings());
-
-    // list properties
     EditPropertyList(def, def.Properties);
+
+    if (def.Properties.Count > 0)
+      BoltEditorGUI.AddButton("", def.Properties, () => new PropertyEventSettings());
   }
 
   void EditCommand(CommandDefinition def) {
@@ -170,15 +173,17 @@ public class BoltEditorWindow : BoltWindow {
 
     // add button
     BoltEditorGUI.AddButton("Input", def.Input, () => new PropertyCommandSettings());
-
-    // list properties
     EditPropertyList(def, def.Input);
+
+    if (def.Input.Count > 0)
+      BoltEditorGUI.AddButton("", def.Input, () => new PropertyCommandSettings());
 
     // add button
     BoltEditorGUI.AddButton("Result", def.Result, () => new PropertyCommandSettings());
-
-    // list properties
     EditPropertyList(def, def.Result);
+
+    if (def.Result.Count > 0)
+      BoltEditorGUI.AddButton("", def.Result, () => new PropertyCommandSettings());
   }
 
   void BeginBackground() {

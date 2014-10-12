@@ -270,7 +270,9 @@ public static class BoltEditorGUI {
       );
     }
 
-    GUILayout.Label(text);
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 2;
+    GUILayout.Label(text, s);
 
     EditorGUILayout.EndHorizontal();
   }
@@ -282,10 +284,10 @@ public static class BoltEditorGUI {
       clicked();
     }
 
-    GUIStyle l = new GUIStyle("Label");
-    l.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 2;
+    GUILayout.Label(text, s);
 
-    GUILayout.Label(text, l);
     EditorGUILayout.EndHorizontal();
   }
 
