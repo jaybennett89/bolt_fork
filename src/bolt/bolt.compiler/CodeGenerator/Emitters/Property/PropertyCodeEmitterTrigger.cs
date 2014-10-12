@@ -24,22 +24,14 @@ namespace Bolt.Compiler {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
     }
 
-    public override string EmitSetPropertyDataArgument() {
-      if (Decorator.DefiningAsset is StateDecorator || Decorator.DefiningAsset is StructDecorator) {
-        var s = Decorator.Definition.StateAssetSettings;
-        return string.Format(
-          "new Bolt.PropertyMecanimData {{ Mode = Bolt.MecanimMode.{0}, OwnerDirection = Bolt.MecanimDirection.{1}, ControllerDirection = Bolt.MecanimDirection.{2}, OthersDirection = Bolt.MecanimDirection.{3}, Layer = {4}, Damping = {5}f }}",
-          s.MecanimMode,
-          s.MecanimOwnerDirection,
-          s.MecanimControllerDirection,
-          s.MecanimOthersDirection,
-          s.MecanimLayer,
-          s.MecanimDamping
-        );
+    public override string[] EmitSetPropertyDataArgument() {
+      List<string> propertyData = new List<string>();
+
+      if (Decorator.DefiningAsset is StateDecorator) {
+        propertyData.Add(Decorator.Definition.StateAssetSettings.GetMecanimDataExpression());
       }
-      else {
-        return null;
-      }
+
+      return propertyData.ToArray();
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {

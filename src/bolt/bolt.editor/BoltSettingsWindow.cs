@@ -143,10 +143,6 @@ public class BoltSettingsWindow : EditorWindow {
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
     });
 
-    BoltAssetEditorGUI.Label("Use Unique Ids", () => {
-      settings._config.globalUniqueIds = EditorGUILayout.Toggle(settings._config.globalUniqueIds);
-    });
-
     BoltAssetEditorGUI.Label("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
@@ -188,19 +184,19 @@ public class BoltSettingsWindow : EditorWindow {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-    BoltAssetEditorGUI.Header("network", "Replication");
+    BoltAssetEditorGUI.Header("mc_state2", "Replication");
     Replication();
 
-    BoltAssetEditorGUI.Header("connection", "Connection");
+    BoltAssetEditorGUI.Header("mc_connection", "Connection");
     Connection();
 
-    BoltAssetEditorGUI.Header("latency", "Latency Simulation");
+    BoltAssetEditorGUI.Header("mc_latency", "Latency Simulation");
     Simulation();
 
-    BoltAssetEditorGUI.Header("settings", "Miscellaneous");
+    BoltAssetEditorGUI.Header("mc_settings", "Miscellaneous");
     Miscellaneous();
 
-    BoltAssetEditorGUI.Header("console", "Console");
+    BoltAssetEditorGUI.Header("mc_console", "Console");
     Console();
 
     GUILayout.Space(4);

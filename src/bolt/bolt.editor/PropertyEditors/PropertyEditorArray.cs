@@ -16,7 +16,7 @@ public class PropertyEditorArray : PropertyEditor<PropertyTypeArray> {
     if (PropertyType.ElementType.HasSettings) {
       GUILayout.Space(5);
       EditorGUILayout.BeginVertical();
-      EditorGUILayout.LabelField("Element Type Settings", BoltEditorGUI.SmallWhiteText);
+      EditorGUILayout.LabelField("Element Type Settings", BoltEditorGUI.AccentText);
       PropertyEditorRegistry.GetEditor(PropertyType.ElementType).EditArrayElement(Asset, Definition, PropertyType.ElementType);
       EditorGUILayout.EndVertical();
     }

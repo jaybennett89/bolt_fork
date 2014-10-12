@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  struct Axis {
+  internal struct Axis {
     public const int X = 0;
     public const int Y = 1;
     public const int Z = 2;

@@ -16,13 +16,13 @@ public class WeaponRifle : WeaponBase {
       // display debug
       Debug.DrawRay(pos, look * Vector3.forward);
 
-      using (var hits = BoltPhysics.Raycast(new Ray(pos, look * Vector3.forward), cmd.ServerFrame)) {
+      using (var hits = BoltNetwork.RaycastAll(new Ray(pos, look * Vector3.forward), cmd.ServerFrame)) {
         for (int i = 0; i < hits.count; ++i) {
           var hit = hits.GetHit(i);
           var serializer = hit.body.GetComponent<PlayerController>();
 
           if ((serializer != null) && (serializer.state.team != state.team)) {
-            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet); 
+            serializer.ApplyDamage(controller.activeWeapon.damagePerBullet);
           }
         }
       }
@@ -52,7 +52,6 @@ public class WeaponRifle : WeaponBase {
         trail.SetPosition(0, muzzleFlash.position);
         trail.SetPosition(1, rh.point);
       }
-
     }
 
     GameObject go = (GameObject)GameObject.Instantiate(shellPrefab, shellEjector.position, shellEjector.rotation);

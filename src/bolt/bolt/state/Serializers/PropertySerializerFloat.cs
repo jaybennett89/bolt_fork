@@ -7,11 +7,16 @@ using UE = UnityEngine;
 using UdpKit;
 
 namespace Bolt {
-
   class PropertySerializerFloat : PropertySerializerMecanim {
-    public PropertySerializerFloat(StatePropertyMetaData info) : base(info) { }
+    FloatCompression Compression;
+
+    public PropertySerializerFloat(StatePropertyMetaData meta) : base(meta) { }
     public PropertySerializerFloat(EventPropertyMetaData meta) : base(meta) { }
     public PropertySerializerFloat(CommandPropertyMetaData meta) : base(meta) { }
+
+    public void SetPropertyData(FloatCompression compression) {
+      Compression = compression; 
+    }
 
     public override int StateBits(State state, State.Frame frame) {
       return 32;

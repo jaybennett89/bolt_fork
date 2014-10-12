@@ -4,20 +4,54 @@ using Bolt.Compiler;
 using UnityEditor;
 
 public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
+
+  public enum AxisSelections {
+    XYZ,
+    XY,
+    XZ,
+    YZ,
+    X,
+    Y,
+    Z,
+  }
+
+  public override bool DisplatyDefaultSettingsHeader {
+    get { return false; }
+  }
+
   protected override void Edit(bool array) {
-    BoltEditorGUI.WithLabel("Transform Space", () => { PropertyType.Space = (TransformSpaces)EditorGUILayout.EnumPopup(PropertyType.Space); });
-
+    //BoltEditorGUI.WithLabel("Transform Space", () => { PropertyType.Space = (TransformSpaces)EditorGUILayout.EnumPopup(PropertyType.Space); });
     //BoltEditorGUI.WithLabel("Rotation Mode", () => { PropertyType.RotationMode = (TransformRotationMode)EditorGUILayout.EnumPopup(PropertyType.RotationMode); });
-    //BoltEditorGUI.EditAxes("Position", PropertyType.PositionAxes);
 
-    //switch (PropertyType.RotationMode) {
-    //  case TransformRotationMode.QuaternionComponents:
-    //    PropertyType.RotationCompressionQuaternion = BoltEditorGUI.EditFloatCompression("Rotation", PropertyType.RotationCompressionQuaternion);
-    //    break;
+    BoltEditorGUI.SettingsSectionDouble("Position Axes", "Rotation Axes", () => {
+      EditorGUILayout.BeginHorizontal();
+      EditorGUILayout.EnumPopup(AxisSelections.XYZ);
+      EditorGUILayout.EnumPopup(AxisSelections.XYZ);
+      EditorGUILayout.EndHorizontal();
+    });
 
-    //  case TransformRotationMode.EulerAngles:
-    //    BoltEditorGUI.EditAxes("Rotation", PropertyType.RotationAxesEuler);
-    //    break;
-    //}
+    bool test = true;
+
+    BoltEditorGUI.SettingsSectionToggle("Compression", ref test, () => {
+
+    }, GUILayout.Width(70));
+
+
+    //EditorGUILayout.BeginHorizontal();
+    //BoltEditorGUI.EditFloatCompression(PropertyType.GetPositionAxis(VectorComponents.X).Compression, true);
+    //GUILayout.Space(5);
+    //BoltEditorGUI.EditFloatCompression(PropertyType.GetPositionAxis(VectorComponents.Y).Compression, true);
+    //GUILayout.Space(5);
+    //BoltEditorGUI.EditFloatCompression(PropertyType.GetPositionAxis(VectorComponents.Z).Compression, true);
+    //EditorGUILayout.EndHorizontal();
+    //string subType =
+    //  PropertyType.GetPositionAxis(VectorComponents.Z).Enabled
+    //    ? "Vector3"
+    //    : "Vector2";
+
+
+    //&BoltEditorGUI.EditAxes("Rotation", PropertyType.RotationAxes);
+
+    //PropertyType.RotationCompressionQuaternion = BoltEditorGUI.EditFloatCompression("Rotation", PropertyType.RotationCompressionQuaternion);
   }
 }

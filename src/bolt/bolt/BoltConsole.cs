@@ -81,7 +81,7 @@ public class BoltConsole : MonoBehaviour {
   internal KeyCode toggleKey = KeyCode.Tab;
 
   [SerializeField]
-  float backgroundTransparency = 0.5f;
+  float backgroundTransparency = 0.75f;
 
   [SerializeField]
   int padding = 0;
@@ -175,7 +175,7 @@ public class BoltConsole : MonoBehaviour {
     int lines = Mathf.Max(1, ((int)(Screen.height * consoleHeight)) / lineHeight) + 1;
 
     // background
-    GUI.color = Color.black * backgroundTransparency;
+    GUI.color = new Color(0, 0, 0, backgroundTransparency);
     GUI.DrawTexture(new Rect(inset, inset, Screen.width - (inset * 2), (lines * lineHeight) + (padding * 2)), background);
     GUI.color = Color.white;
 

@@ -14,8 +14,8 @@ namespace Bolt.Compiler{
       get { return "PackEntity"; }
     }
 
-    public override string EmitSetPropertyDataArgument() {
-      return string.Format("new Bolt.PropertySerializerEntityData {{ IsParent = {0} }}", Decorator.PropertyType.IsParent.ToString().ToLower());
+    public override string[] EmitSetPropertyDataArgument() {
+      return new[] { string.Format("new Bolt.PropertySerializerEntityData {{ IsParent = {0} }}", Decorator.PropertyType.IsParent.ToString().ToLower())};
     }
   }
 }

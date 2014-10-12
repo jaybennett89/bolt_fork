@@ -459,10 +459,10 @@ end tell'";
   void OnGUI() {
     GUILayout.BeginArea(new Rect(0, 2, position.width, position.height - 20));
 
-    BoltAssetEditorGUI.Header("play", "Debug Start Settings");
+    BoltAssetEditorGUI.Header("mc_debugplay", "Debug Start Settings");
     Settings();
 
-    BoltAssetEditorGUI.Header("scenes", "Scenes");
+    BoltAssetEditorGUI.Header("mc_scenes", "Scenes");
     GUILayout.Space(1);
     Scenes();
 

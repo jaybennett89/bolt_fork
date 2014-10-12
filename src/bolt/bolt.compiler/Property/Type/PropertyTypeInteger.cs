@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  [ProtoContract]
+  [ProtoContract()]
   public class PropertyTypeInteger : PropertyType {
     [ProtoMember(2)]
     public int MinValue;

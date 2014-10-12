@@ -12,7 +12,6 @@ namespace Bolt {
       return string.Format("X:{0} Y:{1} Z:{2}", q.x.ToString("F3"), q.y.ToString("F3"), q.z.ToString("F3"));
     }
 
-
     public override int StateBits(State state, State.Frame frame) {
       return 32 * 4;
     }

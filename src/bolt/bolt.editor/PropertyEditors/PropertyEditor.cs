@@ -10,6 +10,10 @@ public abstract class PropertyEditor {
   public PropertyDefinition Definition;
   public PropertyType PropertyType;
 
+  public virtual bool DisplatyDefaultSettingsHeader {
+    get { return true; }
+  }
+
   public void Edit(AssetDefinition asset, PropertyDefinition definition) {
     Asset = asset;
     Definition = definition;

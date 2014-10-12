@@ -90,7 +90,7 @@ namespace Bolt {
     }
 
     bool InvokeForFrame(State state, State.Frame f) {
-      if (state.Animator && (MecanimData.Mode == MecanimMode.Property)) {
+      if (MecanimData.Enabled && state.Animator) {
         switch (GetMecanimDirection(state)) {
           case MecanimDirection.Push:
             return MecanimPushOrNone(state, f, true);

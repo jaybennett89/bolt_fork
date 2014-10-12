@@ -36,6 +36,7 @@ namespace Bolt {
     void OnRender();
     void OnInitialized();
     void OnCreated(Entity entity);
+    void OnParentChanging(Entity newParent, Entity oldParent);
 
     void OnSimulateBefore();
     void OnSimulateAfter();

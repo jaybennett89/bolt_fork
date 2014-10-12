@@ -33,7 +33,7 @@ public static class BoltEditorGUI {
     get {
       GUIStyle style;
       style = new GUIStyle();
-      style.margin = new RectOffset(4, 4, 2, 0);
+      style.margin = new RectOffset(0, 0, 0, 0);
       return style;
     }
   }
@@ -44,50 +44,6 @@ public static class BoltEditorGUI {
       style = new GUIStyle("ObjectFieldThumb");
       style.padding = new RectOffset(5, 5, 5, 5);
       style.margin = new RectOffset(5, 5, 0, 5);
-      return style;
-    }
-  }
-
-  public static GUIStyle StructHeaderStyle {
-    get {
-      return StateHeaderStyle;
-
-      //GUIStyle style;
-      //style = NodeStyle(2);
-      //style.padding = new RectOffset(0, 0, 0, 3);
-      //style.margin = new RectOffset(5, 5, 5, 5);
-      //return style;
-    }
-  }
-
-  public static GUIStyle StateHeaderStyle {
-    get {
-      GUIStyle style;
-      style = NodeStyle(1);
-      style.padding = new RectOffset(0, 0, 0, 3);
-      style.margin = new RectOffset(5, 5, 5, 5);
-      return style;
-    }
-  }
-
-  public static GUIStyle EventHeaderStyle {
-    get {
-      return CommandHeaderStyle;
-      //GUIStyle style;
-      //style = NodeStyle(4);
-      //style.padding = new RectOffset(0, 0, 0, 3);
-      //style.margin = new RectOffset(5, 5, 5, 5);
-      //return style;
-    }
-  }
-
-
-  public static GUIStyle CommandHeaderStyle {
-    get {
-      GUIStyle style;
-      style = NodeStyle(2);
-      style.padding = new RectOffset(0, 0, 0, 3);
-      style.margin = new RectOffset(5, 5, 5, 5);
       return style;
     }
   }
@@ -117,25 +73,7 @@ public static class BoltEditorGUI {
     return new Color(1, 1, 1, opacity);
   }
 
-  public static Color StateHeaderColor {
-    get { return ColorInt(225, 255, 225); }
-  }
-
-  public static Color StructHeaderColor {
-    get { return StateHeaderColor; }
-    //get { return ColorInt(225, 255, 225); }
-  }
-   
-  public static Color EventHeaderColor {
-    get { return CommandHeaderColor; }
-    //get { return ColorInt(255, 75, 75); }
-  }
-
-  public static Color CommandHeaderColor {
-    get { return LightOrange; }
-  }
-
-  public static GUIStyle SmallWhiteText {
+  public static GUIStyle AccentText {
     get {
       GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
       s.normal.textColor = Color.white;
@@ -151,7 +89,7 @@ public static class BoltEditorGUI {
 
   public static GUIStyle PropertiesAddTextStyle {
     get {
-      GUIStyle s = new GUIStyle(SmallWhiteText);
+      GUIStyle s = new GUIStyle(AccentText);
       return s;
     }
   }
@@ -173,14 +111,6 @@ public static class BoltEditorGUI {
       s = new GUIStyle(EditorStyles.miniLabel);
       s.normal.textColor = Color.white;
       s.alignment = TextAnchor.MiddleRight;
-      return s;
-    }
-  }
-
-  public static GUIStyle SelectedStyle {
-    get {
-      GUIStyle s = new GUIStyle();
-      s.normal.background = ((GUIStyle)"LODSliderRangeSelected").normal.background;
       return s;
     }
   }
@@ -223,45 +153,8 @@ public static class BoltEditorGUI {
     return comment;
   }
 
-  public static GUIStyle NodeStyle(int n) {
-    GUIStyle s = new GUIStyle("flow node " + n);
-    s.padding = new RectOffset();
-    s.margin = new RectOffset();
-    return s;
-  }
-
-  public static void Icon(string name) {
-    Icon(name, new RectOffset());
-  }
-
-  public static void Icon(string name, Rect r) {
-    GUI.DrawTexture(r, LoadIcon(name));
-  }
-
-  public static void Icon(string name, RectOffset offset) {
-    Icon(name, offset, GUILayout.Width(16), GUILayout.Height(16));
-  }
-
-  public static void Icon(string name, RectOffset offset, params GUILayoutOption[] layout) {
-    GUIStyle s;
-
-    s = new GUIStyle(GUIStyle.none);
-    s.margin = offset;
-
-    GUILayout.Box(LoadIcon(name), s, layout);
-  }
-
-  public static void IconClickable(string name, System.Action onClick) {
-    IconClickable(name, new RectOffset(), onClick);
-  }
-
-  public static void IconClickable(string name, RectOffset offset, System.Action onClick) {
-    IconClickable(name, offset, onClick, 16);
-  }
-
-  public static void IconClickable(string name, RectOffset offset, System.Action onClick, int w) {
-    Icon(name, offset, GUILayout.Width(w), GUILayout.Height(16));
-    MakeClickable(onClick);
+  public static Texture2D LoadIcon(string name) {
+    return Resources.Load("icons/" + name, typeof(Texture2D)) as Texture2D;
   }
 
   public static void LabelClickable(string label, System.Action onClick) {
@@ -271,10 +164,6 @@ public static class BoltEditorGUI {
   public static void LabelClickable(string label, GUIStyle style, System.Action onClick) {
     GUILayout.Label(label, style);
     MakeClickable(onClick);
-  }
-
-  public static Texture2D LoadIcon(string name) {
-    return Resources.Load("icons/" + name, typeof(Texture2D)) as Texture2D;
   }
 
   public static Guid AssetPopup(IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
@@ -325,15 +214,49 @@ public static class BoltEditorGUI {
     return current;
   }
 
+  static GUIStyle PaddingStyle(int left, int right, int top, int bottom) {
+    GUIStyle s = new GUIStyle(GUIStyle.none);
+    s.padding = new RectOffset(left, right, top, bottom);
+    return s;
+  }
+
+  static bool IconButton(string icon, Color color) {
+    GUIStyle style;
+    style = new GUIStyle(GUIStyle.none);
+    style.padding = new RectOffset();
+    style.margin = new RectOffset(0, 0, 2, 0);
+    style.contentOffset = new Vector2();
+    style.normal.background = LoadIcon(icon);
+
+    GUI.color = color;
+    bool result = GUILayout.Button("", style, GUILayout.Width(16), GUILayout.Height(16));
+    GUI.color = Color.white;
+
+    return result;
+  }
+
+  public static bool Button(string icon) {
+    return IconButton(icon, BoltRuntimeSettings.instance.highlightColor);
+  }
+
+  public static bool Toggle(string on, string off, bool enabled) {
+    return Button(enabled ? on : off);
+  }
+
+  public static bool Toggle(string icon, bool enabled) {
+    Color c;
+
+    c = BoltRuntimeSettings.instance.highlightColor;
+    c.a = enabled ? 1f : 0.25f;
+
+    return IconButton(icon, c);
+  }
+
+
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
+    EditorGUILayout.BeginHorizontal(PaddingStyle(10, 0, 0, 5));
 
-
-    EditorGUILayout.BeginHorizontal();
-    bool btn0 = LabelButton(text, true, 1, GUILayout.ExpandWidth(false));
-    bool btn1 = IconButton("boltico_plus".ToContent());
-    EditorGUILayout.EndHorizontal();
-
-    if (btn0 || btn1) {
+    if (Button("mc_plus")) {
       list.Add(
         new PropertyDefinition {
           Name = "NewProperty",
@@ -346,48 +269,24 @@ public static class BoltEditorGUI {
         }
       );
     }
+
+    GUILayout.Label(text);
+
+    EditorGUILayout.EndHorizontal();
   }
 
-  public static GUIContent ToContent(this string text) {
-    return ToContent(text, "");
-  }
+  public static void HeaderButton(string text, string icon, Action clicked) {
+    EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
 
-  public static GUIContent ToContent(this string text, string tooltip) {
-    return new GUIContent(text, tooltip);
-  }
+    if (Button(icon)) {
+      clicked();
+    }
 
-  public static bool IconButton(GUIContent icon) {
-    return IconButton(icon, Color.white);
-  }
+    GUIStyle l = new GUIStyle("Label");
+    l.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
 
-  public static bool IconButton(GUIContent icon, bool enabled) {
-    return IconButton(icon, new Color(1, 1, 1, enabled ? 1f : 0.25f));
-  }
-
-  public static bool OnOffButton(GUIContent on, GUIContent off, bool enabled) {
-    var texture = LoadIcon(enabled ? on.text : off.text) as Texture;
-    var tooltip = enabled ? on.tooltip : off.tooltip;
-    return GUILayout.Button(new GUIContent(texture, tooltip), ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
-  }
-
-  public static bool OnOffButton(GUIContent on, GUIContent off, bool enabled, float offOpacity) {
-    return IconButton(enabled ? on : off, enabled ? 1f : offOpacity);
-  }
-
-  public static bool IconButton(GUIContent icon, float opacity) {
-    return IconButton(icon, new Color(1, 1, 1, Mathf.Clamp01(opacity)));
-  }
-
-  public static bool IconButton(GUIContent icon, Color color) {
-    bool result = false;
-
-    WithColor(color, () => {
-      var texture = LoadIcon(icon.text) as Texture;
-      var tooltip = icon.tooltip;
-      result = GUILayout.Button(new GUIContent(texture, tooltip), ImageButtonStyle, GUILayout.Width(16), GUILayout.Height(16));
-    });
-
-    return result;
+    GUILayout.Label(text, l);
+    EditorGUILayout.EndHorizontal();
   }
 
   public static int EditPriority(int priority, bool enabled) {
@@ -426,18 +325,8 @@ public static class BoltEditorGUI {
   }
 
   public static float FloatFieldOverlay(float value, string overlay, params GUILayoutOption[] options) {
-    value = EditorGUILayout.FloatField(value, options);
-
-    GUIStyle s = new GUIStyle("Label");
-    s.alignment = TextAnchor.MiddleRight;
-    s.normal.textColor = Color.gray;
-
-    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
-    return value;
-  }
-
-  public static int IntFieldOverlay(int value, string overlay, params GUILayoutOption[] options) {
-    value = EditorGUILayout.IntField(value, options);
+    GUIStyle f = new GUIStyle("TextField");
+    value = EditorGUILayout.FloatField(value, f, options);
 
     GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
     s.alignment = TextAnchor.MiddleRight;
@@ -448,53 +337,78 @@ public static class BoltEditorGUI {
     return value;
   }
 
-  public static FloatCompression EditFloatCompression(FloatCompression c) {
-    return EditFloatCompression("Range", c);
+  public static int IntFieldOverlay(int value, string overlay, params GUILayoutOption[] options) {
+    GUIStyle f = new GUIStyle("TextField");
+    value = EditorGUILayout.IntField(value, f, options);
+
+    GUIStyle l = new GUIStyle(EditorStyles.miniLabel);
+    l.alignment = TextAnchor.MiddleRight;
+    l.contentOffset = new Vector2(-2, 0);
+    l.normal.textColor = Color.gray;
+
+    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, l);
+    return value;
   }
 
-  public static FloatCompression EditFloatCompression(string label, FloatCompression c) {
+
+  public static void SettingsSection(string label, Action gui) {
+    EditorGUILayout.LabelField(label, BoltEditorGUI.AccentText);
+    gui();
+  }
+
+  public static void SettingsSectionDouble(string left, string right, Action gui) {
+    EditorGUILayout.BeginHorizontal();
+    GUILayout.Label(left, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
+    GUILayout.FlexibleSpace();
+    GUILayout.Label(right, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
+    EditorGUILayout.EndHorizontal();
+
+    gui();
+  }
+
+  public static void SettingsSectionToggle(string label, ref bool enabled, Action gui, params GUILayoutOption[] options) {
+    EditorGUILayout.BeginHorizontal();
+    EditorGUILayout.LabelField(label, BoltEditorGUI.AccentText, options);
+
+    if (Toggle("mc_checkbox", "mc_checkbox_empty", enabled)) {
+      enabled = !enabled;
+    }
+
+    EditorGUILayout.EndHorizontal();
+
+    EditorGUI.BeginDisabledGroup(!enabled);
+    gui();
+    EditorGUI.EndDisabledGroup();
+  }
+  public static FloatCompression EditFloatCompression(FloatCompression c, bool vertical) {
     if (c == null) {
       c = FloatCompression.Default();
     }
 
-    var bits = BoltMath.BitsRequired((c.MaxValue - c.MinValue) * c.Fractions);
-    var accuracy = (1f / c.Fractions);
+    string bits = string.Format("Bits: {0}", c.Enabled ? c.BitsRequired : 32);
 
-    WithLabel(string.Format(label + " (Bits:{0}, Acc:{1})", bits, accuracy), () => {
-      c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
-      c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
-      c.Fractions = Mathf.Clamp(IntFieldOverlay(c.Fractions, "Fractions"), 1, 10000);
-    });
+    if (vertical) {
+      EditorGUILayout.BeginVertical();
+    }
+    else {
+      EditorGUILayout.BeginHorizontal();
+      GUILayout.Label(bits, GUILayout.Width(50));
+    }
+
+    c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
+    c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
+    c.Accuracy = Mathf.Max(FloatFieldOverlay(c.Accuracy, "Accuracy"), 0.001f);
+
+
+    if (vertical) {
+      GUILayout.Label(bits, GUILayout.Width(50));
+      EditorGUILayout.EndVertical();
+    }
+    else {
+      EditorGUILayout.EndHorizontal();
+    }
 
     return c;
-  }
-
-  public static void EditAxes(string label, Axis[] axis) {
-
-    WithLabel(label, () => {
-      EditorGUILayout.BeginVertical();
-
-      for (int i = 0; i < axis.Length; ++i) {
-        EditAxis(axis[i]);
-      }
-
-      EditorGUILayout.EndVertical();
-    });
-
-  }
-
-  public static void EditAxis(Axis axis) {
-    EditorGUILayout.BeginHorizontal();
-
-    axis.Enabled = GUILayout.Toggle(axis.Enabled, " " + axis.Component.ToString(), GUILayout.Width(38));
-
-    EditorGUILayout.BeginVertical();
-    EditorGUI.BeginDisabledGroup(!axis.Enabled);
-    EditFloatCompression(axis.Compression);
-    EditorGUI.EndDisabledGroup();
-    EditorGUILayout.EndVertical();
-
-    EditorGUILayout.EndHorizontal();
   }
 
   static void MakeClickable(System.Action onClick) {

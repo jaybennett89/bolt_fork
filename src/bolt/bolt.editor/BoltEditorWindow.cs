@@ -1,6 +1,7 @@
 ﻿using Bolt.Compiler;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -18,6 +19,8 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   Vector2 scroll;
+
+  static bool once = false;
 
   new void OnGUI() {
     base.OnGUI();
@@ -89,11 +92,11 @@ public class BoltEditorWindow : BoltWindow {
     };
 
     if (def.IsAbstract) {
-      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui);
+      EditHeader(def, gui);
     }
     else {
-      EditHeader(def, BoltEditorGUI.StateHeaderStyle, BoltEditorGUI.StateHeaderColor, gui, () => {
-        GUILayout.Label("Bandwidth", BoltEditorGUI.SmallWhiteText);
+      EditHeader(def, gui, () => {
+        GUILayout.Label("Bandwidth", BoltEditorGUI.AccentText);
 
         GUILayout.BeginHorizontal();
         def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
@@ -122,7 +125,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStruct(StructDefinition def) {
-    EditHeader(def, BoltEditorGUI.StructHeaderStyle, BoltEditorGUI.StructHeaderColor, () => {
+    EditHeader(def, () => {
 
     });
 
@@ -135,14 +138,13 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditEvent(EventDefinition def) {
-    EditHeader(def, BoltEditorGUI.EventHeaderStyle, BoltEditorGUI.EventHeaderColor, () => {
+    EditHeader(def, () => {
 
     }, () => {
-
       GUILayout.BeginHorizontal();
-      GUILayout.Label("Global Senders", BoltEditorGUI.SmallWhiteText);
+      GUILayout.Label("Global Senders", BoltEditorGUI.AccentText);
       GUILayout.FlexibleSpace();
-      GUILayout.Label("Entity Senders", BoltEditorGUI.SmallWhiteText);
+      GUILayout.Label("Entity Senders", BoltEditorGUI.AccentText);
       GUILayout.EndHorizontal();
 
       GUILayout.BeginHorizontal();
@@ -162,7 +164,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditCommand(CommandDefinition def) {
-    EditHeader(def, BoltEditorGUI.CommandHeaderStyle, BoltEditorGUI.CommandHeaderColor, () => {
+    EditHeader(def, () => {
       def.SmoothFrames = BoltEditorGUI.IntFieldOverlay(def.SmoothFrames, "Correction Interpolation Frames");
     });
 
@@ -179,11 +181,30 @@ public class BoltEditorWindow : BoltWindow {
     EditPropertyList(def, def.Result);
   }
 
-  void EditHeader(AssetDefinition def, GUIStyle style, Color color, Action action, params Action[] rows) {
-    GUI.color = color;
-    GUILayout.BeginVertical(style);
-    GUI.color = Color.white;
+  void BeginBackground() {
+    GUILayout.BeginVertical(BoltEditorGUI.ParameterBackgroundStyle);
+  }
+
+  void EndBackground() {
+    GUILayout.EndVertical();
+  }
+
+  void EditHeader(AssetDefinition def, Action action, params Action[] rows) {
+    GUILayout.Space(5);
+
+    BeginBackground();
+
     GUILayout.BeginHorizontal();
+
+    var icon = "";
+    if (def is StateDefinition) { icon = "mc_state"; }
+    if (def is StructDefinition) { icon = "mc_struct"; }
+    if (def is EventDefinition) { icon = "mc_event"; }
+    if (def is CommandDefinition) { icon = "mc_controller"; }
+
+    if (BoltEditorGUI.Button(icon)) {
+
+    }
 
     // edit asset name
     def.Name = EditorGUILayout.TextField(def.Name);
@@ -193,17 +214,14 @@ public class BoltEditorWindow : BoltWindow {
 
     GUILayout.EndHorizontal();
 
-    GUILayout.Label("Comment", BoltEditorGUI.SmallWhiteText);
+    GUILayout.Label("Comment", BoltEditorGUI.AccentText);
     def.Comment = EditorGUILayout.TextArea(def.Comment);
 
     for (int i = 0; i < rows.Length; ++i) {
-      GUILayout.BeginVertical();
       rows[i]();
-      GUILayout.EndVertical();
     }
 
-
-    GUILayout.EndVertical();
+    EndBackground();
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
@@ -249,16 +267,17 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditProperty(AssetDefinition def, PropertyDefinition p) {
-    EditorGUILayout.BeginVertical(BoltEditorGUI.ParameterBackgroundStyle);
+    BeginBackground();
+
     EditorGUILayout.BeginHorizontal();
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      if (BoltEditorGUI.IconButton("cross-script".ToContent())) {
+      if (BoltEditorGUI.Button("mc_minus")) {
         p.Deleted = true;
       }
     }
     else {
-      if (BoltEditorGUI.OnOffButton("boltico_arrow_down".ToContent(), "boltico_arrow_right".ToContent(), p.Expanded && (p.PropertyType.HasSettings || p.PropertyType.MecanimApplicable))) {
+      if (BoltEditorGUI.Toggle("mc_arrow_down", "mc_arrow_right", p.Expanded && (p.PropertyType.HasSettings || p.PropertyType.MecanimApplicable))) {
         p.Expanded = !p.Expanded;
       }
     }
@@ -270,7 +289,7 @@ public class BoltEditorWindow : BoltWindow {
       p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
       BoltEditorGUI.SetTooltip("Priority. A higher priority means this property is more likely to be sent.");
 
-      if (BoltEditorGUI.IconButton("joystick".ToContent(), p.Controller)) {
+      if (BoltEditorGUI.Toggle("mc_controller", p.Controller)) {
         p.Controller = !p.Controller;
       }
 
@@ -288,65 +307,13 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (p.Expanded) {
-
-      SettingsSection("Comment", () => {
+      BoltEditorGUI.SettingsSection("Comment", () => {
         p.Comment = EditorGUILayout.TextField(p.Comment);
       });
 
-      if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
-        SettingsSection("Mecanim", () => {
-          if (p.PropertyType is PropertyTypeFloat) {
-            BoltEditorGUI.WithLabel("Mode", () => {
-              p.StateAssetSettings.MecanimMode = (MecanimMode)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimMode);
-            });
-
-            switch (p.StateAssetSettings.MecanimMode) {
-              case MecanimMode.Property: BoltEditorGUI.WithLabel("Damping Time", () => { p.StateAssetSettings.MecanimDamping = EditorGUILayout.FloatField(p.StateAssetSettings.MecanimDamping); }); break;
-              case MecanimMode.LayerWeight: BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); }); break;
-            }
-          }
-          else {
-            BoltEditorGUI.WithLabel("Enabled", () => {
-              switch (EditorGUILayout.Toggle(p.StateAssetSettings.MecanimMode == MecanimMode.Property)) {
-                case true: p.StateAssetSettings.MecanimMode = MecanimMode.Property; break;
-                case false: p.StateAssetSettings.MecanimMode = MecanimMode.None; break;
-              }
-            });
-          }
-
-          if (p.StateAssetSettings.MecanimMode != MecanimMode.None) {
-            BoltEditorGUI.WithLabel("Value", () => {
-              EditorGUILayout.BeginHorizontal();
-
-              EditorGUILayout.BeginVertical();
-              GUILayout.Label("Owner", BoltEditorGUI.SmallWhiteText);
-              p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection);
-              EditorGUILayout.EndVertical();
-
-              EditorGUILayout.BeginVertical();
-              GUILayout.Label("Controller", BoltEditorGUI.SmallWhiteText);
-              p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection);
-              EditorGUILayout.EndVertical();
-
-              EditorGUILayout.BeginVertical();
-              GUILayout.Label("Others", BoltEditorGUI.SmallWhiteText);
-              p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection);
-              EditorGUILayout.EndVertical();
-
-              EditorGUILayout.EndHorizontal();
-            });
-
-            if (p.PropertyType is PropertyTypeTrigger) {
-              BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); });
-              BoltEditorGUI.SetTooltip("Which layer index this trigger creates transitions on");
-            }
-          }
-        });
-      }
-
       if (def is CommandDefinition) {
         if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {
-          SettingsSection("Corrections", () => {
+          BoltEditorGUI.SettingsSection("Corrections", () => {
             BoltEditorGUI.WithLabel("Smooth Corrections", () => {
               p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
             });
@@ -355,42 +322,65 @@ public class BoltEditorWindow : BoltWindow {
       }
 
       if (p.PropertyType.HasSettings) {
-        SettingsSection("Settings", () => {
-          if (IsStateOrStruct(def)) {
-            EditStateAssetSettings(p);
+        PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
+      }
+
+      if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
+        BoltEditorGUI.SettingsSectionToggle("Mecanim", ref p.StateAssetSettings.MecanimEnabled, () => {
+
+          // value push settings
+          {
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.BeginVertical();
+            GUILayout.Label("Owner");
+            p.StateAssetSettings.MecanimOwnerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOwnerDirection);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            GUILayout.Label("Controller");
+            p.StateAssetSettings.MecanimControllerDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimControllerDirection);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.BeginVertical();
+            GUILayout.Label("Others");
+            p.StateAssetSettings.MecanimOthersDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimOthersDirection);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndHorizontal();
           }
 
-          PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
-        });
+          if (p.PropertyType is PropertyTypeFloat) {
+            EditorGUILayout.BeginHorizontal();
+
+            p.StateAssetSettings.MecanimMode = (MecanimMode)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimMode);
+
+            switch (p.StateAssetSettings.MecanimMode) {
+              case MecanimMode.Property: p.StateAssetSettings.MecanimDamping = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.MecanimDamping, "Damping Time"); break;
+              case MecanimMode.LayerWeight: p.StateAssetSettings.MecanimLayer = BoltEditorGUI.IntFieldOverlay(p.StateAssetSettings.MecanimLayer, "Layer Index"); break;
+            }
+
+            EditorGUILayout.EndHorizontal();
+          }
+          else {
+            //BoltEditorGUI.WithLabel("Enabled", () => {
+            //  switch (EditorGUILayout.Toggle(p.StateAssetSettings.MecanimMode == MecanimMode.Property)) {
+            //    case true: p.StateAssetSettings.MecanimMode = MecanimMode.Property; break;
+            //    case false: p.StateAssetSettings.MecanimMode = MecanimMode.None; break;
+            //  }
+            //});
+          }
+
+
+          //if (p.PropertyType is PropertyTypeTrigger) {
+          //  BoltEditorGUI.WithLabel("Layer Index", () => { p.StateAssetSettings.MecanimLayer = EditorGUILayout.IntField(p.StateAssetSettings.MecanimLayer); });
+          //  BoltEditorGUI.SetTooltip("Which layer index this trigger creates transitions on");
+          //}
+        }, GUILayout.Width(50));
       }
     }
 
     EditorGUILayout.EndVertical();
-  }
-
-  void SettingsSection(string label, Action gui) {
-    EditorGUILayout.BeginHorizontal();
-    GUILayout.Space(20);
-
-    EditorGUILayout.BeginVertical();
-    EditorGUILayout.LabelField(label, BoltEditorGUI.SmallWhiteText);
-
-    gui();
-
-    EditorGUILayout.EndVertical();
-    EditorGUILayout.EndHorizontal();
-  }
-
-  void EditStateAssetSettings(PropertyDefinition p) {
-    //if (p.PropertyType.InterpolateAllowed) {
-    //  BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-    //    p.StateAssetSettings.EstimationAlgorithm = (StateEstimationAlgorithm)EditorGUILayout.EnumPopup(p.StateAssetSettings.EstimationAlgorithm);
-
-    //    if (p.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
-    //      p.StateAssetSettings.DeadReckoningErrorTolerance = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.DeadReckoningErrorTolerance, "Error Tolerance");
-    //    }
-    //  });
-    //}
   }
 
   bool IsStateOrStruct(AssetDefinition def) {
@@ -400,7 +390,7 @@ public class BoltEditorWindow : BoltWindow {
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
     EditFilters(p);
 
-    if (BoltEditorGUI.IconButton("boltico_playcom2".ToContent("This property should be replicated to the controller"), p.Controller)) {
+    if (BoltEditorGUI.Toggle("boltico_playcom2", p.Controller)) {
       p.Controller = !p.Controller;
     }
   }

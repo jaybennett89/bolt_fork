@@ -33,8 +33,8 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     }
 
     Bolt.UniqueId IBoltEntitySettingsModifier.defaultSerializerUniqueId {
-      get { return _entity.defaultSerializerUniqueId; }
-      set { _entity.VerifyNotAttached(); _entity.defaultSerializerUniqueId = value; }
+      get { return _entity.defaultSerializerId; }
+      set { _entity.VerifyNotAttached(); _entity.defaultSerializerId = value; }
     }
 
     int IBoltEntitySettingsModifier.updateRate {
@@ -65,7 +65,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal Bolt.Entity _entity;
 
   [UE.SerializeField]
-  byte[] _defaultSerializerGuid;
+  internal byte[] _sceneId;
+
+  [UE.SerializeField]
+  internal byte[] _defaultSerializerGuid;
 
   [UE.SerializeField]
   internal int _prefabId = -1;
@@ -85,7 +88,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _persistThroughSceneLoads = false;
 
-  // our link to Bolts internal entity object
   internal Bolt.Entity Entity {
     get {
       if (_entity == null) {
@@ -96,7 +98,20 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     }
   }
 
-  internal Bolt.UniqueId defaultSerializerUniqueId {
+  internal Bolt.UniqueId sceneId {
+    get {
+      if (_sceneId == null || _sceneId.Length != 16) {
+        return Bolt.UniqueId.None;
+      }
+
+      return new Bolt.UniqueId(_sceneId);
+    }
+    set {
+      _sceneId = value.ToByteArray();
+    }
+  }
+
+  internal Bolt.UniqueId defaultSerializerId {
     get {
       if (_defaultSerializerGuid == null || _defaultSerializerGuid.Length != 16) {
         return Bolt.UniqueId.None;
@@ -126,7 +141,11 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   public bool isAttached {
-    get { return _entity != null; }
+    get { return (_entity != null) && _entity.IsAttached; }
+  }
+
+  public bool isSceneObject {
+    get { return Entity.IsSceneObject; } 
   }
 
   public bool isOwner {
@@ -137,6 +156,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.HasControl; }
   }
 
+  public bool hasControlWithPrediction {
+    get { return Entity.HasPredictedControl; }
+  }
+
   public bool persistsOnSceneLoad {
     get { return Entity.PersistsOnSceneLoad; }
   }
@@ -145,7 +168,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.CanQueueCommands; }
   }
 
-  public IBoltEntitySettingsModifier GetSettingsModifier() {
+  public IBoltEntitySettingsModifier ModifySettings() {
     VerifyNotAttached();
     return new SettingsModifier(this);
   }
@@ -156,6 +179,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public void SetScope(BoltConnection connection, bool inScope) {
     Entity.SetScope(connection, inScope);
+  }
+
+  public void SetParent(BoltEntity entity) {
+    Entity.SetParent(entity.Entity);
   }
 
   /// <summary>
@@ -258,6 +285,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
     BoltLog.Error("You are trying to access the state of {0} as '{1}'", Entity, typeof(TState));
     return default(TState);
+  }
+
+  public bool StateIs<TState>() {
+    return Entity.Serializer is TState;
   }
 
   public override string ToString() {

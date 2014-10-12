@@ -5,12 +5,11 @@ using UnityEditor;
 
 public class PropertyEditorString : PropertyEditor<PropertyTypeString> {
   protected override void Edit(bool array) {
-    BoltEditorGUI.WithLabel("Max Length (1 - 100)", () => {
-      PropertyType.MaxLength = Mathf.Clamp(EditorGUILayout.IntField(PropertyType.MaxLength), 1, 100);
-    });
-
-    BoltEditorGUI.WithLabel("Encoding", () => {
+    BoltEditorGUI.SettingsSection("Encoding & Length", () => {
+      EditorGUILayout.BeginHorizontal();
       PropertyType.Encoding = (StringEncodings)EditorGUILayout.EnumPopup(PropertyType.Encoding);
+      PropertyType.MaxLength = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(PropertyType.MaxLength, "Max Length (1 - 140)"), 1, 140);
+      EditorGUILayout.EndHorizontal();
     });
   }
 }

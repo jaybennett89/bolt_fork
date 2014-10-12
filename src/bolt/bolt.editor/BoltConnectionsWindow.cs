@@ -44,7 +44,7 @@ public class BoltConnectionsWindow : EditorWindow {
   void Connections () {
     GUILayout.Space(2);
 
-    BoltAssetEditorGUI.Header("connection", "Connections");
+    BoltAssetEditorGUI.Header("mc_connection", "Connections");
 
     GUIStyle sceneStyle = "TE NodeBox";
     sceneStyle.padding = new RectOffset(5, 5, 5, 5);
@@ -53,13 +53,13 @@ public class BoltConnectionsWindow : EditorWindow {
       GUILayout.BeginHorizontal(sceneStyle);
       GUILayout.Label(c.udpConnection.RemoteEndPoint.ToString(), GUI.skin.label, GUILayout.Width(150));
 
-      BoltAssetEditorGUI.DrawIcon("rtt");
+      BoltAssetEditorGUI.DrawIconColorized("mc_latency");
       GUILayout.Label(Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f).ToString() + " ms");
 
-      BoltAssetEditorGUI.DrawIcon("download");
+      BoltAssetEditorGUI.DrawIconColorized("mc_download");
       GUILayout.Label(((c.bitsPerSecondIn >> 3) / 1000f).ToString() + " kb/s");
 
-      BoltAssetEditorGUI.DrawIcon("upload");
+      BoltAssetEditorGUI.DrawIconColorized("mc_upload");
       GUILayout.Label(((c.bitsPerSecondOut >> 3) / 1000f).ToString() + " kb/s");
 
       GUILayout.EndHorizontal();

@@ -4,6 +4,8 @@ using Bolt.Compiler;
 
 public class PropertyEditorFloat : PropertyEditor<PropertyTypeFloat> {
   protected override void Edit(bool array) {
-    PropertyType.Compression = BoltEditorGUI.EditFloatCompression(PropertyType.Compression);
+    BoltEditorGUI.SettingsSectionToggle("Compression", ref PropertyType.Compression.Enabled, () => {
+      PropertyType.Compression = BoltEditorGUI.EditFloatCompression(PropertyType.Compression, false);
+    }, GUILayout.Width(70));
   }
 }

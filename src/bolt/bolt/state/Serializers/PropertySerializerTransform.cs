@@ -3,70 +3,31 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  //internal struct TransformConfiguration {
-  //  public Axis[] PositionAxes;
-  //  public Axis[] RotationAxes;
-  //  public TransformModes TransformMode;
-  //  public TransformSpaces Space;
-  //  public TransformRotationMode RotationMode;
-  //  public FloatCompression QuaternionCompression;
-  //}
-
-  //internal enum TransformModes {
-  //  None = 0,
-  //  Interpolate = 1,
-  //  Extrapolate = 2
-  //}
-
-  //internal enum TransformSpaces {
-  //  World = 0,
-  //  Local = 1
-  //}
-
-  //internal enum TransformRotationMode {
-  //  QuaternionComponents = 0,
-  //  EulerAngles = 1
-  //}
+  internal struct PropertySerializerTransformData {
+    public Axis[] PositionAxes;
+    public Axis[] RotationAxes;
+    public FloatCompression QuaternionCompression;
+  }
 
   public class TransformData {
     internal UE.Transform Simulate;
     internal UE.Transform Render;
-    internal DoubleBuffer<UE.Vector3> RenderDoubleBuffer;
+    internal DoubleBuffer<UE.Vector3> RenderDoubleBufferPosition;
+    internal DoubleBuffer<UE.Quaternion> RenderDoubleBufferRotation;
 
     public void SetTransforms(UE.Transform simulate) {
-      SetTransforms(simulate, null, UE.Vector3.zero);
+      SetTransforms(simulate, null);
     }
 
     public void SetTransforms(UE.Transform simulate, UE.Transform render) {
-      SetTransforms(simulate, render, simulate.position);
-    }
-
-    void SetTransforms(UE.Transform simulate, UE.Transform render, UE.Vector3 start) {
-      Render = render;
-      RenderDoubleBuffer = DoubleBuffer<UE.Vector3>.InitBuffer(start);
+      if (render) {
+        Render = render;
+        RenderDoubleBufferPosition = DoubleBuffer<UE.Vector3>.InitBuffer(simulate.position);
+        RenderDoubleBufferRotation = DoubleBuffer<UE.Quaternion>.InitBuffer(simulate.rotation);
+      }
 
       Simulate = simulate;
     }
-  }
-
-  public class TransformDataRigidbody : TransformData {
-    public UE.Rigidbody Rigidbody;
-  }
-
-  public class TransformDataRigidbody2D : TransformData {
-    public UE.Rigidbody2D Rigidbody;
-  }
-
-  public class TransformDataCharacterController : TransformData {
-    public UE.CharacterController CharacterController;
-  }
-
-  public class TransformDataVelocity : TransformData {
-    public UE.Vector3 Velocity;
-  }
-
-  struct PropertySerializerTransformData {
-    public TransformSpaces Space;
   }
 
   class PropertySerializerTransform : PropertySerializer {
@@ -81,7 +42,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return (12 + 16) * 8;
+      return ((12 + 16) * 8) + 1;
     }
 
     public override object GetDebugValue(State state) {
@@ -105,15 +66,58 @@ namespace Bolt {
     public override void OnRender(State state, State.Frame frame) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Render) {
-        var p = td.RenderDoubleBuffer.Previous;
-        var c = td.RenderDoubleBuffer.Current;
+        var p = td.RenderDoubleBufferPosition.Previous;
+        var c = td.RenderDoubleBufferPosition.Current;
         td.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
+        td.Render.rotation = td.RenderDoubleBufferRotation.Current;
+      }
+    }
+
+    public override void OnParentChanged(State state, Entity newParent, Entity oldParent) {
+      var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
+      if (newParent == null) {
+        td.Simulate.transform.parent = null;
+        UpdateTransformValues(state, oldParent.UnityObject.transform.localToWorldMatrix, UE.Matrix4x4.identity);
+      }
+      else if (oldParent == null) {
+        td.Simulate.transform.parent = newParent.UnityObject.transform;
+        UpdateTransformValues(state, UE.Matrix4x4.identity, newParent.UnityObject.transform.worldToLocalMatrix);
+      }
+      else {
+        td.Simulate.transform.parent = newParent.UnityObject.transform;
+        UpdateTransformValues(state, oldParent.UnityObject.transform.localToWorldMatrix, newParent.UnityObject.transform.worldToLocalMatrix);
+      }
+    }
+
+    void UpdateTransformValues(State state, UE.Matrix4x4 l2w, UE.Matrix4x4 w2l) {
+      var it = state.Frames.GetIterator();
+
+      while (it.Next()) {
+        UE.Vector3 p = it.val.Data.ReadVector3(StateData.ObjectOffset);
+        UE.Quaternion r = it.val.Data.ReadQuaternion(StateData.ObjectOffset + 12);
+
+        float angle;
+        UE.Vector3 axis;
+        r.ToAngleAxis(out angle, out axis);
+
+        // transform position
+        p = l2w.MultiplyPoint(p);
+        p = w2l.MultiplyPoint(p);
+
+        // transform rotation
+        axis = l2w.MultiplyVector(axis);
+        axis = w2l.MultiplyVector(axis);
+        r = UE.Quaternion.AngleAxis(angle, axis);
+
+        // put back into frame
+        it.val.Data.PackVector3(StateData.ObjectOffset, p);
+        it.val.Data.PackQuaternion(StateData.ObjectOffset + 12, r);
       }
     }
 
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
-      if (td.Simulate && !state.Entity.IsOwner && (!state.Entity.HasControl || !state.Entity.ControllerLocalPrediction)) {
+      if (td.Simulate && !state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
         PerformInterpolation(td, state);
 
         //switch (Config.TransformMode) {
@@ -135,15 +139,28 @@ namespace Bolt {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
         if (state.Entity.IsOwner) {
-          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.position);
-          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.rotation);
+          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.localPosition);
+          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.localRotation);
         }
 
-        td.RenderDoubleBuffer = td.RenderDoubleBuffer.Shift(td.Simulate.position);
+        td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
+        td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
       }
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      if (state.Entity.HasParent) {
+        if (connection._entityChannel.ExistsOnRemote(state.Entity.Parent)) {
+          stream.WriteEntity(state.Entity.Parent, connection);
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        stream.WriteEntity(null, connection);
+      }
+
       UE.Vector3 p = frame.Data.ReadVector3(StateData.ByteOffset);
       UE.Quaternion r = frame.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
@@ -182,6 +199,8 @@ namespace Bolt {
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
+      state.Entity.SetParentInternal(stream.ReadEntity(connection));
+
       UE.Vector3 p = new UE.Vector3();
       UE.Quaternion r = new UE.Quaternion();
 
@@ -221,30 +240,13 @@ namespace Bolt {
       frame.Data.PackQuaternion(StateData.ByteOffset + 12, r);
     }
 
-    UE.Vector3 PositionGet(UE.Transform t) {
-      return (PropertyData.Space == TransformSpaces.World) ? t.position : t.localPosition;
-    }
-
-    UE.Quaternion RotationGet(UE.Transform t) {
-      return (PropertyData.Space == TransformSpaces.World) ? t.rotation : t.localRotation;
-    }
-
-    void PositionSet(UE.Transform t, UE.Vector3 pos) {
-      //BoltLog.Info("SETPOS: {0}", pos);
-      if (PropertyData.Space == TransformSpaces.World) { t.position = pos; } else { t.localPosition = pos; }
-    }
-
-    void RotationSet(UE.Transform t, UE.Quaternion rot) {
-      if (PropertyData.Space == TransformSpaces.World) { t.rotation = rot; } else { t.localRotation = rot; }
-    }
-
     void PerformNone(TransformData td, State state) {
       var f0 = state.Frames.first;
       UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset);
       UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + 12);
 
-      PositionSet(td.Simulate, p0);
-      RotationSet(td.Simulate, r0);
+      td.Simulate.localPosition = p0;
+      td.Simulate.localRotation = r0;
     }
 
     void PerformInterpolation(TransformData td, State state) {
@@ -254,9 +256,8 @@ namespace Bolt {
 
       if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
         //BoltLog.Info("frame: {0}, f0.number={1}", state.Entity.Frame, f0.Number);
-
-        PositionSet(td.Simulate, p0);
-        RotationSet(td.Simulate, r0);
+        td.Simulate.localPosition = p0;
+        td.Simulate.localRotation = r0;
       }
       else {
         var f1 = state.Frames.Next(f0);
@@ -270,9 +271,8 @@ namespace Bolt {
         float d = state.Entity.Frame - f0.Number;
 
         //BoltLog.Info("frame: {0}, f0.number={1}, f1.number={2}, d/t={3}", state.Entity.Frame, f0.Number, f1.Number, d / t);
-
-        PositionSet(td.Simulate, UE.Vector3.Lerp(p0, p1, d / t));
-        RotationSet(td.Simulate, UE.Quaternion.Lerp(r0, r1, d / t));
+        td.Simulate.localPosition = UE.Vector3.Lerp(p0, p1, d / t);
+        td.Simulate.localRotation = UE.Quaternion.Lerp(r0, r1, d / t);
       }
     }
 

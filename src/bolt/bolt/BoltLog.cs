@@ -101,7 +101,7 @@ public static class BoltLog {
     }
 
     public void Debug(string message) {
-      BoltConsole.Write(message, UE.Color.gray);
+      BoltConsole.Write(message, UE.Color.green);
     }
 
     public void Warn(string message) {

@@ -5,17 +5,28 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  struct FloatCompression {
+  internal struct FloatCompression {
     public int Bits;
-    public int Adjust;
-    public int Fractions;
+    public float Shift;
+    public float PackMultiplier;
+    public float ReadMultiplier;
 
     public void Pack(UdpStream stream, float value) {
-      stream.WriteInt(((int)(value * Fractions)) + Adjust, Bits);
+      if (Bits == 32) {
+        stream.WriteFloat(value);
+      }
+      else {
+        stream.WriteInt((int)((value + Shift) * PackMultiplier), Bits);
+      }
     }
 
     public float Read(UdpStream stream) {
-      return (stream.ReadInt(Bits) + -Adjust) / (float)Fractions;
+      if (Bits == 32) {
+        return stream.ReadFloat();
+      }
+      else {
+        return (stream.ReadInt(Bits) * ReadMultiplier) + -Shift;
+      }
     }
   }
 }

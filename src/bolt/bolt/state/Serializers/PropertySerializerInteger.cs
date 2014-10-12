@@ -15,6 +15,11 @@ namespace Bolt {
       return 32;
     }
 
+    public new void SetPropertyData(PropertyMecanimData mecanimData) {
+      mecanimData.Mode = MecanimMode.Property;
+      base.SetPropertyData(mecanimData);
+    }
+
     public override object GetDebugValue(State state) {
       return Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset);
     }

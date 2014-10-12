@@ -164,7 +164,9 @@ namespace Bolt.Compiler {
         // property data expression
         var dataSetterArgument = emitter.EmitSetPropertyDataArgument();
         if (dataSetterArgument != null) {
-          ctor.Statements.Expr("((Bolt.{0})_Meta.PropertySerializers[{1}]).SetPropertyData({2})", emitter.SerializerClassName, p.Index, dataSetterArgument);
+          for (int n = 0; n < dataSetterArgument.Length; ++n) {
+            ctor.Statements.Expr("((Bolt.{0})_Meta.PropertySerializers[{1}]).SetPropertyData({2})", emitter.SerializerClassName, p.Index, dataSetterArgument[n]);
+          }
         }
       }
     }

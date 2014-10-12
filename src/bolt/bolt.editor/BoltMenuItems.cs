@@ -24,9 +24,8 @@ public static class BoltMenuItems {
   } 
   [MenuItem("Edit/Install Bolt")]
   public static void Install() {
-    int opt = EditorUtility.DisplayDialogComplex("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "Yes (Force)", "No");
-    if (opt < 2) {
-      BoltInstaller.Run(opt == 1);
+    if (EditorUtility.DisplayDialog("Install Bolt?", "Do you want to install/upgrade Bolt?", "Yes", "No")) {
+      BoltInstaller.Run();
     }
   }
 

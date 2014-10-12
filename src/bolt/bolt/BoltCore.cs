@@ -29,6 +29,7 @@ internal static class BoltCore {
   static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
+  static internal List<BoltEntity> _sceneObjects = new List<BoltEntity>();
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -224,7 +225,7 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     BoltEntity be = prefab.GetComponent<BoltEntity>();
-    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerUniqueId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
+    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
   static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
@@ -245,20 +246,28 @@ internal static class BoltCore {
     eo.Initialize();
 
     eo.Attach();
-    
+
     return eo.UnityObject;
   }
 
   public static GameObject Attach(GameObject gameObject) {
-    BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, Factory.GetFactory(be.defaultSerializerUniqueId).TypeId);
+    return Attach(gameObject, EntityFlags.ZERO);
   }
 
   public static GameObject Attach(GameObject gameObject, TypeId serializerId) {
+    return Attach(gameObject, serializerId, EntityFlags.ZERO);
+  }
+
+  internal static GameObject Attach(GameObject gameObject, EntityFlags flags) {
+    BoltEntity be = gameObject.GetComponent<BoltEntity>();
+    return Attach(gameObject, Factory.GetFactory(be.defaultSerializerId).TypeId, flags);
+  }
+
+  internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
 
     Entity en;
-    en = Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId);
+    en = Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId, flags);
     en.Initialize();
     en.Attach();
 
@@ -555,7 +564,7 @@ internal static class BoltCore {
       var iter = _entities.GetIterator();
 
       while (iter.Next()) {
-        if (iter.val.IsOwner || (iter.val.HasControl && iter.val.ControllerLocalPrediction)) {
+        if (iter.val.IsOwner || iter.val.HasPredictedControl) {
           iter.val.Simulate();
         }
       }
@@ -832,6 +841,9 @@ internal static class BoltCore {
       }
     }
 
+    // clear out scene entities
+    _sceneObjects = new List<BoltEntity>();
+
     // update behaviours
     UpdateActiveGlobalBehaviours(scene.Index);
 
@@ -847,7 +859,31 @@ internal static class BoltCore {
     // switch local state
     _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
 
+    // grab all scene entities
+    _sceneObjects =
+      UE.GameObject.FindObjectsOfType<BoltEntity>()
+        .Where(x => !x.isAttached && x.sceneId != UniqueId.None)
+        .ToList();
+
+    // update settings
+    foreach (var se in _sceneObjects) {
+      using (var mod = se.ModifySettings()) {
+        mod.clientPredicted = false;
+        mod.persistThroughSceneLoads = false;
+        mod.allowInstantiateOnClient = false;
+      }
+
+      // attach on server
+      if (isServer) {
+        Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneId);
+      }
+    }
+
     // call out to user code
     BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+  }
+
+  internal static GameObject FindSceneObject(UniqueId uniqueId) {
+    return _sceneObjects.First(x => x.sceneId == uniqueId).gameObject;
   }
 }

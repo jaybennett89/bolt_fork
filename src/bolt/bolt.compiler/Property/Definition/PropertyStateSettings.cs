@@ -29,5 +29,12 @@ namespace Bolt.Compiler {
 
     [ProtoMember(14)]
     public int MecanimLayer;
+
+    [ProtoMember(16)]
+    public bool MecanimEnabled;
+
+    public string GetMecanimDataExpression() {
+      return string.Format("new Bolt.PropertyMecanimData {{ Mode = Bolt.MecanimMode.{0}, OwnerDirection = Bolt.MecanimDirection.{1}, ControllerDirection = Bolt.MecanimDirection.{2}, OthersDirection = Bolt.MecanimDirection.{3}, Layer = {4}, Damping = {5}f, Enabled = {6} }}", MecanimMode, MecanimOwnerDirection, MecanimControllerDirection, MecanimOthersDirection, MecanimLayer, MecanimDamping, MecanimEnabled.ToString().ToLower());
+    }
   }
 }

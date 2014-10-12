@@ -67,7 +67,7 @@ namespace Bolt {
     public virtual void OnSimulateBefore(State state) { }
     public virtual void OnSimulateAfter(State state) { }
     public virtual void OnRender(State state, State.Frame frame) { }
-    public virtual void OnChanged(State state, State.Frame frame) { }
+    public virtual void OnParentChanged(State state, Entity newParent, Entity oldParent) { }
   }
 
   abstract class PropertySerializerSimple : PropertySerializer {
@@ -115,48 +115,28 @@ namespace Bolt {
           : MecanimData.OthersDirection;
     }
 
-    public PropertySerializerMecanim(StatePropertyMetaData info)
-      : base(info) {
-    }
-
-    public PropertySerializerMecanim(EventPropertyMetaData meta)
-      : base(meta) {
-    }
-
-    public PropertySerializerMecanim(CommandPropertyMetaData meta)
-      : base(meta) {
-    }
+    public PropertySerializerMecanim(StatePropertyMetaData meta) : base(meta) { }
+    public PropertySerializerMecanim(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerMecanim(CommandPropertyMetaData meta) : base(meta) { }
 
     public void SetPropertyData(PropertyMecanimData mecanimData) {
       MecanimData = mecanimData;
     }
 
     public override void OnSimulateAfter(State state) {
-      if ((MecanimData.Mode != MecanimMode.None) && state.Animator) {
-        //BoltLog.Info("MEC-1-{0}", StateData.PropertyPath);
-
+      if (MecanimData.Enabled && state.Animator) {
         switch (MecanimData.Mode) {
           case MecanimMode.LayerWeight:
-            //BoltLog.Info("MEC-2-{0}", StateData.PropertyPath);
             switch (GetMecanimDirection(state)) {
-              case MecanimDirection.Pull:
-                //BoltLog.Info("MEC-4-{0}", StateData.PropertyPath);
-                PullMecanimLayer(state); break;
-              case MecanimDirection.Push:
-                //BoltLog.Info("MEC-5-{0}", StateData.PropertyPath);
-                PushMecanimLayer(state); break;
+              case MecanimDirection.Pull: PullMecanimLayer(state); break;
+              case MecanimDirection.Push: PushMecanimLayer(state); break;
             }
             break;
 
           case MecanimMode.Property:
-            //BoltLog.Info("MEC-3-{0}", StateData.PropertyPath);
             switch (GetMecanimDirection(state)) {
-              case MecanimDirection.Pull:
-                //BoltLog.Info("MEC-6-{0}", StateData.PropertyPath);
-                PullMecanimValue(state); break;
-              case MecanimDirection.Push:
-                //BoltLog.Info("MEC-7-{0}", StateData.PropertyPath);
-                PushMecanimValue(state); break;
+              case MecanimDirection.Pull: PullMecanimValue(state); break;
+              case MecanimDirection.Push: PushMecanimValue(state); break;
             }
             break;
         }

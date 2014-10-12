@@ -33,6 +33,16 @@ public abstract class BoltWindow : EditorWindow {
   static protected INamedAsset Selected;
   static protected AssetDefinition SelectedAsset;
 
+  protected void DrawBackground() {
+    float w = 32;
+    float h = 32;
+
+    Rect r = new Rect(0, 0, position.width, position.height);
+    Rect texCoords = new Rect(0, 0, r.width / w, r.height / h);
+
+    GUI.DrawTextureWithTexCoords(r, Resources.Load("BoltEditorBackground") as Texture, texCoords);
+  }
+
   protected bool HasProject {
     get { return Project != null; }
   }

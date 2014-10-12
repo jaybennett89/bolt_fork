@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
 
-
 namespace BoltInternal {
   public interface IDebugDrawer {
     void Indent(int adjust);
@@ -38,8 +37,8 @@ public static class BoltNetworkInternal {
 }
 
 /// <summary>
-/// Holds global methods and properties for starting and s
-/// topping bolt, instantiating prefabs and other utils
+/// Holds global methods and properties for starting and
+/// stopping bolt, instantiating prefabs and other utils
 /// </summary>
 public static class BoltNetwork {
   public static Action ShutdownComplete;

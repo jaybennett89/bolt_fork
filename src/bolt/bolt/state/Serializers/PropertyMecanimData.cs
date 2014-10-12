@@ -10,6 +10,7 @@ namespace Bolt {
     public MecanimDirection ControllerDirection;
     public MecanimDirection OthersDirection;
     public int Layer;
+    public bool Enabled;
     public float Damping;
   }
 }

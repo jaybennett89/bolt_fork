@@ -13,14 +13,25 @@ namespace Bolt.Compiler {
     [ProtoMember(2)]
     public int MaxValue;
 
-    [ProtoMember(4)]
-    public int Fractions;
+    [ProtoMember(5)]
+    public float Accuracy;
+
+    [ProtoMember(6)]
+    public bool Enabled;
+
+    public int BitsRequired {
+      get {
+        var pack = 1f / Accuracy;
+        var shift = -MinValue;
+        return BitForNumber((int)Math.Round((MaxValue + shift) * pack));
+      }
+    }
 
     public static FloatCompression Default() {
       return new FloatCompression {
         MinValue = -2048,
         MaxValue = +2048,
-        Fractions = 100
+        Accuracy = 0.01f,
       };
     }
 
@@ -28,8 +39,23 @@ namespace Bolt.Compiler {
       return new FloatCompression {
         MinValue = 0,
         MaxValue = 360,
-        Fractions = 100
+        Accuracy = 0.1f,
       };
+    }
+
+    static int BitForNumber(int number) {
+      if (number < 0) { return 32; }
+      if (number == 0) { return 1; }
+
+      for (int i = 31; i >= 0; --i) {
+        int b = 1 << i;
+
+        if ((number & b) == b) {
+          return i + 1;
+        }
+      }
+
+      throw new Exception();
     }
   }
 }
