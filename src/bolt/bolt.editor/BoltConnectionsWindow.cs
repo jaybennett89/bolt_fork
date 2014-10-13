@@ -41,8 +41,8 @@ public class BoltConnectionsWindow : EditorWindow {
     GUILayout.EndScrollView();
   }
 
-  void Connections () {
-    GUILayout.Space(2);
+  void Connections() {
+    GUILayout.Space(6);
 
     BoltAssetEditorGUI.Header("mc_connection", "Connections");
 

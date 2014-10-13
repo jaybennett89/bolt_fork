@@ -7,8 +7,9 @@ using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerColor : PropertySerializerSimple {
-    public PropertySerializerColor(StatePropertyMetaData info) : base(info) { }
+    public PropertySerializerColor(StatePropertyMetaData meta) : base(meta) { }
     public PropertySerializerColor(EventPropertyMetaData meta) : base(meta) { }
+    public PropertySerializerColor(CommandPropertyMetaData meta) : base(meta) { }
 
     public override object GetDebugValue(State state) {
       var c = Blit.ReadColor(state.Frames.first.Data, StateData.ByteOffset);
@@ -16,7 +17,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return 32 * 3;
+      return 32 * 4;
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

@@ -71,6 +71,14 @@ namespace Bolt {
       return (data[offset + 0]) | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
     }
 
+    public static void PackPrefabId(this byte[] data, int offset, PrefabId value) {
+      data.PackI32(offset, value.Value);
+    }
+
+    public static PrefabId ReadPrefabId(this byte[] data, int offset) {
+      return new PrefabId(data.ReadI32(offset));
+    }
+
     public static void PackU32(this byte[] data, uint offset, int value) {
       data[offset + 0] = (byte)value;
       data[offset + 1] = (byte)(value >> 8);

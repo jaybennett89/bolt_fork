@@ -52,7 +52,8 @@ namespace Bolt {
   internal
 #endif
  enum MecanimMode {
-    Property,
+    Disabled,
+    Parameter,
     LayerWeight
   }
 
@@ -63,8 +64,8 @@ namespace Bolt {
   internal
 #endif
  enum MecanimDirection {
-    Push,
-    Pull,
+    UsingAnimatorMethods,
+    UsingBoltProperties
   }
 #if BOLT_COMPILER_DLL
   [ProtoContract(EnumPassthru = true)]

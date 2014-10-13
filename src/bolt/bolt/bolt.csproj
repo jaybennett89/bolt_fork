@@ -97,6 +97,7 @@
     <Compile Include="state\Serializers\PropertySerializerEntity.cs" />
     <Compile Include="state\Serializers\PropertySerializerFloat.cs" />
     <Compile Include="state\Serializers\PropertySerializerInteger.cs" />
+    <Compile Include="state\Serializers\PropertySerializerPrefabId.cs" />
     <Compile Include="state\Serializers\PropertySerializerQuaternion.cs" />
     <Compile Include="state\Serializers\PropertySerializerString.cs" />
     <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
