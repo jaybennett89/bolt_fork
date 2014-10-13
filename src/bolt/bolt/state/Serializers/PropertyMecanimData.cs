@@ -6,11 +6,12 @@ using System.Text;
 namespace Bolt {
   struct PropertyMecanimData {
     public MecanimMode Mode;
-    public MecanimDirection OwnerDirection;
-    public MecanimDirection ControllerDirection;
-    public MecanimDirection OthersDirection;
+    public MecanimDirection Direction;
     public int Layer;
-    public bool Enabled;
     public float Damping;
+
+    public bool Enabled {
+      get { return Mode != MecanimMode.Disabled; }
+    }
   }
 }

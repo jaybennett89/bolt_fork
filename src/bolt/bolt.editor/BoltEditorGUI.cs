@@ -77,7 +77,7 @@ public static class BoltEditorGUI {
     get {
       GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
       s.padding = new RectOffset();
-      s.margin = new RectOffset(0, 0, 4, 0);
+      s.margin = new RectOffset(4, 4, 4, 0);
       s.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
       return s;
     }
@@ -184,7 +184,7 @@ public static class BoltEditorGUI {
 
   public static void WithLabel(string label, Action gui) {
     GUILayout.BeginHorizontal();
-    EditorGUILayout.LabelField(label, GUILayout.Width(200));
+    EditorGUILayout.LabelField(label, GUILayout.Width(220));
 
     gui();
 
@@ -363,11 +363,21 @@ public static class BoltEditorGUI {
     }
   }
 
+  static void ToggleDisabled() {
+    EditorGUI.BeginDisabledGroup(true);
+    Toggle(true);
+    EditorGUI.EndDisabledGroup();
+  }
+
+  public static bool Toggle(bool value) {
+    GUIStyle toggle = new GUIStyle("Toggle");
+    toggle.margin = new RectOffset();
+    toggle.padding = new RectOffset();
+    return EditorGUILayout.Toggle(value, toggle, GUILayout.Width(15));
+  }
 
   public static void SettingsSection(string label, Action gui) {
     EditorGUILayout.BeginHorizontal(SettingSectionStyle);
-
-    EditorGUILayout.Toggle(true, GUILayout.Width(15));
 
     GUILayout.Label(label, BoltEditorGUI.AccentText);
     EditorGUILayout.EndHorizontal();
@@ -376,11 +386,9 @@ public static class BoltEditorGUI {
 
   public static void SettingsSectionDouble(string left, string right, Action gui) {
     EditorGUILayout.BeginHorizontal(SettingSectionStyle);
-    EditorGUILayout.Toggle(true, GUILayout.Width(15));
     GUILayout.Label(left, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
     GUILayout.FlexibleSpace();
     GUILayout.Label(right, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
-    EditorGUILayout.Toggle(true, GUILayout.Width(15));
     EditorGUILayout.EndHorizontal();
 
     gui();
@@ -389,9 +397,10 @@ public static class BoltEditorGUI {
   public static void SettingsSectionToggle(string label, ref bool enabled, Action gui, params GUILayoutOption[] options) {
     EditorGUILayout.BeginHorizontal(SettingSectionStyle);
 
-    enabled = EditorGUILayout.Toggle(enabled, GUILayout.Width(15));
-
     GUILayout.Label(label, BoltEditorGUI.AccentText, options);
+
+    enabled = Toggle(enabled);
+
     EditorGUILayout.EndHorizontal();
 
     EditorGUI.BeginDisabledGroup(!enabled);

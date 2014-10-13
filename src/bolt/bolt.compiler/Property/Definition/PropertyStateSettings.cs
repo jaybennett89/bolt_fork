@@ -15,14 +15,8 @@ namespace Bolt.Compiler {
     [ProtoMember(8)]
     public MecanimMode MecanimMode;
 
-    [ProtoMember(9)]
-    public MecanimDirection MecanimOwnerDirection;
-
-    [ProtoMember(11)]
-    public MecanimDirection MecanimControllerDirection;
-
-    [ProtoMember(15)]
-    public MecanimDirection MecanimOthersDirection;
+    [ProtoMember(17)]
+    public MecanimDirection MecanimDirection;
 
     [ProtoMember(12)]
     public float MecanimDamping;
@@ -30,11 +24,24 @@ namespace Bolt.Compiler {
     [ProtoMember(14)]
     public int MecanimLayer;
 
+    #region NOT_USED
+
+    [ProtoMember(9)]
+    public MecanimDirection _NOTUSED_2;
+
+    [ProtoMember(11)]
+    public MecanimDirection _NOTUSED_1;
+
+    [ProtoMember(15)]
+    public MecanimDirection _NOTUSED_0;
+
     [ProtoMember(16)]
-    public bool MecanimEnabled;
+    public bool _NOTUSED_3;
+
+    #endregion
 
     public string GetMecanimDataExpression() {
-      return string.Format("new Bolt.PropertyMecanimData {{ Mode = Bolt.MecanimMode.{0}, OwnerDirection = Bolt.MecanimDirection.{1}, ControllerDirection = Bolt.MecanimDirection.{2}, OthersDirection = Bolt.MecanimDirection.{3}, Layer = {4}, Damping = {5}f, Enabled = {6} }}", MecanimMode, MecanimOwnerDirection, MecanimControllerDirection, MecanimOthersDirection, MecanimLayer, MecanimDamping, MecanimEnabled.ToString().ToLower());
+      return string.Format("new Bolt.PropertyMecanimData(Bolt.MecanimMode.{0}, Bolt.MecanimDirection.{1}, {2}f, {3})", MecanimMode, MecanimDirection, MecanimDamping, MecanimLayer);
     }
   }
 }

@@ -106,13 +106,8 @@ namespace Bolt {
   abstract class PropertySerializerMecanim : PropertySerializerSimple {
     protected PropertyMecanimData MecanimData;
 
-    protected MecanimDirection GetMecanimDirection(State state) {
-      return
-        (state.Entity.IsOwner)
-        ? MecanimData.OwnerDirection
-        : (state.Entity.HasControl)
-          ? MecanimData.ControllerDirection
-          : MecanimData.OthersDirection;
+    protected bool ShouldPullDataFromMecanim(State state) {
+      return MecanimData.Direction == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl);
     }
 
     public PropertySerializerMecanim(StatePropertyMetaData meta) : base(meta) { }
@@ -125,20 +120,21 @@ namespace Bolt {
 
     public override void OnSimulateAfter(State state) {
       if (MecanimData.Enabled && state.Animator) {
-        switch (MecanimData.Mode) {
-          case MecanimMode.LayerWeight:
-            switch (GetMecanimDirection(state)) {
-              case MecanimDirection.Pull: PullMecanimLayer(state); break;
-              case MecanimDirection.Push: PushMecanimLayer(state); break;
-            }
-            break;
-
-          case MecanimMode.Property:
-            switch (GetMecanimDirection(state)) {
-              case MecanimDirection.Pull: PullMecanimValue(state); break;
-              case MecanimDirection.Push: PushMecanimValue(state); break;
-            }
-            break;
+        if (MecanimData.Mode == MecanimMode.LayerWeight) {
+          if (ShouldPullDataFromMecanim(state)) {
+            PullMecanimLayer(state);
+          }
+          else {
+            PushMecanimLayer(state);
+          }
+        }
+        else {
+          if (ShouldPullDataFromMecanim(state)) {
+            PullMecanimValue(state);
+          }
+          else {
+            PushMecanimValue(state);
+          }
         }
       }
     }

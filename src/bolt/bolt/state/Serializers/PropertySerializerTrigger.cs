@@ -91,29 +91,30 @@ namespace Bolt {
 
     bool InvokeForFrame(State state, State.Frame f) {
       if (MecanimData.Enabled && state.Animator) {
-        switch (GetMecanimDirection(state)) {
-          case MecanimDirection.Push:
-            return MecanimPushOrNone(state, f, true);
-
-          case MecanimDirection.Pull:
-            if ((state.Animator.GetBool(StateData.PropertyName) == true) && (state.Animator.IsInTransition(MecanimData.Layer) == false)) {
-              state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
-
-              var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
-
-              if (cb != null) {
-                cb();
-              }
-            }
-            return false;
-
-          default:
-            return MecanimPushOrNone(state, f, false);
+        if (ShouldPullDataFromMecanim(state)) {
+          return MecanimPull(state, f);
+        }
+        else {
+          return MecanimPushOrNone(state, f, true);
         }
       }
       else {
         return MecanimPushOrNone(state, f, false);
       }
+    }
+
+    bool MecanimPull(State state, State.Frame f) {
+      if ((state.Animator.GetBool(StateData.PropertyName) == true) && (state.Animator.IsInTransition(MecanimData.Layer) == false)) {
+        state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
+
+        var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
+
+        if (cb != null) {
+          cb();
+        }
+      }
+
+      return false;
     }
   }
 }

@@ -23,18 +23,18 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     //BoltEditorGUI.WithLabel("Transform Space", () => { PropertyType.Space = (TransformSpaces)EditorGUILayout.EnumPopup(PropertyType.Space); });
     //BoltEditorGUI.WithLabel("Rotation Mode", () => { PropertyType.RotationMode = (TransformRotationMode)EditorGUILayout.EnumPopup(PropertyType.RotationMode); });
 
-    BoltEditorGUI.SettingsSectionDouble("Position Axes", "Rotation Axes", () => {
-      EditorGUILayout.BeginHorizontal();
-      EditorGUILayout.EnumPopup(AxisSelections.XYZ);
-      EditorGUILayout.EnumPopup(AxisSelections.XYZ);
-      EditorGUILayout.EndHorizontal();
-    });
+    //BoltEditorGUI.SettingsSectionDouble("Position Axes", "Rotation Axes", () => {
+    //  EditorGUILayout.BeginHorizontal();
+    //  EditorGUILayout.EnumPopup(AxisSelections.XYZ);
+    //  EditorGUILayout.EnumPopup(AxisSelections.XYZ);
+    //  EditorGUILayout.EndHorizontal();
+    //});
 
-    bool test = true;
+    //bool test = true;
 
-    BoltEditorGUI.SettingsSectionToggle("Compression", ref test, () => {
+    //BoltEditorGUI.SettingsSectionToggle("Compression", ref test, () => {
 
-    }, GUILayout.Width(70));
+    //}, GUILayout.Width(70));
 
 
     //EditorGUILayout.BeginHorizontal();

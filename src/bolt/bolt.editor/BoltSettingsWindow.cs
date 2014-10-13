@@ -155,6 +155,10 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Label("Editor Highlight Color", () => {
       settings.highlightColor = EditorGUILayout.ColorField(settings.highlightColor);
     });
+
+    BoltAssetEditorGUI.Label("Auto-Open Bolt Editor", () => {
+      settings.autoSwitchToEditor = EditorGUILayout.Toggle(settings.autoSwitchToEditor);
+    });
   }
 
   void Console() {
@@ -176,7 +180,7 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
   }
-
+    
   Vector2 scrollPos = Vector2.zero;
 
   void OnGUI() {

@@ -124,6 +124,9 @@ public class BoltProjectWindow : BoltWindow {
     Selected = asset;
     BeginClearFocus();
     BoltEditorGUI.UseEvent();
-    BoltEditorWindow.Open();
+
+    if (BoltRuntimeSettings.instance.autoSwitchToEditor) {
+      BoltEditorWindow.Open();
+    }
   }
 }
