@@ -13,5 +13,12 @@ namespace Bolt {
     public bool Enabled {
       get { return Mode != MecanimMode.Disabled; }
     }
+
+    public PropertyMecanimData(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
+      Mode = mode;
+      Direction = direction;
+      Damping = damping;
+      Layer = layer;
+    }
   }
 }

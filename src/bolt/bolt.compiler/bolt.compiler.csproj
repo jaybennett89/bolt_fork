@@ -64,6 +64,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorEntity.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorFloat.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorInteger.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorPrefabId.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorQuaternion.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorStruct.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTransform.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterEntity.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterFloat.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterInteger.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterPrefabId.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterQuaternion.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterString.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="Property\Type\PropertyTypeFloat.cs" />
     <Compile Include="Property\Type\PropertyType.cs" />
     <Compile Include="Property\Type\PropertyTypeInteger.cs" />
+    <Compile Include="Property\Type\PropertyTypePrefabId.cs" />
     <Compile Include="Property\Type\PropertyTypeQuaternion.cs" />
     <Compile Include="Property\Type\PropertyTypeStruct.cs" />
     <Compile Include="Property\Type\PropertyTypeString.cs" />

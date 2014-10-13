@@ -253,7 +253,6 @@ public static class BoltEditorGUI {
     return IconButton(icon, c);
   }
 
-
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(3, 0, 0, 5));
 
@@ -294,13 +293,10 @@ public static class BoltEditorGUI {
 
   public static int EditPriority(int priority, bool enabled) {
     if (enabled) {
-      priority = Mathf.Clamp(EditorGUILayout.IntField(priority, GUILayout.Width(32)), 1, 999);
-      BoltEditorGUI.SetTooltip("Priority. An integer between 1 and 999. Higher values means this is more likely to be sent.");
+      priority = Mathf.Clamp(IntFieldOverlay(priority, "Priority"), 1, 999);
     }
     else {
-      BoltEditorGUI.Disabled(() => {
-        EditorGUILayout.TextField("---", GUILayout.Width(32));
-      });
+      BoltEditorGUI.Disabled(() => { EditorGUILayout.TextField("---", GUILayout.Width(32)); });
     }
 
     return priority;
@@ -367,6 +363,10 @@ public static class BoltEditorGUI {
     EditorGUI.BeginDisabledGroup(true);
     Toggle(true);
     EditorGUI.EndDisabledGroup();
+  }
+
+  public static bool ToggleDropdown(string on, string off, bool enabled) {
+    return EditorGUILayout.Popup(enabled ? 0 : 1, new[] { on, off }) == 0;
   }
 
   public static bool Toggle(bool value) {

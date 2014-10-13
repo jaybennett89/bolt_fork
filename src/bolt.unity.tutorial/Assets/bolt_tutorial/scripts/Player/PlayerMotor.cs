@@ -69,6 +69,7 @@ public class PlayerMotor : MonoBehaviour {
   }
 
   public void SetState(IPlayerCommandResult result) {
+
     // assign new state
     _state.position = result.position;
     _state.velocity = result.velocity;

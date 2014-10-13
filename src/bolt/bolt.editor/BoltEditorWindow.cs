@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -38,14 +39,6 @@ public class BoltEditorWindow : BoltWindow {
     ClearAllFocus();
   }
 
-  void Footer(Rect r) {
-    GUI.color = EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.45f, 0.45f, 0.45f);
-    GUILayout.BeginHorizontal(BoltEditorGUI.WhiteTextureBackgroundStyle);
-    GUI.color = Color.white;
-
-    GUILayout.Label(BoltEditorGUI.Tooltip ?? "");
-    GUILayout.EndHorizontal();
-  }
 
   void Editor() {
     if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) == false)) {
@@ -92,7 +85,6 @@ public class BoltEditorWindow : BoltWindow {
       });
     }
 
-    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
     EditPropertyList(def, def.Properties);
 
     Guid guid = def.ParentGuid;
@@ -113,7 +105,6 @@ public class BoltEditorWindow : BoltWindow {
     EditHeader(def);
 
     // add button
-    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyStateSettings());
     EditPropertyList(def, def.Properties);
   }
 
@@ -131,8 +122,19 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Properties", def.Properties, () => new PropertyEventSettings());
     EditPropertyList(def, def.Properties);
+  }
+
+  PropertyDefinition CreateProperty(PropertyAssetSettings settings) {
+    return new PropertyDefinition {
+      Name = "NewProperty",
+      Comment = "",
+      Deleted = false,
+      Enabled = true,
+      Expanded = true,
+      PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
+      AssetSettings = settings
+    };
   }
 
   void EditCommand(CommandDefinition def) {
@@ -143,14 +145,10 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.AddButton("Input", def.Input, () => new PropertyCommandSettings());
     EditPropertyList(def, def.Input);
 
-    if (def.Input.Count > 0)
-      BoltEditorGUI.AddButton("", def.Input, () => new PropertyCommandSettings());
-
     // add button
-    BoltEditorGUI.AddButton("Result", def.Result, () => new PropertyCommandSettings());
+    GUILayout.Label("Result", EditorStyles.boldLabel);
     EditPropertyList(def, def.Result);
   }
 
@@ -165,6 +163,11 @@ public class BoltEditorWindow : BoltWindow {
   void EditHeader(AssetDefinition def) {
     BeginBackground();
 
+    var stateDef = def as StateDefinition;
+    var structDef = def as StructDefinition;
+    var cmdDef = def as CommandDefinition;
+    var eventDef = def as EventDefinition;
+
     GUIStyle sceneStyle = "TE NodeBoxSelected";
     sceneStyle.padding = new RectOffset(3, 5, 5, 4);
     GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
@@ -178,6 +181,36 @@ public class BoltEditorWindow : BoltWindow {
 
     // edit asset name
     def.Name = EditorGUILayout.TextField(def.Name);
+
+    if (cmdDef != null) {
+      if (GUILayout.Button("New Input", EditorStyles.miniButtonLeft, GUILayout.Width(75))) {
+        cmdDef.Input.Add(CreateProperty(new PropertyCommandSettings()));
+        Save();
+      }
+
+      if (GUILayout.Button("New Result", EditorStyles.miniButtonRight, GUILayout.Width(75))) {
+        cmdDef.Result.Add(CreateProperty(new PropertyCommandSettings()));
+        Save();
+      }
+    }
+    else {
+      if (GUILayout.Button("New Property", EditorStyles.miniButton, GUILayout.Width(150))) {
+        if (stateDef != null) {
+          stateDef.Properties.Add(CreateProperty(new PropertyStateSettings()));
+          Save();
+        }
+
+        if (structDef != null) {
+          structDef.Properties.Add(CreateProperty(new PropertyStateSettings()));
+          Save();
+        }
+
+        if (eventDef != null) {
+          eventDef.Properties.Add(CreateProperty(new PropertyEventSettings()));
+          Save();
+        }
+      }
+    }
 
     GUILayout.EndHorizontal();
     GUILayout.Space(4);
@@ -247,6 +280,7 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
+
     p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
     BoltEditorGUI.SetTooltip("Name. The name of this property, has to be a valid C# property name.");
 
@@ -264,15 +298,13 @@ public class BoltEditorWindow : BoltWindow {
       });
 
       if (def is StateDefinition || def is StructDefinition) {
-        BoltEditorGUI.WithLabel("Priority", () => {
+        BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
-        });
-
-        BoltEditorGUI.WithLabel("To Controller", () => {
-          p.Controller = BoltEditorGUI.Toggle(p.Controller);
+          p.Controller = BoltEditorGUI.ToggleDropdown("Replicate To Controller", "Don't Replicate To Controller", p.Controller);
         });
       }
-      else if (def is CommandDefinition) {
+
+      if (def is CommandDefinition) {
         if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {
           BoltEditorGUI.SettingsSection("Corrections", () => {
             BoltEditorGUI.WithLabel("Smooth Corrections", () => {
@@ -321,10 +353,6 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     EditorGUILayout.EndVertical();
-  }
-
-  bool IsStateOrStruct(AssetDefinition def) {
-    return ;
   }
 
   void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
