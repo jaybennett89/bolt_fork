@@ -20,30 +20,22 @@ public class BoltEditorWindow : BoltWindow {
 
   Vector2 scroll;
 
-  static bool once = false;
-
   new void OnGUI() {
     base.OnGUI();
 
-    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 20));
-
-    scroll = GUILayout.BeginScrollView(scroll, false, false);
-
     if (HasProject) {
-      Editor();
-    }
+      scroll = GUILayout.BeginScrollView(scroll, false, false);
 
-    GUILayout.EndScrollView();
-    GUILayout.EndArea();
+      Editor();
+
+      GUILayout.EndScrollView();
+    } 
 
     if (GUI.changed) {
       Save();
     }
 
-    Rect r = new Rect(0, position.height - 20, position.width, 20);
-    GUILayout.BeginArea(r);
-    Footer(r);
-    GUILayout.EndArea();
+    ClearAllFocus();
   }
 
   void Footer(Rect r) {
@@ -136,7 +128,6 @@ public class BoltEditorWindow : BoltWindow {
 
     if (def.Properties.Count > 0)
       BoltEditorGUI.AddButton("", def.Properties, () => new PropertyStateSettings());
-
   }
 
   void EditEvent(EventDefinition def) {
@@ -187,7 +178,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void BeginBackground() {
-    GUILayout.BeginVertical(BoltEditorGUI.ParameterBackgroundStyle);
+    GUILayout.BeginVertical();
   }
 
   void EndBackground() {
@@ -195,11 +186,13 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditHeader(AssetDefinition def, Action action, params Action[] rows) {
-    GUILayout.Space(5);
-
     BeginBackground();
 
-    GUILayout.BeginHorizontal();
+    GUIStyle sceneStyle = "TE NodeBoxSelected";
+    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
+    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+
+    GUILayout.Space(3);
 
     var icon = "";
     if (def is StateDefinition) { icon = "mc_state"; }
@@ -274,7 +267,9 @@ public class BoltEditorWindow : BoltWindow {
   void EditProperty(AssetDefinition def, PropertyDefinition p) {
     BeginBackground();
 
-    EditorGUILayout.BeginHorizontal();
+    GUIStyle sceneStyle = "TE NodeBox";
+    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
+    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.Button("mc_minus")) {
@@ -312,9 +307,9 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (p.Expanded) {
-      BoltEditorGUI.SettingsSection("Comment", () => {
-        p.Comment = EditorGUILayout.TextField(p.Comment);
-      });
+      //BoltEditorGUI.SettingsSection("Comment", () => {
+      //  p.Comment = EditorGUILayout.TextField(p.Comment);
+      //});
 
       if (def is CommandDefinition) {
         if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {

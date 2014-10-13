@@ -12,24 +12,27 @@ namespace Bolt.Compiler {
     [ProtoMember(2)]
     public FilterDefinition[] Filters = new FilterDefinition[0];
 
+    [ProtoMember(3)]
+    public bool Merged;
+
     public IEnumerable<FilterDefinition> EnabledFilters {
       get { return Filters.Where(x => x.Enabled); }
     }
 
     public IEnumerable<StateDefinition> States {
-      get { return RootFolder.AssetsAll.Where(x => x is StateDefinition).Cast<StateDefinition>(); }
+      get { return RootFolder.Assets.Where(x => x is StateDefinition).Cast<StateDefinition>(); }
     }
 
     public IEnumerable<StructDefinition> Structs {
-      get { return RootFolder.AssetsAll.Where(x => x is StructDefinition).Cast<StructDefinition>(); }
+      get { return RootFolder.Assets.Where(x => x is StructDefinition).Cast<StructDefinition>(); }
     }
 
     public IEnumerable<EventDefinition> Events {
-      get { return RootFolder.AssetsAll.Where(x => x is EventDefinition).Cast<EventDefinition>(); }
+      get { return RootFolder.Assets.Where(x => x is EventDefinition).Cast<EventDefinition>(); }
     }
 
     public IEnumerable<CommandDefinition> Commands {
-      get { return RootFolder.AssetsAll.Where(x => x is CommandDefinition).Cast<CommandDefinition>(); }
+      get { return RootFolder.Assets.Where(x => x is CommandDefinition).Cast<CommandDefinition>(); }
     }
 
     public bool UseFilters {

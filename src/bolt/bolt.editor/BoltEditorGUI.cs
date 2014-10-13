@@ -76,7 +76,9 @@ public static class BoltEditorGUI {
   public static GUIStyle AccentText {
     get {
       GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
-      s.normal.textColor = Color.white;
+      s.padding = new RectOffset();
+      s.margin = new RectOffset(0, 0, 4, 0);
+      s.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
       return s;
     }
   }
@@ -224,12 +226,11 @@ public static class BoltEditorGUI {
     GUIStyle style;
     style = new GUIStyle(GUIStyle.none);
     style.padding = new RectOffset();
-    style.margin = new RectOffset(0, 0, 2, 0);
-    style.contentOffset = new Vector2();
-    style.normal.background = LoadIcon(icon);
+    style.margin = new RectOffset(0, 0, 0, 0);
+    style.contentOffset = new Vector2(0, 0);
 
     GUI.color = color;
-    bool result = GUILayout.Button("", style, GUILayout.Width(16), GUILayout.Height(16));
+    bool result = GUILayout.Button(LoadIcon(icon), style, GUILayout.Width(16), GUILayout.Height(16));
     GUI.color = Color.white;
 
     return result;
@@ -254,7 +255,7 @@ public static class BoltEditorGUI {
 
 
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
-    EditorGUILayout.BeginHorizontal(PaddingStyle(10, 0, 0, 5));
+    EditorGUILayout.BeginHorizontal(PaddingStyle(3, 0, 0, 5));
 
     if (Button("mc_plus")) {
       list.Add(
@@ -271,7 +272,7 @@ public static class BoltEditorGUI {
     }
 
     GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
-    s.margin.top = 2;
+    s.margin.top = 0;
     GUILayout.Label(text, s);
 
     EditorGUILayout.EndHorizontal();
@@ -285,7 +286,7 @@ public static class BoltEditorGUI {
     }
 
     GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
-    s.margin.top = 2;
+    s.margin.top = 0;
     GUILayout.Label(text, s);
 
     EditorGUILayout.EndHorizontal();
@@ -352,30 +353,45 @@ public static class BoltEditorGUI {
     return value;
   }
 
+  static GUIStyle SettingSectionStyle {
+    get {
+      GUIStyle s = new GUIStyle(GUIStyle.none);
+      s.padding = new RectOffset();
+      s.margin = new RectOffset(0, 0, 3, 0);
+
+      return s;
+    }
+  }
+
 
   public static void SettingsSection(string label, Action gui) {
-    EditorGUILayout.LabelField(label, BoltEditorGUI.AccentText);
+    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
+
+    EditorGUILayout.Toggle(true, GUILayout.Width(15));
+
+    GUILayout.Label(label, BoltEditorGUI.AccentText);
+    EditorGUILayout.EndHorizontal();
     gui();
   }
 
   public static void SettingsSectionDouble(string left, string right, Action gui) {
-    EditorGUILayout.BeginHorizontal();
+    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
+    EditorGUILayout.Toggle(true, GUILayout.Width(15));
     GUILayout.Label(left, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
     GUILayout.FlexibleSpace();
     GUILayout.Label(right, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
+    EditorGUILayout.Toggle(true, GUILayout.Width(15));
     EditorGUILayout.EndHorizontal();
 
     gui();
   }
 
   public static void SettingsSectionToggle(string label, ref bool enabled, Action gui, params GUILayoutOption[] options) {
-    EditorGUILayout.BeginHorizontal();
-    EditorGUILayout.LabelField(label, BoltEditorGUI.AccentText, options);
+    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
 
-    if (Toggle("mc_checkbox", "mc_checkbox_empty", enabled)) {
-      enabled = !enabled;
-    }
+    enabled = EditorGUILayout.Toggle(enabled, GUILayout.Width(15));
 
+    GUILayout.Label(label, BoltEditorGUI.AccentText, options);
     EditorGUILayout.EndHorizontal();
 
     EditorGUI.BeginDisabledGroup(!enabled);

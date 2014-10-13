@@ -54,12 +54,14 @@ public class BoltProjectWindow : BoltWindow {
     if (GUI.changed) {
       Save();
     }
+
+    ClearAllFocus();
   }
 
   void DisplayAssetList(IEnumerable<AssetDefinition> assets) {
     bool deleteMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
-    foreach (var a in assets.OrderBy(x => x.Name)) {
 
+    foreach (var a in assets.OrderBy(x => x.Name)) {
       GUILayout.BeginHorizontal();
       GUIStyle style = new GUIStyle(EditorStyles.miniButton);
       style.alignment = TextAnchor.MiddleLeft;
@@ -96,6 +98,20 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       GUILayout.EndHorizontal();
+    }
+
+
+    for (int i = 0; i < Project.RootFolder.Assets.Length; ++i) {
+      if (Project.RootFolder.Assets[i].Deleted) {
+        // remove deleted assets
+        ArrayUtility.RemoveAt(ref Project.RootFolder.Assets, i);
+
+        // decrement index
+        i -= 1;
+
+        // save project
+        Save();
+      }
     }
   }
 

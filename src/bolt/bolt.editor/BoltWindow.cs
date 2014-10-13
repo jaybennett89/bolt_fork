@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 using UnityEditor;
 using Bolt.Compiler;
 using System.IO;
@@ -22,26 +23,16 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   bool save;
-  bool clear;
 
   float saveTime;
   float repaintTime;
 
   static internal Project Project;
 
+  static bool clear;
   static protected int Repaints;
   static protected INamedAsset Selected;
   static protected AssetDefinition SelectedAsset;
-
-  protected void DrawBackground() {
-    float w = 32;
-    float h = 32;
-
-    Rect r = new Rect(0, 0, position.width, position.height);
-    Rect texCoords = new Rect(0, 0, r.width / w, r.height / h);
-
-    GUI.DrawTextureWithTexCoords(r, Resources.Load("BoltEditorBackground") as Texture, texCoords);
-  }
 
   protected bool HasProject {
     get { return Project != null; }
@@ -91,6 +82,13 @@ public abstract class BoltWindow : EditorWindow {
       }
 
       Project = File.ReadAllBytes(ProjectPath).ToObject<Project>();
+
+      if (Project.Merged == false) {
+        Debug.Log("Merged Project... " + ProjectPath);
+        Project.Merged = true;
+        Project.RootFolder.Assets = Project.RootFolder.AssetsAll.ToArray();
+        Save();
+      }
     }
   }
 
@@ -106,7 +104,7 @@ public abstract class BoltWindow : EditorWindow {
 
     if (clear) {
       GUI.SetNextControlName("ClearFocusFix");
-      GUI.Button(new Rect(0, 0, 0, 0), "");
+      GUI.Button(new Rect(0, 0, 0, 0), "", GUIStyle.none);
       GUI.FocusControl("ClearFocusFix");
     }
   }
