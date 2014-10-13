@@ -68,7 +68,7 @@ public class BoltEditorWindow : BoltWindow {
   void EditState(StateDefinition def) {
     EditHeader(def);
 
-    BoltEditorGUI.WithLabel("IsAbstract", () => {
+    BoltEditorGUI.WithLabel("Is Abstract", () => {
       def.IsAbstract = BoltEditorGUI.Toggle(def.IsAbstract);
     });
 
