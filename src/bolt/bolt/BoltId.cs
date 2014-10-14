@@ -26,13 +26,13 @@ namespace Bolt {
     Guid guid;
 
     [FieldOffset(0)]
-    uint uint0;
+    internal uint uint0;
     [FieldOffset(4)]
-    uint uint1;
+    internal uint uint1;
     [FieldOffset(8)]
-    uint uint2;
+    internal uint uint2;
     [FieldOffset(12)]
-    uint uint3;
+    internal uint uint3;
 
     [FieldOffset(0)]
     byte byte0;

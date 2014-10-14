@@ -50,6 +50,7 @@ namespace Bolt.Compiler {
     }
 
     void EmitClass() {
+      
 
       CodeTypeDeclaration type;
 

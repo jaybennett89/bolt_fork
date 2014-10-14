@@ -69,6 +69,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorStruct.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTransform.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorTrigger.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorUniqueId.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorVector.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\CommandCodeEmitter.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterStruct.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTransform.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterTrigger.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterUniqueId.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterVector.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="NamedAsset.cs" />
@@ -115,6 +117,7 @@
     <Compile Include="Property\Type\PropertyTypeString.cs" />
     <Compile Include="Property\Type\PropertyTypeTransform.cs" />
     <Compile Include="Property\Type\PropertyTypeTrigger.cs" />
+    <Compile Include="Property\Type\PropertyTypeUniqueId.cs" />
     <Compile Include="Property\Type\PropertyTypeVector.cs" />
     <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />
