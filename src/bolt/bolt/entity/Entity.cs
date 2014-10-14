@@ -50,6 +50,17 @@ namespace Bolt {
       }
     }
 
+    internal int SendRate {
+      get {
+        if (IsOwner) {
+          return UpdateRate * BoltCore.localSendRate;
+        }
+        else {
+          return UpdateRate * BoltCore.remoteSendRate;
+        }
+      }
+    }
+
     internal bool IsSceneObject {
       get { return Flags & EntityFlags.SCENE_OBJECT; }
     }

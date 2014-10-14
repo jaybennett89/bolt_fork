@@ -33,7 +33,12 @@ namespace Bolt {
 
   public class DefaultPrefabPool : IPrefabPool {
     UE.GameObject IPrefabPool.Instantiate(PrefabId prefabId, UE.Vector3 position, UE.Quaternion rotation) {
-      return (UE.GameObject)UE.GameObject.Instantiate(((IPrefabPool)this).LoadPrefab(prefabId), position, rotation);
+      UE.GameObject go;
+      
+      go = (UE.GameObject)UE.GameObject.Instantiate(((IPrefabPool)this).LoadPrefab(prefabId), position, rotation);
+      go.GetComponent<BoltEntity>().enabled = true;
+
+      return go;
     }
 
     UE.GameObject IPrefabPool.LoadPrefab(PrefabId prefabId) {

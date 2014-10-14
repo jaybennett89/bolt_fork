@@ -7,7 +7,7 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyStateSettings : PropertyAssetSettings {
     [ProtoMember(5)]
-    public StateEstimationAlgorithm EstimationAlgorithm;
+    public SmoothingAlgorithms SmoothingAlgorithm;
 
     [ProtoMember(6)]
     public float DeadReckoningErrorTolerance = 0.1f;

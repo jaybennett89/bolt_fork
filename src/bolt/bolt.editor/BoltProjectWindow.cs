@@ -45,7 +45,7 @@ public class BoltProjectWindow : BoltWindow {
       BoltEditorGUI.HeaderButton("Structs", "mc_struct", () => NewAsset(new StructDefinition()));
       DisplayAssetList(Project.Structs.Cast<AssetDefinition>());
 
-      BoltEditorGUI.HeaderButton("Commands", "mc_controller", () => NewAsset(new CommandDefinition()));
+      BoltEditorGUI.HeaderButton("Commands", "mc_command", () => NewAsset(new CommandDefinition()));
       DisplayAssetList(Project.Commands.Cast<AssetDefinition>());
 
       BoltEditorGUI.HeaderButton("Events", "mc_event", () => NewAsset(new EventDefinition()));
