@@ -16,10 +16,9 @@ namespace Bolt {
 #else
   internal
 #endif
- enum StateEstimationAlgorithm {
-    None = 0,
-    InterpolatedSnapshots = 1,
-    DeadReckoning = 2,
+ enum SmoothingAlgorithms {
+    InterpolatedSnapshots = 0,
+    DeadReckoning = 1,
   }
 
 #if BOLT_COMPILER_DLL

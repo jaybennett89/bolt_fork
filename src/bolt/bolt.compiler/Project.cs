@@ -43,10 +43,6 @@ namespace Bolt.Compiler {
       return States.First(x => x.Guid == guid);
     }
 
-    public StructDefinition FindStruct(Guid guid) {
-      return Structs.First(x => x.Guid == guid);
-    }
-
     public void GenerateCode(string file) {
       CodeGenerator cg;
 

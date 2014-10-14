@@ -51,6 +51,7 @@ namespace Bolt.Compiler {
 
     void EmitClass() {
 
+
       CodeTypeDeclaration type;
 
       type = Generator.DeclareClass(Decorator.Definition.Name);
@@ -78,6 +79,15 @@ namespace Bolt.Compiler {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltEntity", "entity");
         method.Statements.Expr("return Raise(entity, Bolt.EntityTargets.Everyone)");
+      });
+
+      type.DeclareMethod(typeof(string).FullName, "ToString", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Override;
+
+        string name = Decorator.Definition.Name;
+        string properties = Decorator.Properties.Select((p, i) => " " + p.Definition.Name + "={{" + i + "}}").Join("");
+        string arguments = Decorator.Properties.Select((p, i) => "this." + p.Definition.Name).Join(", ");
+        method.Statements.Expr("return System.String.Format(\"[" + name + properties + "]\", " + arguments + ")");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {

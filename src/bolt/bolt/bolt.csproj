@@ -102,6 +102,7 @@
     <Compile Include="state\Serializers\PropertySerializerString.cs" />
     <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
+    <Compile Include="state\Serializers\PropertySerializerUniqueId.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>

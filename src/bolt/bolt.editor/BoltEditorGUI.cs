@@ -250,7 +250,11 @@ public static class BoltEditorGUI {
     c = BoltRuntimeSettings.instance.highlightColor;
     c.a = enabled ? 1f : 0.25f;
 
-    return IconButton(icon, c);
+    if (IconButton(icon, c)) {
+      return !enabled;
+    }
+
+    return enabled;
   }
 
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
@@ -333,6 +337,19 @@ public static class BoltEditorGUI {
     s.normal.textColor = Color.gray;
 
     GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
+    return value;
+  }
+
+  public static string TextFieldOverlay(string value, string overlay, params GUILayoutOption[] options) {
+    GUIStyle f = new GUIStyle("TextField");
+    value = EditorGUILayout.TextField(value, f, options);
+
+    GUIStyle l = new GUIStyle(EditorStyles.miniLabel);
+    l.alignment = TextAnchor.MiddleRight;
+    l.contentOffset = new Vector2(-2, 0);
+    l.normal.textColor = Color.gray;
+
+    GUI.Label(GUILayoutUtility.GetLastRect(), overlay, l);
     return value;
   }
 

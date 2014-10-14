@@ -7,8 +7,8 @@ namespace Bolt.Compiler {
   public class PropertyDecoratorTransform : PropertyDecorator<PropertyTypeTransform> {
     public override int ByteSize {
       get {
-        // position + rotation
-        return 12 + 16;
+        // position + velocity + rotation
+        return 12 + 12 + 16;
 
         //if (Definition.StateAssetSettings.EstimationAlgorithm == StateEstimationAlgorithm.DeadReckoning) {
         //  // position + rotation + velocity + acceleration

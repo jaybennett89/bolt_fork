@@ -68,7 +68,7 @@ public class BoltEditorWindow : BoltWindow {
   void EditState(StateDefinition def) {
     EditHeader(def);
 
-    BoltEditorGUI.WithLabel("IsAbstract", () => {
+    BoltEditorGUI.WithLabel("Is Abstract", () => {
       def.IsAbstract = BoltEditorGUI.Toggle(def.IsAbstract);
     });
 
@@ -76,12 +76,49 @@ public class BoltEditorWindow : BoltWindow {
       def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
     });
 
-    if (!def.IsAbstract) {
-      BoltEditorGUI.WithLabel("Bandwidth", () => {
-        GUILayout.BeginHorizontal();
-        def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
-        def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
-        GUILayout.EndHorizontal();
+    EditorGUI.BeginDisabledGroup(def.IsAbstract);
+    BoltEditorGUI.WithLabel("Bandwidth", () => {
+      GUILayout.BeginHorizontal();
+      def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
+      def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
+      GUILayout.EndHorizontal();
+    });
+    EditorGUI.EndDisabledGroup();
+
+    var groups =
+      def.Properties
+        .Where(x => x.PropertyType.MecanimApplicable)
+        .Where(x => x.StateAssetSettings.MecanimMode != MecanimMode.Disabled)
+        .GroupBy(x => x.StateAssetSettings.MecanimDirection);
+
+    if (groups.Count() == 1) {
+      var currentDirection = groups.First().Key;
+
+      BoltEditorGUI.WithLabel("Mecanim (State Wide)", () => {
+        var selectedDirection = (MecanimDirection)EditorGUILayout.EnumPopup(currentDirection);
+
+        if (currentDirection != selectedDirection) {
+          foreach (var property in def.Properties.Where(x => x.PropertyType.MecanimApplicable)) {
+            property.StateAssetSettings.MecanimDirection = selectedDirection;
+          }
+
+          Save();
+        }
+      });
+    }
+    else if (groups.Count() > 1) {
+      BoltEditorGUI.WithLabel("Mecanim (State Wide)", () => {
+        string[] options = new string[] { "Using Animator Methods", "Using Bolt Properties", "Mixed (WARNING)" };
+
+        int index = EditorGUILayout.Popup(2, options);
+
+        if (index != 2) {
+          foreach (var property in def.Properties.Where(x => x.PropertyType.MecanimApplicable)) {
+            property.StateAssetSettings.MecanimDirection = (MecanimDirection)index;
+          }
+
+          Save();
+        }
       });
     }
 
@@ -280,8 +317,14 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
+    if (def is StateDefinition || def is StructDefinition) {
+      p.Name = BoltEditorGUI.TextFieldOverlay(p.Name, p.Priority.ToString(), GUILayout.Width(181));
+      p.Controller = BoltEditorGUI.Toggle("mc_controller", p.Controller);
+    }
+    else {
+      p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
+    }
 
-    p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
     BoltEditorGUI.SetTooltip("Name. The name of this property, has to be a valid C# property name.");
 
     // edit property type
@@ -353,14 +396,6 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     EditorGUILayout.EndVertical();
-  }
-
-  void StateAndStructToolbar(AssetDefinition def, PropertyDefinition p) {
-    EditFilters(p);
-
-    if (BoltEditorGUI.Toggle("boltico_playcom2", p.Controller)) {
-      p.Controller = !p.Controller;
-    }
   }
 
   GenericMenu.MenuFunction FilterSetter(PropertyDefinition p, FilterDefinition f) {

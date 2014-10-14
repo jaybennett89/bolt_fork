@@ -11,7 +11,7 @@ namespace Bolt.Compiler {
     }
 
     public override string[] EmitSetPropertyDataArgument() {
-      return new[] { string.Format("new Bolt.PropertySerializerTransformData {{  }}") };
+      return new[] { string.Format("new Bolt.PropertySerializerTransformData {{ Algorithm = Bolt.SmoothingAlgorithms.{0} }}", Decorator.Definition.StateAssetSettings.SmoothingAlgorithm) };
     }
 
     public override CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {

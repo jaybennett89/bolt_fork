@@ -239,9 +239,9 @@ namespace Bolt.Compiler {
           continue;
         }
 
-        var field = type.DeclareField("Bolt.TypeId", s.InterfaceName);
+        var field = type.DeclareField("Bolt.UniqueId", s.InterfaceName);
         field.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-        field.InitExpression = new CodeSnippetExpression(string.Format("new Bolt.TypeId({0})", s.TypeId));
+        field.InitExpression = new CodeSnippetExpression(string.Format("new Bolt.UniqueId({0})", s.Guid.ToByteArray().Join(", ")));
       }
 
       CodeNamespaceBoltInternal.Types.Add(type);

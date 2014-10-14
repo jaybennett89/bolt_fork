@@ -72,7 +72,11 @@ public static class BoltLog {
 
         while (stream.CanWrite && running) {
           if (threadEvent.WaitOne(100)) {
-            streamWriter.WriteLine(threadQueue.Dequeue());
+            lock (threadQueue) {
+              while (threadQueue.Count > 0) {
+                streamWriter.WriteLine(threadQueue.Dequeue());
+              }
+            }
           }
 
           streamWriter.Flush();

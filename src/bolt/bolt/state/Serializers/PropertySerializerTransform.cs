@@ -7,13 +7,19 @@ namespace Bolt {
     public Axis[] PositionAxes;
     public Axis[] RotationAxes;
     public FloatCompression QuaternionCompression;
+    public SmoothingAlgorithms Algorithm;
   }
 
   public class TransformData {
-    internal UE.Transform Simulate;
     internal UE.Transform Render;
+    internal UE.Transform Simulate;
+
     internal DoubleBuffer<UE.Vector3> RenderDoubleBufferPosition;
     internal DoubleBuffer<UE.Quaternion> RenderDoubleBufferRotation;
+
+    internal virtual UE.Vector3 GetVelocity(UE.Vector3 position) {
+      return (Simulate.localPosition - position) * BoltCore._config.framesPerSecond;
+    }
 
     public void SetTransforms(UE.Transform simulate) {
       SetTransforms(simulate, null);
@@ -33,6 +39,10 @@ namespace Bolt {
   class PropertySerializerTransform : PropertySerializer {
     PropertySerializerTransformData PropertyData;
 
+    const int POSITION_OFFSET = 0;
+    const int VELOCITY_OFFSET = 12;
+    const int ROTATION_OFFSET = 24;
+
     public PropertySerializerTransform(StatePropertyMetaData info)
       : base(info) {
     }
@@ -42,14 +52,18 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
+      if (PropertyData.Algorithm == SmoothingAlgorithms.DeadReckoning) {
+        return ((12 + 12 + 16) * 8) + 1;
+      }
+
       return ((12 + 16) * 8) + 1;
     }
 
     public override object GetDebugValue(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
-        var p = state.Frames.first.Data.ReadVector3(StateData.ByteOffset);
-        var r = state.Frames.first.Data.ReadQuaternion(StateData.ByteOffset + 12).eulerAngles;
+        var p = state.Frames.first.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+        var r = state.Frames.first.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET).eulerAngles;
         var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F3"), p.y.ToString("F3"), p.z.ToString("F3"));
         var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F3"), r.y.ToString("F3"), r.z.ToString("F3"));
         return string.Format("{0} / {1}", pos, rot);
@@ -93,8 +107,8 @@ namespace Bolt {
       var it = state.Frames.GetIterator();
 
       while (it.Next()) {
-        UE.Vector3 p = it.val.Data.ReadVector3(StateData.ObjectOffset);
-        UE.Quaternion r = it.val.Data.ReadQuaternion(StateData.ObjectOffset + 12);
+        UE.Vector3 p = it.val.Data.ReadVector3(StateData.ObjectOffset + POSITION_OFFSET);
+        UE.Quaternion r = it.val.Data.ReadQuaternion(StateData.ObjectOffset + ROTATION_OFFSET);
 
         float angle;
         UE.Vector3 axis;
@@ -110,15 +124,23 @@ namespace Bolt {
         r = UE.Quaternion.AngleAxis(angle, axis);
 
         // put back into frame
-        it.val.Data.PackVector3(StateData.ObjectOffset, p);
-        it.val.Data.PackQuaternion(StateData.ObjectOffset + 12, r);
+        it.val.Data.PackVector3(StateData.ObjectOffset + POSITION_OFFSET, p);
+        it.val.Data.PackQuaternion(StateData.ObjectOffset + ROTATION_OFFSET, r);
       }
     }
 
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate && !state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
-        PerformInterpolation(td, state);
+        switch (PropertyData.Algorithm) {
+          case SmoothingAlgorithms.InterpolatedSnapshots:
+            PerformInterpolation(td, state, true);
+            break;
+
+          case SmoothingAlgorithms.DeadReckoning:
+            PerformExtrapolation(td, state);
+            break;
+        }
 
         //switch (Config.TransformMode) {
         //  case TransformModes.None:
@@ -138,9 +160,15 @@ namespace Bolt {
     public override void OnSimulateAfter(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateData.ObjectOffset];
       if (td.Simulate) {
+        var f = state.Frames.first;
+
         if (state.Entity.IsOwner) {
-          state.Frames.first.Data.PackVector3(StateData.ByteOffset, td.Simulate.localPosition);
-          state.Frames.first.Data.PackQuaternion(StateData.ByteOffset + 12, td.Simulate.localRotation);
+          UE.Vector3 position = f.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+          UE.Vector3 velocity = td.GetVelocity(position);
+
+          f.Data.PackVector3(StateData.ByteOffset + POSITION_OFFSET, td.Simulate.localPosition);
+          f.Data.PackVector3(StateData.ByteOffset + VELOCITY_OFFSET, velocity);
+          f.Data.PackQuaternion(StateData.ByteOffset + ROTATION_OFFSET, td.Simulate.localRotation);
         }
 
         td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
@@ -161,12 +189,19 @@ namespace Bolt {
         stream.WriteEntity(null, connection);
       }
 
-      UE.Vector3 p = frame.Data.ReadVector3(StateData.ByteOffset);
-      UE.Quaternion r = frame.Data.ReadQuaternion(StateData.ByteOffset + 12);
+      UE.Vector3 p = frame.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+      UE.Vector3 v = frame.Data.ReadVector3(StateData.ByteOffset + VELOCITY_OFFSET);
+      UE.Quaternion r = frame.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
 
       stream.WriteFloat(p.x);
       stream.WriteFloat(p.y);
       stream.WriteFloat(p.z);
+
+      if (PropertyData.Algorithm == SmoothingAlgorithms.DeadReckoning) {
+        stream.WriteFloat(v.x);
+        stream.WriteFloat(v.y);
+        stream.WriteFloat(v.z);
+      }
 
       stream.WriteFloat(r.x);
       stream.WriteFloat(r.y);
@@ -202,11 +237,18 @@ namespace Bolt {
       state.Entity.SetParentInternal(stream.ReadEntity(connection));
 
       UE.Vector3 p = new UE.Vector3();
+      UE.Vector3 v = new UE.Vector3();
       UE.Quaternion r = new UE.Quaternion();
 
       p.x = stream.ReadFloat();
       p.y = stream.ReadFloat();
       p.z = stream.ReadFloat();
+
+      if (PropertyData.Algorithm == SmoothingAlgorithms.DeadReckoning) {
+        v.x = stream.ReadFloat();
+        v.y = stream.ReadFloat();
+        v.z = stream.ReadFloat();
+      }
 
       r.x = stream.ReadFloat();
       r.y = stream.ReadFloat();
@@ -236,33 +278,37 @@ namespace Bolt {
       //    break;
       //}
 
-      frame.Data.PackVector3(StateData.ByteOffset, p);
-      frame.Data.PackQuaternion(StateData.ByteOffset + 12, r);
+      frame.Data.PackVector3(StateData.ByteOffset + POSITION_OFFSET, p);
+      frame.Data.PackVector3(StateData.ByteOffset + VELOCITY_OFFSET, v);
+      frame.Data.PackQuaternion(StateData.ByteOffset + ROTATION_OFFSET, r);
     }
 
     void PerformNone(TransformData td, State state) {
       var f0 = state.Frames.first;
-      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset);
-      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + 12);
+      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
 
       td.Simulate.localPosition = p0;
       td.Simulate.localRotation = r0;
     }
 
-    void PerformInterpolation(TransformData td, State state) {
+    void PerformInterpolation(TransformData td, State state, bool position) {
       var f0 = state.Frames.first;
-      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset);
-      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + 12);
+
+      UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+      UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
 
       if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
-        //BoltLog.Info("frame: {0}, f0.number={1}", state.Entity.Frame, f0.Number);
-        td.Simulate.localPosition = p0;
+        if (position) {
+          td.Simulate.localPosition = p0;
+        }
+
         td.Simulate.localRotation = r0;
       }
       else {
         var f1 = state.Frames.Next(f0);
-        UE.Vector3 p1 = f1.Data.ReadVector3(StateData.ByteOffset);
-        UE.Quaternion r1 = f1.Data.ReadQuaternion(StateData.ByteOffset + 12);
+        UE.Vector3 p1 = f1.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+        UE.Quaternion r1 = f1.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
 
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > state.Entity.Frame);
@@ -270,14 +316,28 @@ namespace Bolt {
         float t = f1.Number - f0.Number;
         float d = state.Entity.Frame - f0.Number;
 
-        //BoltLog.Info("frame: {0}, f0.number={1}, f1.number={2}, d/t={3}", state.Entity.Frame, f0.Number, f1.Number, d / t);
-        td.Simulate.localPosition = UE.Vector3.Lerp(p0, p1, d / t);
+        if (position) {
+          td.Simulate.localPosition = UE.Vector3.Lerp(p0, p1, d / t);
+        }
+
         td.Simulate.localRotation = UE.Quaternion.Lerp(r0, r1, d / t);
       }
     }
 
     void PerformExtrapolation(TransformData td, State state) {
-      throw new NotImplementedException();
+      var f = state.Frames.first;
+
+      UE.Vector3 p = f.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
+      UE.Vector3 v = f.Data.ReadVector3(StateData.ByteOffset + VELOCITY_OFFSET) * BoltNetwork.frameDeltaTime;
+
+      float d = (state.Entity.Frame + 1) - f.Number;
+      float t = d / state.Entity.SendRate;
+
+      // blend from current to new position
+      td.Simulate.localPosition = UE.Vector3.Lerp(td.Simulate.localPosition + v, p + (v * d), t);
+
+      // interpolate rotation
+      PerformInterpolation(td, state, false);
     }
   }
 }

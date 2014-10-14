@@ -15,12 +15,12 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     Z,
   }
 
-  public override bool DisplatyDefaultSettingsHeader {
-    get { return false; }
-  }
-
   protected override void Edit(bool array) {
-    //BoltEditorGUI.WithLabel("Transform Space", () => { PropertyType.Space = (TransformSpaces)EditorGUILayout.EnumPopup(PropertyType.Space); });
+    BoltEditorGUI.WithLabel("Algorithm", () => {
+      Definition.StateAssetSettings.SmoothingAlgorithm = 
+        (SmoothingAlgorithms)EditorGUILayout.EnumPopup(Definition.StateAssetSettings.SmoothingAlgorithm);
+    });
+
     //BoltEditorGUI.WithLabel("Rotation Mode", () => { PropertyType.RotationMode = (TransformRotationMode)EditorGUILayout.EnumPopup(PropertyType.RotationMode); });
 
     //BoltEditorGUI.SettingsSectionDouble("Position Axes", "Rotation Axes", () => {
