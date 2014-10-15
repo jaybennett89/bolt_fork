@@ -1930,7 +1930,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skinWidth: .0799999982
   gravityForce: -9.81000042
-  jumpForce: 20
+  jumpForce: 30
   jumpTotalFrames: 30
   movingSpeed: 4
   maxVelocity: 32

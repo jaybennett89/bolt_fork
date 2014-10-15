@@ -77,12 +77,14 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     EditorGUI.BeginDisabledGroup(def.IsAbstract);
+
     BoltEditorGUI.WithLabel("Bandwidth", () => {
       GUILayout.BeginHorizontal();
       def.PacketMaxBits = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxBits, "Bits/Packet"), 128, 4096);
       def.PacketMaxProperties = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(def.PacketMaxProperties, "Properties/Packet"), 1, 255);
       GUILayout.EndHorizontal();
     });
+
     EditorGUI.EndDisabledGroup();
 
     var groups =

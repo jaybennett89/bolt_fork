@@ -39,20 +39,15 @@ public class PlayerMotor : MonoBehaviour {
   [SerializeField]
   LayerMask layerMask;
 
-  Vector3 rayStart {
+  Vector3 feetPosition {
     get {
       Vector3 p;
 
       p = transform.position;
-      p = p + _cc.center;
+      p.y += _cc.radius;
+      p.y -= (skinWidth * 2);
 
       return p;
-    }
-  }
-
-  float rayDistance {
-    get {
-      return _cc.center.y + (skinWidth * 2f);
     }
   }
 
@@ -69,7 +64,6 @@ public class PlayerMotor : MonoBehaviour {
   }
 
   public void SetState(IPlayerCommandResult result) {
-
     // assign new state
     _state.position = result.position;
     _state.velocity = result.velocity;
@@ -80,33 +74,22 @@ public class PlayerMotor : MonoBehaviour {
     transform.localPosition = _state.position;
   }
 
-  void DrawRay(Ray r, float d, Color c) {
-    Debug.DrawLine(r.origin, r.origin + (r.direction * d), c);
-  }
+  void Move(Vector3 velocity) {
+    bool isGrounded = false;
 
-  IEnumerable<RaycastHit> FindGround(Vector3 z, int count) {
-    for (int i = 0; i < count; ++i) {
-      Ray r;
-      RaycastHit rh;
+    isGrounded = isGrounded || _cc.Move(velocity * BoltNetwork.frameDeltaTime) == CollisionFlags.Below;
+    isGrounded = isGrounded || _cc.isGrounded;
+    isGrounded = isGrounded || Physics.CheckSphere(feetPosition, _cc.radius, layerMask);
 
-      r = new Ray();
-      r.direction = Vector3.down;
-      r.origin = rayStart + (Quaternion.Euler(0, i * (360 / count), 0) * z);
-
-      if (Physics.Raycast(r, out rh, rayDistance, layerMask)) {
-        DrawRay(r, rayDistance, Color.green);
-        yield return rh;
-      }
-      else {
-        DrawRay(r, rayDistance, Color.red);
-      }
+    if (isGrounded && !_state.isGrounded) {
+      _state.velocity = new Vector3();
     }
 
-    yield break;
+    _state.isGrounded = isGrounded;
+    _state.position = transform.localPosition;
   }
 
   public State Move(IPlayerCommandInput input) {
-
     var moving = false;
     var movingDir = Vector3.zero;
 
@@ -123,39 +106,6 @@ public class PlayerMotor : MonoBehaviour {
       movingDir = Vector3.Normalize(Quaternion.Euler(0, input.yaw, 0) * movingDir);
     }
 
-    // find ground (if any)
-    var hits =
-      FindGround(new Vector3(0, 0, _cc.radius), 8)
-        .Concat(FindGround(new Vector3(0, 0, _cc.radius * 0.5f), 4))
-        .Concat(FindGround(new Vector3(0, 0, 0), 1))
-        .OrderBy(x => x.distance)
-        .ToList();
-
-
-    // if we had any ray hits, we are grounded
-    if (hits.Count > 0) {
-      // if we were not grounded before, zero out or velocity
-      if (!_state.isGrounded) {
-        _state.velocity.x = 0f;
-        _state.velocity.y = 0f;
-        _state.velocity.z = 0f;
-      }
-
-      if (_state.jumpFrames < (jumpTotalFrames / 2)) {
-        Vector3 p;
-
-        p = transform.position;
-        p.y = (hits[0].point.y + skinWidth);
-
-        transform.position = p;
-      }
-
-      _state.isGrounded = true;
-    }
-    else {
-      _state.isGrounded = false;
-    }
-
     //
     if (_state.isGrounded) {
       if (input.jump && _state.jumpFrames == 0) {
@@ -163,9 +113,8 @@ public class PlayerMotor : MonoBehaviour {
         _state.velocity += movingDir * movingSpeed;
       }
 
-      if (moving) {
-        _cc.Move(movingDir * movingSpeed * BoltNetwork.frameDeltaTime);
-        _state.position = transform.localPosition;
+      if (moving && _state.jumpFrames == 0) {
+        Move(movingDir * movingSpeed);
       }
     }
     else {
@@ -175,28 +124,29 @@ public class PlayerMotor : MonoBehaviour {
     if (_state.jumpFrames > 0) {
       // calculate force
       float force;
-
       force = (float)_state.jumpFrames / (float)jumpTotalFrames;
       force = jumpForce * force;
 
-      _cc.Move(new Vector3(0, force * BoltNetwork.frameDeltaTime, 0));
+      Move(new Vector3(0, force, 0));
     }
 
+    // decrease jump frames
+    _state.jumpFrames = Mathf.Max(0, _state.jumpFrames - 1);
+
     // clamp velocity
-    _state.velocity.x = Mathf.Clamp(_state.velocity.x, -maxVelocity, +maxVelocity);
-    _state.velocity.y = Mathf.Clamp(_state.velocity.y, -maxVelocity, +maxVelocity);
-    _state.velocity.z = Mathf.Clamp(_state.velocity.z, -maxVelocity, +maxVelocity);
+    _state.velocity = Vector3.ClampMagnitude(_state.velocity, maxVelocity);
 
     // apply drag
     _state.velocity.x = ApplyDrag(_state.velocity.x, drag.x);
     _state.velocity.y = ApplyDrag(_state.velocity.y, drag.y);
     _state.velocity.z = ApplyDrag(_state.velocity.z, drag.z);
 
-    // decrease jump frames
-    _state.jumpFrames = (byte)Mathf.Max(0, _state.jumpFrames - 1);
+    // this might seem weird, but it actually gets around a ton of issues - we basically apply 
+    // gravity on the Y axis on every frame to simulate instant gravity if you step over a ledge
+    _state.velocity.y = Mathf.Min(_state.velocity.y, gravityForce);
 
-    // apply velocity
-    _cc.Move(_state.velocity * BoltNetwork.frameDeltaTime);
+    // apply movement
+    Move(_state.velocity);
 
     // set local rotation
     transform.localRotation = Quaternion.Euler(0, input.yaw, 0);
@@ -210,13 +160,18 @@ public class PlayerMotor : MonoBehaviour {
 
   float ApplyDrag(float value, float drag) {
     if (value < 0) {
-      return Mathf.Min(value + (drag * BoltNetwork.frameDeltaTime), 0);
+      return Mathf.Min(value + (drag * BoltNetwork.frameDeltaTime), 0f);
     }
 
     else if (value > 0) {
-      return Mathf.Max(value - (drag * BoltNetwork.frameDeltaTime), 0);
+      return Mathf.Max(value - (drag * BoltNetwork.frameDeltaTime), 0f);
     }
 
     return value;
+  }
+
+  void OnDrawGizmos() {
+    Gizmos.color = _state.isGrounded ? Color.green : Color.red;
+    Gizmos.DrawWireSphere(feetPosition, _cc.radius);
   }
 }
