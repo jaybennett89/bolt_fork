@@ -16,11 +16,16 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
     private set;
   }
 
-  public BoltGlobalBehaviourAttribute ()
+  public string[] ScenesNames {
+    get;
+    private set;
+  }
+
+  public BoltGlobalBehaviourAttribute()
     : this(BoltNetworkModes.Server | BoltNetworkModes.Client) {
   }
 
-  public BoltGlobalBehaviourAttribute (BoltNetworkModes mode)
+  public BoltGlobalBehaviourAttribute(BoltNetworkModes mode)
     : this(mode, new int[0]) {
   }
 
@@ -31,5 +36,14 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
   public BoltGlobalBehaviourAttribute(BoltNetworkModes mode, params int[] scenes) {
     this.Mode = mode;
     this.Scenes = scenes;
+  }
+
+  public BoltGlobalBehaviourAttribute(params string[] scenes)
+    : this(BoltNetworkModes.Server | BoltNetworkModes.Client, scenes) {
+  }
+
+  public BoltGlobalBehaviourAttribute(BoltNetworkModes mode, params string[] scenes) {
+    this.Mode = mode;
+    this.ScenesNames = scenes;
   }
 }

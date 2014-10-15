@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server, BoltScenes.Level1)]
+[BoltGlobalBehaviour(BoltNetworkModes.Server, "Level1")]
 public class ServerCallbacks : Bolt.GlobalEventListener {
   public static bool ListenServer = true;
 
@@ -21,6 +21,12 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
         p.Spawn();
       }
     }
+  }
+
+  public override void Connected(BoltConnection c) {
+    c.userToken = new Player();
+    c.GetPlayer().connection = c;
+    c.GetPlayer().name = "CLIENT:" + c.remoteEndPoint.Port;
   }
 
   public override void SceneLoadRemoteDone(BoltConnection connection) {

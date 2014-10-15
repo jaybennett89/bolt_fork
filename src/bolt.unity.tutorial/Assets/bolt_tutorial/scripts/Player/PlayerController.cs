@@ -162,11 +162,11 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     PlayerCommand cmd = (PlayerCommand)c;
 
     if (resetState) {
-      _motor.SetState(cmd.Result);
+      _motor.SetState(cmd.Result.position, cmd.Result.velocity, cmd.Result.isGrounded, cmd.Result.jumpFrames);
     }
     else {
       // move and save the resulting state
-      var result = _motor.Move(cmd.Input);
+      var result = _motor.Move(cmd.Input.forward, cmd.Input.backward, cmd.Input.left, cmd.Input.right, cmd.Input.jump, cmd.Input.yaw);
 
       cmd.Result.position = result.position;
       cmd.Result.velocity = result.velocity;
