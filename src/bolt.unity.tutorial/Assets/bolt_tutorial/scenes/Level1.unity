@@ -525,8 +525,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 3, z: 1}
+  m_Center: {x: 0, y: -1, z: 0}
 --- !u!33 &606553680
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -559,7 +559,7 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneId: 6d29ee0f440c644591511bd2e6ebee8f
+  _sceneId: 612492d93aca624d82c528aba55ec263
   _defaultSerializerGuid: e9ed3b866f59e44ab2e3346194d1220e
   _prefabId: 1
   _updateRate: 1
@@ -2123,6 +2123,14 @@ Prefab:
     - target: {fileID: 11400002, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
       propertyPath: end.z
       value: 14.2880602
+      objectReference: {fileID: 0}
+    - target: {fileID: 6500000, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
+      propertyPath: m_Size.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6500000, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
+      propertyPath: m_Center.y
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
