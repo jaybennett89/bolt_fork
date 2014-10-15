@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Represents an array of floats on a state
+/// </summary>
 public struct FloatArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -16,6 +19,9 @@ public struct FloatArray {
     this.length = length;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return length;
@@ -29,11 +35,18 @@ public struct FloatArray {
     }
   }
 
+  /// <summary>
+  /// Creates aa modifier object for this array
+  /// </summary>
+  /// <returns>The modifier object</returns>
   public FloatArrayModifier Modify() {
     return new FloatArrayModifier(this);
   }
 }
 
+/// <summary>
+/// Object which allows you to modify a float array
+/// </summary>
 public class FloatArrayModifier : IDisposable {
   FloatArray array;
 
@@ -41,6 +54,9 @@ public class FloatArrayModifier : IDisposable {
     this.array = array;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return array.length;

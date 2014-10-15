@@ -1,10 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-/// <summary>
-/// Contains functions for raycasting against BoltHitboxBody objects
-/// </summary>
-public static class BoltPhysics {
+internal static class BoltPhysics {
   static int maxWorldSnapshots = 60;
   static readonly BoltDoubleList<BoltHitboxBody> _hitboxBodies = new BoltDoubleList<BoltHitboxBody>();
   static readonly BoltDoubleList<BoltHitboxWorldSnapshot> _worldSnapshots = new BoltDoubleList<BoltHitboxWorldSnapshot>();
@@ -44,11 +41,7 @@ public static class BoltPhysics {
 #endif
   }
 
-  /// <summary>
-  /// Cast a ray against the last frame
-  /// </summary>
-  [Obsolete("Use BoltNetwork.RaycastAll")]
-  public static BoltPhysicsHits Raycast(Ray ray) {
+  internal static BoltPhysicsHits Raycast(Ray ray) {
     if (_worldSnapshots.count > 0) {
       return Raycast(ray, _worldSnapshots.last);
     }
@@ -56,11 +49,7 @@ public static class BoltPhysics {
     return BoltPhysicsHits._pool.Acquire();
   }
 
-  /// <summary>
-  /// Cast a ray against a specific frame number
-  /// </summary>
-  [Obsolete("Use BoltNetwork.RaycastAll")]
-  public static BoltPhysicsHits Raycast(Ray ray, int frame) {
+  internal static BoltPhysicsHits Raycast(Ray ray, int frame) {
     var it = _worldSnapshots.GetIterator();
 
     while (it.Next()) {
@@ -76,11 +65,7 @@ public static class BoltPhysics {
     return BoltPhysicsHits._pool.Acquire();
   }
 
-  /// <summary>
-  /// Overlap a sphere against the last frame
-  /// </summary>
-  [Obsolete("Use BoltNetwork.OverlapSphereAll")]
-  public static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius) {
+  internal static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius) {
     if (_worldSnapshots.count > 0) {
       return OverlapSphere(origin, radius, _worldSnapshots.last);
     }
@@ -88,11 +73,7 @@ public static class BoltPhysics {
     return BoltPhysicsHits._pool.Acquire();
   }
 
-  /// <summary>
-  /// Overlap a sphere gainst a specific frame
-  /// </summary>
-  [Obsolete("Use BoltNetwork.OverlapSphereAll")]
-  public static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius, int frame) {
+  internal static BoltPhysicsHits OverlapSphere(Vector3 origin, float radius, int frame) {
     var it = _worldSnapshots.GetIterator();
 
     while (it.Next()) {

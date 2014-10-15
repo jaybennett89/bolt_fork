@@ -33,6 +33,9 @@ public class BoltConnection : BoltObject {
 
   internal SceneLoadState _remoteSceneLoading;
 
+  /// <summary>
+  /// Returns true if the remote computer on the other end of this connection is loading a map currently
+  /// </summary>
   public bool isLoadingMap {
     get {
       return
@@ -99,7 +102,7 @@ public class BoltConnection : BoltObject {
   }
 
   /// <summary>
-  /// User setable token
+  /// User assignable token which lets you pair arbitrary data with the connection
   /// </summary>
   public object userToken {
     get;

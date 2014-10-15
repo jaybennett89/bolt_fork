@@ -8,6 +8,9 @@ namespace Bolt {
     internal PropertySerializer[] PropertySerializers;
   }
 
+  /// <summary>
+  /// Base class that all events inherit from
+  /// </summary>
   public abstract class Event : IDisposable {
 
     internal const byte ENTITY_EVERYONE = 1;
@@ -34,10 +37,16 @@ namespace Bolt {
     internal BoltConnection TargetConnection;
     internal BoltConnection SourceConnection;
 
+    /// <summary>
+    /// Returns true if this event was sent from the local computer
+    /// </summary>
     public bool IsFromLocalComputer {
       get { return ReferenceEquals(SourceConnection, null); }
     }
 
+    /// <summary>
+    /// Returns the connection this event was received from, will be null if this event was raised on the local computer
+    /// </summary>
     public BoltConnection RaisedBy {
       get { return SourceConnection; }
     }
@@ -86,7 +95,15 @@ namespace Bolt {
       }
     }
 
+    [Obsolete("Use Event.Send instead")]
     public void Commit() {
+      EventDispatcher.Enqueue(this);
+    }
+
+    /// <summary>
+    /// Send this event
+    /// </summary>
+    public void Send() {
       EventDispatcher.Enqueue(this);
     }
 

@@ -8,13 +8,42 @@ namespace Bolt {
   public delegate void PropertyCallback(IState state, string propertyPath, ArrayIndices arrayIndices);
   public delegate void PropertyCallbackSimple();
 
+  /// <summary>
+  /// Base interface for all states
+  /// </summary>
   public interface IState {
+    /// <summary>
+    /// Set the animator object this state should use for reading/writing mecanim parameters
+    /// </summary>
+    /// <param name="animator">The animator object to use</param>
     void SetAnimator(UE.Animator animator);
 
+    /// <summary>
+    /// Allows you to hook up a callback to a specific property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate</param>
     void AddCallback(string path, PropertyCallback callback);
+
+    /// <summary>
+    /// Allows you to hook up a callback to a specific property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate</param>
     void AddCallback(string path, PropertyCallbackSimple callback);
 
+    /// <summary>
+    /// Removes a callback from a property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate to remove</param>
     void RemoveCallback(string path, PropertyCallback callback);
+
+    /// <summary>
+    /// Removes a callback from a property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate to remove</param>
     void RemoveCallback(string path, PropertyCallbackSimple callback);
   }
 

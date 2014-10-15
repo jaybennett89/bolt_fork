@@ -22,6 +22,10 @@ namespace BoltInternal {
       callbacks.Remove(this);
     }
 
+    /// <summary>
+    /// Override this method and return true if you want the event listener to keep being attached to Bolt even when bBolt shuts down and starts again.
+    /// </summary>
+    /// <returns>True/False</returns>
     public virtual bool PersistBetweenStartupAndShutdown() {
       return false;
     }

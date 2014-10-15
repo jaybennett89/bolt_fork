@@ -19,6 +19,9 @@ namespace Bolt {
 
   }
 
+  /// <summary>
+  /// Base class that all commands inherit from
+  /// </summary>
   public abstract class Command : IBoltListNode {
     internal const int SEQ_BITS = 8;
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;
@@ -39,18 +42,23 @@ namespace Bolt {
     internal CommandFlags Flags;
     internal CommandMetaData Meta;
 
+    /// <summary>
+    /// The value of the BoltNetwork.serverFrame property of the computer this command was created on
+    /// </summary>
     public int ServerFrame {
       get { return Frame; }
     }
 
+    /// <summary>
+    /// Returns true if it's the first time this command executed
+    /// </summary>
     public bool IsFirstExecution {
       get { return !(Flags & CommandFlags.HAS_EXECUTED); }
     }
 
-    public bool StateReceived {
-      get { return Flags & CommandFlags.CORRECTION_RECEIVED; }
-    }
-
+    /// <summary>
+    /// User assignable token that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
+    /// </summary>
     public object UserToken {
       get;
       set;

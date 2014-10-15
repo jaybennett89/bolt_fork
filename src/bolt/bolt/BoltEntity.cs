@@ -3,15 +3,46 @@ using System.Collections.Generic;
 using UdpKit;
 using UE = UnityEngine;
 
-public interface IBoltEntitySettingsModifier : IDisposable {
-  Bolt.PrefabId prefabId { get; set; }
-  Bolt.UniqueId defaultSerializerUniqueId { get; set; }
+public class BoltEntitySettingsModifier : IDisposable {
+  BoltEntity _entity;
 
-  int updateRate { get; set; }
+  internal BoltEntitySettingsModifier(BoltEntity entity) {
+    _entity = entity;
+  }
 
-  bool clientPredicted { get; set; }
-  bool allowInstantiateOnClient { get; set; }
-  bool persistThroughSceneLoads { get; set; }
+  public Bolt.PrefabId prefabId {
+    get { return new Bolt.PrefabId(_entity._prefabId); }
+    set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
+  }
+
+  public Bolt.UniqueId defaultSerializerUniqueId {
+    get { return _entity.defaultSerializerId; }
+    set { _entity.VerifyNotAttached(); _entity.defaultSerializerId = value; }
+  }
+
+  public int updateRate {
+    get { return _entity._updateRate; }
+    set { _entity.VerifyNotAttached(); _entity._updateRate = value; }
+  }
+
+  public bool clientPredicted {
+    get { return _entity._clientPredicted; }
+    set { _entity.VerifyNotAttached(); _entity._clientPredicted = value; }
+  }
+
+  public bool allowInstantiateOnClient {
+    get { return _entity._allowInstantiateOnClient; }
+    set { _entity.VerifyNotAttached(); _entity._allowInstantiateOnClient = value; }
+  }
+
+  public bool persistThroughSceneLoads {
+    get { return _entity._persistThroughSceneLoads; }
+    set { _entity.VerifyNotAttached(); _entity._persistThroughSceneLoads = value; }
+  }
+
+  void IDisposable.Dispose() {
+
+  }
 }
 
 /// <summary>
@@ -19,49 +50,6 @@ public interface IBoltEntitySettingsModifier : IDisposable {
 /// </summary>
 [BoltExecutionOrder(-2500)]
 public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
-
-  class SettingsModifier : IBoltEntitySettingsModifier {
-    BoltEntity _entity;
-
-    public SettingsModifier(BoltEntity entity) {
-      _entity = entity;
-    }
-
-    Bolt.PrefabId IBoltEntitySettingsModifier.prefabId {
-      get { return new Bolt.PrefabId(_entity._prefabId); }
-      set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
-    }
-
-    Bolt.UniqueId IBoltEntitySettingsModifier.defaultSerializerUniqueId {
-      get { return _entity.defaultSerializerId; }
-      set { _entity.VerifyNotAttached(); _entity.defaultSerializerId = value; }
-    }
-
-    int IBoltEntitySettingsModifier.updateRate {
-      get { return _entity._updateRate; }
-      set { _entity.VerifyNotAttached(); _entity._updateRate = value; }
-    }
-
-    bool IBoltEntitySettingsModifier.clientPredicted {
-      get { return _entity._clientPredicted; }
-      set { _entity.VerifyNotAttached(); _entity._clientPredicted = value; }
-    }
-
-    bool IBoltEntitySettingsModifier.allowInstantiateOnClient {
-      get { return _entity._allowInstantiateOnClient; }
-      set { _entity.VerifyNotAttached(); _entity._allowInstantiateOnClient = value; }
-    }
-
-    bool IBoltEntitySettingsModifier.persistThroughSceneLoads {
-      get { return _entity._persistThroughSceneLoads; }
-      set { _entity.VerifyNotAttached(); _entity._persistThroughSceneLoads = value; }
-    }
-
-    void IDisposable.Dispose() {
-
-    }
-  }
-
   internal Bolt.Entity _entity;
 
   [UE.SerializeField]
@@ -128,61 +116,100 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
 
+  /// <summary>
+  /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
+  /// </summary>
   public Bolt.UniqueId uniqueId {
     get { return Entity.UniqueId; }
   }
 
+  /// <summary>
+  /// If this entity was created on another computer, contains the connection we received this entity from, otherwise null
+  /// </summary>
   public BoltConnection source {
     get { return Entity.Source; }
   }
 
+  /// <summary>
+  /// If this entity is controlled by a remote connection it contains that connection, otherwise null
+  /// </summary>
   public BoltConnection controller {
     get { return Entity.Controller; }
   }
 
+  /// <summary>
+  /// If this entity is attached to Bolt or not
+  /// </summary>
   public bool isAttached {
     get { return (_entity != null) && _entity.IsAttached; }
   }
 
+  /// <summary>
+  /// This is a scene object placed in the scene in the Unity editor
+  /// </summary>
   public bool isSceneObject {
     get { return Entity.IsSceneObject; } 
   }
 
+  /// <summary>
+  /// Did the local computer create this entity or not?
+  /// </summary>
   public bool isOwner {
     get { return Entity.IsOwner; }
   }
 
+  /// <summary>
+  /// Do we have control of this entity?
+  /// </summary>
   public bool hasControl {
     get { return Entity.HasControl; }
   }
 
+  /// <summary>
+  /// Do we have control of this entity and are we using client side prediction
+  /// </summary>
   public bool hasControlWithPrediction {
     get { return Entity.HasPredictedControl; }
   }
 
+  /// <summary>
+  /// Should this entity persist between scene loads
+  /// </summary>
   public bool persistsOnSceneLoad {
     get { return Entity.PersistsOnSceneLoad; }
   }
 
-  public bool canQueueCommands {
-    get { return Entity.CanQueueCommands; }
-  }
-
-  public IBoltEntitySettingsModifier ModifySettings() {
+  /// <summary>
+  /// Creates an object which lets you modify the internal settings of an entity before it is attached to Bolt.
+  /// </summary>
+  /// <returns>The object used to modify entity settings</returns>
+  public BoltEntitySettingsModifier ModifySettings() {
     VerifyNotAttached();
-    return new SettingsModifier(this);
+    return new BoltEntitySettingsModifier(this);
   }
 
+  /// <summary>
+  /// Sets the scope of all currently active connections for this entity. Only usable if Scope Mode has been set to Manual.
+  /// </summary>
+  /// <param name="inScope">If this entity should be in scope or not</param>
   public void SetScopeAll(bool inScope) {
     Entity.SetScopeAll(inScope);
   }
 
+  /// <summary>
+  /// Sets the scope for the connection passed in for this entity. Only usable if Scope Mode has been set to Manual.
+  /// </summary>
+  /// <param name="inScope">If this entity should be in scope or not</param>
   public void SetScope(BoltConnection connection, bool inScope) {
     Entity.SetScope(connection, inScope);
   }
 
-  public void SetParent(BoltEntity entity) {
-    Entity.SetParent(entity.Entity);
+  /// <summary>
+  /// Sets the parent of this entity
+  /// </summary>
+  /// <param name="parent">The parent of this entity</param>
+  public void SetParent(BoltEntity parent) {
+    Entity.SetParent(parent.Entity);
   }
 
   /// <summary>
@@ -287,6 +314,11 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     return default(TState);
   }
 
+  /// <summary>
+  /// Checks which type of state this entity has
+  /// </summary>
+  /// <typeparam name="TState">The type of state to check for</typeparam>
+  /// <returns>True if this entity has a state of type TState otherwise false</returns>
   public bool StateIs<TState>() {
     return Entity.Serializer is TState;
   }
