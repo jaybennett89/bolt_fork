@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMotor : MonoBehaviour {
 
   public struct State {
@@ -74,12 +75,12 @@ public class PlayerMotor : MonoBehaviour {
     _state.position = transform.localPosition;
   }
 
-  public void SetState(IPlayerCommandResult result) {
+  public void SetState(Vector3 position, Vector3 velocity, bool isGrounded, int jumpFrames) {
     // assign new state
-    _state.position = result.position;
-    _state.velocity = result.velocity;
-    _state.jumpFrames = result.jumpFrames;
-    _state.isGrounded = result.isGrounded;
+    _state.position = position;
+    _state.velocity = velocity;
+    _state.jumpFrames = jumpFrames;
+    _state.isGrounded = isGrounded;
 
     // assign local position
     transform.localPosition = _state.position;
@@ -100,26 +101,26 @@ public class PlayerMotor : MonoBehaviour {
     _state.position = transform.localPosition;
   }
 
-  public State Move(IPlayerCommandInput input) {
+  public State Move(bool forward, bool backward, bool left, bool right, bool jump, float yaw) {
     var moving = false;
     var movingDir = Vector3.zero;
 
-    if (input.forward ^ input.backward) {
-      movingDir.z = input.forward ? +1 : -1;
+    if (forward ^ backward) {
+      movingDir.z = forward ? +1 : -1;
     }
 
-    if (input.left ^ input.right) {
-      movingDir.x = input.right ? +1 : -1;
+    if (left ^ right) {
+      movingDir.x = right ? +1 : -1;
     }
 
     if (movingDir.x != 0 || movingDir.z != 0) {
       moving = true;
-      movingDir = Vector3.Normalize(Quaternion.Euler(0, input.yaw, 0) * movingDir);
+      movingDir = Vector3.Normalize(Quaternion.Euler(0, yaw, 0) * movingDir);
     }
 
     //
     if (_state.isGrounded) {
-      if (input.jump && _state.jumpFrames == 0) {
+      if (jump && _state.jumpFrames == 0) {
         _state.jumpFrames = (byte)jumpTotalFrames;
         _state.velocity += movingDir * movingSpeed;
       }
@@ -160,7 +161,7 @@ public class PlayerMotor : MonoBehaviour {
     Move(_state.velocity);
 
     // set local rotation
-    transform.localRotation = Quaternion.Euler(0, input.yaw, 0);
+    transform.localRotation = Quaternion.Euler(0, yaw, 0);
 
     // detect tunneling
     DetectTunneling();
@@ -189,7 +190,7 @@ public class PlayerMotor : MonoBehaviour {
 
     if (Physics.Raycast(waist, Vector3.down, out hit, _cc.height / 2, layerMask)) {
       transform.position = hit.point;
-    }
+    } 
   }
 
   void OnDrawGizmos() {

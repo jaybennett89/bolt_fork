@@ -297,10 +297,10 @@ public static class BoltEditorGUI {
 
   public static int EditPriority(int priority, bool enabled) {
     if (enabled) {
-      priority = Mathf.Clamp(IntFieldOverlay(priority, "Priority"), 1, 999);
+      priority = Mathf.Clamp(IntFieldOverlay(priority, "Priority", GUILayout.Width(75)), 1, 999);
     }
     else {
-      BoltEditorGUI.Disabled(() => { EditorGUILayout.TextField("---", GUILayout.Width(32)); });
+      BoltEditorGUI.Disabled(() => { EditorGUILayout.TextField("N/A", GUILayout.Width(75)); });
     }
 
     return priority;
