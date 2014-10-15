@@ -84,7 +84,7 @@ public class BoltConsole : MonoBehaviour {
   float backgroundTransparency = 0.75f;
 
   [SerializeField]
-  int padding = 0;
+  int padding = 10;
 
   [SerializeField]
   int fontSize = 10;
@@ -167,20 +167,21 @@ public class BoltConsole : MonoBehaviour {
       text.fontStyle = FontStyle.Bold;
       text.fontSize = fontSize;
       text.alignment = TextAnchor.UpperLeft;
+      text.clipping = TextClipping.Clip;
     }
 
     LinesRefresh();
 
     // how many lines to render at most
-    int lines = Mathf.Max(1, ((int)(Screen.height * consoleHeight)) / lineHeight) + 1;
+    int lines = Mathf.Max(1, ((int)(Screen.height * consoleHeight)) / lineHeight);
 
     // background
     GUI.color = new Color(0, 0, 0, backgroundTransparency);
-    GUI.DrawTexture(new Rect(inset, inset, Screen.width - (inset * 2), (lines * lineHeight) + (padding * 2)), background);
+    GUI.DrawTexture(new Rect(inset, inset, Screen.width - (inset * 2), ((lines - 1) * lineHeight) + (padding * 2)), background);
     GUI.color = Color.white;
 
     // draw lines
-    for (int i = 0; i < (lines - 1); ++i) {
+    for (int i = 0; i < lines; ++i) {
       int m = Mathf.Min(_linesRender.count, (lines - 1));
 
       if (i < _linesRender.count) {
@@ -193,6 +194,6 @@ public class BoltConsole : MonoBehaviour {
   }
 
   Rect GetRect(int line) {
-    return new Rect(inset + padding, inset + padding + (line * lineHeight), Screen.width - (padding * 2) - (inset * 2), lineHeight);
+    return new Rect(inset + padding, inset + padding + (line * lineHeight), Screen.width - (inset * 2) - (padding * 2), lineHeight);
   }
 }
