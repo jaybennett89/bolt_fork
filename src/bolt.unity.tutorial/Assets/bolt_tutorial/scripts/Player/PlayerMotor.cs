@@ -39,13 +39,24 @@ public class PlayerMotor : MonoBehaviour {
   [SerializeField]
   LayerMask layerMask;
 
-  Vector3 feetPosition {
+  Vector3 sphere {
     get {
       Vector3 p;
 
       p = transform.position;
       p.y += _cc.radius;
       p.y -= (skinWidth * 2);
+
+      return p;
+    }
+  }
+
+  Vector3 waist {
+    get {
+      Vector3 p;
+
+      p = transform.position;
+      p.y += _cc.height / 2f;
 
       return p;
     }
@@ -79,7 +90,7 @@ public class PlayerMotor : MonoBehaviour {
 
     isGrounded = isGrounded || _cc.Move(velocity * BoltNetwork.frameDeltaTime) == CollisionFlags.Below;
     isGrounded = isGrounded || _cc.isGrounded;
-    isGrounded = isGrounded || Physics.CheckSphere(feetPosition, _cc.radius, layerMask);
+    isGrounded = isGrounded || Physics.CheckSphere(sphere, _cc.radius, layerMask);
 
     if (isGrounded && !_state.isGrounded) {
       _state.velocity = new Vector3();
@@ -151,6 +162,9 @@ public class PlayerMotor : MonoBehaviour {
     // set local rotation
     transform.localRotation = Quaternion.Euler(0, input.yaw, 0);
 
+    // detect tunneling
+    DetectTunneling();
+
     // update position
     _state.position = transform.localPosition;
 
@@ -170,8 +184,19 @@ public class PlayerMotor : MonoBehaviour {
     return value;
   }
 
+  void DetectTunneling() {
+    RaycastHit hit;
+
+    if (Physics.Raycast(waist, Vector3.down, out hit, _cc.height / 2, layerMask)) {
+      transform.position = hit.point;
+    }
+  }
+
   void OnDrawGizmos() {
     Gizmos.color = _state.isGrounded ? Color.green : Color.red;
-    Gizmos.DrawWireSphere(feetPosition, _cc.radius);
+    Gizmos.DrawWireSphere(sphere, _cc.radius);
+
+    Gizmos.color = Color.magenta;
+    Gizmos.DrawLine(waist, waist + new Vector3(0, -(_cc.height/2f), 0));
   }
 }
