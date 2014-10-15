@@ -68,13 +68,13 @@ class BoltSceneLoader : MonoBehaviour {
     }
     finally {
       if (_loadOps.count == 0) {
-        _delay = 5;
+        _delay = 60;
       }
     }
   }
 
   internal static void Enqueue(Bolt.Scene scene) {
-    BoltLog.Debug("Loading {0}", scene);
+    BoltLog.Debug("Loading {0} ({1})", scene, BoltNetworkInternal.GetSceneName(scene.Index));
 
     _delay = 0;
     _loadOps.AddLast(new LoadOp { scene = scene });

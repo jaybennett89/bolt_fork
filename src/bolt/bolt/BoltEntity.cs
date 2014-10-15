@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UdpKit;
 using UE = UnityEngine;
@@ -84,6 +85,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
       return _entity;
     }
+  }
+
+  public static string Join<T>(IEnumerable<T> items, string seperator) {
+    return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
   }
 
   internal Bolt.UniqueId sceneId {
@@ -213,7 +218,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// <p>Takes local control of this entity</p>
+  /// Takes local control of this entity
   /// </summary>
   public void TakeControl() {
     Entity.TakeControl();

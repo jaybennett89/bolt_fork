@@ -1,7 +1,4 @@
-﻿/// <summary>
-/// Base class for most objects in Bolt
-/// </summary>
-public class BoltObject : IBoltListNode {
+﻿public class BoltObject : IBoltListNode {
 #if DEBUG
   internal bool _pooled = true;
 #endif

@@ -4,9 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
-/// <summary>
-/// Renders a toggleable console at the top of the screen
-/// </summary>
 public class BoltConsole : MonoBehaviour {
   internal struct Line {
     public Color color;
