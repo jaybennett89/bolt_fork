@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using Bolt;
+using UnityEngine;
 
+[DocumentationAttribute]
 public abstract class BoltSingletonPrefab<T> : MonoBehaviour where T : MonoBehaviour {
   static T _instance;
 

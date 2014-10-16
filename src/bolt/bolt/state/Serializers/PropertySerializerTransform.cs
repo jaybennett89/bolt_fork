@@ -10,6 +10,7 @@ namespace Bolt {
     public SmoothingAlgorithms Algorithm;
   }
 
+  [Documentation]
   public class TransformData {
     internal UE.Transform Render;
     internal UE.Transform Simulate;

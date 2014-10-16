@@ -18,11 +18,22 @@ public class BoltProjectWindow : BoltWindow {
     w.Show();
   }
 
+  string addGroup = null;
+  AssetDefinition addGroupTo = null;
+
   Vector2 scroll;
+
+  bool HasGroupSelected {
+    get { return !string.IsNullOrEmpty(Project.ActiveGroup) && Project.ActiveGroup != "Everything"; }
+  }
 
   void NewAsset(AssetDefinition def) {
     def.Guid = Guid.NewGuid();
     def.Name = "New" + def.GetType().Name.Replace("Definition", "");
+
+    if (HasGroupSelected) {
+      def.Groups.Add(Project.ActiveGroup);
+    }
 
     // add to parent
     ArrayUtility.Add(ref Project.RootFolder.Assets, def);
@@ -35,8 +46,48 @@ public class BoltProjectWindow : BoltWindow {
     base.OnGUI();
 
     GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 16));
-
     scroll = GUILayout.BeginScrollView(scroll, false, false);
+
+    EditorGUILayout.BeginHorizontal();
+
+    var addingGroup = addGroup != null && addGroupTo != null;
+
+    if (addingGroup) {
+      GUI.SetNextControlName("BoltProjectWindow_AddGroup");
+      addGroup = GUILayout.TextField(addGroup);
+      GUI.FocusControl("BoltProjectWindow_AddGroup");
+
+      switch (Event.current.keyCode.ToString()) {
+        case "Return":
+          addGroupTo.Groups.Add(addGroup);
+          addGroup = null;
+          addGroupTo = null;
+          break;
+
+        case "Escape":
+          addGroup = null;
+          addGroupTo = null;
+          break;
+      }
+    }
+    else {
+      EditorGUI.BeginDisabledGroup(Project.Groups.Count() == 0);
+
+      var list = new[] { "Everything" }.Concat(Project.Groups).ToArray();
+      var listCounted = new[] { "Everything (" + Project.RootFolder.Assets.Length + ")" }.Concat(Project.Groups.Select(x => x + " (" + Project.RootFolder.Assets.Count(a => a.Groups.Contains(x)) + ")")).ToArray();
+
+      var index = Mathf.Max(0, Array.IndexOf(list, Project.ActiveGroup));
+      var selected = EditorGUILayout.Popup(index, listCounted);
+
+      if (Project.ActiveGroup != list[selected]) {
+        Project.ActiveGroup = list[selected];
+        Save();
+      }
+
+      EditorGUI.EndDisabledGroup();
+    }
+
+    EditorGUILayout.EndHorizontal();
 
     if (HasProject) {
       BoltEditorGUI.HeaderButton("States", "mc_state", () => NewAsset(new StateDefinition()));
@@ -80,43 +131,79 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
   }
 
+  void OverlayIcon(string icon) {
+    Rect r = GUILayoutUtility.GetLastRect();
+    r.xMin = r.xMax - 14;
+    r.xMax = r.xMax - 2;
+    r.yMin = r.yMin + 2;
+    r.yMax = r.yMax - 1;
+
+    GUI.color = BoltRuntimeSettings.instance.highlightColor;
+    GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
+    GUI.color = Color.white;
+  }
+
   void DisplayAssetList(IEnumerable<AssetDefinition> assets) {
-    bool deleteMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
+    bool modifyMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
 
     foreach (var a in assets.OrderBy(x => x.Name)) {
+
+      // check
+      if (HasGroupSelected && !a.Groups.Contains(Project.ActiveGroup)) {
+        continue;
+      }
+
       GUILayout.BeginHorizontal();
-      GUIStyle style = new GUIStyle(EditorStyles.miniButton);
+
+      GUIStyle style;
+      style = new GUIStyle(modifyMode ? EditorStyles.miniButtonLeft : EditorStyles.miniButton);
       style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
         style.normal.textColor = BoltRuntimeSettings.instance.highlightColor;
       }
 
-      GUILayout.Space(5);
-
       if (GUILayout.Button(new GUIContent(a.Name), style)) {
-        if (deleteMode) {
+        Select(a);
+      }
+
+      if (modifyMode) {
+        if (GUILayout.Button(" ", EditorStyles.miniButtonMid, GUILayout.Width(15))) {
+          GenericMenu menu = new GenericMenu();
+
+          foreach (string group in Project.Groups) {
+            menu.AddItem(new GUIContent(group), a.Groups.Contains(group), userData => {
+              STuple<AssetDefinition, string> pair = (STuple<AssetDefinition, string>)userData;
+
+              if (pair.item0.Groups.Contains(pair.item1)) {
+                pair.item0.Groups.Remove(pair.item1);
+              }
+              else {
+                pair.item0.Groups.Add(pair.item1);
+              }
+
+              Save();
+            }, new STuple<AssetDefinition, string>(a, group));
+          }
+
+          menu.AddItem(new GUIContent(">> New Group"), false, userData => {
+            addGroup = "New Group";
+            addGroupTo = (AssetDefinition)userData;
+          }, a);
+          menu.ShowAsContext();
+        }
+
+        OverlayIcon("mc_group");
+
+        if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(15))) {
           a.Deleted = true;
 
           if (IsSelected(a)) {
             Select(null);
           }
         }
-        else {
-          Select(a);
-        }
-      }
 
-      if (deleteMode) {
-        Rect r = GUILayoutUtility.GetLastRect();
-        r.xMin = r.xMax - 13;
-        r.xMax = r.xMax - 2;
-        r.yMin = r.yMin + 2;
-        r.yMax = r.yMax - 2;
-
-        GUI.color = BoltRuntimeSettings.instance.highlightColor;
-        GUI.DrawTexture(r, BoltEditorGUI.LoadIcon("mc_minus"));
-        GUI.color = Color.white;
+        OverlayIcon("mc_minus");
       }
 
       GUILayout.EndHorizontal();

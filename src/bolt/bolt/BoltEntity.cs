@@ -3,7 +3,9 @@ using System.Linq;
 using System.Collections.Generic;
 using UdpKit;
 using UE = UnityEngine;
+using Bolt;
 
+[DocumentationAttribute]
 public class BoltEntitySettingsModifier : IDisposable {
   BoltEntity _entity;
 
@@ -46,9 +48,7 @@ public class BoltEntitySettingsModifier : IDisposable {
   }
 }
 
-/// <summary>
-/// Enables a game object to be tracked by Bolt over the network
-/// </summary>
+[DocumentationAttribute]
 [BoltExecutionOrder(-2500)]
 public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal Bolt.Entity _entity;

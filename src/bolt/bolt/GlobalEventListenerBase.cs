@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using Bolt;
+using UnityEngine;
 
 
 namespace BoltInternal {
   /// <summary>
   /// Base class for all BoltCallbacks objects
   /// </summary>
+  [DocumentationAttribute(Alias = "Bolt.GlobalEventListener")]
   public abstract partial class GlobalEventListenerBase : MonoBehaviour, IBoltListNode {
     static readonly BoltDoubleList<GlobalEventListenerBase> callbacks = new BoltDoubleList<GlobalEventListenerBase>();
 

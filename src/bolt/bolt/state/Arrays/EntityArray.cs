@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Text;
 /// <summary>
 /// Represents an array of entities on a state
 /// </summary>
+[Documentation]
 public struct EntityArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -57,6 +59,7 @@ public struct EntityArray {
 /// <summary>
 /// Object which allows you to modify an entity array
 /// </summary>
+[Documentation]
 public class EntityArrayModifier : IDisposable {
   EntityArray array;
 

@@ -1,9 +1,11 @@
-﻿using UE = UnityEngine;
+﻿using Bolt;
+using UE = UnityEngine;
 
 namespace Bolt {
   /// <summary>
   /// Base class for unity behaviours that want to access Bolt methods
   /// </summary>
+  [Documentation]
   public abstract class EntityBehaviour : UE.MonoBehaviour, IEntityBehaviour {
     internal BoltEntity _entity;
 
@@ -82,6 +84,7 @@ namespace Bolt {
   /// Base class for unity behaviours that want to access Bolt methods with the state available also
   /// </summary>
   /// <typeparam name="TState"></typeparam>
+  [Documentation(Alias = "Bolt.EntityBehaviour<TState>")]
   public abstract class EntityBehaviour<TState> : EntityBehaviour {
     /// <summary>
     /// The state for this behaviours entity
@@ -93,12 +96,14 @@ namespace Bolt {
 }
 
 namespace BoltInternal {
+  [Documentation(Alias = "Bolt.EntityEventListener")]
   public abstract class EntityEventListenerBase : Bolt.EntityBehaviour {
     public sealed override void Initialized() {
       entity.Entity.AddEventListener(this);
     }
   }
 
+  [Documentation(Alias = "Bolt.EntityEventListener<TState>")]
   public abstract class EntityEventListenerBase<TState> : EntityEventListenerBase {
     public TState state {
       get { return entity.GetState<TState>(); }

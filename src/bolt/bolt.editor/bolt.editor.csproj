@@ -164,6 +164,7 @@
     <Content Include="Resources\Install\bolt\resources\icons\mc_accent.png" />
     <Content Include="Resources\Install\bolt\resources\icons\mc_checkbox_locked.png" />
     <Content Include="Resources\Install\bolt\resources\icons\mc_command.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_group.png" />
     <Content Include="Resources\Install\bolt\resources\icons\mc_settings2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

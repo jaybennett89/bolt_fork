@@ -11,6 +11,7 @@ namespace Bolt {
   /// <summary>
   /// Base class that all events inherit from
   /// </summary>
+  [Documentation]
   public abstract class Event : IDisposable {
 
     internal const byte ENTITY_EVERYONE = 1;

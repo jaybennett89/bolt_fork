@@ -134,7 +134,7 @@ public static class BoltInstaller {
       EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
         txt.textureFormat = TextureImporterFormat.ARGB32;
         txt.wrapMode = TextureWrapMode.Clamp;
-        txt.filterMode = FilterMode.Point;
+        txt.filterMode = FilterMode.Bilinear;
         txt.textureType = TextureImporterType.GUI;
         txt.alphaIsTransparency = true;
         txt.maxTextureSize = 32;

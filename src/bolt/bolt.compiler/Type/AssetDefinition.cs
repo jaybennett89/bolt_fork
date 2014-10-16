@@ -29,6 +29,9 @@ namespace Bolt.Compiler {
     [ProtoMember(6)]
     public bool Enabled;
 
+    [ProtoMember(9, OverwriteList = true)]
+    public HashSet<string> Groups = new HashSet<string>();
+
     public abstract IEnumerable<Type> AllowedPropertyTypes {
       get;
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
@@ -40,6 +41,7 @@ public static class BoltNetworkInternal {
 /// Holds global methods and properties for starting and
 /// stopping bolt, instantiating prefabs and other utils
 /// </summary>
+[DocumentationAttribute]
 public static class BoltNetwork {
   public static Action ShutdownComplete;
 

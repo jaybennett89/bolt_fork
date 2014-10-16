@@ -56,6 +56,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="DocumentationAttribute.cs" />
     <Compile Include="GlobalEventListenerBase.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
@@ -76,7 +77,7 @@
     <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state\Arrays\EntityArray.cs" />
     <Compile Include="state\Arrays\FloatArray.cs" />
-    <Compile Include="state\Arrays\IntegetArray.cs" />
+    <Compile Include="state\Arrays\IntegerArray.cs" />
     <Compile Include="state\Arrays\TransformArray.cs" />
     <Compile Include="state\Auxiliary\Enums.cs" />
     <Compile Include="state\Axis.cs" />

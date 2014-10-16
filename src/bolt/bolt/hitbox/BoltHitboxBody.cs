@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using Bolt;
+using UnityEngine;
 
 /// <summary>
 /// Defines a body of hitboxes to be tracked 
 /// </summary>
+[Documentation]
 public class BoltHitboxBody : MonoBehaviour, IBoltListNode {
   [SerializeField]
   internal BoltHitbox _proximity;

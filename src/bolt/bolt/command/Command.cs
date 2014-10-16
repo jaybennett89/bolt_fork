@@ -22,6 +22,7 @@ namespace Bolt {
   /// <summary>
   /// Base class that all commands inherit from
   /// </summary>
+  [Documentation]
   public abstract class Command : IBoltListNode {
     internal const int SEQ_BITS = 8;
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;

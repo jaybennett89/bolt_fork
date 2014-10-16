@@ -1,4 +1,7 @@
-﻿public enum BoltHitboxType {
+﻿using Bolt;
+
+[Documentation]
+public enum BoltHitboxType {
   Unknown,
   Proximity,
   Body,

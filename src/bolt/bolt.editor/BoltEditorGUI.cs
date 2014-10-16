@@ -222,7 +222,7 @@ public static class BoltEditorGUI {
     return s;
   }
 
-  static bool IconButton(string icon, Color color) {
+  public static bool IconButton(string icon, Color color) {
     GUIStyle style;
     style = new GUIStyle(GUIStyle.none);
     style.padding = new RectOffset();

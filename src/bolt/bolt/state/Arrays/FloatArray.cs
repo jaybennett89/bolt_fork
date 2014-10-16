@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Text;
 /// <summary>
 /// Represents an array of floats on a state
 /// </summary>
+[Documentation]
 public struct FloatArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -47,6 +49,7 @@ public struct FloatArray {
 /// <summary>
 /// Object which allows you to modify a float array
 /// </summary>
+[Documentation]
 public class FloatArrayModifier : IDisposable {
   FloatArray array;
 

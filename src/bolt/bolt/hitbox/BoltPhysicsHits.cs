@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 
 /// <summary>
 /// Describes a hit to a BoltHitbox on a BoltHitboxBody
 /// </summary>
+[Documentation]
 public struct BoltPhysicsHit {
   /// <summary>
   /// The distance away from the origin of the ray
@@ -24,6 +26,7 @@ public struct BoltPhysicsHit {
 /// <summary>
 /// Container for a group of BoltPhysicsHits
 /// </summary>
+[Documentation]
 public class BoltPhysicsHits : BoltObject, IDisposable {
   internal static readonly BoltObjectPool<BoltPhysicsHits> _pool = new BoltObjectPool<BoltPhysicsHits>();
   internal List<BoltPhysicsHit> _hits = new List<BoltPhysicsHit>();

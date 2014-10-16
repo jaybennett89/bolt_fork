@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Text;
 /// <summary>
 /// Represents an array of integers on a state
 /// </summary>
+[Documentation]
 public struct IntegerArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -47,6 +49,7 @@ public struct IntegerArray {
 /// <summary>
 /// Object which allows you to modify an integer array
 /// </summary>
+[Documentation]
 public class IntegerArrayModifier : IDisposable {
   IntegerArray array;
 

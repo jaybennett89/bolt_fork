@@ -11,6 +11,7 @@ namespace Bolt {
   /// <summary>
   /// Base interface for all states
   /// </summary>
+  [Documentation]
   public interface IState {
     /// <summary>
     /// Set the animator object this state should use for reading/writing mecanim parameters
