@@ -226,6 +226,12 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     BoltEntity be = prefab.GetComponent<BoltEntity>();
+
+    if (!be) {
+      BoltLog.Error("Prefab '{0}' does not have a Bolt Entity component attached", prefab.name);
+      return null;
+    }
+
     return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
