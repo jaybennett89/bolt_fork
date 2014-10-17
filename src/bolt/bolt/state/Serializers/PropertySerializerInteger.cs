@@ -23,13 +23,13 @@ namespace Bolt {
       Blit.PackI32(state.Frames.first.Data, Settings.ByteOffset, state.Animator.GetInteger(Settings.PropertyName));
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      stream.WriteInt(Blit.ReadI32(data, offset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+      stream.WriteInt(Blit.ReadI32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Blit.PackI32(data, offset, stream.ReadInt());
+    protected override void Read(byte[] data,BoltConnection connection, UdpStream stream) {
+      Blit.PackI32(data, Settings.ByteOffset, stream.ReadInt());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

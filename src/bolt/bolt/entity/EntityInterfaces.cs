@@ -59,6 +59,9 @@ namespace Bolt {
     void OnSimulateBefore();
     void OnSimulateAfter();
 
+    void OnControlGained();
+    void OnControlLost();
+
     BitArray GetDefaultMask();
     BitArray GetFilter(BoltConnection connection, EntityProxy proxy);
 

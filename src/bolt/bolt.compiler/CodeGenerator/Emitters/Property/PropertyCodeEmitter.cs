@@ -57,7 +57,7 @@ namespace Bolt.Compiler {
 
       // property settings 
       if ((Decorator.DefiningAsset is StateDecorator) || (Decorator.DefiningAsset is StructDecorator)) {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", sp.OffsetBytes, Decorator.Definition.Name));
+        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.State)", sp.OffsetBytes, Decorator.Definition.Name));
         settings.Add(string.Format("new Bolt.PropertyStateSettings({0}, {1}, {2}, \"{3}\", {4}, {5})",
           Decorator.Definition.Priority,
           Decorator.ByteSize,
@@ -68,7 +68,12 @@ namespace Bolt.Compiler {
         ));
       }
       else {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", Decorator.ByteOffset, Decorator.Definition.Name));
+        settings.Add(string.Format(
+          "new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.{2})", 
+          Decorator.ByteOffset, 
+          Decorator.Definition.Name,
+          Decorator.DefiningAsset is EventDecorator ? "Event" : "Command"
+        ));
       }
 
       // mecanim for states settings

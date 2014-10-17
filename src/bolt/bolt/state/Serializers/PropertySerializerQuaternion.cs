@@ -12,13 +12,13 @@ namespace Bolt {
       return 32 * 4;
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      stream.WriteQuaternion(Blit.ReadQuaternion(data, offset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+      stream.WriteQuaternion(Blit.ReadQuaternion(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Blit.PackQuaternion(data, offset, stream.ReadQuaternion());
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+      Blit.PackQuaternion(data, Settings.ByteOffset, stream.ReadQuaternion());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

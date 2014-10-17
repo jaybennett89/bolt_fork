@@ -14,8 +14,30 @@ namespace Bolt {
       CompressionSettings = compressionSettings;
     }
 
+    public new void AddSettings(PropertyStateSettings stateSettings) {
+      Assert.True(stateSettings.ByteLength == 8);
+      StateSettings = stateSettings;
+      StateSettings.ByteLength = 4;
+    }
+
+    public override void OnSimulateBefore(State state) {
+      if (state.Entity.IsDummy) {
+        var f = state.Frames.first;
+
+        switch (SmoothingSettings.Algorithm) {
+          case SmoothingAlgorithms.Interpolation:
+            f.Data.PackF32(Settings.ByteOffset, Bolt.Math.InterpolateFloat(state.Frames, Settings.ByteOffset + 4, state.Entity.Frame));
+            break;
+
+          case SmoothingAlgorithms.Extrapolation:
+            f.Data.PackF32(Settings.ByteOffset, Bolt.Math.ExtrapolateFloat(state.Frames, Settings.ByteOffset + 4, state.Entity.Frame, SmoothingSettings, f.Data.ReadF32(Settings.ByteOffset)));
+            break;
+        }
+      }
+    }
+
     public override int StateBits(State state, State.Frame frame) {
-      return 32;
+      return CompressionSettings.BitsRequired;
     }
 
     public override object GetDebugValue(State state) {
@@ -30,13 +52,19 @@ namespace Bolt {
       state.Animator.SetFloat(Settings.PropertyName, Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset), MecanimSettings.Damping, BoltCore.frameDeltaTime);
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      stream.WriteFloat(Blit.ReadF32(data, offset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+      CompressionSettings.Pack(stream, Blit.ReadF32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Blit.PackF32(data, offset, stream.ReadFloat());
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+      int offset = Settings.ByteOffset;
+
+      if (Settings.PropertyMode == PropertyModes.State && SmoothingSettings.Algorithm != SmoothingAlgorithms.None) {
+        offset += 4;
+      }
+
+      Blit.PackF32(data, offset, CompressionSettings.Read(stream));
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

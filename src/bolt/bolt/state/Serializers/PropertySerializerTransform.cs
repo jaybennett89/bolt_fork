@@ -3,12 +3,6 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  internal struct PropertySmoothingSettings {
-    public SmoothingAlgorithms Algorithm;
-    public int ExtrapolationMaxFrames;
-    public int ExtrapolationCorrectionFrames;
-    public float ExtrapolationErrorTolerance;
-  }
 
   [Documentation]
   public class TransformData {
@@ -35,6 +29,16 @@ namespace Bolt {
 
       Simulate = simulate;
     }
+  }
+
+  struct PropertyTransformCompressionSettings {
+    public PropertyFloatCompressionSettings PositionX;
+    public PropertyFloatCompressionSettings PositionY;
+    public PropertyFloatCompressionSettings PositionZ;
+
+    public PropertyFloatCompressionSettings RotationX;
+    public PropertyFloatCompressionSettings RotationY;
+    public PropertyFloatCompressionSettings RotationZ;
   }
 
   class PropertySerializerTransform : PropertySerializer {

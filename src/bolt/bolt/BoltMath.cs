@@ -68,14 +68,16 @@ namespace Bolt {
       }
     }
 
-    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, float value) {
+    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, float value) {
       var f = frames.first;
+
+      frame = UE.Mathf.Min(frame, f.Number + settings.ExtrapolationMaxFrames);
 
       var v0 = value;
       var v1 = f.Data.ReadF32(offset);
 
       float d = (frame + 1) - f.Number;
-      float t = d / System.Math.Max(2, correctFrames);
+      float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
 
       return v0 + ((v1 - v0) * t);
     }

@@ -19,11 +19,23 @@ namespace Bolt.Compiler {
     [ProtoMember(6)]
     public bool Enabled;
 
+    public float Pack {
+      get { return 1f / Accuracy; }
+    }
+
+    public float Read {
+      get { return Accuracy; }
+    }
+
+    public float Shift {
+      get { return -MinValue; }
+    }
+
     public int BitsRequired {
       get {
         var pack = 1f / Accuracy;
         var shift = -MinValue;
-        return BitForNumber((int)Math.Round((MaxValue + shift) * pack));
+        return BitsForNumber((int)Math.Round((MaxValue + shift) * pack));
       }
     }
 
@@ -43,7 +55,7 @@ namespace Bolt.Compiler {
       };
     }
 
-    static int BitForNumber(int number) {
+    static int BitsForNumber(int number) {
       if (number < 0) { return 32; }
       if (number == 0) { return 1; }
 

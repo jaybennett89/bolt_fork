@@ -31,15 +31,15 @@ namespace Bolt {
       return 32 + (Blit.ReadI32(frame.Data, Settings.ByteOffset) * 8);
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpKit.UdpStream stream) {
-      stream.WriteInt(Blit.ReadI32(data, offset));
-      stream.WriteByteArray(data, offset + 4, Blit.ReadI32(data, offset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
+      stream.WriteInt(Blit.ReadI32(data, Settings.ByteOffset));
+      stream.WriteByteArray(data, Settings.ByteOffset + 4, Blit.ReadI32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpKit.UdpStream stream) {
-      Blit.PackI32(data, offset, stream.ReadInt());
-      Blit.PackBytes(data, offset + 4, stream.ReadByteArray(Blit.ReadI32(data, offset)));
+    protected override void Read(byte[] data,  BoltConnection connection, UdpKit.UdpStream stream) {
+      Blit.PackI32(data, Settings.ByteOffset, stream.ReadInt());
+      Blit.PackBytes(data, Settings.ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(data, Settings.ByteOffset)));
     }
   }
 }

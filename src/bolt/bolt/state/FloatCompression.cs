@@ -1,31 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 
 namespace Bolt {
   internal struct PropertyFloatCompressionSettings {
-    public int Bits;
-    public float Shift;
-    public float PackMultiplier;
-    public float ReadMultiplier;
+    int _bits;
+
+    float _shift;
+    float _pack;
+    float _read;
+
+    public int BitsRequired {
+      get { return _bits; }
+    }
+
+    public static PropertyFloatCompressionSettings CreateUncompressed() {
+      PropertyFloatCompressionSettings f;
+      
+      f = new PropertyFloatCompressionSettings();
+      f._bits = 32;
+
+      return f;
+    }
+
+    public PropertyFloatCompressionSettings(int bits, float shift, float pack, float read) {
+      _bits = bits;
+      _shift = shift;
+      _pack = pack;
+      _read = read;
+    }
 
     public void Pack(UdpStream stream, float value) {
-      if (Bits == 32) {
+      if (_bits == 32) {
         stream.WriteFloat(value);
       }
       else {
-        stream.WriteInt((int)((value + Shift) * PackMultiplier), Bits);
+        stream.WriteInt((int)((value + _shift) * _pack), _bits);
       }
     }
 
     public float Read(UdpStream stream) {
-      if (Bits == 32) {
+      if (_bits == 32) {
         return stream.ReadFloat();
       }
       else {
-        return (stream.ReadInt(Bits) * ReadMultiplier) + -Shift;
+        return (stream.ReadInt(_bits) * _read) + -_shift;
       }
     }
   }

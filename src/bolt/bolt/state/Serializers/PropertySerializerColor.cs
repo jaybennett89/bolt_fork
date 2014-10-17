@@ -16,13 +16,13 @@ namespace Bolt {
       return 32 * 4;
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      stream.WriteColorRGBA(Blit.ReadColor(data, offset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+      stream.WriteColorRGBA(Blit.ReadColor(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Blit.PackColor(data, offset, stream.ReadColorRGBA());
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+      Blit.PackColor(data, Settings.ByteOffset, stream.ReadColorRGBA());
     }
   }
 }

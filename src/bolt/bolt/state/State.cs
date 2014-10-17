@@ -170,6 +170,21 @@ namespace Bolt {
       }
     }
 
+    public void OnControlGained() {
+      if (!Entity.IsOwner) {
+        while (Frames.count > 1) {
+          FreeFrame(Frames.RemoveFirst());
+        }
+      }
+    }
+
+    public void OnControlLost() {
+      if (!Entity.IsOwner) {
+        Assert.True(Frames.count == 1);
+        Frames.first.Number = Entity.Frame;
+      }
+    }
+
     public void SetAnimator(UE.Animator animator) {
       Animator = animator;
 
@@ -528,6 +543,7 @@ namespace Bolt {
     BitArray CalculateFilter(Filter filter) {
       return FullMask;
     }
+
 
 
   }
