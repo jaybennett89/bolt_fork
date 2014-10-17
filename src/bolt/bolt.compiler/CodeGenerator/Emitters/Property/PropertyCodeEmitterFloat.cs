@@ -13,5 +13,9 @@ namespace Bolt.Compiler {
     public override string PackMethod {
       get { return "PackF32"; }
     }
+
+    public override void GetAddSettingsArgument(List<string> settings) {
+
+    }
   }
 }

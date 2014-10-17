@@ -22,7 +22,6 @@ public class BoltCommandAssetEditor : Editor {
     BoltAssetEditorGUI.HeaderPropertyList("result", "Result", ref asset.stateProperties);
     asset.stateProperties = BoltAssetEditorGUI.EditPropertyArray(asset.stateProperties, BoltAssetPropertyEditMode.Command, false);
 
-    BoltAssetEditorGUI.CompileButton(asset);
     EditorGUI.EndDisabledGroup();
   }
 }

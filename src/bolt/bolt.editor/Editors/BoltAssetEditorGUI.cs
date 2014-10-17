@@ -12,48 +12,6 @@ public static class BoltAssetEditorGUI {
   public static BoltAssetPropertyEditMode mode = BoltAssetPropertyEditMode.State;
   public static readonly Color lightOrange = new Color(255f / 255f, 201f / 255f, 12f / 255f);
 
-  public static void Footer(Rect r) {
-    var version = Assembly.GetExecutingAssembly().GetName().Version;
-    var uncompiledCount = EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0);
-
-    GUIStyle bg;
-    bg = new GUIStyle(GUIStyle.none);
-    bg.normal.background = EditorGUIUtility.whiteTexture;
-
-    GUI.color = EditorGUIUtility.isProSkin ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.45f, 0.45f, 0.45f);
-    GUILayout.BeginHorizontal(bg);
-    GUI.color = Color.white;
-
-    // version
-    GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
-    GUILayout.FlexibleSpace();
-
-    // uncompiled
-    GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
-
-    // compile button
-    GUIStyle compileButton = new GUIStyle(EditorStyles.miniButton);
-
-    if (EditorGUIUtility.isProSkin) {
-      compileButton.normal.textColor =
-        uncompiledCount == 0
-          ? compileButton.normal.textColor
-          : BoltRuntimeSettings.instance.highlightColor;
-    }
-    else {
-      GUI.color =
-        uncompiledCount == 0
-          ? Color.white
-          : BoltRuntimeSettings.instance.highlightColor;
-    }
-
-    if (GUILayout.Button("Compile", compileButton)) {
-      BoltUserAssemblyCompiler.Run(true);
-    }
-
-    GUI.color = Color.white;
-    GUILayout.EndHorizontal();
-  }
 
   public static void HeaderBackground(Action contents, int topSpace, int bottomSpace) {
     BeginHeaderBackground(topSpace);
@@ -62,21 +20,13 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void BeginHeaderBackground(int topSpace) {
-    //GUILayout.Space(topSpace);
-    //GUI.color = EditorGUIUtility.isProSkin ? new Color(.15f, .15f, .15f) : new Color(.75f, .75f, .75f);
-    //GUIStyle bg = new GUIStyle();
-    //bg.normal.background = EditorGUIUtility.whiteTexture;
-    //bg.padding = new RectOffset(0, 0, 2, 2);
     GUILayout.BeginHorizontal(GUIStyle.none);
-    //GUI.color = Color.white;
-
   }
 
   public static void EndHeaderBackground(int bottomSpace) {
     GUILayout.EndHorizontal();
     GUILayout.Space(bottomSpace);
   }
-
 
   public static void HeaderPropertyList(string icon, string text, ref BoltAssetProperty[] properties) {
     BeginHeaderBackground(2);
@@ -91,30 +41,11 @@ public static class BoltAssetEditorGUI {
     EndHeaderBackground(2);
   }
 
-  public static void DrawIconColorized(string name) {
-    DrawIconColorized(name, new RectOffset());
-  }
-
-  public static void DrawIconColorized(string name, RectOffset offset) {
-    GUIStyle s;
-
-    s = new GUIStyle(GUIStyle.none);
-    s.margin = offset;
-
-    GUI.color = BoltRuntimeSettings.instance.highlightColor;
-    GUILayout.Box(Icon(name), s, GUILayout.Width(16), GUILayout.Height(16));
-    GUI.color = Color.white;
-  }
-
   public static GUIStyle BoxStyle(int n) {
     GUIStyle s = new GUIStyle("flow node " + n);
     s.padding = new RectOffset();
     s.margin = new RectOffset();
     return s;
-  }
-
-  public static Texture2D Icon(string name) {
-    return Resources.Load("icons/" + name, typeof(Texture2D)) as Texture2D;
   }
 
   public static BoltAssetFloatCompression FloatCompressionPopupNoLabel(BoltAssetFloatCompression value) {
@@ -217,50 +148,6 @@ public static class BoltAssetEditorGUI {
     return mask;
   }
 
-  public static void CompileButton(BoltCompilableAsset asset) {
-    if (GUI.changed) {
-      if (asset.compile == false) {
-        EditorPrefs.SetInt("BOLT_UNCOMPILED_COUNT", EditorPrefs.GetInt("BOLT_UNCOMPILED_COUNT", 0) + 1);
-      }
-
-      asset.compile = true;
-
-      EditorPrefs.SetBool(BoltScenesWindow.COMPILE_SETTING, true);
-      EditorUtility.SetDirty(asset);
-    }
-  }
-
-  public static bool DeleteButton() {
-    if (GUILayout.Button("Delete", EditorStyles.miniButton, GUILayout.ExpandWidth(false))) {
-      return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
-    }
-
-    return false;
-  }
-
-  public static BoltAssetProperty[] RemoveDeletedProperties(BoltAssetProperty[] ps) {
-    for (int i = 0; i < ps.Length; ++i) {
-      if (ps[i].delete) {
-        ArrayUtility.RemoveAt(ref ps, i);
-        i -= 1;
-      }
-    }
-
-    return ps;
-  }
-
-  public static BoltAssetProperty CreateProperty() {
-    BoltAssetProperty p = new BoltAssetProperty();
-    p.name = "new_property";
-    p.type = BoltAssetPropertyType.Float;
-    p.stringSettings = new BoltAssetProperty.StringSettings();
-    p.vectorSettings = new BoltAssetProperty.VectorSettings();
-    p.quaternionSettings = new BoltAssetProperty.QuaternionSettings();
-    p.floatSettings = new BoltAssetProperty.FloatSettings();
-    p.intSettings = new BoltAssetProperty.IntSettings();
-    return p;
-  }
-
   public static void EditBox(GUIStyle style, params Action[] rows) {
     GUILayout.BeginVertical(style);
 
@@ -327,14 +214,8 @@ public static class BoltAssetEditorGUI {
     });
   }
 
-  static bool DeleteDialog() {
-    return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
-  }
-
   public static void EditPropertyDeleteButton(BoltAssetProperty p, bool disabled) {
     EditorGUI.BeginDisabledGroup(disabled);
-
-
     EditorGUI.EndDisabledGroup();
   }
 
@@ -359,29 +240,13 @@ public static class BoltAssetEditorGUI {
 
   public static void EditPropertyEnabled(BoltAssetProperty p) {
     GUI.color = p.enabled ? BoltRuntimeSettings.instance.highlightColor : Color.white;
-
-
     GUI.color = Color.white;
   }
 
   public static void EditPropertyFoldout(BoltAssetProperty p) {
     var noFoldout = (p.type == BoltAssetPropertyType.Trigger);
-
     EditorGUI.BeginDisabledGroup(noFoldout);
-
-
     EditorGUI.EndDisabledGroup();
-  }
-
-  public static bool ArrowButton(string icon) {
-    if (EditorGUIUtility.isProSkin == false) {
-      icon += "_Dark";
-    }
-
-    GUIStyle s = new GUIStyle(EditorStyles.miniButton);
-    s.padding = new RectOffset(2, 2, 2, 2);
-    Texture2D t = Resources.Load(icon) as Texture2D;
-    return GUILayout.Button(t, s, GUILayout.Height(15), GUILayout.Width(20));
   }
 
   public static void EditPropertyType(BoltAssetProperty p, bool disabled) {
@@ -616,7 +481,7 @@ public static class BoltAssetEditorGUI {
       }
     }
 
-    return BoltAssetEditorGUI.RemoveDeletedProperties(ps);
+    return ps;
   }
 
   static BoltAssetAxes EditAxes(BoltAssetAxes axes, BoltAssetPropertyType type) {
@@ -639,13 +504,6 @@ public static class BoltAssetEditorGUI {
     return result;
   }
 
-  public static void Label(string label, GUIStyle style, Action action) {
-    EditorGUILayout.BeginHorizontal();
-    GUILayout.Label(label, style);
-    action();
-    EditorGUILayout.EndHorizontal();
-  }
-
   public static void Label(string label, Action action) {
     EditorGUILayout.BeginHorizontal();
     GUILayout.Label(label, GUILayout.Width(150));
@@ -657,15 +515,6 @@ public static class BoltAssetEditorGUI {
     EditorGUILayout.EndHorizontal();
   }
 
-  public static void DarkLabel(string label, Action action) {
-    EditorGUILayout.BeginHorizontal();
-    GUIStyle s = new GUIStyle(EditorStyles.label);
-    s.normal.textColor = new Color(0.125f, 0.125f, 0.125f);
-    EditorGUILayout.PrefixLabel(label, "Button", s);
-    action();
-    EditorGUILayout.EndHorizontal();
-  }
-
   static T Label<T>(string label, Func<T> action) {
     EditorGUILayout.BeginHorizontal();
     EditorGUILayout.PrefixLabel(label);
@@ -673,26 +522,4 @@ public static class BoltAssetEditorGUI {
     EditorGUILayout.EndHorizontal();
     return result;
   }
-
-  //public static float FloatFieldOverlay(float value, string overlay) {
-  //  value = EditorGUILayout.FloatField(value);
-
-  //  GUIStyle s = new GUIStyle("Label");
-  //  s.alignment = TextAnchor.MiddleRight;
-  //  s.normal.textColor = Color.gray;
-
-  //  GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
-  //  return value;
-  //}
-
-  //public static int IntFieldOverlay(int value, string overlay) {
-  //  value = EditorGUILayout.IntField(value);
-
-  //  GUIStyle s = new GUIStyle("Label");
-  //  s.alignment = TextAnchor.MiddleRight;
-  //  s.normal.textColor = Color.gray;
-
-  //  GUI.Label(GUILayoutUtility.GetLastRect(), overlay, s);
-  //  return value;
-  //}
 }

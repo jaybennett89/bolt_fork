@@ -83,7 +83,6 @@ public class BoltEventAssetEditor : Editor {
     asset.properties = BoltAssetEditorGUI.EditPropertyArray(asset.properties, BoltAssetPropertyEditMode.Event, false);
 
     // compile button
-    BoltAssetEditorGUI.CompileButton(asset);
     EditorGUI.EndDisabledGroup();
   }
 }

@@ -21,6 +21,10 @@ public static class BoltEditorGUI {
     typeof(EditorWindow).GetField("m_CachedTitleContent", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(editor, new GUIContent(title, icon));
   }
 
+  public static bool DeleteDialog() {
+    return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
+  }
+
   public static AxisSelections EditAxisSelection(AxisSelections value) {
     return EditAxisSelection(null, value);
   }

@@ -83,6 +83,9 @@ namespace Bolt.Compiler {
         ));
       }
 
+      // collecting property specific settings
+      GetAddSettingsArgument(settings);
+
       for (int n = 0; n < settings.Count; ++n) {
         statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));
       }

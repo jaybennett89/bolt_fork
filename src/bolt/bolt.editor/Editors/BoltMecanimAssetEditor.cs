@@ -46,7 +46,6 @@ public class BoltMecanimAssetEditor : Editor {
       EditorGUILayout.HelpBox("Select an animation controller to compile", MessageType.Info);
     }
 
-    BoltAssetEditorGUI.CompileButton(asset);
     EditorGUI.EndDisabledGroup();
   }
 }
