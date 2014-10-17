@@ -138,11 +138,6 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltAssetEditorGUI.Label("Compiler Warn Level", () => {
-      settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
-      settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
-    });
-
     BoltAssetEditorGUI.Label("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
@@ -180,27 +175,39 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndVertical();
   }
-    
+
+  void Compiler() {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    BoltAssetEditorGUI.Label("Warning Level", () => {
+      settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
+      settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
+    });
+  }
+
   Vector2 scrollPos = Vector2.zero;
 
   void OnGUI() {
-    GUILayout.Space(6);
-
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-    BoltAssetEditorGUI.Header("mc_state2", "Replication");
+    GUILayout.Space(4);
+
+    BoltEditorGUI.Header("Replication", "mc_state2");
     Replication();
 
-    BoltAssetEditorGUI.Header("mc_connection", "Connection");
+    BoltEditorGUI.Header("Connection", "mc_connection");
     Connection();
 
-    BoltAssetEditorGUI.Header("mc_latency", "Latency Simulation");
+    BoltEditorGUI.Header("Latency Simulation", "mc_latency");
     Simulation();
 
-    BoltAssetEditorGUI.Header("mc_settings", "Miscellaneous");
+    BoltEditorGUI.Header("Miscellaneous", "mc_settings");
     Miscellaneous();
 
-    BoltAssetEditorGUI.Header("mc_console", "Console");
+    BoltEditorGUI.Header("Compiler", "mc_compile");
+    Compiler();
+
+    BoltEditorGUI.Header("Console", "mc_console");
     Console();
 
     EditorGUILayout.EndScrollView();

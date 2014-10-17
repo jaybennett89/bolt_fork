@@ -457,12 +457,12 @@ end tell'";
   }
 
   void OnGUI() {
-    GUILayout.Space(6);
+    GUILayout.Space(4);
 
-    BoltAssetEditorGUI.Header("mc_debugplay", "Debug Start Settings");
+    BoltEditorGUI.Header("Debug Start Settings", "mc_debugplay");
     Settings();
 
-    BoltAssetEditorGUI.Header("mc_scenes", "Scenes");
+    BoltEditorGUI.Header("Scenes", "mc_scenes");
     GUILayout.Space(1);
     Scenes();
 

@@ -342,6 +342,10 @@ public static class BoltEditorGUI {
     EditorGUILayout.EndHorizontal();
   }
 
+  public static void Header(string text, string icon) {
+    HeaderButton(text, icon, () => { });
+  }
+
   public static void HeaderButton(string text, string icon, Action clicked) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
 

@@ -42,9 +42,9 @@ public class BoltConnectionsWindow : EditorWindow {
   }
 
   void Connections() {
-    GUILayout.Space(6);
+    GUILayout.Space(4);
 
-    BoltAssetEditorGUI.Header("mc_connection", "Connections");
+    BoltEditorGUI.Header("Connections", "mc_connection");
 
     GUIStyle sceneStyle = "TE NodeBox";
     sceneStyle.padding = new RectOffset(5, 5, 5, 5);

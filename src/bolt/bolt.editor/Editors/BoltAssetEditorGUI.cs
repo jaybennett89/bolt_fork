@@ -55,19 +55,6 @@ public static class BoltAssetEditorGUI {
     GUILayout.EndHorizontal();
   }
 
-  public static void Header(string icon, string text) {
-    HeaderBackground(() => {
-      DrawIconColorized(icon, new RectOffset(6, 0, 0, 0));
-
-      GUIStyle label;
-      label = new GUIStyle(EditorStyles.label);
-      label.fontStyle = FontStyle.Bold;
-      label.alignment = TextAnchor.UpperLeft;
-      label.contentOffset = new Vector2(0, -2);
-      GUILayout.Label(text, label, GUILayout.ExpandWidth(false));
-    }, 2, 4);
-  }
-
   public static void HeaderBackground(Action contents, int topSpace, int bottomSpace) {
     BeginHeaderBackground(topSpace);
     contents();

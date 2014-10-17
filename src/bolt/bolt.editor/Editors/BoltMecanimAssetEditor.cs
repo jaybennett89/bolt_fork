@@ -16,7 +16,7 @@ public class BoltMecanimAssetEditor : Editor {
     EditorGUI.BeginDisabledGroup(true);
     BoltMecanimAsset asset = (BoltMecanimAsset) target;
 
-    BoltAssetEditorGUI.Header("settings", "Settings");
+    BoltEditorGUI.Header("Settings", "settings");
 
     BoltAssetEditorGUI.Label("Mecanim Controller", () => {
       asset.controller = (RuntimeAnimatorController) EditorGUILayout.ObjectField(asset.controller, typeof(RuntimeAnimatorController), false);
