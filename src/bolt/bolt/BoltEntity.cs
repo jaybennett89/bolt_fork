@@ -332,6 +332,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     return Entity.Serializer is TState;
   }
 
+  public bool StateIs(Type t) {
+    return t.IsAssignableFrom(Entity.Serializer.GetType());
+  }
+
   public override string ToString() {
     return Entity.ToString();
   }
