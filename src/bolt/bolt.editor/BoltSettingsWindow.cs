@@ -204,11 +204,11 @@ public class BoltSettingsWindow : EditorWindow {
     BoltEditorGUI.Header("Miscellaneous", "mc_settings");
     Miscellaneous();
 
-    BoltEditorGUI.Header("Compiler", "mc_compile");
-    Compiler();
-
     BoltEditorGUI.Header("Console", "mc_console");
     Console();
+
+    BoltEditorGUI.Header("Compiler", "mc_compile");
+    Compiler();
 
     EditorGUILayout.EndScrollView();
 
