@@ -91,6 +91,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
   }
 
+  public Bolt.PrefabId prefabId {
+    get { return new PrefabId(_prefabId); }
+  }
+
   internal Bolt.UniqueId sceneId {
     get {
       if (_sceneId == null || _sceneId.Length != 16) {
