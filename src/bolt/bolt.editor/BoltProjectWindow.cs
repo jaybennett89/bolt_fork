@@ -40,6 +40,9 @@ public class BoltProjectWindow : BoltWindow {
 
     // select it
     Select(def);
+
+    // save project
+    Save();
   }
 
   new void OnGUI() {
@@ -133,8 +136,8 @@ public class BoltProjectWindow : BoltWindow {
 
   void OverlayIcon(string icon) {
     Rect r = GUILayoutUtility.GetLastRect();
-    r.xMin = r.xMax - 14;
-    r.xMax = r.xMax - 2;
+    r.xMin = r.xMax - 15;
+    r.xMax = r.xMax - 3;
     r.yMin = r.yMin + 2;
     r.yMax = r.yMax - 1;
 
@@ -144,7 +147,7 @@ public class BoltProjectWindow : BoltWindow {
   }
 
   void DisplayAssetList(IEnumerable<AssetDefinition> assets) {
-    bool modifyMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
+    bool deleteMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
 
     foreach (var a in assets.OrderBy(x => x.Name)) {
 
@@ -156,7 +159,7 @@ public class BoltProjectWindow : BoltWindow {
       GUILayout.BeginHorizontal();
 
       GUIStyle style;
-      style = new GUIStyle(modifyMode ? EditorStyles.miniButtonLeft : EditorStyles.miniButton);
+      style = new GUIStyle(EditorStyles.miniButtonLeft);
       style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
@@ -167,43 +170,26 @@ public class BoltProjectWindow : BoltWindow {
         Select(a);
       }
 
-      if (modifyMode) {
-        if (GUILayout.Button(" ", EditorStyles.miniButtonMid, GUILayout.Width(15))) {
-          GenericMenu menu = new GenericMenu();
-
-          foreach (string group in Project.Groups) {
-            menu.AddItem(new GUIContent(group), a.Groups.Contains(group), userData => {
-              STuple<AssetDefinition, string> pair = (STuple<AssetDefinition, string>)userData;
-
-              if (pair.item0.Groups.Contains(pair.item1)) {
-                pair.item0.Groups.Remove(pair.item1);
-              }
-              else {
-                pair.item0.Groups.Add(pair.item1);
-              }
-
-              Save();
-            }, new STuple<AssetDefinition, string>(a, group));
-          }
-
-          menu.AddItem(new GUIContent(">> New Group"), false, userData => {
-            addGroup = "New Group";
-            addGroupTo = (AssetDefinition)userData;
-          }, a);
-          menu.ShowAsContext();
-        }
-
-        OverlayIcon("mc_group");
-
-        if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(15))) {
+      if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(16))) {
+        if (deleteMode) {
           a.Deleted = true;
 
           if (IsSelected(a)) {
             Select(null);
           }
-        }
 
+          Save();
+        }
+        else {
+          OpenFilterMenu(a);
+        }
+      }
+
+      if (deleteMode) {
         OverlayIcon("mc_minus");
+      }
+      else {
+        OverlayIcon("mc_group");
       }
 
       GUILayout.EndHorizontal();
@@ -222,6 +208,32 @@ public class BoltProjectWindow : BoltWindow {
         Save();
       }
     }
+  }
+
+  void OpenFilterMenu(AssetDefinition asset) {
+    GenericMenu menu = new GenericMenu();
+
+    foreach (string group in Project.Groups) {
+      menu.AddItem(new GUIContent(group), asset.Groups.Contains(group), userData => {
+        STuple<AssetDefinition, string> pair = (STuple<AssetDefinition, string>)userData;
+
+        if (pair.item0.Groups.Contains(pair.item1)) {
+          pair.item0.Groups.Remove(pair.item1);
+        }
+        else {
+          pair.item0.Groups.Add(pair.item1);
+        }
+
+        Save();
+      }, new STuple<AssetDefinition, string>(asset, group));
+    }
+
+    menu.AddItem(new GUIContent(">> New Group"), false, userData => {
+      addGroup = "New Group";
+      addGroupTo = (AssetDefinition)userData;
+    }, asset);
+
+    menu.ShowAsContext();
   }
 
   bool IsSelected(object obj) {

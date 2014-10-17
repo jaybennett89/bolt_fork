@@ -7,24 +7,20 @@ using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerInteger : PropertySerializerMecanim {
-    public PropertySerializerInteger(StatePropertyMetaData info) : base(info) { }
-    public PropertySerializerInteger(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerInteger(CommandPropertyMetaData meta) : base(meta) { }
-
     public override int StateBits(State state, State.Frame frame) {
       return 32;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset);
+      return Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset);
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetInteger(StateData.PropertyName, Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset));
+      state.Animator.SetInteger(Settings.PropertyName, Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset));
     }
 
     protected override void PullMecanimValue(State state) {
-      Blit.PackI32(state.Frames.first.Data, StateData.ByteOffset, state.Animator.GetInteger(StateData.PropertyName));
+      Blit.PackI32(state.Frames.first.Data, Settings.ByteOffset, state.Animator.GetInteger(Settings.PropertyName));
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

@@ -8,14 +8,10 @@ using UdpKit;
 
 namespace Bolt {
   class PropertySerializerFloat : PropertySerializerMecanim {
-    FloatCompression Compression;
+    PropertyFloatCompressionSettings CompressionSettings;
 
-    public PropertySerializerFloat(StatePropertyMetaData meta) : base(meta) { }
-    public PropertySerializerFloat(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerFloat(CommandPropertyMetaData meta) : base(meta) { }
-
-    public void SetPropertyData(FloatCompression compression) {
-      Compression = compression; 
+    public void AddSettings(PropertyFloatCompressionSettings compressionSettings) {
+      CompressionSettings = compressionSettings;
     }
 
     public override int StateBits(State state, State.Frame frame) {
@@ -23,15 +19,15 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset);
+      return Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset);
     }
 
     protected override void PullMecanimValue(State state) {
-      state.Frames.first.Data.PackF32(StateData.ByteOffset, state.Animator.GetFloat(StateData.PropertyName));
+      state.Frames.first.Data.PackF32(Settings.ByteOffset, state.Animator.GetFloat(Settings.PropertyName));
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetFloat(StateData.PropertyName, Blit.ReadF32(state.Frames.first.Data, StateData.ByteOffset), MecanimData.Damping, BoltCore.frameDeltaTime);
+      state.Animator.SetFloat(Settings.PropertyName, Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset), MecanimSettings.Damping, BoltCore.frameDeltaTime);
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
@@ -44,9 +40,9 @@ namespace Bolt {
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-      float v0 = from.ReadF32(CommandData.ByteOffset);
-      float v1 = to.ReadF32(CommandData.ByteOffset);
-      into.PackF32(CommandData.ByteOffset, UE.Mathf.Lerp(v0, v1, t));
+      float v0 = from.ReadF32(Settings.ByteOffset);
+      float v1 = to.ReadF32(Settings.ByteOffset);
+      into.PackF32(Settings.ByteOffset, UE.Mathf.Lerp(v0, v1, t));
     }
   }
 }

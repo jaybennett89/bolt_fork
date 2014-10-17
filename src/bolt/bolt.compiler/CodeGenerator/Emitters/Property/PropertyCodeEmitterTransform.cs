@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using System.Collections.Generic;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTransform : PropertyCodeEmitter<PropertyDecoratorTransform> {
@@ -8,14 +9,6 @@ namespace Bolt.Compiler {
 
     public override void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
 
-    }
-
-    public override string[] EmitSetPropertyDataArgument() {
-      return new[] { string.Format("new Bolt.PropertySerializerTransformData {{ Algorithm = Bolt.SmoothingAlgorithms.{0} }}", Decorator.Definition.StateAssetSettings.SmoothingAlgorithm) };
-    }
-
-    public override CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
-      return expression;
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {

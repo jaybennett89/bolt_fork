@@ -155,19 +155,15 @@ namespace Bolt.Compiler {
         // grab property
         var p = Decorator.AllProperties[i];
         var s = Generator.FindStruct(p.Decorator.DefiningAsset.Guid);
+
         var emitter = PropertyCodeEmitter.Create(p.Decorator);
+        var initExpr = "_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4));
 
         // emit init expression
-        ctor.Statements.Comment(p.CallbackPaths.Join("; "));
-        ctor.Statements.Assign("_Meta.PropertySerializers[{0}]".Expr(p.Index.ToString().PadRight(4)), emitter.EmitStatePropertyInitializer(p));
+        ctor.Statements.Comment(p.PropertyPath);
+        ctor.Statements.Assign(initExpr, emitter.GetCreateSerializerExpression());
 
-        // property data expression
-        var dataSetterArgument = emitter.EmitSetPropertyDataArgument();
-        if (dataSetterArgument != null) {
-          for (int n = 0; n < dataSetterArgument.Length; ++n) {
-            ctor.Statements.Expr("((Bolt.{0})_Meta.PropertySerializers[{1}]).SetPropertyData({2})", emitter.SerializerClassName, p.Index, dataSetterArgument[n]);
-          }
-        }
+        emitter.EmitAddSettings(initExpr, ctor.Statements, p);
       }
     }
 

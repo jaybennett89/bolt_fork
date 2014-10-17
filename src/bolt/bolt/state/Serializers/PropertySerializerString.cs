@@ -4,34 +4,31 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  struct PropertySerializerStringData {
+  internal struct PropertyStringSettings {
     public Bolt.StringEncodings Encoding;
   }
 
   class PropertySerializerString : PropertySerializerSimple {
-    PropertySerializerStringData StringSettings;
+    PropertyStringSettings StringSettings;
 
-    public PropertySerializerString(StatePropertyMetaData meta) : base(meta) { }
-    public PropertySerializerString(EventPropertyMetaData meta) : base(meta) { }
-
-    public void SetPropertyData(PropertySerializerStringData data) {
-      StringSettings = data;
+    public void AddSettings(PropertyStringSettings stringSettings) {
+      StringSettings = stringSettings;
     }
 
     public override object GetDebugValue(State state) {
       var frame = state.Frames.first;
-      int length = Blit.ReadI32(frame.Data, StateData.ByteOffset);
+      int length = Blit.ReadI32(frame.Data, Settings.ByteOffset);
 
       if (StringSettings.Encoding == StringEncodings.ASCII) {
-        return Encoding.ASCII.GetString(frame.Data, StateData.ByteOffset + 4, length);
+        return Encoding.ASCII.GetString(frame.Data, Settings.ByteOffset + 4, length);
       }
       else {
-        return Encoding.UTF8.GetString(frame.Data, StateData.ByteOffset + 4, length);
+        return Encoding.UTF8.GetString(frame.Data, Settings.ByteOffset + 4, length);
       }
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return 32 + (Blit.ReadI32(frame.Data, StateData.ByteOffset) * 8);
+      return 32 + (Blit.ReadI32(frame.Data, Settings.ByteOffset) * 8);
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpKit.UdpStream stream) {

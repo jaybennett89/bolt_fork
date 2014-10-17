@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using Bolt.Compiler;
 using System.IO;
+using System;
 
 public abstract class BoltWindow : EditorWindow {
   public static string ProjectPath {
@@ -28,8 +29,10 @@ public abstract class BoltWindow : EditorWindow {
   float repaintTime;
 
   static internal Project Project;
+  static internal DateTime ProjectModifyTime;
 
   static bool clear;
+  static bool saveUndo;
   static protected int Repaints;
   static protected INamedAsset Selected;
   static protected AssetDefinition SelectedAsset;
@@ -39,7 +42,12 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void Save() {
+    Save(true);
+  }
+
+  protected void Save(bool undo) {
     save = true;
+    saveUndo = undo;
     saveTime = Time.realtimeSinceStartup + 2f;
   }
 
@@ -51,15 +59,38 @@ public abstract class BoltWindow : EditorWindow {
 
     if (save && (saveTime < Time.realtimeSinceStartup) && HasProject) {
       try {
+        if (saveUndo) {
+          //
+          Undo.RecordObject(AssetDatabase.LoadAssetAtPath(ProjectPath, typeof(TextAsset)), "Bolt Project Edit");
+        }
+
+        // write to disk
         File.WriteAllBytes(ProjectPath, Project.ToByteArray());
+
+        if (saveUndo) {
+          // store modify time
+          ProjectModifyTime = File.GetLastWriteTime(ProjectPath);
+        }
+
+        // import asset
+        AssetDatabase.ImportAsset(ProjectPath, ImportAssetOptions.ForceUpdate);
       }
       finally {
         save = false;
+        saveUndo = false;
       }
     }
   }
 
   protected void OnGUI() {
+    if (Event.current.type == EventType.ValidateCommand) {
+      TextAsset ta = (TextAsset)AssetDatabase.LoadAssetAtPath(ProjectPath, typeof(TextAsset));
+
+      if (ta) {
+        Project = ta.bytes.ToObject<Project>();
+      }
+    }
+
     BoltEditorGUI.Tooltip = "";
 
     LoadProject();
@@ -74,20 +105,29 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void LoadProject() {
-    if (Project == null) {
-      Debug.Log("Loading project... " + ProjectPath);
+    if (File.Exists(ProjectPath) == false) {
+      Debug.Log("Creating project... " + ProjectPath);
 
-      if (File.Exists(ProjectPath) == false) {
-        InitNewProject();
+      Project = new Project();
+      Save();
+    }
+    else {
+      if (Project == null) {
+        Debug.Log("Loading project... " + ProjectPath);
+        Project = File.ReadAllBytes(ProjectPath).ToObject<Project>();
+        ProjectModifyTime = File.GetLastWriteTime(ProjectPath);
+
+        if (Project.Merged == false) {
+          Debug.Log("Merged Project... " + ProjectPath);
+
+          Project.Merged = true;
+          Project.RootFolder.Assets = Project.RootFolder.AssetsAll.ToArray();
+
+          Save(false);
+        }
       }
+      else {
 
-      Project = File.ReadAllBytes(ProjectPath).ToObject<Project>();
-
-      if (Project.Merged == false) {
-        Debug.Log("Merged Project... " + ProjectPath);
-        Project.Merged = true;
-        Project.RootFolder.Assets = Project.RootFolder.AssetsAll.ToArray();
-        Save();
       }
     }
   }
@@ -118,9 +158,5 @@ public abstract class BoltWindow : EditorWindow {
 
     // this also helps
     GUIUtility.keyboardControl = 0;
-  }
-
-  void InitNewProject() {
-    File.WriteAllBytes(ProjectPath, new Project().ToByteArray());
   }
 }

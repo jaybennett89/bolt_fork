@@ -1,64 +1,137 @@
 ﻿using System;
-using UnityEngine;
+using UE = UnityEngine;
 
-public static class BoltMath {
-    public static uint Bit (int shift) {
-        return 1u << shift;
+namespace Bolt {
+  [Documentation]
+  public static class Math {
+
+    internal static float InterpolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+      var f0 = frames.first;
+      var p0 = f0.Data.ReadF32(offset);
+
+      if ((frames.count == 1) || (f0.Number >= frame)) {
+        return p0;
+      }
+      else {
+        var f1 = frames.Next(f0);
+        var p1 = f1.Data.ReadF32(offset);
+
+        Assert.True(f1.Number > f0.Number);
+        Assert.True(f1.Number > frame);
+
+        float t = f1.Number - f0.Number;
+        float d = frame - f0.Number;
+
+        return UE.Mathf.Lerp(p0, p1, d / t);
+      }
     }
 
-    public static int SequenceDistance (byte from, byte to, int shift) {
-        to <<= shift;
-        from <<= shift;
-        return ((sbyte) (from - to)) >> shift;
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+      var f0 = frames.first;
+      var p0 = f0.Data.ReadVector3(offset);
+
+      if ((frames.count == 1) || (f0.Number >= frame)) {
+        return p0;
+      }
+      else {
+        var f1 = frames.Next(f0);
+        var p1 = f1.Data.ReadVector3(offset);
+
+        Assert.True(f1.Number > f0.Number);
+        Assert.True(f1.Number > frame);
+
+        float t = f1.Number - f0.Number;
+        float d = frame - f0.Number;
+
+        return UE.Vector3.Lerp(p0, p1, d / t);
+      }
     }
 
-    public static int SequenceDistance (uint from, uint to, int shift) {
-        from <<= shift;
-        to <<= shift;
-        return ((int) (from - to)) >> shift;
+    internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+      var f0 = frames.first;
+      var p0 = f0.Data.ReadQuaternion(offset);
+
+      if ((frames.count == 1) || (f0.Number >= frame)) {
+        return p0;
+      }
+      else {
+        var f1 = frames.Next(f0);
+        var p1 = f1.Data.ReadQuaternion(offset);
+
+        Assert.True(f1.Number > f0.Number);
+        Assert.True(f1.Number > frame);
+
+        float t = f1.Number - f0.Number;
+        float d = frame - f0.Number;
+
+        return UE.Quaternion.Lerp(p0, p1, d / t);
+      }
     }
 
-    public static bool IsSet (byte mask, byte flag) {
-        return (mask & flag) == flag;
+    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, float value) {
+      var f = frames.first;
+
+      var v0 = value;
+      var v1 = f.Data.ReadF32(offset);
+
+      float d = (frame + 1) - f.Number;
+      float t = d / System.Math.Max(2, correctFrames);
+
+      return v0 + ((v1 - v0) * t);
     }
 
-    public static int PopCount (uint value) {
-        int count = 0;
-
-        for (int i = 0; i < 32; ++i) {
-            if ((value & (1u << i)) != 0) {
-                count += 1;
-            }
-        }
-
-        return count;
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, int correctFrames, UE.Vector3 position) {
+      return ExtrapolateVector(frames, offset, frame, correctFrames, position, frames.first.Data.ReadVector3(velocityOffset));
     }
 
-    public static int PopCount (ulong value) {
-        int count = 0;
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, UE.Vector3 position, UE.Vector3 velocity) {
+      var f = frames.first;
 
-        for (int i = 0; i < 32; ++i) {
-            if ((value & (1UL << i)) != 0) {
-                count += 1;
-            }
-        }
+      UE.Vector3 p = f.Data.ReadVector3(offset);
+      UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
-        return count;
+      float d = (frame + 1) - f.Number;
+      float t = d / System.Math.Max(2, correctFrames);
+
+      return UE.Vector3.Lerp(position + v, p + (v * d), t);
     }
 
-    public static int Hibit (uint v) {
-        int bit = 0;
+    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, UE.Quaternion rotation) {
+      var f = frames.first;
+      var r0 = rotation;
+      var r1 = f.Data.ReadQuaternion(offset);
+      var df = r1 * UE.Quaternion.Inverse(r0);
 
-        while (v > 0) {
-            bit += 1;
-            v >>= 1;
-        }
+      float d = (frame + 1) - f.Number;
+      float t = d / System.Math.Max(2, correctFrames);
 
-        return bit;
+      float dAngle;
+      UE.Vector3 dAxis;
+
+      df.ToAngleAxis(out dAngle, out dAxis);
+
+      return UE.Quaternion.AngleAxis((dAngle * t) % 360f, dAxis) * r0;
     }
 
-    public static int BytesRequired (int bits) {
-        return (bits + 7) >> 3;
+    internal static int SequenceDistance(uint from, uint to, int shift) {
+      from <<= shift;
+      to <<= shift;
+      return ((int)(from - to)) >> shift;
+    }
+
+    public static int HighBit(uint v) {
+      int bit = 0;
+
+      while (v > 0) {
+        bit += 1;
+        v >>= 1;
+      }
+
+      return bit;
+    }
+
+    public static int BytesRequired(int bits) {
+      return (bits + 7) >> 3;
     }
 
     public static int BitsRequired(int number) {
@@ -80,4 +153,5 @@ public static class BoltMath {
 
       throw new Exception();
     }
+  }
 }

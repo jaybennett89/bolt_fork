@@ -7,17 +7,18 @@ using UdpKit;
 namespace Bolt {
   class PropertySerializerTrigger : PropertySerializerMecanim {
     int LocalOffset {
-      get { return StateData.ByteOffset + 8; }
+      get { return Settings.ByteOffset + 8; }
     }
 
     int SendOffset {
-      get { return StateData.ByteOffset; }
+      get { return Settings.ByteOffset; }
     }
 
-    public PropertySerializerTrigger(StatePropertyMetaData meta)
-      : base(meta) {
-      Assert.True(meta.ByteLength == 16);
-      meta.ByteLength = 8;
+    public new void AddSettings(PropertyStateSettings stateSettings) {
+      Assert.True(stateSettings.ByteLength == 16);
+
+      StateSettings = stateSettings;
+      StateSettings.ByteLength = 8;
     }
 
     public override object GetDebugValue(State state) {
@@ -57,7 +58,7 @@ namespace Bolt {
     }
 
     bool MecanimPushOrNone(State state, State.Frame f, bool push) {
-      var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
+      var cb = (System.Action)state.Frames.first.Objects[StateSettings.ObjectOffset];
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 
@@ -76,7 +77,7 @@ namespace Bolt {
 
           // apply to mecanim
           if (push) {
-            state.Animator.SetTrigger(StateData.PropertyName);
+            state.Animator.SetTrigger(Settings.PropertyName);
           }
 
           // perform callback
@@ -90,7 +91,7 @@ namespace Bolt {
     }
 
     bool InvokeForFrame(State state, State.Frame f) {
-      if (MecanimData.Enabled && state.Animator) {
+      if (MecanimSettings.Enabled && state.Animator) {
         if (ShouldPullDataFromMecanim(state)) {
           return MecanimPull(state, f);
         }
@@ -104,10 +105,10 @@ namespace Bolt {
     }
 
     bool MecanimPull(State state, State.Frame f) {
-      if ((state.Animator.GetBool(StateData.PropertyName) == true) && (state.Animator.IsInTransition(MecanimData.Layer) == false)) {
+      if ((state.Animator.GetBool(Settings.PropertyName) == true) && (state.Animator.IsInTransition(MecanimSettings.Layer) == false)) {
         state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
 
-        var cb = (System.Action)state.Frames.first.Objects[StateData.ObjectOffset];
+        var cb = (System.Action)state.Frames.first.Objects[StateSettings.ObjectOffset];
 
         if (cb != null) {
           cb();

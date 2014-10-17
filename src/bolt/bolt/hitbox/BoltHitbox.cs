@@ -149,7 +149,7 @@ public class BoltHitbox : MonoBehaviour {
       return false;
     }
 
-    distance = -b - (float) Math.Sqrt(disc);
+    distance = -b - (float) System.Math.Sqrt(disc);
 
     if (distance < 0f) {
       distance = 0f;

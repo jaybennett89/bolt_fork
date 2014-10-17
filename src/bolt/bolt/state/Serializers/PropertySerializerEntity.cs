@@ -5,23 +5,9 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  struct PropertySerializerEntityData {
-    public bool IsParent;
-  }
-
   class PropertySerializerEntity : PropertySerializerSimple {
-    PropertySerializerEntityData PropertyData;
-
-    public PropertySerializerEntity(StatePropertyMetaData meta) : base(meta) { }
-    public PropertySerializerEntity(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerEntity(CommandPropertyMetaData meta) : base(meta) { }
-
-    public void SetPropertyData(PropertySerializerEntityData propertyData) {
-      PropertyData = propertyData;
-    }
-
     public override object GetDebugValue(State state) {
-      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(state.Frames.first.Data, StateData.ByteOffset)));
+      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset)));
 
       if (entity) {
         return entity.ToString();

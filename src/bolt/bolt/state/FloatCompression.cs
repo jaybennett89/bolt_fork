@@ -5,7 +5,7 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
-  internal struct FloatCompression {
+  internal struct PropertyFloatCompressionSettings {
     public int Bits;
     public float Shift;
     public float PackMultiplier;

@@ -6,15 +6,11 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTrigger : PropertyCodeEmitter<PropertyDecoratorTrigger> {
-    public override CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
-      return null;
-    }
     public override void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => { });
     }
 
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      // trigger method
       type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => {
         method.Statements.Expr("Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset + 8);
       });
@@ -22,16 +18,6 @@ namespace Bolt.Compiler {
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
-    }
-
-    public override string[] EmitSetPropertyDataArgument() {
-      List<string> propertyData = new List<string>();
-
-      if (Decorator.DefiningAsset is StateDecorator) {
-        propertyData.Add(Decorator.Definition.StateAssetSettings.GetMecanimDataExpression());
-      }
-
-      return propertyData.ToArray();
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {

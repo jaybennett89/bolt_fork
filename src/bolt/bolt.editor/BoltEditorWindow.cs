@@ -359,10 +359,6 @@ public class BoltEditorWindow : BoltWindow {
         }
       }
 
-      if (p.PropertyType.HasSettings) {
-        PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
-      }
-
       if (p.PropertyType.MecanimApplicable && (def is StateDefinition)) {
         BoltEditorGUI.WithLabel("Mecanim", () => {
           EditorGUILayout.BeginHorizontal();
@@ -394,6 +390,10 @@ public class BoltEditorWindow : BoltWindow {
 
           EditorGUILayout.EndHorizontal();
         });
+      }
+
+      if (p.PropertyType.HasSettings) {
+        PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
       }
     }
 

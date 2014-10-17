@@ -2,16 +2,12 @@
 
 namespace Bolt {
   class PropertySerializerUniqueId : PropertySerializerSimple {
-    public PropertySerializerUniqueId(StatePropertyMetaData info) : base(info) { }
-    public PropertySerializerUniqueId(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerUniqueId(CommandPropertyMetaData meta) : base(meta) { }
-
     public override int StateBits(State state, State.Frame frame) {
       return 16 * 8;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadUniqueId(state.Frames.first.Data, StateData.ByteOffset);
+      return Blit.ReadUniqueId(state.Frames.first.Data, Settings.ByteOffset);
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

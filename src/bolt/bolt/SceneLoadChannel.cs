@@ -20,7 +20,7 @@ namespace Bolt {
       }
       else {
         connection._remoteSceneLoading.Scene = scene;
-        connection._remoteSceneLoading.State = Math.Max(connection._remoteSceneLoading.State, s.ReadInt(32));
+        connection._remoteSceneLoading.State = System.Math.Max(connection._remoteSceneLoading.State, s.ReadInt(32));
       }
 
       if (BoltCore.isClient) {

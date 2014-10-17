@@ -7,45 +7,45 @@ using UE = UnityEngine;
 
 namespace Bolt {
 
-  struct CommandPropertyMetaData {
+  internal struct PropertySettings {
     public int ByteOffset;
     public String PropertyName;
+
+    public PropertySettings(int offset, string name) {
+      ByteOffset = offset;
+      PropertyName = name;
+    }
   }
 
-  struct EventPropertyMetaData {
-    public int ByteOffset;
-    public String PropertyName;
-  }
-
-  struct StatePropertyMetaData {
-    public int ByteOffset;
-    public int ByteLength;
-
+  internal struct PropertyStateSettings {
     public int Priority;
+    public int ByteLength;
     public int ObjectOffset;
 
-    public String PropertyName;
     public String PropertyPath;
     public String[] CallbackPaths;
     public ArrayIndices CallbackIndices;
+
+    public PropertyStateSettings(int priority, int byteLength, int objectOffset, string propertyPath, string[] callbackPaths, ArrayIndices callbackIndices) {
+      Priority = UE.Mathf.Max(1, priority);
+      ByteLength = byteLength;
+      ObjectOffset = objectOffset;
+      PropertyPath = propertyPath;
+      CallbackPaths = callbackPaths;
+      CallbackIndices = callbackIndices;
+    }
   }
 
   abstract class PropertySerializer {
-    public readonly EventPropertyMetaData EventData;
-    public readonly StatePropertyMetaData StateData;
-    public readonly CommandPropertyMetaData CommandData;
+    public PropertySettings Settings;
+    public PropertyStateSettings StateSettings;
 
-    protected PropertySerializer(StatePropertyMetaData stateData) {
-      StateData = stateData;
-      StateData.Priority = UE.Mathf.Max(1, StateData.Priority);
+    public void AddSettings(PropertySettings settings) {
+      Settings = settings;
     }
 
-    protected PropertySerializer(EventPropertyMetaData eventData) {
-      EventData = eventData;
-    }
-
-    protected PropertySerializer(CommandPropertyMetaData commandData) {
-      CommandData = commandData;
+    public void AddSettings(PropertyStateSettings stateSettings) {
+      StateSettings = stateSettings;
     }
 
     public virtual object GetDebugValue(State state) { return null; }
@@ -71,32 +71,28 @@ namespace Bolt {
   }
 
   abstract class PropertySerializerSimple : PropertySerializer {
-    public PropertySerializerSimple(StatePropertyMetaData info) : base(info) { }
-    public PropertySerializerSimple(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerSimple(CommandPropertyMetaData meta) : base(meta) { }
-
     public override bool EventPack(Event data, BoltConnection connection, UdpStream stream) {
-      return Pack(data.Data, EventData.ByteOffset, connection, stream);
+      return Pack(data.Data, Settings.ByteOffset, connection, stream);
     }
 
     public override void EventRead(Event data, BoltConnection connection, UdpStream stream) {
-      Read(data.Data, EventData.ByteOffset, connection, stream);
+      Read(data.Data, Settings.ByteOffset, connection, stream);
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
-      return Pack(frame.Data, StateData.ByteOffset, connection, stream);
+      return Pack(frame.Data, Settings.ByteOffset, connection, stream);
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
-      Read(frame.Data, StateData.ByteOffset, connection, stream);
+      Read(frame.Data, Settings.ByteOffset, connection, stream);
     }
 
     public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
-      Pack(data, CommandData.ByteOffset, connection, stream);
+      Pack(data, Settings.ByteOffset, connection, stream);
     }
 
     public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
-      Read(data, CommandData.ByteOffset, connection, stream);
+      Read(data, Settings.ByteOffset, connection, stream);
     }
 
     protected virtual bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
@@ -104,23 +100,19 @@ namespace Bolt {
   }
 
   abstract class PropertySerializerMecanim : PropertySerializerSimple {
-    protected PropertyMecanimData MecanimData;
+    protected PropertyMecanimSettings MecanimSettings;
 
     protected bool ShouldPullDataFromMecanim(State state) {
-      return MecanimData.Direction == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl);
+      return MecanimSettings.Direction == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl);
     }
 
-    public PropertySerializerMecanim(StatePropertyMetaData meta) : base(meta) { }
-    public PropertySerializerMecanim(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerMecanim(CommandPropertyMetaData meta) : base(meta) { }
-
-    public void SetPropertyData(PropertyMecanimData mecanimData) {
-      MecanimData = mecanimData;
+    public void AddSettings(PropertyMecanimSettings mecanimSettings) {
+      MecanimSettings = mecanimSettings;
     }
 
     public override void OnSimulateAfter(State state) {
-      if (MecanimData.Enabled && state.Animator) {
-        if (MecanimData.Mode == MecanimMode.LayerWeight) {
+      if (MecanimSettings.Enabled && state.Animator) {
+        if (MecanimSettings.Mode == MecanimMode.LayerWeight) {
           if (ShouldPullDataFromMecanim(state)) {
             PullMecanimLayer(state);
           }
@@ -143,11 +135,11 @@ namespace Bolt {
     protected virtual void PushMecanimValue(State state) { }
 
     void PullMecanimLayer(State state) {
-      state.Frames.first.Data.PackF32(StateData.ByteOffset, state.Animator.GetLayerWeight(MecanimData.Layer));
+      state.Frames.first.Data.PackF32(Settings.ByteOffset, state.Animator.GetLayerWeight(MecanimSettings.Layer));
     }
 
     void PushMecanimLayer(State state) {
-      state.Animator.SetLayerWeight(MecanimData.Layer, state.Frames.first.Data.ReadF32(StateData.ByteOffset));
+      state.Animator.SetLayerWeight(MecanimSettings.Layer, state.Frames.first.Data.ReadF32(Settings.ByteOffset));
     }
   }
 }
