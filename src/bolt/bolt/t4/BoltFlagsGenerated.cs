@@ -3,6 +3,7 @@
 namespace Bolt {
 
 
+[Documentation]
 public struct EntityFlags {
     public static readonly EntityFlags ZERO = new EntityFlags(0);
     public static readonly EntityFlags HAS_CONTROL = new EntityFlags(1);
@@ -97,6 +98,7 @@ public struct EntityFlags {
   }
 
 
+[Documentation]
 public struct InstantiateFlags {
     public static readonly InstantiateFlags ZERO = new InstantiateFlags(0);
     public static readonly InstantiateFlags TAKE_CONTROL = new InstantiateFlags(1);
@@ -179,6 +181,7 @@ public struct InstantiateFlags {
   }
 
 
+[Documentation]
 public struct ProxyFlags {
     public static readonly ProxyFlags ZERO = new ProxyFlags(0);
     public static readonly ProxyFlags CREATE_REQUESTED = new ProxyFlags(1);
@@ -281,6 +284,7 @@ public struct ProxyFlags {
   }
 
 
+[Documentation]
 public struct CommandFlags {
     public static readonly CommandFlags ZERO = new CommandFlags(0);
     public static readonly CommandFlags HAS_EXECUTED = new CommandFlags(1);

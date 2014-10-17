@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sceneId: 
-  _defaultSerializerGuid: 104a5b68b419b94ba2d6f358b23e1fca
+  _defaultSerializerGuid: 9a445790399b744ca4679798e650ff20
   _prefabId: 0
   _updateRate: 1
   _defaultSerializerTypeId: 0

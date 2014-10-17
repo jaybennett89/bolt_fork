@@ -65,8 +65,14 @@ namespace Bolt.Compiler {
         ctor.Statements.Expr("_meta.PropertySerializers = new Bolt.PropertySerializer[{0}]", Decorator.Properties.Count);
 
         for (int i = 0; i < Decorator.Properties.Count; ++i) {
-          CodeExpression expr = PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitEventPropertyInitializer();
-          ctor.Statements.Assign("_meta.PropertySerializers[{0}]".Expr(i), expr);
+          PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.Properties[i]);
+          CodeExpression expression = "_meta.PropertySerializers[{0}]".Expr(i);
+
+          // create new 
+          ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
+
+          // amit add settings calls
+          emitter.EmitAddSettings(expression, ctor.Statements, null);
         }
       });
 
@@ -86,8 +92,8 @@ namespace Bolt.Compiler {
 
         string name = Decorator.Definition.Name;
         string properties = Decorator.Properties.Select((p, i) => " " + p.Definition.Name + "={{" + i + "}}").Join("");
-        string arguments = Decorator.Properties.Select((p, i) => "this." + p.Definition.Name).Join(", ");
-        method.Statements.Expr("return System.String.Format(\"[" + name + properties + "]\", " + arguments + ")");
+        string arguments = Decorator.Properties.Select((p, i) => ", this." + p.Definition.Name).Join("");
+        method.Statements.Expr("return System.String.Format(\"[" + name + properties + "]\"" + arguments + ")");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {

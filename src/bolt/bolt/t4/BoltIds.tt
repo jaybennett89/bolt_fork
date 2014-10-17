@@ -7,6 +7,7 @@
 <# foreach(string id in new string[]{ "NetId", "InstanceId", "PrefabId", "TypeId" }) { #>
 
 namespace Bolt {
+[Documentation]
   public struct <#=id#> {
     public class Comparer : IComparer<<#=id#>> {
       public static readonly Comparer Instance = new Comparer();

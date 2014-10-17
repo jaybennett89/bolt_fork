@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  struct PropertyMecanimData {
+  struct PropertyMecanimSettings {
     public MecanimMode Mode;
     public MecanimDirection Direction;
     public int Layer;
@@ -14,7 +14,7 @@ namespace Bolt {
       get { return Mode != MecanimMode.Disabled; }
     }
 
-    public PropertyMecanimData(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
+    public PropertyMecanimSettings(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
       Mode = mode;
       Direction = direction;
       Damping = damping;

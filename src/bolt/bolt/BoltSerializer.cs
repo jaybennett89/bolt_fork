@@ -5,7 +5,7 @@ class BoltSerializer : UdpSerializer<BoltPacket> {
     Assert.False(input.pooled);
 
     int writeOffset = 0;
-    int writeLength = BoltMath.BytesRequired(input.stream.Position);
+    int writeLength = Bolt.Math.BytesRequired(input.stream.Position);
 
     // we always send the entire thing
     sent = input;
@@ -18,8 +18,8 @@ class BoltSerializer : UdpSerializer<BoltPacket> {
   }
 
   public override bool Unpack (UdpStream stream, out BoltPacket received) {
-    int readOffset = BoltMath.BytesRequired(stream.Position);
-    int readLength = BoltMath.BytesRequired(stream.Size - stream.Position);
+    int readOffset = Bolt.Math.BytesRequired(stream.Position);
+    int readLength = Bolt.Math.BytesRequired(stream.Size - stream.Position);
 
     // allocate a new packet and stream and copy data
     received = BoltPacketPool.Acquire();

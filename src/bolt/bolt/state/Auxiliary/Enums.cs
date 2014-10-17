@@ -10,6 +10,38 @@ namespace Bolt.Compiler {
 namespace Bolt {
 #endif
 
+  
+#if BOLT_COMPILER_DLL
+  [ProtoContract(EnumPassthru = true)]
+  public
+#else
+  internal
+#endif 
+  enum AxisSelections {
+    XYZ = X | Y | Z,
+    XY = X | Y,
+    XZ = X | Z,
+    YZ = Y | Z,
+    X = 1 << 1,
+    Y = 1 << 2,
+    Z = 1 << 3,
+    Disabled = 0,
+  }
+
+
+#if BOLT_COMPILER_DLL
+  [ProtoContract(EnumPassthru = true)]
+  public
+#else
+  internal
+#endif
+ enum ExtrapolationVelocityModes {
+    CalculateFromPosition = 0,
+    CopyFromRigidbody = 1,
+    CopyFromRigidbody2D = 2,
+    CopyFromCharacterController = 3
+  }
+
 #if BOLT_COMPILER_DLL
   [ProtoContract(EnumPassthru = true)]
   public
@@ -17,8 +49,9 @@ namespace Bolt {
   internal
 #endif
  enum SmoothingAlgorithms {
-    InterpolatedSnapshots = 0,
-    DeadReckoning = 1,
+    None = 0,
+    Interpolation = 1,
+    Extrapolation = 2,
   }
 
 #if BOLT_COMPILER_DLL

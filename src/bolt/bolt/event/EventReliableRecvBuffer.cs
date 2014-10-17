@@ -52,7 +52,7 @@ namespace Bolt {
     }
 
     public RecvBufferAddResult TryEnqueue(EventReliable value) {
-      int distance = BoltMath.SequenceDistance(value.Sequence, sequenceNext, sequenceShift);
+      int distance = Bolt.Math.SequenceDistance(value.Sequence, sequenceNext, sequenceShift);
       int index = (tail + distance) & mask;
 
       if (distance <= -nodes.Length || distance >= nodes.Length) {

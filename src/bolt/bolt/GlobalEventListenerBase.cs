@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using Bolt;
+using UnityEngine;
 
 
 namespace BoltInternal {
   /// <summary>
   /// Base class for all BoltCallbacks objects
   /// </summary>
+  [DocumentationAttribute(Alias = "Bolt.GlobalEventListener")]
   public abstract partial class GlobalEventListenerBase : MonoBehaviour, IBoltListNode {
     static readonly BoltDoubleList<GlobalEventListenerBase> callbacks = new BoltDoubleList<GlobalEventListenerBase>();
 
@@ -22,6 +24,10 @@ namespace BoltInternal {
       callbacks.Remove(this);
     }
 
+    /// <summary>
+    /// Override this method and return true if you want the event listener to keep being attached to Bolt even when bBolt shuts down and starts again.
+    /// </summary>
+    /// <returns>True/False</returns>
     public virtual bool PersistBetweenStartupAndShutdown() {
       return false;
     }

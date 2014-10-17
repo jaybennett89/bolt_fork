@@ -17,7 +17,7 @@ partial class BoltCompiler {
     }
 
     // grab asset
-    BoltRuntimeSettings table = BoltEditorUtils.GetSingletonAsset<BoltRuntimeSettings>();
+    BoltRuntimeSettings table = BoltRuntimeSettings.instance;
 
     // update asset
     table._prefabs = prefabsArray;

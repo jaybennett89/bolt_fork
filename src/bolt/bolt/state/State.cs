@@ -8,13 +8,43 @@ namespace Bolt {
   public delegate void PropertyCallback(IState state, string propertyPath, ArrayIndices arrayIndices);
   public delegate void PropertyCallbackSimple();
 
+  /// <summary>
+  /// Base interface for all states
+  /// </summary>
+  [Documentation]
   public interface IState {
+    /// <summary>
+    /// Set the animator object this state should use for reading/writing mecanim parameters
+    /// </summary>
+    /// <param name="animator">The animator object to use</param>
     void SetAnimator(UE.Animator animator);
 
+    /// <summary>
+    /// Allows you to hook up a callback to a specific property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate</param>
     void AddCallback(string path, PropertyCallback callback);
+
+    /// <summary>
+    /// Allows you to hook up a callback to a specific property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate</param>
     void AddCallback(string path, PropertyCallbackSimple callback);
 
+    /// <summary>
+    /// Removes a callback from a property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate to remove</param>
     void RemoveCallback(string path, PropertyCallback callback);
+
+    /// <summary>
+    /// Removes a callback from a property
+    /// </summary>
+    /// <param name="path">The path of the property</param>
+    /// <param name="callback">The callback delegate to remove</param>
     void RemoveCallback(string path, PropertyCallbackSimple callback);
   }
 
@@ -101,7 +131,7 @@ namespace Bolt {
     }
 
     protected State(StateMetaData meta) {
-      meta.PacketMaxProperties = Math.Max(Math.Min(meta.PacketMaxProperties, 255), 1);
+      meta.PacketMaxProperties = System.Math.Max(System.Math.Min(meta.PacketMaxProperties, 255), 1);
 
       MetaData = meta;
       DiffFrame = AllocFrame(-1);
@@ -113,7 +143,7 @@ namespace Bolt {
 
       PropertyIdBits = 16; //BoltMath.BitsRequired(MetaData.PropertyCount - 1);
       PropertyObjects = new object[MetaData.ObjectCount];
-      PacketMaxPropertiesBits = BoltMath.BitsRequired(MetaData.PacketMaxProperties);
+      PacketMaxPropertiesBits = Bolt.Math.BitsRequired(MetaData.PacketMaxProperties);
     }
 
     public void DebugInfo() {
@@ -123,7 +153,7 @@ namespace Bolt {
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
         for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-          string label = MetaData.PropertySerializers[i].StateData.PropertyPath.TrimStart('.');
+          string label = MetaData.PropertySerializers[i].StateSettings.PropertyPath;
           object value = MetaData.PropertySerializers[i].GetDebugValue(this);
 
           BoltNetworkInternal.DebugDrawer.Indent(label.Count(c => c == '.' || c == '['));
@@ -298,20 +328,20 @@ namespace Bolt {
     }
 
     void InvokeCallbacksForProperty(PropertySerializer p) {
-      for (int i = 0; i < p.StateData.CallbackPaths.Length; ++i) {
+      for (int i = 0; i < p.StateSettings.CallbackPaths.Length; ++i) {
         {
           List<PropertyCallback> callbacksList;
 
-          if (Callbacks.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
+          if (Callbacks.TryGetValue(p.StateSettings.CallbackPaths[i], out callbacksList)) {
             for (int n = 0; n < callbacksList.Count; ++n) {
-              callbacksList[n](this, p.StateData.PropertyPath, p.StateData.CallbackIndices);
+              callbacksList[n](this, p.StateSettings.PropertyPath, p.StateSettings.CallbackIndices);
             }
           }
         }
         {
           List<PropertyCallbackSimple> callbacksList;
 
-          if (CallbacksSimple.TryGetValue(p.StateData.CallbackPaths[i], out callbacksList)) {
+          if (CallbacksSimple.TryGetValue(p.StateSettings.CallbackPaths[i], out callbacksList)) {
             for (int n = 0; n < callbacksList.Count; ++n) {
               callbacksList[n]();
             }
@@ -335,7 +365,7 @@ namespace Bolt {
         if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
 
           // increment priority for this property
-          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].StateData.Priority;
+          proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].StateSettings.Priority;
 
           // copy to our temp array
           tempPriority[tempCount] = proxyPriority[i];
@@ -371,7 +401,7 @@ namespace Bolt {
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
       // how many bits can we write at the most
-      int bits = Math.Min(MetaData.PacketMaxBits, stream.Size - stream.Position);
+      int bits = System.Math.Min(MetaData.PacketMaxBits, stream.Size - stream.Position);
 
       for (int i = 0; i < priorityCount; ++i) {
 
@@ -473,7 +503,7 @@ namespace Bolt {
       for (int i = 0; i < L; ++i) {
         PropertySerializer s = MetaData.PropertySerializers[i];
 
-        if (Blit.Diff(a.Data, b.Data, s.StateData.ByteOffset, s.StateData.ByteLength)) {
+        if (Blit.Diff(a.Data, b.Data, s.Settings.ByteOffset, s.StateSettings.ByteLength)) {
           DiffMask.Set(i);
         }
       }

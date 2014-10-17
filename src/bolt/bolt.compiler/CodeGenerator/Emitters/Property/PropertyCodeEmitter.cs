@@ -13,44 +13,15 @@ namespace Bolt.Compiler {
     }
 
     public virtual string SerializerClassName {
-      get { return "PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
+      get { return "Bolt.PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
-    public CodeExpression EmitStatePropertyInitializer(StateProperty p) {
-      return (@"new Bolt." + SerializerClassName + @"(new Bolt.StatePropertyMetaData {{ ByteOffset = {0}, ByteLength = {1}, ObjectOffset = {2}, Priority = {3}, PropertyPath = ""{4}"", CallbackPaths = {5}, CallbackIndices = {6}, PropertyName = ""{7}"" }})").Expr(
-        p.OffsetBytes, // {0}
-        Decorator.ByteSize, // {1}
-        p.OffsetObjects, // {2}
-        Decorator.Definition.Priority, // {3}
-        p.PropertyPath, // {4}
-        p.CallbackPathsExpression(), // {5}
-        p.CreateIndicesExpr(), // {6}
-        Decorator.Definition.Name // {7} 
-      );
+    public CodeExpression GetCreateSerializerExpression() {
+      return "new {0}()".Expr(SerializerClassName);
     }
 
-    public virtual string[] EmitSetPropertyDataArgument() {
-      return null;
-    }
+    public virtual void GetAddSettingsArgument(List<string> settings) {
 
-    public CodeExpression EmitCommandPropertyInitializer() {
-      return (@"new Bolt.{0}(new Bolt.CommandPropertyMetaData {{ ByteOffset = {1}, PropertyName = ""{2}"" }})").Expr(
-        SerializerClassName,
-        Decorator.ByteOffset,
-        Decorator.Definition.Name
-      );
-    }
-
-    public CodeExpression EmitEventPropertyInitializer() {
-      return (@"new Bolt.{0}(new Bolt.EventPropertyMetaData {{ ByteOffset = {1}, PropertyName = ""{2}"" }})").Expr(
-        SerializerClassName,
-        Decorator.ByteOffset,
-        Decorator.Definition.Name
-      );
-    }
-
-    public virtual CodeExpression EmitCustomSerializerInitilization(CodeExpression expression) {
-      return null;
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
@@ -79,6 +50,45 @@ namespace Bolt.Compiler {
 
     public virtual void EmitEventMembers(CodeTypeDeclaration type) {
       throw new NotImplementedException();
+    }
+
+    public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, StateProperty sp) {
+      List<string> settings = new List<string>();
+
+      // property settings 
+      if ((Decorator.DefiningAsset is StateDecorator) || (Decorator.DefiningAsset is StructDecorator)) {
+        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", sp.OffsetBytes, Decorator.Definition.Name));
+        settings.Add(string.Format("new Bolt.PropertyStateSettings({0}, {1}, {2}, \"{3}\", {4}, {5})",
+          Decorator.Definition.Priority,
+          Decorator.ByteSize,
+          sp.OffsetObjects,
+          sp.PropertyPath,
+          sp.CallbackPathsExpression(),
+          sp.CallbackIndicesExpression()
+        ));
+      }
+      else {
+        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", Decorator.ByteOffset, Decorator.Definition.Name));
+      }
+
+      // mecanim for states settings
+      if ((Decorator.DefiningAsset is StateDecorator) && Decorator.Definition.PropertyType.MecanimApplicable) {
+        var s = Decorator.Definition.StateAssetSettings;
+
+        settings.Add(string.Format("new Bolt.PropertyMecanimSettings(Bolt.MecanimMode.{0}, Bolt.MecanimDirection.{1}, {2}f, {3})",
+          s.MecanimMode,
+          s.MecanimDirection,
+          s.MecanimDamping,
+          s.MecanimLayer
+        ));
+      }
+
+      // collecting property specific settings
+      GetAddSettingsArgument(settings);
+
+      for (int n = 0; n < settings.Count; ++n) {
+        statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));
+      }
     }
 
     public void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {

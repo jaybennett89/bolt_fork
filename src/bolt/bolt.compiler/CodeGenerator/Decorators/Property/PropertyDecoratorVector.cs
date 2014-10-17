@@ -7,15 +7,7 @@ namespace Bolt.Compiler {
   class PropertyDecoratorVector : PropertyDecorator<PropertyTypeVector> {
     public override string ClrType {
       get {
-        if (PropertyType[VectorComponents.W].Enabled) {
-          return "UE.Vector4";
-        }
-
-        if (PropertyType[VectorComponents.Z].Enabled) {
-          return "UE.Vector3";
-        }
-
-        return "UE.Vector2";
+        return "UE.Vector3";
       }
     }
 

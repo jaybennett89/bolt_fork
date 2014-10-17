@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Represents an array of entities on a state
+/// </summary>
+[Documentation]
 public struct EntityArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -16,6 +21,9 @@ public struct EntityArray {
     this.length = length;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return length;
@@ -39,11 +47,19 @@ public struct EntityArray {
     }
   }
 
+  /// <summary>
+  /// Creates aa modifier object for this array
+  /// </summary>
+  /// <returns>The modifier object</returns>
   public EntityArrayModifier Modify() {
     return new EntityArrayModifier(this);
   }
 }
 
+/// <summary>
+/// Object which allows you to modify an entity array
+/// </summary>
+[Documentation]
 public class EntityArrayModifier : IDisposable {
   EntityArray array;
 
@@ -51,6 +67,9 @@ public class EntityArrayModifier : IDisposable {
     this.array = array;
   }
 
+  /// <summary>
+  /// How many entities are available in this array
+  /// </summary>
   public int Length {
     get {
       return array.length;

@@ -15,6 +15,13 @@ namespace Bolt.Compiler {
     [ProtoMember(3)]
     public bool Merged;
 
+    [ProtoMember(4)]
+    public string ActiveGroup;
+
+    public IEnumerable<string> Groups {
+      get { return RootFolder.Assets.SelectMany(x => x.Groups).Distinct(); }
+    }
+
     public IEnumerable<FilterDefinition> EnabledFilters {
       get { return Filters.Where(x => x.Enabled); }
     }

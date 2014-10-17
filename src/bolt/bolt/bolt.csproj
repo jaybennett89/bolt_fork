@@ -36,9 +36,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
@@ -59,6 +56,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="DocumentationAttribute.cs" />
     <Compile Include="GlobalEventListenerBase.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
@@ -72,7 +70,6 @@
     <Compile Include="event\EventChannel.cs" />
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
-    <Compile Include="event\EventInterfaces.cs" />
     <Compile Include="event\EventReliableRecvBuffer.cs" />
     <Compile Include="event\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
@@ -80,10 +77,9 @@
     <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state\Arrays\EntityArray.cs" />
     <Compile Include="state\Arrays\FloatArray.cs" />
-    <Compile Include="state\Arrays\IntegetArray.cs" />
+    <Compile Include="state\Arrays\IntegerArray.cs" />
     <Compile Include="state\Arrays\TransformArray.cs" />
     <Compile Include="state\Auxiliary\Enums.cs" />
-    <Compile Include="state\Axis.cs" />
     <Compile Include="state\BitArray.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />

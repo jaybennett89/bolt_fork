@@ -6,24 +6,20 @@ using UdpKit;
 
 namespace Bolt {
   class PropertySerializerBool : PropertySerializerMecanim {
-    public PropertySerializerBool(StatePropertyMetaData info) : base(info) { }
-    public PropertySerializerBool(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerBool(CommandPropertyMetaData meta) : base(meta) { }
-
     public override int StateBits(State state, State.Frame frame) {
       return 1;
     }
 
     public override object GetDebugValue(State state) {
-      return state.Frames.first.Data.ReadBool(StateData.ByteOffset);
+      return state.Frames.first.Data.ReadBool(Settings.ByteOffset);
     }
 
     protected override void PullMecanimValue(State state) {
-      state.Frames.first.Data.PackBool(StateData.ByteOffset, state.Animator.GetBool(StateData.PropertyName));
+      state.Frames.first.Data.PackBool(Settings.ByteOffset, state.Animator.GetBool(Settings.PropertyName));
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetBool(StateData.PropertyName, state.Frames.first.Data.ReadBool(StateData.ByteOffset));
+      state.Animator.SetBool(Settings.PropertyName, state.Frames.first.Data.ReadBool(Settings.ByteOffset));
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

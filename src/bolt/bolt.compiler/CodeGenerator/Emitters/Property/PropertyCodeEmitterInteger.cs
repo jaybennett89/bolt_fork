@@ -13,14 +13,5 @@ namespace Bolt.Compiler {
     public override string PackMethod {
       get { return "PackI32"; }
     }
-    public override string[] EmitSetPropertyDataArgument() {
-      List<string> propertyData = new List<string>();
-
-      if (Decorator.DefiningAsset is StateDecorator) {
-        propertyData.Add(Decorator.Definition.StateAssetSettings.GetMecanimDataExpression());
-      }
-
-      return propertyData.ToArray();
-    }
   }
 }

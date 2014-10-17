@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Represents an array of transforms on a state
+/// </summary>
+[Documentation]
 public struct TransformArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -16,6 +21,9 @@ public struct TransformArray {
     this.length = length;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return length;

@@ -2,16 +2,12 @@
 
 namespace Bolt {
   class PropertySerializerPrefabId : PropertySerializerSimple {
-    public PropertySerializerPrefabId(StatePropertyMetaData info) : base(info) { }
-    public PropertySerializerPrefabId(EventPropertyMetaData meta) : base(meta) { }
-    public PropertySerializerPrefabId(CommandPropertyMetaData meta) : base(meta) { }
-
     public override int StateBits(State state, State.Frame frame) {
       return 32;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadPrefabId(state.Frames.first.Data, StateData.ByteOffset);
+      return Blit.ReadPrefabId(state.Frames.first.Data, Settings.ByteOffset);
     }
 
     protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {

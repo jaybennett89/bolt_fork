@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
+  /// <summary>
+  /// Contains the indices for all arrays that contain a specific property, in order
+  /// </summary>
   public struct ArrayIndices {
     readonly int[] indices;
 
@@ -11,6 +14,9 @@ namespace Bolt {
       this.indices = indices;
     }
 
+    /// <summary>
+    /// The amount of indices
+    /// </summary>
     public int Length {
       get { return (indices == null) ? 0 : indices.Length; }
     }

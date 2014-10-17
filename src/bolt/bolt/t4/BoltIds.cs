@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Bolt {
+[Documentation]
   public struct NetId {
     public class Comparer : IComparer<NetId> {
       public static readonly Comparer Instance = new Comparer();
@@ -79,6 +80,7 @@ namespace Bolt {
 }
 
 namespace Bolt {
+[Documentation]
   public struct InstanceId {
     public class Comparer : IComparer<InstanceId> {
       public static readonly Comparer Instance = new Comparer();
@@ -157,6 +159,7 @@ namespace Bolt {
 }
 
 namespace Bolt {
+[Documentation]
   public struct PrefabId {
     public class Comparer : IComparer<PrefabId> {
       public static readonly Comparer Instance = new Comparer();
@@ -235,6 +238,7 @@ namespace Bolt {
 }
 
 namespace Bolt {
+[Documentation]
   public struct TypeId {
     public class Comparer : IComparer<TypeId> {
       public static readonly Comparer Instance = new Comparer();

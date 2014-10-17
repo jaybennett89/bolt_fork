@@ -21,6 +21,71 @@ public static class BoltEditorGUI {
     typeof(EditorWindow).GetField("m_CachedTitleContent", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(editor, new GUIContent(title, icon));
   }
 
+  public static bool DeleteDialog() {
+    return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
+  }
+
+  public static AxisSelections EditAxisSelection(AxisSelections value) {
+    return EditAxisSelection(null, value);
+  }
+
+  public static AxisSelections EditAxisSelection(string prefix, AxisSelections value) {
+    var values = Enum.GetValues(typeof(AxisSelections)).Cast<AxisSelections>().ToArray();
+    var names = values.Select(x => x.ToString());
+    AxisSelections selection = values[EditorGUILayout.Popup(Array.IndexOf(values, value), names.Select(x => (prefix ?? "") + x).ToArray())];
+
+    if (prefix == null && selection == AxisSelections.Disabled) {
+      Debug.LogError("Can't disable axis selection on standalone properties");
+      selection = AxisSelections.XYZ;
+    }
+
+    return selection;
+  }
+
+  public static void EditAxes(FloatCompression[] compression, AxisSelections selection) {
+    EditorGUILayout.BeginVertical();
+    compression[Axis.X] = ExitAxis(compression[Axis.X], "X", (selection & AxisSelections.X) == AxisSelections.X);
+    compression[Axis.Y] = ExitAxis(compression[Axis.Y], "Y", (selection & AxisSelections.Y) == AxisSelections.Y);
+    compression[Axis.Z] = ExitAxis(compression[Axis.Z], "Z", (selection & AxisSelections.Z) == AxisSelections.Z);
+    EditorGUILayout.EndVertical();
+  }
+
+  static FloatCompression ExitAxis(FloatCompression compression, string label, bool enabled) {
+    if (enabled) {
+      EditorGUILayout.BeginHorizontal();
+      GUILayout.Label(label, GUILayout.Width(15));
+      compression = BoltEditorGUI.EditFloatCompression(compression);
+      EditorGUILayout.EndHorizontal();
+    }
+
+    return compression;
+  }
+
+  public static void EditSmoothingAlgorithm(AssetDefinition adef, PropertyDefinition pdef) {
+    if (adef is StateDefinition) {
+      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+        pdef.StateAssetSettings.SmoothingAlgorithm = (SmoothingAlgorithms)EditorGUILayout.EnumPopup(pdef.StateAssetSettings.SmoothingAlgorithm);
+      });
+
+      if (pdef.StateAssetSettings.SmoothingAlgorithm == SmoothingAlgorithms.Extrapolation) {
+
+        if (pdef.PropertyType is PropertyTypeTransform) {
+          PropertyTypeTransform transform = (PropertyTypeTransform)pdef.PropertyType;
+
+          BoltEditorGUI.WithLabel("Extrapolation Velocity", () => {
+            transform.ExtrapolationVelocityMode = (ExtrapolationVelocityModes)EditorGUILayout.EnumPopup(transform.ExtrapolationVelocityMode);
+          });
+        }
+
+        BoltEditorGUI.WithLabel("Extrapolation Settings", () => {
+          pdef.StateAssetSettings.ExtrapolationMaxFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationMaxFrames, "Max Frames");
+          pdef.StateAssetSettings.ExtrapolationCorrectionFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationCorrectionFrames, "Correction Frames");
+          pdef.StateAssetSettings.ExtrapolationErrorTolerance = FloatFieldOverlay(pdef.StateAssetSettings.ExtrapolationErrorTolerance, "Error Tolerance");
+        });
+      }
+    }
+  }
+
   public static void SetTooltip(string tooltip) {
     Rect r = GUILayoutUtility.GetLastRect();
 
@@ -222,7 +287,7 @@ public static class BoltEditorGUI {
     return s;
   }
 
-  static bool IconButton(string icon, Color color) {
+  public static bool IconButton(string icon, Color color) {
     GUIStyle style;
     style = new GUIStyle(GUIStyle.none);
     style.padding = new RectOffset();
@@ -279,6 +344,10 @@ public static class BoltEditorGUI {
     GUILayout.Label(text, s);
 
     EditorGUILayout.EndHorizontal();
+  }
+
+  public static void Header(string text, string icon) {
+    HeaderButton(text, icon, () => { });
   }
 
   public static void HeaderButton(string text, string icon, Action clicked) {
@@ -424,33 +493,19 @@ public static class BoltEditorGUI {
     gui();
     EditorGUI.EndDisabledGroup();
   }
-  public static FloatCompression EditFloatCompression(FloatCompression c, bool vertical) {
+
+  public static FloatCompression EditFloatCompression(FloatCompression c) {
     if (c == null) {
       c = FloatCompression.Default();
     }
 
-    string bits = string.Format("Bits: {0}", c.Enabled ? c.BitsRequired : 32);
+    c.Enabled = BoltEditorGUI.Toggle(c.Enabled);
 
-    if (vertical) {
-      EditorGUILayout.BeginVertical();
-    }
-    else {
-      EditorGUILayout.BeginHorizontal();
-      GUILayout.Label(bits, GUILayout.Width(50));
-    }
-
+    EditorGUI.BeginDisabledGroup(!c.Enabled);
     c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
     c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
     c.Accuracy = Mathf.Max(FloatFieldOverlay(c.Accuracy, "Accuracy"), 0.001f);
-
-
-    if (vertical) {
-      GUILayout.Label(bits, GUILayout.Width(50));
-      EditorGUILayout.EndVertical();
-    }
-    else {
-      EditorGUILayout.EndHorizontal();
-    }
+    EditorGUI.EndDisabledGroup();
 
     return c;
   }

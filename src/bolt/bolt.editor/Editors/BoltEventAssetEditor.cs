@@ -15,7 +15,7 @@ public class BoltEventAssetEditor : Editor {
     BoltEventAsset asset = (BoltEventAsset) target;
 
     // event specific stuff editor
-    BoltAssetEditorGUI.Header("settings", "Settings");
+    BoltEditorGUI.Header("Settings", "settings");
 
     //GUILayout.Label("Settings", EditorStyles.boldLabel);
 
@@ -83,7 +83,6 @@ public class BoltEventAssetEditor : Editor {
     asset.properties = BoltAssetEditorGUI.EditPropertyArray(asset.properties, BoltAssetPropertyEditMode.Event, false);
 
     // compile button
-    BoltAssetEditorGUI.CompileButton(asset);
     EditorGUI.EndDisabledGroup();
   }
 }

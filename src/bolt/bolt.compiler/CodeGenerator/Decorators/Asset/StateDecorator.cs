@@ -138,7 +138,7 @@ namespace Bolt.Compiler {
       }
     }
 
-    public string CreateIndicesExpr() {
+    public string CallbackIndicesExpression() {
       if (CallbackIndices == null) {
         return "new Bolt.ArrayIndices(new int[0])";
       }

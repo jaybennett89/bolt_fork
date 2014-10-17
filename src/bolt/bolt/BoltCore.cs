@@ -135,7 +135,7 @@ internal static class BoltCore {
   }
 
   internal static int localSendRateBits {
-    get { return BoltMath.Hibit((uint)localSendRate); }
+    get { return Bolt.Math.HighBit((uint)localSendRate); }
   }
 
   internal static int remoteSendRate {
@@ -149,7 +149,7 @@ internal static class BoltCore {
   }
 
   internal static int remoteSendRateBits {
-    get { return BoltMath.Hibit((uint)remoteSendRate); }
+    get { return Bolt.Math.HighBit((uint)remoteSendRate); }
   }
 
   internal static int localInterpolationDelay {
@@ -226,6 +226,12 @@ internal static class BoltCore {
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
     BoltEntity be = prefab.GetComponent<BoltEntity>();
+
+    if (!be) {
+      BoltLog.Error("Prefab '{0}' does not have a Bolt Entity component attached", prefab.name);
+      return null;
+    }
+
     return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
@@ -779,16 +785,6 @@ internal static class BoltCore {
     _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
-
-    //var userHash = GetUserAssemblyHash();
-    //if (_config.useAssemblyChecksum && userHash != null && userHash.Length == 16) {
-    //  _udpConfig.HandshakeData = new UdpHandshakeData[1];
-    //  _udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    //  _udpConfig.HandshakeData[1] = new UdpHandshakeData("AssemblyHash", GetUserAssemblyHash());
-    //} else {
-    //_udpConfig.HandshakeData = new UdpHandshakeData[1];
-    //_udpConfig.HandshakeData[0] = new UdpHandshakeData("ApplicationGUID", new Guid(_config.applicationGuid).ToByteArray());
-    //}
 
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();

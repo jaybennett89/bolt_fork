@@ -25,7 +25,6 @@ public class BoltStateAssetEditor : Editor {
 
     //asset._groups = EditGroupArray(asset._groups);
 
-    BoltAssetEditorGUI.CompileButton(asset);
     EditorGUI.EndDisabledGroup();
   }
 
@@ -61,10 +60,6 @@ public class BoltStateAssetEditor : Editor {
       EditorGUI.EndDisabledGroup();
 
       g.syncTarget = BoltAssetEditorGUI.ToggleRow<BoltAssetSyncTarget>((int) g.syncTarget);
-
-      if (BoltAssetEditorGUI.DeleteButton()) {
-        result = null;
-      }
     });
 
     EditorGUI.BeginDisabledGroup(g.enabled == false);

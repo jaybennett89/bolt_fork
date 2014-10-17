@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using UnityEngine;
 /// <summary>
 /// Defines one hitbox on a BoltHitboxBody
 /// </summary>
+[Documentation]
 public class BoltHitbox : MonoBehaviour {
 
   [SerializeField]
@@ -147,7 +149,7 @@ public class BoltHitbox : MonoBehaviour {
       return false;
     }
 
-    distance = -b - (float) Math.Sqrt(disc);
+    distance = -b - (float) System.Math.Sqrt(disc);
 
     if (distance < 0f) {
       distance = 0f;

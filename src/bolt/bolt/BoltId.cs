@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using UdpKit;
 
 namespace Bolt {
+  [DocumentationAttribute]
   [StructLayout(LayoutKind.Explicit)]
   public struct UniqueId {
     public class EqualityComparer : IEqualityComparer<UniqueId> {

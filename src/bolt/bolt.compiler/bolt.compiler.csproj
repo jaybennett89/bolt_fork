@@ -98,11 +98,11 @@
     <Compile Include="FloatCompression.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorString.cs" />
     <Compile Include="FilterDefinition.cs" />
-    <Compile Include="Property\Definition\PropertyCommandSettings.cs" />
-    <Compile Include="Property\Definition\PropertyDefinition.cs" />
-    <Compile Include="Property\Definition\PropertyAssetSettings.cs" />
-    <Compile Include="Property\Definition\PropertyEventSettings.cs" />
-    <Compile Include="Property\Definition\PropertyStateSettings.cs" />
+    <Compile Include="Property\Settings\PropertyCommandSettings.cs" />
+    <Compile Include="Property\Settings\PropertyDefinition.cs" />
+    <Compile Include="Property\Settings\PropertyAssetSettings.cs" />
+    <Compile Include="Property\Settings\PropertyEventSettings.cs" />
+    <Compile Include="Property\Settings\PropertyStateSettings.cs" />
     <Compile Include="Property\PropertyEnums.cs" />
     <Compile Include="Property\Type\PropertyTypeArray.cs" />
     <Compile Include="Property\Type\PropertyTypeBool.cs" />

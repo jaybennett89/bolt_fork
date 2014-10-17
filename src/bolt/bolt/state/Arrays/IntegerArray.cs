@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Represents an array of integers on a state
+/// </summary>
+[Documentation]
 public struct IntegerArray {
   internal Bolt.State.Frame frame;
   internal int offsetObjects;
@@ -16,6 +21,9 @@ public struct IntegerArray {
     this.length = length;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return length;
@@ -29,11 +37,19 @@ public struct IntegerArray {
     }
   }
 
+  /// <summary>
+  /// Creates aa modifier object for this array
+  /// </summary>
+  /// <returns>The modifier object</returns>
   public IntegerArrayModifier Modify() {
     return new IntegerArrayModifier(this);
   }
 }
 
+/// <summary>
+/// Object which allows you to modify an integer array
+/// </summary>
+[Documentation]
 public class IntegerArrayModifier : IDisposable {
   IntegerArray array;
 
@@ -41,6 +57,9 @@ public class IntegerArrayModifier : IDisposable {
     this.array = array;
   }
 
+  /// <summary>
+  /// The size of the array
+  /// </summary>
   public int Length {
     get {
       return array.length;
