@@ -86,8 +86,8 @@ namespace Bolt.Compiler {
 
         string name = Decorator.Definition.Name;
         string properties = Decorator.Properties.Select((p, i) => " " + p.Definition.Name + "={{" + i + "}}").Join("");
-        string arguments = Decorator.Properties.Select((p, i) => "this." + p.Definition.Name).Join(", ");
-        method.Statements.Expr("return System.String.Format(\"[" + name + properties + "]\", " + arguments + ")");
+        string arguments = Decorator.Properties.Select((p, i) => ", this." + p.Definition.Name).Join("");
+        method.Statements.Expr("return System.String.Format(\"[" + name + properties + "]\"" + arguments + ")");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
