@@ -59,6 +59,7 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BoltEditorGUI.cs" />
+    <Compile Include="BoltEditorSkins.cs" />
     <Compile Include="BoltEditorWindow.cs" />
     <Compile Include="BoltFilterWindow.cs" />
     <Compile Include="BoltInstaller.cs" />

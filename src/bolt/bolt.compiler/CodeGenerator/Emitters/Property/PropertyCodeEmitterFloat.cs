@@ -15,13 +15,7 @@ namespace Bolt.Compiler {
     }
 
     public override void GetAddSettingsArgument(List<string> settings) {
-      var c = Decorator.PropertyType.Compression;
-      if (c.Enabled) {
-        settings.Add(string.Format("new Bolt.PropertyFloatCompressionSettings({0}, {1}f, {2}f, {3}f)", c.BitsRequired, c.Shift, c.Pack, c.Read));
-      }
-      else {
-        settings.Add(string.Format("Bolt.PropertyFloatCompressionSettings.CreateNoCompression()"));
-      }
+      settings.Add(Generator.CreateFloatCompressionExpression(Decorator.PropertyType.Compression));
 
       var stateSettings = Decorator.Definition.StateAssetSettings;
       if (stateSettings != null) {

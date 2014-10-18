@@ -9,6 +9,7 @@ namespace Bolt {
     public int ExtrapolationMaxFrames;
     public int ExtrapolationCorrectionFrames;
     public float ExtrapolationErrorTolerance;
+    public ExtrapolationVelocityModes ExtrapolationVelocityMode;
 
     public static PropertySmoothingSettings CreateInterpolation() {
       return new PropertySmoothingSettings {
@@ -16,12 +17,13 @@ namespace Bolt {
       };
     }
 
-    public static PropertySmoothingSettings CreateExtrapolation(int maxFrames, int correctionFrames, float errorTolerance) {
+    public static PropertySmoothingSettings CreateExtrapolation(int maxFrames, int correctionFrames, float errorTolerance, ExtrapolationVelocityModes velocityMode) {
       return new PropertySmoothingSettings {
         Algorithm = SmoothingAlgorithms.Extrapolation,
         ExtrapolationMaxFrames = maxFrames,
         ExtrapolationCorrectionFrames = correctionFrames,
-        ExtrapolationErrorTolerance = errorTolerance
+        ExtrapolationErrorTolerance = errorTolerance,
+        ExtrapolationVelocityMode = velocityMode
       };
     }
   }

@@ -141,7 +141,7 @@ public class BoltProjectWindow : BoltWindow {
     r.yMin = r.yMin + 2;
     r.yMax = r.yMax - 1;
 
-    GUI.color = BoltRuntimeSettings.instance.highlightColor;
+    GUI.color = BoltEditorSkin.Selected.IconColor;
     GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
     GUI.color = Color.white;
   }
@@ -163,7 +163,7 @@ public class BoltProjectWindow : BoltWindow {
       style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
-        style.normal.textColor = BoltRuntimeSettings.instance.highlightColor;
+        style.normal.textColor = BoltEditorSkin.Selected.IconColor;
       }
 
       if (GUILayout.Button(new GUIContent(a.Name), style)) {

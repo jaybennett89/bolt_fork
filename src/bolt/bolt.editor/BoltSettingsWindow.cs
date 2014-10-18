@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define COLOR_EDITOR
+
+using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -147,8 +150,8 @@ public class BoltSettingsWindow : EditorWindow {
       Save();
     }
 
-    BoltAssetEditorGUI.Label("Editor Highlight Color", () => {
-      settings.highlightColor = EditorGUILayout.ColorField(settings.highlightColor);
+    BoltAssetEditorGUI.Label("Editor Skin", () => {
+      settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
 
     BoltAssetEditorGUI.Label("Auto-Open Bolt Editor", () => {
@@ -209,6 +212,21 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltEditorGUI.Header("Compiler", "mc_compile");
     Compiler();
+
+
+#if COLOR_EDITOR
+    var v = BoltEditorSkin.Selected.Variation;
+
+    v.TintColor = EditorGUILayout.ColorField(v.TintColor);
+    v.IconColor = EditorGUILayout.ColorField(v.IconColor);
+
+    BoltEditorSkin s;
+    
+    s = BoltEditorSkin.Selected;
+    s.Variation = v;
+
+    BoltEditorSkin.Selected = s;
+#endif
 
     EditorGUILayout.EndScrollView();
 

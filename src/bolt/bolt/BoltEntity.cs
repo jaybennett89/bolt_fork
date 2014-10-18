@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
-using UdpKit;
+using System.Linq;
 using UE = UnityEngine;
-using Bolt;
 
 [DocumentationAttribute]
 public class BoltEntitySettingsModifier : IDisposable {

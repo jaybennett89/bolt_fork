@@ -191,6 +191,12 @@ public class BoltEditorWindow : BoltWindow {
     EditPropertyList(def, def.Result);
   }
 
+  public static GUIStyle BoxStyle(int n) {
+    GUIStyle s = new GUIStyle("flow node " + n);
+    s.padding = new RectOffset(4, 4, 4, 4);
+    return s;
+  }
+
   void BeginBackground() {
     GUILayout.BeginVertical();
   }
@@ -207,9 +213,9 @@ public class BoltEditorWindow : BoltWindow {
     var cmdDef = def as CommandDefinition;
     var eventDef = def as EventDefinition;
 
-    GUIStyle sceneStyle = "TE NodeBoxSelected";
-    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
-    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
+    GUILayout.BeginHorizontal(BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUI.color = Color.white;
 
     GUILayout.Space(3);
 
@@ -252,7 +258,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     GUILayout.EndHorizontal();
-    GUILayout.Space(4);
+    GUILayout.Space(2);
 
     BoltEditorGUI.WithLabel("Comment", () => { def.Comment = EditorGUILayout.TextArea(def.Comment); });
 
@@ -306,7 +312,10 @@ public class BoltEditorWindow : BoltWindow {
 
     GUIStyle sceneStyle = "TE NodeBox";
     sceneStyle.padding = new RectOffset(3, 5, 5, 4);
-    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+
+    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
+    GUILayout.BeginHorizontal(BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUI.color = Color.white;
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.Button("mc_minus")) {
@@ -351,10 +360,8 @@ public class BoltEditorWindow : BoltWindow {
 
       if (def is CommandDefinition) {
         if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {
-          BoltEditorGUI.SettingsSection("Corrections", () => {
-            BoltEditorGUI.WithLabel("Smooth Corrections", () => {
-              p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
-            });
+          BoltEditorGUI.WithLabel("Smooth Corrections", () => {
+            p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
           });
         }
       }

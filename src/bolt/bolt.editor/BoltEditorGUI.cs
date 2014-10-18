@@ -302,7 +302,7 @@ public static class BoltEditorGUI {
   }
 
   public static bool Button(string icon) {
-    return IconButton(icon, BoltRuntimeSettings.instance.highlightColor);
+    return IconButton(icon, BoltEditorSkin.Selected.IconColor);
   }
 
   public static bool Toggle(string on, string off, bool enabled) {
@@ -312,7 +312,7 @@ public static class BoltEditorGUI {
   public static bool Toggle(string icon, bool enabled) {
     Color c;
 
-    c = BoltRuntimeSettings.instance.highlightColor;
+    c = BoltEditorSkin.Selected.IconColor;
     c.a = enabled ? 1f : 0.25f;
 
     if (IconButton(icon, c)) {
