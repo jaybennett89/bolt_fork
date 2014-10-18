@@ -17,6 +17,7 @@ public class BoltEditorWindow : BoltWindow {
     w.name = "Bolt Editor";
     w.minSize = new Vector2(300, 400);
     w.Show();
+    w.Focus();
   }
 
   Vector2 scroll;
@@ -41,10 +42,6 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void Editor() {
-    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, Selected) == false)) {
-      Selected = (AssetDefinition)Selected;
-    }
-
     if (Selected != null) {
       if (Selected is StateDefinition) {
         EditState((StateDefinition)Selected);
@@ -63,7 +60,6 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
   }
-
 
   void EditState(StateDefinition def) {
     EditHeader(def);
@@ -216,9 +212,10 @@ public class BoltEditorWindow : BoltWindow {
     if (def is StateDefinition) { BoltEditorGUI.Button("mc_state"); }
     if (def is StructDefinition) { BoltEditorGUI.Button("mc_struct"); }
     if (def is EventDefinition) { BoltEditorGUI.Button("mc_event"); }
-    if (def is CommandDefinition) { BoltEditorGUI.Button("mc_controller"); }
+    if (def is CommandDefinition) { BoltEditorGUI.Button("mc_command"); }
 
     // edit asset name
+    GUI.SetNextControlName("BoltEditorName");
     def.Name = EditorGUILayout.TextField(def.Name);
 
     if (cmdDef != null) {

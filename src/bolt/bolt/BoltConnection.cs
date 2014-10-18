@@ -52,32 +52,29 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  /// <summary>
-  /// The underlying UdpKit connection for this connection
-  /// </summary>
-  public UdpConnection udpConnection {
-    get { return _udp; }
-  }
-
-  /// <summary>
-  /// This is the estimated remote frame of the other end of this connection
-  /// </summary>
   public int remoteFrame {
     get { return _remoteFrameEstimated; }
   }
 
-  /// <summary>
-  /// Ping (in seconds) of this connection
-  /// </summary>
+  [Obsolete("Use BoltConnection.pingNetwork instead")]
   public float ping {
     get { return _udp.NetworkPing; }
   }
 
-  /// <summary>
-  /// Aliased ping (in seconds) of this connection
-  /// </summary>
+  public float pingNetwork {
+    get { return _udp.NetworkPing; }
+  }
+
+  public int dejitterFrames {
+    get { return _remoteFrameActual - _remoteFrameEstimated; }
+  }
+
   public float pingAliased {
     get { return _udp.AliasedPing; }
+  }
+
+  internal UdpConnection udpConnection {
+    get { return _udp; }
   }
 
   internal int remoteFrameLatest {

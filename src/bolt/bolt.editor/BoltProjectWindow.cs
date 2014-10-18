@@ -41,7 +41,7 @@ public class BoltProjectWindow : BoltWindow {
     ArrayUtility.Add(ref Project.RootFolder.Assets, def);
 
     // select it
-    Select(def);
+    Select(def, true);
 
     // save project
     Save();
@@ -53,7 +53,7 @@ public class BoltProjectWindow : BoltWindow {
     if (HasProject) {
       if (string.IsNullOrEmpty(selectedAssetGuid) == false && Selected == null) {
         try {
-          Select(Project.RootFolder.Assets.First(x => x.Guid == new Guid(selectedAssetGuid)));
+          Select(Project.RootFolder.Assets.First(x => x.Guid == new Guid(selectedAssetGuid)), false);
         }
         catch {
           selectedAssetGuid = null;
@@ -153,8 +153,8 @@ public class BoltProjectWindow : BoltWindow {
 
   void OverlayIcon(string icon) {
     Rect r = GUILayoutUtility.GetLastRect();
-    r.xMin = r.xMax - 15;
-    r.xMax = r.xMax - 3;
+    r.xMin = r.xMax - 17;
+    r.xMax = r.xMax - 5;
     r.yMin = r.yMin + 2;
     r.yMax = r.yMax - 1;
 
@@ -184,15 +184,15 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (GUILayout.Button(new GUIContent(a.Name), style)) {
-        Select(a);
+        Select(a, false);
       }
 
-      if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(16))) {
+      if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(20))) {
         if (deleteMode) {
           a.Deleted = true;
 
           if (IsSelected(a)) {
-            Select(null);
+            Select(null, false);
           }
 
           Save();
@@ -206,7 +206,7 @@ public class BoltProjectWindow : BoltWindow {
         OverlayIcon("mc_minus");
       }
       else {
-        OverlayIcon("mc_settings");
+        OverlayIcon("mc_group");
       }
 
       GUILayout.EndHorizontal();
@@ -257,10 +257,7 @@ public class BoltProjectWindow : BoltWindow {
     return ReferenceEquals(obj, Selected);
   }
 
-  void Select(AssetDefinition asset) {
-    Repaints = 10;
-    Selected = asset;
-
+  void Select(AssetDefinition asset, bool isnew) {
     if (asset == null) {
       selectedAssetGuid = null;
     }
@@ -268,11 +265,13 @@ public class BoltProjectWindow : BoltWindow {
       selectedAssetGuid = asset.Guid.ToString();
     }
 
-    BeginClearFocus();
-    BoltEditorGUI.UseEvent();
+    Repaints = 10;
+    Selected = asset;
+    AutoFocusName = isnew;
 
-    if (BoltRuntimeSettings.instance.autoSwitchToEditor) {
-      BoltEditorWindow.Open();
-    }
+    BeginClearFocus();
+
+    BoltEditorGUI.UseEvent();
+    BoltEditorWindow.Open();
   }
 }

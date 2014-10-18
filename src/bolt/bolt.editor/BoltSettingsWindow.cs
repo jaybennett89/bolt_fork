@@ -153,10 +153,6 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Label("Editor Skin", () => {
       settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
-
-    BoltAssetEditorGUI.Label("Auto-Open Bolt Editor", () => {
-      settings.autoSwitchToEditor = EditorGUILayout.Toggle(settings.autoSwitchToEditor);
-    });
   }
 
   void Console() {
@@ -195,13 +191,13 @@ public class BoltSettingsWindow : EditorWindow {
 
     GUILayout.Space(4);
 
-    BoltEditorGUI.Header("Replication", "mc_state2");
+    BoltEditorGUI.Header("Replication", "mc_replication");
     Replication();
 
     BoltEditorGUI.Header("Connection", "mc_connection");
     Connection();
 
-    BoltEditorGUI.Header("Latency Simulation", "mc_latency");
+    BoltEditorGUI.Header("Latency Simulation", "mc_state2");
     Simulation();
 
     BoltEditorGUI.Header("Miscellaneous", "mc_settings");

@@ -34,6 +34,7 @@ public abstract class BoltWindow : EditorWindow {
   static bool clear;
   static bool saveUndo;
   static protected int Repaints;
+  static protected bool AutoFocusName;
   static protected AssetDefinition Selected;
 
   protected bool HasProject {
@@ -137,6 +138,11 @@ public abstract class BoltWindow : EditorWindow {
     }
 
     if (Repaints == 0) {
+      if (AutoFocusName) {
+        GUI.FocusControl("BoltEditorName");
+        AutoFocusName = false;
+      }
+
       clear = false;
       return;
     }
