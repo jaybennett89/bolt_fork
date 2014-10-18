@@ -336,7 +336,6 @@ namespace Bolt {
       // raise local changed events
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         if (diff.IsSet(i)) {
-          //BoltLog.Info("property changed {0}", MetaData.PropertySerializers[i].StateData.PropertyName);
           InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
         }
       }
