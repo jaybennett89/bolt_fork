@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bolt Engine AB")]
 [assembly: AssemblyProduct("Bolt")]
-[assembly: AssemblyCopyright("Copyright © Fredrik Holmstrom 2012 - 2014")]
+[assembly: AssemblyCopyright("Copyright © Bolt Engine AB 2012 - 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
