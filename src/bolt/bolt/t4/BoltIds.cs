@@ -315,3 +315,82 @@ namespace Bolt {
     }
   }
 }
+
+namespace Bolt {
+[Documentation]
+  public struct SceneId {
+    public class Comparer : IComparer<SceneId> {
+      public static readonly Comparer Instance = new Comparer();
+
+      Comparer() {
+
+      }
+
+      int IComparer<SceneId>.Compare(SceneId x, SceneId y) {
+        return x.Value - y.Value;
+      }
+    }
+
+    public class EqualityComparer : IEqualityComparer<SceneId> {
+      public static readonly EqualityComparer Instance = new EqualityComparer();
+
+      EqualityComparer() {
+
+      }
+
+      bool IEqualityComparer<SceneId>.Equals(SceneId x, SceneId y) {
+        return x.Value == y.Value;
+      }
+
+      int IEqualityComparer<SceneId>.GetHashCode(SceneId x) {
+        return x.Value;
+      }
+    }
+
+    public readonly int Value;
+
+    internal SceneId(int value) {
+      Value = value;
+    }
+
+    public override bool Equals(object obj) {
+      if (obj is SceneId) {
+        return this.Value == ((SceneId)obj).Value;
+      }
+
+      return false;
+    }
+
+    public override int GetHashCode() {
+      return Value;
+    }
+
+    public override string ToString() {
+      return string.Format("[SceneId:{0}]", Value);
+    }
+
+	public void Pack(UdpKit.UdpStream stream, int bits) {
+		stream.WriteInt(Value, bits);
+	}
+	
+	public void Pack(UdpKit.UdpStream stream) {
+		stream.WriteInt(Value);
+	}
+
+	public static SceneId Read(UdpKit.UdpStream stream, int bits) {
+		return new SceneId(stream.ReadInt(bits));
+	}
+	
+	public static SceneId Read(UdpKit.UdpStream stream) {
+		return new SceneId(stream.ReadInt());
+	}
+
+    public static bool operator ==(SceneId a, SceneId b) {
+      return a.Value == b.Value;
+    }
+
+    public static bool operator !=(SceneId a, SceneId b) {
+      return a.Value != b.Value;
+    }
+  }
+}

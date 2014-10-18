@@ -469,7 +469,6 @@ end tell'";
     Settings();
 
     BoltEditorGUI.Header("Scenes", "mc_scenes");
-    GUILayout.Space(1);
     Scenes();
 
     if (GUI.changed) {

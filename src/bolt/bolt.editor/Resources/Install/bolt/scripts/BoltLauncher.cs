@@ -6,9 +6,6 @@ using System;
 using System.Reflection;
 
 public static class BoltLauncher {
-  static bool _hasDebugScene = false;
-  static bool _isFirstInitialize = true;
-
   public static void StartServer() {
     StartServer(UdpEndPoint.Any);
   }
@@ -46,14 +43,6 @@ public static class BoltLauncher {
   }
 
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
-    if (_isFirstInitialize) {
-      _hasDebugScene = Application.loadedLevelName == "BoltDebugScene";
-
-      if (_hasDebugScene) {
-        BoltNetworkInternal.SceneIndexOffset = -1;
-      }
-    }
-
 #if UNITY_EDITOR
     BoltNetworkInternal.DebugDrawer = new BoltInternal.UnityDebugDrawer();
 #endif
@@ -75,20 +64,10 @@ public static class BoltLauncher {
   }
 
   static int GetSceneIndex(string name) {
-    int index = BoltInternal.BoltScenes_Internal.GetSceneIndex(name);
-
-    if (_hasDebugScene) {
-      index = index + 1;
-    }
-
-    return index;
+    return BoltInternal.BoltScenes_Internal.GetSceneIndex(name);
   }
 
   static string GetSceneName(int index) {
-    if (_hasDebugScene) {
-      index = index - 1;
-    }
-
     return BoltInternal.BoltScenes_Internal.GetSceneName(index);
   }
 

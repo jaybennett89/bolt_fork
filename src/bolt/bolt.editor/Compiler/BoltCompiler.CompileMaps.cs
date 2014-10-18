@@ -1,12 +1,12 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 partial class BoltCompiler {
-  struct SceneIndex {
-    public int Index;
-    public bool Enabled;
+  struct Scene {
+    public string Name;
     public string Identifier;
   }
 
@@ -21,17 +21,20 @@ partial class BoltCompiler {
   }
 
   public static void CompileMaps(BoltCompilerOperation op) {
-    var si = new SceneIndex[EditorBuildSettings.scenes.Length];
+    var scenes = new List<Scene>();
 
-    for (int i = 0; i < si.Length; ++i) {
+    for (int i = 0; i < EditorBuildSettings.scenes.Length; ++i) {
       if (EditorBuildSettings.scenes[i].enabled) {
-        si[i].Index = i;
-        si[i].Enabled = true;
-        si[i].Identifier = BoltEditorUtils.CSharpIdentifier(Path.GetFileNameWithoutExtension(EditorBuildSettings.scenes[i].path));
+        var name = Path.GetFileNameWithoutExtension(EditorBuildSettings.scenes[i].path);
+
+        scenes.Add(new Scene {
+          Name = name,
+          Identifier = BoltEditorUtils.CSharpIdentifier(name)
+        });
       }
     }
 
-    foreach (var group in si.Where(x => x.Enabled).GroupBy(x => x.Identifier)) {
+    foreach (var group in scenes.GroupBy(x => x.Identifier)) {
       if (group.Count() > 1) {
         throw new BoltException("You have several scenes named '{0}' in the build settings.", group.Key);
       }
@@ -46,18 +49,14 @@ partial class BoltCompiler {
         file.EmitLine("static public IEnumerable<string> AllScenes { get { return nameLookup.Keys; } }");
 
         file.EmitScope("static BoltScenes()", () => {
-          for (int n = 0; n < si.Length; ++n) {
-            if (si[n].Enabled) {
-              file.EmitLine("nameLookup.Add(\"{0}\", {0});", si[n].Identifier);
-              file.EmitLine("indexLookup.Add({0}, \"{0}\");", si[n].Identifier);
-            }
+          for (int n = 0; n < scenes.Count; ++n) {
+            file.EmitLine("nameLookup.Add(\"{0}\", {1});", scenes[n].Name, n);
+            file.EmitLine("indexLookup.Add({1}, \"{0}\");", scenes[n].Name, n);
           }
         });
 
-        for (int n = 0; n < si.Length; ++n) {
-          if (si[n].Enabled) {
-            file.EmitLine("public const int {0} = {1};", si[n].Identifier, si[n].Index);
-          }
+        for (int n = 0; n < scenes.Count; ++n) {
+          file.EmitLine("public const string {0} = \"{1}\";", scenes[n].Identifier, scenes[n].Name);
         }
       });
 

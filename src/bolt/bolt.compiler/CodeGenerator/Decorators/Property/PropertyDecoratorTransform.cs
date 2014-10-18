@@ -7,11 +7,7 @@ namespace Bolt.Compiler {
   public class PropertyDecoratorTransform : PropertyDecorator<PropertyTypeTransform> {
     public override int ByteSize {
       get {
-        if (Definition.StateAssetSettings.SmoothingAlgorithm == SmoothingAlgorithms.Extrapolation) {
-          return 12 + 12 + 16;
-        }
-
-        return 12 + 16;
+        return 12 + 12 + 16;
       }
     }
 
