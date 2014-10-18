@@ -15,7 +15,9 @@ public enum BoltNetworkModes {
   Client = 2,
 }
 
+
 internal static class BoltCore {
+  
   static UdpSocket _udpSocket;
   static internal SceneLoadState _localSceneLoading;
 
@@ -55,7 +57,7 @@ internal static class BoltCore {
     (go) => GameObject.Destroy(go);
 
   public static Action ShutdownComplete;
-
+     
   public static int loadedScene {
     get { return _localSceneLoading.Scene.Index; }
   }

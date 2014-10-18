@@ -191,12 +191,6 @@ public class BoltEditorWindow : BoltWindow {
     EditPropertyList(def, def.Result);
   }
 
-  public static GUIStyle BoxStyle(int n) {
-    GUIStyle s = new GUIStyle("flow node " + n);
-    s.padding = new RectOffset(4, 4, 4, 4);
-    return s;
-  }
-
   void BeginBackground() {
     GUILayout.BeginVertical();
   }
@@ -214,7 +208,7 @@ public class BoltEditorWindow : BoltWindow {
     var eventDef = def as EventDefinition;
 
     GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-    GUILayout.BeginHorizontal(BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
     GUI.color = Color.white;
 
     GUILayout.Space(3);
@@ -310,11 +304,8 @@ public class BoltEditorWindow : BoltWindow {
   void EditProperty(AssetDefinition def, PropertyDefinition p) {
     BeginBackground();
 
-    GUIStyle sceneStyle = "TE NodeBox";
-    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
-
     GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-    GUILayout.BeginHorizontal(BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
     GUI.color = Color.white;
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {

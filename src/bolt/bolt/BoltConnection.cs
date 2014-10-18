@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
 
+public struct PacketStats {
+  public int StateBits;
+  public int EventBits;
+  public int CommandBits;
+}
+
 [DocumentationAttribute]
 public class BoltConnection : BoltObject {
 
@@ -24,10 +30,14 @@ public class BoltConnection : BoltObject {
 
   int _bitsSecondOut;
   int _bitsSecondOutAcc;
+
   internal EventChannel _eventChannel;
   internal SceneLoadChannel _sceneLoadChannel;
   internal EntityChannel _entityChannel;
   internal EntityChannel.CommandChannel _commandChannel;
+
+  internal BoltRingBuffer<PacketStats> _packetStatsIn;
+  internal BoltRingBuffer<PacketStats> _packetStatsOut;
 
   internal SceneLoadState _remoteSceneLoading;
 
@@ -122,6 +132,12 @@ public class BoltConnection : BoltObject {
 
     _remoteFrameAdjust = false;
     _remoteSceneLoading = SceneLoadState.DefaultRemote();
+
+    _packetStatsOut = new BoltRingBuffer<PacketStats>(BoltCore._config.framesPerSecond);
+    _packetStatsOut.autofree = true;
+
+    _packetStatsIn = new BoltRingBuffer<PacketStats>(BoltCore._config.framesPerSecond);
+    _packetStatsIn.autofree = true;
 
     // set channels connection
     for (int i = 0; i < _channels.Length; ++i) {
@@ -272,7 +288,7 @@ public class BoltConnection : BoltObject {
   internal void Send() {
     try {
       BoltPacket packet = BoltPacketPool.Acquire();
-      packet.info = new BoltPacketInfo();
+      packet.stats = new PacketStats();
       packet.number = ++_packetCounter;
       packet.frame = BoltCore.frame;
       packet.stream.WriteInt(packet.frame);
@@ -283,8 +299,10 @@ public class BoltConnection : BoltObject {
 
       Assert.False(packet.stream.Overflowing);
 
-      _bitsSecondOutAcc += packet.stream.Position;
       _udp.Send(packet);
+
+      _bitsSecondOutAcc += packet.stream.Position;
+      _packetStatsOut.Enqueue(packet.stats);
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
@@ -301,15 +319,15 @@ public class BoltConnection : BoltObject {
   internal void PacketReceived(BoltPacket packet) {
     try {
       packet.frame = packet.stream.ReadInt();
-      //BoltLog.Info("PACKET-FRAME: {0}", packet.frame);
+      packet.stats = new PacketStats();
 
       if (packet.frame > _remoteFrameActual) {
         _remoteFrameAdjust = true;
         _remoteFrameActual = packet.frame;
       }
 
-      _packetsReceived += 1;
       _bitsSecondInAcc += packet.stream.Size;
+      _packetsReceived += 1;
 
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Read(packet);
@@ -319,6 +337,7 @@ public class BoltConnection : BoltObject {
         _channels[i].ReadDone();
       }
 
+      _packetStatsIn.Enqueue(packet.stats);
       Assert.False(packet.stream.Overflowing);
     }
     catch (Exception exn) {

@@ -260,16 +260,20 @@ partial class EntityChannel : BoltChannel {
     }
 
     packet.stream.WriteStopMarker();
-    packet.info.entityBits = packet.stream.Position - startPos;
+    packet.stats.StateBits = packet.stream.Position - startPos;
   }
 
   public override void Read(BoltPacket packet) {
+    int startPtr = packet.stream.Position;
+
     // unpack all of our data
     while (packet.stream.CanRead()) {
       if (ReadUpdate(packet) == false) {
         break;
       }
     }
+
+    packet.stats.StateBits = packet.stream.Position - startPtr;
   }
 
   public override void Lost(BoltPacket packet) {

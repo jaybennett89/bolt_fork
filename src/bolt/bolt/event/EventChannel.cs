@@ -106,6 +106,8 @@ namespace Bolt {
     }
 
     public override void Pack(BoltPacket packet) {
+      int startPos = packet.stream.Position;
+
       // prune events and calculate priority for remaining ones
       for (int i = 0; i < unreliableSend.Count; ++i) {
         var existsOnRemote = connection._entityChannel.ExistsOnRemote(unreliableSend[i].Event.TargetEntity);
@@ -186,6 +188,8 @@ namespace Bolt {
           unreliableSend[i] = r;
         }
       }
+
+      packet.stats.EventBits = packet.stream.Position - startPos;
     }
 
     bool PackEvent(Event ev, UdpStream stream, uint sequence) {
@@ -210,6 +214,8 @@ namespace Bolt {
     }
 
     public override void Read(BoltPacket packet) {
+      int startPtr = packet.stream.Position;
+
       while (packet.stream.ReadStopMarker()) {
         uint sequence = 0;
         Event ev = ReadEvent(packet.stream, ref sequence);
@@ -233,6 +239,8 @@ namespace Bolt {
       while (reliableRecv.TryRemove(out reliable)) {
         EventDispatcher.Enqueue(reliable.Event);
       }
+
+      packet.stats.EventBits = packet.stream.Position - startPtr;
     }
 
     Event ReadEvent(UdpStream stream, ref uint sequence) {

@@ -48,12 +48,16 @@ partial class EntityChannel {
       PackResult(packet);
       PackInput(packet);
 
-      packet.info.commandBits = packet.stream.Position - pos;
+      packet.stats.CommandBits = packet.stream.Position - pos;
     }
 
     public override void Read(BoltPacket packet) {
+      int startPtr = packet.stream.Position;
+
       ReadResult(packet);
       ReadInput(packet);
+
+      packet.stats.CommandBits = packet.stream.Position - startPtr;
     }
 
 

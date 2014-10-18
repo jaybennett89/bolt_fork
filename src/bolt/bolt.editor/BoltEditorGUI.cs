@@ -25,6 +25,12 @@ public static class BoltEditorGUI {
     return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
   }
 
+  public static GUIStyle BoxStyle(int n) {
+    GUIStyle s = new GUIStyle("flow node " + n);
+    s.padding = new RectOffset(4, 4, 4, 4);
+    return s;
+  } 
+
   public static AxisSelections EditAxisSelection(AxisSelections value) {
     return EditAxisSelection(null, value);
   }

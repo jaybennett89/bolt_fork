@@ -189,7 +189,7 @@ public class BoltProjectWindow : BoltWindow {
         OverlayIcon("mc_minus");
       }
       else {
-        OverlayIcon("mc_group");
+        OverlayIcon("mc_settings");
       }
 
       GUILayout.EndHorizontal();
