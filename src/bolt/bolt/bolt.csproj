@@ -83,10 +83,8 @@
     <Compile Include="state\BitArray.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
-    <Compile Include="state\FloatCompression.cs" />
     <Compile Include="state\Indices.cs" />
     <Compile Include="state\Priority.cs" />
-    <Compile Include="state\Serializers\PropertyMecanimData.cs" />
     <Compile Include="state\Serializers\PropertySerializer.cs" />
     <Compile Include="state\Serializers\PropertySerializerBool.cs" />
     <Compile Include="state\Serializers\PropertySerializerColor.cs" />
@@ -100,7 +98,15 @@
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
     <Compile Include="state\Serializers\PropertySerializerUniqueId.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
+    <Compile Include="state\Settings\Compression\Float.cs" />
+    <Compile Include="state\Settings\Compression\Int.cs" />
+    <Compile Include="state\Settings\Mecanim.cs" />
+    <Compile Include="state\Settings\Property.cs" />
+    <Compile Include="state\Settings\Compression\Quaternion.cs" />
     <Compile Include="state\Settings\Smoothing.cs" />
+    <Compile Include="state\Settings\State.cs" />
+    <Compile Include="state\Settings\Compression\Transform.cs" />
+    <Compile Include="state\Settings\Compression\Vector.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

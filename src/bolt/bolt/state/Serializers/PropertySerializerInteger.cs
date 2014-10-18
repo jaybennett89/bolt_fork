@@ -7,8 +7,14 @@ using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerInteger : PropertySerializerMecanim {
+    PropertyIntCompressionSettings IntCompression;
+
+    public void AddSettings(PropertyIntCompressionSettings intCompression) {
+      IntCompression = intCompression;
+    }
+
     public override int StateBits(State state, State.Frame frame) {
-      return 32;
+      return IntCompression.BitsRequired;
     }
 
     public override object GetDebugValue(State state) {
@@ -24,12 +30,12 @@ namespace Bolt {
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
-      stream.WriteInt(Blit.ReadI32(data, Settings.ByteOffset));
+      IntCompression.Pack(stream, Blit.ReadI32(data, Settings.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data,BoltConnection connection, UdpStream stream) {
-      Blit.PackI32(data, Settings.ByteOffset, stream.ReadInt());
+      Blit.PackI32(data, Settings.ByteOffset, IntCompression.Read(stream));
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

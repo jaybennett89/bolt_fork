@@ -18,10 +18,12 @@ public class BoltProjectWindow : BoltWindow {
     w.Show();
   }
 
+  Vector2 scroll;
   string addGroup = null;
   AssetDefinition addGroupTo = null;
 
-  Vector2 scroll;
+  [SerializeField]
+  string selectedAssetGuid;
 
   bool HasGroupSelected {
     get { return !string.IsNullOrEmpty(Project.ActiveGroup) && Project.ActiveGroup != "Everything"; }
@@ -43,6 +45,21 @@ public class BoltProjectWindow : BoltWindow {
 
     // save project
     Save();
+  }
+
+  new void Update() {
+    base.Update();
+
+    if (HasProject) {
+      if (string.IsNullOrEmpty(selectedAssetGuid) == false && Selected == null) {
+        try {
+          Select(Project.RootFolder.Assets.First(x => x.Guid == new Guid(selectedAssetGuid)));
+        }
+        catch {
+          selectedAssetGuid = null;
+        }
+      }
+    }
   }
 
   new void OnGUI() {
@@ -240,9 +257,17 @@ public class BoltProjectWindow : BoltWindow {
     return ReferenceEquals(obj, Selected);
   }
 
-  void Select(INamedAsset asset) {
+  void Select(AssetDefinition asset) {
     Repaints = 10;
     Selected = asset;
+
+    if (asset == null) {
+      selectedAssetGuid = null;
+    }
+    else {
+      selectedAssetGuid = asset.Guid.ToString();
+    }
+
     BeginClearFocus();
     BoltEditorGUI.UseEvent();
 

@@ -71,6 +71,23 @@ namespace Bolt.Compiler {
       return CreateFloatCompressionExpression(c, true);
     }
 
+    public string CreateVectorCompressionExpression(FloatCompression[] axes, AxisSelections selection) {
+      List<string> args = new List<string>();
+      args.Add(CreateFloatCompressionExpression(axes[Axis.X], (selection & AxisSelections.X) == AxisSelections.X));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Y], (selection & AxisSelections.Y) == AxisSelections.Y));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Z], (selection & AxisSelections.Z) == AxisSelections.Z));
+      return string.Format("Bolt.PropertyVectorCompressionSettings.Create({0})", args.Join(", "));
+    }
+
+    public string CreateRotationCompressionExpression(FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
+      if (selection == AxisSelections.XYZ) {
+        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateFloatCompressionExpression(quaternion));
+      }
+      else {
+        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateVectorCompressionExpression(axes, selection));
+      }
+    }
+
     public string CreateFloatCompressionExpression(FloatCompression c, bool enabled) {
       if (enabled) {
         if (c.Enabled) {

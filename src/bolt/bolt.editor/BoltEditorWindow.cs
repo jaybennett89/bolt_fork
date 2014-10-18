@@ -41,25 +41,25 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void Editor() {
-    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) == false)) {
-      SelectedAsset = (AssetDefinition)Selected;
+    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, Selected) == false)) {
+      Selected = (AssetDefinition)Selected;
     }
 
-    if (SelectedAsset != null) {
-      if (SelectedAsset is StateDefinition) {
-        EditState((StateDefinition)SelectedAsset);
+    if (Selected != null) {
+      if (Selected is StateDefinition) {
+        EditState((StateDefinition)Selected);
       }
 
-      if (SelectedAsset is StructDefinition) {
-        EditStruct((StructDefinition)SelectedAsset);
+      if (Selected is StructDefinition) {
+        EditStruct((StructDefinition)Selected);
       }
 
-      if (SelectedAsset is EventDefinition) {
-        EditEvent((EventDefinition)SelectedAsset);
+      if (Selected is EventDefinition) {
+        EditEvent((EventDefinition)Selected);
       }
 
-      if (SelectedAsset is CommandDefinition) {
-        EditCommand((CommandDefinition)SelectedAsset);
+      if (Selected is CommandDefinition) {
+        EditCommand((CommandDefinition)Selected);
       }
     }
   }

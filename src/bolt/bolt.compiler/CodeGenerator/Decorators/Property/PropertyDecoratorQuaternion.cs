@@ -10,7 +10,7 @@ namespace Bolt.Compiler {
     }
 
     public override int ByteSize {
-      get { return 16; }
+      get { return 32; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {

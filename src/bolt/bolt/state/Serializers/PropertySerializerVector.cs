@@ -7,10 +7,29 @@ using UE = UnityEngine;
 
 namespace Bolt {
   class PropertySerializerVector : PropertySerializerSimple {
-    PropertySmoothingSettings SmoothingSettings;
+    PropertyVectorCompressionSettings VectorCompression;
 
-    public void AddSettings(PropertySmoothingSettings smoothingSettings) {
-      SmoothingSettings = smoothingSettings;
+    public void AddSettings(PropertyVectorCompressionSettings vectorCompression) {
+      VectorCompression = vectorCompression;
+    }
+
+    public new void AddSettings(PropertyStateSettings stateSettings) {
+      Assert.True(stateSettings.ByteLength == 24);
+      StateSettings = stateSettings;
+      StateSettings.ByteLength = 12;
+    }
+
+    public override void OnSimulateBefore(State state) {
+      if (state.Entity.IsDummy) {
+        var f = state.Frames.first;
+
+        switch (SmoothingSettings.Algorithm) {
+          case SmoothingAlgorithms.Interpolation:
+          case SmoothingAlgorithms.Extrapolation:
+            f.Data.PackVector3(Settings.ByteOffset, Bolt.Math.InterpolateVector(state.Frames, Settings.ByteOffset + 12, state.Entity.Frame));
+            break;
+        }
+      }
     }
 
     public override object GetDebugValue(State state) {
@@ -22,13 +41,13 @@ namespace Bolt {
       return 32 * 3;
     }
 
-    protected override bool Pack(byte[] data,  BoltConnection connection, UdpStream stream) {
-      stream.WriteVector3(Blit.ReadVector3(data, Settings.ByteOffset));
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+      VectorCompression.Pack(stream, Blit.ReadVector3(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data,  BoltConnection connection, UdpStream stream) {
-      Blit.PackVector3(data, Settings.ByteOffset, stream.ReadVector3());
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+      Blit.PackVector3(data, Settings.ByteOffset, VectorCompression.Read(stream));
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

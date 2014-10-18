@@ -6,42 +6,10 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-
   internal enum PropertyModes {
     State = 0,
     Command = 1,
     Event = 2
-  }
-
-  internal struct PropertySettings {
-    public int ByteOffset;
-    public String PropertyName;
-    public PropertyModes PropertyMode;
-
-    public PropertySettings(int offset, string name, PropertyModes mode) {
-      ByteOffset = offset;
-      PropertyName = name;
-      PropertyMode = mode;
-    }
-  }
-
-  internal struct PropertyStateSettings {
-    public int Priority;
-    public int ByteLength;
-    public int ObjectOffset;
-
-    public String PropertyPath;
-    public String[] CallbackPaths;
-    public ArrayIndices CallbackIndices;
-
-    public PropertyStateSettings(int priority, int byteLength, int objectOffset, string propertyPath, string[] callbackPaths, ArrayIndices callbackIndices) {
-      Priority = UE.Mathf.Max(1, priority);
-      ByteLength = byteLength;
-      ObjectOffset = objectOffset;
-      PropertyPath = propertyPath;
-      CallbackPaths = callbackPaths;
-      CallbackIndices = callbackIndices;
-    }
   }
 
   abstract class PropertySerializer {

@@ -26,64 +26,13 @@ namespace Bolt {
     }
   }
 
-  struct PropertyTransformCompressionSettings {
-    public PropertyFloatCompressionSettings PositionX;
-    public PropertyFloatCompressionSettings PositionY;
-    public PropertyFloatCompressionSettings PositionZ;
-
-    public PropertyFloatCompressionSettings RotationX;
-    public PropertyFloatCompressionSettings RotationY;
-    public PropertyFloatCompressionSettings RotationZ;
-
-    public bool QuaternionMode;
-    public PropertyFloatCompressionSettings Quaternion;
-
-    public static PropertyTransformCompressionSettings Create(
-      PropertyFloatCompressionSettings posX,
-      PropertyFloatCompressionSettings posY,
-      PropertyFloatCompressionSettings posZ,
-      PropertyFloatCompressionSettings quaternion) {
-
-      return new PropertyTransformCompressionSettings {
-        PositionX = posX,
-        PositionY = posY,
-        PositionZ = posZ,
-        Quaternion = quaternion,
-        QuaternionMode = true
-      };
-    }
-
-    public static PropertyTransformCompressionSettings Create(
-      PropertyFloatCompressionSettings posX,
-      PropertyFloatCompressionSettings posY,
-      PropertyFloatCompressionSettings posZ,
-      PropertyFloatCompressionSettings rotX,
-      PropertyFloatCompressionSettings rotY,
-      PropertyFloatCompressionSettings rotZ) {
-
-      return new PropertyTransformCompressionSettings {
-        PositionX = posX,
-        PositionY = posY,
-        PositionZ = posZ,
-        RotationX = rotX,
-        RotationY = rotY,
-        RotationZ = rotZ,
-        QuaternionMode = false
-      };
-    }
-  }
 
   class PropertySerializerTransform : PropertySerializer {
-    PropertySmoothingSettings SmoothingSettings;
     PropertyTransformCompressionSettings TransformCompression;
 
     const int POSITION_OFFSET = 0;
     const int ROTATION_OFFSET = 24;
     const int VELOCITY_OFFSET = 12;
-
-    public void AddSettings(PropertySmoothingSettings smoothingSettings) {
-      SmoothingSettings = smoothingSettings;
-    }
 
     public void AddSettings(PropertyTransformCompressionSettings transformCompression) {
       TransformCompression = transformCompression;
@@ -92,23 +41,11 @@ namespace Bolt {
     public override int StateBits(State state, State.Frame frame) {
       int bits = 1;
 
-      bits += TransformCompression.PositionX.BitsRequired;
-      bits += TransformCompression.PositionY.BitsRequired;
-      bits += TransformCompression.PositionZ.BitsRequired;
-
-      if (TransformCompression.QuaternionMode) {
-        bits += (TransformCompression.Quaternion.BitsRequired * 4);
-      }
-      else {
-        bits += TransformCompression.RotationX.BitsRequired;
-        bits += TransformCompression.RotationY.BitsRequired;
-        bits += TransformCompression.RotationZ.BitsRequired;
-      }
+      bits += TransformCompression.Position.BitsRequired;
+      bits += TransformCompression.Rotation.BitsRequired;
 
       if (SmoothingSettings.Algorithm == SmoothingAlgorithms.Extrapolation) {
-        bits += TransformCompression.PositionX.BitsRequired;
-        bits += TransformCompression.PositionY.BitsRequired;
-        bits += TransformCompression.PositionZ.BitsRequired;
+        bits += TransformCompression.Position.BitsRequired;
       }
 
       return bits;
@@ -203,8 +140,8 @@ namespace Bolt {
 
           case SmoothingAlgorithms.Extrapolation:
             int frame = UE.Mathf.Min(state.Frames.first.Number + SmoothingSettings.ExtrapolationMaxFrames, state.Entity.Frame);
-            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings.ExtrapolationCorrectionFrames, td.Simulate.localPosition);
-            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings.ExtrapolationCorrectionFrames, td.Simulate.localRotation);
+            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition);
+            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings, td.Simulate.localRotation);
             break;
         }
       }
@@ -263,30 +200,15 @@ namespace Bolt {
       }
 
       UE.Vector3 p = frame.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
-      TransformCompression.PositionX.Pack(stream, p.x);
-      TransformCompression.PositionY.Pack(stream, p.y);
-      TransformCompression.PositionZ.Pack(stream, p.z);
+      TransformCompression.Position.Pack(stream, p);
 
       if (SmoothingSettings.Algorithm == SmoothingAlgorithms.Extrapolation) {
         UE.Vector3 v = frame.Data.ReadVector3(Settings.ByteOffset + VELOCITY_OFFSET);
-        TransformCompression.PositionX.Pack(stream, v.x);
-        TransformCompression.PositionY.Pack(stream, v.y);
-        TransformCompression.PositionZ.Pack(stream, v.z);
+        TransformCompression.Position.Pack(stream, v);
       }
 
       UE.Quaternion r = frame.Data.ReadQuaternion(Settings.ByteOffset + ROTATION_OFFSET);
-      if (TransformCompression.QuaternionMode) {
-        TransformCompression.Quaternion.Pack(stream, r.x);
-        TransformCompression.Quaternion.Pack(stream, r.y);
-        TransformCompression.Quaternion.Pack(stream, r.z);
-        TransformCompression.Quaternion.Pack(stream, r.w);
-      }
-      else {
-        UE.Vector3 a = r.eulerAngles;
-        TransformCompression.RotationX.Pack(stream, a.x);
-        TransformCompression.RotationY.Pack(stream, a.y);
-        TransformCompression.RotationZ.Pack(stream, a.z);
-      }
+      TransformCompression.Rotation.Pack(stream, r);
 
       return true;
     }
@@ -294,34 +216,17 @@ namespace Bolt {
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpStream stream) {
       state.Entity.SetParentInternal(stream.ReadEntity(connection));
 
-      UE.Vector3 p = new UE.Vector3();
-      UE.Vector3 v = new UE.Vector3();
-      UE.Quaternion r = new UE.Quaternion();
+      UE.Vector3 p = default(UE.Vector3);
+      UE.Vector3 v = default(UE.Vector3);
+      UE.Quaternion r = default(UE.Quaternion);
 
-      p.x = TransformCompression.PositionX.Read(stream);
-      p.y = TransformCompression.PositionY.Read(stream);
-      p.z = TransformCompression.PositionZ.Read(stream);
+      p = TransformCompression.Position.Read(stream);
 
       if (SmoothingSettings.Algorithm == SmoothingAlgorithms.Extrapolation) {
-        v.x = TransformCompression.PositionX.Read(stream);
-        v.y = TransformCompression.PositionY.Read(stream);
-        v.z = TransformCompression.PositionZ.Read(stream);
+        v = TransformCompression.Position.Read(stream);
       }
 
-      if (TransformCompression.QuaternionMode) {
-        r.x = TransformCompression.Quaternion.Read(stream);
-        r.y = TransformCompression.Quaternion.Read(stream);
-        r.z = TransformCompression.Quaternion.Read(stream);
-        r.w = TransformCompression.Quaternion.Read(stream);
-      }
-      else {
-        UE.Vector3 a = new UE.Vector3();
-        a.x = TransformCompression.RotationX.Read(stream);
-        a.y = TransformCompression.RotationY.Read(stream);
-        a.z = TransformCompression.RotationZ.Read(stream);
-
-        r = UE.Quaternion.Euler(a);
-      }
+      r = TransformCompression.Rotation.Read(stream);
 
       frame.Data.PackVector3(Settings.ByteOffset + POSITION_OFFSET, p);
       frame.Data.PackVector3(Settings.ByteOffset + VELOCITY_OFFSET, v);
