@@ -171,6 +171,9 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ok.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_settings2.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_wifi.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

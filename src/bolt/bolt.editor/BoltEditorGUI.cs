@@ -511,7 +511,7 @@ public static class BoltEditorGUI {
     c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
     c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
     c.Accuracy = Mathf.Max(FloatFieldOverlay(c.Accuracy, "Accuracy"), 0.001f);
-    GUILayout.Label("Bits: " + c.BitsRequired, EditorStyles.miniLabel, GUILayout.Width(50));
+    GUILayout.Label("Bits: " + (c.Enabled ? c.BitsRequired : 32), EditorStyles.miniLabel, GUILayout.Width(50));
     EditorGUI.EndDisabledGroup();
 
     return c;

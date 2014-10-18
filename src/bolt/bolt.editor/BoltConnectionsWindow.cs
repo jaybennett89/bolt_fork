@@ -36,7 +36,15 @@ public class BoltConnectionsWindow : BoltWindow {
   void OnGUI() {
     base.OnGUI();
 
+    if (!Application.isPlaying) {
+      ConnectionDetails = null;
+    }
+
     scroll = GUILayout.BeginScrollView(scroll);
+
+    if (BoltNetwork.connections.Count() == 1) {
+      ConnectionDetails = BoltNetwork.connections.First();
+    }
 
     Header("mc_connection", "Connections");
     Connections();
@@ -45,7 +53,6 @@ public class BoltConnectionsWindow : BoltWindow {
       Header("mc_wifi", "Packet details for " + ConnectionDetails.remoteEndPoint.ToString());
       Stats();
     }
-
 
     GUILayout.EndScrollView();
   }

@@ -141,7 +141,7 @@ namespace Bolt {
       DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
       TempPriority = new Priority[MetaData.PropertyCount];
 
-      PropertyIdBits = 16; //BoltMath.BitsRequired(MetaData.PropertyCount - 1);
+      PropertyIdBits = Bolt.Math.BitsRequired(MetaData.PropertyCount);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = Bolt.Math.BitsRequired(MetaData.PacketMaxProperties);
     }
@@ -396,7 +396,7 @@ namespace Bolt {
       }
 
       // write into stream
-      PackWrite(connection, stream, env, tempPriority, tempCount);
+      PackProperties(connection, stream, env, tempPriority, tempCount);
 
       for (int i = 0; i < env.Written.Count; ++i) {
         Priority p = env.Written[i];
@@ -411,7 +411,7 @@ namespace Bolt {
       return env.Written.Count;
     }
 
-    void PackWrite(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
+    void PackProperties(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
       int propertyCountPtr = stream.Ptr;
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
