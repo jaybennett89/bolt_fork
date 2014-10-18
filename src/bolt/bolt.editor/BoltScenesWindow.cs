@@ -395,12 +395,18 @@ end tell'";
 
     foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes) {
       if (scene.enabled) {
-        var sceneName = Path.GetFileNameWithoutExtension(scene.path);
-        var isCurrent = EditorApplication.currentScene == scene.path;
-        GUIStyle sceneStyle = isCurrent ? "TE NodeBoxSelected" : "TE NodeBox";
-        sceneStyle.padding = new RectOffset(5, 5, 5, 5);
 
-        GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+        var sceneName = Path.GetFileNameWithoutExtension(scene.path);
+
+        GUILayout.Space(2);
+
+        GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
+        GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+        GUI.color = Color.white;
+
+        var isCurrent = EditorApplication.currentScene == scene.path;
+        GUIStyle label = new GUIStyle("Label");
+        label.normal.textColor = isCurrent ? BoltEditorSkin.Selected.Variation.TintColor : label.normal.textColor;
         GUILayout.Label(sceneName);
 
         // Scene Edit Button
