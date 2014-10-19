@@ -323,6 +323,9 @@ namespace Bolt {
       // calculate diff mask
       var diff = Diff(Frames.first, DiffFrame);
 
+      // copy data from latest frame to diff buffer
+      Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
+
       // combine with existing masks for proxies
       var it = Entity.Proxies.GetIterator();
 
@@ -336,9 +339,6 @@ namespace Bolt {
           InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
         }
       }
-
-      // copy data from latest frame to diff buffer
-      Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
     }
 
     void InvokeCallbacksForProperty(PropertySerializer p) {
