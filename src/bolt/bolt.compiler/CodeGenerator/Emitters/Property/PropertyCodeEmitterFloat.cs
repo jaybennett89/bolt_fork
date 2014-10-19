@@ -16,24 +16,7 @@ namespace Bolt.Compiler {
 
     public override void AddSettingsArgument(List<string> settings) {
       settings.Add(Generator.CreateFloatCompressionExpression(Decorator.PropertyType.Compression));
-
-      var stateSettings = Decorator.Definition.StateAssetSettings;
-      if (stateSettings != null) {
-        switch (stateSettings.SmoothingAlgorithm) {
-          case SmoothingAlgorithms.Interpolation:
-            settings.Add("Bolt.PropertySmoothingSettings.CreateInterpolation()");
-            break;
-
-          case SmoothingAlgorithms.Extrapolation:
-            settings.Add(
-              string.Format("Bolt.PropertySmoothingSettings.CreateExtrapolation({0}, {1}, {2}f)",
-              stateSettings.ExtrapolationMaxFrames,
-              stateSettings.ExtrapolationCorrectionFrames,
-              stateSettings.ExtrapolationErrorTolerance)
-            );
-            break;
-        }
-      }
+      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
     }
   }
 }

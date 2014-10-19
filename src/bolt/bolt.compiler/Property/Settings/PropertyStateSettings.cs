@@ -10,10 +10,10 @@ namespace Bolt.Compiler {
     public SmoothingAlgorithms SmoothingAlgorithm;
 
     [ProtoMember(6)]
-    public float ExtrapolationErrorTolerance = 0.1f;
+    public float ExtrapolationErrorTolerance = 0.25f;
 
     [ProtoMember(18)]
-    public int ExtrapolationCorrectionFrames = 3;
+    public int ExtrapolationCorrectionFrames = 6;
 
     [ProtoMember(19)]
     public int ExtrapolationMaxFrames = 9;

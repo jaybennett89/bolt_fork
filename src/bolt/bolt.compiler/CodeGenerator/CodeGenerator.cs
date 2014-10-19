@@ -67,6 +67,30 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
+    public string CreateSmoothingSettings(PropertyDefinition p) {
+      var s = p.StateAssetSettings;
+      if (s != null) {
+        var t = p.PropertyType as PropertyTypeTransform;
+
+        switch (s.SmoothingAlgorithm) {
+          case SmoothingAlgorithms.Interpolation:
+            return "Bolt.PropertySmoothingSettings.CreateInterpolation()";
+
+          case SmoothingAlgorithms.Extrapolation:
+            return string.Format("Bolt.PropertySmoothingSettings.CreateExtrapolation({0}, {1}, {2}f, {3})",
+              s.ExtrapolationMaxFrames,
+              s.ExtrapolationCorrectionFrames,
+              s.ExtrapolationErrorTolerance,
+              t == null
+                ? string.Format("Bolt.ExtrapolationVelocityModes.{0}", t.ExtrapolationVelocityMode)
+                : "default(Bolt.ExtrapolationVelocityModes)"
+            );
+        }
+      }
+
+      return "default(Bolt.PropertySmoothingSettings)";
+    }
+
     public string CreateFloatCompressionExpression(FloatCompression c) {
       return CreateFloatCompressionExpression(c, true);
     }

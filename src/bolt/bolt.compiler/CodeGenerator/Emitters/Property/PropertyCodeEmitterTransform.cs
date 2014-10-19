@@ -15,6 +15,7 @@ namespace Bolt.Compiler {
       var position = Generator.CreateVectorCompressionExpression(Decorator.PropertyType.PositionCompression, Decorator.PropertyType.PositionSelection);
       var rotation = Generator.CreateRotationCompressionExpression(Decorator.PropertyType.RotationCompression, Decorator.PropertyType.RotationCompressionQuaternion, Decorator.PropertyType.RotationSelection);
       settings.Add(string.Format("Bolt.PropertyTransformCompressionSettings.Create({0}, {1})", position, rotation));
+      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {

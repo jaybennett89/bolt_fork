@@ -16,6 +16,7 @@ namespace Bolt.Compiler {
 
     public override void AddSettingsArgument(List<string> settings) {
       settings.Add(Generator.CreateRotationCompressionExpression(Decorator.PropertyType.EulerCompression, Decorator.PropertyType.QuaternionCompression, Decorator.PropertyType.Selection));
+      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
     }
   }
 }
