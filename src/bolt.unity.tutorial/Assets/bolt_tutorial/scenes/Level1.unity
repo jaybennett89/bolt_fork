@@ -539,6 +539,7 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
+    - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: b5907a8b9fa4ef549b9dd4f8a9e863eb, type: 2}
   m_RootGameObject: {fileID: 663922310}
   m_IsPrefabParent: 0
@@ -2475,6 +2476,7 @@ Prefab:
       value: 16
       objectReference: {fileID: 0}
     m_RemovedComponents:
+    - {fileID: 0}
     - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: b5907a8b9fa4ef549b9dd4f8a9e863eb, type: 2}
   m_RootGameObject: {fileID: 1641960023}
