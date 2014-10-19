@@ -38,7 +38,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return 32 * 3;
+      return VectorCompression.BitsRequired;
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
