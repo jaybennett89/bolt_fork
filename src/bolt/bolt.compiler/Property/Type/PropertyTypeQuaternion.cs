@@ -8,7 +8,7 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeQuaternion : PropertyType {
     [ProtoMember(16)]
-    public AxisSelections Selection;
+    public AxisSelections Selection = AxisSelections.XYZ;
 
     [ProtoMember(18, OverwriteList = true)]
     public FloatCompression[] EulerCompression = new FloatCompression[3] {

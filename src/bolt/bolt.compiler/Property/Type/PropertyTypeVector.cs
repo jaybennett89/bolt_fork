@@ -14,7 +14,7 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeVector : PropertyType {
     [ProtoMember(16)]
-    public AxisSelections Selection;
+    public AxisSelections Selection = AxisSelections.XYZ;
 
     [ProtoMember(18, OverwriteList = true)]
     public FloatCompression[] Compression = new FloatCompression[3] {
