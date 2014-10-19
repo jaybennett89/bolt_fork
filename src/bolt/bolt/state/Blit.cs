@@ -386,11 +386,6 @@ namespace Bolt {
     }
 
     public static string ReadString(this byte[] data, int offset, Encoding encoding) {
-      BoltLog.Info("data = {0}", data);
-      BoltLog.Info("data.Length = {0}", data.Length);
-      BoltLog.Info("offset = {0}", offset);
-      BoltLog.Info("length = {0}", data.ReadI32(offset));
-
       return encoding.GetString(data, offset + 4, data.ReadI32(offset));
     }
 

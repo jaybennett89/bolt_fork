@@ -20,7 +20,7 @@ namespace Bolt.Compiler {
       return "new {0}()".Expr(SerializerClassName);
     }
 
-    public virtual void GetAddSettingsArgument(List<string> settings) {
+    public virtual void AddSettingsArgument(List<string> settings) {
 
     }
 
@@ -89,7 +89,7 @@ namespace Bolt.Compiler {
       }
 
       // collecting property specific settings
-      GetAddSettingsArgument(settings);
+      AddSettingsArgument(settings);
 
       for (int n = 0; n < settings.Count; ++n) {
         statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));

@@ -14,7 +14,7 @@ namespace Bolt.Compiler {
       get { return "PackF32"; }
     }
 
-    public override void GetAddSettingsArgument(List<string> settings) {
+    public override void AddSettingsArgument(List<string> settings) {
       settings.Add(Generator.CreateFloatCompressionExpression(Decorator.PropertyType.Compression));
 
       var stateSettings = Decorator.Definition.StateAssetSettings;

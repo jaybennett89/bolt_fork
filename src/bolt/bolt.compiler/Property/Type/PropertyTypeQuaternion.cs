@@ -18,7 +18,7 @@ namespace Bolt.Compiler {
     };
 
     [ProtoMember(17)]
-    public FloatCompression CompressionQuaternion = new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };
+    public FloatCompression QuaternionCompression = new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };
 
     public override bool InterpolateAllowed {
       get { return true; }

@@ -18,7 +18,7 @@ class PropertyEditorQuaternion : PropertyEditor<PropertyTypeQuaternion> {
 
       BoltEditorGUI.WithLabel(quaternion ? "Quaternion Compression" : "Axis Compression", () => {
         if (quaternion) {
-          PropertyType.CompressionQuaternion = BoltEditorGUI.EditFloatCompression(PropertyType.CompressionQuaternion);
+          PropertyType.QuaternionCompression = BoltEditorGUI.EditFloatCompression(PropertyType.QuaternionCompression);
         }
         else {
           BoltEditorGUI.EditAxes(PropertyType.EulerCompression, PropertyType.Selection);

@@ -13,8 +13,11 @@ namespace Bolt.Compiler {
     [ProtoMember(3)]
     public int MaxValue;
 
+    [ProtoMember(4)]
+    public bool CompressionEnabled;
+
     public override bool HasSettings {
-      get { return false; }
+      get { return true; }
     }
 
     public override bool MecanimApplicable {
