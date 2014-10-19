@@ -25,7 +25,7 @@ public class BoltConnectionsWindow : BoltWindow {
     GUILayout.EndHorizontal();
   }
 
-  void Update() {
+  new void Update() {
     if (Application.isPlaying) {
       Repaints = Mathf.Max(Repaints, 1);
     }
@@ -33,7 +33,7 @@ public class BoltConnectionsWindow : BoltWindow {
     base.Update();
   }
 
-  void OnGUI() {
+  new void OnGUI() {
     base.OnGUI();
 
     if (!Application.isPlaying) {
