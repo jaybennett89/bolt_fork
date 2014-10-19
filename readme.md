@@ -1,7 +1,6 @@
 # ![Bolt Engine](https://github.com/tonybilby/bolt/blob/master/z-bolt-logo.png "Bolt Engine")
 
 ## EULA (End User License Agreement)
-
 End User License Agreement
 THIS IS A LEGAL DOCUMENT. PLEASE READ THIS DOCUMENT CAREFULLY BEFORE USING THIS SOFTWARE. THIS LICENSE PROVIDES IMPORTANT INFORMATION CONCERNING THE SOFTWARE, PROVIDES YOU WITH A LICENSE TO USE THE SOFTWARE AND CONTAINS WARRANTY AND LIABILITY INFORMATION. BY USING THE SOFTWARE, YOU ARE ACCEPTING THE SOFTWARE “AS IS” AND AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE AGREEMENT. IF YOU DO NOT WISH TO BE LEGALLY BOUND BY THIS AGREEMENT, DO NOT USE THE SOFTWARE.
 
@@ -38,3 +37,14 @@ This license agreement is effective until terminated. The licensee may terminate
 (a)	This Agreement shall be governed by the laws of Sweden.
 (b)	This Agreement contains the complete agreement between the parties with respect to the subject matter hereof, and supersedes all prior or contemporaneous agreements or understandings, whether oral or written.
 (c)	All questions, comments or concerns with respect to this Agreement shall be directed to: support@boltengine.com.
+
+## FAQ (Frequently asked questions)
+
+#### Q: What are Bolt's theoretical concurrent user limits
+There are no direct limits inside Bolt itself, any of the hard coded "max" values that are defined can be changed by re-compiling your code yourself, it will solely depend on your game and how much data you send over the network.
+
+#### Q: Does Bolt require Unity Pro in any way?
+No, the only feature in Bolt which is not available in without Unity Pro is the "Debug Start" feature due to limitations within Unity Free itself.
+
+#### Q: What is a BoltEntity?
+A BoltEntity is similar to a Unity/uLink NetworkView or Photon PhotonView. It is the representation of a network-aware object, and is the base for having Bolt control an actual GameObject in Unity.
