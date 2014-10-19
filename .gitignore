@@ -4,6 +4,7 @@
 *.pdb
 *.dll
 
+udpkit
 build
 upload
 Temp
