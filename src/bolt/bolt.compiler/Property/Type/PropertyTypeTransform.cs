@@ -8,10 +8,10 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeTransform : PropertyType {
     [ProtoMember(6)]
-    public AxisSelections PositionSelection;
+    public AxisSelections PositionSelection = AxisSelections.XYZ;
 
     [ProtoMember(7)]
-    public AxisSelections RotationSelection;
+    public AxisSelections RotationSelection = AxisSelections.XYZ;
 
     [ProtoMember(10)]
     public ExtrapolationVelocityModes ExtrapolationVelocityMode = ExtrapolationVelocityModes.CalculateFromPosition;
