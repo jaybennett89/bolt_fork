@@ -3,16 +3,17 @@ using UnityEditor;
 using Bolt.Compiler;
 using UnityEngine;
 
-[InitializeOnLoad]
+//[InitializeOnLoad]
 public static class BoltMenuItems {
-  const string UPGRADE_FLAG = "BOLT_UPGRADE";
 
-  static BoltMenuItems() {
-    if (EditorPrefs.GetBool(UPGRADE_FLAG, false)) {
-      EditorPrefs.SetBool(UPGRADE_FLAG, false);
-      RunCompiler();
-    }
-  }
+  //const string UPGRADE_FLAG = "BOLT_UPGRADE";
+
+  //static BoltMenuItems() {
+  //  if (EditorPrefs.GetBool(UPGRADE_FLAG, false)) {
+  //    EditorPrefs.SetBool(UPGRADE_FLAG, false);
+  //    RunCompiler();
+  //  }
+  //}
 
   [MenuItem("Assets/Compile Bolt Assets (All)")]
   public static void RunCompiler() {
@@ -42,17 +43,17 @@ public static class BoltMenuItems {
   }
 
 
-  [MenuItem("Edit/Upgrade Bolt")]
-  public static void Upgrade() {
-    if (EditorUtility.DisplayDialog("Upgrade", "Do you want to upgrade Bolt? This will shut down Unity during the upgrade process", "Yes", "No")) {
-      var package = EditorUtility.OpenFilePanel("Select Package", ".", "unitypackage");
-      Debug.Log(string.Format("Importing {0}", package));
-      AssetDatabase.ImportPackage(package, false);
-      EditorPrefs.SetBool(UPGRADE_FLAG, true);
-      EditorUtility.DisplayDialog("", "Click OK to restart Unity", "Ok");
-      EditorApplication.Exit(0);
-    }
-  }
+  //[MenuItem("Edit/Upgrade Bolt")]
+  //public static void Upgrade() {
+  //  if (EditorUtility.DisplayDialog("Upgrade", "Do you want to upgrade Bolt? This will shut down Unity during the upgrade process", "Yes", "No")) {
+  //    var package = EditorUtility.OpenFilePanel("Select Package", ".", "unitypackage");
+  //    Debug.Log(string.Format("Importing {0}", package));
+  //    AssetDatabase.ImportPackage(package, false);
+  //    EditorPrefs.SetBool(UPGRADE_FLAG, true);
+  //    EditorUtility.DisplayDialog("", "Click OK to restart Unity", "Ok");
+  //    EditorApplication.Exit(0);
+  //  }
+  //}
 
   [MenuItem("Window/Bolt Engine/Remotes", priority = 22)]
   public static void OpenInfoPanel() {

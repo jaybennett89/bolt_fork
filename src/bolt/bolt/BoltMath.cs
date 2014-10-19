@@ -19,8 +19,13 @@ namespace Bolt {
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > frame);
 
-        float t = f1.Number - f0.Number;
-        float d = frame - f0.Number;
+        int f0Frame = f0.Number;
+        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
+          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        }
+
+        float t = f1.Number - f0Frame;
+        float d = frame - f0Frame;
 
         return UE.Mathf.Lerp(p0, p1, d / t);
       }
@@ -40,8 +45,13 @@ namespace Bolt {
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > frame);
 
-        float t = f1.Number - f0.Number;
-        float d = frame - f0.Number;
+        int f0Frame = f0.Number;
+        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
+          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        }
+
+        float t = f1.Number - f0Frame;
+        float d = frame - f0Frame;
 
         return UE.Vector3.Lerp(p0, p1, d / t);
       }
@@ -61,8 +71,13 @@ namespace Bolt {
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > frame);
 
-        float t = f1.Number - f0.Number;
-        float d = frame - f0.Number;
+        int f0Frame = f0.Number;
+        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
+          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        }
+
+        float t = f1.Number - f0Frame;
+        float d = frame - f0Frame;
 
         return UE.Quaternion.Lerp(p0, p1, d / t);
       }
@@ -76,7 +91,7 @@ namespace Bolt {
       var v0 = value;
       var v1 = f.Data.ReadF32(offset);
 
-      float d = (frame + 1) - f.Number;
+      float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
       float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
 
       return v0 + ((v1 - v0) * t);
@@ -88,14 +103,22 @@ namespace Bolt {
 
     internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity) {
       var f = frames.first;
+      var tolerance = settings.ExtrapolationErrorTolerance;
 
       UE.Vector3 p = f.Data.ReadVector3(offset);
+      UE.Vector3 m = p - position;
       UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
-      float d = (frame + 1) - f.Number;
+      float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
       float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
-      return UE.Vector3.Lerp(position + v, p + (v * d), t);
+      p = UE.Vector3.Lerp(position + v, p + (v * d), t);
+
+      if ((velocity.magnitude < tolerance) && ((p - position).magnitude < tolerance)) {
+        return position;
+      }
+
+      return p;
     }
 
     internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
@@ -104,7 +127,7 @@ namespace Bolt {
       var r1 = f.Data.ReadQuaternion(offset);
       var df = r1 * UE.Quaternion.Inverse(r0);
 
-      float d = (frame + 1) - f.Number;
+      float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
       float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
       float dAngle;

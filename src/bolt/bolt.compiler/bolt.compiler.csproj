@@ -103,7 +103,6 @@
     <Compile Include="Property\Settings\PropertyAssetSettings.cs" />
     <Compile Include="Property\Settings\PropertyEventSettings.cs" />
     <Compile Include="Property\Settings\PropertyStateSettings.cs" />
-    <Compile Include="Property\PropertyEnums.cs" />
     <Compile Include="Property\Type\PropertyTypeArray.cs" />
     <Compile Include="Property\Type\PropertyTypeBool.cs" />
     <Compile Include="Property\Type\PropertyTypeColor.cs" />

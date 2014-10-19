@@ -16,6 +16,7 @@ namespace Bolt.Compiler {
 
     public override void AddSettingsArgument(List<string> settings) {
       settings.Add(Generator.CreateVectorCompressionExpression(Decorator.PropertyType.Compression, Decorator.PropertyType.Selection));
+      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
     }
   }
 }

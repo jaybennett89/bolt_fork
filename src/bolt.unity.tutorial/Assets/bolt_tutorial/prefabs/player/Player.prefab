@@ -14,7 +14,6 @@ GameObject:
   - 114: {fileID: 11400020}
   - 143: {fileID: 14300000}
   - 114: {fileID: 11400010}
-  - 114: {fileID: 11400002}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1918,20 +1917,6 @@ MonoBehaviour:
   _clientPredicted: 1
   _allowInstantiateOnClient: 0
   _persistThroughSceneLoads: 0
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51a2b5975f24f06488d5a5414a80078d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectRadius: 8
-  releaseRadius: 16
-  updateRate: 30
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
