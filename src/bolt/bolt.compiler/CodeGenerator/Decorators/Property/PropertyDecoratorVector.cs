@@ -6,13 +6,11 @@ using System.Text;
 namespace Bolt.Compiler {
   class PropertyDecoratorVector : PropertyDecorator<PropertyTypeVector> {
     public override string ClrType {
-      get {
-        return "UE.Vector3";
-      }
+      get { return "UE.Vector3"; }
     }
 
     public override int ByteSize {
-      get { return 16; }
+      get { return 24; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {

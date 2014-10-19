@@ -15,7 +15,6 @@ namespace BoltInternal {
 }
 
 public static class BoltNetworkInternal {
-  public static int SceneIndexOffset;
   public static bool UsingUnityPro;
 
   public static Action EnvironmentSetup;
@@ -343,19 +342,11 @@ public static class BoltNetwork {
   }
 
   /// <summary>
-  /// Load a scene based on index, only possible on the Server
-  /// </summary>
-  /// <param name="scene">The scene to load</param>
-  public static void LoadScene(int scene) {
-    BoltCore.LoadScene(scene);
-  }
-
-  /// <summary>
   /// Load a scene based on name, only possible on the Server
   /// </summary>
   /// <param name="scene">The scene to load</param>
   public static void LoadScene(string scene) {
-    LoadScene(BoltNetworkInternal.GetSceneIndex(scene));
+    BoltCore.LoadScene(BoltNetworkInternal.GetSceneIndex(scene));
   }
 
   /// <summary>

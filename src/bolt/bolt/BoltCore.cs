@@ -15,7 +15,9 @@ public enum BoltNetworkModes {
   Client = 2,
 }
 
+
 internal static class BoltCore {
+
   static UdpSocket _udpSocket;
   static internal SceneLoadState _localSceneLoading;
 
@@ -660,11 +662,10 @@ internal static class BoltCore {
 
     foreach (var pair in _globalBehaviours) {
       if ((pair.item0.Mode & _mode) == _mode) {
-        var anyMap = ((pair.item0.Scenes == null) || (pair.item0.Scenes.Length == 0)) && ((pair.item0.ScenesNames == null) || (pair.item0.ScenesNames.Length == 0));
-        var matchesMapIndex = (pair.item0.Scenes != null) && (Array.IndexOf<int>(pair.item0.Scenes, index + BoltNetworkInternal.SceneIndexOffset) != -1);
-        var matchesMapName = (index >= 0) && (pair.item0.ScenesNames != null) && (Array.FindIndex<string>(pair.item0.ScenesNames, v => Regex.IsMatch(BoltNetworkInternal.GetSceneName(index), v)) != -1);
+        var anyMap = ((pair.item0.Scenes == null) || (pair.item0.Scenes.Length == 0)) && ((pair.item0.Scenes == null) || (pair.item0.Scenes.Length == 0));
+        var nameMatches = (index >= 0) && (pair.item0.Scenes != null) && (Array.FindIndex<string>(pair.item0.Scenes, v => Regex.IsMatch(BoltNetworkInternal.GetSceneName(index), v)) != -1);
 
-        if (anyMap || matchesMapIndex || matchesMapName) {
+        if (anyMap || nameMatches) {
           CreateGlobalBehaviour(pair.item1);
         }
         else {

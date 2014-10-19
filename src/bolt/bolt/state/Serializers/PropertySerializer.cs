@@ -6,39 +6,16 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-
-  internal struct PropertySettings {
-    public int ByteOffset;
-    public String PropertyName;
-
-    public PropertySettings(int offset, string name) {
-      ByteOffset = offset;
-      PropertyName = name;
-    }
-  }
-
-  internal struct PropertyStateSettings {
-    public int Priority;
-    public int ByteLength;
-    public int ObjectOffset;
-
-    public String PropertyPath;
-    public String[] CallbackPaths;
-    public ArrayIndices CallbackIndices;
-
-    public PropertyStateSettings(int priority, int byteLength, int objectOffset, string propertyPath, string[] callbackPaths, ArrayIndices callbackIndices) {
-      Priority = UE.Mathf.Max(1, priority);
-      ByteLength = byteLength;
-      ObjectOffset = objectOffset;
-      PropertyPath = propertyPath;
-      CallbackPaths = callbackPaths;
-      CallbackIndices = callbackIndices;
-    }
+  internal enum PropertyModes {
+    State = 0,
+    Command = 1,
+    Event = 2
   }
 
   abstract class PropertySerializer {
     public PropertySettings Settings;
     public PropertyStateSettings StateSettings;
+    public PropertySmoothingSettings SmoothingSettings;
 
     public void AddSettings(PropertySettings settings) {
       Settings = settings;
@@ -46,6 +23,10 @@ namespace Bolt {
 
     public void AddSettings(PropertyStateSettings stateSettings) {
       StateSettings = stateSettings;
+    }
+
+    public void AddSettings(PropertySmoothingSettings smoothingSettings) {
+      SmoothingSettings = smoothingSettings;
     }
 
     public virtual object GetDebugValue(State state) { return null; }
@@ -72,31 +53,31 @@ namespace Bolt {
 
   abstract class PropertySerializerSimple : PropertySerializer {
     public override bool EventPack(Event data, BoltConnection connection, UdpStream stream) {
-      return Pack(data.Data, Settings.ByteOffset, connection, stream);
+      return Pack(data.Data, connection, stream);
     }
 
     public override void EventRead(Event data, BoltConnection connection, UdpStream stream) {
-      Read(data.Data, Settings.ByteOffset, connection, stream);
+      Read(data.Data, connection, stream);
     }
 
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
-      return Pack(frame.Data, Settings.ByteOffset, connection, stream);
+      return Pack(frame.Data, connection, stream);
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
-      Read(frame.Data, Settings.ByteOffset, connection, stream);
+      Read(frame.Data, connection, stream);
     }
 
     public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
-      Pack(data, Settings.ByteOffset, connection, stream);
+      Pack(data, connection, stream);
     }
 
     public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
-      Read(data, Settings.ByteOffset, connection, stream);
+      Read(data, connection, stream);
     }
 
-    protected virtual bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    protected virtual void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    protected virtual bool Pack(byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    protected virtual void Read(byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
   }
 
   abstract class PropertySerializerMecanim : PropertySerializerSimple {

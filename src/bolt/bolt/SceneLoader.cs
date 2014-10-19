@@ -38,7 +38,7 @@ class BoltSceneLoader : MonoBehaviour {
     BoltCore.SceneLoadBegin(_loadOps.first.scene);
 
     // load level
-    Application.LoadLevel(_loadOps.first.scene.Index);
+    Application.LoadLevel(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Index));
 
     // we are done!
     Done();
@@ -50,7 +50,7 @@ class BoltSceneLoader : MonoBehaviour {
       BoltCore.SceneLoadBegin(_loadOps.first.scene);
 
       // begin new async load
-      _loadOps.first.async = Application.LoadLevelAsync(_loadOps.first.scene.Index);
+      _loadOps.first.async = Application.LoadLevelAsync(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Index));
 
     }
     else {

@@ -6,7 +6,7 @@ using System.Text;
 namespace Bolt.Compiler {
   public class PropertyDecoratorFloat : PropertyDecorator<PropertyTypeFloat> {
     public override int ByteSize {
-      get { return 4; }
+      get { return 8; }
     }
 
     public override string ClrType {

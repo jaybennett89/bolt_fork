@@ -25,6 +25,12 @@ public static class BoltEditorGUI {
     return EditorUtility.DisplayDialog("Confirm", "Do you want to delete this item?", "Yes", "No");
   }
 
+  public static GUIStyle BoxStyle(int n) {
+    GUIStyle s = new GUIStyle("flow node " + n);
+    s.padding = new RectOffset(4, 4, 4, 4);
+    return s;
+  } 
+
   public static AxisSelections EditAxisSelection(AxisSelections value) {
     return EditAxisSelection(null, value);
   }
@@ -302,7 +308,7 @@ public static class BoltEditorGUI {
   }
 
   public static bool Button(string icon) {
-    return IconButton(icon, BoltRuntimeSettings.instance.highlightColor);
+    return IconButton(icon, BoltEditorSkin.Selected.IconColor);
   }
 
   public static bool Toggle(string on, string off, bool enabled) {
@@ -312,7 +318,7 @@ public static class BoltEditorGUI {
   public static bool Toggle(string icon, bool enabled) {
     Color c;
 
-    c = BoltRuntimeSettings.instance.highlightColor;
+    c = BoltEditorSkin.Selected.IconColor;
     c.a = enabled ? 1f : 0.25f;
 
     if (IconButton(icon, c)) {
@@ -505,6 +511,7 @@ public static class BoltEditorGUI {
     c.MinValue = Mathf.Min(IntFieldOverlay(c.MinValue, "Min"), c.MaxValue - 1);
     c.MaxValue = Mathf.Max(IntFieldOverlay(c.MaxValue, "Max"), c.MinValue + 1);
     c.Accuracy = Mathf.Max(FloatFieldOverlay(c.Accuracy, "Accuracy"), 0.001f);
+    GUILayout.Label("Bits: " + (c.Enabled ? c.BitsRequired : 32), EditorStyles.miniLabel, GUILayout.Width(50));
     EditorGUI.EndDisabledGroup();
 
     return c;

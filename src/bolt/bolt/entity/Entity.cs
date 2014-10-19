@@ -77,6 +77,10 @@ namespace Bolt {
       get { return ReferenceEquals(Source, null); }
     }
 
+    internal bool IsDummy {
+      get { return !IsOwner && !HasPredictedControl; }
+    }
+
     internal bool HasControl {
       get { return Flags & EntityFlags.HAS_CONTROL; }
     }

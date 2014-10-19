@@ -20,7 +20,7 @@ namespace Bolt.Compiler {
       return "new {0}()".Expr(SerializerClassName);
     }
 
-    public virtual void GetAddSettingsArgument(List<string> settings) {
+    public virtual void AddSettingsArgument(List<string> settings) {
 
     }
 
@@ -57,7 +57,7 @@ namespace Bolt.Compiler {
 
       // property settings 
       if ((Decorator.DefiningAsset is StateDecorator) || (Decorator.DefiningAsset is StructDecorator)) {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", sp.OffsetBytes, Decorator.Definition.Name));
+        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.State)", sp.OffsetBytes, Decorator.Definition.Name));
         settings.Add(string.Format("new Bolt.PropertyStateSettings({0}, {1}, {2}, \"{3}\", {4}, {5})",
           Decorator.Definition.Priority,
           Decorator.ByteSize,
@@ -68,7 +68,12 @@ namespace Bolt.Compiler {
         ));
       }
       else {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\")", Decorator.ByteOffset, Decorator.Definition.Name));
+        settings.Add(string.Format(
+          "new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.{2})", 
+          Decorator.ByteOffset, 
+          Decorator.Definition.Name,
+          Decorator.DefiningAsset is EventDecorator ? "Event" : "Command"
+        ));
       }
 
       // mecanim for states settings
@@ -84,7 +89,7 @@ namespace Bolt.Compiler {
       }
 
       // collecting property specific settings
-      GetAddSettingsArgument(settings);
+      AddSettingsArgument(settings);
 
       for (int n = 0; n < settings.Count; ++n) {
         statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));

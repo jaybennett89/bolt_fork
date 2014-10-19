@@ -49,15 +49,15 @@ namespace Bolt.Compiler {
     public int Filters;
 
     public PropertyStateSettings StateAssetSettings {
-      get { return (PropertyStateSettings)AssetSettings; }
+      get { return AssetSettings as PropertyStateSettings; }
     }
 
     public PropertyEventSettings EventAssetSettings {
-      get { return (PropertyEventSettings)AssetSettings; }
+      get { return AssetSettings as PropertyEventSettings; }
     }
 
     public PropertyCommandSettings CommandAssetSettings {
-      get { return (PropertyCommandSettings)AssetSettings; }
+      get { return AssetSettings as PropertyCommandSettings; }
     }
 
   }

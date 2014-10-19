@@ -44,9 +44,6 @@ public class BoltRuntimeSettings : ScriptableObject {
   public bool debugPlayAsServer = false;
 
   [SerializeField]
-  public bool autoSwitchToEditor = true;
-
-  [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   [SerializeField]
@@ -59,7 +56,10 @@ public class BoltRuntimeSettings : ScriptableObject {
   public int compilationWarnLevel = 4;
 
   [SerializeField]
-  public Color highlightColor = new Color(81f / 255f, 203f / 255f, 255f / 255f);
+  public int editorSkin = 4;
+
+  [SerializeField]
+  public Color _notUsed = new Color(81f / 255f, 203f / 255f, 255f / 255f);
 
   [SerializeField]
   public string projectPath = "";

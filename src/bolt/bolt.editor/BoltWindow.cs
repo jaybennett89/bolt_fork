@@ -34,8 +34,8 @@ public abstract class BoltWindow : EditorWindow {
   static bool clear;
   static bool saveUndo;
   static protected int Repaints;
-  static protected INamedAsset Selected;
-  static protected AssetDefinition SelectedAsset;
+  static protected bool AutoFocusName;
+  static protected AssetDefinition Selected;
 
   protected bool HasProject {
     get { return Project != null; }
@@ -99,8 +99,8 @@ public abstract class BoltWindow : EditorWindow {
       Repaints = Mathf.Max(0, Repaints - 1);
     }
 
-    if (SelectedAsset != null && SelectedAsset.Deleted) {
-      SelectedAsset = null;
+    if (Selected != null && Selected.Deleted) {
+      Selected = null;
     }
   }
 
@@ -138,6 +138,11 @@ public abstract class BoltWindow : EditorWindow {
     }
 
     if (Repaints == 0) {
+      if (AutoFocusName) {
+        GUI.FocusControl("BoltEditorName");
+        AutoFocusName = false;
+      }
+
       clear = false;
       return;
     }

@@ -129,5 +129,16 @@ partial class GlobalEventListenerBase {
     }
   }
 
+  
+  public virtual void EntityReceived(BoltEntity entity) { 
+  }
+
+  internal static void EntityReceivedInvoke(BoltEntity entity) { 
+    BoltLog.Debug("Invoking callback EntityReceived");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.EntityReceived(entity);
+    }
+  }
+
   }
 }

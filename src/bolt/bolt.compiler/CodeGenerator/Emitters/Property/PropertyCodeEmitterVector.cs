@@ -13,5 +13,9 @@ namespace Bolt.Compiler {
     public override string PackMethod {
       get { return "PackVector3"; }
     }
+
+    public override void AddSettingsArgument(List<string> settings) {
+      settings.Add(Generator.CreateVectorCompressionExpression(Decorator.PropertyType.Compression, Decorator.PropertyType.Selection));
+    }
   }
 }

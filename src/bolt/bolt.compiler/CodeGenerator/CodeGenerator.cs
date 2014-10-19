@@ -67,6 +67,41 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
+    public string CreateFloatCompressionExpression(FloatCompression c) {
+      return CreateFloatCompressionExpression(c, true);
+    }
+
+    public string CreateVectorCompressionExpression(FloatCompression[] axes, AxisSelections selection) {
+      List<string> args = new List<string>();
+      args.Add(CreateFloatCompressionExpression(axes[Axis.X], (selection & AxisSelections.X) == AxisSelections.X));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Y], (selection & AxisSelections.Y) == AxisSelections.Y));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Z], (selection & AxisSelections.Z) == AxisSelections.Z));
+      return string.Format("Bolt.PropertyVectorCompressionSettings.Create({0})", args.Join(", "));
+    }
+
+    public string CreateRotationCompressionExpression(FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
+      if (selection == AxisSelections.XYZ) {
+        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateFloatCompressionExpression(quaternion));
+      }
+      else {
+        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateVectorCompressionExpression(axes, selection));
+      }
+    }
+
+    public string CreateFloatCompressionExpression(FloatCompression c, bool enabled) {
+      if (enabled) {
+        if (c.Enabled) {
+          return string.Format("Bolt.PropertyFloatCompressionSettings.Create({0}, {1}f, {2}f, {3}f)", c.BitsRequired, c.Shift, c.Pack, c.Read);
+        }
+        else {
+          return string.Format("Bolt.PropertyFloatCompressionSettings.Create()");
+        }
+      }
+      else {
+        return string.Format("default(Bolt.PropertyFloatCompressionSettings)");
+      }
+    }
+
     public FilterDefinition FindFilter(int index) {
       return Filters.First(x => x.Index == index);
     }
@@ -233,9 +268,9 @@ namespace Bolt.Compiler {
 
       type = new CodeTypeDeclaration("StateSerializerTypeIds");
       type.TypeAttributes = TypeAttributes.Public | TypeAttributes.Abstract;
-      
+
       foreach (StateDecorator s in States) {
-        if(s.Definition.IsAbstract) {
+        if (s.Definition.IsAbstract) {
           continue;
         }
 

@@ -13,5 +13,9 @@ namespace Bolt.Compiler {
     public override string PackMethod {
       get { return "PackQuaternion"; }
     }
+
+    public override void AddSettingsArgument(List<string> settings) {
+      settings.Add(Generator.CreateRotationCompressionExpression(Decorator.PropertyType.EulerCompression, Decorator.PropertyType.QuaternionCompression, Decorator.PropertyType.Selection));
+    }
   }
 }

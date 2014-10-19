@@ -68,42 +68,44 @@ namespace Bolt {
       }
     }
 
-    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, float value) {
+    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, float value) {
       var f = frames.first;
+
+      frame = UE.Mathf.Min(frame, f.Number + settings.ExtrapolationMaxFrames);
 
       var v0 = value;
       var v1 = f.Data.ReadF32(offset);
 
       float d = (frame + 1) - f.Number;
-      float t = d / System.Math.Max(2, correctFrames);
+      float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
 
       return v0 + ((v1 - v0) * t);
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, int correctFrames, UE.Vector3 position) {
-      return ExtrapolateVector(frames, offset, frame, correctFrames, position, frames.first.Data.ReadVector3(velocityOffset));
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, PropertySmoothingSettings settings, UE.Vector3 position) {
+      return ExtrapolateVector(frames, offset, frame, settings, position, frames.first.Data.ReadVector3(velocityOffset));
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, UE.Vector3 position, UE.Vector3 velocity) {
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity) {
       var f = frames.first;
 
       UE.Vector3 p = f.Data.ReadVector3(offset);
       UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
       float d = (frame + 1) - f.Number;
-      float t = d / System.Math.Max(2, correctFrames);
+      float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
       return UE.Vector3.Lerp(position + v, p + (v * d), t);
     }
 
-    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, int correctFrames, UE.Quaternion rotation) {
+    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
       var f = frames.first;
       var r0 = rotation;
       var r1 = f.Data.ReadQuaternion(offset);
       var df = r1 * UE.Quaternion.Inverse(r0);
 
       float d = (frame + 1) - f.Number;
-      float t = d / System.Math.Max(2, correctFrames);
+      float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
       float dAngle;
       UE.Vector3 dAxis;

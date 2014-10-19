@@ -18,10 +18,12 @@ public class BoltProjectWindow : BoltWindow {
     w.Show();
   }
 
+  Vector2 scroll;
   string addGroup = null;
   AssetDefinition addGroupTo = null;
 
-  Vector2 scroll;
+  [SerializeField]
+  string selectedAssetGuid;
 
   bool HasGroupSelected {
     get { return !string.IsNullOrEmpty(Project.ActiveGroup) && Project.ActiveGroup != "Everything"; }
@@ -39,10 +41,25 @@ public class BoltProjectWindow : BoltWindow {
     ArrayUtility.Add(ref Project.RootFolder.Assets, def);
 
     // select it
-    Select(def);
+    Select(def, true);
 
     // save project
     Save();
+  }
+
+  new void Update() {
+    base.Update();
+
+    if (HasProject) {
+      if (string.IsNullOrEmpty(selectedAssetGuid) == false && Selected == null) {
+        try {
+          Select(Project.RootFolder.Assets.First(x => x.Guid == new Guid(selectedAssetGuid)), false);
+        }
+        catch {
+          selectedAssetGuid = null;
+        }
+      }
+    }
   }
 
   new void OnGUI() {
@@ -136,12 +153,12 @@ public class BoltProjectWindow : BoltWindow {
 
   void OverlayIcon(string icon) {
     Rect r = GUILayoutUtility.GetLastRect();
-    r.xMin = r.xMax - 15;
-    r.xMax = r.xMax - 3;
+    r.xMin = r.xMax - 17;
+    r.xMax = r.xMax - 5;
     r.yMin = r.yMin + 2;
     r.yMax = r.yMax - 1;
 
-    GUI.color = BoltRuntimeSettings.instance.highlightColor;
+    GUI.color = BoltEditorSkin.Selected.IconColor;
     GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
     GUI.color = Color.white;
   }
@@ -163,19 +180,19 @@ public class BoltProjectWindow : BoltWindow {
       style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
-        style.normal.textColor = BoltRuntimeSettings.instance.highlightColor;
+        style.normal.textColor = BoltEditorSkin.Selected.IconColor;
       }
 
       if (GUILayout.Button(new GUIContent(a.Name), style)) {
-        Select(a);
+        Select(a, false);
       }
 
-      if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(16))) {
+      if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(20))) {
         if (deleteMode) {
           a.Deleted = true;
 
           if (IsSelected(a)) {
-            Select(null);
+            Select(null, false);
           }
 
           Save();
@@ -240,14 +257,21 @@ public class BoltProjectWindow : BoltWindow {
     return ReferenceEquals(obj, Selected);
   }
 
-  void Select(INamedAsset asset) {
+  void Select(AssetDefinition asset, bool isnew) {
+    if (asset == null) {
+      selectedAssetGuid = null;
+    }
+    else {
+      selectedAssetGuid = asset.Guid.ToString();
+    }
+
     Repaints = 10;
     Selected = asset;
-    BeginClearFocus();
-    BoltEditorGUI.UseEvent();
+    AutoFocusName = isnew;
 
-    if (BoltRuntimeSettings.instance.autoSwitchToEditor) {
-      BoltEditorWindow.Open();
-    }
+    BeginClearFocus();
+
+    BoltEditorGUI.UseEvent();
+    BoltEditorWindow.Open();
   }
 }

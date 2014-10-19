@@ -4,7 +4,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>using System.Collections.Generic;
-<# foreach(string id in new string[]{ "NetId", "InstanceId", "PrefabId", "TypeId" }) { #>
+<# foreach(string id in new string[]{ "NetId", "InstanceId", "PrefabId", "TypeId", "SceneId" }) { #>
 
 namespace Bolt {
 [Documentation]

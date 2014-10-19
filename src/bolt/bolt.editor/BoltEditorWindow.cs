@@ -17,6 +17,7 @@ public class BoltEditorWindow : BoltWindow {
     w.name = "Bolt Editor";
     w.minSize = new Vector2(300, 400);
     w.Show();
+    w.Focus();
   }
 
   Vector2 scroll;
@@ -41,29 +42,24 @@ public class BoltEditorWindow : BoltWindow {
 
 
   void Editor() {
-    if ((Selected is AssetDefinition) && (ReferenceEquals(Selected, SelectedAsset) == false)) {
-      SelectedAsset = (AssetDefinition)Selected;
-    }
-
-    if (SelectedAsset != null) {
-      if (SelectedAsset is StateDefinition) {
-        EditState((StateDefinition)SelectedAsset);
+    if (Selected != null) {
+      if (Selected is StateDefinition) {
+        EditState((StateDefinition)Selected);
       }
 
-      if (SelectedAsset is StructDefinition) {
-        EditStruct((StructDefinition)SelectedAsset);
+      if (Selected is StructDefinition) {
+        EditStruct((StructDefinition)Selected);
       }
 
-      if (SelectedAsset is EventDefinition) {
-        EditEvent((EventDefinition)SelectedAsset);
+      if (Selected is EventDefinition) {
+        EditEvent((EventDefinition)Selected);
       }
 
-      if (SelectedAsset is CommandDefinition) {
-        EditCommand((CommandDefinition)SelectedAsset);
+      if (Selected is CommandDefinition) {
+        EditCommand((CommandDefinition)Selected);
       }
     }
   }
-
 
   void EditState(StateDefinition def) {
     EditHeader(def);
@@ -207,18 +203,19 @@ public class BoltEditorWindow : BoltWindow {
     var cmdDef = def as CommandDefinition;
     var eventDef = def as EventDefinition;
 
-    GUIStyle sceneStyle = "TE NodeBoxSelected";
-    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
-    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
+    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUI.color = Color.white;
 
     GUILayout.Space(3);
 
     if (def is StateDefinition) { BoltEditorGUI.Button("mc_state"); }
     if (def is StructDefinition) { BoltEditorGUI.Button("mc_struct"); }
     if (def is EventDefinition) { BoltEditorGUI.Button("mc_event"); }
-    if (def is CommandDefinition) { BoltEditorGUI.Button("mc_controller"); }
+    if (def is CommandDefinition) { BoltEditorGUI.Button("mc_command"); }
 
     // edit asset name
+    GUI.SetNextControlName("BoltEditorName");
     def.Name = EditorGUILayout.TextField(def.Name);
 
     if (cmdDef != null) {
@@ -252,7 +249,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     GUILayout.EndHorizontal();
-    GUILayout.Space(4);
+    GUILayout.Space(2);
 
     BoltEditorGUI.WithLabel("Comment", () => { def.Comment = EditorGUILayout.TextArea(def.Comment); });
 
@@ -304,9 +301,9 @@ public class BoltEditorWindow : BoltWindow {
   void EditProperty(AssetDefinition def, PropertyDefinition p) {
     BeginBackground();
 
-    GUIStyle sceneStyle = "TE NodeBox";
-    sceneStyle.padding = new RectOffset(3, 5, 5, 4);
-    GUILayout.BeginHorizontal(sceneStyle, GUILayout.Height(22));
+    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
+    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
+    GUI.color = Color.white;
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.Button("mc_minus")) {
@@ -351,10 +348,8 @@ public class BoltEditorWindow : BoltWindow {
 
       if (def is CommandDefinition) {
         if (p.PropertyType.CanSmoothCorrections && ((CommandDefinition)def).Result.Contains(p)) {
-          BoltEditorGUI.SettingsSection("Corrections", () => {
-            BoltEditorGUI.WithLabel("Smooth Corrections", () => {
-              p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
-            });
+          BoltEditorGUI.WithLabel("Smooth Corrections", () => {
+            p.CommandAssetSettings.SmoothCorrection = EditorGUILayout.Toggle(p.CommandAssetSettings.SmoothCorrection);
           });
         }
       }

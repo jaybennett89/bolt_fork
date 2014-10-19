@@ -141,7 +141,7 @@ namespace Bolt {
       DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
       TempPriority = new Priority[MetaData.PropertyCount];
 
-      PropertyIdBits = 16; //BoltMath.BitsRequired(MetaData.PropertyCount - 1);
+      PropertyIdBits = Bolt.Math.BitsRequired(MetaData.PropertyCount);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = Bolt.Math.BitsRequired(MetaData.PacketMaxProperties);
     }
@@ -167,6 +167,21 @@ namespace Bolt {
 
           BoltNetworkInternal.DebugDrawer.Indent(0);
         }
+      }
+    }
+
+    public void OnControlGained() {
+      if (!Entity.IsOwner) {
+        while (Frames.count > 1) {
+          FreeFrame(Frames.RemoveFirst());
+        }
+      }
+    }
+
+    public void OnControlLost() {
+      if (!Entity.IsOwner) {
+        Assert.True(Frames.count == 1);
+        Frames.first.Number = Entity.Frame;
       }
     }
 
@@ -318,7 +333,6 @@ namespace Bolt {
       // raise local changed events
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
         if (diff.IsSet(i)) {
-          //BoltLog.Info("property changed {0}", MetaData.PropertySerializers[i].StateData.PropertyName);
           InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
         }
       }
@@ -381,7 +395,7 @@ namespace Bolt {
       }
 
       // write into stream
-      PackWrite(connection, stream, env, tempPriority, tempCount);
+      PackProperties(connection, stream, env, tempPriority, tempCount);
 
       for (int i = 0; i < env.Written.Count; ++i) {
         Priority p = env.Written[i];
@@ -396,7 +410,7 @@ namespace Bolt {
       return env.Written.Count;
     }
 
-    void PackWrite(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
+    void PackProperties(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
       int propertyCountPtr = stream.Ptr;
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
@@ -528,6 +542,7 @@ namespace Bolt {
     BitArray CalculateFilter(Filter filter) {
       return FullMask;
     }
+
 
 
   }

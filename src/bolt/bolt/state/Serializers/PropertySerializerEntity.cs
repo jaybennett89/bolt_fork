@@ -20,8 +20,8 @@ namespace Bolt {
       return EntityProxy.ID_BIT_COUNT + 1;
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, offset)));
+    protected override bool Pack(byte[] data,  BoltConnection connection, UdpStream stream) {
+      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, Settings.ByteOffset)));
 
       if ((entity != null) && (connection._entityChannel.ExistsOnRemote(entity) == false)) {
         return false;
@@ -31,14 +31,14 @@ namespace Bolt {
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
       Bolt.Entity entity = stream.ReadEntity(connection);
 
       if (entity) {
-        Blit.PackI32(data, offset, entity.InstanceId.Value);
+        Blit.PackI32(data, Settings.ByteOffset, entity.InstanceId.Value);
       }
       else {
-        Blit.PackI32(data, offset, 0);
+        Blit.PackI32(data, Settings.ByteOffset, 0);
       }
     }
   }

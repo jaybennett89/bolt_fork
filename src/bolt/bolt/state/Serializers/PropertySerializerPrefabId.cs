@@ -10,13 +10,13 @@ namespace Bolt {
       return Blit.ReadPrefabId(state.Frames.first.Data, Settings.ByteOffset);
     }
 
-    protected override bool Pack(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      stream.WriteInt(Blit.ReadPrefabId(data, offset).Value);
+    protected override bool Pack(byte[] data,  BoltConnection connection, UdpStream stream) {
+      stream.WriteInt(Blit.ReadPrefabId(data, Settings.ByteOffset).Value);
       return true;
     }
 
-    protected override void Read(byte[] data, int offset, BoltConnection connection, UdpStream stream) {
-      Blit.PackPrefabId(data, offset, new Bolt.PrefabId(stream.ReadInt()));
+    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+      Blit.PackPrefabId(data, Settings.ByteOffset, new Bolt.PrefabId(stream.ReadInt()));
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

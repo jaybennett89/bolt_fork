@@ -31,6 +31,9 @@ namespace Bolt {
       CommandQueue.Clear();
       CommandSequence = 0;
 
+      // call to serializer
+      Serializer.OnControlGained();
+
       // raise user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
 
@@ -60,6 +63,9 @@ namespace Bolt {
       Flags &= ~EntityFlags.HAS_CONTROL;
       CommandQueue.Clear();
       CommandSequence = 0;
+
+      // call to serializer
+      Serializer.OnControlLost();
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {

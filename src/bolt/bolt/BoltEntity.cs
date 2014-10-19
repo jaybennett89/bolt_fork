@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
-using UdpKit;
+using System.Linq;
 using UE = UnityEngine;
-using Bolt;
 
 [DocumentationAttribute]
 public class BoltEntitySettingsModifier : IDisposable {
@@ -89,6 +88,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public static string Join<T>(IEnumerable<T> items, string seperator) {
     return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
+  }
+
+  public Bolt.PrefabId prefabId {
+    get { return new PrefabId(_prefabId); }
   }
 
   internal Bolt.UniqueId sceneId {
@@ -326,6 +329,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// <returns>True if this entity has a state of type TState otherwise false</returns>
   public bool StateIs<TState>() {
     return Entity.Serializer is TState;
+  }
+
+  public bool StateIs(Type t) {
+    return t.IsAssignableFrom(Entity.Serializer.GetType());
   }
 
   public override string ToString() {
