@@ -164,6 +164,10 @@ public class BoltConnection : BoltObject {
     return ReferenceEquals(this, obj);
   }
 
+  public bool IsScoped(BoltEntity entity) {
+    return _entityChannel.MightExistOnRemote(entity.Entity);
+  }
+
   public override int GetHashCode() {
     return _udp.GetHashCode();
   }

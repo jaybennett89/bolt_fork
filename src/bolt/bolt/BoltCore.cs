@@ -877,6 +877,9 @@ internal static class BoltCore {
       if (isServer) {
         Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneId);
       }
+      else {
+        se.gameObject.SendMessage("BoltSceneObject", UE.SendMessageOptions.DontRequireReceiver);
+      }
     }
 
     // call out to user code
@@ -884,6 +887,12 @@ internal static class BoltCore {
   }
 
   internal static GameObject FindSceneObject(UniqueId uniqueId) {
-    return _sceneObjects.First(x => x.sceneId == uniqueId).gameObject;
+    BoltEntity entity = _sceneObjects.FirstOrDefault(x => x.sceneId == uniqueId);
+
+    if (entity) {
+      return entity.gameObject;
+    }
+
+    return null;
   }
 }

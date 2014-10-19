@@ -194,10 +194,12 @@ public class PlayerMotor : MonoBehaviour {
   }
 
   void OnDrawGizmos() {
-    Gizmos.color = _state.isGrounded ? Color.green : Color.red;
-    Gizmos.DrawWireSphere(sphere, _cc.radius);
+    if (Application.isPlaying) {
+      Gizmos.color = _state.isGrounded ? Color.green : Color.red;
+      Gizmos.DrawWireSphere(sphere, _cc.radius);
 
-    Gizmos.color = Color.magenta;
-    Gizmos.DrawLine(waist, waist + new Vector3(0, -(_cc.height/2f), 0));
+      Gizmos.color = Color.magenta;
+      Gizmos.DrawLine(waist, waist + new Vector3(0, -(_cc.height / 2f), 0));
+    }
   }
 }

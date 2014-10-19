@@ -184,7 +184,7 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (GUILayout.Button(new GUIContent(a.Name), style)) {
-        Select(a, false);
+        Select(a, true);
       }
 
       if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(20))) {
@@ -257,7 +257,7 @@ public class BoltProjectWindow : BoltWindow {
     return ReferenceEquals(obj, Selected);
   }
 
-  void Select(AssetDefinition asset, bool isnew) {
+  void Select(AssetDefinition asset, bool focusEditor) {
     if (asset == null) {
       selectedAssetGuid = null;
     }
@@ -267,11 +267,12 @@ public class BoltProjectWindow : BoltWindow {
 
     Repaints = 10;
     Selected = asset;
-    AutoFocusName = isnew;
-
     BeginClearFocus();
 
     BoltEditorGUI.UseEvent();
-    BoltEditorWindow.Open();
+
+    if (focusEditor) {
+      BoltEditorWindow.Open();
+    }
   }
 }

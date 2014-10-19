@@ -98,6 +98,8 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltPOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltUnityDebugDrawer.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
   </ItemGroup>
@@ -164,6 +166,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_wifi.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\BoltShaderPOI.shader" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\IcoSphere.fbx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
