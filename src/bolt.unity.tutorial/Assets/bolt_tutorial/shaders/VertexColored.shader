@@ -1,11 +1,11 @@
-﻿Shader "Custom/Vertex Colored Diffuse" {
+﻿Shader "Bolt/Vertex Colored Diffuse" {
 Properties {
     _Color ("Main Color", Color) = (1,1,1,1)
     _MainTex ("Base (RGB)", 2D) = "white" {}
 }
  
 SubShader {
-    Tags { "RenderType"="Opaque" }
+
     LOD 150
  
 CGPROGRAM
@@ -31,6 +31,4 @@ void surf (Input IN, inout SurfaceOutput o) {
 }
 ENDCG
 }
- 
-Fallback "Diffuse"
 }

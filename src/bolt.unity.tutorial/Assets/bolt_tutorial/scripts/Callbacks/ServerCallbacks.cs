@@ -44,8 +44,4 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
       p.entity = null;
     }
   }
-
-  public BoltEntity SpawnPlayerCharacter() {
-    return BoltNetwork.Instantiate(BoltPrefabs.Player, new Vector3(0, 15, 0), Quaternion.identity);
-  }
 }

@@ -226,7 +226,7 @@ partial class EntityChannel : BoltChannel {
 
       // if this is the controller give it the max priority
       if (proxy.Entity.IsController(connection)) {
-        proxy.Priority = 1 << 30  ;
+        proxy.Priority = 1 << 30;
       }
 
       // push
@@ -500,8 +500,15 @@ partial class EntityChannel : BoltChannel {
         }
 
         // create entity
+
         if (isSceneObject) {
-          entity = Entity.CreateFor(BoltCore.FindSceneObject(uniqueId), prefabId, serializerId, EntityFlags.SCENE_OBJECT);
+          GameObject go = BoltCore.FindSceneObject(uniqueId);
+
+          if (!go) {
+            go = BoltCore.PrefabPool.Instantiate(prefabId, spawnPosition, spawnRotation);
+          }
+
+          entity = Entity.CreateFor(go, prefabId, serializerId, EntityFlags.SCENE_OBJECT);
         }
         else {
           entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);

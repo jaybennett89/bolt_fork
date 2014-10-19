@@ -99,6 +99,23 @@ public static class BoltInstaller {
     Progress("Cleaning up old install ... ", 1f);
   }
 
+  static void InstallAreaOfInterest() {
+    Progress("Installing area of interest ... ", 0f);
+
+    var shader = Resources.First(x => x.Contains("BoltShaderPOI.shader"));
+    InstallAsset(shader);
+
+    var mesh = Resources.First(x => x.Contains("IcoSphere.fbx"));
+    InstallAsset(mesh);
+
+    EditImporter<ModelImporter>(ResourceToAssetPath(mesh), m => {
+      m.globalScale = 1f;
+    });
+
+    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+    Progress("Installing area of interest ... ", 1f);
+  }
+
   static void InstallLogo() {
     Progress("Installing logo ... ", 0f);
 
