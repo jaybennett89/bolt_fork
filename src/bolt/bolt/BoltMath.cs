@@ -60,6 +60,9 @@ namespace Bolt {
     internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadQuaternion(offset);
+      if (p0 == default(UE.Quaternion)) {
+        p0 = UE.Quaternion.identity;
+      }
 
       if ((frames.count == 1) || (f0.Number >= frame)) {
         return p0;
@@ -67,6 +70,9 @@ namespace Bolt {
       else {
         var f1 = frames.Next(f0);
         var p1 = f1.Data.ReadQuaternion(offset);
+        if (p1 == default(UE.Quaternion)) {
+          p1 = UE.Quaternion.identity;
+        }
 
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > frame);
@@ -122,6 +128,10 @@ namespace Bolt {
     }
 
     internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
+      if (rotation == default(UE.Quaternion)) {
+        rotation = UE.Quaternion.identity;
+      }
+
       var f = frames.first;
       var r0 = rotation;
       var r1 = f.Data.ReadQuaternion(offset);
