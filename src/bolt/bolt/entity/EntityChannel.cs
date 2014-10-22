@@ -197,8 +197,11 @@ partial class EntityChannel : BoltChannel {
         // check update rate of this entity
         if ((packet.number % proxy.Entity.UpdateRate) != 0) { continue; }
 
+        // meep
+        if (proxy.Envelopes.full) { continue; }
+
         // if this connection is loading a map dont send any creates or state updates
-        if (connection.isLoadingMap || BoltSceneLoader.IsLoading) { continue; }
+        if (connection.isLoadingMap || BoltSceneLoader.IsLoading || !connection._canReceiveEntities) { continue; }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
           proxy.Priority = 1 << 18;

@@ -56,6 +56,10 @@ public static class BoltNetwork {
     ShutdownComplete = null;
   }
 
+  public static void SetCanReceiveEntities(bool canReceiveEntities) {
+    BoltCore._canReceiveEntities = canReceiveEntities;
+  }
+
   /// <summary>
   /// The current local simulation frame number
   /// </summary>

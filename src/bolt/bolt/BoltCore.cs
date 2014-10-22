@@ -21,6 +21,7 @@ internal static class BoltCore {
   static UdpSocket _udpSocket;
   static internal SceneLoadState _localSceneLoading;
 
+  static internal bool _canReceiveEntities = true;
   static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
 
   static internal int _frame = 0;
@@ -480,6 +481,10 @@ internal static class BoltCore {
             ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
           }
           break;
+
+        case UdpEventType.ConnectAttempt:
+          BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
+          break;
       }
     }
   }
@@ -733,6 +738,7 @@ internal static class BoltCore {
 
     // set config
     _config = config;
+    _canReceiveEntities = true;
 
     // set frametime
     Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
@@ -877,10 +883,9 @@ internal static class BoltCore {
       if (isServer) {
         Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneId);
       }
-      else {
-        se.gameObject.SendMessage("BoltSceneObject", UE.SendMessageOptions.DontRequireReceiver);
-      }
     }
+
+    BoltLog.Debug("Found {0} Scene Objects", _sceneObjects.Count);
 
     // call out to user code
     BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
