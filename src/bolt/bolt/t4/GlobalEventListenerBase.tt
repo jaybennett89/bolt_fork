@@ -11,6 +11,7 @@ cbs.Add("SceneLoadLocalBegin", new[] { "string", "map" });
 cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
 cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });
 
+cbs.Add("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" });
 cbs.Add("Connected", new[] { "BoltConnection", "connection" });
 cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});

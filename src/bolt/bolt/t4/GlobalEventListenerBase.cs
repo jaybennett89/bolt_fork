@@ -97,6 +97,17 @@ partial class GlobalEventListenerBase {
   }
 
   
+  public virtual void ConnectAttempt(UdpKit.UdpEndPoint endpoint) { 
+  }
+
+  internal static void ConnectAttemptInvoke(UdpKit.UdpEndPoint endpoint) { 
+    BoltLog.Debug("Invoking callback ConnectAttempt");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.ConnectAttempt(endpoint);
+    }
+  }
+
+  
   public virtual void Connected(BoltConnection connection) { 
   }
 
