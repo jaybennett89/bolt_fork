@@ -13,7 +13,6 @@ namespace Bolt {
 
     public static void DispatchAllEvents() {
       while (_dispatchQueue.Count > 0) {
-
         Dispatch(_dispatchQueue.Dequeue());
       }
     }
@@ -28,6 +27,14 @@ namespace Bolt {
 
         case Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER:
           Entity_Everyone_Except_Controller(ev);
+          break;
+
+        case Event.ENTITY_ONLY_CONTROLLER:
+          Entity_Only_Controller(ev);
+          break;
+
+        case Event.ENTITY_ONLY_OWNER:
+          Entity_Only_Owner(ev);
           break;
 
         case Event.GLOBAL_EVERYONE:
@@ -49,6 +56,42 @@ namespace Bolt {
         case Event.GLOBAL_SPECIFIC_CONNECTION:
           Global_Specific_Connection(ev);
           break;
+      }
+    }
+
+    static void Entity_Only_Owner(Event ev) {
+      if (ev.TargetEntity) {
+        if (ev.TargetEntity.IsOwner) {
+          RaiseLocal(ev);
+        }
+        else {
+          // forward to owner
+          ev.TargetEntity.Source._eventChannel.Queue(ev);
+        }
+      }
+    }
+
+    static void Entity_Only_Controller(Event ev) {
+      if (ev.TargetEntity) {
+        if (ev.TargetEntity.HasControl) {
+          RaiseLocal(ev);
+        }
+        else {
+          if (ev.TargetEntity.IsOwner) {
+            if (ev.TargetEntity.Controller != null) {
+              ev.TargetEntity.Controller._eventChannel.Queue(ev);
+            }
+            else {
+              BoltLog.Warn("{0} was sent to controller but no controller exists, event will NOT be raised");
+            }
+          }
+          else {
+            ev.TargetEntity.Source._eventChannel.Queue(ev);
+          }
+        }
+      }
+      else {
+        BoltLog.Warn("{0} with NULL target, event will NOT be forwarded or raised", ev);
       }
     }
 

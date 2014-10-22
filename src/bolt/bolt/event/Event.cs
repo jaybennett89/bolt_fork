@@ -15,13 +15,15 @@ namespace Bolt {
   public abstract class Event : IDisposable {
 
     internal const byte ENTITY_EVERYONE = 1;
-    internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 2;
+    internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 3;
+    internal const byte ENTITY_ONLY_CONTROLLER = 5;
+    internal const byte ENTITY_ONLY_OWNER = 7;
 
-    internal const byte GLOBAL_EVERYONE = 3;
+    internal const byte GLOBAL_EVERYONE = 2;
     internal const byte GLOBAL_OTHERS = 4;
-    internal const byte GLOBAL_SERVER = 5;
-    internal const byte GLOBAL_ALL_CLIENTS = 6;
-    internal const byte GLOBAL_SPECIFIC_CONNECTION = 7;
+    internal const byte GLOBAL_SERVER = 6;
+    internal const byte GLOBAL_ALL_CLIENTS = 8;
+    internal const byte GLOBAL_SPECIFIC_CONNECTION = 10;
 
     internal const int RELIABLE_WINDOW_BITS = 10;
     internal const int RELIABLE_SEQUENCE_BITS = 12;
@@ -34,22 +36,21 @@ namespace Bolt {
     internal byte[] Data;
 
     internal int Targets;
+    internal bool Reliable;
     internal Entity TargetEntity;
     internal BoltConnection TargetConnection;
     internal BoltConnection SourceConnection;
 
-    /// <summary>
-    /// Returns true if this event was sent from the local computer
-    /// </summary>
     public bool IsFromLocalComputer {
       get { return ReferenceEquals(SourceConnection, null); }
     }
 
-    /// <summary>
-    /// Returns the connection this event was received from, will be null if this event was raised on the local computer
-    /// </summary>
     public BoltConnection RaisedBy {
       get { return SourceConnection; }
+    }
+
+    public bool IsGlobalEvent {
+      get { return !IsEntityEvent; }
     }
 
     internal bool IsEntityEvent {
@@ -77,7 +78,6 @@ namespace Bolt {
 
     internal void IncrementRefs() {
       refs += 1;
-      //BoltLog.Debug("{0} Ref Count = {1}", this, refs);
     }
 
     internal bool Pack(BoltConnection connection, UdpStream stream) {

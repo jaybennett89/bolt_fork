@@ -442,8 +442,8 @@ namespace Bolt {
 
       eo = new Entity();
       eo.UnityObject = instance.GetComponent<BoltEntity>();
-      eo.PrefabId = prefabId;
       eo.UpdateRate = eo.UnityObject._updateRate;
+      eo.PrefabId = prefabId;
       eo.Flags = flags;
 
       if (eo.UnityObject._persistThroughSceneLoads) { eo.Flags |= EntityFlags.PERSIST_ON_LOAD; }
