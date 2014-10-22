@@ -17,6 +17,11 @@ public class BoltEntitySettingsModifier : IDisposable {
     set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
   }
 
+  public Bolt.UniqueId sceneId {
+    get { return new Bolt.UniqueId(_entity._sceneId); }
+    set { _entity.VerifyNotAttached(); _entity._sceneId = value.ToByteArray(); }
+  }
+
   public Bolt.UniqueId defaultSerializerUniqueId {
     get { return _entity.defaultSerializerId; }
     set { _entity.VerifyNotAttached(); _entity.defaultSerializerId = value; }
