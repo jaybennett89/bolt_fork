@@ -313,7 +313,7 @@ partial class EntityChannel : BoltChannel {
       var env = packet.envelopes.RemoveFirst();
       var pending = env.Proxy.Envelopes.Dequeue();
 
-      Assert.Same(env, pending);
+      Assert.Same(env, pending, string.Format("{0}Frame <> {1}Frame", env.Frame, pending.Frame));
       Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
 
       if (env.Flags & ProxyFlags.DESTROY_PENDING) {
