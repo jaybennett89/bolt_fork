@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UEDI = UnityEditorInternal;
 
 public class BoltEditorWindow : BoltWindow {
   [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
@@ -61,6 +62,35 @@ public class BoltEditorWindow : BoltWindow {
     }
   }
 
+  RuntimeAnimatorController mecanimController;
+
+
+  void ImportMecanimParameter(StateDefinition def, UEDI.AnimatorControllerParameter p) {
+    PropertyType type = null;
+
+    switch (p.type) {
+      case UEDI.AnimatorControllerParameterType.Trigger: type = new PropertyTypeTrigger(); break;
+      case UEDI.AnimatorControllerParameterType.Bool: type = new PropertyTypeBool(); break;
+      case UEDI.AnimatorControllerParameterType.Int: type = new PropertyTypeInteger(); break;
+      case UEDI.AnimatorControllerParameterType.Float: type = new PropertyTypeFloat(); break;
+    }
+
+
+    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == p.name);
+
+    if (pdef == null) {
+      pdef = CreateProperty(new PropertyStateSettings());
+      pdef.PropertyType = type;
+      pdef.Name = p.name;
+      pdef.StateAssetSettings.MecanimMode = MecanimMode.Parameter;
+      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+      def.Properties.Add(pdef);
+    }
+    else {
+      pdef.PropertyType = type;
+    }
+  }
+
   void EditState(StateDefinition def) {
     EditHeader(def);
 
@@ -72,6 +102,7 @@ public class BoltEditorWindow : BoltWindow {
       def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
     });
 
+
     EditorGUI.BeginDisabledGroup(def.IsAbstract);
 
     BoltEditorGUI.WithLabel("Bandwidth", () => {
@@ -82,6 +113,27 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     EditorGUI.EndDisabledGroup();
+
+    BoltEditorGUI.WithLabel("Import Mecanim Parameters", () => {
+      mecanimController = EditorGUILayout.ObjectField(mecanimController, typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
+
+      if (mecanimController) {
+        if (GUILayout.Button("Import", EditorStyles.miniButton)) {
+          try {
+            UEDI.AnimatorController ac = (UEDI.AnimatorController)mecanimController;
+
+            for (int i = 0; i < ac.parameterCount; ++i) {
+              ImportMecanimParameter(def, ac.GetParameter(i));
+            }
+
+            Save();
+          }
+          finally {
+            mecanimController = null;
+          }
+        }
+      }
+    });
 
     var groups =
       def.Properties
@@ -250,6 +302,9 @@ public class BoltEditorWindow : BoltWindow {
 
     GUILayout.EndHorizontal();
     GUILayout.Space(2);
+    
+
+    
 
     BoltEditorGUI.WithLabel("Comment", () => { def.Comment = EditorGUILayout.TextArea(def.Comment); });
 
