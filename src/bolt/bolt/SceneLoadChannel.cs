@@ -5,18 +5,18 @@ namespace Bolt {
     public override void Pack(BoltPacket packet) {
       var s = packet.stream;
       s.WriteBool(BoltCore._canReceiveEntities);
-      s.WriteInt(BoltCore._localSceneLoading.Scene.Index, 16);
-      s.WriteInt(BoltCore._localSceneLoading.Scene.Token, 16);
-      s.WriteInt(BoltCore._localSceneLoading.State, 8);
+      s.WriteInt(BoltCore._localSceneLoading.Scene.Index, 32);
+      s.WriteInt(BoltCore._localSceneLoading.Scene.Token, 32);
+      s.WriteInt(BoltCore._localSceneLoading.State, 32);
     }
 
     public override void Read(BoltPacket packet) {
       var s = packet.stream;
 
       var canReceiveEntities = s.ReadBool();
-      var sceneIndex = s.ReadInt(16);
-      var sceneToken = s.ReadInt(16);
-      var state = s.ReadInt(8);
+      var sceneIndex = s.ReadInt(32);
+      var sceneToken = s.ReadInt(32);
+      var state = s.ReadInt(32);
       var scene = new Scene(sceneIndex, sceneToken);
 
       connection._canReceiveEntities = canReceiveEntities;
