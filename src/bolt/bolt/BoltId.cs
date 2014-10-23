@@ -24,7 +24,7 @@ namespace Bolt {
     }
 
     [FieldOffset(0)]
-    Guid guid;
+    internal Guid guid;
 
     [FieldOffset(0)]
     internal uint uint0;
@@ -83,6 +83,12 @@ namespace Bolt {
 
     public bool IsNone {
       get { return guid == Guid.Empty; }
+    }
+
+    public UniqueId(string guid) {
+      Assert.NotNull(guid);
+      this = default(UniqueId);
+      this.guid = new Guid(guid);
     }
 
     public UniqueId(byte[] bytes) {
@@ -175,16 +181,20 @@ namespace Bolt {
     }
 
     public static UniqueId Parse(string text) {
-      if (text == "NONE") {
+      if (text == null || text == "" || text == "NONE") {
         return None;
       }
 
-      UniqueId id;
-
-      id = default(UniqueId);
-      id.guid = new Guid(text);
-
-      return id;
+      try {
+        UniqueId id;
+        id = default(UniqueId);
+        id.guid = new Guid(text);
+        return id;
+      }
+      catch {
+        BoltLog.Warn("Could not parse '{0}' as a UniqueId", text);
+        return UniqueId.None;
+      }
     }
 
     public static UniqueId Read(UdpStream stream) {
