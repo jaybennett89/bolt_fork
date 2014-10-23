@@ -3,19 +3,9 @@ using UnityEditor;
 using Bolt.Compiler;
 using UnityEngine;
 
-//[InitializeOnLoad]
 public static class BoltMenuItems {
 
-  //const string UPGRADE_FLAG = "BOLT_UPGRADE";
-
-  //static BoltMenuItems() {
-  //  if (EditorPrefs.GetBool(UPGRADE_FLAG, false)) {
-  //    EditorPrefs.SetBool(UPGRADE_FLAG, false);
-  //    RunCompiler();
-  //  }
-  //}
-
-  [MenuItem("Assets/Compile Bolt Assets (All)")]
+  [MenuItem("Assets/Bolt Engine/Compile Assets (All)")]
   public static void RunCompiler() {
     try {
       BoltUserAssemblyCompiler.Run(true);
@@ -25,7 +15,7 @@ public static class BoltMenuItems {
     }
   }
 
-  [MenuItem("Assets/Compile Bolt Assets (Code Only)")]
+  [MenuItem("Assets/Bolt Engine/Compile Assets (Code Only)")]
   public static void RunCompilerProjectOnly() {
     try {
       BoltUserAssemblyCompiler.Run(false);
@@ -33,7 +23,25 @@ public static class BoltMenuItems {
     catch {
 
     }
-  } 
+  }
+
+  [MenuItem("Assets/Bolt Engine/Generate Scene Object Ids")]
+  public static void GenerateSceneObjectGuids() {
+    if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isPaused || EditorApplication.isUpdating) {
+      Debug.LogError("Can't generate scene guids while the editor is playing, paused, updating assets or compiling");
+      return;
+    }
+
+    foreach (BoltEntity en in GameObject.FindObjectsOfType<BoltEntity>()) {
+      en.ModifySettings().sceneId = Bolt.UniqueId.New();
+      EditorUtility.SetDirty(en);
+      EditorUtility.SetDirty(en.gameObject);
+      Debug.Log(string.Format("Assigned new scene id to {0}", en));
+    }
+
+    // save scene
+    Bolt.Editor.Internal.EditorHousekeeping.AskToSaveSceneAt = System.DateTime.Now.AddSeconds(1);
+  }
 
   [MenuItem("Edit/Install Bolt")]
   public static void Install() {
