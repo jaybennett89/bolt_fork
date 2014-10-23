@@ -39,6 +39,12 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", offset), Set("Data", offset));
     }
 
+    public override void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
+      CodeMemberProperty property;
+      property = type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get(bytes, Decorator.ByteOffset), Set(bytes, Decorator.ByteOffset));
+      property.PrivateImplementationType = new CodeTypeReference(implType);
+    }
+
     public override void AddSettingsArgument(List<string> settings) {
       settings.Add(string.Format("new Bolt.PropertyStringSettings {{ Encoding = Bolt.StringEncodings.{0} }}", Decorator.PropertyType.Encoding));
     }
