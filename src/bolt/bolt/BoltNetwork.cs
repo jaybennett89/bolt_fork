@@ -210,6 +210,18 @@ public static class BoltNetwork {
     return null;
   }
 
+  public static void SetPrefabPool(IPrefabPool pool) {
+    if (pool == null) {
+      throw new ArgumentNullException("pool");
+    }
+
+    if (isRunning) {
+      throw new BoltException("You can't change the prefab pool after starting");
+    }
+
+    BoltCore.PrefabPool = pool;
+  }
+
   /// <summary>
   /// Instantiates and attaches an instance of this prefab to Bolt 
   /// </summary>
