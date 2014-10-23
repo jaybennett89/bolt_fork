@@ -53,10 +53,12 @@ public static class BoltInstaller {
       CleanOldInstall();
       InstallLogo();
       InstallIcons();
+      InstallDocumentation();
       InstallGizmos();
       InstallRuntimeSettings();
       CompileUserAssembly();
       InstallScripts();
+      InstallAreaOfInterest();
       CreateDebugScene();
       InstallPlugins();
 
@@ -100,7 +102,7 @@ public static class BoltInstaller {
   }
 
   static void InstallAreaOfInterest() {
-    Progress("Installing area of interest ... ", 0f);
+    Progress("Installing area of interest assets ... ", 0f);
 
     var shader = Resources.First(x => x.Contains("BoltShaderPOI.shader"));
     InstallAsset(shader);
@@ -113,7 +115,7 @@ public static class BoltInstaller {
     });
 
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-    Progress("Installing area of interest ... ", 1f);
+    Progress("Installing area of interest assets ... ", 1f);
   }
 
   static void InstallDocumentation() {
