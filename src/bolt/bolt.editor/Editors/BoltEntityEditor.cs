@@ -46,16 +46,21 @@ public class BoltEntityEditor : Editor {
     EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
 
     if (prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance) {
-      EditorGUILayout.LabelField("Scene Id", entity.sceneId.ToString());
+      EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
 
-      if (GUILayout.Button("Regenerate Scene Id", EditorStyles.miniButton) || (entity.sceneId == Bolt.UniqueId.None)) {
-        entity.sceneId = Bolt.UniqueId.New();
-        Save();
+      if (entity.sceneGuid == Bolt.UniqueId.None) {
+        // create new scene id
+        entity.sceneGuid = Bolt.UniqueId.New();
+
+        // save shit (force)
+        EditorUtility.SetDirty(this);
+
+        // log it
+        Debug.Log(string.Format("Generated scene {0} for {1}", entity.sceneGuid, entity.gameObject.name));
       }
     }
 
     EditorGUI.BeginDisabledGroup(!canBeEdited);
-
 
     // Prefab Id
     switch (prefabType) {
@@ -88,14 +93,14 @@ public class BoltEntityEditor : Editor {
 
     // Serializer
     int selectedIndex;
-    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.defaultSerializerId) + 1);
+    selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.serializerGuid) + 1);
     selectedIndex = EditorGUILayout.Popup("Serializer", selectedIndex, serializerNames);
 
     if (selectedIndex == 0) {
-      entity.defaultSerializerId = Bolt.UniqueId.None;
+      entity.serializerGuid = Bolt.UniqueId.None;
     }
     else {
-      entity.defaultSerializerId = serializerIds[selectedIndex - 1];
+      entity.serializerGuid = serializerIds[selectedIndex - 1];
     }
 
     // Update Rate

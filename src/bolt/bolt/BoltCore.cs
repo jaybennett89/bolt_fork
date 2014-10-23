@@ -21,6 +21,7 @@ internal static class BoltCore {
   static UdpSocket _udpSocket;
   static internal SceneLoadState _localSceneLoading;
 
+  static internal bool _canReceiveEntities = true;
   static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
 
   static internal int _frame = 0;
@@ -234,7 +235,7 @@ internal static class BoltCore {
       return null;
     }
 
-    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.defaultSerializerId).TypeId, position, rotation, InstantiateFlags.ZERO, null);
+    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
   static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
@@ -269,7 +270,7 @@ internal static class BoltCore {
 
   internal static GameObject Attach(GameObject gameObject, EntityFlags flags) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, Factory.GetFactory(be.defaultSerializerId).TypeId, flags);
+    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags);
   }
 
   internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags) {
@@ -479,6 +480,10 @@ internal static class BoltCore {
           using ((BoltPacket)ev.Object0) {
             ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
           }
+          break;
+
+        case UdpEventType.ConnectAttempt:
+          BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
           break;
       }
     }
@@ -733,6 +738,7 @@ internal static class BoltCore {
 
     // set config
     _config = config;
+    _canReceiveEntities = true;
 
     // set frametime
     Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
@@ -862,7 +868,7 @@ internal static class BoltCore {
     // grab all scene entities
     _sceneObjects =
       UE.GameObject.FindObjectsOfType<BoltEntity>()
-        .Where(x => !x.isAttached && x.sceneId != UniqueId.None)
+        .Where(x => !x.isAttached && x.sceneGuid != UniqueId.None)
         .ToList();
 
     // update settings
@@ -875,19 +881,18 @@ internal static class BoltCore {
 
       // attach on server
       if (isServer) {
-        Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneId);
-      }
-      else {
-        se.gameObject.SendMessage("BoltSceneObject", UE.SendMessageOptions.DontRequireReceiver);
+        Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneGuid);
       }
     }
+
+    BoltLog.Debug("Found {0} Scene Objects", _sceneObjects.Count);
 
     // call out to user code
     BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 
   internal static GameObject FindSceneObject(UniqueId uniqueId) {
-    BoltEntity entity = _sceneObjects.FirstOrDefault(x => x.sceneId == uniqueId);
+    BoltEntity entity = _sceneObjects.FirstOrDefault(x => x.sceneGuid == uniqueId);
 
     if (entity) {
       return entity.gameObject;

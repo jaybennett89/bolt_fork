@@ -1,10 +1,8 @@
 ﻿using Bolt;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UE = UnityEngine;
 
-[DocumentationAttribute]
+[Documentation]
 public class BoltEntitySettingsModifier : IDisposable {
   BoltEntity _entity;
 
@@ -13,13 +11,18 @@ public class BoltEntitySettingsModifier : IDisposable {
   }
 
   public Bolt.PrefabId prefabId {
-    get { return new Bolt.PrefabId(_entity._prefabId); }
+    get { return _entity.prefabId; }
     set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
   }
 
-  public Bolt.UniqueId defaultSerializerUniqueId {
-    get { return _entity.defaultSerializerId; }
-    set { _entity.VerifyNotAttached(); _entity.defaultSerializerId = value; }
+  public Bolt.UniqueId sceneId {
+    get { return _entity.sceneGuid; }
+    set { _entity.VerifyNotAttached(); _entity.sceneGuid = value; }
+  }
+
+  public Bolt.UniqueId serializerId {
+    get { return _entity.serializerGuid; }
+    set { _entity.VerifyNotAttached(); _entity.serializerGuid = value; }
   }
 
   public int updateRate {
@@ -47,25 +50,23 @@ public class BoltEntitySettingsModifier : IDisposable {
   }
 }
 
-[DocumentationAttribute]
+[Documentation]
+[UE.ExecuteInEditMode]
 [BoltExecutionOrder(-2500)]
 public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal Bolt.Entity _entity;
 
   [UE.SerializeField]
-  internal byte[] _sceneId;
+  internal string _sceneGuid;
 
   [UE.SerializeField]
-  internal byte[] _defaultSerializerGuid;
+  internal string _serializerGuid;
 
   [UE.SerializeField]
   internal int _prefabId = -1;
 
   [UE.SerializeField]
   internal int _updateRate = 1;
-
-  [UE.SerializeField]
-  int _defaultSerializerTypeId = 0;
 
   [UE.SerializeField]
   internal bool _clientPredicted = true;
@@ -86,43 +87,23 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     }
   }
 
-  public static string Join<T>(IEnumerable<T> items, string seperator) {
-    return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
+  internal Bolt.UniqueId sceneGuid {
+    get { return Bolt.UniqueId.Parse(_sceneGuid); }
+    set { _sceneGuid = value.guid.ToString(); }
   }
 
-  public Bolt.PrefabId prefabId {
-    get { return new PrefabId(_prefabId); }
-  }
-
-  internal Bolt.UniqueId sceneId {
-    get {
-      if (_sceneId == null || _sceneId.Length != 16) {
-        return Bolt.UniqueId.None;
-      }
-
-      return new Bolt.UniqueId(_sceneId);
-    }
-    set {
-      _sceneId = value.ToByteArray();
-    }
-  }
-
-  internal Bolt.UniqueId defaultSerializerId {
-    get {
-      if (_defaultSerializerGuid == null || _defaultSerializerGuid.Length != 16) {
-        return Bolt.UniqueId.None;
-      }
-
-      return new Bolt.UniqueId(_defaultSerializerGuid);
-    }
-    set {
-      _defaultSerializerGuid = value.ToByteArray();
-    }
+  internal Bolt.UniqueId serializerGuid {
+    get { return Bolt.UniqueId.Parse(_serializerGuid); }
+    set { _serializerGuid = value.guid.ToString(); }
   }
 
   object IBoltListNode.prev { get; set; }
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
+
+  public Bolt.PrefabId prefabId {
+    get { return new PrefabId(_prefabId); }
+  }
 
   /// <summary>
   /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
@@ -156,7 +137,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// This is a scene object placed in the scene in the Unity editor
   /// </summary>
   public bool isSceneObject {
-    get { return Entity.IsSceneObject; } 
+    get { return Entity.IsSceneObject; }
   }
 
   /// <summary>
@@ -336,7 +317,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   public override string ToString() {
-    return Entity.ToString();
+    if (isAttached) {
+      return Entity.ToString();
+    }
+    else {
+      return string.Format("[DetachedEntity {2} SceneId={0} SerializerId={1}]", sceneGuid, serializerGuid, prefabId);
+    }
   }
 
   internal void VerifyNotAttached() {
@@ -346,19 +332,38 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void Awake() {
-    DontDestroyOnLoad(gameObject);
+    if (UE.Application.isPlaying) {
+      DontDestroyOnLoad(gameObject);
+    }
+    else {
+      // only in the editor
+      if (UE.Application.isEditor) {
+        // check if we don't have a valid scene guid
+        if (sceneGuid == Bolt.UniqueId.None) {
+          // set a new one
+          sceneGuid = Bolt.UniqueId.New();
+
+          // tell editor to save us
+          BoltInternal.BoltCoreInternal.ChangedEditorEntities.Add(this);
+        }
+      }
+    }
   }
 
   void OnEnable() {
-    DontDestroyOnLoad(gameObject);
+    if (UE.Application.isPlaying) {
+      DontDestroyOnLoad(gameObject);
+    }
   }
 
   void OnDisable() {
-    OnDestroy();
+    if (UE.Application.isPlaying) {
+      OnDestroy();
+    }
   }
 
   void OnDestroy() {
-    if (_entity) {
+    if (_entity && UE.Application.isPlaying) {
       // log that his is happening
       BoltLog.Warn("{0} is being destroyed or disabled without being detached, forcing detach", Entity);
 
@@ -373,7 +378,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void Update() {
-    if (isAttached) {
+    if (isAttached && UE.Application.isPlaying) {
       Entity.Render();
     }
   }

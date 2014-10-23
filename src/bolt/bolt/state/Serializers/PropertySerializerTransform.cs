@@ -31,8 +31,8 @@ namespace Bolt {
     PropertyTransformCompressionSettings TransformCompression;
 
     const int POSITION_OFFSET = 0;
-    const int ROTATION_OFFSET = 24;
     const int VELOCITY_OFFSET = 12;
+    const int ROTATION_OFFSET = 24;
 
     public void AddSettings(PropertyTransformCompressionSettings transformCompression) {
       TransformCompression = transformCompression;
@@ -99,8 +99,8 @@ namespace Bolt {
       var it = state.Frames.GetIterator();
 
       while (it.Next()) {
-        UE.Vector3 p = it.val.Data.ReadVector3(StateSettings.ObjectOffset + POSITION_OFFSET);
-        UE.Quaternion r = it.val.Data.ReadQuaternion(StateSettings.ObjectOffset + ROTATION_OFFSET);
+        UE.Vector3 p = it.val.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
+        UE.Quaternion r = it.val.Data.ReadQuaternion(Settings.ByteOffset + ROTATION_OFFSET);
 
         float angle;
         UE.Vector3 axis;
@@ -116,17 +116,17 @@ namespace Bolt {
         r = UE.Quaternion.AngleAxis(angle, axis);
 
         // put back into frame
-        it.val.Data.PackVector3(StateSettings.ObjectOffset + POSITION_OFFSET, p);
-        it.val.Data.PackQuaternion(StateSettings.ObjectOffset + ROTATION_OFFSET, r);
+        it.val.Data.PackVector3(Settings.ByteOffset + POSITION_OFFSET, p);
+        it.val.Data.PackQuaternion(Settings.ByteOffset + ROTATION_OFFSET, r);
       }
     }
 
     public override void OnSimulateBefore(State state) {
       var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
       if (td.Simulate && !state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
-        var p = StateSettings.ObjectOffset + POSITION_OFFSET;
-        var v = StateSettings.ObjectOffset + VELOCITY_OFFSET;
-        var r = StateSettings.ObjectOffset + ROTATION_OFFSET;
+        var p = Settings.ByteOffset + POSITION_OFFSET;
+        var v = Settings.ByteOffset + VELOCITY_OFFSET;
+        var r = Settings.ByteOffset + ROTATION_OFFSET;
 
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.None:
@@ -242,53 +242,5 @@ namespace Bolt {
       td.Simulate.localPosition = p0;
       td.Simulate.localRotation = r0;
     }
-
-    //void PerformInterpolation(TransformData td, State state, bool position) {
-    //  var f0 = state.Frames.first;
-
-    //  UE.Vector3 p0 = f0.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
-    //  UE.Quaternion r0 = f0.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
-
-    //  if ((state.Frames.count == 1) || (f0.Number >= state.Entity.Frame)) {
-    //    if (position) {
-    //      td.Simulate.localPosition = p0;
-    //    }
-
-    //    td.Simulate.localRotation = r0;
-    //  }
-    //  else {
-    //    var f1 = state.Frames.Next(f0);
-    //    UE.Vector3 p1 = f1.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
-    //    UE.Quaternion r1 = f1.Data.ReadQuaternion(StateData.ByteOffset + ROTATION_OFFSET);
-
-    //    Assert.True(f1.Number > f0.Number);
-    //    Assert.True(f1.Number > state.Entity.Frame);
-
-    //    float t = f1.Number - f0.Number;
-    //    float d = state.Entity.Frame - f0.Number;
-
-    //    if (position) {
-    //      td.Simulate.localPosition = UE.Vector3.Lerp(p0, p1, d / t);
-    //    }
-
-    //    td.Simulate.localRotation = UE.Quaternion.Lerp(r0, r1, d / t);
-    //  }
-    //}
-
-    //void PerformExtrapolation(TransformData td, State state) {
-    //  var f = state.Frames.first;
-
-    //  UE.Vector3 p = f.Data.ReadVector3(StateData.ByteOffset + POSITION_OFFSET);
-    //  UE.Vector3 v = f.Data.ReadVector3(StateData.ByteOffset + VELOCITY_OFFSET) * BoltNetwork.frameDeltaTime;
-
-    //  float d = (state.Entity.Frame + 1) - f.Number;
-    //  float t = d / state.Entity.SendRate;
-
-    //  // blend from current to new position
-    //  td.Simulate.localPosition = UE.Vector3.Lerp(td.Simulate.localPosition + v, p + (v * d), t);
-
-    //  // interpolate rotation
-    //  PerformInterpolation(td, state, false);
-    //}
   }
 }

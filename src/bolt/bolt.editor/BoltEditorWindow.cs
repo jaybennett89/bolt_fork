@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UEDI = UnityEditorInternal;
 
 public class BoltEditorWindow : BoltWindow {
   [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
@@ -26,11 +27,13 @@ public class BoltEditorWindow : BoltWindow {
     base.OnGUI();
 
     if (HasProject) {
-      scroll = GUILayout.BeginScrollView(scroll, false, false);
+      scroll = GUILayout.BeginScrollView(scroll, false, true);
 
       Editor();
 
       GUILayout.EndScrollView();
+
+      Header();
     }
 
     if (GUI.changed) {
@@ -43,6 +46,12 @@ public class BoltEditorWindow : BoltWindow {
 
   void Editor() {
     if (Selected != null) {
+      GUILayout.Space(30);
+
+      BoltEditorGUI.WithLabel("Comment", () => {
+        Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
+      });
+
       if (Selected is StateDefinition) {
         EditState((StateDefinition)Selected);
       }
@@ -61,9 +70,40 @@ public class BoltEditorWindow : BoltWindow {
     }
   }
 
-  void EditState(StateDefinition def) {
-    EditHeader(def);
+  void Header() {
+    if (Selected != null) {
+      EditHeader(Selected);
+    }
+  }
 
+  RuntimeAnimatorController mecanimController;
+
+  void ImportMecanimParameter(StateDefinition def, UEDI.AnimatorControllerParameter p) {
+    PropertyType type = null;
+
+    switch (p.type) {
+      case UEDI.AnimatorControllerParameterType.Trigger: type = new PropertyTypeTrigger(); break;
+      case UEDI.AnimatorControllerParameterType.Bool: type = new PropertyTypeBool(); break;
+      case UEDI.AnimatorControllerParameterType.Int: type = new PropertyTypeInteger(); break;
+      case UEDI.AnimatorControllerParameterType.Float: type = new PropertyTypeFloat(); break;
+    }
+
+    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == p.name);
+
+    if (pdef == null) {
+      pdef = CreateProperty(new PropertyStateSettings());
+      pdef.PropertyType = type;
+      pdef.Name = p.name;
+      pdef.StateAssetSettings.MecanimMode = MecanimMode.Parameter;
+      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+      def.Properties.Add(pdef);
+    }
+    else {
+      pdef.PropertyType = type;
+    }
+  }
+
+  void EditState(StateDefinition def) {
     BoltEditorGUI.WithLabel("Is Abstract", () => {
       def.IsAbstract = BoltEditorGUI.Toggle(def.IsAbstract);
     });
@@ -82,6 +122,27 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     EditorGUI.EndDisabledGroup();
+
+    BoltEditorGUI.WithLabel("Import Mecanim Parameters", () => {
+      mecanimController = EditorGUILayout.ObjectField(mecanimController, typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;
+
+      if (mecanimController) {
+        if (GUILayout.Button("Import", EditorStyles.miniButton)) {
+          try {
+            UEDI.AnimatorController ac = (UEDI.AnimatorController)mecanimController;
+
+            for (int i = 0; i < ac.parameterCount; ++i) {
+              ImportMecanimParameter(def, ac.GetParameter(i));
+            }
+
+            Save();
+          }
+          finally {
+            mecanimController = null;
+          }
+        }
+      }
+    });
 
     var groups =
       def.Properties
@@ -137,15 +198,11 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditStruct(StructDefinition def) {
-    EditHeader(def);
-
     // add button
     EditPropertyList(def, def.Properties);
   }
 
   void EditEvent(EventDefinition def) {
-    EditHeader(def);
-
     BoltEditorGUI.WithLabel("Global Senders", () => {
       def.GlobalSenders = (GlobalEventSenders)EditorGUILayout.EnumPopup(def.GlobalSenders);
       BoltEditorGUI.SetTooltip("Who can send this as an global event?");
@@ -173,8 +230,6 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditCommand(CommandDefinition def) {
-    EditHeader(def);
-
     BoltEditorGUI.WithLabel("Correction Interpolation", () => {
       def.SmoothFrames = BoltEditorGUI.IntFieldOverlay(def.SmoothFrames, "Frames");
     });
@@ -196,18 +251,16 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditHeader(AssetDefinition def) {
-    BeginBackground();
-
     var stateDef = def as StateDefinition;
     var structDef = def as StructDefinition;
     var cmdDef = def as CommandDefinition;
     var eventDef = def as EventDefinition;
 
+    GUILayout.BeginArea(new Rect(0, 0, position.width - 14, 25));
+
     GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
     GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
     GUI.color = Color.white;
-
-    GUILayout.Space(3);
 
     if (def is StateDefinition) { BoltEditorGUI.Button("mc_state"); }
     if (def is StructDefinition) { BoltEditorGUI.Button("mc_struct"); }
@@ -249,11 +302,7 @@ public class BoltEditorWindow : BoltWindow {
     }
 
     GUILayout.EndHorizontal();
-    GUILayout.Space(2);
-
-    BoltEditorGUI.WithLabel("Comment", () => { def.Comment = EditorGUILayout.TextArea(def.Comment); });
-
-    EndBackground();
+    GUILayout.EndArea();
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {

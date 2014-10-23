@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Bolt {
-  /// <summary>
-  /// Enumeration of target options for events sent to entitiessx
-  /// </summary>
+﻿namespace Bolt {
   [Documentation]
   public enum EntityTargets : byte {
     Everyone = Event.ENTITY_EVERYONE,
-    EveryoneExceptController = Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER
+    EveryoneExceptController = Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER,
+    OnlyController = Event.ENTITY_ONLY_CONTROLLER,
+    OnlyOwner = Event.ENTITY_ONLY_OWNER,
   }
 
-  /// <summary>
-  /// Enumeration of target options for global events
-  /// </summary>
   [Documentation]
   public enum GlobalTargets : byte {
     Everyone = Event.GLOBAL_EVERYONE,

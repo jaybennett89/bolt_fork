@@ -36,10 +36,12 @@ namespace Bolt {
     }
 
     internal static Bolt.IFactory GetFactory(TypeId id) {
+      BoltLog.Debug("Looking up factory {0}", id);
       return _factoriesByTypeId[id];
     }
 
     internal static Bolt.IFactory GetFactory(UniqueId id) {
+      BoltLog.Debug("Looking up factory {0}", id);
       return _factoriesByUniqueId[id];
     }
 

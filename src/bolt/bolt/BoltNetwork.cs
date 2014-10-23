@@ -56,6 +56,10 @@ public static class BoltNetwork {
     ShutdownComplete = null;
   }
 
+  public static void SetCanReceiveEntities(bool canReceiveEntities) {
+    BoltCore._canReceiveEntities = canReceiveEntities;
+  }
+
   /// <summary>
   /// The current local simulation frame number
   /// </summary>
@@ -204,6 +208,18 @@ public static class BoltNetwork {
 
     BoltLog.Warn("Could not find entity with {0}", id);
     return null;
+  }
+
+  public static void SetPrefabPool(IPrefabPool pool) {
+    if (pool == null) {
+      throw new ArgumentNullException("pool");
+    }
+
+    if (isRunning) {
+      throw new BoltException("You can't change the prefab pool after starting");
+    }
+
+    BoltCore.PrefabPool = pool;
   }
 
   /// <summary>

@@ -73,6 +73,7 @@
     <Compile Include="event\EventReliableRecvBuffer.cs" />
     <Compile Include="event\EventReliableSendBuffer.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="internal\BoltCoreInternal.cs" />
     <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
     <Compile Include="state\Arrays\EntityArray.cs" />
