@@ -53,10 +53,12 @@ public static class BoltInstaller {
       CleanOldInstall();
       InstallLogo();
       InstallIcons();
+      InstallDocumentation();
       InstallGizmos();
       InstallRuntimeSettings();
       CompileUserAssembly();
       InstallScripts();
+      InstallAreaOfInterest();
       CreateDebugScene();
       InstallPlugins();
 
@@ -100,7 +102,7 @@ public static class BoltInstaller {
   }
 
   static void InstallAreaOfInterest() {
-    Progress("Installing area of interest ... ", 0f);
+    Progress("Installing area of interest assets ... ", 0f);
 
     var shader = Resources.First(x => x.Contains("BoltShaderPOI.shader"));
     InstallAsset(shader);
@@ -110,10 +112,23 @@ public static class BoltInstaller {
 
     EditImporter<ModelImporter>(ResourceToAssetPath(mesh), m => {
       m.globalScale = 1f;
+      m.importMaterials = false;
     });
 
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-    Progress("Installing area of interest ... ", 1f);
+    Progress("Installing area of interest assets ... ", 1f);
+  }
+
+  static void InstallDocumentation() {
+    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "documentation"));
+
+    Progress("Installing documentation ... ", 0f);
+
+    foreach (var resource in Resources.Where(x => x.Contains("Install.bolt.documentation"))) {
+      InstallAsset(resource);
+    }
+
+    Progress("Installing documentation ... ", 1f);
   }
 
   static void InstallLogo() {
@@ -147,15 +162,17 @@ public static class BoltInstaller {
       // install asset
       InstallAsset(icons[i]);
 
-      // edit asset
-      EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
-        txt.textureFormat = TextureImporterFormat.ARGB32;
-        txt.wrapMode = TextureWrapMode.Clamp;
-        txt.filterMode = FilterMode.Bilinear;
-        txt.textureType = TextureImporterType.GUI;
-        txt.alphaIsTransparency = true;
-        txt.maxTextureSize = 32;
-      });
+      if (icons[i].EndsWith(".png")) {
+        // edit asset
+        EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
+          txt.textureFormat = TextureImporterFormat.ARGB32;
+          txt.wrapMode = TextureWrapMode.Clamp;
+          txt.filterMode = FilterMode.Bilinear;
+          txt.textureType = TextureImporterType.GUI;
+          txt.alphaIsTransparency = true;
+          txt.maxTextureSize = 32;
+        });
+      }
     }
   }
 
@@ -290,7 +307,7 @@ public static class BoltInstaller {
     Debug.Log("installing:" + file);
 
     // delete existing asset
-    AssetDatabase.DeleteAsset(asset);
+    // AssetDatabase.DeleteAsset(asset);
 
     // clean up any residual files
     CleanExistingFile(file, true);

@@ -128,24 +128,32 @@ namespace Bolt {
     }
 
     internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
-      if (rotation == default(UE.Quaternion)) {
-        rotation = UE.Quaternion.identity;
+      var r0 = rotation;
+      if (r0 == default(UE.Quaternion)) {
+        r0 = UE.Quaternion.identity;
       }
 
-      var f = frames.first;
-      var r0 = rotation;
-      var r1 = f.Data.ReadQuaternion(offset);
-      var df = r1 * UE.Quaternion.Inverse(r0);
+      var r1 = frames.first.Data.ReadQuaternion(offset);
+      if (r1 == default(UE.Quaternion)) {
+        r1 = UE.Quaternion.identity;
+      }
 
-      float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
+      var r2 = r1 * UE.Quaternion.Inverse(r0);
+      float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - frames.first.Number);
       float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
-      float dAngle;
-      UE.Vector3 dAxis;
+      float r2_angle;
+      UE.Vector3 r2_axis;
 
-      df.ToAngleAxis(out dAngle, out dAxis);
+      r2.ToAngleAxis(out r2_angle, out r2_axis);
 
-      return UE.Quaternion.AngleAxis((dAngle * t) % 360f, dAxis) * r0;
+      if (r2_angle > 180) {
+        r2_angle -= 360;
+      }
+
+      r2_angle = (r2_angle * t) % 360f;
+
+      return UE.Quaternion.AngleAxis(r2_angle, r2_axis) * r0;
     }
 
     internal static int SequenceDistance(uint from, uint to, int shift) {

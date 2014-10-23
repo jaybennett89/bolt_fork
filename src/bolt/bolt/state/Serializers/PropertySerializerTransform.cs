@@ -11,6 +11,14 @@ namespace Bolt {
     internal DoubleBuffer<UE.Vector3> RenderDoubleBufferPosition;
     internal DoubleBuffer<UE.Quaternion> RenderDoubleBufferRotation;
 
+    public UE.Vector3 Position {
+      get { return RenderDoubleBufferPosition.Current; }
+    }
+
+    public UE.Quaternion Rotation {
+      get { return RenderDoubleBufferRotation.Current; }
+    }
+
     public void SetTransforms(UE.Transform simulate) {
       SetTransforms(simulate, null);
     }
