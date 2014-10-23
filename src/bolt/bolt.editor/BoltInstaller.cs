@@ -112,6 +112,7 @@ public static class BoltInstaller {
 
     EditImporter<ModelImporter>(ResourceToAssetPath(mesh), m => {
       m.globalScale = 1f;
+      m.importMaterials = false;
     });
 
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
@@ -119,6 +120,8 @@ public static class BoltInstaller {
   }
 
   static void InstallDocumentation() {
+    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "documentation"));
+
     Progress("Installing documentation ... ", 0f);
 
     foreach (var resource in Resources.Where(x => x.Contains("Install.bolt.documentation"))) {
