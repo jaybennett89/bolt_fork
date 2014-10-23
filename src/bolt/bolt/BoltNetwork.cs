@@ -20,6 +20,7 @@ public static class BoltNetworkInternal {
   public static Action EnvironmentSetup;
   public static Action EnvironmentReset;
   public static BoltInternal.IDebugDrawer DebugDrawer;
+  public static BoltInternal.NatCommunicator NatCommunicator;
 
   public static Func<UdpPlatform> CreateUdpPlatform;
   public static Func<UdpIPv4Address> GetBroadcastAddress;
@@ -208,6 +209,14 @@ public static class BoltNetwork {
 
     BoltLog.Warn("Could not find entity with {0}", id);
     return null;
+  }
+
+  public static void EnableUPnP() {
+    UPnP.Enable();
+  }
+
+  public static void DisableUPnP() {
+    UPnP.Disable(true);
   }
 
   public static void SetPrefabPool(IPrefabPool pool) {

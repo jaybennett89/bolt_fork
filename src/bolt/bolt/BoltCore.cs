@@ -325,6 +325,8 @@ internal static class BoltCore {
       BoltLog.Info("shutting down");
 
       try {
+        UPnP.Disable(false);
+
         // 
         _mode = BoltNetworkModes.None;
 

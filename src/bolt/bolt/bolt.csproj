@@ -35,9 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Nat">
-      <HintPath>..\..\assemblies\Mono.Nat.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
@@ -167,6 +164,7 @@
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
     <Compile Include="event\Legacy\BoltEventEnums.cs" />
+    <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />

@@ -49,6 +49,9 @@ public class BoltConnectionsWindow : BoltWindow {
     Header("mc_connection", "Connections");
     Connections();
 
+    Header("mc_nat", "NAT Devices");
+    NatDevices();
+
     if (ConnectionDetails != null) {
       Header("mc_wifi", "Packet details for " + ConnectionDetails.remoteEndPoint.ToString());
       Stats();
@@ -88,7 +91,7 @@ public class BoltConnectionsWindow : BoltWindow {
     }
   }
 
-  void StatsLabel(BoltConnection c, object text) {
+  void StatsLabel(object text) {
     GUIStyle s = new GUIStyle("Label");
     s.padding = new RectOffset();
     s.margin = new RectOffset(0, 0, 0, 2);
@@ -99,7 +102,6 @@ public class BoltConnectionsWindow : BoltWindow {
 
   void Connections() {
     GUILayout.Space(2);
-
     GUIStyle s = new GUIStyle(GUIStyle.none);
     s.padding = new RectOffset(5, 5, 2, 2);
     GUILayout.BeginHorizontal(s);
@@ -114,15 +116,38 @@ public class BoltConnectionsWindow : BoltWindow {
     GUILayout.Space(4);
   }
 
+  void NatDevices() {
+    GUILayout.Space(2);
+    GUIStyle s = new GUIStyle(GUIStyle.none);
+    s.padding = new RectOffset(5, 5, 2, 2);
+    GUILayout.BeginHorizontal(s);
+
+    EachNatDevice(MakeHeader("mc_devicetype", "Device Type"), n => StatsLabel(n.DeviceType));
+    EachNatDevice(MakeHeader("mc_ipaddress", "Public Address"), n => StatsLabel(n.PublicAddress));
+    EachNatDevice(MakeHeader("mc_ipaddress", "Local Address"), n => StatsLabel(n.LocalAddress));
+
+    GUILayout.EndHorizontal();
+    GUILayout.Space(4);
+  }
+
   void EachConnection(Action header, Action<BoltConnection> call) {
     EachConnection(BoltCore.connections, header, call);
   }
 
-  void EachConnection(IEnumerable connections, Action header, Action<BoltConnection> call) {
+  void EachNatDevice(Action header, Action<Bolt.INatDevice> call) {
+    if (BoltNetworkInternal.NatCommunicator != null) {
+      EachConnection(BoltNetworkInternal.NatCommunicator.NatDevices, header, call);
+    }
+    else {
+      EachConnection(new Bolt.INatDevice[0], header, call);
+    }
+  }
+
+  void EachConnection<T>(IEnumerable connections, Action header, Action<T> call) {
     GUILayout.BeginVertical();
     header();
 
-    foreach (BoltConnection c in connections) {
+    foreach (T c in connections) {
       call(c);
     }
 
@@ -146,14 +171,14 @@ public class BoltConnectionsWindow : BoltWindow {
     s.padding = new RectOffset(5, 5, 2, 2);
     GUILayout.BeginHorizontal(s);
 
-    SelectedConnection(MakeHeader("mc_state", "In: States"), c => StatsLabel(c, statesIn + " bytes"));
-    SelectedConnection(MakeHeader("mc_state", "Out: States"), c => StatsLabel(c, statesOut + " bytes"));
+    SelectedConnection(MakeHeader("mc_state", "In: States"), c => StatsLabel(statesIn + " bytes"));
+    SelectedConnection(MakeHeader("mc_state", "Out: States"), c => StatsLabel(statesOut + " bytes"));
 
-    SelectedConnection(MakeHeader("mc_event", "In: Events"), c => StatsLabel(c, eventsIn + " bytes"));
-    SelectedConnection(MakeHeader("mc_event", "Out: Events"), c => StatsLabel(c, eventsOut + " bytes"));
+    SelectedConnection(MakeHeader("mc_event", "In: Events"), c => StatsLabel(eventsIn + " bytes"));
+    SelectedConnection(MakeHeader("mc_event", "Out: Events"), c => StatsLabel(eventsOut + " bytes"));
 
-    SelectedConnection(MakeHeader("mc_command", "In: Commands"), c => StatsLabel(c, commandsIn + " bytes"));
-    SelectedConnection(MakeHeader("mc_command", "Out: Commands"), c => StatsLabel(c, commandsOut + " bytes"));
+    SelectedConnection(MakeHeader("mc_command", "In: Commands"), c => StatsLabel(commandsIn + " bytes"));
+    SelectedConnection(MakeHeader("mc_command", "Out: Commands"), c => StatsLabel(commandsOut + " bytes"));
 
     GUILayout.EndHorizontal();
     GUILayout.Space(4);
