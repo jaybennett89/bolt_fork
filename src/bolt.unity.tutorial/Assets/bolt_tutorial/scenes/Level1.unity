@@ -648,7 +648,7 @@ GameObject:
   - 23: {fileID: 620304900}
   - 114: {fileID: 620304899}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: SceneCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1243,7 +1243,7 @@ GameObject:
   - 23: {fileID: 1176216078}
   - 114: {fileID: 1176216077}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: SceneCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2420,7 +2420,7 @@ GameObject:
   - 23: {fileID: 1212661749}
   - 114: {fileID: 1212661748}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: SceneCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
