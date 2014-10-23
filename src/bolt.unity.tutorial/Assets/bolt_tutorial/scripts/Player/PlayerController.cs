@@ -90,11 +90,14 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void OnFire() {
-    if (BoltNetwork.entities.Count() > 1) {
-      using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
-        ev.message = name + " joined the game";
-        ev.sender = BoltNetwork.entities.First();
-        ev.sender2 = BoltNetwork.entities.Skip(1).First();
+    if (entity.isOwner) {
+      using (var ev = LogEvent.Raise(entity, Bolt.EntityTargets.OnlyController)) {
+        ev.message = "TO CONTROLLER";
+      }
+    }
+    else if (entity.hasControl) {
+      using (var ev = LogEvent.Raise(entity, Bolt.EntityTargets.OnlyOwner)) {
+        ev.message = "TO OWNER";
       }
     }
 

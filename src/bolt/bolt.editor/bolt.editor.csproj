@@ -172,6 +172,9 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltShaderPOI.shader" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\IcoSphere.fbx" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ATTRIBUTIONS.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
