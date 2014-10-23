@@ -15,9 +15,10 @@ namespace Bolt {
   public abstract class Event : IDisposable {
 
     internal const byte ENTITY_EVERYONE = 1;
-    internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 3;
-    internal const byte ENTITY_ONLY_CONTROLLER = 5;
-    internal const byte ENTITY_ONLY_OWNER = 7;
+    internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
+    internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
+    internal const byte ENTITY_ONLY_CONTROLLER = 7;
+    internal const byte ENTITY_ONLY_OWNER = 9;
 
     internal const byte GLOBAL_EVERYONE = 2;
     internal const byte GLOBAL_OTHERS = 4;
@@ -56,7 +57,12 @@ namespace Bolt {
     internal bool IsEntityEvent {
       get {
         VerifyIsActive();
-        return Targets == ENTITY_EVERYONE || Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER;
+        return 
+          Targets == ENTITY_EVERYONE ||
+          Targets == ENTITY_EVERYONE_EXCEPT_OWNER ||
+          Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER || 
+          Targets == ENTITY_ONLY_CONTROLLER || 
+          Targets == ENTITY_ONLY_OWNER;
       }
     }
 

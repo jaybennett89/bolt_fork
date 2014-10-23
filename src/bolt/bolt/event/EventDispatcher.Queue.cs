@@ -11,6 +11,10 @@ namespace Bolt {
       _dispatchQueue.Enqueue(ev);
     }
 
+    public static void Received(Event ev) {
+      _dispatchQueue.Enqueue(ev);
+    }
+
     public static void DispatchAllEvents() {
       while (_dispatchQueue.Count > 0) {
         Dispatch(_dispatchQueue.Dequeue());
@@ -18,7 +22,6 @@ namespace Bolt {
     }
 
     static void Dispatch(Event ev) {
-      var it = BoltCore._connections.GetIterator();
 
       switch (ev.Targets) {
         case Event.ENTITY_EVERYONE:
@@ -27,6 +30,10 @@ namespace Bolt {
 
         case Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER:
           Entity_Everyone_Except_Controller(ev);
+          break;
+
+        case Event.ENTITY_EVERYONE_EXCEPT_OWNER:
+          Entity_Everyone_Except_Owner(ev);
           break;
 
         case Event.ENTITY_ONLY_CONTROLLER:
@@ -82,7 +89,7 @@ namespace Bolt {
               ev.TargetEntity.Controller._eventChannel.Queue(ev);
             }
             else {
-              BoltLog.Warn("{0} was sent to controller but no controller exists, event will NOT be raised");
+              BoltLog.Warn("Event sent to controller but no controller exists, event will NOT be raised");
             }
           }
           else {
@@ -91,7 +98,63 @@ namespace Bolt {
         }
       }
       else {
-        BoltLog.Warn("{0} with NULL target, event will NOT be forwarded or raised", ev);
+        BoltLog.Warn("Event with NULL target, event will NOT be forwarded or raised");
+      }
+    }
+
+    static void Entity_Everyone_Except_Owner(Event ev) {
+      if (ev.TargetEntity != null) {
+        var it = BoltCore._connections.GetIterator();
+
+        while (it.Next()) {
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        if (ev.TargetEntity.IsOwner == false) {
+          RaiseLocal(ev);
+        }
+      }
+    }
+
+    static void Entity_Everyone_Except_Controller(Event ev) {
+      if (ev.TargetEntity != null) {
+        var it = BoltCore._connections.GetIterator();
+
+        while (it.Next()) {
+          if (ev.TargetEntity.IsController(it.val)) {
+            continue;
+          }
+
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        if (ev.TargetEntity.HasControl == false) {
+          RaiseLocal(ev);
+        }
+      }
+    }
+
+    static void Entity_Everyone(Event ev) {
+      var it = BoltCore._connections.GetIterator();
+
+      if (ev.TargetEntity != null) {
+        while (it.Next()) {
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        RaiseLocal(ev);
       }
     }
 
@@ -159,43 +222,6 @@ namespace Bolt {
       RaiseLocal(ev);
     }
 
-    static void Entity_Everyone_Except_Controller(Event ev) {
-      var it = BoltCore._connections.GetIterator();
-
-      if (ev.TargetEntity != null) {
-        while (it.Next()) {
-          if (ev.TargetEntity.IsController(it.val)) {
-            continue;
-          }
-
-          if (ReferenceEquals(it.val, ev.SourceConnection)) {
-            continue;
-          }
-
-          it.val._eventChannel.Queue(ev);
-        }
-
-        if (ev.TargetEntity.HasControl == false) {
-          RaiseLocal(ev);
-        }
-      }
-    }
-
-    static void Entity_Everyone(Event ev) {
-      var it = BoltCore._connections.GetIterator();
-
-      if (ev.TargetEntity != null) {
-        while (it.Next()) {
-          if (ReferenceEquals(it.val, ev.SourceConnection)) {
-            continue;
-          }
-
-          it.val._eventChannel.Queue(ev);
-        }
-
-        RaiseLocal(ev);
-      }
-    }
 
     static void RaiseLocal(Event ev) {
       try {

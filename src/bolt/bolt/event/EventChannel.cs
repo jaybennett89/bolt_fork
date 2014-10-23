@@ -199,7 +199,7 @@ namespace Bolt {
       ev.Meta.TypeId.Pack(stream);
 
       // targets of this event
-      stream.WriteInt(ev.Targets, 4);
+      stream.WriteInt(ev.Targets, 5);
 
       if (ev.IsEntityEvent) {
         // write network id for entity events
@@ -221,7 +221,7 @@ namespace Bolt {
         Event ev = ReadEvent(packet.stream, ref sequence);
 
         if (ev.IsEntityEvent) {
-          EventDispatcher.Enqueue(ev);
+          EventDispatcher.Received(ev);
         }
         else {
           switch (reliableRecv.TryEnqueue(EventReliable.Wrap(ev, sequence))) {
@@ -237,7 +237,7 @@ namespace Bolt {
       EventReliable reliable;
 
       while (reliableRecv.TryRemove(out reliable)) {
-        EventDispatcher.Enqueue(reliable.Event);
+        EventDispatcher.Received(reliable.Event);
       }
 
       packet.stats.EventBits = packet.stream.Position - startPtr;
@@ -247,7 +247,7 @@ namespace Bolt {
       Event ev;
 
       ev = Factory.NewEvent(TypeId.Read(stream));
-      ev.Targets = stream.ReadInt(4);
+      ev.Targets = stream.ReadInt(5);
       ev.SourceConnection = connection;
 
       if (ev.IsEntityEvent) {
