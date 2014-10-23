@@ -19,9 +19,14 @@ internal static class Assert {
 
   [Conditional("DEBUG")]
   internal static void Same (object a, object b) {
+    Same(a, b, "");
+  }
+
+  [Conditional("DEBUG")]
+  internal static void Same(object a, object b, string error) {
     NotNull(a);
     NotNull(b);
-    True(ReferenceEquals(a, b));
+    True(ReferenceEquals(a, b), error);
   }
 
   [Conditional("DEBUG")]
