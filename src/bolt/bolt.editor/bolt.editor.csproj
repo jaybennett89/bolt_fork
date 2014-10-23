@@ -175,6 +175,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ATTRIBUTIONS.html" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\documentation\DOCUMENTATION.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

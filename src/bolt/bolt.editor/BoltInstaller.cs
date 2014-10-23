@@ -116,6 +116,16 @@ public static class BoltInstaller {
     Progress("Installing area of interest ... ", 1f);
   }
 
+  static void InstallDocumentation() {
+    Progress("Installing documentation ... ", 0f);
+
+    foreach (var resource in Resources.Where(x => x.Contains("Install.bolt.documentation"))) {
+      InstallAsset(resource);
+    }
+
+    Progress("Installing documentation ... ", 1f);
+  }
+
   static void InstallLogo() {
     Progress("Installing logo ... ", 0f);
 
@@ -292,7 +302,7 @@ public static class BoltInstaller {
     Debug.Log("installing:" + file);
 
     // delete existing asset
-    AssetDatabase.DeleteAsset(asset);
+    // AssetDatabase.DeleteAsset(asset);
 
     // clean up any residual files
     CleanExistingFile(file, true);
