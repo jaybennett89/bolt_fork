@@ -560,6 +560,10 @@ internal static class BoltCore {
 
   internal static void FixedUpdate() {
     if (hasSocket) {
+      if (UE.Time.timeScale != 1f) {
+        BoltLog.Error("Time.timeScale is not 1, value: {0}", UE.Time.timeScale);
+      }
+
       _frame += 1;
 
       // first thing we do is to poll the network
