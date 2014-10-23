@@ -615,7 +615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: e6b99e69-1682-45cd-9e00-dbfbe183a4af
   _serializerGuid: 2f3355b6-af0d-41a1-98e8-a125b330bc8b
-  _prefabId: 2
+  _prefabId: 1
   _updateRate: 1
   _clientPredicted: 0
   _allowInstantiateOnClient: 0
@@ -668,7 +668,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: b48677ff-76ae-4d71-808b-80be75ea3016
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 0
+  _prefabId: 2
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -762,7 +762,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 61ffb958-5157-45b7-b832-21a192830164
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 1
+  _prefabId: 0
   _updateRate: 1
   _clientPredicted: 0
   _allowInstantiateOnClient: 0
@@ -1263,7 +1263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 359cf3f6-14a7-4b3b-a116-2731f3a84c23
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 0
+  _prefabId: 2
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -2440,7 +2440,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 7a0d5917-9511-45a1-9205-3004404b8537
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 0
+  _prefabId: 2
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -2906,7 +2906,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 38a5bc33-13c5-40cf-b727-d9be8e6816cd
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 1
+  _prefabId: 0
   _updateRate: 1
   _clientPredicted: 0
   _allowInstantiateOnClient: 0
