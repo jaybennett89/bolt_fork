@@ -16,7 +16,7 @@ public class GameHealth : Bolt.GlobalEventListener {
 
       HealthChanged();
     }
-  }
+  } 
 
   public override void ControlOfEntityLost(BoltEntity arg) {
     if (arg.GetComponent<PlayerController>()) {

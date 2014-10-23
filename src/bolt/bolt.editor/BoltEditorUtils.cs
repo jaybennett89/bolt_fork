@@ -12,6 +12,10 @@ using UnityEditorInternal;
 using UnityEngine;
 
 static class BoltEditorUtils {
+  public static bool isEditorPlaying {
+    get { return EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPaused; }
+  }
+
   public static bool hasPro {
     get { return UnityEditorInternal.InternalEditorUtility.HasPro(); }
   }
