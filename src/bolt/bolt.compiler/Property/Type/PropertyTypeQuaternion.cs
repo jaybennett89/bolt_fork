@@ -32,6 +32,10 @@ namespace Bolt.Compiler {
       get { return true; }
     }
 
+    public override void OnCreated() {
+      Selection = AxisSelections.XYZ;
+    }
+
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorQuaternion();
     }

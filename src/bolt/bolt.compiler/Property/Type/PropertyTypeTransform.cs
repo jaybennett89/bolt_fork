@@ -8,10 +8,10 @@ namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeTransform : PropertyType {
     [ProtoMember(6)]
-    public AxisSelections PositionSelection = AxisSelections.XYZ;
+    public AxisSelections PositionSelection = AxisSelections.Disabled;
 
     [ProtoMember(7)]
-    public AxisSelections RotationSelection = AxisSelections.XYZ;
+    public AxisSelections RotationSelection = AxisSelections.Disabled;
 
     [ProtoMember(10)]
     public ExtrapolationVelocityModes ExtrapolationVelocityMode = ExtrapolationVelocityModes.CalculateFromPosition;
@@ -48,6 +48,11 @@ namespace Bolt.Compiler {
 
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorTransform();
+    }
+
+    public override void OnCreated() {
+      PositionSelection = AxisSelections.XYZ;
+      RotationSelection = AxisSelections.XYZ;
     }
   }
 }

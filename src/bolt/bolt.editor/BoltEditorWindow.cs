@@ -218,7 +218,7 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   PropertyDefinition CreateProperty(PropertyAssetSettings settings) {
-    return new PropertyDefinition {
+    PropertyDefinition def = new PropertyDefinition {
       Name = "NewProperty",
       Comment = "",
       Deleted = false,
@@ -227,6 +227,9 @@ public class BoltEditorWindow : BoltWindow {
       PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
       AssetSettings = settings
     };
+
+    def.PropertyType.OnCreated();
+    return def;
   }
 
   void EditCommand(CommandDefinition def) {

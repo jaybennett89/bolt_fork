@@ -178,6 +178,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\documentation\DOCUMENTATION.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_devicetype.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ipaddress.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_nat.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_port.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_port_in.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_port_out.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
