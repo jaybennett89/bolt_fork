@@ -61,7 +61,13 @@ namespace Bolt.Compiler {
     public string[] CallbackPaths { get; private set; }
 
     public string PropertyPath {
-      get { return CallbackPaths[CallbackPaths.Length - 1]; }
+      get {
+        if (CallbackPaths == null || CallbackPaths.Length == 0) {
+          return Decorator.Definition.Name;
+        }
+
+        return CallbackPaths[CallbackPaths.Length - 1];
+      }
     }
 
     public PropertyDecorator Decorator { get; private set; }
@@ -121,7 +127,7 @@ namespace Bolt.Compiler {
       if (clone.CallbackPaths.Length == 0) {
         clone.CallbackPaths = new string[] { extend };
       }
-      else { 
+      else {
         string prev = clone.CallbackPaths[clone.CallbackPaths.Length - 1];
         clone.CallbackPaths = clone.CallbackPaths.Add(prev + "." + extend);
       }
