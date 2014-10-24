@@ -13,6 +13,10 @@ namespace Bolt {
   /// </summary>
   [Documentation]
   public interface IState {
+    UE.Animator Animator {
+      get;
+    }
+
     /// <summary>
     /// Set the animator object this state should use for reading/writing mecanim parameters
     /// </summary>
@@ -144,6 +148,10 @@ namespace Bolt {
       PropertyIdBits = Bolt.Math.BitsRequired(MetaData.PropertyCount);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = Bolt.Math.BitsRequired(MetaData.PacketMaxProperties);
+    }
+
+    UE.Animator IState.Animator {
+      get { return Animator; }
     }
 
     public void DebugInfo() {
@@ -542,6 +550,7 @@ namespace Bolt {
     BitArray CalculateFilter(Filter filter) {
       return FullMask;
     }
+
 
 
 
