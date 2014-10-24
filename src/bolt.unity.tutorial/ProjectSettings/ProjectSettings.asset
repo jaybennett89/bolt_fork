@@ -150,7 +150,8 @@ PlayerSettings:
   psp2PackagedResourcesPath: 
   flashStrippingLevel: 2
   spritePackerPolicy: 
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    1: 
   metroPackageName: bolt.unity.tutorial
   metroPackageLogo: 
   metroPackageLogo140: 

@@ -39,7 +39,12 @@ namespace Bolt {
     }
 
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {
-      data.PackI32(offset, entity.Entity.InstanceId.Value);
+      if (entity) {
+        data.PackI32(offset, entity.Entity.InstanceId.Value);
+      }
+      else {
+        data.PackI32(offset, 0);
+      }
     }
 
     public static BoltEntity ReadEntity(this byte[] data, int offset) {

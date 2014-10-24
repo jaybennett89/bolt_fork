@@ -101,6 +101,7 @@ Target "InstallIOSNative" (fun _ ->
 
 Target "InstallBolt" (fun _ ->
   mkdir (unityDir + "/Assets/bolt/assemblies")
+  mkdir (unityDir + "/Assets/bolt/assemblies/upnp")
   mkdir (unityDir + "/Assets/bolt/assemblies/editor")
   mkdir (unityDir + "/Assets/bolt/assemblies/udpkit")
 
@@ -108,7 +109,10 @@ Target "InstallBolt" (fun _ ->
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
 )
 
 Target "InstallBoltDebugFiles" (fun _ ->

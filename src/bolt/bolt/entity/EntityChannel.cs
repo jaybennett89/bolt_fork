@@ -114,6 +114,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   public bool ExistsOnRemote(Entity entity) {
+    if (entity == null) { return false; }
     if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
 
     EntityProxy proxy;

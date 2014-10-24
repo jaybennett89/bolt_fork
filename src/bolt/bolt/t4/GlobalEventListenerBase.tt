@@ -17,6 +17,7 @@ cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
 
 cbs.Add("EntityReceived", new[] { "BoltEntity", "entity" });
+cbs.Add("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" });
 
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("ConnectFailed", "UdpEndPoint"));

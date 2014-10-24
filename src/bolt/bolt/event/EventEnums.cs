@@ -1,5 +1,12 @@
 ﻿namespace Bolt {
   [Documentation]
+  public enum ReliabilityModes : byte {
+    Unreliable = 0,
+    //ReliableUnordered = 1,
+    ReliableOrdered = 2,
+  }
+
+  [Documentation]
   public enum EntityTargets : byte {
     Everyone = Event.ENTITY_EVERYONE,
     EveryoneExceptController = Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER,

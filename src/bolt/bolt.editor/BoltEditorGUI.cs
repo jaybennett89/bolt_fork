@@ -311,6 +311,13 @@ public static class BoltEditorGUI {
     return IconButton(icon, BoltEditorSkin.Selected.IconColor);
   }
 
+  public static bool Button(string icon, bool enabled) {
+    Color c;
+    c = BoltEditorSkin.Selected.IconColor;
+    c.a = enabled ? 1f : 0.25f;
+    return IconButton(icon, c) && enabled;
+  }
+
   public static bool Toggle(string on, string off, bool enabled) {
     return Button(enabled ? on : off);
   }

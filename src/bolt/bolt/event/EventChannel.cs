@@ -53,17 +53,17 @@ namespace Bolt {
 
   class EventChannel : BoltChannel {
     List<EventUnreliable> unreliableSend;
-    EventReliableSendBuffer reliableSend;
-    EventReliableRecvBuffer reliableRecv;
+    EventReliableSendBuffer reliableOrderedSend;
+    EventReliableRecvBuffer reliableOrderedRecv;
 
     public EventChannel() {
       unreliableSend = new List<EventUnreliable>(256);
-      reliableSend = new EventReliableSendBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
-      reliableRecv = new EventReliableRecvBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
+      reliableOrderedSend = new EventReliableSendBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
+      reliableOrderedRecv = new EventReliableRecvBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
     }
 
     public void Queue(Event ev) {
-      if (ev.IsEntityEvent) {
+      if (ev.Reliability == ReliabilityModes.Unreliable) {
         // push on unreliable send queue
         unreliableSend.Add(EventUnreliable.Wrap(ev));
 
@@ -71,11 +71,11 @@ namespace Bolt {
         ev.IncrementRefs();
       }
       else {
-        if (reliableSend.TryEnqueue(EventReliable.Wrap(ev))) {
+        if (reliableOrderedSend.TryEnqueue(EventReliable.Wrap(ev))) {
           ev.IncrementRefs();
         }
         else {
-          BoltLog.Warn("The reliable event queue for {0} is full, disconnecting", connection);
+          BoltLog.Warn("The reliable-ordered event queue for {0} is full, disconnecting", connection);
           connection.Disconnect();
         }
       }
@@ -84,12 +84,12 @@ namespace Bolt {
     public override void Delivered(BoltPacket packet) {
       // set events as delivered
       for (int i = 0; i < packet.eventReliable.Count; ++i) {
-        reliableSend.SetDelivered(packet.eventReliable[i]);
+        reliableOrderedSend.SetDelivered(packet.eventReliable[i]);
       }
 
       EventReliable reliable;
 
-      while (reliableSend.TryRemove(out reliable)) {
+      while (reliableOrderedSend.TryRemove(out reliable)) {
         reliable.Event.DecrementRefs();
       }
 
@@ -99,7 +99,7 @@ namespace Bolt {
 
     public override void Lost(BoltPacket packet) {
       for (int i = 0; i < packet.eventReliable.Count; ++i) {
-        reliableSend.SetSend(packet.eventReliable[i]);
+        reliableOrderedSend.SetSend(packet.eventReliable[i]);
       }
 
       packet.eventReliable.Clear();
@@ -110,19 +110,26 @@ namespace Bolt {
 
       // prune events and calculate priority for remaining ones
       for (int i = 0; i < unreliableSend.Count; ++i) {
-        var existsOnRemote = connection._entityChannel.ExistsOnRemote(unreliableSend[i].Event.TargetEntity);
-        if (existsOnRemote) {
-          EventUnreliable r;
+        EventUnreliable r = unreliableSend[i];
 
-          r = unreliableSend[i];
-          r.Priority = unreliableSend[i].Event.TargetEntity.PriorityCalculator.CalculateEventPriority(connection, r.Event);
+        if (r.Event.IsEntityEvent) {
+          var existsOnRemote = connection._entityChannel.ExistsOnRemote(r.Event.TargetEntity);
+          if (existsOnRemote == false) {
+            unreliableSend[i].Event.DecrementRefs();
+            unreliableSend.RemoveAt(i);
 
-          unreliableSend[i] = r;
+            i -= 1;
+
+            continue;
+          }
         }
-        else {
-          unreliableSend[i].Event.DecrementRefs();
-          unreliableSend.RemoveAt(i);
-        }
+
+        r.Priority =
+          r.Event.IsEntityEvent
+            ? r.Event.TargetEntity.PriorityCalculator.CalculateEventPriority(connection, r.Event)
+            : 10;
+
+        unreliableSend[i] = r;
       }
 
       // sort on priority (descending)
@@ -134,7 +141,7 @@ namespace Bolt {
       // pack reliable events into packet
       EventReliable reliable;
 
-      while (reliableSend.TryNext(out reliable)) {
+      while (reliableOrderedSend.TryNext(out reliable)) {
         int ptr = packet.stream.Ptr;
 
         bool packOk = PackEvent(reliable.Event, packet.stream, reliable.Sequence);
@@ -149,7 +156,7 @@ namespace Bolt {
           packet.stream.Ptr = ptr;
 
           // flag for sending
-          reliableSend.SetSend(reliable);
+          reliableOrderedSend.SetSend(reliable);
           break;
         }
       }
@@ -201,13 +208,15 @@ namespace Bolt {
       // targets of this event
       stream.WriteInt(ev.Targets, 5);
 
-      if (ev.IsEntityEvent) {
-        // write network id for entity events
-        stream.WriteEntity(ev.TargetEntity, connection);
+      if (stream.WriteBool(ev.Reliability == ReliabilityModes.ReliableOrdered)) {
+        // write sequence number for reliable events
+        stream.WriteUInt(sequence, Event.RELIABLE_SEQUENCE_BITS);
       }
       else {
-        // write sequence number for global events
-        stream.WriteUInt(sequence, Event.RELIABLE_SEQUENCE_BITS);
+        if (ev.IsEntityEvent) {
+          // write network id for entity events
+          stream.WriteEntity(ev.TargetEntity, connection);
+        }
       }
 
       return ev.Pack(connection, stream);
@@ -220,11 +229,11 @@ namespace Bolt {
         uint sequence = 0;
         Event ev = ReadEvent(packet.stream, ref sequence);
 
-        if (ev.IsEntityEvent) {
+        if (ev.Reliability == ReliabilityModes.Unreliable) {
           EventDispatcher.Received(ev);
         }
         else {
-          switch (reliableRecv.TryEnqueue(EventReliable.Wrap(ev, sequence))) {
+          switch (reliableOrderedRecv.TryEnqueue(EventReliable.Wrap(ev, sequence))) {
             case RecvBufferAddResult.Old:
             case RecvBufferAddResult.OutOfBounds:
             case RecvBufferAddResult.AlreadyExists:
@@ -236,7 +245,7 @@ namespace Bolt {
 
       EventReliable reliable;
 
-      while (reliableRecv.TryRemove(out reliable)) {
+      while (reliableOrderedRecv.TryRemove(out reliable)) {
         EventDispatcher.Received(reliable.Event);
       }
 
@@ -250,11 +259,19 @@ namespace Bolt {
       ev.Targets = stream.ReadInt(5);
       ev.SourceConnection = connection;
 
-      if (ev.IsEntityEvent) {
-        ev.TargetEntity = stream.ReadEntity(connection);
+      if (stream.ReadBool()) {
+        sequence = stream.ReadUInt(Event.RELIABLE_SEQUENCE_BITS);
+
+        // assign relability mode
+        ev.Reliability = ReliabilityModes.ReliableOrdered;
       }
       else {
-        sequence = stream.ReadUInt(Event.RELIABLE_SEQUENCE_BITS);
+        if (ev.IsEntityEvent) {
+          ev.TargetEntity = stream.ReadEntity(connection);
+        }
+
+        // assign relability mode
+        ev.Reliability = ReliabilityModes.Unreliable;
       }
 
       ev.Read(connection, stream);

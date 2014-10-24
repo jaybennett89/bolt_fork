@@ -32,6 +32,7 @@ namespace Bolt {
     int refs;
 
     internal EventMetaData Meta;
+    internal ReliabilityModes Reliability;
 
     internal uint Sequence;
     internal byte[] Data;
@@ -102,20 +103,12 @@ namespace Bolt {
       }
     }
 
-    [Obsolete("Use Event.Send instead")]
-    public void Commit() {
-      EventDispatcher.Enqueue(this);
-    }
-
-    /// <summary>
-    /// Send this event
-    /// </summary>
     public void Send() {
       EventDispatcher.Enqueue(this);
     }
 
     void IDisposable.Dispose() {
-      Commit();
+      Send();
     }
 
     void VerifyIsActive() {
@@ -129,6 +122,5 @@ namespace Bolt {
 
       }
     }
-
   }
 }

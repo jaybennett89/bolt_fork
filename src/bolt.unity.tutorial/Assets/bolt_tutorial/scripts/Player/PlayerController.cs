@@ -90,6 +90,10 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void OnFire() {
+    using (var ev = LogEvent.Raise(Bolt.ReliabilityModes.Unreliable)) {
+      ev.message = "GLOBAL UNRELIABLE";
+    }
+
     if (entity.isOwner) {
       using (var ev = LogEvent.Raise(entity, Bolt.EntityTargets.OnlyController)) {
         ev.message = "TO CONTROLLER";

@@ -164,6 +164,7 @@
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
     <Compile Include="event\Legacy\BoltEventEnums.cs" />
+    <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />

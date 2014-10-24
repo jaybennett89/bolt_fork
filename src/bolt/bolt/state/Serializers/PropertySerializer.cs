@@ -40,9 +40,7 @@ namespace Bolt {
 
     public virtual void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
     public virtual void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    public virtual void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-      throw new NotSupportedException();
-    }
+    public virtual void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) { }
 
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }

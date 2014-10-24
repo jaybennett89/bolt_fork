@@ -41,8 +41,24 @@ public static class BoltInstaller {
     }
   }
 
-
   public static void Run() {
+    string error = null;
+
+    if (BoltEditorUtils.isEditorPlaying) {
+      error = "You can't install Bolt when the editor is playing";
+    }
+    else if (EditorApplication.isCompiling) {
+      error = "You can't install Bolt when the editor is compiling scripts";
+    }
+    else if (EditorApplication.isUpdating) {
+      error = "You can't install Bolt when the editor is updating the asset database";
+    }
+
+    if (error != null) {
+      EditorUtility.DisplayDialog("Bolt Installer", error, "Ok");
+      return;
+    }
+
     Debug.Log(string.Format("Installing Bolt v{0}", CurrentVersion));
 
     try {
@@ -50,7 +66,6 @@ public static class BoltInstaller {
 
       EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "resources"));
 
-      CleanOldInstall();
       InstallLogo();
       InstallIcons();
       InstallDocumentation();
@@ -69,36 +84,6 @@ public static class BoltInstaller {
       EditorApplication.UnlockReloadAssemblies();
       EditorUtility.ClearProgressBar();
     }
-  }
-
-
-  static void CleanOldInstall() {
-    Progress("Cleaning up old install ... ", 0f);
-
-    // delete all old scripts
-    var scripts = Resources.Where(x => x.Contains("Install.bolt.scripts")).ToArray();
-    var scriptsPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "scripts");
-
-    if (Directory.Exists(scriptsPath)) {
-      foreach (var f in Directory.GetFiles(scriptsPath, "*.cs", SearchOption.AllDirectories)) {
-        CleanExistingFile(f, false);
-      }
-    }
-
-    foreach (var f in scripts) {
-      AssetDatabase.ImportAsset(ResourceToAssetPath(f));
-    }
-
-    // delete old user assembly
-    AssetDatabase.DeleteAsset(BoltEditorUtils.MakeAssetPath("bolt/assemblies/bolt.user.dll"));
-
-    // delete old scene
-    AssetDatabase.DeleteAsset(BoltEditorUtils.MakeAssetPath("bolt/scenes/BoltDebugScene.unity"));
-
-    // refresh db
-    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-
-    Progress("Cleaning up old install ... ", 1f);
   }
 
   static void InstallAreaOfInterest() {
@@ -254,7 +239,7 @@ public static class BoltInstaller {
     EnsureDirectoryExists(scriptsPath);
 
     foreach (var f in Directory.GetFiles(scriptsPath, "*.cs", SearchOption.AllDirectories)) {
-      CleanExistingFile(f, false);
+      CleanExistingFile(f);
     }
 
     for (int i = 0; i < scripts.Length; ++i) {
@@ -309,12 +294,6 @@ public static class BoltInstaller {
     // delete existing asset
     // AssetDatabase.DeleteAsset(asset);
 
-    // clean up any residual files
-    CleanExistingFile(file, true);
-
-    // force update of asset database
-    AssetDatabase.Refresh(ImportOptions);
-
     // write new file
     File.WriteAllBytes(file, data);
 
@@ -368,15 +347,9 @@ public static class BoltInstaller {
     return BoltEditorUtils.MakeAssetPath(ResourceToPath(resource)).Replace('\\', '/');
   }
 
-  static void CleanExistingFile(string file, bool meta) {
+  static void CleanExistingFile(string file) {
     if (File.Exists(file)) {
       File.Delete(file);
-    }
-
-    if (meta) {
-      if (File.Exists(file + ".meta")) {
-        File.Delete(file + ".meta");
-      }
     }
   }
 }

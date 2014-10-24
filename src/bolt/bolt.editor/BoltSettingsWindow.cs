@@ -1,6 +1,7 @@
 ﻿//#define COLOR_EDITOR
 
 using System;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -94,9 +95,74 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.Label("Packet Size", () => {
-
       settings._config.packetSize = BoltEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
     });
+
+    BoltAssetEditorGUI.Label("UPnP", () => {
+      EditorGUILayout.BeginVertical();
+      EditorGUILayout.BeginHorizontal();
+
+      var dllPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.dll");
+      var bytesPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.bytes");
+      var label = new GUIStyle(GUI.skin.label);
+
+      Color c;
+      c = BoltEditorSkin.Selected.IconColor;
+      c.a = File.Exists(dllPath) ? 1f : 0.5f;
+
+      label.normal.textColor = c;
+
+      if (File.Exists(dllPath)) {
+        GUILayout.Label("ENABLED", label);
+
+        if (GUILayout.Button("Disable", EditorStyles.miniButton)) {
+          DisableCompilerConstant(BuildTargetGroup.Standalone, "BOLT_UPNP_SUPPORT");
+          SwitchAsset(dllPath, bytesPath);
+        }
+      }
+      else {
+        GUILayout.Label("DISABLED", label);
+
+        if (GUILayout.Button("Enable", EditorStyles.miniButton)) {
+          EnableCompilerConstant(BuildTargetGroup.Standalone, "BOLT_UPNP_SUPPORT");
+          SwitchAsset(bytesPath, dllPath);
+        }
+      }
+      EditorGUILayout.EndHorizontal();
+
+      EditorGUILayout.HelpBox("The UPnP feature is currently experimental and has not been tested thoroughly.", MessageType.Warning);
+
+      EditorGUILayout.EndVertical();
+    });
+  }
+
+  void SwitchAsset(string a, string b) {
+    File.Move(a, b);
+
+    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+    AssetDatabase.ImportAsset(BoltEditorUtils.MakeAssetPath(b));
+    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+  }
+
+  void EnableCompilerConstant(BuildTargetGroup group, string constantToEnable) {
+    string constants = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone).Trim();
+
+    if (!constants.Contains(constantToEnable)) {
+      if (string.IsNullOrEmpty(constants)) {
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(group, constantToEnable);
+      }
+      else {
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(group, constants + ";" + constantToEnable);
+      }
+    }
+  }
+
+  void DisableCompilerConstant(BuildTargetGroup group, string constantToDisable) {
+    string constants = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone).Trim();
+
+    if (constants.Contains(constantToDisable)) {
+      PlayerSettings.SetScriptingDefineSymbolsForGroup(group, constants.Replace(constantToDisable, "").Trim().Trim(';'));
+    }
   }
 
   void Simulation() {

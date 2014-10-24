@@ -38,5 +38,9 @@ namespace Bolt.Compiler {
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorVector();
     }
+
+    public override void OnCreated() {
+      Selection = AxisSelections.XYZ;
+    }
   }
 }

@@ -47,6 +47,10 @@ namespace Bolt.Compiler {
     [ProtoIgnore]
     public virtual bool CanSmoothCorrections { get { return false; } }
 
+    public virtual void OnCreated() {
+
+    }
+
     public virtual PropertyDecorator CreateDecorator() {
       throw new NotImplementedException();
     }
