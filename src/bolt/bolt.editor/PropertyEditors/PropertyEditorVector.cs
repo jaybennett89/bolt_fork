@@ -13,10 +13,22 @@ class PropertyEditorVector : PropertyEditor<PropertyTypeVector> {
       PropertyType.Selection = BoltEditorGUI.EditAxisSelection(PropertyType.Selection);
     });
 
-    if (PropertyType.Selection != AxisSelections.Disabled) {
-      BoltEditorGUI.WithLabel("Axis Compression", () => {
-        BoltEditorGUI.EditAxes(PropertyType.Compression, PropertyType.Selection);
-      });
-    }
+    var cmdSettings = Definition.CommandAssetSettings;
+    var stateSettings = Definition.StateAssetSettings;
+
+    BoltEditorGUI.WithLabel("Snap Magnitude", () => {
+      if (cmdSettings != null) {
+        cmdSettings.SnapMagnitude = EditorGUILayout.FloatField(cmdSettings.SnapMagnitude);
+      }
+
+      if (stateSettings != null) {
+        stateSettings.SnapMagnitude = EditorGUILayout.FloatField(stateSettings.SnapMagnitude);
+      }
+    });
+
+    BoltEditorGUI.WithLabel("Axis Compression", () => {
+      BoltEditorGUI.EditAxes(PropertyType.Compression, PropertyType.Selection);
+    });
+
   }
 }

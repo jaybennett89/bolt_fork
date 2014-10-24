@@ -29,5 +29,8 @@ namespace Bolt.Compiler {
 
     [ProtoMember(14)]
     public int MecanimLayer;
+
+    [ProtoMember(20)]
+    public float SnapMagnitude;
   }
 }

@@ -26,7 +26,8 @@ namespace Bolt {
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
           case SmoothingAlgorithms.Extrapolation:
-            f.Data.PackVector3(Settings.ByteOffset, Bolt.Math.InterpolateVector(state.Frames, Settings.ByteOffset + 12, state.Entity.Frame));
+            float snapMagnitude = SmoothingSettings.SnapMagnitude == 0f ? 1 << 16 : SmoothingSettings.SnapMagnitude;
+            f.Data.PackVector3(Settings.ByteOffset, Bolt.Math.InterpolateVector(state.Frames, Settings.ByteOffset + 12, state.Entity.Frame, snapMagnitude));
             break;
         }
       }
@@ -53,7 +54,14 @@ namespace Bolt {
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
       var v0 = from.ReadVector3(Settings.ByteOffset);
       var v1 = to.ReadVector3(Settings.ByteOffset);
-      into.PackVector3(Settings.ByteOffset, UE.Vector3.Lerp(v0, v1, t));
+      var m = (v1 - v0).sqrMagnitude;
+
+      if ((CommandSettings.SmoothCorrections == false) || (m > (CommandSettings.SnapMagnitude * CommandSettings.SnapMagnitude))) {
+        into.PackVector3(Settings.ByteOffset, v1);
+      }
+      else {
+        into.PackVector3(Settings.ByteOffset, UE.Vector3.Lerp(v0, v1, t));
+      }
     }
   }
 }

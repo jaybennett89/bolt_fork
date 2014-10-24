@@ -16,6 +16,10 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     });
 
     if (PropertyType.PositionSelection != AxisSelections.Disabled) {
+      BoltEditorGUI.WithLabel("Snap Magnitude", () => {
+        Definition.StateAssetSettings.SnapMagnitude = EditorGUILayout.FloatField(Definition.StateAssetSettings.SnapMagnitude);
+      });
+
       BoltEditorGUI.WithLabel("Position Axis Compression", () => {
         BoltEditorGUI.EditAxes(PropertyType.PositionCompression, PropertyType.PositionSelection);
       });

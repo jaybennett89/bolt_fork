@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UdpKit;
-using UE = UnityEngine;
 
 namespace Bolt {
   internal enum PropertyModes {
@@ -15,6 +11,7 @@ namespace Bolt {
   abstract class PropertySerializer {
     public PropertySettings Settings;
     public PropertyStateSettings StateSettings;
+    public PropertyCommandSettings CommandSettings;
     public PropertySmoothingSettings SmoothingSettings;
 
     public void AddSettings(PropertySettings settings) {
@@ -23,6 +20,10 @@ namespace Bolt {
 
     public void AddSettings(PropertyStateSettings stateSettings) {
       StateSettings = stateSettings;
+    }
+
+    public void AddSettings(PropertyCommandSettings commandSettings) {
+      CommandSettings = commandSettings;
     }
 
     public void AddSettings(PropertySmoothingSettings smoothingSettings) {

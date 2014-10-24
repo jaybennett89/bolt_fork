@@ -142,7 +142,7 @@ namespace Bolt {
             break;
 
           case SmoothingAlgorithms.Interpolation:
-            td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame);
+            td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude);
             td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
             break;
 

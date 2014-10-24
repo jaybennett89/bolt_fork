@@ -99,6 +99,7 @@
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
     <Compile Include="state\Serializers\PropertySerializerUniqueId.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
+    <Compile Include="state\Settings\Command.cs" />
     <Compile Include="state\Settings\Compression\Float.cs" />
     <Compile Include="state\Settings\Compression\Int.cs" />
     <Compile Include="state\Settings\Mecanim.cs" />

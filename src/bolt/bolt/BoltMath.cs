@@ -31,7 +31,7 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, float snapLimit) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadVector3(offset);
 
@@ -45,15 +45,21 @@ namespace Bolt {
         Assert.True(f1.Number > f0.Number);
         Assert.True(f1.Number > frame);
 
-        int f0Frame = f0.Number;
-        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
-          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        if ((p0 - p1).sqrMagnitude > (snapLimit * snapLimit)) {
+          return p1;
         }
+        else {
+          int f0Frame = f0.Number;
 
-        float t = f1.Number - f0Frame;
-        float d = frame - f0Frame;
+          if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
+            f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+          }
 
-        return UE.Vector3.Lerp(p0, p1, d / t);
+          float t = f1.Number - f0Frame;
+          float d = frame - f0Frame;
+
+          return UE.Vector3.Lerp(p0, p1, d / t);
+        }
       }
     }
 
@@ -112,19 +118,27 @@ namespace Bolt {
       var tolerance = settings.ExtrapolationErrorTolerance;
 
       UE.Vector3 p = f.Data.ReadVector3(offset);
-      UE.Vector3 m = p - position;
       UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
       float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
       float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
 
-      p = UE.Vector3.Lerp(position + v, p + (v * d), t);
+      UE.Vector3 p0 = position + v;
+      UE.Vector3 p1 = p + (v * d);
 
-      if ((velocity.magnitude < tolerance) && ((p - position).magnitude < tolerance)) {
-        return position;
+      var m = (p1 - p0).sqrMagnitude;
+      if (m > (settings.SnapMagnitude * settings.SnapMagnitude)) {
+        return p1;
       }
+      else {
+        tolerance = tolerance * tolerance;
 
-      return p;
+        if ((m < tolerance) && (velocity.sqrMagnitude < tolerance)) {
+          return position;
+        }
+
+        return UE.Vector3.Lerp(p0, p1, t);
+      }
     }
 
     internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
