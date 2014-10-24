@@ -151,5 +151,16 @@ partial class GlobalEventListenerBase {
     }
   }
 
+  
+  public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
+  }
+
+  internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
+    BoltLog.Debug("Invoking callback PortMappingChanged");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.PortMappingChanged(device, portMapping);
+    }
+  }
+
   }
 }

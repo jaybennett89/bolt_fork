@@ -219,6 +219,18 @@ public static class BoltNetwork {
     UPnP.Disable(true);
   }
 
+  public static void OpenPortUPnP(int port) {
+    UPnP.OpenPort(port);
+  }
+
+  public static void ClosePortUPnP(int port) {
+    UPnP.ClosePort(port);
+  }
+
+  public static IEnumerable<Bolt.INatDevice> NatDevicesUPnP {
+    get { return UPnP.NatDevices; }
+  }
+
   public static void SetPrefabPool(IPrefabPool pool) {
     if (pool == null) {
       throw new ArgumentNullException("pool");

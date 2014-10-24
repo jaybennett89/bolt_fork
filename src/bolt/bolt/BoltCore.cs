@@ -560,6 +560,20 @@ internal static class BoltCore {
     }
   }
 
+  static void UpdateUPnP() {
+    if (_frame % 60 == 0) {
+
+      UPnP.Update();
+
+      INatDevice device;
+      IPortMapping portMapping;
+
+      while (UPnP.NextPortStatusChange(out device, out portMapping)) {
+        BoltInternal.GlobalEventListenerBase.PortMappingChangedInvoke(device, portMapping);
+      }
+    }
+  }
+
   internal static void FixedUpdate() {
     if (hasSocket) {
       if (UE.Time.timeScale != 1f) {
@@ -567,6 +581,8 @@ internal static class BoltCore {
       }
 
       _frame += 1;
+
+      BoltCore.UpdateUPnP();
 
       // first thing we do is to poll the network
       BoltCore.PollNetwork();
