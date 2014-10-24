@@ -117,17 +117,15 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   public void ApplyDamage(byte damage) {
     if (!state.Dead) {
 
-      using (var mod = state.Modify()) {
-        mod.health -= damage;
+      state.health -= damage;
 
-        if (mod.health > 100 || mod.health < 0) {
-          mod.health = 0;
-        }
+      if (state.health > 100 || state.health < 0) {
+        state.health = 0;
       }
+    }
 
-      if (state.health == 0) {
-        entity.controller.GetPlayer().Kill();
-      }
+    if (state.health == 0) {
+      entity.controller.GetPlayer().Kill();
     }
   }
 

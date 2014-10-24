@@ -12,7 +12,7 @@ static partial class BoltCompiler {
     CompileNetwork(op);
     CompileAssemblyInfo(op);
 
-    op.project.GenerateCode(op.projectFilePath);
+    op.project.GenerateCode(op.projectFilePath, BoltRuntimeSettings.instance.allowStatePropertySetters);
   }
 
   static void EmitFileHeader(BoltSourceFile file) {

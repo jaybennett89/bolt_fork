@@ -72,6 +72,7 @@ namespace Bolt.Compiler {
       type.BaseTypes.Add(Decorator.InterfaceName);
 
       type.DeclareField("Bolt.State.StateMetaData", "_Meta").Attributes = STATIC_PRIVATE;
+      type.DeclareField(Decorator.RootStruct.ModifierName, "_Modifier").Attributes = MemberAttributes.Assembly;
 
       type.DeclareConstructorStatic(ctor => {
         ctor.Statements.Expr("_Meta = new Bolt.State.StateMetaData()");
@@ -95,7 +96,11 @@ namespace Bolt.Compiler {
         EmitControllerFilter(ctor);
       });
 
-      type.DeclareConstructor(ctor => { ctor.BaseConstructorArgs.Add("_Meta".Expr()); });
+      type.DeclareConstructor(ctor => {
+        ctor.BaseConstructorArgs.Add("_Meta".Expr());
+        ctor.Statements.Expr("_Modifier = new {0}(null, 0, 0)", Decorator.RootStruct.ModifierName);
+      });
+
       type.DeclareMethod(typeof(string).FullName, "ToString", method => {
         method.Statements.Expr(string.Format(@"return string.Format(""[Serializer {0}]"")", Decorator.InterfaceName));
       }).Attributes = MemberAttributes.Override | MemberAttributes.Public;
@@ -114,7 +119,8 @@ namespace Bolt.Compiler {
     void DeclareModify(CodeTypeDeclaration type, StateDecorator decorator) {
       type.DeclareMethod(decorator.RootStruct.ModifierInterfaceName, "Modify", method => {
         method.PrivateImplementationType = new CodeTypeReference(decorator.InterfaceName);
-        method.Statements.Expr("return new {0}(Frames.first, 0, 0)", Decorator.RootStruct.ModifierName);
+        method.Statements.Expr("_Modifier.frame = Frames.first");
+        method.Statements.Expr("return _Modifier");
       });
     }
 

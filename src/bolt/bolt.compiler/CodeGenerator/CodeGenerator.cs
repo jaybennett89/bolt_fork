@@ -16,6 +16,7 @@ namespace Bolt.Compiler {
     public List<StructDecorator> Structs;
     public List<EventDecorator> Events;
     public List<CommandDecorator> Commands;
+    public bool AllowStatePropertySetters = false;
 
     public CodeNamespace CodeNamespace;
     public CodeNamespace CodeNamespaceBolt;

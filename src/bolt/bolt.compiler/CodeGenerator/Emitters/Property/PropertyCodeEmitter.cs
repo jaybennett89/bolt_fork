@@ -25,11 +25,11 @@ namespace Bolt.Compiler {
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, false);
+      EmitSimpleIntefaceMember(type, true, Generator.AllowStatePropertySetters);
     }
 
     public virtual void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      EmitForwardStateMember(decorator, type);
+      EmitForwardStateMember(decorator, type, true);
     }
 
     public virtual void EmitStructMembers(CodeTypeDeclaration type) {
@@ -108,10 +108,19 @@ namespace Bolt.Compiler {
       }
     }
 
-    protected void EmitForwardStateMember(StateDecorator decorator, CodeTypeDeclaration type) {
+    protected void EmitForwardStateMember(StateDecorator decorator, CodeTypeDeclaration type, bool allowSetter) {
+      Action<CodeStatementCollection> setter = null;
+
+      if (Generator.AllowStatePropertySetters && allowSetter) {
+        setter = set => {
+          set.Expr("_Modifier.frame = Frames.first");
+          set.Expr("_Modifier.{0} = value", Decorator.Definition.Name);
+        };
+      }
+
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
         get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.Name);
-      });
+      }, setter);
     }
 
     protected string CallbackDelegateType {
