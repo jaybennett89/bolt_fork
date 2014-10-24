@@ -130,7 +130,9 @@ public class BoltSettingsWindow : EditorWindow {
       }
       EditorGUILayout.EndHorizontal();
 
-      EditorGUILayout.HelpBox("The UPnP feature is currently experimental and has not been tested thoroughly.", MessageType.Warning);
+      if (File.Exists(dllPath)) {
+        EditorGUILayout.HelpBox("The UPnP feature is currently experimental and has not been tested thoroughly.", MessageType.Warning);
+      }
 
       EditorGUILayout.EndVertical();
     });
@@ -247,6 +249,11 @@ public class BoltSettingsWindow : EditorWindow {
     BoltAssetEditorGUI.Label("Warning Level", () => {
       settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
+    });
+
+    BoltAssetEditorGUI.Label("Property Setters", () => {
+      settings.allowStatePropertySetters =
+        BoltEditorGUI.ToggleDropdown("Directly on state property", "Only through 'Modify' call", settings.allowStatePropertySetters);
     });
   }
 

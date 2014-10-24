@@ -189,6 +189,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_up.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_name.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_server.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

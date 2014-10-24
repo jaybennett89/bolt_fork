@@ -64,7 +64,25 @@ public class BoltConnectionsWindow : BoltWindow {
       NatDeviceDetailsView();
     }
 
+    Header("mc_server", "LAN Servers");
+    LanServers();
+
     GUILayout.EndScrollView();
+  }
+
+  void LanServers() {
+    GUIStyle s = new GUIStyle(GUIStyle.none);
+    s.padding = new RectOffset(5, 5, 2, 2);
+    GUILayout.BeginHorizontal(s);
+
+    var sessions = BoltNetwork.isRunning ? BoltNetwork.GetSessions() : new UdpKit.UdpSession[0];
+
+    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "Name"), c => StatsLabel(c.ServerName));
+    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_ipaddress", "End Point"), c => StatsLabel(c.EndPoint));
+    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "User Data"), c => StatsLabel(c.UserData ?? ""));
+
+    GUILayout.EndHorizontal();
+    GUILayout.Space(4);
   }
 
   void NatDeviceDetailsView() {

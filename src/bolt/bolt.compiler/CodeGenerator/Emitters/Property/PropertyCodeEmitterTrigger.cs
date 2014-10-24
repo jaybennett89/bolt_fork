@@ -18,6 +18,10 @@ namespace Bolt.Compiler {
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
+
+      if (Generator.AllowStatePropertySetters) {
+        type.DeclareMethod(typeof(void).FullName, Decorator.Definition.Name + "Trigger", mtd => { });
+      }
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
@@ -26,6 +30,13 @@ namespace Bolt.Compiler {
       }, set => {
         set.Expr(" (new {0}(Frames.first, 0, 0)).{1} = value", decorator.RootStruct.Name, Decorator.Definition.Name);
       });
+
+      if (Generator.AllowStatePropertySetters) {
+        type.DeclareMethod(typeof(void).FullName, Decorator.Definition.Name + "Trigger", method => {
+          method.Statements.Expr("_Modifier.frame = Frames.first");
+          method.Statements.Expr("_Modifier.{0}()", Decorator.SetMethodName);
+        });
+      }
     }
 
     public override void EmitStructMembers(CodeTypeDeclaration type) {
