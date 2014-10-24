@@ -36,12 +36,24 @@ namespace Bolt {
     }
 
     internal static Bolt.IFactory GetFactory(TypeId id) {
-      BoltLog.Debug("Looking up factory {0}", id);
+#if DEBUG
+      if (!_factoriesByTypeId.ContainsKey(id)) {
+        BoltLog.Error("Unknown factory {0}", id);
+        return null;
+      }
+#endif
+
       return _factoriesByTypeId[id];
     }
 
     internal static Bolt.IFactory GetFactory(UniqueId id) {
-      BoltLog.Debug("Looking up factory {0}", id);
+#if DEBUG
+      if (!_factoriesByUniqueId.ContainsKey(id)) {
+        BoltLog.Error("Unknown factory {0}", id);
+        return null;
+      }
+#endif
+
       return _factoriesByUniqueId[id];
     }
 
