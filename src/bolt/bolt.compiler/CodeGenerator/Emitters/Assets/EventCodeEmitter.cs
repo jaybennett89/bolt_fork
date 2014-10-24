@@ -113,6 +113,7 @@ namespace Bolt.Compiler {
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
         method.Statements.Expr("evt.Targets = (byte) targets", Decorator.Definition.EntityTargets);
         method.Statements.Expr("evt.TargetEntity = entity.Entity");
+        method.Statements.Expr("evt.Reliability = Bolt.ReliabilityModes.Unreliable");
         method.Statements.Expr("evt.IncrementRefs()");
         method.Statements.Expr("return evt");
       });
@@ -121,6 +122,7 @@ namespace Bolt.Compiler {
         method.Attributes = MemberAttributes.Private | MemberAttributes.Static;
         method.DeclareParameter(typeof(byte).FullName, "targets");
         method.DeclareParameter("BoltConnection", "connection");
+        method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
 
         switch (Decorator.Definition.GlobalSenders) {
           case GlobalEventSenders.OnlyServer: method.Statements.Expr("if (!BoltCore.isServer) throw new BoltException(\"You are not the server of, you can not raise this event\")"); break;
@@ -131,6 +133,7 @@ namespace Bolt.Compiler {
         method.Statements.Expr("evt = new {0}()", Decorator.Definition.Name);
         method.Statements.Expr("evt.Targets = targets");
         method.Statements.Expr("evt.TargetConnection = connection");
+        method.Statements.Expr("evt.Reliability = reliability");
         method.Statements.Expr("evt.IncrementRefs()");
         method.Statements.Expr("return evt");
       });
@@ -138,18 +141,38 @@ namespace Bolt.Compiler {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("Bolt.GlobalTargets", "targets");
-        method.Statements.Expr("return Raise((byte) targets, null)");
+        method.Statements.Expr("return Raise((byte) targets, null, Bolt.ReliabilityModes.ReliableOrdered)");
+      });
+
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.DeclareParameter("Bolt.GlobalTargets", "targets");
+        method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
+        method.Statements.Expr("return Raise((byte) targets, null, reliability)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltConnection", "connection");
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection)");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, Bolt.ReliabilityModes.ReliableOrdered)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null)");
+        method.DeclareParameter("BoltConnection", "connection");
+        method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, reliability)");
+      });
+
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, Bolt.ReliabilityModes.ReliableOrdered)");
+      });
+
+      type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
+        method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+        method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, reliability)");
       });
 
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
