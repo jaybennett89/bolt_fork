@@ -551,7 +551,10 @@ partial class EntityChannel : BoltChannel {
         }
 
         // log debug info
-        BoltLog.Debug("Received proxy for {0} from {1}", entity.UnityObject, connection);
+        BoltLog.Debug("Received {0} from {1}", entity, connection);
+
+        // notify user
+        BoltInternal.GlobalEventListenerBase.EntityReceivedInvoke(proxy.Entity.UnityObject);
       }
       else {
         // find proxy
