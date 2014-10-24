@@ -76,6 +76,11 @@ namespace Bolt.Compiler {
         ));
       }
 
+      // command settings
+      if (Decorator.DefiningAsset is CommandDecorator) {
+        settings.Add(Generator.CreateCommandSettings(Decorator.Definition));
+      }
+
       // mecanim for states settings
       if ((Decorator.DefiningAsset is StateDecorator) && Decorator.Definition.PropertyType.MecanimApplicable) {
         var s = Decorator.Definition.StateAssetSettings;

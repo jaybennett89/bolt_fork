@@ -68,6 +68,15 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
+    public string CreateCommandSettings(PropertyDefinition p) {
+      var s = p.CommandAssetSettings;
+      if (s != null) {
+        return string.Format("Bolt.PropertyCommandSettings.Create({0}, {1}f)", s.SmoothCorrection.ToString().ToLower(), s.SnapMagnitude);
+      }
+
+      return "default(Bolt.PropertyCommandSettings)";
+    }
+
     public string CreateSmoothingSettings(PropertyDefinition p) {
       var s = p.StateAssetSettings;
       if (s != null) {
@@ -75,13 +84,14 @@ namespace Bolt.Compiler {
 
         switch (s.SmoothingAlgorithm) {
           case SmoothingAlgorithms.Interpolation:
-            return "Bolt.PropertySmoothingSettings.CreateInterpolation()";
+            return string.Format("Bolt.PropertySmoothingSettings.CreateInterpolation({0}f)", s.SnapMagnitude);
 
           case SmoothingAlgorithms.Extrapolation:
-            return string.Format("Bolt.PropertySmoothingSettings.CreateExtrapolation({0}, {1}, {2}f, {3})",
+            return string.Format("Bolt.PropertySmoothingSettings.CreateExtrapolation({0}, {1}, {2}f, {3}f, {4})",
               s.ExtrapolationMaxFrames,
               s.ExtrapolationCorrectionFrames,
               s.ExtrapolationErrorTolerance,
+              s.SnapMagnitude,
               t == null
                 ? string.Format("Bolt.ExtrapolationVelocityModes.{0}", t.ExtrapolationVelocityMode)
                 : "default(Bolt.ExtrapolationVelocityModes)"
