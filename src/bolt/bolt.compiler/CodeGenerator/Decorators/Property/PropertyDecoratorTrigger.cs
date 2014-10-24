@@ -18,11 +18,19 @@ namespace Bolt.Compiler {
     }
 
     public string SetMethodName {
-      get { return Definition.Name;  }
+      get { return Definition.Name; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterTrigger();
+    }
+
+    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
+      all.Add(
+        p
+          .Combine(Definition.Filters, Definition.Controller)
+          .Combine(all.Count, this)
+      );
     }
   }
 }
