@@ -16,6 +16,9 @@ namespace Bolt.Compiler {
     public bool IsArrayElement;
 
     [ProtoIgnore]
+    public int Adjust;
+
+    [ProtoIgnore]
     public Project Context;
 
     [ProtoMember(1)]

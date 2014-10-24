@@ -310,7 +310,7 @@ public class BoltEditorWindow : BoltWindow {
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
     for (int i = 0; i < list.Count; ++i) {
-      EditProperty(def, list[i]);
+      EditProperty(def, list[i], i == 0, i == (list.Count - 1));
     }
 
     // move nudged property
@@ -346,11 +346,31 @@ public class BoltEditorWindow : BoltWindow {
 
         // rewind index
         i -= 1;
+
+        // save
+        Save();
       }
     }
+
+    // adjust properties
+    for (int i = 0; i < list.Count; ++i) {
+      if (list[i].Adjust != 0) {
+        var self = list[i];
+        var other = list[i + list[i].Adjust];
+
+        list[i + list[i].Adjust] = self;
+        list[i] = other;
+
+        self.Adjust = 0;
+        other.Adjust = 0;
+
+        Save();
+      }
+    }
+
   }
 
-  void EditProperty(AssetDefinition def, PropertyDefinition p) {
+  void EditProperty(AssetDefinition def, PropertyDefinition p, bool first, bool last) {
     BeginBackground();
 
     GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
@@ -381,6 +401,14 @@ public class BoltEditorWindow : BoltWindow {
     // edit property type
     BoltEditorGUI.PropertyTypePopup(def, p);
     BoltEditorGUI.SetTooltip("Type. The type of this property.");
+
+    if (BoltEditorGUI.Button("mc_arrow_down", !last)) {
+      p.Adjust += 1;
+    }
+
+    if (BoltEditorGUI.Button("mc_arrow_up", !first)) {
+      p.Adjust -= 1;
+    }
 
     EditorGUILayout.EndHorizontal();
 
