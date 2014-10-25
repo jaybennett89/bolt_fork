@@ -198,6 +198,9 @@ namespace Bolt {
         eb.Attached();
       }
 
+      // mark as don't destroy on load
+      UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
+
       // log
       BoltLog.Debug("Attached {0}", this);
     }

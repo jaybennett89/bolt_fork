@@ -37,9 +37,6 @@ namespace Bolt {
     protected override void Read(byte[] data,BoltConnection connection, UdpStream stream) {
       Blit.PackI32(data, Settings.ByteOffset, IntCompression.Read(stream));
     }
-
-    public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-
-    }
   }
 }
+ 
