@@ -332,27 +332,16 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void Awake() {
-    if (UE.Application.isPlaying) {
-      DontDestroyOnLoad(gameObject);
-    }
-    else {
-      // only in the editor
-      if (UE.Application.isEditor) {
-        // check if we don't have a valid scene guid
-        if (sceneGuid == Bolt.UniqueId.None) {
-          // set a new one
-          sceneGuid = Bolt.UniqueId.New();
+    // only in the editor
+    if ((UE.Application.isEditor == true) && (UE.Application.isPlaying == false)) {
+      // check if we don't have a valid scene guid
+      if (sceneGuid == Bolt.UniqueId.None) {
+        // set a new one
+        sceneGuid = Bolt.UniqueId.New();
 
-          // tell editor to save us
-          BoltInternal.BoltCoreInternal.ChangedEditorEntities.Add(this);
-        }
+        // tell editor to save us
+        BoltInternal.BoltCoreInternal.ChangedEditorEntities.Add(this);
       }
-    }
-  }
-
-  void OnEnable() {
-    if (UE.Application.isPlaying) {
-      DontDestroyOnLoad(gameObject);
     }
   }
 
