@@ -8,7 +8,7 @@
     public Scene Scene;
 
     public SceneLoadState BeginLoad(int index) {
-      return new SceneLoadState { Scene = new Scene(index, this.Scene.Token + 1), State = SceneLoadState.STATE_LOADING };
+      return new SceneLoadState { Scene = new Scene(index, (this.Scene.Token + 1) & 255), State = SceneLoadState.STATE_LOADING };
     }
 
     public static SceneLoadState DefaultRemote() {
@@ -23,7 +23,7 @@
   struct Scene {
     public readonly int Index;
     public readonly int Token;
-     
+
     public Scene(int index, int token) {
       Assert.True(index == (index & 255));
       Assert.True(token == (token & 255));

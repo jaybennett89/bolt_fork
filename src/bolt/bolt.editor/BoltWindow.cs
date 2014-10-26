@@ -8,19 +8,7 @@ using System;
 
 public abstract class BoltWindow : EditorWindow {
   public static string ProjectPath {
-    get {
-      var s = BoltRuntimeSettings.instance;
-
-      if (s) {
-        var p = s.projectPath.Trim();
-
-        if (string.IsNullOrEmpty(p) == false) {
-          return p;
-        }
-      }
-
-      return "Assets/bolt/project.bytes";
-    }
+    get { return "Assets/bolt/project.bytes"; }
   }
 
   bool save;

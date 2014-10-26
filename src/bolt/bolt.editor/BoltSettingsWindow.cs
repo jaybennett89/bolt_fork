@@ -1,5 +1,6 @@
 ﻿//#define COLOR_EDITOR
 
+using Bolt;
 using System;
 using System.IO;
 using System.Linq;
@@ -43,16 +44,16 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.scopeMode = (Bolt.ScopeMode)EditorGUILayout.EnumPopup(settings._config.scopeMode);
 
       if (previous != settings._config.scopeMode) {
-        settings._config.scopeModeHideWarningInGui = false;
+        settings.scopeModeHideWarningInGui = false;
         Save();
       }
     });
 
-    if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings._config.scopeModeHideWarningInGui == false)) {
+    if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings.scopeModeHideWarningInGui == false)) {
       EditorGUILayout.HelpBox("When manual scoping is enabled you are required to call BoltEntity.SetScope for each connection that should receive a replicated copy of the entity.", MessageType.Warning);
 
       if (GUILayout.Button("I understand, hide this warning", EditorStyles.miniButton)) {
-        settings._config.scopeModeHideWarningInGui = true;
+        settings.scopeModeHideWarningInGui = true;
         Save();
       }
     }
@@ -213,11 +214,6 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
 
-    if (settings._config.applicationGuid == null || settings._config.applicationGuid.Length != 16) {
-      settings._config.applicationGuid = Guid.NewGuid().ToByteArray();
-      Save();
-    }
-
     BoltAssetEditorGUI.Label("Editor Skin", () => {
       settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
@@ -252,8 +248,11 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltAssetEditorGUI.Label("Property Setters", () => {
-      settings.allowStatePropertySetters =
-        BoltEditorGUI.ToggleDropdown("Directly on state property", "Only through 'Modify' call", settings.allowStatePropertySetters);
+      settings.allowStatePropertySetters = BoltEditorGUI.ToggleDropdown("Directly on state property", "Only through 'Modify' call", settings.allowStatePropertySetters);
+    });
+
+    BoltAssetEditorGUI.Label("Prefab Mode", () => {
+      PrefabDatabase.Instance.ManualMode = BoltEditorGUI.ToggleDropdown("Manual", "Automatic", PrefabDatabase.Instance.ManualMode);
     });
   }
 

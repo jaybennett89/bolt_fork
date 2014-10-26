@@ -76,6 +76,7 @@
     <Compile Include="BoltMainThreadInvoker.cs" />
     <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
     <Compile Include="Editors\BoltMecanimAssetEditor.cs" />
+    <Compile Include="Editors\BoltPrefabDatabaseEditor.cs" />
     <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />
     <Compile Include="Editors\BoltStateAssetEditor.cs" />
     <Compile Include="BoltUserAssemblyCompiler.cs" />
@@ -139,9 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_down.png" />

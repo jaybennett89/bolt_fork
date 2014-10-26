@@ -124,32 +124,7 @@ class BoltUserAssemblyCompiler {
     }
   }
 
-  static IEnumerable<BoltPrefab> FindPrefabs() {
-    int id = 0;
-
-    foreach (var file in Directory.GetFiles(@"Assets", "*.prefab", SearchOption.AllDirectories)) {
-      BoltEntity entity = AssetDatabase.LoadAssetAtPath(file, typeof(BoltEntity)) as BoltEntity;
-
-      if (entity) {
-        if (entity) {
-          entity.SetField("_prefabId", id);
-
-          EditorUtility.SetDirty(entity.gameObject);
-          EditorUtility.SetDirty(entity);
-
-          yield return new BoltPrefab { go = entity.gameObject, id = id, name = entity.gameObject.name.CSharpIdentifier() };
-
-          id += 1;
-        }
-        else {
-          entity = null;
-          EditorUtility.UnloadUnusedAssets();
-        }
-      }
-    }
-  }
-
-  public static ManualResetEvent Run(bool all) {
+  public static ManualResetEvent Run() {
     ManualResetEvent evnt = new ManualResetEvent(false);
 
     try {
@@ -161,7 +136,6 @@ class BoltUserAssemblyCompiler {
 
       // setup compiler options
       BoltCompilerOperation op = new BoltCompilerOperation();
-
       op.projectFilePath = projectFile;
       op.project = File.Exists("Assets/bolt/project.bytes") ? File.ReadAllBytes("Assets/bolt/project.bytes").ToObject<Project>() : new Project();
 
@@ -171,15 +145,10 @@ class BoltUserAssemblyCompiler {
 
       // maps config
       op.scenesFilePath = mapsFile;
-
-      // prefabs config
-      if (all) {
-        op.prefabsFilePath = prefabsFile;
-        op.prefabs = FindPrefabs().ToList();
-      }
+      op.prefabsFilePath = prefabsFile;
 
       // run code emitter
-      BoltCompiler.Run(op, all);
+      BoltCompiler.Run(op);
       RunCSharpCompiler(op, evnt);
 
     }

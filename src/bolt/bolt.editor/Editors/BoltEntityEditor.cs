@@ -73,7 +73,7 @@ public class BoltEntityEditor : Editor {
         }
 
         if (prefabType == PrefabType.Prefab) {
-          if (BoltRuntimeSettings.ContainsPrefab(entity) == false) {
+          if (Bolt.PrefabDatabase.Contains(entity) == false) {
             EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
           }
         }
