@@ -196,8 +196,15 @@ namespace Bolt {
     public void SetAnimator(UE.Animator animator) {
       Animator = animator;
 
-      if (Animator && (Animator.updateMode != UE.AnimatorUpdateMode.AnimatePhysics)) {
-        BoltLog.Warn("Animator for '{0}' is not set to 'AnimatePhysics', this might cause Bolt to miss values and triggers being updated.", animator.gameObject);
+      if (Animator) {
+        if (Animator.updateMode != UE.AnimatorUpdateMode.AnimatePhysics) {
+          BoltLog.Warn("Animator for '{0}' is not set to 'AnimatePhysics', this might cause Bolt to miss values and triggers being updated.", animator.gameObject);
+        }
+
+        if (!Entity.IsOwner && Animator.applyRootMotion) {
+          BoltLog.Warn("Animator for '{0}' has root motion enabled on a remote entity, auto-disabling it");
+          Animator.applyRootMotion = false;
+        }
       }
     }
 
