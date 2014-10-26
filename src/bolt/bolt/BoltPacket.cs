@@ -10,7 +10,7 @@ internal class BoltPacketInfo {
 
 internal class BoltPacket : IDisposable {
   public static int packetSize {
-    get { return BoltCore._udpConfig.PacketSize - Bolt.Math.BytesRequired(UdpSocket.HeaderBitSize); }
+    get { return BoltCore._udpConfig.PacketSize - UdpHeader.SIZE_BYTES; }
   }
 
   internal int number;

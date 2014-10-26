@@ -17,7 +17,6 @@ abstract class BoltChannel {
   public abstract void Pack (BoltPacket packet);
   public abstract void Read (BoltPacket packet);
 
-  public virtual void Sent (BoltPacket packet) { }
   public virtual void Lost (BoltPacket packet) { }
   public virtual void Delivered (BoltPacket packet) { }
 

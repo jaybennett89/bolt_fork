@@ -460,32 +460,26 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.ObjectSent:
-          ev.Connection.GetBoltConnection().PacketSent((BoltPacket)ev.Object0);
-          break;
-
-        case UdpEventType.ObjectReceived:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
-          }
-          break;
-
-        case UdpEventType.ObjectDelivered:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
-          }
-          break;
-
-        case UdpEventType.ObjectLost:
-        case UdpEventType.ObjectRejected:
-        case UdpEventType.ObjectSendFailed:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
-          }
-          break;
-
         case UdpEventType.ConnectAttempt:
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
+          break;
+
+        case UdpEventType.StreamReceived:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Stream.UserToken);
+          }
+          break;
+
+        case UdpEventType.StreamDelivered:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
+          }
+          break;
+
+        case UdpEventType.StreamLost:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
+          }
           break;
       }
     }
@@ -818,7 +812,7 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = UdpSocket.Create(BoltNetworkInternal.CreateUdpPlatform(), () => new BoltSerializer(), _udpConfig);
+    _udpSocket = UdpSocket.Create(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
