@@ -12,21 +12,24 @@
     }
 
     public static SceneLoadState DefaultRemote() {
-      return new SceneLoadState() { Scene = new Scene(-1, -1), State = SceneLoadState.STATE_CALLBACK_INVOKED };
+      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_CALLBACK_INVOKED };
     }
 
     public static SceneLoadState DefaultLocal() {
-      return new SceneLoadState() { Scene = new Scene(-1, -1), State = SceneLoadState.STATE_LOADING_DONE };
+      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_LOADING_DONE };
     }
   }
 
   struct Scene {
     public readonly int Index;
     public readonly int Token;
-
+     
     public Scene(int index, int token) {
-      this.Index = index;
-      this.Token = token;
+      Assert.True(index == (index & 255));
+      Assert.True(token == (token & 255));
+
+      this.Index = index & 255;
+      this.Token = token & 255;
     }
 
     public override int GetHashCode() {
