@@ -62,10 +62,12 @@ partial class BoltCompiler {
 
     using (BoltSourceFile file = new BoltSourceFile(op.prefabsFilePath)) {
       file.EmitScope("public static class BoltPrefabs", () => {
-
         for (int i = 1; i < PrefabDatabase.Instance.Prefabs.Length; ++i) {
           GameObject prefab = PrefabDatabase.Instance.Prefabs[i];
-          file.EmitLine("public static readonly Bolt.PrefabId {0} = new Bolt.PrefabId({1});", BoltEditorUtils.CSharpIdentifier(prefab.name), prefab.GetComponent<BoltEntity>()._prefabId);
+
+          if (prefab) {
+            file.EmitLine("public static readonly Bolt.PrefabId {0} = new Bolt.PrefabId({1});", BoltEditorUtils.CSharpIdentifier(prefab.name), prefab.GetComponent<BoltEntity>()._prefabId);
+          }
         }
       });
     }

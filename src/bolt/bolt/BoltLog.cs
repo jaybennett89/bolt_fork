@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+
+using IO = System.IO;
 using SYS = System;
-using SYS_IO = System.IO;
 using UE = UnityEngine;
 
 public static class BoltLog {
@@ -65,12 +66,10 @@ public static class BoltLog {
         logFile = "Bolt_Log_{0}Y-{1}M-{2}D_{3}H{4}M{5}S_{6}MS.txt";
         logFile = string.Format(logFile, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond);
 
-        BoltLog.Info("writing log to {0}{1}{2}", SYS_IO.Directory.GetCurrentDirectory(), SYS_IO.Path.DirectorySeparatorChar, logFile);
+        var stream = IO.File.Open(logFile, IO.FileMode.Create);
+        var streamWriter = new IO.StreamWriter(stream);
 
-        var stream = SYS_IO.File.Open(logFile, SYS_IO.FileMode.Create);
-        var streamWriter = new SYS_IO.StreamWriter(stream);
-
-        while (stream.CanWrite && running) {
+        while (running) {
           if (threadEvent.WaitOne(100)) {
             lock (threadQueue) {
               while (threadQueue.Count > 0) {
@@ -178,38 +177,9 @@ public static class BoltLog {
     }
   }
 
-  public static bool Has<T>() where T : class, IWriter {
-    lock (_lock) {
-      for (int i = 0; i < _writers.Count; ++i) {
-        if (typeof(T).IsAssignableFrom(_writers[i].GetType())) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
   public static void Add<T>(T instance) where T : class, IWriter {
     lock (_lock) {
       _writers.Add(instance);
-    }
-  }
-
-  public static void Remove<T>() where T : class, IWriter {
-    lock (_lock) {
-      for (int i = 0; i < _writers.Count; ++i) {
-        if (typeof(T).IsAssignableFrom(_writers[i].GetType())) {
-          // clean up
-          _writers[i].Dispose();
-
-          // remove
-          _writers.RemoveAt(i);
-
-          // reduce one
-          i -= 1;
-        }
-      }
     }
   }
 

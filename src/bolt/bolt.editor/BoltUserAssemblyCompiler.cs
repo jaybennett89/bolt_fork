@@ -191,7 +191,7 @@ class BoltUserAssemblyCompiler {
       evnt.Set();
 
       // continue
-      BoltMainThreadInvoker.Invoke(() => {
+      BoltEditor.Internal.EditorHousekeeping.Invoke(() => {
         if (p.ExitCode == 0) { CompilationDone(op); }
       });
     };

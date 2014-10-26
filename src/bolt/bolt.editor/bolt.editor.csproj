@@ -71,9 +71,7 @@
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
-    <Compile Include="Editors\BoltConfigAssetEditor.cs" />
     <Compile Include="Editors\BoltEventAssetEditor.cs" />
-    <Compile Include="BoltMainThreadInvoker.cs" />
     <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
     <Compile Include="Editors\BoltMecanimAssetEditor.cs" />
     <Compile Include="Editors\BoltPrefabDatabaseEditor.cs" />

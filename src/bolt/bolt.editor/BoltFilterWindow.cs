@@ -1,11 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using Bolt.Compiler;
-using System.Linq;
+﻿using Bolt.Compiler;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 public class BoltFilterWindow : BoltWindow {
   static Type[] FindInspectorWindowType() {

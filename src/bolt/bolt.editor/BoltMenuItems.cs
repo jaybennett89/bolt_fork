@@ -1,11 +1,8 @@
-﻿using ProtoBuf;
-using UnityEditor;
-using Bolt.Compiler;
+﻿using UnityEditor;
 using UnityEngine;
 
 public static class BoltMenuItems {
-
-  [MenuItem("Assets/Bolt Engine/Compile Assets")]
+  [MenuItem("Assets/Bolt Engine/Compile Assembly")]
   public static void RunCompiler() {
     BoltUserAssemblyCompiler.Run();
   }
@@ -35,7 +32,7 @@ public static class BoltMenuItems {
     }
 
     // save scene
-    Bolt.Editor.Internal.EditorHousekeeping.AskToSaveSceneAt = System.DateTime.Now.AddSeconds(1);
+    BoltEditor.Internal.EditorHousekeeping.AskToSaveSceneAt(System.DateTime.Now.AddSeconds(1));
   }
 
   [MenuItem("Edit/Install Bolt")]
