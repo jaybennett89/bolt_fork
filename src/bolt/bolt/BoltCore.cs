@@ -391,7 +391,7 @@ internal static class BoltCore {
 
   public static void EnableLanBroadcast(UdpEndPoint endpoint) {
     if (endpoint.Address == UdpIPv4Address.Any || endpoint.Port == 0) {
-      BoltLog.Error("incorrect broadcast endpoint: {0}", endpoint);
+      BoltLog.Error("Incorrect broadcast endpoint: {0}", endpoint);
     }
     else {
       _udpSocket.EnableLanBroadcast(endpoint, isServer);
@@ -460,7 +460,7 @@ internal static class BoltCore {
 
         case UdpEventType.StreamReceived:
           using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Stream.UserToken);
+            ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
           }
           break;
 
@@ -806,7 +806,7 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = UdpSocket.Create(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
+    _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours

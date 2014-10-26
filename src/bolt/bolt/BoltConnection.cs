@@ -313,8 +313,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketReceived(BoltPacket packet) {
+  internal void PacketReceived(UdpStream stream) {
     try {
+      BoltPacket packet = new BoltPacket();
+      packet.stream = stream;
       packet.frame = packet.stream.ReadInt();
       packet.stats = new PacketStats();
 
