@@ -821,14 +821,11 @@ internal static class BoltCore {
 
   static void UdpLogWriter(uint level, string message) {
     switch (level) {
-#if DEBUG
       case UdpLog.DEBUG:
       case UdpLog.TRACE:
         BoltLog.Debug(message);
         break;
-#endif
 
-      case UdpLog.USER:
       case UdpLog.INFO:
         BoltLog.Info(message);
         break;
