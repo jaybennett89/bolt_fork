@@ -64,6 +64,28 @@ partial class GlobalEventListenerBase {
    
 
   
+  public virtual void BoltShutdown() { 
+  }
+
+  internal static void BoltShutdownInvoke() { 
+    BoltLog.Debug("Invoking callback BoltShutdown");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.BoltShutdown();
+    }
+  }
+
+  
+  public virtual void BoltStarted() { 
+  }
+
+  internal static void BoltStartedInvoke() { 
+    BoltLog.Debug("Invoking callback BoltStarted");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.BoltStarted();
+    }
+  }
+
+  
   public virtual void SceneLoadLocalBegin(string map) { 
   }
 

@@ -57,8 +57,6 @@ internal static class BoltCore {
   internal static Action<GameObject> _destroy =
     (go) => GameObject.Destroy(go);
 
-  public static Action ShutdownComplete;
-
   public static int loadedScene {
     get { return _localSceneLoading.Scene.Index; }
   }
@@ -322,46 +320,42 @@ internal static class BoltCore {
 
   public static void Shutdown() {
     if (_udpSocket != null && _mode != BoltNetworkModes.None) {
-      BoltLog.Info("shutting down");
+      // log that we are shutting down
+      BoltLog.Info("Shutdown");
 
-      try {
-        UPnP.Disable(false);
+      // notify user code
+      BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
 
-        // 
-        _mode = BoltNetworkModes.None;
+      UPnP.Disable(false);
 
-        // disconnect from everywhere
-        foreach (BoltConnection connection in _connections) {
-          connection.Disconnect();
-        }
+      // 
+      _mode = BoltNetworkModes.None;
 
-        foreach (Bolt.Entity entity in _entities.ToArray()) {
-          DestroyForce(entity);
-        }
-
-        _entities.Clear();
-        _connections.Clear();
-        _globalEventDispatcher.Clear();
-        _globalBehaviours.Clear();
-
-        if (_globalBehaviourObject) {
-          GameObject.Destroy(_globalBehaviourObject);
-        }
-
-        BoltNetworkInternal.EnvironmentReset();
-
-        _udpSocket.Close();
-        _udpSocket = null;
-
-        Factory.UnregisterAll();
-        BoltLog.RemoveAll();
-
+      // disconnect from everywhere
+      foreach (BoltConnection connection in _connections) {
+        connection.Disconnect();
       }
-      finally {
-        if (ShutdownComplete != null) {
-          ShutdownComplete();
-        }
+
+      foreach (Bolt.Entity entity in _entities.ToArray()) {
+        DestroyForce(entity);
       }
+
+      _entities.Clear();
+      _connections.Clear();
+      _globalEventDispatcher.Clear();
+      _globalBehaviours.Clear();
+
+      if (_globalBehaviourObject) {
+        GameObject.Destroy(_globalBehaviourObject);
+      }
+
+      BoltNetworkInternal.EnvironmentReset();
+
+      _udpSocket.Close();
+      _udpSocket = null;
+
+      Factory.UnregisterAll();
+      BoltLog.RemoveAll();
     }
   }
 
@@ -817,6 +811,9 @@ internal static class BoltCore {
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);
+
+    // tell user that we started
+    BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
 
   static UdpNoise CreatePerlinNoise() {
