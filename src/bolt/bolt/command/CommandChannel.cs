@@ -277,7 +277,11 @@ partial class EntityChannel {
         if (packet.stream.ReadBool() == false) { break; }
 
         NetId netId = packet.stream.ReadNetworkId();
-        EntityProxy proxy = outgoingProxiesByNetworkId[netId];
+        EntityProxy proxy = null;
+
+        if (outgoingProxiesByNetworkId.ContainsKey(netId)) {
+          proxy = outgoingProxiesByNetworkId[netId];
+        }
 
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
