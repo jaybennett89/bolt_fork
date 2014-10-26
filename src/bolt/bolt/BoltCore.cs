@@ -135,10 +135,6 @@ internal static class BoltCore {
     }
   }
 
-  internal static int localSendRateBits {
-    get { return Bolt.Math.HighBit((uint)localSendRate); }
-  }
-
   internal static int remoteSendRate {
     get {
       switch (_mode) {
@@ -147,10 +143,6 @@ internal static class BoltCore {
         default: return -1;
       }
     }
-  }
-
-  internal static int remoteSendRateBits {
-    get { return Bolt.Math.HighBit((uint)remoteSendRate); }
   }
 
   internal static int localInterpolationDelay {
