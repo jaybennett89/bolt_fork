@@ -31,6 +31,7 @@ public class BoltHitbox : MonoBehaviour {
   /// </summary>
   public BoltHitboxShape hitboxShape {
     get { return _shape; }
+    set { _shape = value; }
   }
 
   /// <summary>
@@ -38,6 +39,7 @@ public class BoltHitbox : MonoBehaviour {
   /// </summary>
   public BoltHitboxType hitboxType {
     get { return _type; }
+    set { _type = value; }
   }
 
   /// <summary>
@@ -45,6 +47,7 @@ public class BoltHitbox : MonoBehaviour {
   /// </summary>
   public Vector3 hitboxCenter {
     get { return _center; }
+    set { _center = value; }
   }
 
   /// <summary>
@@ -52,6 +55,7 @@ public class BoltHitbox : MonoBehaviour {
   /// </summary>
   public Vector3 hitboxBoxSize {
     get { return _boxSize; }
+    set { _boxSize = value; }
   }
 
   /// <summary>
@@ -59,6 +63,7 @@ public class BoltHitbox : MonoBehaviour {
   /// </summary>
   public float hitboxSphereRadius {
     get { return _sphereRadius; }
+    set { _sphereRadius = value; }
   }
 
   void OnDrawGizmos () {
