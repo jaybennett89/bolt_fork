@@ -138,6 +138,7 @@ namespace Bolt {
           var p = Settings.ByteOffset + POSITION_OFFSET;
           var v = Settings.ByteOffset + VELOCITY_OFFSET;
           var r = Settings.ByteOffset + ROTATION_OFFSET;
+          var snap = false;
 
           switch (SmoothingSettings.Algorithm) {
             case SmoothingAlgorithms.None:
@@ -145,15 +146,19 @@ namespace Bolt {
               break;
 
             case SmoothingAlgorithms.Interpolation:
-              td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude);
+              td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude, ref snap);
               td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
               break;
 
             case SmoothingAlgorithms.Extrapolation:
               int frame = UE.Mathf.Min(state.Frames.first.Number + SmoothingSettings.ExtrapolationMaxFrames, state.Entity.Frame);
-              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition);
+              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
               td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings, td.Simulate.localRotation);
               break;
+          }
+
+          if (snap) {
+            td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position).Shift(td.Simulate.position);
           }
         }
         else {
