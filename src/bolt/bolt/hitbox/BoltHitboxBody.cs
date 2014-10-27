@@ -16,6 +16,16 @@ public class BoltHitboxBody : MonoBehaviour, IBoltListNode {
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
 
+  public BoltHitbox proximity {
+    get { return _proximity; }
+    set { _proximity = value; }
+  }
+
+  public BoltHitbox[] hitboxes {
+    get { return _hitboxes; }
+    set { _hitboxes = value; }
+  }
+
   void OnEnable () {
     BoltPhysics.RegisterBody(this);
   }

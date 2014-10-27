@@ -57,8 +57,6 @@ internal static class BoltCore {
   internal static Action<GameObject> _destroy =
     (go) => GameObject.Destroy(go);
 
-  public static Action ShutdownComplete;
-
   public static int loadedScene {
     get { return _localSceneLoading.Scene.Index; }
   }
@@ -137,10 +135,6 @@ internal static class BoltCore {
     }
   }
 
-  internal static int localSendRateBits {
-    get { return Bolt.Math.HighBit((uint)localSendRate); }
-  }
-
   internal static int remoteSendRate {
     get {
       switch (_mode) {
@@ -149,10 +143,6 @@ internal static class BoltCore {
         default: return -1;
       }
     }
-  }
-
-  internal static int remoteSendRateBits {
-    get { return Bolt.Math.HighBit((uint)remoteSendRate); }
   }
 
   internal static int localInterpolationDelay {
@@ -322,46 +312,42 @@ internal static class BoltCore {
 
   public static void Shutdown() {
     if (_udpSocket != null && _mode != BoltNetworkModes.None) {
-      BoltLog.Info("shutting down");
+      // log that we are shutting down
+      BoltLog.Info("Shutdown");
 
-      try {
-        UPnP.Disable(false);
+      // notify user code
+      BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
 
-        // 
-        _mode = BoltNetworkModes.None;
+      UPnP.Disable(false);
 
-        // disconnect from everywhere
-        foreach (BoltConnection connection in _connections) {
-          connection.Disconnect();
-        }
+      // 
+      _mode = BoltNetworkModes.None;
 
-        foreach (Bolt.Entity entity in _entities.ToArray()) {
-          DestroyForce(entity);
-        }
-
-        _entities.Clear();
-        _connections.Clear();
-        _globalEventDispatcher.Clear();
-        _globalBehaviours.Clear();
-
-        if (_globalBehaviourObject) {
-          GameObject.Destroy(_globalBehaviourObject);
-        }
-
-        BoltNetworkInternal.EnvironmentReset();
-
-        _udpSocket.Close();
-        _udpSocket = null;
-
-        Factory.UnregisterAll();
-        BoltLog.RemoveAll();
-
+      // disconnect from everywhere
+      foreach (BoltConnection connection in _connections) {
+        connection.Disconnect();
       }
-      finally {
-        if (ShutdownComplete != null) {
-          ShutdownComplete();
-        }
+
+      foreach (Bolt.Entity entity in _entities.ToArray()) {
+        DestroyForce(entity);
       }
+
+      _entities.Clear();
+      _connections.Clear();
+      _globalEventDispatcher.Clear();
+      _globalBehaviours.Clear();
+
+      if (_globalBehaviourObject) {
+        GameObject.Destroy(_globalBehaviourObject);
+      }
+
+      BoltNetworkInternal.EnvironmentReset();
+
+      _udpSocket.Close();
+      _udpSocket = null;
+
+      Factory.UnregisterAll();
+      BoltLog.RemoveAll();
     }
   }
 
@@ -397,7 +383,7 @@ internal static class BoltCore {
 
   public static void EnableLanBroadcast(UdpEndPoint endpoint) {
     if (endpoint.Address == UdpIPv4Address.Any || endpoint.Port == 0) {
-      BoltLog.Error("incorrect broadcast endpoint: {0}", endpoint);
+      BoltLog.Error("Incorrect broadcast endpoint: {0}", endpoint);
     }
     else {
       _udpSocket.EnableLanBroadcast(endpoint, isServer);
@@ -460,32 +446,26 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.ObjectSent:
-          ev.Connection.GetBoltConnection().PacketSent((BoltPacket)ev.Object0);
-          break;
-
-        case UdpEventType.ObjectReceived:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
-          }
-          break;
-
-        case UdpEventType.ObjectDelivered:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
-          }
-          break;
-
-        case UdpEventType.ObjectLost:
-        case UdpEventType.ObjectRejected:
-        case UdpEventType.ObjectSendFailed:
-          using ((BoltPacket)ev.Object0) {
-            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
-          }
-          break;
-
         case UdpEventType.ConnectAttempt:
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
+          break;
+
+        case UdpEventType.StreamReceived:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
+          }
+          break;
+
+        case UdpEventType.StreamDelivered:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
+          }
+          break;
+
+        case UdpEventType.StreamLost:
+          using (ev.Stream) {
+            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
+          }
           break;
       }
     }
@@ -818,11 +798,14 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = UdpSocket.Create(BoltNetworkInternal.CreateUdpPlatform(), () => new BoltSerializer(), _udpConfig);
+    _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);
+
+    // tell user that we started
+    BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
 
   static UdpNoise CreatePerlinNoise() {
@@ -838,14 +821,11 @@ internal static class BoltCore {
 
   static void UdpLogWriter(uint level, string message) {
     switch (level) {
-#if DEBUG
       case UdpLog.DEBUG:
       case UdpLog.TRACE:
         BoltLog.Debug(message);
         break;
-#endif
 
-      case UdpLog.USER:
       case UdpLog.INFO:
         BoltLog.Info(message);
         break;

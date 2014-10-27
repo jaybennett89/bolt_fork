@@ -71,11 +71,10 @@
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltCommandAssetEditor.cs" />
-    <Compile Include="Editors\BoltConfigAssetEditor.cs" />
     <Compile Include="Editors\BoltEventAssetEditor.cs" />
-    <Compile Include="BoltMainThreadInvoker.cs" />
     <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
     <Compile Include="Editors\BoltMecanimAssetEditor.cs" />
+    <Compile Include="Editors\BoltPrefabDatabaseEditor.cs" />
     <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />
     <Compile Include="Editors\BoltStateAssetEditor.cs" />
     <Compile Include="BoltUserAssemblyCompiler.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
+    <Compile Include="Resources\Install\bolt\scripts\upnp\BoltUPnP.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltPOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltUnityDebugDrawer.cs" />
@@ -138,9 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\Gizmos\BoltRuntimeSettings Icon.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_down.png" />

@@ -219,6 +219,7 @@ namespace Bolt {
         }
       }
 
+      stream.WriteByteArraySimple(ev.UserData, BoltCore._config.packetSize / 2);
       return ev.Pack(connection, stream);
     }
 
@@ -274,6 +275,7 @@ namespace Bolt {
         ev.Reliability = ReliabilityModes.Unreliable;
       }
 
+      ev.UserData = stream.ReadByteArraySimple();
       ev.Read(connection, stream);
       return ev;
     }

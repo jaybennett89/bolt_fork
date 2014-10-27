@@ -56,6 +56,7 @@
     <Compile Include="assets\BoltEventAsset.cs" />
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
+    <Compile Include="PrefabDatabase.cs" />
     <Compile Include="DocumentationAttribute.cs" />
     <Compile Include="GlobalEventListenerBase.cs" />
     <Compile Include="BoltLog.cs">

@@ -130,27 +130,34 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(State state) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
-      if (td.Simulate && !state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
-        var p = Settings.ByteOffset + POSITION_OFFSET;
-        var v = Settings.ByteOffset + VELOCITY_OFFSET;
-        var r = Settings.ByteOffset + ROTATION_OFFSET;
+      if (!state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
 
-        switch (SmoothingSettings.Algorithm) {
-          case SmoothingAlgorithms.None:
-            PerformNone(td, state);
-            break;
+        var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
 
-          case SmoothingAlgorithms.Interpolation:
-            td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude);
-            td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
-            break;
+        if (td.Simulate) {
+          var p = Settings.ByteOffset + POSITION_OFFSET;
+          var v = Settings.ByteOffset + VELOCITY_OFFSET;
+          var r = Settings.ByteOffset + ROTATION_OFFSET;
 
-          case SmoothingAlgorithms.Extrapolation:
-            int frame = UE.Mathf.Min(state.Frames.first.Number + SmoothingSettings.ExtrapolationMaxFrames, state.Entity.Frame);
-            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition);
-            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings, td.Simulate.localRotation);
-            break;
+          switch (SmoothingSettings.Algorithm) {
+            case SmoothingAlgorithms.None:
+              PerformNone(td, state);
+              break;
+
+            case SmoothingAlgorithms.Interpolation:
+              td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude);
+              td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
+              break;
+
+            case SmoothingAlgorithms.Extrapolation:
+              int frame = UE.Mathf.Min(state.Frames.first.Number + SmoothingSettings.ExtrapolationMaxFrames, state.Entity.Frame);
+              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition);
+              td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings, td.Simulate.localRotation);
+              break;
+          }
+        }
+        else {
+          BoltLog.Warn("The transform of {0} has not been assigned", Settings.PropertyName);
         }
       }
     }
@@ -171,6 +178,9 @@ namespace Bolt {
 
         td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
         td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
+      }
+      else {
+        BoltLog.Warn("The transform of {0} has not been assigned", Settings.PropertyName);
       }
     }
 

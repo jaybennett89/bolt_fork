@@ -43,20 +43,6 @@ public static class BoltNetworkInternal {
 /// </summary>
 [DocumentationAttribute]
 public static class BoltNetwork {
-  public static Action ShutdownComplete;
-
-  static BoltNetwork() {
-    BoltCore.ShutdownComplete = new Action(ShutdownDone);
-  }
-
-  static void ShutdownDone() {
-    if (ShutdownComplete != null) {
-      ShutdownComplete();
-    }
-
-    ShutdownComplete = null;
-  }
-
   public static void SetCanReceiveEntities(bool canReceiveEntities) {
     BoltCore._canReceiveEntities = canReceiveEntities;
   }

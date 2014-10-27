@@ -53,6 +53,10 @@ public static class BoltLauncher {
     BoltNetworkInternal.UsingUnityPro = false;
 #endif
 
+#if BOLT_UPNP_SUPPORT
+    BoltNetworkInternal.NatCommunicator = new BoltInternal.StandaloneNatCommunicator();
+#endif
+
     BoltNetworkInternal.CreateUdpPlatform = BoltNetworkUtils.CreateUdpPlatform;
     BoltNetworkInternal.GetBroadcastAddress = BoltNetworkUtils.FindBroadcastAddress;
     BoltNetworkInternal.GetSceneName = GetSceneName;

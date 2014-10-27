@@ -91,22 +91,27 @@ namespace Bolt {
     }
 
     public override void OnSimulateAfter(State state) {
-      if (MecanimSettings.Enabled && state.Animator) {
-        if (MecanimSettings.Mode == MecanimMode.LayerWeight) {
-          if (ShouldPullDataFromMecanim(state)) {
-            PullMecanimLayer(state);
+      if (MecanimSettings.Enabled) {
+        if (state.Animator) {
+          if (MecanimSettings.Mode == MecanimMode.LayerWeight) {
+            if (ShouldPullDataFromMecanim(state)) {
+              PullMecanimLayer(state);
+            }
+            else {
+              PushMecanimLayer(state);
+            }
           }
           else {
-            PushMecanimLayer(state);
+            if (ShouldPullDataFromMecanim(state)) {
+              PullMecanimValue(state);
+            }
+            else {
+              PushMecanimValue(state);
+            }
           }
         }
         else {
-          if (ShouldPullDataFromMecanim(state)) {
-            PullMecanimValue(state);
-          }
-          else {
-            PushMecanimValue(state);
-          }
+          BoltLog.Warn("You have not assigned a mecanim animator to the state on {0}, but you have properties set to use mecanim", state.Entity.UnityObject.gameObject.name);
         }
       }
     }

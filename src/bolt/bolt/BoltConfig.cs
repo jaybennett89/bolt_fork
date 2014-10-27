@@ -29,13 +29,8 @@ public enum BoltConfigLogTargets {
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
   public int packetSize = 1024;
-  public bool autoCreateConsole = true;
-  public bool globalUniqueIds = false;
-  public byte[] applicationGuid;
-  public bool useAssemblyChecksum = true;
   public int packetMaxEventSize = 512;
   public Bolt.ScopeMode scopeMode = Bolt.ScopeMode.Automatic;
-  public bool scopeModeHideWarningInGui = false;
   public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
   public int clientSendRate;

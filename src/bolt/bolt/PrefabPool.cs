@@ -42,7 +42,7 @@ namespace Bolt {
     }
 
     UE.GameObject IPrefabPool.LoadPrefab(PrefabId prefabId) {
-      return BoltRuntimeSettings.FindPrefab(prefabId);
+      return PrefabDatabase.Find(prefabId);
     }
 
     void IPrefabPool.Destroy(UE.GameObject gameObject) {

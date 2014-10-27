@@ -302,7 +302,7 @@ end tell'";
   void CompileBolt() {
     if (EditorPrefs.GetBool(COMPILE_SETTING)) {
       SetStage(STAGE_COMPILE_BOLT_WAIT);
-      BoltUserAssemblyCompiler.Run(true);
+      BoltUserAssemblyCompiler.Run();
 
     }
     else {
@@ -343,7 +343,7 @@ end tell'";
     GUILayout.Label(string.Format("Uncompiled Assets: {0}", uncompiledCount), EditorStyles.miniLabel);
 
     if (GUILayout.Button("Compile", EditorStyles.miniButton)) {
-      BoltUserAssemblyCompiler.Run(true);
+      BoltUserAssemblyCompiler.Run();
     }
 
     GUILayout.EndHorizontal();

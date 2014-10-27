@@ -207,10 +207,16 @@ public static class BoltInstaller {
     Progress("Creating settings resource ... ", 0f);
 
     const string SETTINGS_PATH = "Assets/bolt/resources/BoltRuntimeSettings.asset";
+    const string PREFABDB_PATH = "Assets/bolt/resources/BoltPrefabDatabase.asset";
 
     if (!AssetDatabase.LoadAssetAtPath(SETTINGS_PATH, typeof(BoltRuntimeSettings))) {
       AssetDatabase.CreateAsset(BoltRuntimeSettings.CreateInstance<BoltRuntimeSettings>(), SETTINGS_PATH);
       AssetDatabase.ImportAsset(SETTINGS_PATH, ImportOptions);
+    }
+
+    if (!AssetDatabase.LoadAssetAtPath(PREFABDB_PATH, typeof(Bolt.PrefabDatabase))) {
+      AssetDatabase.CreateAsset(Bolt.PrefabDatabase.CreateInstance<Bolt.PrefabDatabase>(), PREFABDB_PATH);
+      AssetDatabase.ImportAsset(PREFABDB_PATH, ImportOptions);
     }
 
     Progress("Creating settings resource ... ", 1f);
@@ -219,7 +225,7 @@ public static class BoltInstaller {
   static void CompileUserAssembly() {
     Progress("Compiling user assembly ... ", 0f);
 
-    BoltUserAssemblyCompiler.Run(true).WaitOne();
+    BoltUserAssemblyCompiler.Run().WaitOne();
 
     Progress("Compiling user assembly ... ", 1f);
   }

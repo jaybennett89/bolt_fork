@@ -54,6 +54,12 @@ namespace Bolt.Compiler {
       get { return true; }
     }
 
+    public override void OnCreated() {
+      MinValue = 0;
+      MaxValue = 255;
+      CompressionEnabled = false;
+    }
+
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorInteger();
     }

@@ -293,6 +293,7 @@ public class BoltConnection : BoltObject {
       packet.stats = new PacketStats();
       packet.number = ++_packetCounter;
       packet.frame = BoltCore.frame;
+      packet.stream.UserToken = packet;
       packet.stream.WriteInt(packet.frame);
 
       for (int i = 0; i < _channels.Length; ++i) {
@@ -301,7 +302,7 @@ public class BoltConnection : BoltObject {
 
       Assert.False(packet.stream.Overflowing);
 
-      _udp.Send(packet);
+      _udp.Send(packet.stream);
 
       _bitsSecondOutAcc += packet.stream.Position;
       _packetStatsOut.Enqueue(packet.stats);
@@ -312,14 +313,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketSent(BoltPacket packet) {
-    for (int i = 0; i < _channels.Length; ++i) {
-      _channels[i].Sent(packet);
-    }
-  }
-
-  internal void PacketReceived(BoltPacket packet) {
+  internal void PacketReceived(UdpStream stream) {
     try {
+      BoltPacket packet = new BoltPacket();
+      packet.stream = stream;
       packet.frame = packet.stream.ReadInt();
       packet.stats = new PacketStats();
 

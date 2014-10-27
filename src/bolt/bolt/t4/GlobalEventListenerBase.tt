@@ -7,6 +7,9 @@
 <#@ output extension=".cs" #><#
 
 Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
+cbs.Add("BoltShutdown", new string[0]);
+cbs.Add("BoltStarted", new string[0]);
+
 cbs.Add("SceneLoadLocalBegin", new[] { "string", "map" });
 cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
 cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });

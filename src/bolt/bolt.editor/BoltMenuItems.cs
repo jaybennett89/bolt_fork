@@ -1,28 +1,20 @@
-﻿using ProtoBuf;
-using UnityEditor;
-using Bolt.Compiler;
+﻿using UnityEditor;
 using UnityEngine;
 
 public static class BoltMenuItems {
-
-  [MenuItem("Assets/Bolt Engine/Compile Assets (All)")]
+  [MenuItem("Assets/Bolt Engine/Compile Assembly")]
   public static void RunCompiler() {
-    try {
-      BoltUserAssemblyCompiler.Run(true);
-    }
-    catch {
-
-    }
+    BoltUserAssemblyCompiler.Run();
   }
 
-  [MenuItem("Assets/Bolt Engine/Compile Assets (Code Only)")]
-  public static void RunCompilerProjectOnly() {
-    try {
-      BoltUserAssemblyCompiler.Run(false);
+  [MenuItem("Assets/Bolt Engine/Update Prefab Database")]
+  public static void UpdatePrefabDatabase() {
+    if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isPaused || EditorApplication.isUpdating) {
+      Debug.LogError("Can't generate prefab database while the editor is playing, paused, updating assets or compiling");
+      return;
     }
-    catch {
 
-    }
+    BoltCompiler.UpdatePrefabsDatabase();
   }
 
   [MenuItem("Assets/Bolt Engine/Generate Scene Object Ids")]
@@ -40,7 +32,7 @@ public static class BoltMenuItems {
     }
 
     // save scene
-    Bolt.Editor.Internal.EditorHousekeeping.AskToSaveSceneAt = System.DateTime.Now.AddSeconds(1);
+    BoltEditor.Internal.EditorHousekeeping.AskToSaveSceneAt(System.DateTime.Now.AddSeconds(1));
   }
 
   [MenuItem("Edit/Install Bolt")]
@@ -49,19 +41,6 @@ public static class BoltMenuItems {
       BoltInstaller.Run();
     }
   }
-
-
-  //[MenuItem("Edit/Upgrade Bolt")]
-  //public static void Upgrade() {
-  //  if (EditorUtility.DisplayDialog("Upgrade", "Do you want to upgrade Bolt? This will shut down Unity during the upgrade process", "Yes", "No")) {
-  //    var package = EditorUtility.OpenFilePanel("Select Package", ".", "unitypackage");
-  //    Debug.Log(string.Format("Importing {0}", package));
-  //    AssetDatabase.ImportPackage(package, false);
-  //    EditorPrefs.SetBool(UPGRADE_FLAG, true);
-  //    EditorUtility.DisplayDialog("", "Click OK to restart Unity", "Ok");
-  //    EditorApplication.Exit(0);
-  //  }
-  //}
 
   [MenuItem("Window/Bolt Engine/Remotes", priority = 22)]
   public static void OpenInfoPanel() {

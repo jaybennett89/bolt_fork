@@ -22,22 +22,6 @@ namespace Bolt {
       return false;
     }
 
-    unsafe public static bool Diff(byte* a, byte* b, int offset, int length) {
-      Assert.True(a != null);
-      Assert.True(b != null);
-
-      while (length > 0) {
-        if (a[offset] != b[offset]) {
-          return true;
-        }
-
-        ++offset;
-        --length;
-      }
-
-      return false;
-    }
-
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {
       if (entity) {
         data.PackI32(offset, entity.Entity.InstanceId.Value);
