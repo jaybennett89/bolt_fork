@@ -20,7 +20,6 @@ public abstract class BoltWindow : EditorWindow {
   static internal DateTime ProjectModifyTime;
 
   static bool clear;
-  static bool saveUndo;
   static protected int Repaints;
   static protected AssetDefinition Selected;
 
@@ -29,13 +28,17 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void Save() {
-    Save(true);
+    Save(false);
   }
 
-  protected void Save(bool undo) {
-    save = true;
-    saveUndo = undo;
-    saveTime = Time.realtimeSinceStartup + 2f;
+  protected void Save(bool instant) {
+    if (instant) {
+      SaveToDisk();
+    }
+    else {
+      save = true;
+      saveTime = Time.realtimeSinceStartup + 1f;
+    }
   }
 
   protected void Update() {
@@ -44,40 +47,23 @@ public abstract class BoltWindow : EditorWindow {
       repaintTime = Time.realtimeSinceStartup;
     }
 
-    if (save && (saveTime < Time.realtimeSinceStartup) && HasProject) {
+    if (save && (saveTime < Time.realtimeSinceStartup)) {
+      SaveToDisk();
+    }
+  }
+
+  void SaveToDisk() {
+    if (HasProject) {
       try {
-        if (saveUndo) {
-          //
-          Undo.RecordObject(AssetDatabase.LoadAssetAtPath(ProjectPath, typeof(TextAsset)), "Bolt Project Edit");
-        }
-
-        // write to disk
         File.WriteAllBytes(ProjectPath, Project.ToByteArray());
-
-        if (saveUndo) {
-          // store modify time
-          ProjectModifyTime = File.GetLastWriteTime(ProjectPath);
-        }
-
-        // import asset
-        AssetDatabase.ImportAsset(ProjectPath, ImportAssetOptions.ForceUpdate);
       }
       finally {
         save = false;
-        saveUndo = false;
       }
     }
   }
 
   protected void OnGUI() {
-    if (Event.current.type == EventType.ValidateCommand) {
-      TextAsset ta = (TextAsset)AssetDatabase.LoadAssetAtPath(ProjectPath, typeof(TextAsset));
-
-      if (ta) {
-        Project = ta.bytes.ToObject<Project>();
-      }
-    }
-
     BoltEditorGUI.Tooltip = "";
 
     LoadProject();
@@ -110,7 +96,7 @@ public abstract class BoltWindow : EditorWindow {
           Project.Merged = true;
           Project.RootFolder.Assets = Project.RootFolder.AssetsAll.ToArray();
 
-          Save(false);
+          Save();
         }
       }
       else {
