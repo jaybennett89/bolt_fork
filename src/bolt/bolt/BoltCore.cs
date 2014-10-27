@@ -541,16 +541,13 @@ internal static class BoltCore {
   }
 
   static void UpdateUPnP() {
-    if ((_frame % 60 == 0) && (BoltNetworkInternal.NatCommunicator != null) && BoltNetworkInternal.NatCommunicator.IsEnabled) {
-      UPnP.Update();
-
+    if ((_frame % 60 == 0) && UPnP.Update()) {
       INatDevice device;
       IPortMapping portMapping;
 
       while (UPnP.NextPortStatusChange(out device, out portMapping)) {
         BoltInternal.GlobalEventListenerBase.PortMappingChangedInvoke(device, portMapping);
       }
-
     }
   }
 

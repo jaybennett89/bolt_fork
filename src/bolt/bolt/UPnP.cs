@@ -73,10 +73,13 @@ namespace Bolt {
       return false;
     }
 
-    static public void Update() {
-      if (Available() && BoltNetworkInternal.NatCommunicator.IsEnabled) {
+    static public bool Update() {
+      if ((BoltNetworkInternal.NatCommunicator != null) && BoltNetworkInternal.NatCommunicator.IsEnabled) {
         BoltNetworkInternal.NatCommunicator.Update();
+        return true;
       }
+
+      return false;
     }
 
     static public bool NextPortStatusChange(out Bolt.INatDevice device, out Bolt.IPortMapping mapping) {
@@ -119,7 +122,7 @@ namespace Bolt {
     }
 
     static public void Disable(bool async) {
-      if (Available()) {
+      if ((BoltNetworkInternal.NatCommunicator != null) && BoltNetworkInternal.NatCommunicator.IsEnabled) {
         BoltNetworkInternal.NatCommunicator.Disable(async);
       }
     }
