@@ -36,6 +36,7 @@ namespace Bolt {
 
     internal uint Sequence;
     internal byte[] Data;
+    internal byte[] UserData;
 
     internal int Targets;
     internal bool Reliable;
@@ -55,14 +56,19 @@ namespace Bolt {
       get { return !IsEntityEvent; }
     }
 
+    public byte[] BinaryData {
+      get { return UserData; }
+      set { UserData = value; }
+    }
+
     internal bool IsEntityEvent {
       get {
         VerifyIsActive();
-        return 
+        return
           Targets == ENTITY_EVERYONE ||
           Targets == ENTITY_EVERYONE_EXCEPT_OWNER ||
-          Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER || 
-          Targets == ENTITY_ONLY_CONTROLLER || 
+          Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER ||
+          Targets == ENTITY_ONLY_CONTROLLER ||
           Targets == ENTITY_ONLY_OWNER;
       }
     }
