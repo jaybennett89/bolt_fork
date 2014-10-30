@@ -185,6 +185,8 @@ public static class BoltLog {
 
   public static void Info(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Info(message);
       }
@@ -214,6 +216,8 @@ public static class BoltLog {
   [Conditional("DEBUG")]
   internal static void Debug(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Debug(message);
       }
@@ -245,8 +249,16 @@ public static class BoltLog {
     Debug(string.Format(message, args));
   }
 
+  static void VerifyOneWriter() {
+    if (_writers.Count == 0) {
+      _writers.Add(new Unity());
+    }
+  }
+
   public static void Warn(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Warn(message);
       }
@@ -275,6 +287,8 @@ public static class BoltLog {
 
   public static void Error(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Error(message);
       }
