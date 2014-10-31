@@ -119,13 +119,23 @@ public static class BoltInstaller {
   static void InstallLogo() {
     Progress("Installing logo ... ", 0f);
 
-    var resource = Resources.First(x => x.Contains("Install.bolt.resources.BoltLogo"));
+    var resourceLogo = Resources.First(x => x.Contains("Install.bolt.resources.BoltLogo"));
+    var resourceIcon = Resources.First(x => x.Contains("Install.bolt.resources.BoltIcon"));
 
     // install asset
-    InstallAsset(resource);
+    InstallAsset(resourceLogo);
+    InstallAsset(resourceIcon);
 
     // edit asset
-    EditImporter<TextureImporter>(ResourceToAssetPath(resource), txt => {
+    EditImporter<TextureImporter>(ResourceToAssetPath(resourceLogo), txt => {
+      txt.textureFormat = TextureImporterFormat.ARGB32;
+      txt.wrapMode = TextureWrapMode.Clamp;
+      txt.filterMode = FilterMode.Bilinear;
+      txt.alphaIsTransparency = true;
+      txt.maxTextureSize = 256;
+    });
+
+    EditImporter<TextureImporter>(ResourceToAssetPath(resourceIcon), txt => {
       txt.textureFormat = TextureImporterFormat.ARGB32;
       txt.wrapMode = TextureWrapMode.Clamp;
       txt.filterMode = FilterMode.Bilinear;

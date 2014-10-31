@@ -156,6 +156,7 @@ namespace Bolt {
 
     public void DebugInfo() {
       if (BoltNetworkInternal.DebugDrawer != null) {
+        BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
         BoltNetworkInternal.DebugDrawer.LabelField("State Type", Factory.GetFactory(TypeId).TypeObject);
         BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count.ToString());
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");

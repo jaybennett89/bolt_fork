@@ -8,7 +8,9 @@ namespace Bolt {
   public class DebugInfo : MonoBehaviour {
     static GUIStyle labelStyle;
     static GUIStyle labelStyleBold;
+    static Texture2D boltIconTexture;
     static Texture2D backgroundTexture;
+    static internal bool showEntityDebugInfo = true;
     static internal HashSet<InstanceId> ignoreList = new HashSet<InstanceId>();
 
     public static int PollTime { get; internal set; }
@@ -23,6 +25,16 @@ namespace Bolt {
       GUI.color = new Color(0, 0, 0, 0.75f);
       GUI.DrawTexture(r, BackgroundTexture);
       GUI.color = Color.white;
+    }
+
+    public static Texture2D BoltIconTexture {
+      get {
+        if (!boltIconTexture) {
+          boltIconTexture = (Texture2D)Resources.Load("BoltIcon", typeof(Texture2D));
+        }
+
+        return boltIconTexture;
+      }
     }
 
     public static Texture2D BackgroundTexture {
@@ -152,6 +164,7 @@ namespace Bolt {
 
         GUILayout.Label(string.Format("Poll {0} ms", pollTime), LabelStyleColor(GetColor(PollTime, 16)));
         GUILayout.Label(string.Format("Send {0} ms", sendTime), LabelStyleColor(GetColor(SendTime, 16)));
+        GUILayout.Label(string.Format("Total Entities {0}", BoltCore._entities.count), LabelStyle);
 
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
@@ -163,7 +176,20 @@ namespace Bolt {
           return;
         }
 
-        Entity entity = BoltCore._entities.Where(x => ignoreList.Contains(x.InstanceId) == false).OrderBy(x => (new Vector3(0.5f, 0.5f, 0f) - c.WorldToViewportPoint(x.UnityObject.transform.position)).sqrMagnitude).FirstOrDefault();
+        Entity entity = BoltCore._entities
+          .Where(x => ignoreList.Contains(x.InstanceId) == false)
+          .Where(x => {
+              Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+              return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
+          })
+          .OrderBy(x => { 
+            Vector3 vc = new Vector3(0.5f, 0.5f, 0f);
+            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+            vp.z = 0;
+
+            return (vc - vp).sqrMagnitude;
+          })
+          .FirstOrDefault();
 
         if (entity) {
 

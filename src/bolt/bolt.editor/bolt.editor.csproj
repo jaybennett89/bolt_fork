@@ -193,6 +193,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_save.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\BoltIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
