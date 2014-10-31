@@ -529,12 +529,23 @@ internal static class BoltCore {
         }
       }
 
-      if ((_frame % localSendRate) == 0) {
-        // send data on all connections
+      // send data on all connections
+      {
         var it = _connections.GetIterator();
+        var localNotLoadingAndCanReceive = (BoltSceneLoader.IsLoading == false) && _canReceiveEntities;
 
         while (it.Next()) {
-          it.val.Send();
+          var remoteNotLoadingAndCanReceive = (it.val.isLoadingMap == false) && it.val._canReceiveEntities;
+
+          // if both connection and local can receive entities, use local sendrate
+          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % localSendRate) == 0)) {
+            it.val.Send();
+          }
+
+          // if not, only send 1 packet/second
+          else if ((_frame % framesPerSecond) == 0) {
+            it.val.Send();
+          }
         }
       }
     }
@@ -768,6 +779,7 @@ internal static class BoltCore {
 
     // setup udpkit configuration
     _udpConfig = new UdpConfig();
+    _udpConfig.PacketWindow = 512;
     _udpConfig.ConnectionTimeout = (uint)config.connectionTimeout;
     _udpConfig.ConnectRequestAttempts = (uint)config.connectionRequestAttempts;
     _udpConfig.ConnectRequestTimeout = (uint)config.connectionRequestTimeout;
