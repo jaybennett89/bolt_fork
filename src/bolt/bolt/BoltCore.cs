@@ -19,7 +19,11 @@ public enum BoltNetworkModes {
 internal static class BoltCore {
 
   static UdpSocket _udpSocket;
+  static internal Stopwatch _timer = new Stopwatch();
   static internal SceneLoadState _localSceneLoading;
+  static internal bool _disableWorldSnapshots = false;
+
+
 
   static internal bool _canReceiveEntities = true;
   static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
@@ -518,7 +522,9 @@ internal static class BoltCore {
         }
       }
 
-      BoltPhysics.SnapshotWorld();
+      if (_disableWorldSnapshots == false) {
+        BoltPhysics.SnapshotWorld();
+      }
 
       // switch perf counters
       if ((_frame % framesPerSecond) == 0) {
@@ -562,7 +568,7 @@ internal static class BoltCore {
     }
   }
 
-  internal static void FixedUpdate() {
+  internal static void Poll() {
     if (hasSocket) {
       if (UE.Time.timeScale != 1f) {
         BoltLog.Error("Time.timeScale is not 1, value: {0}", UE.Time.timeScale);
@@ -722,6 +728,12 @@ internal static class BoltCore {
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
+
+    DebugInfo.ignoreList = new HashSet<InstanceId>();
+
+    if (BoltRuntimeSettings.instance.showDebugInfo) {
+      DebugInfo.Show();
+    }
 
     // close any existing socket
     Shutdown();

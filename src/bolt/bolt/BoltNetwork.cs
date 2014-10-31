@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace BoltInternal {
   public interface IDebugDrawer {
+    void IsEditor(bool isEditor);
     void Indent(int adjust);
     void Label(string text);
     void LabelBold(string text);

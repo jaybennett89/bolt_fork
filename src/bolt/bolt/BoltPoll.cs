@@ -7,7 +7,15 @@ public class BoltPoll : MonoBehaviour {
   }
 
   protected void FixedUpdate () {
-    BoltCore.FixedUpdate();
+    BoltCore._timer.Stop();
+    BoltCore._timer.Reset();
+    BoltCore._timer.Start();
+
+    BoltCore.Poll();
+
+    BoltCore._timer.Stop();
+
+    Bolt.DebugInfo.PollTime = (int)BoltCore._timer.ElapsedMilliseconds;
   }
 
   protected void OnDisable () {

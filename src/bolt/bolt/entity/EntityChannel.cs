@@ -219,7 +219,7 @@ partial class EntityChannel : BoltChannel {
               continue;
             }
 
-            proxy.Priority = proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
+            proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
             proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 15);
           }
           else {
@@ -249,7 +249,10 @@ partial class EntityChannel : BoltChannel {
 
       for (; i < n; ++i) {
         var result = PackUpdate(packet, _outgoingProxiesByPriority[i]);
-        if (result == false) {
+        if (result) {
+          _outgoingProxiesByPriority[i].Priority = 0f;
+        }
+        else {
           if (++failCount >= 2) {
             break;
           }

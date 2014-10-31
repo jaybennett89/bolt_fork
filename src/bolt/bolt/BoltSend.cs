@@ -4,33 +4,19 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 
 [BoltExecutionOrder(10000)]
 public class BoltSend : MonoBehaviour {
-  TimeSpan ts;
-
-#if DEBUG
-  Stopwatch sw = new Stopwatch();
-#endif
-
   void Awake () {
     DontDestroyOnLoad(gameObject);
   }
 
   void FixedUpdate () {
-#if DEBUG
-    sw.Reset();
-    sw.Start();
-#endif
+    BoltCore._timer.Stop();
+    BoltCore._timer.Reset();
+    BoltCore._timer.Start();
 
     BoltCore.Send();
 
-#if DEBUG
-    sw.Stop();
-    ts = sw.Elapsed;
-#endif
-  }
+    BoltCore._timer.Stop();
 
-#if DEBUG
-  void OnDrawGizmos () {
-    BoltPhysics.DrawSnapshot();
+    Bolt.DebugInfo.SendTime = (int)BoltCore._timer.ElapsedMilliseconds;
   }
-#endif
 }

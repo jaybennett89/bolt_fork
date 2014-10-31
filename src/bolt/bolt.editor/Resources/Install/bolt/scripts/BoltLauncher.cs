@@ -43,9 +43,7 @@ public static class BoltLauncher {
   }
 
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
-#if UNITY_EDITOR
     BoltNetworkInternal.DebugDrawer = new BoltInternal.UnityDebugDrawer();
-#endif
 
 #if UNITY_PRO_LICENSE
     BoltNetworkInternal.UsingUnityPro = true;

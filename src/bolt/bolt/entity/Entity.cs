@@ -265,6 +265,9 @@ namespace Bolt {
       if (PriorityCalculator == null) {
         PriorityCalculator = this;
       }
+      else {
+        BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
+      }
 
       // set instance id
       InstanceId = new InstanceId(++_instanceIdCounter);

@@ -132,6 +132,8 @@ public class BoltEntityEditor : Editor {
   }
 
   void RuntimeInfoGUI(BoltEntity entity) {
+    BoltNetworkInternal.DebugDrawer.IsEditor(true);
+
     GUILayout.Label("Runtime Info", EditorStyles.boldLabel);
     EditorGUILayout.Toggle("Is Attached", entity.isAttached);
 

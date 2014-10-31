@@ -214,6 +214,10 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
 
+    BoltAssetEditorGUI.Label("Show Debug Info", () => {
+      settings.showDebugInfo = EditorGUILayout.Toggle(settings.showDebugInfo);
+    });
+
     BoltAssetEditorGUI.Label("Editor Skin", () => {
       settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
