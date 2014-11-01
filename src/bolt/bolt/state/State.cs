@@ -392,7 +392,7 @@ namespace Bolt {
         Assert.True(proxyPriority[i].PropertyIndex == i);
 
         // if this property is set both in our filter and the proxy mask we can consider it for sending
-        if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
+        if (env.Proxy.Mask.IsSet(proxyPriority[i].PropertyIndex)) {
 
           // increment priority for this property
           proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].StateSettings.Priority;

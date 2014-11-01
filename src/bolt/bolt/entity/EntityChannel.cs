@@ -199,23 +199,29 @@ partial class EntityChannel : BoltChannel {
 
     foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
-        if (proxy.Flags & ProxyFlags.DESTROY_PENDING) { continue; }
+        if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
+          continue;
+        }
 
         proxy.Mask.Clear();
         proxy.Priority = 1 << 16;
       }
       else {
         // check update rate of this entity
-        if ((packet.number % proxy.Entity.UpdateRate) != 0) { continue; }
+        if ((packet.number % proxy.Entity.UpdateRate) != 0) {
+          continue;
+        }
 
         // meep
         if (proxy.Envelopes.Count >= 256) {
           BoltLog.Warn("Envelopes for {0} to {1} full", proxy, connection);
-          continue; 
+          continue;
         }
 
         // if this connection is loading a map dont send any creates or state updates
-        if (connection.isLoadingMap || BoltSceneLoader.IsLoading || !connection._canReceiveEntities) { continue; }
+        if (connection.isLoadingMap || BoltSceneLoader.IsLoading || !connection._canReceiveEntities) {
+          continue;
+        }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
           proxy.Priority = 1 << 18;
@@ -241,6 +247,8 @@ partial class EntityChannel : BoltChannel {
     }
 
     if (n > 0) {
+      Assert.True(_outgoingProxiesByPriority.Take(n).GroupBy(x => x.NetId.Value).All(x => x.Count() == 1));
+
       // only if we have any proxies to sort
       // sort proxies by their priority (highest to lowest)
       Array.Sort(_outgoingProxiesByPriority, 0, n, EntityProxy.PriorityComparer.Instance);
@@ -286,14 +294,13 @@ partial class EntityChannel : BoltChannel {
   }
 
   public override void Lost(BoltPacket packet) {
-    while (packet.envelopes.count > 0) {
-      var env = packet.envelopes.RemoveFirst();
-      var pending = env.Proxy.Envelopes[0];
+    while (packet.ProxyEnvelopes.Count > 0) {
+      var env = packet.ProxyEnvelopes.Dequeue();
+      var pending = env.Proxy.Envelopes.Dequeue();
 
-      env.Proxy.Envelopes.RemoveAt(0);
-
-      Assert.Same(env, pending);
-      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
+      //BoltLog.Error("LOST ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
+      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
+      Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
 
       // copy back all priorities
       ApplyPropertyPriorities(env);
@@ -317,14 +324,13 @@ partial class EntityChannel : BoltChannel {
   }
 
   public override void Delivered(BoltPacket packet) {
-    while (packet.envelopes.count > 0) {
-      var env = packet.envelopes.RemoveFirst();
-      var pending = env.Proxy.Envelopes[0];
+    while (packet.ProxyEnvelopes.Count > 0) {
+      var env = packet.ProxyEnvelopes.Dequeue();
+      var pending = env.Proxy.Envelopes.Dequeue();
 
-      env.Proxy.Envelopes.RemoveAt(0);
-
-      Assert.Same(env, pending, string.Format("{0}Frame <> {1}Frame", env.Frame, pending.Frame));
-      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]);
+      //BoltLog.Info("DELIVERED ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
+      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
+      Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
 
       if (env.Flags & ProxyFlags.DESTROY_PENDING) {
         Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_PENDING);
@@ -376,7 +382,7 @@ partial class EntityChannel : BoltChannel {
       env.Proxy.Mask.Set(p.PropertyIndex);
 
       // increment priority
-      env.Proxy.PropertyPriority[p.PriorityValue].PriorityValue += p.PriorityValue;
+      env.Proxy.PropertyPriority[p.PropertyIndex].PriorityValue += p.PriorityValue;
     }
   }
 
@@ -440,11 +446,15 @@ partial class EntityChannel : BoltChannel {
       // clear skipped count
       proxy.Skipped = 0;
 
+      // set packet number
+      env.PacketNumber = packet.number;
+
       // put on packets list
-      packet.envelopes.AddLast(env);
+      packet.ProxyEnvelopes.Enqueue(env);
 
       // put on proxies pending queue
-      proxy.Envelopes.Add(env);
+      // BoltLog.Info("adding envelope to {0}, count: {1}", proxy, proxy.Envelopes.Count + 1);
+      proxy.Envelopes.Enqueue(env);
 
       // keep going!
       return true;

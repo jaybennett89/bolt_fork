@@ -454,19 +454,32 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.ObjectReceived:
-          ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
+        case UdpEventType.StreamLost:
+          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
           break;
 
-        case UdpEventType.ObjectDelivered:
-          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
+        case UdpEventType.StreamDelivered:
+          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
           break;
 
-        case UdpEventType.ObjectLost:
-        case UdpEventType.ObjectRejected:
-        case UdpEventType.ObjectSendFailed:
-          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
+        case UdpEventType.StreamReceived:
+          ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
           break;
+
+
+        //case UdpEventType.ObjectReceived:
+        //  ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
+        //  break;
+
+        //case UdpEventType.ObjectDelivered:
+        //  ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
+        //  break;
+
+        //case UdpEventType.ObjectLost:
+        //case UdpEventType.ObjectRejected:
+        //case UdpEventType.ObjectSendFailed:
+        //  ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
+        //  break;
       }
     }
   }
@@ -749,7 +762,7 @@ internal static class BoltCore {
         case RuntimePlatform.WindowsEditor:
         case RuntimePlatform.WindowsPlayer:
         case RuntimePlatform.OSXPlayer:
-          BoltLog.Add(new BoltLog.File());
+          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Server));
           break;
       }
     }
@@ -815,7 +828,8 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
+    //_udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
+    _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours

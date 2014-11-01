@@ -18,11 +18,13 @@ public static class BoltLog {
   public class File : IWriter {
     volatile bool running = true;
 
+    bool isServer;
     Thread thread;
     AutoResetEvent threadEvent;
     Queue<string> threadQueue;
 
-    public File() {
+    public File(bool server) {
+      isServer = server;
       threadEvent = new AutoResetEvent(false);
       threadQueue = new Queue<string>(1024);
 
@@ -63,8 +65,8 @@ public static class BoltLog {
         var n = DateTime.Now;
 
         string logFile;
-        logFile = "Bolt_Log_{0}Y-{1}M-{2}D_{3}H{4}M{5}S_{6}MS.txt";
-        logFile = string.Format(logFile, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond);
+        logFile = "Bolt_Log_{7}_{0}Y-{1}M-{2}D_{3}H{4}M{5}S_{6}MS.txt";
+        logFile = string.Format(logFile, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond, isServer ? "SERVER" : "CLIENT");
 
         var stream = IO.File.Open(logFile, IO.FileMode.Create);
         var streamWriter = new IO.StreamWriter(stream);
