@@ -162,7 +162,7 @@ namespace Bolt {
           }
         }
         else {
-          BoltLog.Warn("The transform of {0} has not been assigned", Settings.PropertyName);
+          BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
         }
       }
     }
@@ -185,7 +185,7 @@ namespace Bolt {
         td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
       }
       else {
-        BoltLog.Warn("The transform of {0} has not been assigned", Settings.PropertyName);
+        BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
       }
     }
 

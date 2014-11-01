@@ -454,22 +454,18 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.StreamReceived:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
-          }
+        case UdpEventType.ObjectReceived:
+          ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
           break;
 
-        case UdpEventType.StreamDelivered:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
-          }
+        case UdpEventType.ObjectDelivered:
+          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
           break;
 
-        case UdpEventType.StreamLost:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
-          }
+        case UdpEventType.ObjectLost:
+        case UdpEventType.ObjectRejected:
+        case UdpEventType.ObjectSendFailed:
+          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
           break;
       }
     }
@@ -819,7 +815,7 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
+    _udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
     _udpSocket.Start(endpoint);
 
     // init all global behaviours

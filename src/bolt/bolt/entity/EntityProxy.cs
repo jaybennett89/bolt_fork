@@ -68,7 +68,7 @@ internal partial class EntityProxy : BoltObject {
 
   public Bolt.Entity Entity;
   public BoltConnection Connection;
-  public BoltRingBuffer<EntityProxyEnvelope> Envelopes;
+  public List<EntityProxyEnvelope> Envelopes;
 
   public int Skipped;
   public float Priority;
@@ -76,7 +76,7 @@ internal partial class EntityProxy : BoltObject {
   // ###################
 
   public EntityProxy() {
-    Envelopes = new BoltRingBuffer<EntityProxyEnvelope>(BoltCore._udpConfig.PacketWindow);
+    Envelopes = new List<EntityProxyEnvelope>();
   }
 
   public EntityProxyEnvelope CreateEnvelope() {

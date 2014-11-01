@@ -153,6 +153,10 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// How many updates have been skipped for the entity to this connection
   /// </summary>
+  public float GetCurrentPriority(BoltEntity en) {
+    return _entityChannel.GetPriority(en.Entity);
+  }
+
   public int GetSkippedUpdates(BoltEntity en) {
     return _entityChannel.GetSkippedUpdates(en.Entity);
   }
@@ -302,7 +306,7 @@ public class BoltConnection : BoltObject {
 
       Assert.False(packet.stream.Overflowing);
 
-      _udp.Send(packet.stream);
+      _udp.Send(packet);
 
       _bitsSecondOutAcc += packet.stream.Position;
       _packetStatsOut.Enqueue(packet.stats);
@@ -313,10 +317,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketReceived(UdpStream stream) {
+  internal void PacketReceived(BoltPacket packet) {
     try {
-      BoltPacket packet = new BoltPacket();
-      packet.stream = stream;
+      //BoltPacket packet = new BoltPacket();
+      //packet.stream = stream;
       packet.frame = packet.stream.ReadInt();
       packet.stats = new PacketStats();
 

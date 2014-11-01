@@ -100,19 +100,19 @@ public static class BoltLog {
 
   public class Console : IWriter {
     public void Info(string message) {
-      BoltConsole.Write(message, UE.Color.white);
+      BoltConsole.Write(message, BoltGUI.Sky);
     }
 
     public void Debug(string message) {
-      BoltConsole.Write(message, UE.Color.green);
+      BoltConsole.Write(message, BoltGUI.Green);
     }
 
     public void Warn(string message) {
-      BoltConsole.Write(message, UE.Color.yellow);
+      BoltConsole.Write(message, BoltGUI.Orange);
     }
 
     public void Error(string message) {
-      BoltConsole.Write(message, UE.Color.red);
+      BoltConsole.Write(message, BoltGUI.Error);
     }
 
     public void Dispose() {

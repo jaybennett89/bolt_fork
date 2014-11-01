@@ -101,7 +101,7 @@ namespace Bolt {
 
     public static void LabelField(object label, object value) {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(label.ToString(), LabelStyle, GUILayout.Height(11), GUILayout.Width(125));
+      GUILayout.Label(label.ToString(), LabelStyle, GUILayout.Height(11), GUILayout.Width(175));
       GUILayout.Label(value.ToString(), LabelStyle, GUILayout.Height(11));
       GUILayout.EndHorizontal();
     }
@@ -138,9 +138,7 @@ namespace Bolt {
     }
 
     Color GetColor(float t) {
-      Color good = new Color(102 / 255f, 239 / 255f, 20 / 255f);
-      Color bad = new Color(255f / 255f, 128 / 255f, 39 / 255f);
-      return Color.Lerp(good, bad, t);
+      return Color.Lerp(BoltGUI.Green, BoltGUI.Error, t);
     }
 
     void OnGUI() {
@@ -207,6 +205,25 @@ namespace Bolt {
 
           debugInfoScroll = GUILayout.BeginScrollView(debugInfoScroll, false, false, GUIStyle.none, GUIStyle.none);
           GUILayout.BeginVertical();
+
+          var state = (State)entity.Serializer;
+
+          LabelBold("Entity Info");
+          LabelField("Name", entity.UnityObject.gameObject.name);
+          LabelField("UniqueId", entity.UniqueId);
+          LabelField("World Position", entity.UnityObject.transform.position);
+          LabelField("Frame Count", state.Frames.count);
+          LabelField("Frame Latest Number", state.Frames.last.Number);
+          LabelField("Frame Server Number", BoltNetwork.serverFrame);
+
+          LabelBold("Proxy Data");
+
+          foreach (BoltConnection connection in BoltCore._connections) {
+            int skipCount = connection._entityChannel.GetSkippedUpdates(entity);
+            if (skipCount >= 0) {
+              LabelField(connection.remoteEndPoint, "Skip: " + skipCount + " / Priority: " + connection._entityChannel.GetPriority(entity));
+            }
+          }
 
           entity.Serializer.DebugInfo();
 
