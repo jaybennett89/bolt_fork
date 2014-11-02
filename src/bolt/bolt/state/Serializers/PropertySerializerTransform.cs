@@ -151,9 +151,8 @@ namespace Bolt {
               break;
 
             case SmoothingAlgorithms.Extrapolation:
-              int frame = UE.Mathf.Min(state.Frames.first.Number + SmoothingSettings.ExtrapolationMaxFrames, state.Entity.Frame);
-              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
-              td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, frame, SmoothingSettings, td.Simulate.localRotation);
+              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
+              td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation);
               break;
           }
 

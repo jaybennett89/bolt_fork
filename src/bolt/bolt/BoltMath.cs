@@ -122,22 +122,21 @@ namespace Bolt {
       UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
       float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
-      float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
+      float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
 
       UE.Vector3 p0 = position + v;
       UE.Vector3 p1 = p + (v * d);
 
-      var m = (p1 - p0).sqrMagnitude;
-      if (m > (settings.SnapMagnitude * settings.SnapMagnitude)) {
+      if ((p1 - p0).sqrMagnitude > (settings.SnapMagnitude * settings.SnapMagnitude)) {
         snapped = true;
         return p1;
       }
       else {
-        tolerance = tolerance * tolerance;
+        //if (velocity.magnitude < 0.1f && ((p1 - p0).magnitude < tolerance)) {
+        //  return position;
+        //}
 
-        if ((m < tolerance) && (velocity.sqrMagnitude < tolerance)) {
-          return position;
-        }
+        //BoltLog.Info("EXTERP: ({0}, {1}, {2})", p0, p1, t);
 
         return UE.Vector3.Lerp(p0, p1, t);
       }

@@ -204,7 +204,7 @@ partial class EntityChannel : BoltChannel {
         }
 
         proxy.Mask.Clear();
-        proxy.Priority = 1 << 16;
+        proxy.Priority = 1 << 17;
       }
       else {
         // check update rate of this entity
@@ -214,7 +214,7 @@ partial class EntityChannel : BoltChannel {
 
         // meep
         if (proxy.Envelopes.Count >= 256) {
-          BoltLog.Warn("Envelopes for {0} to {1} full", proxy, connection);
+          BoltLog.Error("Envelopes for {0} to {1} full", proxy, connection);
           continue;
         }
 
@@ -224,22 +224,28 @@ partial class EntityChannel : BoltChannel {
         }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
-          proxy.Priority = 1 << 18;
+          proxy.Priority = 1 << 19;
 
         }
         else {
-          if (proxy.Flags & ProxyFlags.IDLE) {
-            continue;
-          }
+          if ((proxy.Flags & ProxyFlags.CREATE_DONE) || (proxy.Envelopes.Count > 0)) {
+            var noDataToSend = proxy.Mask.AndCheck(proxy.Entity.Serializer.GetFilter(connection, proxy)) == false;
+            if (noDataToSend) {
+              continue;
+            }
 
-          proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
-          proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 15);
+            proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
+            proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
+          }
+          else {
+            proxy.Priority = 1 << 18;
+          }
         }
       }
 
       // if this is the controller give it the max priority
       if (proxy.Entity.IsController(connection)) {
-        proxy.Priority = 1 << 30;
+        proxy.Priority = 1 << 20;
       }
 
       // push

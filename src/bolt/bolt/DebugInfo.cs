@@ -215,6 +215,7 @@ namespace Bolt {
           LabelField("Frame Count", state.Frames.count);
           LabelField("Frame Latest Number", state.Frames.last.Number);
           LabelField("Frame Server Number", BoltNetwork.serverFrame);
+          LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
           LabelBold("Proxy Data");
 
