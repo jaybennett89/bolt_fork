@@ -229,11 +229,11 @@ namespace Bolt {
 
         callbacksList.Add(callback);
       }
-      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, CallbacksSimple.Select(x => x.Value.Count).Sum());
+      //BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, CallbacksSimple.Select(x => x.Value.Count).Sum());
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
-      BoltLog.Debug("Adding callback for {0}", path);
+      //BoltLog.Debug("Adding callback for {0}", path);
 
       if (VerifyCallbackPath(path)) {
         List<PropertyCallback> callbacksList;
@@ -245,7 +245,7 @@ namespace Bolt {
         callbacksList.Add(callback);
       }
 
-      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, Callbacks.Select(x => x.Value.Count).Sum());
+      //BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, Callbacks.Select(x => x.Value.Count).Sum());
     }
 
     public void RemoveCallback(string path, PropertyCallback callback) {
