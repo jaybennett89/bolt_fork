@@ -153,7 +153,7 @@
     <Compile Include="BoltConsole.cs" />
     <Compile Include="BoltException.cs" />
     <Compile Include="BoltExecutionOrder.cs" />
-    <Compile Include="BoltRuntimeSettings.cs" />
+    <Compile Include="RuntimeSettings.cs" />
     <Compile Include="BoltCore.cs" />
     <Compile Include="BoltObject.cs" />
     <Compile Include="BoltPacket.cs" />
@@ -205,7 +205,6 @@
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

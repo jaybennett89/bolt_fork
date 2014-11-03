@@ -4,9 +4,20 @@ using UE = UnityEngine;
 namespace Bolt {
   public class PrefabDatabase : UE.ScriptableObject {
     static Dictionary<Bolt.PrefabId, UE.GameObject> lookup;
+    static PrefabDatabase _instance;
 
-    static public PrefabDatabase Instance {
-      get { return UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase)) as PrefabDatabase; }
+    public static PrefabDatabase Instance {
+      get {
+        if (_instance == null) {
+          _instance = (PrefabDatabase)UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase));
+
+          if (_instance == null) {
+            BoltLog.Error("Could not find resource 'BoltPrefabDatabase'");
+          }
+        }
+
+        return _instance;
+      }
     }
 
     [UE.SerializeField]
