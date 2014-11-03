@@ -68,8 +68,8 @@ namespace Bolt {
     void DebugInfo();
     void InitProxy(EntityProxy p);
 
-    int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);
-    void Read(BoltConnection connection, UdpStream stream, int frame);
+    int Pack(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope proxy);
+    void Read(BoltConnection connection, UdpPacket stream, int frame);
   }
 
   internal interface IEntitySerializer<TState> : IEntitySerializer where TState : IState {

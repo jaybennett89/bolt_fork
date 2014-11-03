@@ -45,12 +45,12 @@ namespace Bolt {
       return VectorCompression.BitsRequired;
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       VectorCompression.Pack(stream, Blit.ReadVector3(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Blit.PackVector3(data, Settings.ByteOffset, VectorCompression.Read(stream));
     }
 

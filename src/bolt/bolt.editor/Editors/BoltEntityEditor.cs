@@ -18,7 +18,7 @@ public class BoltEntityEditor : Editor {
         .ToArray();
 
     serializerNames =
-      new string[] { "<Dynamic>" }
+      new string[] { "NOT ASSIGNED" }
         .Concat(serializerFactories.Select(x => x.TypeObject.Name))
         .ToArray();
 
@@ -32,11 +32,11 @@ public class BoltEntityEditor : Editor {
     BoltEntity entity = (BoltEntity)target;
     PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
 
-    bool canBeEdited = 
+    bool canBeEdited =
       (Application.isPlaying == false) &&
       (
-        prefabType == PrefabType.Prefab || 
-        prefabType == PrefabType.DisconnectedPrefabInstance || 
+        prefabType == PrefabType.Prefab ||
+        prefabType == PrefabType.DisconnectedPrefabInstance ||
         prefabType == PrefabType.None
       );
 
@@ -69,12 +69,12 @@ public class BoltEntityEditor : Editor {
         EditorGUILayout.LabelField("Prefab Id", entity._prefabId.ToString());
 
         if (entity._prefabId < 0) {
-          EditorGUILayout.HelpBox("Prefab Id not set, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
+          EditorGUILayout.HelpBox("Prefab id not set, run the 'Assets/Bolt Engine/Compile Assembly' menu option to correct", MessageType.Error);
         }
 
         if (prefabType == PrefabType.Prefab) {
           if (Bolt.PrefabDatabase.Contains(entity) == false) {
-            EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Compile Bolt Assets' menu option to correct", MessageType.Error);
+            EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Bolt Engine/Compile Assembly' menu option to correct", MessageType.Error);
           }
         }
 
@@ -98,6 +98,7 @@ public class BoltEntityEditor : Editor {
 
     if (selectedIndex == 0) {
       entity.serializerGuid = Bolt.UniqueId.None;
+      EditorGUILayout.HelpBox("You must assign a serializer to this prefab before using it", MessageType.Error);
     }
     else {
       entity.serializerGuid = serializerIds[selectedIndex - 1];

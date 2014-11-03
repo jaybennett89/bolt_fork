@@ -33,14 +33,14 @@ namespace Bolt {
     public virtual object GetDebugValue(State state) { return null; }
 
     public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
-    public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
 
-    public virtual bool EventPack(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    public virtual void EventRead(Event data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual bool EventPack(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void EventRead(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
 
-    public virtual void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    public virtual void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    public virtual void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
     public virtual void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) { }
 
     public virtual void OnInit(State state) { }
@@ -51,32 +51,32 @@ namespace Bolt {
   }
 
   abstract class PropertySerializerSimple : PropertySerializer {
-    public override bool EventPack(Event data, BoltConnection connection, UdpStream stream) {
+    public override bool EventPack(Event data, BoltConnection connection, UdpPacket stream) {
       return Pack(data.Data, connection, stream);
     }
 
-    public override void EventRead(Event data, BoltConnection connection, UdpStream stream) {
+    public override void EventRead(Event data, BoltConnection connection, UdpPacket stream) {
       Read(data.Data, connection, stream);
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
       return Pack(frame.Data, connection, stream);
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
       Read(frame.Data, connection, stream);
     }
 
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
+    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
       Pack(data, connection, stream);
     }
 
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpStream stream) {
+    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
       Read(data, connection, stream);
     }
 
-    protected virtual bool Pack(byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
-    protected virtual void Read(byte[] data, BoltConnection connection, UdpStream stream) { throw new NotSupportedException(); }
+    protected virtual bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    protected virtual void Read(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
   }
 
   abstract class PropertySerializerMecanim : PropertySerializerSimple {

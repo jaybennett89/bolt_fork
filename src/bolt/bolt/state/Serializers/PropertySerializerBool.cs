@@ -22,12 +22,12 @@ namespace Bolt {
       state.Animator.SetBool(Settings.PropertyName, state.Frames.first.Data.ReadBool(Settings.ByteOffset));
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       stream.WriteBool(Blit.ReadBool(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Blit.PackBool(data, Settings.ByteOffset, stream.ReadBool());
     }
 

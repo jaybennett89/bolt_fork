@@ -380,7 +380,7 @@ namespace Bolt {
       }
     }
 
-    public int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env) {
+    public int Pack(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope env) {
       BitArray filter = GetFilter(connection, env.Proxy);
 
       int tempCount = 0;
@@ -426,7 +426,7 @@ namespace Bolt {
       return env.Written.Count;
     }
 
-    void PackProperties(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
+    void PackProperties(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
       int propertyCountPtr = stream.Ptr;
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
@@ -484,10 +484,10 @@ namespace Bolt {
       Assert.True(env.Written.Count <= MetaData.PacketMaxProperties);
 
       // write the amount of properties
-      UdpStream.WriteByteAt(stream.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
+      UdpPacket.WriteByteAt(stream.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
     }
 
-    public void Read(BoltConnection connection, UdpStream stream, int frameNumber) {
+    public void Read(BoltConnection connection, UdpPacket stream, int frameNumber) {
       int count = stream.ReadByte(PacketMaxPropertiesBits);
       var frame = default(Frame);
 

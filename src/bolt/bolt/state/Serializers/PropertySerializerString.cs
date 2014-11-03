@@ -31,13 +31,13 @@ namespace Bolt {
       return 32 + (Blit.ReadI32(frame.Data, Settings.ByteOffset) * 8);
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpKit.UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpKit.UdpPacket stream) {
       stream.WriteInt(Blit.ReadI32(data, Settings.ByteOffset));
       stream.WriteByteArray(data, Settings.ByteOffset + 4, Blit.ReadI32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data,  BoltConnection connection, UdpKit.UdpStream stream) {
+    protected override void Read(byte[] data,  BoltConnection connection, UdpKit.UdpPacket stream) {
       Blit.PackI32(data, Settings.ByteOffset, stream.ReadInt());
       Blit.PackBytes(data, Settings.ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(data, Settings.ByteOffset)));
     }

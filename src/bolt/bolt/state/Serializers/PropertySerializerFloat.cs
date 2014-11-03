@@ -52,12 +52,12 @@ namespace Bolt {
       state.Animator.SetFloat(Settings.PropertyName, Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset), MecanimSettings.Damping, BoltCore.frameDeltaTime);
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       CompressionSettings.Pack(stream, Blit.ReadF32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       int offset = Settings.ByteOffset;
 
       if (Settings.PropertyMode == PropertyModes.State && SmoothingSettings.Algorithm != SmoothingAlgorithms.None) {

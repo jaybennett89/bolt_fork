@@ -53,19 +53,19 @@ namespace Bolt {
       return string.Format("[NetId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static NetId Read(UdpKit.UdpStream stream, int bits) {
+	public static NetId Read(UdpKit.UdpPacket stream, int bits) {
 		return new NetId(stream.ReadInt(bits));
 	}
 	
-	public static NetId Read(UdpKit.UdpStream stream) {
+	public static NetId Read(UdpKit.UdpPacket stream) {
 		return new NetId(stream.ReadInt());
 	}
 
@@ -132,19 +132,19 @@ namespace Bolt {
       return string.Format("[InstanceId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static InstanceId Read(UdpKit.UdpStream stream, int bits) {
+	public static InstanceId Read(UdpKit.UdpPacket stream, int bits) {
 		return new InstanceId(stream.ReadInt(bits));
 	}
 	
-	public static InstanceId Read(UdpKit.UdpStream stream) {
+	public static InstanceId Read(UdpKit.UdpPacket stream) {
 		return new InstanceId(stream.ReadInt());
 	}
 
@@ -211,19 +211,19 @@ namespace Bolt {
       return string.Format("[PrefabId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static PrefabId Read(UdpKit.UdpStream stream, int bits) {
+	public static PrefabId Read(UdpKit.UdpPacket stream, int bits) {
 		return new PrefabId(stream.ReadInt(bits));
 	}
 	
-	public static PrefabId Read(UdpKit.UdpStream stream) {
+	public static PrefabId Read(UdpKit.UdpPacket stream) {
 		return new PrefabId(stream.ReadInt());
 	}
 
@@ -290,19 +290,19 @@ namespace Bolt {
       return string.Format("[TypeId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static TypeId Read(UdpKit.UdpStream stream, int bits) {
+	public static TypeId Read(UdpKit.UdpPacket stream, int bits) {
 		return new TypeId(stream.ReadInt(bits));
 	}
 	
-	public static TypeId Read(UdpKit.UdpStream stream) {
+	public static TypeId Read(UdpKit.UdpPacket stream) {
 		return new TypeId(stream.ReadInt());
 	}
 
@@ -369,19 +369,19 @@ namespace Bolt {
       return string.Format("[SceneId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static SceneId Read(UdpKit.UdpStream stream, int bits) {
+	public static SceneId Read(UdpKit.UdpPacket stream, int bits) {
 		return new SceneId(stream.ReadInt(bits));
 	}
 	
-	public static SceneId Read(UdpKit.UdpStream stream) {
+	public static SceneId Read(UdpKit.UdpPacket stream) {
 		return new SceneId(stream.ReadInt());
 	}
 

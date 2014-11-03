@@ -320,7 +320,7 @@ public class BoltConnection : BoltObject {
   }
 
   //internal void PacketReceived(BoltPacket packet) {
-  internal void PacketReceived(UdpStream stream) {
+  internal void PacketReceived(UdpPacket stream) {
     try {
       BoltPacket packet = new BoltPacket();
       packet.stream = stream;

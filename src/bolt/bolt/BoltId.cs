@@ -136,7 +136,7 @@ namespace Bolt {
       this.byte15 = byte15;
     }
 
-    public void Pack(UdpStream stream) {
+    public void Pack(UdpPacket stream) {
       stream.WriteUInt(uint0);
       stream.WriteUInt(uint1);
       stream.WriteUInt(uint2);
@@ -197,7 +197,7 @@ namespace Bolt {
       }
     }
 
-    public static UniqueId Read(UdpStream stream) {
+    public static UniqueId Read(UdpPacket stream) {
       UniqueId id;
 
       id = default(UniqueId);

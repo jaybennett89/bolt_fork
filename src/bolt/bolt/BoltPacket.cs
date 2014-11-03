@@ -21,7 +21,7 @@ internal class BoltPacket : IDisposable {
   internal Queue<EntityProxyEnvelope> ProxyEnvelopes = new Queue<EntityProxyEnvelope>();
 
   public int frame { get; internal set; }
-  public UdpStream stream { get; internal set; }
+  public UdpPacket stream { get; internal set; }
   public IDisposable userToken { get; set; }
 
   void IDisposable.Dispose() {

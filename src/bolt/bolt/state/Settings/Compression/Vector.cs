@@ -27,13 +27,13 @@ namespace Bolt {
       };
     }
 
-    public void Pack(UdpStream stream, UE.Vector3 value) {
+    public void Pack(UdpPacket stream, UE.Vector3 value) {
       X.Pack(stream, value.x);
       Y.Pack(stream, value.y);
       Z.Pack(stream, value.z);
     }
 
-    public UE.Vector3 Read(UdpStream stream) {
+    public UE.Vector3 Read(UdpPacket stream) {
       UE.Vector3 v;
 
       v.x = X.Read(stream);

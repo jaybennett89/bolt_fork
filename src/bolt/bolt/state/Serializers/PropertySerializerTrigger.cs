@@ -29,7 +29,7 @@ namespace Bolt {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
       // shift data so it aligns with our local frame
       state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
 
@@ -40,7 +40,7 @@ namespace Bolt {
       return true;
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpStream stream) {
+    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
       int triggerBits = stream.ReadInt(BoltCore.remoteSendRate * state.Entity.UpdateRate);
 
       frame.Data.PackI32(LocalOffset, frame.Number);

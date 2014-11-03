@@ -17,7 +17,7 @@ static class BoltPacketPool {
 
     if (packet == null) {
       packet = new BoltPacket();
-      packet.stream = new UdpStream(new byte[BoltCore._udpConfig.PacketSize * 2]);
+      packet.stream = new UdpPacket(new byte[BoltCore._udpConfig.PacketSize * 2]);
     }
 
     Assert.True(packet.pooled);

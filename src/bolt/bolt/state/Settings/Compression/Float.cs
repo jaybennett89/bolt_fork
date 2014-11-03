@@ -36,7 +36,7 @@ namespace Bolt {
       return c;
     }
 
-    public void Pack(UdpStream stream, float value) {
+    public void Pack(UdpPacket stream, float value) {
       switch (_bits) {
         case 0:
           break;
@@ -51,7 +51,7 @@ namespace Bolt {
       }
     }
 
-    public float Read(UdpStream stream) {
+    public float Read(UdpPacket stream) {
       switch (_bits) {
         case 0:
           return 0f;

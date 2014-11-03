@@ -225,19 +225,24 @@ internal static class BoltCore {
       return null;
     }
 
+    if (be.serializerGuid == UniqueId.None) {
+      BoltLog.Error("Prefab '{0}' does not have a serializer assigned", prefab.name);
+      return null;
+    }
+
     return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
   static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
     // prefab checks
     GameObject prefab = PrefabPool.LoadPrefab(prefabId);
-    BoltEntity be = prefab.GetComponent<BoltEntity>();
+    BoltEntity entity = prefab.GetComponent<BoltEntity>();
 
-    if (isClient && (be._allowInstantiateOnClient == false)) {
+    if (isClient && (entity._allowInstantiateOnClient == false)) {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
-    if (be._prefabId != prefabId.Value) {
+    if (entity._prefabId != prefabId.Value) {
       throw new BoltException("PrefabId for BoltEntity component did not return the same value as prefabId passed in as argument to Instantiate");
     }
 
@@ -450,16 +455,16 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.StreamLost:
-          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
+        case UdpEventType.PacketLost:
+          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Packet.UserToken);
           break;
 
-        case UdpEventType.StreamDelivered:
-          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
+        case UdpEventType.PacketDelivered:
+          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Packet.UserToken);
           break;
 
-        case UdpEventType.StreamReceived:
-          ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
+        case UdpEventType.PacketReceived:
+          ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
           break;
       }
     }
