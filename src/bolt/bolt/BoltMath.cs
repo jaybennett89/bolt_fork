@@ -136,8 +136,6 @@ namespace Bolt {
         //  return position;
         //}
 
-        //BoltLog.Info("EXTERP: ({0}, {1}, {2})", p0, p1, t);
-
         return UE.Vector3.Lerp(p0, p1, t);
       }
     }

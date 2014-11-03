@@ -17,13 +17,9 @@ public enum BoltNetworkModes {
 
 
 internal static class BoltCore {
-
   static UdpSocket _udpSocket;
   static internal Stopwatch _timer = new Stopwatch();
   static internal SceneLoadState _localSceneLoading;
-  static internal bool _disableWorldSnapshots = false;
-
-
 
   static internal bool _canReceiveEntities = true;
   static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
@@ -465,21 +461,6 @@ internal static class BoltCore {
         case UdpEventType.StreamReceived:
           ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
           break;
-
-
-        //case UdpEventType.ObjectReceived:
-        //  ev.Connection.GetBoltConnection().PacketReceived((BoltPacket)ev.Object0);
-        //  break;
-
-        //case UdpEventType.ObjectDelivered:
-        //  ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Object0);
-        //  break;
-
-        //case UdpEventType.ObjectLost:
-        //case UdpEventType.ObjectRejected:
-        //case UdpEventType.ObjectSendFailed:
-        //  ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Object0);
-        //  break;
       }
     }
   }
@@ -531,9 +512,7 @@ internal static class BoltCore {
         }
       }
 
-      if (_disableWorldSnapshots == false) {
-        BoltPhysics.SnapshotWorld();
-      }
+      BoltPhysics.SnapshotWorld();
 
       // switch perf counters
       if ((_frame % framesPerSecond) == 0) {
