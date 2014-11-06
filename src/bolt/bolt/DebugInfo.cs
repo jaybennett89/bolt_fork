@@ -208,6 +208,10 @@ namespace Bolt {
 
           var state = (State)entity.Serializer;
 
+          if (Input.GetKeyDown(KeyCode.L)) {
+            BoltNetworkInternal.DebugDrawer.SelectGameObject(entity.UnityObject.gameObject);
+          }
+
           LabelBold("Entity Info");
           LabelField("Name", entity.UnityObject.gameObject.name);
           LabelField("UniqueId", entity.UniqueId);

@@ -1,5 +1,6 @@
 ﻿using Bolt;
 using System;
+using System.Collections;
 using UE = UnityEngine;
 
 [Documentation]
@@ -321,13 +322,25 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       return Entity.ToString();
     }
     else {
-      return string.Format("[DetachedEntity {2} SceneId={0} SerializerId={1}]", sceneGuid, serializerGuid, prefabId);
+      return string.Format("[DetachedEntity {2} SceneId={0} SerializerId={1} {3}]", sceneGuid, serializerGuid, prefabId, gameObject.name);
     }
+  }
+
+  public void DestroyDelayed(float time) {
+    StartCoroutine(DestroyDelayedInternal(time));
   }
 
   internal void VerifyNotAttached() {
     if (isAttached) {
       throw new BoltException("You can't modify a BoltEntity behaviour which is attached to Bolt");
+    }
+  }
+
+  IEnumerator DestroyDelayedInternal(float time) {
+    yield return new UE.WaitForSeconds(time);
+
+    if (isAttached) {
+      BoltNetwork.Destroy(this);
     }
   }
 

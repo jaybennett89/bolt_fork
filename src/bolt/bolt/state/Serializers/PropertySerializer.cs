@@ -31,6 +31,7 @@ namespace Bolt {
     }
 
     public virtual object GetDebugValue(State state) { return null; }
+    public virtual void SetDynamic(State.Frame frame, object value) { throw new NotSupportedException(); }
 
     public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
     public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }

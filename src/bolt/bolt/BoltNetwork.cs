@@ -12,6 +12,7 @@ namespace BoltInternal {
     void LabelBold(string text);
     void LabelField(string text, object value);
     void Separator();
+    void SelectGameObject(GameObject gameObject);
   }
 }
 

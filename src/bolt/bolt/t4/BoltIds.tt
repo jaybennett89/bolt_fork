@@ -8,6 +8,7 @@
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct <#=id#> {
     public class Comparer : IComparer<<#=id#>> {
       public static readonly Comparer Instance = new Comparer();
@@ -37,7 +38,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal <#=id#>(int value) {
       Value = value;
@@ -59,19 +60,19 @@ namespace Bolt {
       return string.Format("[<#=id#>:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static <#=id#> Read(UdpKit.UdpStream stream, int bits) {
+	public static <#=id#> Read(UdpKit.UdpPacket stream, int bits) {
 		return new <#=id#>(stream.ReadInt(bits));
 	}
 	
-	public static <#=id#> Read(UdpKit.UdpStream stream) {
+	public static <#=id#> Read(UdpKit.UdpPacket stream) {
 		return new <#=id#>(stream.ReadInt());
 	}
 

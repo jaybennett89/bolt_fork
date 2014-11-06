@@ -2,6 +2,7 @@
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct NetId {
     public class Comparer : IComparer<NetId> {
       public static readonly Comparer Instance = new Comparer();
@@ -31,7 +32,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal NetId(int value) {
       Value = value;
@@ -81,6 +82,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct InstanceId {
     public class Comparer : IComparer<InstanceId> {
       public static readonly Comparer Instance = new Comparer();
@@ -110,7 +112,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal InstanceId(int value) {
       Value = value;
@@ -160,6 +162,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct PrefabId {
     public class Comparer : IComparer<PrefabId> {
       public static readonly Comparer Instance = new Comparer();
@@ -189,7 +192,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal PrefabId(int value) {
       Value = value;
@@ -239,6 +242,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct TypeId {
     public class Comparer : IComparer<TypeId> {
       public static readonly Comparer Instance = new Comparer();
@@ -268,7 +272,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal TypeId(int value) {
       Value = value;
@@ -318,6 +322,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct SceneId {
     public class Comparer : IComparer<SceneId> {
       public static readonly Comparer Instance = new Comparer();
@@ -347,7 +352,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal SceneId(int value) {
       Value = value;

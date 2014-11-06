@@ -12,6 +12,15 @@ namespace BoltInternal {
       this.isEditor = isEditor;
     }
 
+
+    void IDebugDrawer.SelectGameObject(GameObject gameObject) {
+#if UNITY_EDITOR
+      if (!isEditor) {
+        UnityEditor.Selection.activeGameObject = gameObject;
+      }
+#endif
+    }
+
     void BoltInternal.IDebugDrawer.Indent(int level) {
 #if UNITY_EDITOR
       if (isEditor) {
