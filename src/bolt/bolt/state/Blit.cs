@@ -1,9 +1,19 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using UE = UnityEngine;
 
 namespace Bolt {
+  [StructLayout(LayoutKind.Explicit)]
+  public struct Block {
+    [FieldOffset(0)]
+    public int Offset;
+
+    [FieldOffset(4)]
+    public uint Length;
+  }
+
   public static class Blit {
     public static bool Diff(byte[] a, byte[] b, int offset, int length) {
       Assert.True(a != null);
@@ -20,6 +30,26 @@ namespace Bolt {
       }
 
       return false;
+    }
+
+    [SuppressUnmanagedCodeSecurity]
+    [DllImport("BoltFastCompare", ExactSpelling = true)]
+    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
+
+    public unsafe static int DiffNative(byte[] a, byte[] b, Block[] blocks, int[] result) {
+      int count = 0;
+
+      fixed (byte* aPtr = a) {
+        fixed (byte* bPtr = b) {
+          fixed (Block* blocksPtr = blocks) {
+            fixed (int* resultPtr = result) {
+              count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
+            }
+          }
+        }
+      }
+
+      return count;
     }
 
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {

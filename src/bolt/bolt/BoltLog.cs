@@ -253,7 +253,7 @@ public static class BoltLog {
 
   static void VerifyOneWriter() {
     if (_writers.Count == 0) {
-      _writers.Add(new Unity());
+      //_writers.Add(new Unity());
     }
   }
 

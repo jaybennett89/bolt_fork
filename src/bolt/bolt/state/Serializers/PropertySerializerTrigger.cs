@@ -21,6 +21,10 @@ namespace Bolt {
       StateSettings.ByteLength = 8;
     }
 
+    public override void SetDynamic(State.Frame frame, object value) {
+      frame.Data.SetTrigger(BoltCore.frame, LocalOffset, true);
+    }
+
     public override object GetDebugValue(State state) {
       return "TRIGGER";
     }

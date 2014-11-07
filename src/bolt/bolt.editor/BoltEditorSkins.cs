@@ -22,7 +22,7 @@ public struct BoltEditorSkinVariation {
 
 public struct BoltEditorSkin {
   public static int Count {
-    get { return skins.Length; }
+    get { return skins.Length; } 
   }
 
   public static IEnumerable<BoltEditorSkin> All {

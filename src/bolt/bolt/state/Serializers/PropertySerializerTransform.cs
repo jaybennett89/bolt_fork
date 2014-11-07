@@ -130,8 +130,8 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(State state) {
-      if (!state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
 
+      if (!state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
         var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
 
         if (td.Simulate) {
@@ -151,7 +151,14 @@ namespace Bolt {
               break;
 
             case SmoothingAlgorithms.Extrapolation:
-              td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
+              //BoltPoll.CALC.Start();
+              UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);;
+              //BoltPoll.CALC.Stop();
+
+              //BoltPoll.ASSIGN.Start();
+              td.Simulate.localPosition = calc;
+              //BoltPoll.ASSIGN.Stop();
+
               td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation);
               break;
           }
@@ -161,9 +168,10 @@ namespace Bolt {
           }
         }
         else {
-          BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
+          //BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
         }
       }
+
     }
 
     public override void OnSimulateAfter(State state) {
@@ -184,7 +192,7 @@ namespace Bolt {
         td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
       }
       else {
-        BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
+        //BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
       }
     }
 

@@ -106,6 +106,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return new PrefabId(_prefabId); }
   }
 
+  public Bolt.InstanceId instanceId {
+    get { return Entity.InstanceId; }
+  }
+
   /// <summary>
   /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
   /// </summary>

@@ -86,7 +86,11 @@ namespace Bolt.Compiler {
         ctor.Statements.Expr("_Meta.PacketMaxProperties = {0}", Decorator.Definition.PacketMaxProperties);
 
         ctor.Statements.Comment("Setup data structures");
+
+        ctor.Statements.Expr("_Meta.FramePool = new System.Collections.Generic.Stack<Bolt.State.Frame>()");
         ctor.Statements.Expr("_Meta.PropertyFilters = new Bolt.BitArray[32]");
+        ctor.Statements.Expr("_Meta.PropertyBlocks = new Bolt.Block[_Meta.PropertyCount]");
+        ctor.Statements.Expr("_Meta.PropertyBlocksResult = new System.Int32[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyFilterCache = new Dictionary<Bolt.Filter, Bolt.BitArray>(128, Bolt.Filter.EqualityComparer.Instance)");
         ctor.Statements.Expr("_Meta.PropertySerializers = new Bolt.PropertySerializer[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyCallbackPaths = new HashSet<string>(new string[] {{ {0} }})", Decorator.AllProperties.SelectMany(x => x.CallbackPaths).Distinct().Select(x => '"' + x.Trim('.') + '"').Join(", "));
@@ -94,6 +98,7 @@ namespace Bolt.Compiler {
         EmitFilters(ctor);
         EmitProperties(ctor);
         EmitControllerFilter(ctor);
+        EmitBlocks(ctor);
       });
 
       type.DeclareConstructor(ctor => {
@@ -114,6 +119,12 @@ namespace Bolt.Compiler {
       }
 
       DeclareModify(type, Decorator);
+    }
+
+    void EmitBlocks(CodeTypeConstructor ctor) {
+      ctor.Statements.For("n", "n < _Meta.PropertyCount", body => {
+        body.Expr("_Meta.PropertyBlocks[n] = new Bolt.Block {{ Offset = _Meta.PropertySerializers[n].Settings.ByteOffset, Length = (uint) _Meta.PropertySerializers[n].StateSettings.ByteLength }}");
+      });
     }
 
     void DeclareModify(CodeTypeDeclaration type, StateDecorator decorator) {

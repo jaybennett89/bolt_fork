@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
 
 enum BoltEntityDestroyMode {
   OutOfScope,
@@ -179,6 +180,7 @@ partial class EntityChannel : BoltChannel {
       }
 
       // simulate this entity
+
       proxy.Entity.Simulate();
     }
   }
