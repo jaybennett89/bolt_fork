@@ -201,7 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\udpkit\udpkit.csproj">
-      <Project>{66A5F183-3065-4A77-A109-779D7984990F}</Project>
+      <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>

@@ -132,6 +132,10 @@
       <Project>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</Project>
       <Name>bolt</Name>
     </ProjectReference>
+    <ProjectReference Include="..\udpkit\udpkit.csproj">
+      <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
+      <Name>udpkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compiler\BoltCompiler.CompileMaps.cs" />
