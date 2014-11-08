@@ -302,13 +302,22 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
+    def.SortOrder = (SortOrder) EditorGUILayout.EnumPopup(def.SortOrder, GUILayout.Width(75));
+
     GUILayout.EndHorizontal();
     GUILayout.EndArea();
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
-    for (int i = 0; i < list.Count; ++i) {
-      EditProperty(def, list[i], i == 0, i == (list.Count - 1));
+    List<PropertyDefinition> sortedList = list;
+
+    switch (def.SortOrder) {
+      case SortOrder.Name: sortedList = list.OrderBy(x => x.Name).ToList(); break;
+      case SortOrder.Priority: sortedList = list.OrderBy(x => x.Priority).ToList(); break;
+    }
+
+    for (int i = 0; i < sortedList.Count; ++i) {
+      EditProperty(def, sortedList[i], i == 0, i == (sortedList.Count - 1));
     }
 
     // move nudged property
@@ -400,6 +409,8 @@ public class BoltEditorWindow : BoltWindow {
     BoltEditorGUI.PropertyTypePopup(def, p);
     BoltEditorGUI.SetTooltip("Type. The type of this property.");
 
+    EditorGUI.BeginDisabledGroup(def.SortOrder != SortOrder.Manual);
+
     if (BoltEditorGUI.Button("mc_arrow_down", !last)) {
       p.Adjust += 1;
     }
@@ -408,6 +419,7 @@ public class BoltEditorWindow : BoltWindow {
       p.Adjust -= 1;
     }
 
+    EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndHorizontal();
 
     if (p.Expanded) {
