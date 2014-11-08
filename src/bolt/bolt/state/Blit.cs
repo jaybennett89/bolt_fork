@@ -15,42 +15,42 @@ namespace Bolt {
   }
 
   public static class Blit {
-    public static bool Diff(byte[] a, byte[] b, int offset, int length) {
-      Assert.True(a != null);
-      Assert.True(b != null);
-      Assert.True(a.Length == b.Length);
+    //public static bool Diff(byte[] a, byte[] b, int offset, int length) {
+    //  Assert.True(a != null);
+    //  Assert.True(b != null);
+    //  Assert.True(a.Length == b.Length);
 
-      while (length > 0) {
-        if (a[offset] != b[offset]) {
-          return true;
-        }
+    //  while (length > 0) {
+    //    if (a[offset] != b[offset]) {
+    //      return true;
+    //    }
 
-        ++offset;
-        --length;
-      }
+    //    ++offset;
+    //    --length;
+    //  }
 
-      return false;
-    }
+    //  return false;
+    //}
 
-    [SuppressUnmanagedCodeSecurity]
-    [DllImport("BoltFastCompare", ExactSpelling = true)]
-    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
+    //[SuppressUnmanagedCodeSecurity]
+    //[DllImport("BoltFastCompare", ExactSpelling = true)]
+    //static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
 
-    public unsafe static int DiffNative(byte[] a, byte[] b, Block[] blocks, int[] result) {
-      int count = 0;
+    //public unsafe static int DiffNative(byte[] a, byte[] b, Block[] blocks, int[] result) {
+    //  int count = 0;
 
-      fixed (byte* aPtr = a) {
-        fixed (byte* bPtr = b) {
-          fixed (Block* blocksPtr = blocks) {
-            fixed (int* resultPtr = result) {
-              count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
-            }
-          }
-        }
-      }
+    //  fixed (byte* aPtr = a) {
+    //    fixed (byte* bPtr = b) {
+    //      fixed (Block* blocksPtr = blocks) {
+    //        fixed (int* resultPtr = result) {
+    //          count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
+    //        }
+    //      }
+    //    }
+    //  }
 
-      return count;
-    }
+    //  return count;
+    //}
 
     public unsafe static int DiffUnsafe(byte[] a, byte[] b, Block[] blocks, int[] result) {
       if (blocks.Length == 0) {
