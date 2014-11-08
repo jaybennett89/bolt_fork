@@ -23,6 +23,9 @@ namespace Bolt {
   }
 
   static class Factory {
+    static Dictionary<byte, Type> _id2token = new Dictionary<byte, Type>();
+    static Dictionary<Type, byte> _token2id = new Dictionary<Type, byte>();
+
     static Dictionary<UniqueId, IFactory> _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>();
     static Dictionary<TypeId, IFactory> _factoriesByTypeId = new Dictionary<TypeId, IFactory>();
 
@@ -83,6 +86,14 @@ namespace Bolt {
       return ev;
     }
 
+    internal static byte TokenId(IProtocolToken obj) {
+      return _token2id[obj.GetType()];
+    }
+
+    internal static IProtocolToken NewToken(byte id) {
+      return (IProtocolToken)Activator.CreateInstance(_id2token[id]);
+    }
+
     internal static Command NewCommand(TypeId id) {
       return (Command)Create(id);
     }
@@ -121,13 +132,28 @@ namespace Bolt {
     }
 
     internal static void UnregisterAll() {
+      _token2id.Clear();
+      _id2token.Clear();
+
       _factoriesByTypeId.Clear();
       _factoriesByUniqueId.Clear();
+
+      _token2id = new Dictionary<Type, byte>();
+      _id2token = new Dictionary<byte, Type>();
 
       _factoriesByTypeId = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
       _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>(128, UniqueId.EqualityComparer.Instance);
     }
 
-  }
+    internal static void RegisterTokenClass(Type type) {
+      if (_token2id.Count == 255) {
+        throw new ArgumentException("Can only register 255 different token types");
+      }
 
+      byte id = (byte)_token2id.Count;
+
+      _token2id.Add(type, id);
+      _id2token.Add(id, type);
+    }
+  }
 }

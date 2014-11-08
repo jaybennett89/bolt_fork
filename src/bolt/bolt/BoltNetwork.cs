@@ -199,6 +199,10 @@ public static class BoltNetwork {
     return null;
   }
 
+  public static void RegisterTokenClass<T>() where T : class, IProtocolToken, new() {
+    Factory.RegisterTokenClass(typeof(T));
+  }
+
   public static void EnableUPnP() {
     UPnP.Enable();
   }

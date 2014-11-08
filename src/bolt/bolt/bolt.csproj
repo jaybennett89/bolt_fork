@@ -57,6 +57,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
     <Compile Include="DocumentationAttribute.cs" />
     <Compile Include="GlobalEventListenerBase.cs" />
@@ -180,7 +181,7 @@
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="utils\BitUtils.cs" />
     <Compile Include="utils\UdpStreamExt.cs" />
-    <Compile Include="WorldId.cs" />
+    <Compile Include="entity\EntityId.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 
 namespace Bolt {
   partial class Entity {
@@ -30,6 +26,7 @@ namespace Bolt {
       Flags |= EntityFlags.HAS_CONTROL;
       CommandQueue.Clear();
       CommandSequence = 0;
+      CommandLastExecuted = null;
 
       // call to serializer
       Serializer.OnControlGained();
@@ -63,6 +60,7 @@ namespace Bolt {
       Flags &= ~EntityFlags.HAS_CONTROL;
       CommandQueue.Clear();
       CommandSequence = 0;
+      CommandLastExecuted = null;
 
       // call to serializer
       Serializer.OnControlLost();
@@ -79,6 +77,7 @@ namespace Bolt {
     internal void AssignControl(BoltConnection connection) {
       if (IsOwner) {
         if (connection._entityChannel.CreateOnRemote(this)) {
+          CommandLastExecuted = null;
           CommandSequence = 0;
           CommandQueue.Clear();
 
@@ -106,6 +105,7 @@ namespace Bolt {
           Controller = null;
 
           // clear out everything
+          CommandLastExecuted = null;
           CommandSequence = 0;
           CommandQueue.Clear();
         }

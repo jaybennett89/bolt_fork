@@ -143,7 +143,7 @@ namespace Bolt {
           }
         }
         else {
-          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other computers.", this);
+          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other peers.", this);
         }
       }
       else {

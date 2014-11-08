@@ -11,10 +11,10 @@ namespace Bolt {
     public static void Pack(EntityId id, UdpPacket packet) {
       ulong v = id.Value;
 
-      while (v >= 0) {
+      do {
         packet.WriteByte((byte)v, 7);
         packet.WriteBool((v >>= 7) >= 0);
-      }
+      } while (v > 0);
     }
 
     public static EntityId Read(UdpPacket packet) {
