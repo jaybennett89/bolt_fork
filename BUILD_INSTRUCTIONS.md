@@ -1,5 +1,6 @@
+Delete the asset store version if installed.
+
 # OS X
- 
 1. Download and install the latest MDK from http://www.mono-project.com/download/#download-mac
 2. Open up a terminal and navigate to the Bolt repository root directory
 3. Run this command: cp FAKE/tools/NuGet.Core.dll .
