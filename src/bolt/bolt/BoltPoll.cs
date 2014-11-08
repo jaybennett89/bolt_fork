@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using UnityEngine;
 
 [BoltExecutionOrder(-10000)]
 public class BoltPoll : MonoBehaviour {
@@ -7,7 +8,15 @@ public class BoltPoll : MonoBehaviour {
   }
 
   protected void FixedUpdate () {
-    BoltCore.FixedUpdate();
+    BoltCore._timer.Stop();
+    BoltCore._timer.Reset();
+    BoltCore._timer.Start();
+
+    BoltCore.Poll();
+
+    BoltCore._timer.Stop();
+
+    Bolt.DebugInfo.PollTime = (int)BoltCore._timer.ElapsedMilliseconds;
   }
 
   protected void OnDisable () {

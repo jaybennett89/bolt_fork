@@ -265,6 +265,9 @@ namespace Bolt {
       if (PriorityCalculator == null) {
         PriorityCalculator = this;
       }
+      else {
+        BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
+      }
 
       // set instance id
       InstanceId = new InstanceId(++_instanceIdCounter);
@@ -471,6 +474,10 @@ namespace Bolt {
 
     public static bool operator !=(Entity a, Entity b) {
       return ReferenceEquals(a, b) == false;
+    }
+
+    bool IPriorityCalculator.Always {
+      get { return false; }
     }
 
     float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {

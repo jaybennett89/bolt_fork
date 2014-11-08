@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UdpKit;
 
 namespace Bolt {
@@ -199,7 +196,7 @@ namespace Bolt {
       packet.stats.EventBits = packet.stream.Position - startPos;
     }
 
-    bool PackEvent(Event ev, UdpStream stream, uint sequence) {
+    bool PackEvent(Event ev, UdpPacket stream, uint sequence) {
       stream.WriteContinueMarker();
 
       // type id of this event
@@ -253,7 +250,7 @@ namespace Bolt {
       packet.stats.EventBits = packet.stream.Position - startPtr;
     }
 
-    Event ReadEvent(UdpStream stream, ref uint sequence) {
+    Event ReadEvent(UdpPacket stream, ref uint sequence) {
       Event ev;
 
       ev = Factory.NewEvent(TypeId.Read(stream));

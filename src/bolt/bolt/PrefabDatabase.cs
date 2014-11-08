@@ -3,10 +3,21 @@ using UE = UnityEngine;
 
 namespace Bolt {
   public class PrefabDatabase : UE.ScriptableObject {
-    static Dictionary<Bolt.PrefabId, UE.GameObject> lookup;
+    static PrefabDatabase _instance;
+    static Dictionary<Bolt.PrefabId, UE.GameObject> _lookup;
 
-    static public PrefabDatabase Instance {
-      get { return UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase)) as PrefabDatabase; }
+    public static PrefabDatabase Instance {
+      get {
+        if (_instance == null) {
+          _instance = (PrefabDatabase)UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase));
+
+          if (_instance == null) {
+            BoltLog.Error("Could not find resource 'BoltPrefabDatabase'");
+          }
+        }
+
+        return _instance;
+      }
     }
 
     [UE.SerializeField]
@@ -15,20 +26,40 @@ namespace Bolt {
     [UE.SerializeField]
     internal UE.GameObject[] Prefabs = new UE.GameObject[0];
 
-    internal static UE.GameObject Find(Bolt.PrefabId id) {
-      if (lookup == null) {
-        lookup = new Dictionary<Bolt.PrefabId, UE.GameObject>();
+    internal static void BuildCache() {
+      LoadInstance();
+      UpdateLookup();
+    }
 
-        for (int i = 1; i < Instance.Prefabs.Length; ++i) {
-          if (Instance.Prefabs[i]) {
-            lookup.Add(Instance.Prefabs[i].GetComponent<BoltEntity>().prefabId, Instance.Prefabs[i]);
+    static void UpdateLookup() {
+      _lookup = new Dictionary<Bolt.PrefabId, UE.GameObject>();
+
+      for (int i = 1; i < Instance.Prefabs.Length; ++i) {
+        if (Instance.Prefabs[i]) {
+          var prefabId = Instance.Prefabs[i].GetComponent<BoltEntity>().prefabId;
+
+          if (_lookup.ContainsKey(prefabId)) {
+            throw new BoltException("Duplicate {0} for {1} and {2}", prefabId, Instance.Prefabs[i].GetComponent<BoltEntity>(), _lookup[prefabId].GetComponent<BoltEntity>());
           }
+
+          _lookup.Add(Instance.Prefabs[i].GetComponent<BoltEntity>().prefabId, Instance.Prefabs[i]);
         }
+      }
+    }
+
+    static void LoadInstance() {
+      _instance = (PrefabDatabase)UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase));
+    }
+
+    internal static UE.GameObject Find(Bolt.PrefabId id) {
+      if (_lookup == null || _instance == null) {
+        LoadInstance();
+        UpdateLookup();
       }
 
       UE.GameObject prefab;
 
-      if (lookup.TryGetValue(id, out prefab)) {
+      if (_lookup.TryGetValue(id, out prefab)) {
         return prefab;
       }
       else {

@@ -32,11 +32,11 @@ namespace Bolt {
       return f;
     }
 
-    public void Pack(UdpStream stream, int value) {
+    public void Pack(UdpPacket stream, int value) {
       stream.WriteInt(value + _shift, _bits);
     }
 
-    public int Read(UdpStream stream) {
+    public int Read(UdpPacket stream) {
       return stream.ReadInt(_bits) + _shift;
     }
   }

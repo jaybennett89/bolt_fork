@@ -18,11 +18,13 @@ public static class BoltLog {
   public class File : IWriter {
     volatile bool running = true;
 
+    bool isServer;
     Thread thread;
     AutoResetEvent threadEvent;
     Queue<string> threadQueue;
 
-    public File() {
+    public File(bool server) {
+      isServer = server;
       threadEvent = new AutoResetEvent(false);
       threadQueue = new Queue<string>(1024);
 
@@ -63,8 +65,8 @@ public static class BoltLog {
         var n = DateTime.Now;
 
         string logFile;
-        logFile = "Bolt_Log_{0}Y-{1}M-{2}D_{3}H{4}M{5}S_{6}MS.txt";
-        logFile = string.Format(logFile, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond);
+        logFile = "Bolt_Log_{7}_{0}Y-{1}M-{2}D_{3}H{4}M{5}S_{6}MS.txt";
+        logFile = string.Format(logFile, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond, isServer ? "SERVER" : "CLIENT");
 
         var stream = IO.File.Open(logFile, IO.FileMode.Create);
         var streamWriter = new IO.StreamWriter(stream);
@@ -100,19 +102,19 @@ public static class BoltLog {
 
   public class Console : IWriter {
     public void Info(string message) {
-      BoltConsole.Write(message, UE.Color.white);
+      BoltConsole.Write(message, BoltGUI.Sky);
     }
 
     public void Debug(string message) {
-      BoltConsole.Write(message, UE.Color.green);
+      BoltConsole.Write(message, BoltGUI.Green);
     }
 
     public void Warn(string message) {
-      BoltConsole.Write(message, UE.Color.yellow);
+      BoltConsole.Write(message, BoltGUI.Orange);
     }
 
     public void Error(string message) {
-      BoltConsole.Write(message, UE.Color.red);
+      BoltConsole.Write(message, BoltGUI.Error);
     }
 
     public void Dispose() {
@@ -183,124 +185,157 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Info(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Info(message);
       }
     }
   }
 
+  [Conditional("LOG")]
   public static void Info(object message) {
     Info(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0) {
     Info(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0, object arg1) {
     Info(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0, object arg1, object arg2) {
     Info(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, params object[] args) {
     Info(string.Format(message, args));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Debug(message);
       }
     }
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(object message) {
     Debug(message.ToString());
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0) {
     Debug(string.Format(message, arg0));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0, object arg1) {
     Debug(string.Format(message, arg0, arg1));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0, object arg1, object arg2) {
     Debug(string.Format(message, arg0, arg1, arg2));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, params object[] args) {
     Debug(string.Format(message, args));
   }
 
+  static void VerifyOneWriter() {
+    if (_writers.Count == 0) {
+      //_writers.Add(new Unity());
+    }
+  }
+
+  [Conditional("LOG")]
   public static void Warn(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Warn(message);
       }
     }
   }
 
+  [Conditional("LOG")]
   public static void Warn(object message) {
     Warn(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0) {
     Warn(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0, object arg1) {
     Warn(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0, object arg1, object arg2) {
     Warn(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, params object[] args) {
     Warn(string.Format(message, args));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message) {
     lock (_lock) {
+      VerifyOneWriter();
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Error(message);
       }
     }
   }
 
+  [Conditional("LOG")]
   public static void Error(object message) {
     Error(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0) {
     Error(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0, object arg1) {
     Error(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0, object arg1, object arg2) {
     Error(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, params object[] args) {
     Error(string.Format(message, args));
   }
 
+  [Conditional("LOG")]
   public static void Exception(Exception exception) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {

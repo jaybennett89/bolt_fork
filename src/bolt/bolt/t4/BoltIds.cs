@@ -2,6 +2,7 @@
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct NetId {
     public class Comparer : IComparer<NetId> {
       public static readonly Comparer Instance = new Comparer();
@@ -31,7 +32,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal NetId(int value) {
       Value = value;
@@ -53,19 +54,19 @@ namespace Bolt {
       return string.Format("[NetId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static NetId Read(UdpKit.UdpStream stream, int bits) {
+	public static NetId Read(UdpKit.UdpPacket stream, int bits) {
 		return new NetId(stream.ReadInt(bits));
 	}
 	
-	public static NetId Read(UdpKit.UdpStream stream) {
+	public static NetId Read(UdpKit.UdpPacket stream) {
 		return new NetId(stream.ReadInt());
 	}
 
@@ -81,6 +82,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct InstanceId {
     public class Comparer : IComparer<InstanceId> {
       public static readonly Comparer Instance = new Comparer();
@@ -110,7 +112,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal InstanceId(int value) {
       Value = value;
@@ -132,19 +134,19 @@ namespace Bolt {
       return string.Format("[InstanceId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static InstanceId Read(UdpKit.UdpStream stream, int bits) {
+	public static InstanceId Read(UdpKit.UdpPacket stream, int bits) {
 		return new InstanceId(stream.ReadInt(bits));
 	}
 	
-	public static InstanceId Read(UdpKit.UdpStream stream) {
+	public static InstanceId Read(UdpKit.UdpPacket stream) {
 		return new InstanceId(stream.ReadInt());
 	}
 
@@ -160,6 +162,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct PrefabId {
     public class Comparer : IComparer<PrefabId> {
       public static readonly Comparer Instance = new Comparer();
@@ -189,7 +192,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal PrefabId(int value) {
       Value = value;
@@ -211,19 +214,19 @@ namespace Bolt {
       return string.Format("[PrefabId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static PrefabId Read(UdpKit.UdpStream stream, int bits) {
+	public static PrefabId Read(UdpKit.UdpPacket stream, int bits) {
 		return new PrefabId(stream.ReadInt(bits));
 	}
 	
-	public static PrefabId Read(UdpKit.UdpStream stream) {
+	public static PrefabId Read(UdpKit.UdpPacket stream) {
 		return new PrefabId(stream.ReadInt());
 	}
 
@@ -239,6 +242,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct TypeId {
     public class Comparer : IComparer<TypeId> {
       public static readonly Comparer Instance = new Comparer();
@@ -268,7 +272,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal TypeId(int value) {
       Value = value;
@@ -290,19 +294,19 @@ namespace Bolt {
       return string.Format("[TypeId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static TypeId Read(UdpKit.UdpStream stream, int bits) {
+	public static TypeId Read(UdpKit.UdpPacket stream, int bits) {
 		return new TypeId(stream.ReadInt(bits));
 	}
 	
-	public static TypeId Read(UdpKit.UdpStream stream) {
+	public static TypeId Read(UdpKit.UdpPacket stream) {
 		return new TypeId(stream.ReadInt());
 	}
 
@@ -318,6 +322,7 @@ namespace Bolt {
 
 namespace Bolt {
 [Documentation]
+[System.Serializable]
   public struct SceneId {
     public class Comparer : IComparer<SceneId> {
       public static readonly Comparer Instance = new Comparer();
@@ -347,7 +352,7 @@ namespace Bolt {
       }
     }
 
-    public readonly int Value;
+    public int Value;
 
     internal SceneId(int value) {
       Value = value;
@@ -369,19 +374,19 @@ namespace Bolt {
       return string.Format("[SceneId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpStream stream, int bits) {
+	public void Pack(UdpKit.UdpPacket stream, int bits) {
 		stream.WriteInt(Value, bits);
 	}
 	
-	public void Pack(UdpKit.UdpStream stream) {
+	public void Pack(UdpKit.UdpPacket stream) {
 		stream.WriteInt(Value);
 	}
 
-	public static SceneId Read(UdpKit.UdpStream stream, int bits) {
+	public static SceneId Read(UdpKit.UdpPacket stream, int bits) {
 		return new SceneId(stream.ReadInt(bits));
 	}
 	
-	public static SceneId Read(UdpKit.UdpStream stream) {
+	public static SceneId Read(UdpKit.UdpPacket stream) {
 		return new SceneId(stream.ReadInt());
 	}
 

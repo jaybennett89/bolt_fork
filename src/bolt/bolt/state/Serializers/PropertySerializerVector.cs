@@ -26,8 +26,11 @@ namespace Bolt {
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
           case SmoothingAlgorithms.Extrapolation:
-            float snapMagnitude = SmoothingSettings.SnapMagnitude == 0f ? 1 << 16 : SmoothingSettings.SnapMagnitude;
-            f.Data.PackVector3(Settings.ByteOffset, Bolt.Math.InterpolateVector(state.Frames, Settings.ByteOffset + 12, state.Entity.Frame, snapMagnitude));
+            var snap = false;
+            var snapMagnitude = SmoothingSettings.SnapMagnitude == 0f ? 1 << 16 : SmoothingSettings.SnapMagnitude;
+
+            f.Data.PackVector3(Settings.ByteOffset, Bolt.Math.InterpolateVector(state.Frames, Settings.ByteOffset + 12, state.Entity.Frame, snapMagnitude, ref snap));
+
             break;
         }
       }
@@ -42,12 +45,12 @@ namespace Bolt {
       return VectorCompression.BitsRequired;
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       VectorCompression.Pack(stream, Blit.ReadVector3(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Blit.PackVector3(data, Settings.ByteOffset, VectorCompression.Read(stream));
     }
 

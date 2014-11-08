@@ -31,7 +31,7 @@ namespace Bolt {
       };
     }
 
-    public void Pack(UdpStream stream, UE.Quaternion value) {
+    public void Pack(UdpPacket stream, UE.Quaternion value) {
       if (QuaternionMode) {
         Quaternion.Pack(stream, value.x);
         Quaternion.Pack(stream, value.y);
@@ -43,7 +43,7 @@ namespace Bolt {
       }
     }
 
-    public UE.Quaternion Read(UdpStream stream) {
+    public UE.Quaternion Read(UdpPacket stream) {
       UE.Quaternion q;
 
       if (QuaternionMode) {

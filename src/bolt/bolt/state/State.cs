@@ -50,6 +50,9 @@ namespace Bolt {
     /// <param name="path">The path of the property</param>
     /// <param name="callback">The callback delegate to remove</param>
     void RemoveCallback(string path, PropertyCallbackSimple callback);
+
+
+    void SetDynamic(string property, object value);
   }
 
   public interface IStateModifier : IDisposable {
@@ -66,6 +69,10 @@ namespace Bolt {
       public int PacketMaxBits;
       public int PacketMaxProperties;
 
+      public Block[] PropertyBlocks;
+      public int[] PropertyBlocksResult;
+
+      public Stack<Frame> FramePool;
       public BitArray[] PropertyFilters;
       public BitArray PropertyControllerFilter;
       public PropertySerializer[] PropertySerializers;
@@ -75,6 +82,8 @@ namespace Bolt {
 
     public class Frame : IBoltListNode {
       public int Number;
+      public bool Pooled;
+      public bool Diffed;
       public State State;
       public object[] Objects;
       public readonly byte[] Data;
@@ -156,6 +165,7 @@ namespace Bolt {
 
     public void DebugInfo() {
       if (BoltNetworkInternal.DebugDrawer != null) {
+        BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
         BoltNetworkInternal.DebugDrawer.LabelField("State Type", Factory.GetFactory(TypeId).TypeObject);
         BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count.ToString());
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
@@ -228,11 +238,11 @@ namespace Bolt {
 
         callbacksList.Add(callback);
       }
-      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, CallbacksSimple.Select(x => x.Value.Count).Sum());
+      //BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, CallbacksSimple.Select(x => x.Value.Count).Sum());
     }
 
     public void AddCallback(string path, PropertyCallback callback) {
-      BoltLog.Debug("Adding callback for {0}", path);
+      //BoltLog.Debug("Adding callback for {0}", path);
 
       if (VerifyCallbackPath(path)) {
         List<PropertyCallback> callbacksList;
@@ -244,7 +254,7 @@ namespace Bolt {
         callbacksList.Add(callback);
       }
 
-      BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, Callbacks.Select(x => x.Value.Count).Sum());
+      //BoltLog.Debug("Added callbacks for '{0}', total callbacks: {1}", path, Callbacks.Select(x => x.Value.Count).Sum());
     }
 
     public void RemoveCallback(string path, PropertyCallback callback) {
@@ -335,6 +345,10 @@ namespace Bolt {
     }
 
     void InvokeCallbacks() {
+      if (Frames.first.Diffed) {
+        return;
+      }
+
       // calculate diff mask
       var diff = Diff(Frames.first, DiffFrame);
 
@@ -354,6 +368,8 @@ namespace Bolt {
           InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
         }
       }
+
+      Frames.first.Diffed = (Entity.IsOwner == false) && (Entity.HasPredictedControl == false);
     }
 
     void InvokeCallbacksForProperty(PropertySerializer p) {
@@ -379,7 +395,7 @@ namespace Bolt {
       }
     }
 
-    public int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env) {
+    public int Pack(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope env) {
       BitArray filter = GetFilter(connection, env.Proxy);
 
       int tempCount = 0;
@@ -391,7 +407,7 @@ namespace Bolt {
         Assert.True(proxyPriority[i].PropertyIndex == i);
 
         // if this property is set both in our filter and the proxy mask we can consider it for sending
-        if (BitArray.SetInBoth(filter, env.Proxy.Mask, i)) {
+        if (env.Proxy.Mask.IsSet(proxyPriority[i].PropertyIndex)) {
 
           // increment priority for this property
           proxyPriority[i].PriorityValue += MetaData.PropertySerializers[i].StateSettings.Priority;
@@ -425,7 +441,7 @@ namespace Bolt {
       return env.Written.Count;
     }
 
-    void PackProperties(BoltConnection connection, UdpStream stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
+    void PackProperties(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope env, Priority[] priority, int priorityCount) {
       int propertyCountPtr = stream.Ptr;
       stream.WriteByte(0, PacketMaxPropertiesBits);
 
@@ -483,10 +499,10 @@ namespace Bolt {
       Assert.True(env.Written.Count <= MetaData.PacketMaxProperties);
 
       // write the amount of properties
-      UdpStream.WriteByteAt(stream.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
+      UdpPacket.WriteByteAt(stream.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
     }
 
-    public void Read(BoltConnection connection, UdpStream stream, int frameNumber) {
+    public void Read(BoltConnection connection, UdpPacket stream, int frameNumber) {
       int count = stream.ReadByte(PacketMaxPropertiesBits);
       var frame = default(Frame);
 
@@ -527,15 +543,21 @@ namespace Bolt {
     BitArray Diff(Frame a, Frame b) {
       DiffMask.Clear();
 
-      int L = MetaData.PropertySerializers.Length;
+      int count = Blit.DiffNative(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
 
-      for (int i = 0; i < L; ++i) {
-        PropertySerializer s = MetaData.PropertySerializers[i];
-
-        if (Blit.Diff(a.Data, b.Data, s.Settings.ByteOffset, s.StateSettings.ByteLength)) {
-          DiffMask.Set(i);
-        }
+      for (int i = 0; i < count; ++i) {
+        DiffMask.Set(MetaData.PropertyBlocksResult[i]);
       }
+
+      //int L = MetaData.PropertySerializers.Length;
+
+      //for (int i = 0; i < L; ++i) {
+      //  PropertySerializer s = MetaData.PropertySerializers[i];
+
+      //  if (Blit.DiffNative(a.Data, b.Data, s.Settings.ByteOffset, s.StateSettings.ByteLength)) {
+      //    DiffMask.Set(i);
+      //  }
+      //}
 
       return DiffMask;
     }
@@ -543,7 +565,23 @@ namespace Bolt {
     Frame AllocFrame(int number) {
       Frame f;
 
-      f = new Frame(number, MetaData.FrameSize);
+      if (MetaData.FramePool.Count > 0) {
+        f = MetaData.FramePool.Pop();
+
+        Array.Clear(f.Data, 0, f.Data.Length);
+        Assert.True(f.Pooled);
+        Assert.True(f.Data.Length == MetaData.FrameSize);
+
+        f.Pooled = false;
+      }
+      else {
+        f = new Frame(number, MetaData.FrameSize);
+        f.Pooled = false;
+      }
+
+
+      f.Diffed = false;
+      f.Number = number;
       f.Objects = PropertyObjects;
       f.State = this;
 
@@ -551,15 +589,22 @@ namespace Bolt {
     }
 
     void FreeFrame(Frame frame) {
-
+      Assert.False(frame.Pooled);
+      MetaData.FramePool.Push(frame);
+      frame.Pooled = true;
     }
 
     BitArray CalculateFilter(Filter filter) {
       return FullMask;
     }
 
-
-
-
+    public void SetDynamic(string property, object value) {
+      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+        if (MetaData.PropertySerializers[i].StateSettings.PropertyPath == property) {
+          MetaData.PropertySerializers[i].SetDynamic(Frames.first, value);
+          break;
+        }
+      }
+    }
   }
 }

@@ -9,11 +9,11 @@ partial class EntityChannel {
 
     #region sequence
 
-    static void WriteSequence(UdpStream stream, ushort sequence) {
+    static void WriteSequence(UdpPacket stream, ushort sequence) {
       stream.WriteUShort(sequence, Command.SEQ_BITS);
     }
 
-    static ushort ReadSequence(UdpStream stream) {
+    static ushort ReadSequence(UdpPacket stream) {
       return stream.ReadUShort(Command.SEQ_BITS);
     }
 
@@ -309,5 +309,6 @@ partial class EntityChannel {
       }
     }
   }
+
 
 }

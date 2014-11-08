@@ -40,12 +40,12 @@ namespace Bolt {
       return QuaternionCompression.BitsRequired;
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       QuaternionCompression.Pack(stream, Blit.ReadQuaternion(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Blit.PackQuaternion(data, Settings.ByteOffset, QuaternionCompression.Read(stream));
     }
 

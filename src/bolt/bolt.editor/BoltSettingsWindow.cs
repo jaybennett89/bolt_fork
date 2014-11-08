@@ -24,7 +24,7 @@ public class BoltSettingsWindow : EditorWindow {
 
   void Replication() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
-
+     
     BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
       settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
     });
@@ -103,8 +103,8 @@ public class BoltSettingsWindow : EditorWindow {
       EditorGUILayout.BeginVertical();
       EditorGUILayout.BeginHorizontal();
 
-      var dllPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.dll");
-      var bytesPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.bytes");
+      var dllPath = BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.dll");
+      var bytesPath = BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "assemblies", "upnp", "Mono.Nat.bytes");
       var label = new GUIStyle(GUI.skin.label);
 
       Color c;
@@ -143,7 +143,7 @@ public class BoltSettingsWindow : EditorWindow {
     File.Move(a, b);
 
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-    AssetDatabase.ImportAsset(BoltEditorUtils.MakeAssetPath(b));
+    AssetDatabase.ImportAsset(BoltEditorUtilsInternal.MakeAssetPath(b));
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
   }
 
@@ -212,6 +212,10 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Label("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
+    });
+
+    BoltAssetEditorGUI.Label("Show Debug Info", () => {
+      settings.showDebugInfo = EditorGUILayout.Toggle(settings.showDebugInfo);
     });
 
     BoltAssetEditorGUI.Label("Editor Skin", () => {

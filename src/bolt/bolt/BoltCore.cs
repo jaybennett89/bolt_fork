@@ -17,8 +17,8 @@ public enum BoltNetworkModes {
 
 
 internal static class BoltCore {
-
   static UdpSocket _udpSocket;
+  static internal Stopwatch _timer = new Stopwatch();
   static internal SceneLoadState _localSceneLoading;
 
   static internal bool _canReceiveEntities = true;
@@ -225,19 +225,24 @@ internal static class BoltCore {
       return null;
     }
 
+    if (be.serializerGuid == UniqueId.None) {
+      BoltLog.Error("Prefab '{0}' does not have a serializer assigned", prefab.name);
+      return null;
+    }
+
     return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null);
   }
 
   static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
     // prefab checks
     GameObject prefab = PrefabPool.LoadPrefab(prefabId);
-    BoltEntity be = prefab.GetComponent<BoltEntity>();
+    BoltEntity entity = prefab.GetComponent<BoltEntity>();
 
-    if (isClient && (be._allowInstantiateOnClient == false)) {
+    if (isClient && (entity._allowInstantiateOnClient == false)) {
       throw new BoltException("This prefab is not allowed to be instantiated on clients");
     }
 
-    if (be._prefabId != prefabId.Value) {
+    if (entity._prefabId != prefabId.Value) {
       throw new BoltException("PrefabId for BoltEntity component did not return the same value as prefabId passed in as argument to Instantiate");
     }
 
@@ -450,22 +455,16 @@ internal static class BoltCore {
           BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
           break;
 
-        case UdpEventType.StreamReceived:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketReceived(ev.Stream);
-          }
+        case UdpEventType.PacketLost:
+          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Packet.UserToken);
           break;
 
-        case UdpEventType.StreamDelivered:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Stream.UserToken);
-          }
+        case UdpEventType.PacketDelivered:
+          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Packet.UserToken);
           break;
 
-        case UdpEventType.StreamLost:
-          using (ev.Stream) {
-            ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Stream.UserToken);
-          }
+        case UdpEventType.PacketReceived:
+          ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
           break;
       }
     }
@@ -529,32 +528,40 @@ internal static class BoltCore {
         }
       }
 
-      if ((_frame % localSendRate) == 0) {
-        // send data on all connections
+      // send data on all connections
+      {
         var it = _connections.GetIterator();
+        var localNotLoadingAndCanReceive = (BoltSceneLoader.IsLoading == false) && _canReceiveEntities;
 
         while (it.Next()) {
-          it.val.Send();
+          var remoteNotLoadingAndCanReceive = (it.val.isLoadingMap == false) && it.val._canReceiveEntities;
+
+          // if both connection and local can receive entities, use local sendrate
+          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % localSendRate) == 0)) {
+            it.val.Send();
+          }
+
+          // if not, only send 1 packet/second
+          else if ((_frame % framesPerSecond) == 0) {
+            it.val.Send();
+          }
         }
       }
     }
   }
 
   static void UpdateUPnP() {
-    if ((_frame % 60 == 0) && (BoltNetworkInternal.NatCommunicator != null) && BoltNetworkInternal.NatCommunicator.IsEnabled) {
-      UPnP.Update();
-
+    if ((_frame % 60 == 0) && UPnP.Update()) {
       INatDevice device;
       IPortMapping portMapping;
 
       while (UPnP.NextPortStatusChange(out device, out portMapping)) {
         BoltInternal.GlobalEventListenerBase.PortMappingChangedInvoke(device, portMapping);
       }
-
     }
   }
 
-  internal static void FixedUpdate() {
+  internal static void Poll() {
     if (hasSocket) {
       if (UE.Time.timeScale != 1f) {
         BoltLog.Error("Time.timeScale is not 1, value: {0}", UE.Time.timeScale);
@@ -712,8 +719,16 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
+    PrefabDatabase.BuildCache();
+
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
+
+    DebugInfo.ignoreList = new HashSet<InstanceId>();
+
+    if (BoltRuntimeSettings.instance.showDebugInfo) {
+      DebugInfo.Show();
+    }
 
     // close any existing socket
     Shutdown();
@@ -733,7 +748,7 @@ internal static class BoltCore {
         case RuntimePlatform.WindowsEditor:
         case RuntimePlatform.WindowsPlayer:
         case RuntimePlatform.OSXPlayer:
-          BoltLog.Add(new BoltLog.File());
+          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Server));
           break;
       }
     }
@@ -771,6 +786,7 @@ internal static class BoltCore {
 
     // setup udpkit configuration
     _udpConfig = new UdpConfig();
+    _udpConfig.PacketWindow = 512;
     _udpConfig.ConnectionTimeout = (uint)config.connectionTimeout;
     _udpConfig.ConnectRequestAttempts = (uint)config.connectionRequestAttempts;
     _udpConfig.ConnectRequestTimeout = (uint)config.connectionRequestTimeout;
@@ -798,6 +814,7 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
+    //_udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
     _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
     _udpSocket.Start(endpoint);
 

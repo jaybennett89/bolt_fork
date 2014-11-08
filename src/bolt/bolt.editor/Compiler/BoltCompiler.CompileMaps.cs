@@ -29,7 +29,7 @@ partial class BoltCompiler {
 
         scenes.Add(new Scene {
           Name = name,
-          Identifier = BoltEditorUtils.CSharpIdentifier(name)
+          Identifier = BoltEditorUtilsInternal.CSharpIdentifier(name)
         });
       }
     }

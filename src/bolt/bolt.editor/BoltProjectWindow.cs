@@ -141,14 +141,25 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.EndScrollView();
     GUILayout.EndArea();
 
-    GUILayout.BeginArea(new Rect(0, position.height - 16, position.width, 16));
+    GUILayout.BeginArea(new Rect(4, position.height - 20, position.width - 8, 16));
     Footer();
     GUILayout.EndArea();
   }
 
   void Footer() {
+    GUILayout.BeginHorizontal();
+
     var version = Assembly.GetExecutingAssembly().GetName().Version;
     GUILayout.Label(string.Format("{0} ({1})", version, BoltCore.isDebugMode ? "DEBUG" : "RELEASE"), EditorStyles.miniLabel);
+
+    GUILayout.FlexibleSpace();
+
+    if (BoltEditorGUI.Button("mc_save")) {
+      Save(true);
+      Debug.Log("Saving project... " + ProjectPath);
+    }
+
+    GUILayout.EndHorizontal();
   }
 
   void OverlayIcon(string icon) {

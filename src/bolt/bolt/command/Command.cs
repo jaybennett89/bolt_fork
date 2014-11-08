@@ -100,25 +100,25 @@ namespace Bolt {
       return clone;
     }
 
-    internal void PackInput(BoltConnection connection, UdpStream stream) {
+    internal void PackInput(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.InputSerializers.Length; ++i) {
         Meta.InputSerializers[i].CommandPack(this, InputData, connection, stream);
       }
     }
 
-    internal void ReadInput(BoltConnection connection, UdpStream stream) {
+    internal void ReadInput(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.InputSerializers.Length; ++i) {
         Meta.InputSerializers[i].CommandRead(this, InputData, connection, stream);
       }
     }
 
-    internal void PackResult(BoltConnection connection, UdpStream stream) {
+    internal void PackResult(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
         Meta.ResultSerializers[i].CommandPack(this, ResultData, connection, stream);
       }
     }
 
-    internal void ReadResult(BoltConnection connection, byte[] array, UdpStream stream) {
+    internal void ReadResult(BoltConnection connection, byte[] array, UdpPacket stream) {
       for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
         Meta.ResultSerializers[i].CommandRead(this, array, connection, stream);
       }

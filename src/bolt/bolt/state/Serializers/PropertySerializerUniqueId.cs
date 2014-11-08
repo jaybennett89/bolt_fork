@@ -10,7 +10,7 @@ namespace Bolt {
       return Blit.ReadUniqueId(state.Frames.first.Data, Settings.ByteOffset);
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       Bolt.UniqueId id = Blit.ReadUniqueId(data, Settings.ByteOffset);
       stream.WriteUInt(id.uint0);
       stream.WriteUInt(id.uint1);
@@ -19,7 +19,7 @@ namespace Bolt {
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Bolt.UniqueId id = new UniqueId();
       id.uint0 = stream.ReadUInt();
       id.uint1 = stream.ReadUInt();

@@ -11,7 +11,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-static class BoltEditorUtils {
+static class BoltEditorUtilsInternal {
   public static bool isEditorPlaying {
     get { return EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPaused; }
   }

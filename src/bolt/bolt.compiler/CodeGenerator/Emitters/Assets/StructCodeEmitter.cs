@@ -14,7 +14,7 @@ namespace Bolt.Compiler {
 
     public void EmitStruct() {
       if (Decorator.BasedOnState && Decorator.SourceState.Definition.IsAbstract) {
-        return;
+        return; 
       }
 
       CodeTypeDeclaration type;

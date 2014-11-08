@@ -153,6 +153,10 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// How many updates have been skipped for the entity to this connection
   /// </summary>
+  public float GetCurrentPriority(BoltEntity en) {
+    return _entityChannel.GetPriority(en.Entity);
+  }
+
   public int GetSkippedUpdates(BoltEntity en) {
     return _entityChannel.GetSkippedUpdates(en.Entity);
   }
@@ -211,6 +215,8 @@ public class BoltConnection : BoltObject {
 
     return _framesToStep > 0;
   }
+
+  int notifyPacketNumber = 0;
 
   internal void AdjustRemoteFrame() {
     if (_packetsReceived == 0)
@@ -313,7 +319,8 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketReceived(UdpStream stream) {
+  //internal void PacketReceived(BoltPacket packet) {
+  internal void PacketReceived(UdpPacket stream) {
     try {
       BoltPacket packet = new BoltPacket();
       packet.stream = stream;
@@ -342,20 +349,35 @@ public class BoltConnection : BoltObject {
     catch (Exception exn) {
       BoltLog.Exception(exn);
       BoltLog.Error("exception thrown while unpacking data from {0}, disconnecting", udpConnection.RemoteEndPoint);
-
       Disconnect();
     }
   }
 
   internal void PacketDelivered(BoltPacket packet) {
-    for (int i = 0; i < _channels.Length; ++i) {
-      _channels[i].Delivered(packet);
+    try {
+      Assert.True((notifyPacketNumber + 1) == packet.number, "notify packet number did not match");
+      notifyPacketNumber = packet.number;
+      for (int i = 0; i < _channels.Length; ++i) {
+        _channels[i].Delivered(packet);
+      }
+    }
+    catch (Exception exn) {
+      BoltLog.Exception(exn);
+      BoltLog.Error("exception thrown while handling delivered packet to {0}", udpConnection.RemoteEndPoint);
     }
   }
 
   internal void PacketLost(BoltPacket packet) {
-    for (int i = 0; i < _channels.Length; ++i) {
-      _channels[i].Lost(packet);
+    try {
+      Assert.True((notifyPacketNumber + 1) == packet.number, "notify packet number did not match");
+      notifyPacketNumber = packet.number;
+      for (int i = 0; i < _channels.Length; ++i) {
+        _channels[i].Lost(packet);
+      }
+    }
+    catch (Exception exn) {
+      BoltLog.Exception(exn);
+      BoltLog.Error("exception thrown while handling lost packet to {0}", udpConnection.RemoteEndPoint);
     }
   }
 

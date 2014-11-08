@@ -62,9 +62,6 @@ public class BoltConsole : MonoBehaviour {
     _lines.Enqueue(new Line { text = line, color = color });
   }
 
-  GUIStyle text;
-  Texture2D background;
-
   [SerializeField]
   float consoleHeight = 0.5f;
 
@@ -96,19 +93,6 @@ public class BoltConsole : MonoBehaviour {
         fontSize *= 2;
         lineHeight *= 2;
         break;
-    }
-  }
-
-  void OnDestroy() {
-    if (background) {
-      if (Application.isEditor) {
-        Texture2D.DestroyImmediate(background);
-      }
-      else {
-        Texture2D.Destroy(background);
-      }
-
-      background = null;
     }
   }
 
@@ -145,37 +129,13 @@ public class BoltConsole : MonoBehaviour {
     if (visible == false) {
       return;
     }
-
-    if (!background) {
-      background = new Texture2D(2, 2);
-      background.SetPixels(
-          new Color[] {
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                }
-      );
-    }
-
-    if (text == null) {
-      text = new GUIStyle();
-      text.normal.textColor = Color.white;
-      text.fontStyle = FontStyle.Bold;
-      text.fontSize = fontSize;
-      text.alignment = TextAnchor.UpperLeft;
-      text.clipping = TextClipping.Clip;
-    }
-
     LinesRefresh();
 
     // how many lines to render at most
     int lines = Mathf.Max(1, ((int)(Screen.height * consoleHeight)) / lineHeight);
 
     // background
-    GUI.color = new Color(0, 0, 0, backgroundTransparency);
-    GUI.DrawTexture(new Rect(inset, inset, Screen.width - (inset * 2), ((lines - 1) * lineHeight) + (padding * 2)), background);
-    GUI.color = Color.white;
+    Bolt.DebugInfo.DrawBackground(new Rect(inset, inset, Screen.width - (inset * 2), ((lines - 1) * lineHeight) + (padding * 2)));
 
     // draw lines
     for (int i = 0; i < lines; ++i) {
@@ -183,9 +143,7 @@ public class BoltConsole : MonoBehaviour {
 
       if (i < _linesRender.count) {
         Line l = _linesRender[_linesRender.count - m + i];
-        GUI.color = l.color;
-        GUI.Label(GetRect(i), l.text, text);
-        GUI.color = Color.white;
+        GUI.Label(GetRect(i), l.text, Bolt.DebugInfo.LabelStyleColor(l.color));
       }
     }
   }

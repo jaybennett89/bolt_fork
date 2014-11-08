@@ -20,7 +20,7 @@ namespace Bolt {
       return EntityProxy.ID_BIT_COUNT + 1;
     }
 
-    protected override bool Pack(byte[] data,  BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data,  BoltConnection connection, UdpPacket stream) {
       Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, Settings.ByteOffset)));
 
       if ((entity != null) && (connection._entityChannel.ExistsOnRemote(entity) == false)) {
@@ -31,7 +31,7 @@ namespace Bolt {
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
       Bolt.Entity entity = stream.ReadEntity(connection);
 
       if (entity) {

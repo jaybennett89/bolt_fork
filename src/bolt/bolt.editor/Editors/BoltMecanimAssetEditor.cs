@@ -27,7 +27,7 @@ public class BoltMecanimAssetEditor : Editor {
     });
 
     if (asset.controller) {
-      BoltEditorUtils.SynchronizeWithController(asset);
+      BoltEditorUtilsInternal.SynchronizeWithController(asset);
 
       // display editor
       BoltAssetEditorGUI.HeaderPropertyList("properties", "Properties", ref asset.properties);

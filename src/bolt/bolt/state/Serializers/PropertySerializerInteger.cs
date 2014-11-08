@@ -29,12 +29,12 @@ namespace Bolt {
       Blit.PackI32(state.Frames.first.Data, Settings.ByteOffset, state.Animator.GetInteger(Settings.PropertyName));
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpStream stream) {
+    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
       IntCompression.Pack(stream, Blit.ReadI32(data, Settings.ByteOffset));
       return true;
     }
 
-    protected override void Read(byte[] data,BoltConnection connection, UdpStream stream) {
+    protected override void Read(byte[] data,BoltConnection connection, UdpPacket stream) {
       Blit.PackI32(data, Settings.ByteOffset, IntCompression.Read(stream));
     }
   }

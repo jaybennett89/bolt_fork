@@ -12,7 +12,7 @@ public abstract class BoltSingletonPrefab<T> : MonoBehaviour where T : MonoBehav
     }
   }
 
-  public static void Instantiate() {
+  public static void Instantiate() { 
     if (!_instance) {
       Object obj = FindObjectOfType(typeof(T));
 

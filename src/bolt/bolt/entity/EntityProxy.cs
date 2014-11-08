@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Bolt;
 
 internal class EntityProxyEnvelope : BoltObject, IDisposable {
-  public int Frame;
+  public int PacketNumber;
   public ProxyFlags Flags;
   public EntityProxy Proxy = null;
   public List<Priority> Written = new List<Priority>();
@@ -68,7 +68,7 @@ internal partial class EntityProxy : BoltObject {
 
   public Bolt.Entity Entity;
   public BoltConnection Connection;
-  public BoltRingBuffer<EntityProxyEnvelope> Envelopes;
+  public Queue<EntityProxyEnvelope> Envelopes;
 
   public int Skipped;
   public float Priority;
@@ -76,7 +76,7 @@ internal partial class EntityProxy : BoltObject {
   // ###################
 
   public EntityProxy() {
-    Envelopes = new BoltRingBuffer<EntityProxyEnvelope>(BoltCore._udpConfig.PacketWindow);
+    Envelopes = new Queue<EntityProxyEnvelope>();
   }
 
   public EntityProxyEnvelope CreateEnvelope() {

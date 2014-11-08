@@ -134,7 +134,7 @@ namespace Bolt.Compiler {
       CodeIterationStatement it;
 
       it = new CodeIterationStatement();
-      it.InitStatement = (variableName + " = 0").Stmt();
+      it.InitStatement = ("int " + variableName + " = 0").Stmt();
       it.TestExpression = testExpression.Expr();
       it.IncrementStatement = ("++" + variableName).Stmt();
 

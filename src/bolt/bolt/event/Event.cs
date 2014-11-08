@@ -93,7 +93,7 @@ namespace Bolt {
       refs += 1;
     }
 
-    internal bool Pack(BoltConnection connection, UdpStream stream) {
+    internal bool Pack(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.PropertySerializers.Length; ++i) {
         if (Meta.PropertySerializers[i].EventPack(this, connection, stream) == false) {
           return false;
@@ -103,7 +103,7 @@ namespace Bolt {
       return true;
     }
 
-    internal void Read(BoltConnection connection, UdpStream stream) {
+    internal void Read(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.PropertySerializers.Length; ++i) {
         Meta.PropertySerializers[i].EventRead(this, connection, stream);
       }

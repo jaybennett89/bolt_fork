@@ -42,6 +42,8 @@ namespace Bolt {
     /// <param name="evnt">The event we are calculating priority for</param>
     /// <returns>The priority of the event</returns>
     float CalculateEventPriority(BoltConnection connection, Event evnt);
+
+    bool Always { get; }
   }
 
   public interface IEntityBehaviour<TState> : IEntityBehaviour where TState : IState {
@@ -68,8 +70,8 @@ namespace Bolt {
     void DebugInfo();
     void InitProxy(EntityProxy p);
 
-    int Pack(BoltConnection connection, UdpStream stream, EntityProxyEnvelope proxy);
-    void Read(BoltConnection connection, UdpStream stream, int frame);
+    int Pack(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope proxy);
+    void Read(BoltConnection connection, UdpPacket stream, int frame);
   }
 
   internal interface IEntitySerializer<TState> : IEntitySerializer where TState : IState {

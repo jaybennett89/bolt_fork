@@ -1,5 +1,6 @@
 ﻿using Bolt;
 using System;
+using System.Collections;
 using UE = UnityEngine;
 
 [Documentation]
@@ -103,6 +104,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public Bolt.PrefabId prefabId {
     get { return new PrefabId(_prefabId); }
+  }
+
+  public Bolt.InstanceId instanceId {
+    get { return Entity.InstanceId; }
   }
 
   /// <summary>
@@ -321,13 +326,25 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       return Entity.ToString();
     }
     else {
-      return string.Format("[DetachedEntity {2} SceneId={0} SerializerId={1}]", sceneGuid, serializerGuid, prefabId);
+      return string.Format("[DetachedEntity {2} SceneId={0} SerializerId={1} {3}]", sceneGuid, serializerGuid, prefabId, gameObject.name);
     }
+  }
+
+  public void DestroyDelayed(float time) {
+    StartCoroutine(DestroyDelayedInternal(time));
   }
 
   internal void VerifyNotAttached() {
     if (isAttached) {
       throw new BoltException("You can't modify a BoltEntity behaviour which is attached to Bolt");
+    }
+  }
+
+  IEnumerator DestroyDelayedInternal(float time) {
+    yield return new UE.WaitForSeconds(time);
+
+    if (isAttached) {
+      BoltNetwork.Destroy(this);
     }
   }
 
@@ -370,5 +387,29 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     if (isAttached && UE.Application.isPlaying) {
       Entity.Render();
     }
+  }
+
+  void OnGUI() {
+    int depth = UE.GUI.depth;
+    UE.GUI.depth = int.MinValue;
+
+    if (DebugInfo.Enabled && isAttached) {
+      UE.Camera c = UE.Camera.main;
+
+      if (c) {
+        UE.Vector3 vp = c.WorldToViewportPoint(transform.position);
+
+        if (vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1) {
+          UE.Vector3 sp = c.WorldToScreenPoint(transform.position);
+          UE.Rect r = new UE.Rect(sp.x - 16, (UE.Screen.height - sp.y) - 16, 32, 32);
+
+          DebugInfo.DrawBackground(r);
+
+          UE.GUI.DrawTexture(r, DebugInfo.BoltIconTexture);
+        }
+      }
+    }
+
+    UE.GUI.depth = depth;
   }
 }

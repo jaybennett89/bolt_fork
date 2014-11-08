@@ -31,7 +31,7 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, float snapLimit) {
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, float snapLimit, ref bool snapped) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadVector3(offset);
 
@@ -46,6 +46,7 @@ namespace Bolt {
         Assert.True(f1.Number > frame);
 
         if ((p0 - p1).sqrMagnitude > (snapLimit * snapLimit)) {
+          snapped = true;
           return p1;
         }
         else {
@@ -109,11 +110,11 @@ namespace Bolt {
       return v0 + ((v1 - v0) * t);
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, PropertySmoothingSettings settings, UE.Vector3 position) {
-      return ExtrapolateVector(frames, offset, frame, settings, position, frames.first.Data.ReadVector3(velocityOffset));
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, ref bool snapped) {
+      return ExtrapolateVector(frames, offset, frame, settings, position, frames.first.Data.ReadVector3(velocityOffset), ref snapped);
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity) {
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity, ref bool snapped) {
       var f = frames.first;
       var tolerance = settings.ExtrapolationErrorTolerance;
 
@@ -121,21 +122,19 @@ namespace Bolt {
       UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
 
       float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
-      float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
+      float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
 
       UE.Vector3 p0 = position + v;
       UE.Vector3 p1 = p + (v * d);
 
-      var m = (p1 - p0).sqrMagnitude;
-      if (m > (settings.SnapMagnitude * settings.SnapMagnitude)) {
+      if ((p1 - p0).sqrMagnitude > (settings.SnapMagnitude * settings.SnapMagnitude)) {
+        snapped = true;
         return p1;
       }
       else {
-        tolerance = tolerance * tolerance;
-
-        if ((m < tolerance) && (velocity.sqrMagnitude < tolerance)) {
-          return position;
-        }
+        //if (velocity.magnitude < 0.1f && ((p1 - p0).magnitude < tolerance)) {
+        //  return position;
+        //}
 
         return UE.Vector3.Lerp(p0, p1, t);
       }

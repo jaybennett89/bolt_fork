@@ -93,8 +93,8 @@ namespace Bolt.Compiler {
               s.ExtrapolationErrorTolerance,
               s.SnapMagnitude,
               t == null
-                ? string.Format("Bolt.ExtrapolationVelocityModes.{0}", t.ExtrapolationVelocityMode)
-                : "default(Bolt.ExtrapolationVelocityModes)"
+                ? "default(Bolt.ExtrapolationVelocityModes)"
+                : string.Format("Bolt.ExtrapolationVelocityModes.{0}", t.ExtrapolationVelocityMode)
             );
         }
       }

@@ -47,15 +47,18 @@ namespace BoltEditor.Internal {
     static void SaveEntities() {
       for (int i = 0; i < BoltInternal.BoltCoreInternal.ChangedEditorEntities.Count; ++i) {
         var entity = BoltInternal.BoltCoreInternal.ChangedEditorEntities[i];
-        var entityPrefabType = UED.EditorUtility.GetPrefabType(entity);
 
-        switch (entityPrefabType) {
-          case UED.PrefabType.Prefab:
-          case UED.PrefabType.PrefabInstance:
-            UE.Debug.Log(string.Format("Saving Entity {0}", entity), entity);
-            UED.EditorUtility.SetDirty(entity);
-            UED.EditorUtility.SetDirty(entity.gameObject);
-            break;
+        if (entity) {
+          var entityPrefabType = UED.EditorUtility.GetPrefabType(entity);
+
+          switch (entityPrefabType) {
+            case UED.PrefabType.Prefab:
+            case UED.PrefabType.PrefabInstance:
+              UE.Debug.Log(string.Format("Saving Entity {0}", entity), entity);
+              UED.EditorUtility.SetDirty(entity);
+              UED.EditorUtility.SetDirty(entity.gameObject);
+              break;
+          }
         }
       }
 

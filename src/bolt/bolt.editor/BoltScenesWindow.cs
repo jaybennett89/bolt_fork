@@ -97,7 +97,7 @@ public class BoltScenesWindow : EditorWindow {
         return;
       }
       string path =
-        BoltEditorUtils.MakePath(
+        BoltEditorUtilsInternal.MakePath(
           Path.GetDirectoryName(Application.dataPath),
           isOSX ? playerPath : Path.GetDirectoryName(playerPath)
         );
@@ -219,7 +219,7 @@ end tell'";
 
   void StartEditor() {
     try {
-      if (BoltEditorUtils.hasPro == false) {
+      if (BoltEditorUtilsInternal.hasPro == false) {
         LoadAndStartScene();
       }
       else {
@@ -380,7 +380,7 @@ end tell'";
     GUILayout.BeginVertical();
     Settings_ServerPort();
 
-    if (BoltEditorUtils.hasPro) {
+    if (BoltEditorUtilsInternal.hasPro) {
       settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
       settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
     }
@@ -438,7 +438,7 @@ end tell'";
           }
         }
 
-        if (BoltEditorUtils.hasPro) {
+        if (BoltEditorUtilsInternal.hasPro) {
           if (GUILayout.Button("Debug Start", EditorStyles.miniButton, GUILayout.Width(100))) {
             BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
