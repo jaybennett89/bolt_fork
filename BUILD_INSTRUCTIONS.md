@@ -6,7 +6,7 @@
 4. Clone bolt_udpkit into src/bolt: git clone https://github.com/BoltEngine/bolt_udpkit src/bolt/udpkit
 5. Run this command: chmod a+x Build.sh
 6. Run this command: ./Build.sh -ev project /path/to/your/unity/project
-7. Open your Unity project and run "Bolt/Install Bolt" from the top menu bar
+7. Open your Unity project and from the top menu bar click Edit then Install Bolt from the bottom of the drop down.
 8. Restart Unity
 
 # Windows
