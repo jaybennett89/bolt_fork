@@ -44,6 +44,10 @@ namespace Bolt {
           Entity_Only_Owner(ev);
           break;
 
+        case Event.ENTITY_ONLY_SELF:
+          Entity_Only_Self(ev);
+          break;
+
         case Event.GLOBAL_EVERYONE:
           Global_Everyone(ev);
           break;
@@ -56,13 +60,27 @@ namespace Bolt {
           Global_All_Clients(ev);
           break;
 
-        case Event.GLOBAL_SERVER:
+        case Event.GLOBAL_ONLY_SERVER:
           Global_Server(ev);
           break;
 
         case Event.GLOBAL_SPECIFIC_CONNECTION:
           Global_Specific_Connection(ev);
           break;
+
+        case Event.GLOBAL_ONLY_SELF:
+          Global_Only_Self(ev);
+          break;
+      }
+    }
+
+    static void Global_Only_Self(Event ev) {
+      RaiseLocal(ev);
+    }
+
+    static void Entity_Only_Self(Event ev) {
+      if (ev.TargetEntity) {
+        RaiseLocal(ev);
       }
     }
 

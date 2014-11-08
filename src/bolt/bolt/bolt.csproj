@@ -180,6 +180,7 @@
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="utils\BitUtils.cs" />
     <Compile Include="utils\UdpStreamExt.cs" />
+    <Compile Include="WorldId.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />

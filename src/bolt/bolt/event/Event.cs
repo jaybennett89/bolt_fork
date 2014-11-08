@@ -19,12 +19,14 @@ namespace Bolt {
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
     internal const byte ENTITY_ONLY_CONTROLLER = 7;
     internal const byte ENTITY_ONLY_OWNER = 9;
+    internal const byte ENTITY_ONLY_SELF = 11;
 
     internal const byte GLOBAL_EVERYONE = 2;
     internal const byte GLOBAL_OTHERS = 4;
-    internal const byte GLOBAL_SERVER = 6;
+    internal const byte GLOBAL_ONLY_SERVER = 6;
     internal const byte GLOBAL_ALL_CLIENTS = 8;
     internal const byte GLOBAL_SPECIFIC_CONNECTION = 10;
+    internal const byte GLOBAL_ONLY_SELF = 12;
 
     internal const int RELIABLE_WINDOW_BITS = 10;
     internal const int RELIABLE_SEQUENCE_BITS = 12;
@@ -69,6 +71,7 @@ namespace Bolt {
           Targets == ENTITY_EVERYONE_EXCEPT_OWNER ||
           Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER ||
           Targets == ENTITY_ONLY_CONTROLLER ||
+          Targets == ENTITY_ONLY_SELF ||
           Targets == ENTITY_ONLY_OWNER;
       }
     }

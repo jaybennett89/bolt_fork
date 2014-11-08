@@ -12,7 +12,6 @@ namespace BoltInternal {
       this.isEditor = isEditor;
     }
 
-
     void IDebugDrawer.SelectGameObject(GameObject gameObject) {
 #if UNITY_EDITOR
       if (!isEditor) {
