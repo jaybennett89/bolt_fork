@@ -1,11 +1,14 @@
-# OSX
- 
+Delete the asset store version if installed.
+
+# OS X
 1. Download and install the latest MDK from http://www.mono-project.com/download/#download-mac
 2. Open up a terminal and navigate to the Bolt repository root directory
-3. Run this command: chmod a+x Build.sh
-4. Run this command: ./Build.sh -ev project /path/to/your/unity/project
-5. Open your Unity project and run "Bolt/Install Bolt" from the top menu bar
-6. Restart Unity
+3. Run this command: cp FAKE/tools/NuGet.Core.dll .
+4. Clone bolt_udpkit into src/bolt: git clone https://github.com/BoltEngine/bolt_udpkit src/bolt/udpkit
+5. Run this command: chmod a+x Build.sh
+6. Run this command: ./Build.sh -ev project /path/to/your/unity/project
+7. Open your Unity project and from the top menu bar click Edit then Install Bolt from the bottom of the drop down.
+8. Restart Unity
 
 # Windows
 
