@@ -21,39 +21,39 @@ class BoltUserAssemblyCompiler {
   }
 
   static string boltAssemblyPath {
-    get { return BoltEditorUtils.MakePath(assetDir, "bolt", "assemblies", "bolt.dll"); }
+    get { return BoltEditorUtilsInternal.MakePath(assetDir, "bolt", "assemblies", "bolt.dll"); }
   }
 
   static string boltUserAssemblyPath {
-    get { return BoltEditorUtils.MakePath(assetDir, "bolt", "assemblies", "bolt.user.dll"); }
+    get { return BoltEditorUtilsInternal.MakePath(assetDir, "bolt", "assemblies", "bolt.user.dll"); }
   }
 
   static string boltUserAssemblyAsset {
-    get { return BoltEditorUtils.MakePath("Assets", "bolt", "assemblies", "bolt.user.dll"); }
+    get { return BoltEditorUtilsInternal.MakePath("Assets", "bolt", "assemblies", "bolt.user.dll"); }
   }
 
   static string udpkitAssemblyPath {
-    get { return BoltEditorUtils.MakePath(assetDir, "bolt", "assemblies", "udpkit", "udpkit.dll"); }
+    get { return BoltEditorUtilsInternal.MakePath(assetDir, "bolt", "assemblies", "udpkit", "udpkit.dll"); }
   }
 
   static string networkFile {
-    get { return BoltEditorUtils.MakePath(sourceDir, "network.cs"); }
+    get { return BoltEditorUtilsInternal.MakePath(sourceDir, "network.cs"); }
   }
 
   static string projectFile {
-    get { return BoltEditorUtils.MakePath(sourceDir, "project.cs"); }
+    get { return BoltEditorUtilsInternal.MakePath(sourceDir, "project.cs"); }
   }
 
   static string assemblyInfoFile {
-    get { return BoltEditorUtils.MakePath(sourceDir, "assemblyinfo.cs"); }
+    get { return BoltEditorUtilsInternal.MakePath(sourceDir, "assemblyinfo.cs"); }
   }
 
   static string prefabsFile {
-    get { return BoltEditorUtils.MakePath(sourceDir, "prefabs.cs"); }
+    get { return BoltEditorUtilsInternal.MakePath(sourceDir, "prefabs.cs"); }
   }
 
   static string mapsFile {
-    get { return BoltEditorUtils.MakePath(sourceDir, "maps.cs"); }
+    get { return BoltEditorUtilsInternal.MakePath(sourceDir, "maps.cs"); }
   }
 
   static string sourceFileList {
@@ -94,10 +94,10 @@ class BoltUserAssemblyCompiler {
   static string csharpCompilerPath {
     get {
       if (isOSX) {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
       }
       else {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
       }
     }
   }
@@ -105,10 +105,10 @@ class BoltUserAssemblyCompiler {
   static string unityengineAssemblyPath {
     get {
       if (isOSX) {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/Managed/UnityEngine.dll");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Frameworks/Managed/UnityEngine.dll");
       }
       else {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Managed/UnityEngine.dll");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Managed/UnityEngine.dll");
       }
     }
   }
@@ -116,10 +116,10 @@ class BoltUserAssemblyCompiler {
   static string monoPath {
     get {
       if (isOSX) {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/bin/mono");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/bin/mono");
       }
       else {
-        return BoltEditorUtils.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/bin/mono.exe");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/bin/mono.exe");
       }
     }
   }
@@ -129,7 +129,7 @@ class BoltUserAssemblyCompiler {
 
     try {
       // calculate source dir
-      _sourceDir = BoltEditorUtils.MakePath(Path.GetDirectoryName(assetDir), "Temp", "bolt");
+      _sourceDir = BoltEditorUtilsInternal.MakePath(Path.GetDirectoryName(assetDir), "Temp", "bolt");
 
       // ensure temp path exists
       Directory.CreateDirectory(sourceDir);
@@ -169,7 +169,7 @@ class BoltUserAssemblyCompiler {
 
     string args = CMD_ARGS;
 
-    if (BoltEditorUtils.hasPro == false) {
+    if (BoltEditorUtilsInternal.hasPro == false) {
       args += "-define:UNITY_NOT_PRO ";
     }
 

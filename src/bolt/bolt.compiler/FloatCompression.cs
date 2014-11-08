@@ -14,7 +14,7 @@ namespace Bolt.Compiler {
     public int MaxValue;
 
     [ProtoMember(5)]
-    public float Accuracy;
+    public float Accuracy; 
 
     [ProtoMember(6)]
     public bool Enabled;

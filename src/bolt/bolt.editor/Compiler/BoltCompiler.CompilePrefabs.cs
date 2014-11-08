@@ -13,10 +13,11 @@ partial class BoltCompiler {
   }
 
   static IEnumerable<BoltPrefab> FindPrefabs() {
-    int id = 1;
+    var id = 1;
+    var files = Directory.GetFiles(@"Assets", "*.prefab", SearchOption.AllDirectories);
 
-    foreach (var file in Directory.GetFiles(@"Assets", "*.prefab", SearchOption.AllDirectories)) {
-      BoltEntity entity = AssetDatabase.LoadAssetAtPath(file, typeof(BoltEntity)) as BoltEntity;
+    for (int i = 0; i < files.Length; ++i) {
+      BoltEntity entity = AssetDatabase.LoadAssetAtPath(files[i], typeof(BoltEntity)) as BoltEntity;
 
       if (entity) {
         entity._prefabId = id;
@@ -28,31 +29,38 @@ partial class BoltCompiler {
 
         id += 1;
       }
+
+      EditorUtility.DisplayProgressBar("Updating Bolt Prefab Database", "Scanning for prefabs ...", Mathf.Clamp01((float)i / (float)files.Length));
     }
   }
 
   public static void UpdatePrefabsDatabase() {
-    // get all prefabs
-    IEnumerable<BoltPrefab> prefabs = FindPrefabs();
+    try {
+      // get all prefabs
+      IEnumerable<BoltPrefab> prefabs = FindPrefabs();
 
-    // create new array
-    PrefabDatabase.Instance.Prefabs = new GameObject[prefabs.Count() + 1];
+      // create new array
+      PrefabDatabase.Instance.Prefabs = new GameObject[prefabs.Count() + 1];
 
-    // update array
-    foreach (BoltPrefab prefab in prefabs) {
-      if (PrefabDatabase.Instance.Prefabs[prefab.id]) {
-        throw new BoltException("Duplicate Prefab ID {0}", prefab.id);
+      // update array
+      foreach (BoltPrefab prefab in prefabs) {
+        if (PrefabDatabase.Instance.Prefabs[prefab.id]) {
+          throw new BoltException("Duplicate Prefab ID {0}", prefab.id);
+        }
+
+        // assign prefab
+        PrefabDatabase.Instance.Prefabs[prefab.id] = prefab.go;
+
+        // log this to the user
+        Debug.Log(string.Format("Assigned {0} to '{1}'", new PrefabId(prefab.id), AssetDatabase.GetAssetPath(prefab.go)));
       }
 
-      // assign prefab
-      PrefabDatabase.Instance.Prefabs[prefab.id] = prefab.go;
-
-      // log this to the user
-      Debug.Log(string.Format("Assigned {0} to '{1}'", new PrefabId(prefab.id), AssetDatabase.GetAssetPath(prefab.go)));
+      // save it!
+      EditorUtility.SetDirty(PrefabDatabase.Instance);
     }
-
-    // save it!
-    EditorUtility.SetDirty(PrefabDatabase.Instance);
+    finally {
+      EditorUtility.ClearProgressBar();
+    }
   }
 
   static void CompilePrefabs(BoltCompilerOperation op) {
@@ -66,7 +74,7 @@ partial class BoltCompiler {
           GameObject prefab = PrefabDatabase.Instance.Prefabs[i];
 
           if (prefab) {
-            file.EmitLine("public static readonly Bolt.PrefabId {0} = new Bolt.PrefabId({1});", BoltEditorUtils.CSharpIdentifier(prefab.name), prefab.GetComponent<BoltEntity>()._prefabId);
+            file.EmitLine("public static readonly Bolt.PrefabId {0} = new Bolt.PrefabId({1});", BoltEditorUtilsInternal.CSharpIdentifier(prefab.name), prefab.GetComponent<BoltEntity>()._prefabId);
           }
         }
       });

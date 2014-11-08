@@ -476,6 +476,10 @@ namespace Bolt {
       return ReferenceEquals(a, b) == false;
     }
 
+    bool IPriorityCalculator.Always {
+      get { return false; }
+    }
+
     float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {
       return skipped;
     }

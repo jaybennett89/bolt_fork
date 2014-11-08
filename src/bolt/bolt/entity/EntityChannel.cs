@@ -29,6 +29,8 @@ partial class EntityChannel : BoltChannel {
 
     _incommingProxiesByNetId = new Dictionary<Bolt.NetId, EntityProxy>(1024, Bolt.NetId.EqualityComparer.Instance);
     _incommingProxiesByInstanceId = new Dictionary<Bolt.InstanceId, EntityProxy>(1024, Bolt.InstanceId.EqualityComparer.Instance);
+
+    // BoltLog.Debug("Created entity channel with the ability to proxy {0} entities", EntityProxy.MAX_COUNT);
   }
 
   public Bolt.Entity GetIncommingEntity(Bolt.NetId netId) {
@@ -62,10 +64,10 @@ partial class EntityChannel : BoltChannel {
 
     if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
       if (idle) {
-        proxy.Flags |= Bolt.ProxyFlags.FORCE_SYNC;
+        proxy.Flags |= Bolt.ProxyFlags.IDLE;
       }
       else {
-        proxy.Flags &= ~Bolt.ProxyFlags.FORCE_SYNC;
+        proxy.Flags &= ~Bolt.ProxyFlags.IDLE;
       }
     }
   }
@@ -73,6 +75,10 @@ partial class EntityChannel : BoltChannel {
   public void SetScope(Entity entity, bool inScope) {
     if (BoltCore._config.scopeMode == Bolt.ScopeMode.Automatic) {
       BoltLog.Warn("SetScope has no effect when Scope Mode is set to Automatic");
+      return;
+    }
+
+    if (ReferenceEquals(entity.Source, connection)) {
       return;
     }
 
@@ -148,28 +154,37 @@ partial class EntityChannel : BoltChannel {
   }
 
   public bool CreateOnRemote(Bolt.Entity entity) {
-    if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
-    if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
+    try {
+      if (ReferenceEquals(entity.Source, connection)) { return true; }
+      if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
+      if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
 
-    NetId id;
+      //BoltLog.Error("creating proxy {0} on {1}", entity, connection);
 
-    if (_outgoingProxiesNetworkIdPool.Acquire(out id) == false) {
-      BoltLog.Warn("{0} is already proxying the max amount of objects", connection);
+      NetId id;
+
+      if (_outgoingProxiesNetworkIdPool.Acquire(out id) == false) {
+        BoltLog.Warn("{0} is already proxying the max amount of objects", connection);
+        return false;
+      }
+
+      EntityProxy proxy;
+      proxy = entity.CreateProxy();
+      proxy.NetId = id;
+      proxy.Flags = ProxyFlags.CREATE_REQUESTED;
+      proxy.Filter = new Filter(1);
+      proxy.Connection = connection;
+
+      _outgoingProxiesByNetId.Add(proxy.NetId, proxy);
+      _outgoingProxiesByInstanceId.Add(entity.InstanceId, proxy);
+
+      BoltLog.Debug("Created {0} on {1}", proxy, connection);
+      return true;
+    }
+    catch (Exception exn) {
+      BoltLog.Exception(exn);
       return false;
     }
-
-    EntityProxy proxy;
-    proxy = entity.CreateProxy();
-    proxy.NetId = id;
-    proxy.Flags = ProxyFlags.CREATE_REQUESTED;
-    proxy.Filter = new Filter(1);
-    proxy.Connection = connection;
-
-    _outgoingProxiesByNetId[proxy.NetId] = proxy;
-    _outgoingProxiesByInstanceId[entity.InstanceId] = proxy;
-
-    BoltLog.Debug("Created {0} on {1}", proxy, connection);
-    return true;
   }
 
   public override void StepRemoteFrame() {
@@ -236,18 +251,28 @@ partial class EntityChannel : BoltChannel {
               continue;
             }
 
-            proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
-            proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
+            if (proxy.Entity.PriorityCalculator.Always) {
+              proxy.Priority = 1 << 20;
+            }
+            else {
+              proxy.Priority = proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
+              proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
+            }
           }
           else {
-            proxy.Priority = 1 << 18;
+            if (proxy.Entity.PriorityCalculator.Always) {
+              proxy.Priority = 1 << 20;
+            }
+            else {
+              proxy.Priority = 1 << 18;
+            }
           }
         }
       }
 
       // if this is the controller give it the max priority
       if (proxy.Entity.IsController(connection)) {
-        proxy.Priority = 1 << 20;
+        proxy.Priority = 1 << 21;
       }
 
       // push

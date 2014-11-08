@@ -44,7 +44,7 @@ public static class BoltInstaller {
   public static void Run() {
     string error = null;
 
-    if (BoltEditorUtils.isEditorPlaying) {
+    if (BoltEditorUtilsInternal.isEditorPlaying) {
       error = "You can't install Bolt when the editor is playing";
     }
     else if (EditorApplication.isCompiling) {
@@ -64,7 +64,7 @@ public static class BoltInstaller {
     try {
       EditorApplication.LockReloadAssemblies();
 
-      EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "resources"));
+      EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources"));
 
       InstallLogo();
       InstallIcons();
@@ -105,7 +105,7 @@ public static class BoltInstaller {
   }
 
   static void InstallDocumentation() {
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "documentation"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "documentation"));
 
     Progress("Installing documentation ... ", 0f);
 
@@ -147,7 +147,7 @@ public static class BoltInstaller {
   }
 
   static void InstallIcons() {
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "resources", "icons"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources", "icons"));
 
     var icons = Resources.Where(x => x.Contains("Install.bolt.resources.icons")).ToArray();
 
@@ -174,7 +174,7 @@ public static class BoltInstaller {
   static void InstallGizmos() {
     Progress("Installing gizmos ... ", 0f);
 
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "Gizmos"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Gizmos"));
 
     var gizmos = Resources.Where(x => x.Contains("Install.Gizmos")).ToArray();
 
@@ -199,9 +199,9 @@ public static class BoltInstaller {
   static void InstallPlugins() {
     Progress("Installing native plugins ... ", 0f);
 
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "Plugins"));
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "Plugins", "iOS"));
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "Plugins", "Android"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins", "iOS"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins", "Android"));
 
     var plugins = Resources.Where(x => x.Contains("Install.Plugins")).ToArray();
 
@@ -250,7 +250,7 @@ public static class BoltInstaller {
     Progress("Installing scripts ... ", 0);
 
     var scripts = Resources.Where(x => x.Contains("Install.bolt.scripts")).ToArray();
-    var scriptsPath = BoltEditorUtils.MakePath(Application.dataPath, "bolt", "scripts");
+    var scriptsPath = BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "scripts");
 
     EnsureDirectoryExists(scriptsPath);
 
@@ -261,7 +261,7 @@ public static class BoltInstaller {
     for (int i = 0; i < scripts.Length; ++i) {
       Progress("Installing scripts ... ", i, scripts.Length);
 
-      var data = BoltEditorUtils.GetResourceBytes(scripts[i]);
+      var data = BoltEditorUtilsInternal.GetResourceBytes(scripts[i]);
       var file = ResourceToFilePath(scripts[i]);
       var asset = ResourceToAssetPath(scripts[i]);
 
@@ -282,17 +282,17 @@ public static class BoltInstaller {
   static void CreateDebugScene() {
     Progress("Creating debug start scene ... ", 0);
 
-    EnsureDirectoryExists(BoltEditorUtils.MakePath(Application.dataPath, "bolt", "scenes"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "scenes"));
 
     // create new scene
     EditorApplication.NewScene();
 
     // add debug script thingy
-    var debugStartScript = (MonoScript)AssetDatabase.LoadAssetAtPath(BoltEditorUtils.MakeAssetPath("bolt", "scripts", "BoltDebugStart.cs"), typeof(MonoScript));
+    var debugStartScript = (MonoScript)AssetDatabase.LoadAssetAtPath(BoltEditorUtilsInternal.MakeAssetPath("bolt", "scripts", "BoltDebugStart.cs"), typeof(MonoScript));
     InternalEditorUtility.AddScriptComponentUnchecked(new GameObject("BoltDebugStart"), debugStartScript);
 
     // save scene
-    EditorApplication.SaveScene(BoltEditorUtils.MakeAssetPath("bolt/scenes/BoltDebugScene.unity"));
+    EditorApplication.SaveScene(BoltEditorUtilsInternal.MakeAssetPath("bolt/scenes/BoltDebugScene.unity"));
 
     // create a new scene
     EditorApplication.NewScene();
@@ -301,7 +301,7 @@ public static class BoltInstaller {
   }
 
   static void InstallAsset(string resource) {
-    var data = BoltEditorUtils.GetResourceBytes(resource);
+    var data = BoltEditorUtilsInternal.GetResourceBytes(resource);
     var file = ResourceToFilePath(resource);
     var asset = ResourceToAssetPath(resource);
 
@@ -356,11 +356,11 @@ public static class BoltInstaller {
   }
 
   static string ResourceToFilePath(string resource) {
-    return BoltEditorUtils.MakePath(Application.dataPath, ResourceToPath(resource));
+    return BoltEditorUtilsInternal.MakePath(Application.dataPath, ResourceToPath(resource));
   }
 
   static string ResourceToAssetPath(string resource) {
-    return BoltEditorUtils.MakeAssetPath(ResourceToPath(resource)).Replace('\\', '/');
+    return BoltEditorUtilsInternal.MakeAssetPath(ResourceToPath(resource)).Replace('\\', '/');
   }
 
   static void CleanExistingFile(string file) {

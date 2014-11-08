@@ -185,6 +185,7 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Info(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -195,27 +196,32 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Info(object message) {
     Info(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0) {
     Info(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0, object arg1) {
     Info(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, object arg0, object arg1, object arg2) {
     Info(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Info(string message, params object[] args) {
     Info(string.Format(message, args));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -226,27 +232,27 @@ public static class BoltLog {
     }
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(object message) {
     Debug(message.ToString());
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0) {
     Debug(string.Format(message, arg0));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0, object arg1) {
     Debug(string.Format(message, arg0, arg1));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, object arg0, object arg1, object arg2) {
     Debug(string.Format(message, arg0, arg1, arg2));
   }
 
-  [Conditional("DEBUG")]
+  [Conditional("LOG")]
   internal static void Debug(string message, params object[] args) {
     Debug(string.Format(message, args));
   }
@@ -257,6 +263,7 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -267,26 +274,32 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Warn(object message) {
     Warn(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0) {
     Warn(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0, object arg1) {
     Warn(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, object arg0, object arg1, object arg2) {
     Warn(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Warn(string message, params object[] args) {
     Warn(string.Format(message, args));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -297,26 +310,32 @@ public static class BoltLog {
     }
   }
 
+  [Conditional("LOG")]
   public static void Error(object message) {
     Error(message.ToString());
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0) {
     Error(string.Format(message, arg0));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0, object arg1) {
     Error(string.Format(message, arg0, arg1));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, object arg0, object arg1, object arg2) {
     Error(string.Format(message, arg0, arg1, arg2));
   }
 
+  [Conditional("LOG")]
   public static void Error(string message, params object[] args) {
     Error(string.Format(message, args));
   }
 
+  [Conditional("LOG")]
   public static void Exception(Exception exception) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {

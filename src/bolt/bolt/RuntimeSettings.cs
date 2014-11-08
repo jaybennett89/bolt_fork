@@ -13,7 +13,7 @@ public class BoltRuntimeSettings : ScriptableObject {
 
   public static BoltRuntimeSettings instance {
     get {
-      if (_instance == null) {
+      if (_instance == null) { 
         _instance = (BoltRuntimeSettings)Resources.Load(typeof(BoltRuntimeSettings).Name, typeof(BoltRuntimeSettings));
 
         if (_instance == null) {

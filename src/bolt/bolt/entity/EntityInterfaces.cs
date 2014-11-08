@@ -42,6 +42,8 @@ namespace Bolt {
     /// <param name="evnt">The event we are calculating priority for</param>
     /// <returns>The priority of the event</returns>
     float CalculateEventPriority(BoltConnection connection, Event evnt);
+
+    bool Always { get; }
   }
 
   public interface IEntityBehaviour<TState> : IEntityBehaviour where TState : IState {

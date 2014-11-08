@@ -97,7 +97,7 @@
     <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />
     <Compile Include="Editors\BoltStateAssetEditor.cs" />
     <Compile Include="BoltUserAssemblyCompiler.cs" />
-    <Compile Include="BoltEditorUtils.cs" />
+    <Compile Include="BoltEditorUtilsInternal.cs" />
     <Compile Include="Editors\BoltEntityEditor.cs" />
     <Compile Include="BoltMenuItems.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileNetwork.cs" />
@@ -106,6 +106,7 @@
     <Compile Include="Compiler\BoltCompilerOperation.cs" />
     <Compile Include="BoltReflectionUtils.cs" />
     <Compile Include="Compiler\BoltSourceFile.cs" />
+    <Compile Include="EditorUtility.cs" />
     <Compile Include="Internal\EditorHousekeeping.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorArray.cs" />
