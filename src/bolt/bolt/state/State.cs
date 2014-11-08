@@ -543,7 +543,7 @@ namespace Bolt {
     BitArray Diff(Frame a, Frame b) {
       DiffMask.Clear();
 
-      int count = Blit.DiffNative(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
+      int count = Blit.DiffUnsafe(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
 
       for (int i = 0; i < count; ++i) {
         DiffMask.Set(MetaData.PropertyBlocksResult[i]);
