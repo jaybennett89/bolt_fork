@@ -52,6 +52,37 @@ namespace Bolt {
       return count;
     }
 
+    public unsafe static int DiffUnsafe(byte[] a, byte[] b, Block[] blocks, int[] result) {
+      if (blocks.Length == 0) {
+        return 0;
+      }
+
+      int count = 0;
+      int countBlocks = blocks.Length;
+
+      fixed (byte* aPtr = a) {
+        fixed (byte* bPtr = b) {
+          for (int i = 0; i < countBlocks; ++i) {
+            int offset = blocks[i].Offset;
+            uint length = blocks[i].Length;
+
+            while (length > 0) {
+              if (aPtr[offset] != bPtr[offset]) {
+                result[count] = i;
+                count += 1;
+                break;
+              }
+
+              ++offset;
+              --length;
+            }
+          }
+        }
+      }
+
+      return count;
+    }
+
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {
       if (entity) {
         data.PackI32(offset, entity.Entity.InstanceId.Value);
