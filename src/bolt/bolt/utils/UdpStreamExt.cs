@@ -311,6 +311,39 @@ public static class UdpStreamExtensions {
     }
   }
 
+
+  public static void PackNetworkId(UdpPacket packet, NetworkId id) {
+    ulong v = id.Value;
+    ulong b = 0UL;
+
+    do {
+      b = v & 127UL;
+
+      if ((v >>= 7) > 0) {
+        b |= 128UL;
+      }
+
+      packet.WriteByte((byte)b);
+
+    } while ((b & 128UL) == 128UL);
+  }
+
+  public static NetworkId ReadNetworkId(UdpPacket packet) {
+    ulong v = 0UL;
+    ulong b = 0UL;
+
+    int s = 0;
+
+    do {
+      b = packet.ReadByte();
+      v = v | ((b & 127UL) << s);
+      s += 7;
+
+    } while ((b & 128UL) == 128UL);
+
+    return new NetworkId(v);
+  }
+
   internal static void WriteContinueMarker(this UdpPacket stream) {
     if (stream.CanWrite()) {
       stream.WriteBool(true);

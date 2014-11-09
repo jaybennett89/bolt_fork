@@ -278,11 +278,13 @@ namespace Bolt {
     }
 
     public BitArray GetDefaultMask() {
+
       if (Frames.count == 0) {
         return BitArray.CreateClear(MetaData.PropertyCount);
       }
 
-      return Diff(Frames.first, NullFrame).Clone();
+      int diffCount;
+      return Diff(Frames.first, NullFrame, out diffCount).Clone();
     }
 
     public void InitProxy(EntityProxy p) {
@@ -350,10 +352,11 @@ namespace Bolt {
       }
 
       // calculate diff mask
-      var diff = Diff(Frames.first, DiffFrame);
+      var diffCount = 0;
+      var diff = Diff(Frames.first, DiffFrame, out diffCount);
 
       // copy data from latest frame to diff buffer
-      Array.Copy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
+      Buffer.BlockCopy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
 
       // combine with existing masks for proxies
       var it = Entity.Proxies.GetIterator();
@@ -363,9 +366,10 @@ namespace Bolt {
       }
 
       // raise local changed events
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
+      for (int i = 0; (i < MetaData.PropertySerializers.Length) && (diffCount > 0); ++i) {
         if (diff.IsSet(i)) {
           InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
+          diffCount -= 1;
         }
       }
 
@@ -540,10 +544,10 @@ namespace Bolt {
       return CalculateFilter(proxy.Filter);
     }
 
-    BitArray Diff(Frame a, Frame b) {
+    BitArray Diff(Frame a, Frame b, out int count) {
       DiffMask.Clear();
 
-      int count = Blit.DiffUnsafe(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
+      count = Blit.DiffUnsafe(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
 
       for (int i = 0; i < count; ++i) {
         DiffMask.Set(MetaData.PropertyBlocksResult[i]);
