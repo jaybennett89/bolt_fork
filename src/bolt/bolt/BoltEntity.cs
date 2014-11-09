@@ -388,28 +388,4 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       Entity.Render();
     }
   }
-
-  void OnGUI() {
-    int depth = UE.GUI.depth;
-    UE.GUI.depth = int.MinValue;
-
-    if (DebugInfo.Enabled && isAttached) {
-      UE.Camera c = UE.Camera.main;
-
-      if (c) {
-        UE.Vector3 vp = c.WorldToViewportPoint(transform.position);
-
-        if (vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1) {
-          UE.Vector3 sp = c.WorldToScreenPoint(transform.position);
-          UE.Rect r = new UE.Rect(sp.x - 16, (UE.Screen.height - sp.y) - 16, 32, 32);
-
-          DebugInfo.DrawBackground(r);
-
-          UE.GUI.DrawTexture(r, DebugInfo.BoltIconTexture);
-        }
-      }
-    }
-
-    UE.GUI.depth = depth;
-  }
 }
