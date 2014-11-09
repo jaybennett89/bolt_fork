@@ -44,6 +44,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   public bool showDebugInfo = false;
 
   [SerializeField]
+  public bool logUncaughtExceptions = true;
+
+  [SerializeField]
   public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   [SerializeField]

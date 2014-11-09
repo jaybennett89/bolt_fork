@@ -11,6 +11,18 @@ namespace Bolt.Compiler {
       }
     }
 
+    public override bool OnRenderCallback {
+      get { return true; }
+    }
+
+    public override bool OnSimulateAfterCallback {
+      get { return true; }
+    }
+
+    public override bool OnSimulateBeforeCallback {
+      get { return true; }
+    }
+
     public override int ObjectSize {
       get { return 1; }
     }

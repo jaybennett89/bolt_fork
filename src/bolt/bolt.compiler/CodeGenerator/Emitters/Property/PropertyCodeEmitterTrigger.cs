@@ -12,7 +12,7 @@ namespace Bolt.Compiler {
 
     public override void EmitModifierMembers(CodeTypeDeclaration type) {
       type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => {
-        method.Statements.Expr("Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset + 8);
+        method.Statements.Expr("frame.Changed = true; Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset + 8);
       });
     }
 
@@ -34,6 +34,7 @@ namespace Bolt.Compiler {
       if (Generator.AllowStatePropertySetters) {
         type.DeclareMethod(typeof(void).FullName, Decorator.Definition.Name + "Trigger", method => {
           method.Statements.Expr("_Modifier.frame = Frames.first");
+          method.Statements.Expr("_Modifier.frame.Changed = true");
           method.Statements.Expr("_Modifier.{0}()", Decorator.SetMethodName);
         });
       }

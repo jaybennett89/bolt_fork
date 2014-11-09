@@ -718,6 +718,38 @@ internal static class BoltCore {
     }
   }
 
+  static void UnityLogCallback(string condition, string stackTrace, LogType type) {
+    stackTrace = (stackTrace ?? "").Trim();
+
+    switch (type) {
+      case LogType.Error:
+      case LogType.Assert:
+      case LogType.Exception:
+        BoltLog.Error(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Error(stackTrace);
+        }
+        break;
+
+      case LogType.Log:
+        BoltLog.Info(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Info(stackTrace);
+        }
+        break;
+
+      case LogType.Warning:
+        BoltLog.Warn(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Warn(stackTrace);
+        }
+        break;
+    }
+  }
+
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
     PrefabDatabase.BuildCache();
 
@@ -730,6 +762,10 @@ internal static class BoltCore {
       DebugInfo.Show();
     }
 
+    if (BoltRuntimeSettings.instance.logUncaughtExceptions) {
+      UE.Application.RegisterLogCallbackThreaded(UnityLogCallback);
+    }
+
     // close any existing socket
     Shutdown();
 
@@ -739,7 +775,7 @@ internal static class BoltCore {
     var consoleLog = (config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     var systemOutLog = (config.logTargets & BoltConfigLogTargets.SystemOut) == BoltConfigLogTargets.SystemOut;
 
-    if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
+    if (unityLog && (BoltRuntimeSettings.instance.logUncaughtExceptions == false)) { BoltLog.Add(new BoltLog.Unity()); }
     if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
     if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
     if (fileLog) {

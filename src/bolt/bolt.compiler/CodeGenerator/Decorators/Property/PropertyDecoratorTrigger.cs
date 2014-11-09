@@ -21,6 +21,10 @@ namespace Bolt.Compiler {
       get { return Definition.Name; }
     }
 
+    public override bool OnSimulateAfterCallback {
+      get { return true; }
+    }
+
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterTrigger();
     }

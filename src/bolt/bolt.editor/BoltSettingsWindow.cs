@@ -218,13 +218,13 @@ public class BoltSettingsWindow : EditorWindow {
       settings.showDebugInfo = EditorGUILayout.Toggle(settings.showDebugInfo);
     });
 
+    BoltAssetEditorGUI.Label("Log Unity To Console", () => {
+      settings.logUncaughtExceptions = EditorGUILayout.Toggle(settings.logUncaughtExceptions);
+    });
+
     BoltAssetEditorGUI.Label("Editor Skin", () => {
       settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
-  }
-
-  void Console() {
-    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     var consoleEnabled = (settings._config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     EditorGUI.BeginDisabledGroup(consoleEnabled == false);
@@ -278,9 +278,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltEditorGUI.Header("Miscellaneous", "mc_settings");
     Miscellaneous();
-
-    BoltEditorGUI.Header("Console", "mc_console");
-    Console();
 
     BoltEditorGUI.Header("Compiler", "mc_compile");
     Compiler();

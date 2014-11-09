@@ -76,6 +76,9 @@ namespace Bolt {
       public BitArray[] PropertyFilters;
       public BitArray PropertyControllerFilter;
       public PropertySerializer[] PropertySerializers;
+      public PropertySerializer[] PropertySerializersOnRender;
+      public PropertySerializer[] PropertySerializersOnSimulateAfter;
+      public PropertySerializer[] PropertySerializersOnSimulateBefore;
       public Dictionary<Filter, BitArray> PropertyFilterCache;
       public HashSet<string> PropertyCallbackPaths;
     }
@@ -99,7 +102,6 @@ namespace Bolt {
           f = new Frame(0, Size);
         }
 
-        f.Diffed = false;
         f.Pooled = false;
         f.Number = number;
 
@@ -133,8 +135,10 @@ namespace Bolt {
     public class Frame : IBoltListNode {
       public int Number;
       public bool Pooled;
-      public bool Diffed;
+      public bool Changed;
+
       public State State;
+
       public object[] Objects;
       public readonly byte[] Data;
 
@@ -182,11 +186,8 @@ namespace Bolt {
     }
 
     protected State(StateMetaData meta) {
-      meta.PacketMaxProperties = System.Math.Max(System.Math.Min(meta.PacketMaxProperties, 255), 1);
-
       MetaData = meta;
-      DiffFrame = AllocFrame(-1);
-      NullFrame = AllocFrame(-1);
+      MetaData.PacketMaxProperties = System.Math.Max(System.Math.Min(MetaData.PacketMaxProperties, 255), 1);
 
       FullMask = BitArray.CreateSet(MetaData.PropertyCount);
       DiffMask = BitArray.CreateClear(MetaData.PropertyCount);
@@ -195,6 +196,9 @@ namespace Bolt {
       PropertyIdBits = Bolt.Math.BitsRequired(MetaData.PropertyCount);
       PropertyObjects = new object[MetaData.ObjectCount];
       PacketMaxPropertiesBits = Bolt.Math.BitsRequired(MetaData.PacketMaxProperties);
+
+      DiffFrame = MetaData.FramePool.Allocate(this, -1);
+      NullFrame = MetaData.FramePool.Allocate(this, -1);
     }
 
     UE.Animator IState.Animator {
@@ -204,6 +208,7 @@ namespace Bolt {
     public void DebugInfo() {
       if (BoltNetworkInternal.DebugDrawer != null) {
         BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
+        BoltNetworkInternal.DebugDrawer.LabelField("Animator", Animator ? Animator.gameObject.name : "NOT ASSIGNED");
         BoltNetworkInternal.DebugDrawer.LabelField("State Type", Factory.GetFactory(TypeId).TypeObject);
         BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count.ToString());
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
@@ -229,7 +234,7 @@ namespace Bolt {
     public void OnControlGained() {
       if (!Entity.IsOwner) {
         while (Frames.count > 1) {
-          FreeFrame(Frames.RemoveFirst());
+          MetaData.FramePool.Free(Frames.RemoveFirst());
         }
       }
     }
@@ -341,7 +346,7 @@ namespace Bolt {
 
     public void OnInitialized() {
       if (Entity.IsOwner) {
-        Frames.AddLast(AllocFrame(BoltCore.frame));
+        Frames.AddLast(MetaData.FramePool.Allocate(this, BoltCore.frame));
       }
 
       for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
@@ -367,51 +372,48 @@ namespace Bolt {
       }
       else {
         while ((Frames.count > 1) && (Entity.Frame >= Frames.Next(Frames.first).Number)) {
-          FreeFrame(Frames.RemoveFirst());
+          MetaData.FramePool.Free(Frames.RemoveFirst());
         }
       }
 
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        MetaData.PropertySerializers[i].OnSimulateBefore(this);
+      for (int i = 0; i < MetaData.PropertySerializersOnSimulateBefore.Length; ++i) {
+        MetaData.PropertySerializersOnSimulateBefore[i].OnSimulateBefore(this);
       }
     }
 
     public void OnSimulateAfter() {
-      for (int i = 0; i < MetaData.PropertySerializers.Length; ++i) {
-        MetaData.PropertySerializers[i].OnSimulateAfter(this);
+      for (int i = 0; i < MetaData.PropertySerializersOnSimulateAfter.Length; ++i) {
+        MetaData.PropertySerializersOnSimulateAfter[i].OnSimulateAfter(this);
       }
 
       InvokeCallbacks();
     }
 
     void InvokeCallbacks() {
-      if (Frames.first.Diffed) {
-        return;
-      }
+      //if (Frames.first.Changed == false) {
+      //  return;
+      //}
 
       // calculate diff mask
       var diffCount = 0;
-      var diff = Diff(Frames.first, DiffFrame, out diffCount);
+      var diff = DiffFast(Frames.first, DiffFrame, out diffCount);
 
       // copy data from latest frame to diff buffer
       Buffer.BlockCopy(Frames.first.Data, 0, DiffFrame.Data, 0, Frames.first.Data.Length);
 
       // combine with existing masks for proxies
-      var it = Entity.Proxies.GetIterator();
+      for (int i = 0; i < diffCount; ++i) {
+        // set on proxies
+        var it = Entity.Proxies.GetIterator();
 
-      while (it.Next()) {
-        it.val.Mask.OrAssign(diff);
-      }
-
-      // raise local changed events
-      for (int i = 0; (i < MetaData.PropertySerializers.Length) && (diffCount > 0); ++i) {
-        if (diff.IsSet(i)) {
-          InvokeCallbacksForProperty(MetaData.PropertySerializers[i]);
-          diffCount -= 1;
+        while (it.Next()) {
+          it.val.Mask.Set(diff[i]);
         }
+
+        InvokeCallbacksForProperty(MetaData.PropertySerializers[diff[i]]);
       }
 
-      Frames.first.Diffed = (Entity.IsOwner == false) && (Entity.HasPredictedControl == false);
+      Frames.first.Changed = false;
     }
 
     void InvokeCallbacksForProperty(PropertySerializer p) {
@@ -549,7 +551,8 @@ namespace Bolt {
       var frame = default(Frame);
 
       if (Frames.count == 0) {
-        frame = AllocFrame(frameNumber);
+        frame = MetaData.FramePool.Allocate(this, frameNumber);
+        frame.Changed = true;
         Frames.AddLast(frame);
       }
       else {
@@ -557,10 +560,12 @@ namespace Bolt {
           Assert.True(Frames.count == 1);
 
           frame = Frames.first;
+          frame.Changed = true;
           frame.Number = BoltCore.frame;
         }
         else {
           frame = MetaData.FramePool.Duplicate(Frames.last, frameNumber);
+          frame.Changed = true;
           Frames.AddLast(frame);
         }
       }
@@ -580,6 +585,11 @@ namespace Bolt {
       }
 
       return CalculateFilter(proxy.Filter);
+    }
+
+    int[] DiffFast(Frame a, Frame b, out int count) {
+      count = Blit.DiffUnsafe(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
+      return MetaData.PropertyBlocksResult;
     }
 
     BitArray Diff(Frame a, Frame b, out int count) {
@@ -602,14 +612,6 @@ namespace Bolt {
       //}
 
       return DiffMask;
-    }
-
-    Frame AllocFrame(int number) {
-      return MetaData.FramePool.Allocate(this, number);
-    }
-
-    void FreeFrame(Frame f) {
-      MetaData.FramePool.Free(f);
     }
 
     BitArray CalculateFilter(Filter filter) {

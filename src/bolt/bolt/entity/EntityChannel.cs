@@ -213,7 +213,6 @@ partial class EntityChannel : BoltChannel {
   public override void Pack(BoltPacket packet) {
     int n = 0;
     int startPos = packet.stream.Position;
-
     foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
@@ -255,7 +254,7 @@ partial class EntityChannel : BoltChannel {
               proxy.Priority = 1 << 20;
             }
             else {
-              proxy.Priority = proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
+              proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
               proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
             }
           }
@@ -278,10 +277,7 @@ partial class EntityChannel : BoltChannel {
       // push
       _outgoingProxiesByPriority[n++] = proxy;
     }
-
     if (n > 0) {
-      Assert.True(_outgoingProxiesByPriority.Take(n).GroupBy(x => x.NetId.Value).All(x => x.Count() == 1));
-
       // only if we have any proxies to sort
       // sort proxies by their priority (highest to lowest)
       Array.Sort(_outgoingProxiesByPriority, 0, n, EntityProxy.PriorityComparer.Instance);
@@ -297,7 +293,7 @@ partial class EntityChannel : BoltChannel {
         else {
           var result = PackUpdate(packet, _outgoingProxiesByPriority[i]);
           if (result) {
-            _outgoingProxiesByPriority[i].Priority = 0f;
+            _outgoingProxiesByPriority[i].Priority = 0;
           }
           else {
             failCount += 1;
