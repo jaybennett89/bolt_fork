@@ -72,12 +72,62 @@ namespace Bolt {
       public Block[] PropertyBlocks;
       public int[] PropertyBlocksResult;
 
-      public Stack<Frame> FramePool;
+      public FramePool FramePool;
       public BitArray[] PropertyFilters;
       public BitArray PropertyControllerFilter;
       public PropertySerializer[] PropertySerializers;
       public Dictionary<Filter, BitArray> PropertyFilterCache;
       public HashSet<string> PropertyCallbackPaths;
+    }
+
+    public class FramePool {
+      public readonly int Size;
+      public readonly Stack<Frame> Pool = new Stack<Frame>();
+
+      public FramePool(int frameSize) {
+        Size = frameSize;
+      }
+
+      public Frame Allocate(State state, int number) {
+        Frame f;
+
+        if (Pool.Count > 0) {
+          f = Pool.Pop();
+          Assert.True(f.Pooled);
+        }
+        else {
+          f = new Frame(0, Size);
+        }
+
+        f.Diffed = false;
+        f.Pooled = false;
+        f.Number = number;
+
+        f.State = state;
+        f.Objects = f.State.PropertyObjects;
+
+        return f;
+      }
+
+      public void Free(Frame f) {
+        Assert.False(f.Pooled);
+        Assert.True(f.Data.Length == Size);
+
+        Array.Clear(f.Data, 0, Size);
+
+        Pool.Push(f);
+
+        f.Pooled = true;
+      }
+
+      public Frame Duplicate(Frame f, int number) {
+        Frame c = Allocate(f.State, number);
+
+        Assert.True(f.Data.Length == c.Data.Length);
+        Buffer.BlockCopy(f.Data, 0, c.Data, 0, f.Data.Length);
+
+        return c;
+      }
     }
 
     public class Frame : IBoltListNode {
@@ -91,18 +141,6 @@ namespace Bolt {
       public Frame(int number, int size) {
         Number = number;
         Data = new byte[size];
-      }
-
-      public Frame Duplicate(int frameNumber) {
-        Frame clone;
-
-        clone = new Frame(frameNumber, Data.Length);
-        clone.Objects = Objects;
-        clone.State = State;
-
-        Array.Copy(Data, 0, clone.Data, 0, Data.Length);
-
-        return clone;
       }
 
       object IBoltListNode.prev {
@@ -522,7 +560,7 @@ namespace Bolt {
           frame.Number = BoltCore.frame;
         }
         else {
-          frame = Frames.last.Duplicate(frameNumber);
+          frame = MetaData.FramePool.Duplicate(Frames.last, frameNumber);
           Frames.AddLast(frame);
         }
       }
@@ -567,35 +605,11 @@ namespace Bolt {
     }
 
     Frame AllocFrame(int number) {
-      Frame f;
-
-      if (MetaData.FramePool.Count > 0) {
-        f = MetaData.FramePool.Pop();
-
-        Array.Clear(f.Data, 0, f.Data.Length);
-        Assert.True(f.Pooled);
-        Assert.True(f.Data.Length == MetaData.FrameSize);
-
-        f.Pooled = false;
-      }
-      else {
-        f = new Frame(number, MetaData.FrameSize);
-        f.Pooled = false;
-      }
-
-
-      f.Diffed = false;
-      f.Number = number;
-      f.Objects = PropertyObjects;
-      f.State = this;
-
-      return f;
+      return MetaData.FramePool.Allocate(this, number);
     }
 
-    void FreeFrame(Frame frame) {
-      Assert.False(frame.Pooled);
-      MetaData.FramePool.Push(frame);
-      frame.Pooled = true;
+    void FreeFrame(Frame f) {
+      MetaData.FramePool.Free(f);
     }
 
     BitArray CalculateFilter(Filter filter) {

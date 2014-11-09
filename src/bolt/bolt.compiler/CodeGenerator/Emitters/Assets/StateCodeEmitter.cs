@@ -87,7 +87,7 @@ namespace Bolt.Compiler {
 
         ctor.Statements.Comment("Setup data structures");
 
-        ctor.Statements.Expr("_Meta.FramePool = new System.Collections.Generic.Stack<Bolt.State.Frame>()");
+        ctor.Statements.Expr("_Meta.FramePool = new Bolt.State.FramePool(_Meta.FrameSize)");
         ctor.Statements.Expr("_Meta.PropertyFilters = new Bolt.BitArray[32]");
         ctor.Statements.Expr("_Meta.PropertyBlocks = new Bolt.Block[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyBlocksResult = new System.Int32[_Meta.PropertyCount]");
