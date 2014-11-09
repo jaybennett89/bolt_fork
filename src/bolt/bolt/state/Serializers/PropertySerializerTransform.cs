@@ -152,7 +152,7 @@ namespace Bolt {
 
             case SmoothingAlgorithms.Extrapolation:
               //BoltPoll.CALC.Start();
-              UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);;
+              UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
               //BoltPoll.CALC.Stop();
 
               //BoltPoll.ASSIGN.Start();

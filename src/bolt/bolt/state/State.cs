@@ -59,6 +59,29 @@ namespace Bolt {
 
   }
 
+  internal class DataFrame {
+    object _object;
+
+    public int Number;
+    public readonly NetworkValue[] Values;
+
+    public State State { get { return (State)_object; } set { _object = value; } }
+    public Event Event { get { return (Event)_object; } set { _object = value; } }
+    public Command Command { get { return (Command)_object; } set { _object = value; } }
+
+    public DataFrame(int size) {
+      Values = new NetworkValue[size];
+    }
+  }
+
+  internal class DataFramePool {
+
+    public DataFramePool(int frameSize) {
+
+    }
+
+  }
+
   internal abstract class State : IState, IEntitySerializer {
     internal struct StateMetaData {
       public TypeId TypeId;
