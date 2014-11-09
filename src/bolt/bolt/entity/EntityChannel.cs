@@ -426,7 +426,7 @@ partial class EntityChannel : BoltChannel {
     EntityProxyEnvelope env = proxy.CreateEnvelope();
 
     packet.stream.WriteBool(true);
-    packet.stream.WriteNetworkId(proxy.NetId);
+    packet.stream.WriteNetworkId_old(proxy.NetId);
 
     if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED) == false) {
       // if the remote is the controller or not
@@ -499,7 +499,7 @@ partial class EntityChannel : BoltChannel {
       return false;
 
     // grab networkid
-    var netId = packet.stream.ReadNetworkId();
+    var netId = packet.stream.ReadNetworkId_Old();
     var destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
