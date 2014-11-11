@@ -3,7 +3,6 @@ using UnityEngine;
 
 [BoltExecutionOrder(-10000)]
 public class BoltPoll : MonoBehaviour {
-
   public static Stopwatch Timer = new Stopwatch();
 
   protected void Awake () {

@@ -15,11 +15,12 @@ namespace Bolt {
   }
 
   public static class Blit {
+#if NATIVE_DIFF
     [SuppressUnmanagedCodeSecurity]
     [DllImport("BoltFastCompare", ExactSpelling = true)]
     static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
 
-    public unsafe static int DiffNative(byte[] a, byte[] b, Block[] blocks, int[] result) {
+    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] result) {
       int count = 0;
 
       fixed (byte* aPtr = a) {
@@ -34,8 +35,8 @@ namespace Bolt {
 
       return count;
     }
-
-    public unsafe static int DiffUnsafe(byte[] a, byte[] b, Block[] blocks, int[] result) {
+#else
+    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] result) {
       if (blocks.Length == 0) {
         return 0;
       }
@@ -65,6 +66,7 @@ namespace Bolt {
 
       return count;
     }
+#endif
 
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {
       if (entity && entity.isAttached) {

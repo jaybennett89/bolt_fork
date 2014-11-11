@@ -588,14 +588,14 @@ namespace Bolt {
     }
 
     int[] DiffFast(Frame a, Frame b, out int count) {
-      count = Blit.DiffNative(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
+      count = Blit.Diff(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
       return MetaData.PropertyBlocksResult;
     }
 
     BitArray Diff(Frame a, Frame b, out int count) {
       DiffMask.Clear();
 
-      count = Blit.DiffNative(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
+      count = Blit.Diff(a.Data, b.Data, MetaData.PropertyBlocks, MetaData.PropertyBlocksResult);
 
       for (int i = 0; i < count; ++i) {
         DiffMask.Set(MetaData.PropertyBlocksResult[i]);
