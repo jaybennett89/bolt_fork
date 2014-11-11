@@ -374,7 +374,7 @@ internal static class BoltCore {
     DisableLanBroadcast();
 
     // connect
-    _udpSocket.Connect(endpoint, token.ToByteArray());
+    _udpSocket.Connect(endpoint, (token == null) ? null : token.ToByteArray());
   }
 
   public static void SetSessionData(string serverName, string userData) {
