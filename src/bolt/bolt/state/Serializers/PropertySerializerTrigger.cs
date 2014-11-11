@@ -66,27 +66,29 @@ namespace Bolt {
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
 
-      for (int i = 31; i >= 0; --i) {
-        if (frame - i > state.Entity.Frame) {
-          return false;
-        }
-
-        int b = 1 << i;
-        if ((bits & b) == b) {
-          // clear out bit
-          f.Data.PackI32(LocalOffset + 4, bits & ~b);
-
-          // push to send index
-          state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
-
-          // apply to mecanim
-          if (push) {
-            state.Animator.SetTrigger(Settings.PropertyName);
+      if (bits != 0) {
+        for (int i = 31; i >= 0; --i) {
+          if (frame - i > state.Entity.Frame) {
+            return false;
           }
 
-          // perform callback
-          if (cb != null) {
-            cb();
+          int b = 1 << i;
+          if ((bits & b) == b) {
+            // clear out bit
+            f.Data.PackI32(LocalOffset + 4, bits & ~b);
+
+            // push to send index
+            state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
+
+            // apply to mecanim
+            if (push) {
+              state.Animator.SetTrigger(Settings.PropertyName);
+            }
+
+            // perform callback
+            if (cb != null) {
+              cb();
+            }
           }
         }
       }

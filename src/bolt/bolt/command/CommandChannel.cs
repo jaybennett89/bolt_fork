@@ -90,7 +90,7 @@ partial class EntityChannel {
           int cmdWriteCount = 0;
 
           packet.stream.WriteBool(true);
-          packet.stream.WriteNetworkId(proxy.NetId);
+          packet.stream.WriteNetworkId_old(proxy.NetId);
 
           var it = entity.CommandQueue.GetIterator();
 
@@ -146,7 +146,7 @@ partial class EntityChannel {
       while (packet.stream.CanRead()) {
         if (packet.stream.ReadBool() == false) { break; }
 
-        NetId netId = packet.stream.ReadNetworkId();
+        NetId netId = packet.stream.ReadNetworkId_Old();
         EntityProxy proxy = incommingProxiesByNetworkId[netId];
         Entity entity = proxy.Entity;
 
@@ -216,7 +216,7 @@ partial class EntityChannel {
 
           int proxyPos = packet.stream.Position;
           packet.stream.WriteBool(true);
-          packet.stream.WriteNetworkId(proxy.NetId);
+          packet.stream.WriteNetworkId_old(proxy.NetId);
 
           Command cmd = entity.CommandQueue.last;
 
@@ -276,7 +276,7 @@ partial class EntityChannel {
       while (packet.stream.CanRead()) {
         if (packet.stream.ReadBool() == false) { break; }
 
-        NetId netId = packet.stream.ReadNetworkId();
+        NetId netId = packet.stream.ReadNetworkId_Old();
         EntityProxy proxy = null;
 
         if (outgoingProxiesByNetworkId.ContainsKey(netId)) {

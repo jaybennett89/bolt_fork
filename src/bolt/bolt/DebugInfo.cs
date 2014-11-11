@@ -141,6 +141,26 @@ namespace Bolt {
       return Color.Lerp(BoltGUI.Green, BoltGUI.Error, t);
     }
 
+
+
+    void DrawEntity(BoltEntity entity) {
+      if (entity && entity.isAttached) {
+        Camera c = Camera.main;
+
+        if (c) {
+          Vector3 vp = c.WorldToViewportPoint(entity.transform.position);
+
+          if (vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1) {
+            Vector3 sp = c.WorldToScreenPoint(entity.transform.position);
+            Rect r = new Rect(sp.x - 16, (Screen.height - sp.y) - 16, 32, 32);
+            DebugInfo.DrawBackground(r);
+
+            GUI.DrawTexture(r, DebugInfo.BoltIconTexture);
+          }
+        }
+      }
+    }
+
     void OnGUI() {
       BoltNetworkInternal.DebugDrawer.IsEditor(false);
 
@@ -172,6 +192,10 @@ namespace Bolt {
 
         if (!c) {
           return;
+        }
+
+        foreach (Entity en in BoltCore._entities) {
+          DrawEntity(en.UnityObject);
         }
 
         Entity entity = BoltCore._entities

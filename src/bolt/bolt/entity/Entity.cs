@@ -143,7 +143,7 @@ namespace Bolt {
           }
         }
         else {
-          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other computers.", this);
+          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other peers.", this);
         }
       }
       else {
@@ -219,11 +219,24 @@ namespace Bolt {
 
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
-        eb.Detached();
+        try {
+          eb.Detached();
+          eb.entity = null;
+        }
+        catch (Exception exn) {
+          BoltLog.Error("User code threw exception inside Detach callback");
+          BoltLog.Exception(exn);
+        }
       }
 
       // call out to user
-      BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
+      try {
+        BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject);
+      }
+      catch (Exception exn) {
+        BoltLog.Error("User code threw exception inside Detach callback");
+        BoltLog.Exception(exn);
+      }
 
       // clear out attached flag
       Flags &= ~EntityFlags.ATTACHED;
@@ -233,7 +246,7 @@ namespace Bolt {
 
       // clear from unity object
       UnityObject._entity = null;
-
+       
       // log
       BoltLog.Debug("Detached {0}", this);
     }

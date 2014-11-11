@@ -115,6 +115,21 @@ public class BoltConnection : BoltObject {
     set;
   }
 
+  internal int SendRateMultiplier {
+    get {
+      float r = udpConnection.WindowFillRatio;
+
+      if (r < 0.25f) {
+        return 1;
+      }
+
+      r = r - 0.25f;
+      r = r / 0.75f;
+
+      return Mathf.Clamp((int)(r * 60), 1, 60);
+    }
+  }
+
   internal BoltConnection(UdpConnection udp) {
     userToken = udp.UserToken;
 

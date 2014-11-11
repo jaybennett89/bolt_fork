@@ -31,14 +31,18 @@ static class EntityProxyEnvelopePool {
       obj = new EntityProxyEnvelope();
     }
 
+#if DEBUG
     Assert.True(obj._pooled);
     obj._pooled = false;
+#endif
     return obj;
   }
 
   internal static void Release(EntityProxyEnvelope obj) {
+#if DEBUG
     Assert.False(obj._pooled);
     obj._pooled = true;
+#endif
     pool.Push(obj);
   }
 }

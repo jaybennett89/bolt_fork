@@ -364,7 +364,7 @@ internal static class BoltCore {
     Connect(endpoint, null);
   }
 
-  public static void Connect(UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     if (server != null) {
       BoltLog.Error("You must disconnect from the current server first");
       return;
@@ -374,7 +374,7 @@ internal static class BoltCore {
     DisableLanBroadcast();
 
     // connect
-    _udpSocket.Connect(endpoint, token);
+    _udpSocket.Connect(endpoint, (token == null) ? null : token.ToByteArray());
   }
 
   public static void SetSessionData(string serverName, string userData) {
@@ -440,7 +440,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRequest:
-          BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
+          HandleConnectRequest(ev.EndPoint, (byte[])ev.Object0);
           break;
 
         case UdpEventType.ConnectFailed:
@@ -467,6 +467,15 @@ internal static class BoltCore {
           ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
           break;
       }
+    }
+  }
+
+  static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
+    if (token != null) {
+      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
+    }
+    else {
+      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, null);
     }
   }
 
@@ -534,11 +543,17 @@ internal static class BoltCore {
         var localNotLoadingAndCanReceive = (BoltSceneLoader.IsLoading == false) && _canReceiveEntities;
 
         while (it.Next()) {
+          var sendRateMultiplier = it.val.SendRateMultiplier;
           var remoteNotLoadingAndCanReceive = (it.val.isLoadingMap == false) && it.val._canReceiveEntities;
+          var modifiedSendRate = localSendRate * sendRateMultiplier;
 
           // if both connection and local can receive entities, use local sendrate
-          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % localSendRate) == 0)) {
+          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % modifiedSendRate) == 0)) {
             it.val.Send();
+
+            if (sendRateMultiplier != 1) {
+              BoltLog.Debug("Send Rate: {0} / {1}", modifiedSendRate, sendRateMultiplier);
+            }
           }
 
           // if not, only send 1 packet/second
@@ -657,6 +672,7 @@ internal static class BoltCore {
   }
 
   static internal void UpdateActiveGlobalBehaviours(int index) {
+#if LOG
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
       BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
@@ -669,6 +685,7 @@ internal static class BoltCore {
     else {
       DeleteGlobalBehaviour(typeof(BoltConsole));
     }
+#endif
 
     CreateGlobalBehaviour(typeof(BoltPoll));
     CreateGlobalBehaviour(typeof(BoltSend));
@@ -718,28 +735,67 @@ internal static class BoltCore {
     }
   }
 
+  static void UnityLogCallback(string condition, string stackTrace, LogType type) {
+    stackTrace = (stackTrace ?? "").Trim();
+
+    switch (type) {
+      case LogType.Error:
+      case LogType.Assert:
+      case LogType.Exception:
+        BoltLog.Error(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Error(stackTrace);
+        }
+        break;
+
+      case LogType.Log:
+        BoltLog.Info(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Info(stackTrace);
+        }
+        break;
+
+      case LogType.Warning:
+        BoltLog.Warn(condition);
+
+        if (stackTrace.Length > 0) {
+          BoltLog.Warn(stackTrace);
+        }
+        break;
+    }
+  }
+
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
     PrefabDatabase.BuildCache();
 
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
+#if LOG
     DebugInfo.ignoreList = new HashSet<InstanceId>();
 
     if (BoltRuntimeSettings.instance.showDebugInfo) {
       DebugInfo.Show();
     }
 
+    if (BoltRuntimeSettings.instance.logUncaughtExceptions) {
+      UE.Application.RegisterLogCallbackThreaded(UnityLogCallback);
+    }
+#endif
+
     // close any existing socket
     Shutdown();
 
+#if LOG
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
     var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
     var consoleLog = (config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     var systemOutLog = (config.logTargets & BoltConfigLogTargets.SystemOut) == BoltConfigLogTargets.SystemOut;
 
-    if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
+    if (unityLog && (BoltRuntimeSettings.instance.logUncaughtExceptions == false)) { BoltLog.Add(new BoltLog.Unity()); }
     if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
     if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
     if (fileLog) {
@@ -752,6 +808,7 @@ internal static class BoltCore {
           break;
       }
     }
+#endif
 
     // set config
     _config = config;
@@ -825,6 +882,7 @@ internal static class BoltCore {
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
 
+#if DEBUG
   static UdpNoise CreatePerlinNoise() {
     var x = UnityEngine.Random.value;
     var s = Stopwatch.StartNew();
@@ -835,8 +893,10 @@ internal static class BoltCore {
     var r = new System.Random();
     return () => (float)r.NextDouble();
   }
+#endif
 
   static void UdpLogWriter(uint level, string message) {
+#if LOG
     switch (level) {
       case UdpLog.DEBUG:
       case UdpLog.TRACE:
@@ -855,6 +915,7 @@ internal static class BoltCore {
         BoltLog.Error(message);
         break;
     }
+#endif
   }
 
   internal static void SceneLoadBegin(Scene scene) {
@@ -919,4 +980,5 @@ internal static class BoltCore {
 
     return null;
   }
+
 }

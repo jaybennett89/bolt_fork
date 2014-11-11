@@ -13,6 +13,18 @@ namespace Bolt.Compiler {
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
 
+    public virtual bool OnRenderCallback {
+      get { return false; }
+    }
+
+    public virtual bool OnSimulateBeforeCallback {
+      get { return false; }
+    }
+
+    public virtual bool OnSimulateAfterCallback {
+      get { return false; }
+    }
+
     public abstract string ClrType {
       get;
     }

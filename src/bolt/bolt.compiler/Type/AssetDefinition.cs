@@ -6,6 +6,13 @@ using System.Linq;
 
 namespace Bolt.Compiler {
   [ProtoContract]
+  public enum SortOrder {
+    Manual,
+    Name,
+    Priority
+  }
+
+  [ProtoContract]
   [ProtoInclude(100, typeof(StateDefinition))]
   [ProtoInclude(200, typeof(EventDefinition))]
   [ProtoInclude(300, typeof(StructDefinition))]
@@ -31,6 +38,9 @@ namespace Bolt.Compiler {
 
     [ProtoMember(9, OverwriteList = true)]
     public HashSet<string> Groups = new HashSet<string>();
+
+    [ProtoMember(10)]
+    public SortOrder SortOrder;
 
     public abstract IEnumerable<Type> AllowedPropertyTypes {
       get;

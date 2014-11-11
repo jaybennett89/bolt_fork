@@ -252,14 +252,14 @@ public static class UdpStreamExtensions {
     return m;
   }
 
-  internal static void WriteNetworkId(this UdpPacket stream, NetId id) {
+  internal static void WriteNetworkId_old(this UdpPacket stream, NetId id) {
     Assert.True(id.Value >= 0);
     Assert.True(id.Value < EntityProxy.MAX_COUNT);
 
     stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
   }
 
-  internal static NetId ReadNetworkId(this UdpPacket stream) {
+  internal static NetId ReadNetworkId_Old(this UdpPacket stream) {
     return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
   }
 
@@ -280,7 +280,7 @@ public static class UdpStreamExtensions {
       stream.WriteBool(ReferenceEquals(en.Source, cn));
 
       // the actual network id
-      stream.WriteNetworkId(id);
+      stream.WriteNetworkId_old(id);
     }
   }
 
@@ -297,11 +297,11 @@ public static class UdpStreamExtensions {
       // and the reverse if it's false
 
       if (stream.ReadBool()) {
-        networkId = stream.ReadNetworkId();
+        networkId = stream.ReadNetworkId_Old();
         return cn.GetOutgoingEntity(networkId);
       }
       else {
-        networkId = stream.ReadNetworkId();
+        networkId = stream.ReadNetworkId_Old();
         return cn.GetIncommingEntity(networkId);
       }
     }
@@ -309,6 +309,40 @@ public static class UdpStreamExtensions {
       networkId = new NetId(int.MaxValue);
       return null;
     }
+  }
+
+
+  public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
+    ulong v = id.Value;
+    ulong b = 0UL;
+
+    do {
+      b = v & 127UL;
+      v = v >> 7;
+
+      if (v > 0) {
+        b |= 128UL;
+      }
+
+      packet.WriteByte((byte)b);
+
+    } while ((b & 128UL) == 128UL);
+  }
+
+  public static NetworkId ReadNetworkId(this UdpPacket packet) {
+    ulong v = 0UL;
+    ulong b = 0UL;
+
+    int s = 0;
+
+    do {
+      b = packet.ReadByte();
+      v = v | ((b & 127UL) << s);
+      s = s + 7;
+
+    } while ((b & 128UL) == 128UL);
+
+    return new NetworkId(v);
   }
 
   internal static void WriteContinueMarker(this UdpPacket stream) {

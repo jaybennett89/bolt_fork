@@ -166,7 +166,12 @@ namespace Bolt.Compiler {
     }
 
     string Set(object data, object offset) {
-      return string.Format("Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
+      if ((Decorator.DefiningAsset is StructDecorator) || (Decorator.DefiningAsset is StateDecorator)) {
+        return string.Format("frame.Changed = true; Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
+      }
+      else {
+        return string.Format("Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
+      }
     }
 
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {

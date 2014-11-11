@@ -1,4 +1,5 @@
-﻿namespace Bolt {
+﻿using System;
+namespace Bolt {
   [Documentation]
   public enum ReliabilityModes : byte {
     Unreliable = 0,
@@ -13,13 +14,18 @@
     EveryoneExceptOwner = Event.ENTITY_EVERYONE_EXCEPT_OWNER,
     OnlyController = Event.ENTITY_ONLY_CONTROLLER,
     OnlyOwner = Event.ENTITY_ONLY_OWNER,
+    OnlySelf = Event.ENTITY_ONLY_SELF,
   }
 
   [Documentation]
   public enum GlobalTargets : byte {
     Everyone = Event.GLOBAL_EVERYONE,
     Others = Event.GLOBAL_OTHERS,
-    Server = Event.GLOBAL_SERVER,
-    AllClients = Event.GLOBAL_ALL_CLIENTS
+    AllClients = Event.GLOBAL_ALL_CLIENTS,
+    OnlyServer = Event.GLOBAL_ONLY_SERVER,
+    OnlySelf = Event.GLOBAL_ONLY_SELF,
+
+    [Obsolete("Use GlobalTargets.OnlyServer")]
+    Server = Event.GLOBAL_ONLY_SERVER,
   }
 }

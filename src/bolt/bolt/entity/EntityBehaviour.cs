@@ -29,6 +29,9 @@ namespace Bolt {
 
         return _entity;
       }
+      set {
+        _entity = value;
+      }
     }
 
     /// <summary>

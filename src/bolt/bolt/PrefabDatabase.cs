@@ -51,7 +51,7 @@ namespace Bolt {
       _instance = (PrefabDatabase)UE.Resources.Load("BoltPrefabDatabase", typeof(PrefabDatabase));
     }
 
-    internal static UE.GameObject Find(Bolt.PrefabId id) {
+    public static UE.GameObject Find(Bolt.PrefabId id) {
       if (_lookup == null || _instance == null) {
         LoadInstance();
         UpdateLookup();

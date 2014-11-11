@@ -199,6 +199,10 @@ public static class BoltNetwork {
     return null;
   }
 
+  public static void RegisterTokenClass<T>() where T : class, IProtocolToken, new() {
+    Factory.RegisterTokenClass(typeof(T));
+  }
+
   public static void EnableUPnP() {
     UPnP.Enable();
   }
@@ -222,10 +226,6 @@ public static class BoltNetwork {
   public static void SetPrefabPool(IPrefabPool pool) {
     if (pool == null) {
       throw new ArgumentNullException("pool");
-    }
-
-    if (isRunning) {
-      throw new BoltException("You can't change the prefab pool after starting");
     }
 
     BoltCore.PrefabPool = pool;
@@ -382,7 +382,7 @@ public static class BoltNetwork {
     BoltCore.Connect(endpoint);
   }
 
-  public static void Connect(UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     BoltCore.Connect(endpoint, token);
   }
 
