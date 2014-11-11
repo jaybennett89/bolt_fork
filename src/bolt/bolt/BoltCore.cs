@@ -364,7 +364,7 @@ internal static class BoltCore {
     Connect(endpoint, null);
   }
 
-  public static void Connect(UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     if (server != null) {
       BoltLog.Error("You must disconnect from the current server first");
       return;
@@ -374,7 +374,7 @@ internal static class BoltCore {
     DisableLanBroadcast();
 
     // connect
-    _udpSocket.Connect(endpoint, token);
+    _udpSocket.Connect(endpoint, token.ToByteArray());
   }
 
   public static void SetSessionData(string serverName, string userData) {
@@ -440,7 +440,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRequest:
-          BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Object0 as byte[]);
+          HandleConnectRequest(ev.EndPoint, (byte[])ev.Object0);
           break;
 
         case UdpEventType.ConnectFailed:
@@ -467,6 +467,15 @@ internal static class BoltCore {
           ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
           break;
       }
+    }
+  }
+
+  static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
+    if (token != null) {
+      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
+    }
+    else {
+      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, null);
     }
   }
 
@@ -778,7 +787,7 @@ internal static class BoltCore {
 
     // close any existing socket
     Shutdown();
-    
+
 #if LOG
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
@@ -872,7 +881,7 @@ internal static class BoltCore {
     // tell user that we started
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
-  
+
 #if DEBUG
   static UdpNoise CreatePerlinNoise() {
     var x = UnityEngine.Random.value;

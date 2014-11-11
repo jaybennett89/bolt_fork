@@ -382,7 +382,7 @@ public static class BoltNetwork {
     BoltCore.Connect(endpoint);
   }
 
-  public static void Connect(UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     BoltCore.Connect(endpoint, token);
   }
 
