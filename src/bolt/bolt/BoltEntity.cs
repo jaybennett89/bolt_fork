@@ -308,6 +308,16 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     return default(TState);
   }
 
+  public bool TryFindState<TState>(out TState state) {
+    if (Entity.Serializer is TState) {
+      state = (TState) (object)Entity.Serializer;
+      return true;
+    }
+
+    state = default(TState);
+    return false;
+  }
+
   /// <summary>
   /// Checks which type of state this entity has
   /// </summary>

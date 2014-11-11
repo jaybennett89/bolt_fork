@@ -15,12 +15,17 @@ partial class BoltCompiler {
   static IEnumerable<BoltPrefab> FindPrefabs() {
     var id = 1;
     var files = Directory.GetFiles(@"Assets", "*.prefab", SearchOption.AllDirectories);
+    var settings = BoltRuntimeSettings.instance;
 
     for (int i = 0; i < files.Length; ++i) {
       BoltEntity entity = AssetDatabase.LoadAssetAtPath(files[i], typeof(BoltEntity)) as BoltEntity;
 
       if (entity) {
         entity._prefabId = id;
+
+        if (settings.clientCanInstantiateAll) {
+          entity._allowInstantiateOnClient = true;
+        }
 
         EditorUtility.SetDirty(entity.gameObject);
         EditorUtility.SetDirty(entity);

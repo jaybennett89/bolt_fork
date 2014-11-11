@@ -15,6 +15,26 @@ namespace Bolt {
   }
 
   public static class Blit {
+    [SuppressUnmanagedCodeSecurity]
+    [DllImport("BoltFastCompare", ExactSpelling = true)]
+    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
+
+    public unsafe static int DiffNative(byte[] a, byte[] b, Block[] blocks, int[] result) {
+      int count = 0;
+
+      fixed (byte* aPtr = a) {
+        fixed (byte* bPtr = b) {
+          fixed (Block* blocksPtr = blocks) {
+            fixed (int* resultPtr = result) {
+              count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
+            }
+          }
+        }
+      }
+
+      return count;
+    }
+
     public unsafe static int DiffUnsafe(byte[] a, byte[] b, Block[] blocks, int[] result) {
       if (blocks.Length == 0) {
         return 0;

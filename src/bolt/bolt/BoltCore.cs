@@ -534,11 +534,17 @@ internal static class BoltCore {
         var localNotLoadingAndCanReceive = (BoltSceneLoader.IsLoading == false) && _canReceiveEntities;
 
         while (it.Next()) {
+          var sendRateMultiplier = it.val.SendRateMultiplier;
           var remoteNotLoadingAndCanReceive = (it.val.isLoadingMap == false) && it.val._canReceiveEntities;
+          var modifiedSendRate = localSendRate * sendRateMultiplier;
 
           // if both connection and local can receive entities, use local sendrate
-          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % localSendRate) == 0)) {
+          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % modifiedSendRate) == 0)) {
             it.val.Send();
+
+            if (sendRateMultiplier != 1) {
+              BoltLog.Debug("Send Rate: {0} / {1}", modifiedSendRate, sendRateMultiplier);
+            }
           }
 
           // if not, only send 1 packet/second
@@ -657,6 +663,7 @@ internal static class BoltCore {
   }
 
   static internal void UpdateActiveGlobalBehaviours(int index) {
+#if LOG
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
       BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
@@ -669,6 +676,7 @@ internal static class BoltCore {
     else {
       DeleteGlobalBehaviour(typeof(BoltConsole));
     }
+#endif
 
     CreateGlobalBehaviour(typeof(BoltPoll));
     CreateGlobalBehaviour(typeof(BoltSend));
@@ -756,6 +764,7 @@ internal static class BoltCore {
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
+#if LOG
     DebugInfo.ignoreList = new HashSet<InstanceId>();
 
     if (BoltRuntimeSettings.instance.showDebugInfo) {
@@ -765,10 +774,12 @@ internal static class BoltCore {
     if (BoltRuntimeSettings.instance.logUncaughtExceptions) {
       UE.Application.RegisterLogCallbackThreaded(UnityLogCallback);
     }
+#endif
 
     // close any existing socket
     Shutdown();
-
+    
+#if LOG
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
     var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
@@ -788,6 +799,7 @@ internal static class BoltCore {
           break;
       }
     }
+#endif
 
     // set config
     _config = config;
@@ -860,7 +872,8 @@ internal static class BoltCore {
     // tell user that we started
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
-
+  
+#if DEBUG
   static UdpNoise CreatePerlinNoise() {
     var x = UnityEngine.Random.value;
     var s = Stopwatch.StartNew();
@@ -871,8 +884,10 @@ internal static class BoltCore {
     var r = new System.Random();
     return () => (float)r.NextDouble();
   }
+#endif
 
   static void UdpLogWriter(uint level, string message) {
+#if LOG
     switch (level) {
       case UdpLog.DEBUG:
       case UdpLog.TRACE:
@@ -891,6 +906,7 @@ internal static class BoltCore {
         BoltLog.Error(message);
         break;
     }
+#endif
   }
 
   internal static void SceneLoadBegin(Scene scene) {

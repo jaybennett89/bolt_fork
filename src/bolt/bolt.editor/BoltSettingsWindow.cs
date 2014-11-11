@@ -49,6 +49,10 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
+    BoltAssetEditorGUI.Label("Instantiate Mode", () => {
+      settings.clientCanInstantiateAll = BoltEditorGUI.ToggleDropdown("Client Can Instantiate Everything", "Individual On Each Prefab", settings.clientCanInstantiateAll);
+    });
+
     if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings.scopeModeHideWarningInGui == false)) {
       EditorGUILayout.HelpBox("When manual scoping is enabled you are required to call BoltEntity.SetScope for each connection that should receive a replicated copy of the entity.", MessageType.Warning);
 

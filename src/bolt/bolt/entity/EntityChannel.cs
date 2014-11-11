@@ -296,7 +296,7 @@ partial class EntityChannel : BoltChannel {
             _outgoingProxiesByPriority[i].Priority = 0;
           }
           else {
-            failCount += 1;
+            failCount += 1; 
           }
         }
       }
