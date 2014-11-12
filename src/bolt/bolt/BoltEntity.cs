@@ -203,7 +203,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="parent">The parent of this entity</param>
   public void SetParent(BoltEntity parent) {
-    Entity.SetParent(parent.Entity);
+    if (parent) {
+      Entity.SetParent(parent.Entity);
+    }
+    else {
+      Entity.SetParent(null);
+    }
   }
 
   /// <summary>
