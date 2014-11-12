@@ -181,16 +181,16 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="id">The id to look up</param>
   /// <returns>The entity if one was found, otherwise null</returns>
-  public static BoltEntity FindEntity(Bolt.UniqueId id) {
-    if (id.IsNone) {
-      BoltLog.Error("You can't look up entities with the 'None' id value");
+  public static BoltEntity FindEntity(Bolt.NetworkId id) {
+    if (id.Value == 0) {
+      BoltLog.Error("You can't look up entities a zero network id");
       return null;
     }
 
     var it = BoltCore._entities.GetIterator();
 
     while (it.Next()) {
-      if (it.val.UniqueId == id) {
+      if (it.val.NetworkId.Value == id.Value) {
         return it.val.UnityObject;
       }
     }

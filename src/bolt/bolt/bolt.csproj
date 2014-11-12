@@ -58,6 +58,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="NetworkIdChannel.cs" />
     <Compile Include="NetworkMask.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
@@ -121,10 +122,10 @@
       <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
-    <Compile Include="t4\BoltFlagsGenerated.cs">
+    <Compile Include="t4\Flags.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BoltFlagsGenerated.tt</DependentUpon>
+      <DependentUpon>Flags.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltGlobalBehaviour.cs" />
     <Compile Include="BoltId.cs" />
@@ -191,9 +192,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>
     </None>
-    <None Include="t4\BoltFlagsGenerated.tt">
+    <None Include="t4\Flags.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltFlagsGenerated.cs</LastGenOutput>
+      <LastGenOutput>Flags.cs</LastGenOutput>
     </None>
     <None Include="t4\BoltIds.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

@@ -11,6 +11,9 @@ enum BoltEntityDestroyMode {
 }
 
 partial class EntityChannel : BoltChannel {
+  Dictionary<Bolt.NetworkId, EntityProxy> _outgoing;
+  Dictionary<Bolt.NetworkId, EntityProxy> _incomming;
+
   NetIdPool _outgoingProxiesNetworkIdPool;
   EntityProxy[] _outgoingProxiesByPriority;
 
@@ -21,6 +24,9 @@ partial class EntityChannel : BoltChannel {
   Dictionary<Bolt.InstanceId, EntityProxy> _incommingProxiesByInstanceId;
 
   public EntityChannel() {
+    _outgoing = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
+    _incomming = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
+
     _outgoingProxiesNetworkIdPool = new NetIdPool(EntityProxy.MAX_COUNT);
     _outgoingProxiesByPriority = new EntityProxy[EntityProxy.MAX_COUNT];
 

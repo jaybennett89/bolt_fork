@@ -13,6 +13,8 @@ internal class BoltPacket : IDisposable {
     get { return BoltCore._udpConfig.PacketSize - UdpHeader.SIZE_BYTES; }
   }
 
+  internal Bolt.NetworkId NetworkIdBlock;
+
   internal int number;
   internal PacketStats stats;
   internal volatile bool pooled = true;

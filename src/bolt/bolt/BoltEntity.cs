@@ -106,15 +106,11 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return new PrefabId(_prefabId); }
   }
 
-  public Bolt.InstanceId instanceId {
-    get { return Entity.InstanceId; }
-  }
-
   /// <summary>
   /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
   /// </summary>
   public Bolt.UniqueId uniqueId {
-    get { return Entity.UniqueId; }
+    get { return default(Bolt.UniqueId); }
   }
 
   /// <summary>
@@ -122,6 +118,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   public BoltConnection source {
     get { return Entity.Source; }
+  }
+
+  public NetworkId networkId {
+    get { return Entity.NetworkId; }
   }
 
   /// <summary>
@@ -230,7 +230,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="id"></param>
   public void SetUniqueId(Bolt.UniqueId id) {
-    Entity.SetUniqueId(id);
+    BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
   }
 
   /// <summary>

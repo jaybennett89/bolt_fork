@@ -11,9 +11,8 @@ namespace Bolt {
 
     bool _canQueueCommands = false;
 
-    internal UniqueId UniqueId;
+    internal NetworkId NetworkId;
     internal PrefabId PrefabId;
-    internal InstanceId InstanceId;
     internal EntityFlags Flags;
 
     internal UE.Vector3 SpawnPosition;
@@ -102,7 +101,7 @@ namespace Bolt {
     object IBoltListNode.list { get; set; }
 
     public override string ToString() {
-      return string.Format("[Entity {0} {1} {2}]", InstanceId, PrefabId, Serializer);
+      return string.Format("[Entity {0} {1}]", NetworkId, Serializer);
     }
 
     internal void SetParent(Entity entity) {
@@ -129,25 +128,6 @@ namespace Bolt {
           // set parent
           Parent = entity;
         }
-      }
-    }
-
-    internal void SetUniqueId(UniqueId id) {
-      if (IsOwner) {
-        if (Proxies.count == 0) {
-          if (UniqueId.IsNone) {
-            UniqueId = id;
-          }
-          else {
-            BoltLog.Error("You can not change the UniqueId of {0} after it has been set.", this);
-          }
-        }
-        else {
-          BoltLog.Error("You can not set UniqueId of {0} after it has been replicated to other peers.", this);
-        }
-      }
-      else {
-        BoltLog.Error("You can not set UniqueId of {0}, you are not the owner of this entity.", this);
       }
     }
 
@@ -182,7 +162,7 @@ namespace Bolt {
     internal void Attach() {
       Assert.NotNull(UnityObject);
       Assert.False(IsAttached);
-      Assert.True(InstanceId.Value != 0);
+      Assert.True(NetworkId.Value == 0UL);
 
       // add to entities list
       BoltCore._entities.AddLast(this);
@@ -208,7 +188,7 @@ namespace Bolt {
     internal void Detach() {
       Assert.NotNull(UnityObject);
       Assert.True(IsAttached);
-      Assert.True(InstanceId.Value != 0);
+      Assert.True(NetworkId.Value != 0UL);
 
       // destroy on all connections
       var it = BoltCore._connections.GetIterator();
@@ -268,7 +248,7 @@ namespace Bolt {
     }
 
     internal void Initialize() {
-      Assert.True(InstanceId.Value == 0);
+      Assert.True(NetworkId.Value == 0UL);
 
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
@@ -281,9 +261,6 @@ namespace Bolt {
       else {
         BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
       }
-
-      // set instance id
-      InstanceId = new InstanceId(++_instanceIdCounter);
 
       // assign usertokens
       UnityObject._entity = this;

@@ -238,8 +238,10 @@ namespace Bolt {
 
           LabelBold("Entity Info");
           LabelField("Name", entity.UnityObject.gameObject.name);
-          LabelField("UniqueId", entity.UniqueId);
+          LabelField("Network Id", entity.NetworkId);
+
           LabelField("World Position", entity.UnityObject.transform.position);
+
           LabelField("Frame Count", state.Frames.count);
           LabelField("Frame Latest Number", state.Frames.last.Number);
           LabelField("Frame Server Number", BoltNetwork.serverFrame);

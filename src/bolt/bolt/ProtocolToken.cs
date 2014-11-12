@@ -11,7 +11,7 @@ namespace Bolt {
     public static byte[] ToByteArray(this IProtocolToken token) {
       UdpPacket packet;
       packet = new UdpPacket(new byte[BoltCore._config.packetSize - 256]);
-      packet.WriteByte(Factory.TokenId(token));
+      packet.WriteByte(Factory.GetTokenId(token));
 
       token.Pack(packet);
 

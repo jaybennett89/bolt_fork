@@ -7,15 +7,4 @@ static class BoltGUI {
   public static UE.Color Green = new UE.Color(108 / 255f, 255 / 255f, 20 / 255f);
   public static UE.Color Sky = new UE.Color(245 / 255f, 245 / 255f, 255 / 255f);
   public static UE.Color Error = new UE.Color(255 / 255f, 37 / 255f, 37 / 255f);
-
-  public static void Label(object label) {
-    UE.GUILayout.Label(label.ToString());
-  }
-
-  public static void LabelText(string label, string text) {
-    UE.GUILayout.BeginHorizontal();
-    UE.GUILayout.Label(label);
-    UE.GUILayout.Label(text);
-    UE.GUILayout.EndHorizontal();
-  }
 }

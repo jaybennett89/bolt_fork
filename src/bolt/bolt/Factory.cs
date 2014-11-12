@@ -86,7 +86,7 @@ namespace Bolt {
       return ev;
     }
 
-    internal static byte TokenId(IProtocolToken obj) {
+    internal static byte GetTokenId(IProtocolToken obj) {
       return _token2id[obj.GetType()];
     }
 
@@ -97,7 +97,6 @@ namespace Bolt {
     internal static Command NewCommand(TypeId id) {
       return (Command)Create(id);
     }
-
 
     internal static Command NewCommand(UniqueId id) {
       return (Command)Create(id);
