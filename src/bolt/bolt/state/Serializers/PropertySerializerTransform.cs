@@ -79,12 +79,15 @@ namespace Bolt {
 
     public override void OnRender(State state, State.Frame frame) {
       var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
-      if (td.Render) {
-        var p = td.RenderDoubleBufferPosition.Previous;
-        var c = td.RenderDoubleBufferPosition.Current;
-        td.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
-        td.Render.rotation = td.RenderDoubleBufferRotation.Current;
+
+      if (ReferenceEquals(td.Render, null)) {
+        return;
       }
+
+      var p = td.RenderDoubleBufferPosition.Previous;
+      var c = td.RenderDoubleBufferPosition.Current;
+      td.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
+      td.Render.rotation = td.RenderDoubleBufferRotation.Current;
     }
 
     public override void OnParentChanged(State state, Entity newParent, Entity oldParent) {
@@ -130,70 +133,70 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(State state) {
-
-      if (!state.Entity.IsOwner && !state.Entity.HasPredictedControl) {
+      if (state.Entity.IsDummy) {
         var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
 
-        if (td.Simulate) {
-          var p = Settings.ByteOffset + POSITION_OFFSET;
-          var v = Settings.ByteOffset + VELOCITY_OFFSET;
-          var r = Settings.ByteOffset + ROTATION_OFFSET;
-          var snap = false;
-
-          switch (SmoothingSettings.Algorithm) {
-            case SmoothingAlgorithms.None:
-              PerformNone(td, state);
-              break;
-
-            case SmoothingAlgorithms.Interpolation:
-              td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude, ref snap);
-              td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
-              break;
-
-            case SmoothingAlgorithms.Extrapolation:
-              //BoltPoll.CALC.Start();
-              UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);
-              //BoltPoll.CALC.Stop();
-
-              //BoltPoll.ASSIGN.Start();
-              td.Simulate.localPosition = calc;
-              //BoltPoll.ASSIGN.Stop();
-
-              td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation);
-              break;
-          }
-
-          if (snap) {
-            td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position).Shift(td.Simulate.position);
-          }
-        }
-        else {
-          //BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
-        }
-      }
-
-    }
-
-    public override void OnSimulateAfter(State state) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
-      if (td.Simulate) {
-        var f = state.Frames.first;
-
-        if (state.Entity.IsOwner) {
-          UE.Vector3 position = f.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
-          UE.Vector3 velocity = GetVelocity(td, position);
-
-          f.Data.PackVector3(Settings.ByteOffset + POSITION_OFFSET, td.Simulate.localPosition);
-          f.Data.PackVector3(Settings.ByteOffset + VELOCITY_OFFSET, velocity);
-          f.Data.PackQuaternion(Settings.ByteOffset + ROTATION_OFFSET, td.Simulate.localRotation);
+        if (ReferenceEquals(td.Simulate, null)) {
+          return;
         }
 
-        td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
-        td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
+        var p = Settings.ByteOffset + POSITION_OFFSET;
+        var v = Settings.ByteOffset + VELOCITY_OFFSET;
+        var r = Settings.ByteOffset + ROTATION_OFFSET;
+        var snap = false;
+
+        switch (SmoothingSettings.Algorithm) {
+          case SmoothingAlgorithms.None:
+            PerformNone(td, state);
+            break;
+
+          case SmoothingAlgorithms.Interpolation:
+            td.Simulate.localPosition = Math.InterpolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings.SnapMagnitude, ref snap);
+            td.Simulate.localRotation = Math.InterpolateQuaternion(state.Frames, r, state.Entity.Frame);
+            break;
+
+          case SmoothingAlgorithms.Extrapolation:
+            //BoltPoll.CALC.Start();
+            UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap); ;
+            //BoltPoll.CALC.Stop();
+
+            //BoltPoll.ASSIGN.Start();
+            td.Simulate.localPosition = calc;
+            //BoltPoll.ASSIGN.Stop();
+
+            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation);
+            break;
+        }
+
+        if (snap) {
+          td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position).Shift(td.Simulate.position);
+        }
       }
       else {
         //BoltLog.Warn("The transform of {0}.{1} has not been assigned", state.Entity.UnityObject.gameObject.name, Settings.PropertyName);
       }
+    }
+
+    public override void OnSimulateAfter(State state) {
+      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+
+      if (ReferenceEquals(td.Simulate, null)) {
+        return;
+      }
+
+      var f = state.Frames.first;
+
+      if (state.Entity.IsOwner) {
+        UE.Vector3 position = f.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
+        UE.Vector3 velocity = GetVelocity(td, position);
+
+        f.Data.PackVector3(Settings.ByteOffset + POSITION_OFFSET, td.Simulate.localPosition);
+        f.Data.PackVector3(Settings.ByteOffset + VELOCITY_OFFSET, velocity);
+        f.Data.PackQuaternion(Settings.ByteOffset + ROTATION_OFFSET, td.Simulate.localRotation);
+      }
+
+      td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
+      td.RenderDoubleBufferRotation = td.RenderDoubleBufferRotation.Shift(td.Simulate.rotation);
     }
 
     UE.Vector3 GetVelocity(TransformData td, UE.Vector3 position) {

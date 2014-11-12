@@ -49,6 +49,10 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
+    BoltAssetEditorGUI.Label("Instantiate Mode", () => {
+      settings.clientCanInstantiateAll = BoltEditorGUI.ToggleDropdown("Client Can Instantiate Everything", "Individual On Each Prefab", settings.clientCanInstantiateAll);
+    });
+
     if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings.scopeModeHideWarningInGui == false)) {
       EditorGUILayout.HelpBox("When manual scoping is enabled you are required to call BoltEntity.SetScope for each connection that should receive a replicated copy of the entity.", MessageType.Warning);
 
@@ -218,13 +222,13 @@ public class BoltSettingsWindow : EditorWindow {
       settings.showDebugInfo = EditorGUILayout.Toggle(settings.showDebugInfo);
     });
 
+    BoltAssetEditorGUI.Label("Log Unity To Console", () => {
+      settings.logUncaughtExceptions = EditorGUILayout.Toggle(settings.logUncaughtExceptions);
+    });
+
     BoltAssetEditorGUI.Label("Editor Skin", () => {
       settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
-  }
-
-  void Console() {
-    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     var consoleEnabled = (settings._config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     EditorGUI.BeginDisabledGroup(consoleEnabled == false);
@@ -278,9 +282,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltEditorGUI.Header("Miscellaneous", "mc_settings");
     Miscellaneous();
-
-    BoltEditorGUI.Header("Console", "mc_console");
-    Console();
 
     BoltEditorGUI.Header("Compiler", "mc_compile");
     Compiler();

@@ -17,7 +17,7 @@ cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });
 cbs.Add("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" });
 cbs.Add("Connected", new[] { "BoltConnection", "connection" });
 cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
-cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "byte[]", "token"});
+cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
 
 cbs.Add("EntityReceived", new[] { "BoltEntity", "entity" });
 cbs.Add("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" });

@@ -228,10 +228,6 @@ public static class BoltNetwork {
       throw new ArgumentNullException("pool");
     }
 
-    if (isRunning) {
-      throw new BoltException("You can't change the prefab pool after starting");
-    }
-
     BoltCore.PrefabPool = pool;
   }
 
@@ -386,7 +382,7 @@ public static class BoltNetwork {
     BoltCore.Connect(endpoint);
   }
 
-  public static void Connect(UdpEndPoint endpoint, byte[] token) {
+  public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     BoltCore.Connect(endpoint, token);
   }
 

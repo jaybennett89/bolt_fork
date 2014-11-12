@@ -197,6 +197,8 @@ namespace Bolt {
     }
 
     bool PackEvent(Event ev, UdpPacket stream, uint sequence) {
+      BoltLog.Debug("sending event {0}", ev);
+
       stream.WriteContinueMarker();
 
       // type id of this event
@@ -227,6 +229,7 @@ namespace Bolt {
         uint sequence = 0;
         Event ev = ReadEvent(packet.stream, ref sequence);
 
+        BoltLog.Debug("recv event {0}", ev);
         if (ev.Reliability == ReliabilityModes.Unreliable) {
           EventDispatcher.Received(ev);
         }
@@ -235,6 +238,7 @@ namespace Bolt {
             case RecvBufferAddResult.Old:
             case RecvBufferAddResult.OutOfBounds:
             case RecvBufferAddResult.AlreadyExists:
+              BoltLog.Debug("FAILED");
               ev.DecrementRefs();
               break;
           }

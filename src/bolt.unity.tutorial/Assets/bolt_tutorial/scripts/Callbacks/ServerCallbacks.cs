@@ -23,6 +23,10 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
   }
 
+  public override void ConnectRequest(UdpKit.UdpEndPoint endpoint, Bolt.IProtocolToken token) {
+    BoltNetwork.Accept(endpoint);
+  }
+
   public override void Connected(BoltConnection c) {
     c.userToken = new Player();
     c.GetPlayer().connection = c;

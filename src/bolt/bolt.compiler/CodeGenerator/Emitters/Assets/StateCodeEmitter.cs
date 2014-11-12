@@ -87,18 +87,25 @@ namespace Bolt.Compiler {
 
         ctor.Statements.Comment("Setup data structures");
 
-        ctor.Statements.Expr("_Meta.FramePool = new System.Collections.Generic.Stack<Bolt.State.Frame>()");
+        ctor.Statements.Expr("_Meta.FramePool = new Bolt.State.FramePool(_Meta.FrameSize)");
         ctor.Statements.Expr("_Meta.PropertyFilters = new Bolt.BitArray[32]");
         ctor.Statements.Expr("_Meta.PropertyBlocks = new Bolt.Block[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyBlocksResult = new System.Int32[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyFilterCache = new Dictionary<Bolt.Filter, Bolt.BitArray>(128, Bolt.Filter.EqualityComparer.Instance)");
-        ctor.Statements.Expr("_Meta.PropertySerializers = new Bolt.PropertySerializer[_Meta.PropertyCount]");
         ctor.Statements.Expr("_Meta.PropertyCallbackPaths = new HashSet<string>(new string[] {{ {0} }})", Decorator.AllProperties.SelectMany(x => x.CallbackPaths).Distinct().Select(x => '"' + x.Trim('.') + '"').Join(", "));
+
+        ctor.Statements.Expr("_Meta.PropertySerializers = new Bolt.PropertySerializer[_Meta.PropertyCount]");
+        ctor.Statements.Expr("_Meta.PropertySerializersOnRender = new Bolt.PropertySerializer[{0}]", Decorator.AllProperties.Count(x => x.Decorator.OnRenderCallback));
+        ctor.Statements.Expr("_Meta.PropertySerializersOnSimulateAfter = new Bolt.PropertySerializer[{0}]", Decorator.AllProperties.Count(x => x.Decorator.OnSimulateAfterCallback));
+        ctor.Statements.Expr("_Meta.PropertySerializersOnSimulateBefore = new Bolt.PropertySerializer[{0}]", Decorator.AllProperties.Count(x => x.Decorator.OnSimulateBeforeCallback));
 
         EmitFilters(ctor);
         EmitProperties(ctor);
         EmitControllerFilter(ctor);
         EmitBlocks(ctor);
+        EmitCallbacks(ctor, "OnRender", p => p.Decorator.OnRenderCallback);
+        EmitCallbacks(ctor, "OnSimulateAfter", p => p.Decorator.OnSimulateAfterCallback);
+        EmitCallbacks(ctor, "OnSimulateBefore", p => p.Decorator.OnSimulateBeforeCallback);
       });
 
       type.DeclareConstructor(ctor => {
@@ -119,6 +126,15 @@ namespace Bolt.Compiler {
       }
 
       DeclareModify(type, Decorator);
+    }
+
+    void EmitCallbacks(CodeTypeConstructor ctor, string array, Func<StateProperty, bool> check) {
+      int n = 0;
+
+      foreach (var sp in Decorator.AllProperties.Where(check)) {
+        ctor.Statements.Expr("_Meta.PropertySerializers{0}[{1}] = _Meta.PropertySerializers[{2}]", array, n, sp.Index);
+        n += 1;
+      }
     }
 
     void EmitBlocks(CodeTypeConstructor ctor) {

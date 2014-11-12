@@ -152,10 +152,10 @@ partial class GlobalEventListenerBase {
   }
 
   
-  public virtual void ConnectRequest(UdpEndPoint endpoint, byte[] token) { 
+  public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
   }
 
-  internal static void ConnectRequestInvoke(UdpEndPoint endpoint, byte[] token) { 
+  internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
     BoltLog.Debug("Invoking callback ConnectRequest");
     foreach (GlobalEventListenerBase cb in callbacks) {
         cb.ConnectRequest(endpoint, token);

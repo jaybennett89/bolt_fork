@@ -12,12 +12,20 @@ namespace Bolt.Compiler {
     }
 
     string Set(object data, object offset) {
-      return string.Format("Bolt.Blit.PackString({0}, {1}, System.Text.Encoding.{2}, value, {3}, {4})",
+      string prefix = "";
+
+
+      if ((Decorator.DefiningAsset is StructDecorator) || (Decorator.DefiningAsset is StateDecorator)) {
+        prefix = "frame.Changed = true;";
+      }
+
+      return string.Format("{5} Bolt.Blit.PackString({0}, {1}, System.Text.Encoding.{2}, value, {3}, {4})",
         data,
         offset,
         Decorator.PropertyType.Encoding,
         Decorator.PropertyType.MaxLength,
-        Decorator.PropertyType.EncodingClass.GetMaxByteCount(Decorator.PropertyType.MaxLength)
+        Decorator.PropertyType.EncodingClass.GetMaxByteCount(Decorator.PropertyType.MaxLength),
+        prefix
       );
     }
 
