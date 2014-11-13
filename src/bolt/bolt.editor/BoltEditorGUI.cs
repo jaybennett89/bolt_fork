@@ -423,6 +423,7 @@ public static class BoltEditorGUI {
 
       if (EditorGUIUtility.isProSkin) {
         s.normal.background = Resources.Load("backgrounds/dark", typeof(Texture2D)) as Texture2D;
+        s.hover.background = Resources.Load("backgrounds/dark_hover", typeof(Texture2D)) as Texture2D;
       }
       else {
         s.normal.background = Resources.Load("backgrounds/light", typeof(Texture2D)) as Texture2D;
