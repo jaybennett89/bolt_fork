@@ -11,6 +11,7 @@ namespace Bolt {
 
     bool _canQueueCommands = false;
 
+    internal UniqueId UniqueId;
     internal NetworkId NetworkId;
     internal PrefabId PrefabId;
     internal EntityFlags Flags;

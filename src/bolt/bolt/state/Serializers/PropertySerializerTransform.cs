@@ -217,14 +217,14 @@ namespace Bolt {
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
       if (state.Entity.HasParent) {
         if (connection._entityChannel.ExistsOnRemote(state.Entity.Parent)) {
-          stream.WriteEntity(state.Entity.Parent, connection);
+          stream.WriteEntity(state.Entity.Parent);
         }
         else {
           return false;
         }
       }
       else {
-        stream.WriteEntity(null, connection);
+        stream.WriteEntity(null);
       }
 
       UE.Vector3 p = frame.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
@@ -242,7 +242,7 @@ namespace Bolt {
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
-      state.Entity.SetParentInternal(stream.ReadEntity(connection));
+      state.Entity.SetParentInternal(stream.ReadEntity());
 
       UE.Vector3 p = default(UE.Vector3);
       UE.Vector3 v = default(UE.Vector3);

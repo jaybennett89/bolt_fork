@@ -147,10 +147,10 @@
     <Compile Include="SceneLoadState.cs" />
     <Compile Include="state\Blit.cs" />
     <Compile Include="state\State.cs" />
-    <Compile Include="t4\BoltIds.cs">
+    <Compile Include="t4\Ids.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BoltIds.tt</DependentUpon>
+      <DependentUpon>Ids.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltChannel.cs" />
     <Compile Include="BoltConnection.cs" />
@@ -195,9 +195,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Flags.cs</LastGenOutput>
     </None>
-    <None Include="t4\BoltIds.tt">
+    <None Include="t4\Ids.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltIds.cs</LastGenOutput>
+      <LastGenOutput>Ids.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

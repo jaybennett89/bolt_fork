@@ -105,6 +105,10 @@ public class BoltConnection : BoltObject {
     get { return _bitsSecondOut; }
   }
 
+  public uint ConnectionId {
+    get { return udpConnection.ConnectionId; }
+  }
+
   /// <summary>
   /// Remote end point of this connection
   /// </summary>
@@ -170,19 +174,8 @@ public class BoltConnection : BoltObject {
     _udp.Disconnect();
   }
 
-  /// <summary>
-  /// How many updates have been skipped for the entity to this connection
-  /// </summary>
-  public float GetCurrentPriority(BoltEntity en) {
-    return _entityChannel.GetPriority(en.Entity);
-  }
-
   public int GetSkippedUpdates(BoltEntity en) {
     return _entityChannel.GetSkippedUpdates(en.Entity);
-  }
-
-  internal NetId GetNetworkId(Entity en) {
-    return _entityChannel.GetNetworkId(en);
   }
 
   public override bool Equals(object obj) {
@@ -199,14 +192,6 @@ public class BoltConnection : BoltObject {
 
   public override string ToString() {
     return string.Format("[Connection {0}]", _udp.RemoteEndPoint);
-  }
-
-  internal Entity GetIncommingEntity(NetId networkId) {
-    return _entityChannel.GetIncommingEntity(networkId);
-  }
-
-  internal Entity GetOutgoingEntity(NetId networkId) {
-    return _entityChannel.GetOutgoingEntity(networkId);
   }
 
   internal void DisconnectedInternal() {

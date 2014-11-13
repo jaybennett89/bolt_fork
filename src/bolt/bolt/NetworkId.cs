@@ -8,6 +8,10 @@ namespace Bolt {
     static uint ConnectionId;
 
     public static void Reset(uint connectionId) {
+      if (connectionId > 0) {
+        BoltLog.Debug("Id allocator reset with id {0}", connectionId);
+      }
+
       EntityId = 0;
       ConnectionId = connectionId;
     }

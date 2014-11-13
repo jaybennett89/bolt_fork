@@ -11,14 +11,14 @@ namespace Bolt {
     static Texture2D boltIconTexture;
     static Texture2D backgroundTexture;
     static internal bool showEntityDebugInfo = true;
-    static internal HashSet<InstanceId> ignoreList = new HashSet<InstanceId>();
+    static internal HashSet<NetworkId> ignoreList = new HashSet<NetworkId>();
 
     public static int PollTime { get; internal set; }
     public static int SendTime { get; internal set; }
     public static bool Enabled { get; private set; }
 
     public static void Ignore(BoltEntity entity) {
-      ignoreList.Add(entity.Entity.InstanceId);
+      ignoreList.Add(entity.Entity.NetworkId);
     }
 
     public static void DrawBackground(Rect r) {
@@ -199,7 +199,7 @@ namespace Bolt {
         }
 
         Entity entity = BoltCore._entities
-          .Where(x => ignoreList.Contains(x.InstanceId) == false)
+          .Where(x => ignoreList.Contains(x.NetworkId) == false)
           .Where(x => {
               Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
               return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
@@ -246,15 +246,6 @@ namespace Bolt {
           LabelField("Frame Latest Number", state.Frames.last.Number);
           LabelField("Frame Server Number", BoltNetwork.serverFrame);
           LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
-
-          LabelBold("Proxy Data");
-
-          foreach (BoltConnection connection in BoltCore._connections) {
-            int skipCount = connection._entityChannel.GetSkippedUpdates(entity);
-            if (skipCount >= 0) {
-              LabelField(connection.remoteEndPoint, "Skip: " + skipCount + " / Priority: " + connection._entityChannel.GetPriority(entity));
-            }
-          }
 
           entity.Serializer.DebugInfo();
 

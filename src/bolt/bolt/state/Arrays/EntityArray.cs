@@ -36,7 +36,7 @@ public struct EntityArray {
         throw new IndexOutOfRangeException();
       }
 
-      Bolt.InstanceId id = new Bolt.InstanceId(Bolt.Blit.ReadI32(frame.Data, offsetBytes + (index * 4)));
+      Bolt.NetworkId id = Bolt.Blit.ReadNetworkId(frame.Data, offsetBytes + (index * 8));
       Bolt.Entity entity = BoltCore.FindEntity(id);
 
       if (entity) {
@@ -85,14 +85,14 @@ public class EntityArrayModifier : IDisposable {
 
       if (value) {
         if (value.isAttached) {
-          Bolt.Blit.PackI32(array.frame.Data, array.offsetBytes + (index * 4), value._entity.InstanceId.Value);
+          Bolt.Blit.PackNetworkId(array.frame.Data, array.offsetBytes + (index * 8), value._entity.NetworkId);
         }
         else {
           BoltLog.Error("You can't put an entity which is not attached into the array");
         }
       }
       else {
-        Bolt.Blit.PackI32(array.frame.Data, array.offsetBytes + (index * 4), 0);
+        Bolt.Blit.PackNetworkId(array.frame.Data, array.offsetBytes + (index * 8), default(NetworkId));
       }
     }
   }

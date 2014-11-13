@@ -70,17 +70,17 @@ namespace Bolt {
 
     public static void PackEntity(this byte[] data, int offset, BoltEntity entity) {
       if (entity && entity.isAttached) {
-        data.PackI32(offset, entity.Entity.InstanceId.Value);
+        data.PackNetworkId(offset, entity.networkId);
       }
       else {
-        data.PackI32(offset, 0);
+        data.PackNetworkId(offset, default(NetworkId));
       }
     }
 
     public static BoltEntity ReadEntity(this byte[] data, int offset) {
-      Entity en = BoltCore.FindEntity(new InstanceId(data.ReadI32(offset)));
+      Entity en = BoltCore.FindEntity(data.ReadNetworkId(offset));
 
-      if (en) {
+      if (en && en.IsAttached) {
         return en.UnityObject;
       }
 
@@ -139,6 +139,17 @@ namespace Bolt {
 
     public static uint ReadU32(this byte[] data, int offset) {
       return (uint)((data[offset + 0]) | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24));
+    }
+
+    public static void PackNetworkId(this byte[] data, int offset, NetworkId networkId) {
+      data.PackU32(offset, networkId.Connection);
+      data.PackU32(offset + 4, networkId.Entity);
+    }
+
+    public static NetworkId ReadNetworkId(this byte[] data, int offset) {
+      uint connection = data.ReadU32(offset);
+      uint entity = data.ReadU32(offset + 4);
+      return new NetworkId(connection, entity);
     }
 
     public static void PackF32(this byte[] data, int offset, float value) {
@@ -466,6 +477,7 @@ namespace Bolt {
       [FieldOffset(3)]
       public Byte Byte3;
     }
+
 
   }
 }

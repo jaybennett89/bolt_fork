@@ -40,7 +40,7 @@ namespace Bolt {
     }
 
     public static IProtocolToken ToToken(this byte[] bytes) {
-      if ((bytes == null) || (bytes.Length == 1)) {
+      if ((bytes == null) || (bytes.Length == 0)) {
         return null;
       }
 

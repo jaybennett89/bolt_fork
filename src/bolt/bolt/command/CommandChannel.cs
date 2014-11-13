@@ -23,20 +23,12 @@ partial class EntityChannel {
       get { return Mathf.CeilToInt((connection.udpConnection.AliasedPing * BoltCore._config.commandPingMultiplier) / BoltCore.frameDeltaTime); }
     }
 
-    Dictionary<InstanceId, EntityProxy> incommingProxiesByEntityId {
-      get { return connection._entityChannel._incommingProxiesByInstanceId; }
+    Dictionary<NetworkId, EntityProxy> incommingProxiesByNetworkId {
+      get { return connection._entityChannel._incomming; }
     }
 
-    Dictionary<NetId, EntityProxy> incommingProxiesByNetworkId {
-      get { return connection._entityChannel._incommingProxiesByNetId; }
-    }
-
-    Dictionary<InstanceId, EntityProxy> outgoingProxiesByEntityId {
-      get { return connection._entityChannel._outgoingProxiesByInstanceId; }
-    }
-
-    Dictionary<NetId, EntityProxy> outgoingProxiesByNetworkId {
-      get { return connection._entityChannel._outgoingProxiesByNetId; }
+    Dictionary<NetworkId, EntityProxy> outgoingProxiesByNetworkId {
+      get { return connection._entityChannel._outgoing; }
     }
 
     public CommandChannel() {
@@ -74,7 +66,7 @@ partial class EntityChannel {
     }
 
     void PackResult(BoltPacket packet) {
-      foreach (EntityProxy proxy in outgoingProxiesByEntityId.Values) {
+      foreach (EntityProxy proxy in outgoingProxiesByNetworkId.Values) {
         Entity entity = proxy.Entity;
 
         // four conditions have to hold
@@ -90,7 +82,7 @@ partial class EntityChannel {
           int cmdWriteCount = 0;
 
           packet.stream.WriteBool(true);
-          packet.stream.WriteNetworkId_old(proxy.NetId);
+          packet.stream.PackNetworkId(proxy.NetId);
 
           var it = entity.CommandQueue.GetIterator();
 
@@ -146,7 +138,7 @@ partial class EntityChannel {
       while (packet.stream.CanRead()) {
         if (packet.stream.ReadBool() == false) { break; }
 
-        NetId netId = packet.stream.ReadNetworkId_Old();
+        NetworkId netId = packet.stream.ReadNetworkId();
         EntityProxy proxy = incommingProxiesByNetworkId[netId];
         Entity entity = proxy.Entity;
 
@@ -216,7 +208,7 @@ partial class EntityChannel {
 
           int proxyPos = packet.stream.Position;
           packet.stream.WriteBool(true);
-          packet.stream.WriteNetworkId_old(proxy.NetId);
+          packet.stream.PackNetworkId(proxy.NetId);
 
           Command cmd = entity.CommandQueue.last;
 
@@ -276,7 +268,7 @@ partial class EntityChannel {
       while (packet.stream.CanRead()) {
         if (packet.stream.ReadBool() == false) { break; }
 
-        NetId netId = packet.stream.ReadNetworkId_Old();
+        NetworkId netId = packet.stream.ReadNetworkId();
         EntityProxy proxy = null;
 
         if (outgoingProxiesByNetworkId.ContainsKey(netId)) {

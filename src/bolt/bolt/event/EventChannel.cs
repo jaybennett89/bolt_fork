@@ -214,7 +214,7 @@ namespace Bolt {
       else {
         if (ev.IsEntityEvent) {
           // write network id for entity events
-          stream.WriteEntity(ev.TargetEntity, connection);
+          stream.WriteEntity(ev.TargetEntity);
         }
       }
 
@@ -269,7 +269,7 @@ namespace Bolt {
       }
       else {
         if (ev.IsEntityEvent) {
-          ev.TargetEntity = stream.ReadEntity(connection);
+          ev.TargetEntity = stream.ReadEntity();
         }
 
         // assign relability mode

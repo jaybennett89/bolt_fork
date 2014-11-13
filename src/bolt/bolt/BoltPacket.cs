@@ -18,7 +18,6 @@ internal class BoltPacket : IDisposable {
   internal int number;
   internal PacketStats stats;
   internal volatile bool pooled = true;
-  //internal BoltSingleList<EntityProxyEnvelope> envelopes = new BoltSingleList<EntityProxyEnvelope>();
   internal List<Bolt.EventReliable> eventReliable = new List<Bolt.EventReliable>();
   internal Queue<EntityProxyEnvelope> ProxyEnvelopes = new Queue<EntityProxyEnvelope>();
 

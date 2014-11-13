@@ -284,11 +284,11 @@ internal static class BoltCore {
     entity.Entity.Detach();
   }
 
-  public static Bolt.Entity FindEntity(InstanceId id) {
+  public static Bolt.Entity FindEntity(NetworkId id) {
     var it = _entities.GetIterator();
 
     while (it.Next()) {
-      if (it.val.InstanceId == id) {
+      if (it.val.NetworkId == id) {
         return it.val;
       }
     }
@@ -627,11 +627,14 @@ internal static class BoltCore {
   }
 
   static void HandleConnected(UdpConnection udp) {
-    BoltConnection cn = new BoltConnection(udp);
-
-    if (udp.AcceptToken != null) {
-      cn.AcceptToken = udp.AcceptToken.ToToken();
+    if (isClient) {
+      Bolt.NetworkIdAllocator.Reset(udp.ConnectionId);
     }
+
+    BoltConnection cn;
+    
+    cn = new BoltConnection(udp);
+    cn.AcceptToken = udp.AcceptToken.ToToken();
 
     // put on connection list
     _connections.AddLast(cn);
