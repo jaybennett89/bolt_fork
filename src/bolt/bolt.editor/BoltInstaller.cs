@@ -148,6 +148,7 @@ public static class BoltInstaller {
 
   static void InstallIcons() {
     EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources", "icons"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources", "backgrounds"));
 
     var icons = 
       Resources

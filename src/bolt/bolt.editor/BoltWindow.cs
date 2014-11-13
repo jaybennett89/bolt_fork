@@ -40,7 +40,9 @@ static class BoltBackgroundSaver {
             Directory.CreateDirectory(Path.GetDirectoryName(BoltWindow.ProjectTempNewPath));
 
             // copy current project
-            File.Copy(BoltWindow.ProjectPath, BoltWindow.ProjectTempOldPath, true);
+            if (File.Exists(BoltWindow.ProjectPath)) {
+              File.Copy(BoltWindow.ProjectPath, BoltWindow.ProjectTempOldPath, true);
+            }
 
             // write new project
             File.WriteAllBytes(BoltWindow.ProjectTempNewPath, project.ToByteArray());
