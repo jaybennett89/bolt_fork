@@ -18,7 +18,7 @@ public class BoltConnectionsWindow : BoltWindow {
   void Header(string icon, string text) {
     GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
-    BoltEditorGUI.Button(icon);
+    BoltEditorGUI.IconButton(icon);
     GUILayout.Label(text);
 
     GUILayout.EndHorizontal();
@@ -103,7 +103,7 @@ public class BoltConnectionsWindow : BoltWindow {
     return () => {
       GUILayout.BeginHorizontal();
 
-      BoltEditorGUI.Button(icon);
+      BoltEditorGUI.IconButton(icon);
 
       GUIStyle s = new GUIStyle(EditorStyles.miniLabel);
       s.padding = new RectOffset();

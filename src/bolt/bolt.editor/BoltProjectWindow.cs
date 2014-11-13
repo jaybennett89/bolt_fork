@@ -110,16 +110,16 @@ public class BoltProjectWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (HasProject) {
-      BoltEditorGUI.HeaderButton("States", "mc_state", () => NewAsset(new StateDefinition()));
+      BoltEditorGUI.Header("States", "mc_state");
       DisplayAssetList(Project.States.Cast<AssetDefinition>());
 
-      BoltEditorGUI.HeaderButton("Structs", "mc_struct", () => NewAsset(new StructDefinition()));
+      BoltEditorGUI.Header("Structs", "mc_struct");
       DisplayAssetList(Project.Structs.Cast<AssetDefinition>());
 
-      BoltEditorGUI.HeaderButton("Commands", "mc_command", () => NewAsset(new CommandDefinition()));
+      BoltEditorGUI.Header("Commands", "mc_command");
       DisplayAssetList(Project.Commands.Cast<AssetDefinition>());
 
-      BoltEditorGUI.HeaderButton("Events", "mc_event", () => NewAsset(new EventDefinition()));
+      BoltEditorGUI.Header("Events", "mc_event");
       DisplayAssetList(Project.Events.Cast<AssetDefinition>());
 
       if (BoltEditorGUI.IsRightClick) {
@@ -157,7 +157,7 @@ public class BoltProjectWindow : BoltWindow {
     Bolt.PrefabDatabase db = Bolt.PrefabDatabase.Instance;
 
     if (db.ManualMode) {
-      if (BoltEditorGUI.Button("mc_refresh")) {
+      if (BoltEditorGUI.IconButton("mc_refresh")) {
         BoltCompiler.UpdatePrefabsDatabase();
         Debug.Log("Upading prefab database...");
       }
@@ -165,14 +165,14 @@ public class BoltProjectWindow : BoltWindow {
       GUILayout.Space(8);
     }
 
-    if (BoltEditorGUI.Button("mc_compile_assembly")) {
+    if (BoltEditorGUI.IconButton("mc_compile_assembly")) {
       BoltUserAssemblyCompiler.Run();
       Debug.Log("Compiling project... " + ProjectPath);
     }
 
     GUILayout.Space(8);
 
-    if (BoltEditorGUI.Button("mc_save")) {
+    if (BoltEditorGUI.IconButton("mc_save")) {
       Save();
       Debug.Log("Saving project... " + ProjectPath);
     }

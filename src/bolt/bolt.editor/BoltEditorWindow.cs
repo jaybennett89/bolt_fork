@@ -262,10 +262,10 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginArea(new Rect(BoltEditorGUI.GLOBAL_INSET, BoltEditorGUI.GLOBAL_INSET, position.width - (BoltEditorGUI.GLOBAL_INSET * 2), BoltEditorGUI.HEADER_HEIGHT));
     GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
-    if (def is StateDefinition) { BoltEditorGUI.Button("mc_state"); }
-    if (def is StructDefinition) { BoltEditorGUI.Button("mc_struct"); }
-    if (def is EventDefinition) { BoltEditorGUI.Button("mc_event"); }
-    if (def is CommandDefinition) { BoltEditorGUI.Button("mc_command"); }
+    if (def is StateDefinition) { BoltEditorGUI.IconButton("mc_state"); }
+    if (def is StructDefinition) { BoltEditorGUI.IconButton("mc_struct"); }
+    if (def is EventDefinition) { BoltEditorGUI.IconButton("mc_event"); }
+    if (def is CommandDefinition) { BoltEditorGUI.IconButton("mc_command"); }
 
     // edit asset name
     GUI.SetNextControlName("BoltEditorName");
@@ -382,7 +382,7 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
-      if (BoltEditorGUI.Button("mc_minus")) {
+      if (BoltEditorGUI.IconButton("mc_minus")) {
         p.Deleted = true;
       }
     }
@@ -408,11 +408,11 @@ public class BoltEditorWindow : BoltWindow {
 
     EditorGUI.BeginDisabledGroup(def.SortOrder != SortOrder.Manual);
 
-    if (BoltEditorGUI.Button("mc_arrow_down", !last)) {
+    if (BoltEditorGUI.IconButton("mc_arrow_down", !last)) {
       p.Adjust += 1;
     }
 
-    if (BoltEditorGUI.Button("mc_arrow_up", !first)) {
+    if (BoltEditorGUI.IconButton("mc_arrow_up", !first)) {
       p.Adjust -= 1;
     }
 

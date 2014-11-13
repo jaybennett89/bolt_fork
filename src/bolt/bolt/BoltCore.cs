@@ -783,7 +783,7 @@ internal static class BoltCore {
     PrefabDatabase.BuildCache();
 
 #if LOG
-    DebugInfo.ignoreList = new HashSet<InstanceId>();
+    DebugInfo.ignoreList = new HashSet<NetworkId>();
 
     if (BoltRuntimeSettings.instance.showDebugInfo) {
       DebugInfo.Show();

@@ -27,7 +27,7 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     BoltNetwork.Accept(endpoint);
   }
 
-  public override void Connected(BoltConnection c) {
+  public override void Connected(BoltConnection c, Bolt.IProtocolToken token) {
     c.userToken = new Player();
     c.GetPlayer().connection = c;
     c.GetPlayer().name = "CLIENT:" + c.remoteEndPoint.Port;
