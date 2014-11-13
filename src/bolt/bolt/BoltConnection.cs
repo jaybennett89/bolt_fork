@@ -57,6 +57,11 @@ public class BoltConnection : BoltObject {
     get { return _remoteFrameEstimated; }
   }
 
+  public IProtocolToken AcceptToken {
+    get;
+    internal set;
+  }
+
   [Obsolete("Use BoltConnection.pingNetwork instead")]
   public float ping {
     get { return _udp.NetworkPing; }

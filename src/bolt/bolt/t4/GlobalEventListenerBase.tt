@@ -15,16 +15,16 @@ cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
 cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });
 
 cbs.Add("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" });
-cbs.Add("Connected", new[] { "BoltConnection", "connection" });
+cbs.Add("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" });
 cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
+cbs.Add("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
 
 cbs.Add("EntityReceived", new[] { "BoltEntity", "entity" });
 cbs.Add("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" });
 
 List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
 callbacks.Add(Tuple.Create<string, string>("ConnectFailed", "UdpEndPoint"));
-callbacks.Add(Tuple.Create<string, string>("ConnectRefused", "UdpEndPoint"));
 callbacks.Add(Tuple.Create<string, string>("EntityAttached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("EntityDetached", "BoltEntity"));
 callbacks.Add(Tuple.Create<string, string>("ControlOfEntityGained", "BoltEntity"));

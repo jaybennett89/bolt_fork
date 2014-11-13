@@ -311,38 +311,46 @@ public static class UdpStreamExtensions {
     }
   }
 
-
-  public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
-    ulong v = id.Value;
-    ulong b = 0UL;
+  public static void PackUIntVB(this UdpPacket packet, uint v) {
+    uint b = 0U;
 
     do {
-      b = v & 127UL;
+      b = v & 127U;
       v = v >> 7;
 
       if (v > 0) {
-        b |= 128UL;
+        b |= 128U;
       }
 
       packet.WriteByte((byte)b);
-
-    } while ((b & 128UL) == 128UL);
+    } while ((b & 128U) == 128U);
   }
 
-  public static NetworkId ReadNetworkId(this UdpPacket packet) {
-    ulong v = 0UL;
-    ulong b = 0UL;
+  public static uint ReadUIntVB(this UdpPacket packet) {
+    uint v = 0U;
+    uint b = 0U;
 
     int s = 0;
 
     do {
       b = packet.ReadByte();
-      v = v | ((b & 127UL) << s);
+      v = v | ((b & 127U) << s);
       s = s + 7;
 
-    } while ((b & 128UL) == 128UL);
+    } while ((b & 128U) == 128U);
 
-    return new NetworkId(v);
+    return v;
+  }
+
+  public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
+    packet.PackUIntVB(id.Connection);
+    packet.PackUIntVB(id.Entity);
+  }
+
+  public static NetworkId ReadNetworkId(this UdpPacket packet) {
+    uint connection = packet.ReadUIntVB();
+    uint entity = packet.ReadUIntVB();
+    return new NetworkId(connection, entity);
   }
 
   internal static void WriteContinueMarker(this UdpPacket stream) {

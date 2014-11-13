@@ -162,7 +162,7 @@ namespace Bolt {
     internal void Attach() {
       Assert.NotNull(UnityObject);
       Assert.False(IsAttached);
-      Assert.True(NetworkId.Value == 0UL);
+      Assert.True(NetworkId.Packed == 0UL);
 
       // add to entities list
       BoltCore._entities.AddLast(this);
@@ -188,7 +188,7 @@ namespace Bolt {
     internal void Detach() {
       Assert.NotNull(UnityObject);
       Assert.True(IsAttached);
-      Assert.True(NetworkId.Value != 0UL);
+      Assert.True(NetworkId.Packed != 0UL);
 
       // destroy on all connections
       var it = BoltCore._connections.GetIterator();
@@ -248,7 +248,7 @@ namespace Bolt {
     }
 
     internal void Initialize() {
-      Assert.True(NetworkId.Value == 0UL);
+      Assert.True(NetworkId.Packed == 0UL);
 
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();

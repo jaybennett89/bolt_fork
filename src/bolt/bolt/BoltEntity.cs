@@ -315,7 +315,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public bool TryFindState<TState>(out TState state) {
     if (Entity.Serializer is TState) {
-      state = (TState) (object)Entity.Serializer;
+      state = (TState)(object)Entity.Serializer;
       return true;
     }
 
@@ -351,7 +351,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   internal void VerifyNotAttached() {
     if (isAttached) {
-      throw new BoltException("You can't modify a BoltEntity behaviour which is attached to Bolt");
+      throw new InvalidOperationException("You can't modify a BoltEntity behaviour which is attached to Bolt");
     }
   }
 
@@ -384,9 +384,13 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void OnDestroy() {
-    if (_entity && UE.Application.isPlaying) {
-      // log that his is happening
-      BoltLog.Warn("{0} is being destroyed or disabled without being detached, forcing detach", Entity);
+    if (_entity && _entity.IsAttached && UE.Application.isPlaying) {
+      if (_entity.IsOwner) {
+        BoltLog.Warn("{0} is being destroyed/disabled without being detached, forcing detach", Entity);
+      }
+      else {
+        BoltLog.Error("{0} is being destroyed/disabled without being detached by the owner, this will cause this peer to disconnect the next time it receives an update for this entity");
+      }
 
       // force detach
       _entity.Detach();
