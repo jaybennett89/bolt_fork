@@ -215,6 +215,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltIcon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\dark.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\light.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_compile_assembly.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_refresh.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

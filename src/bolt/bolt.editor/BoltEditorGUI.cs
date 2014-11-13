@@ -422,10 +422,10 @@ public static class BoltEditorGUI {
       s.margin = new RectOffset();
 
       if (EditorGUIUtility.isProSkin) {
-        s.normal.background = Resources.Load("background", typeof(Texture2D)) as Texture2D;
+        s.normal.background = Resources.Load("backgrounds/dark", typeof(Texture2D)) as Texture2D;
       }
       else {
-        s.normal.background = Resources.Load("background_light", typeof(Texture2D)) as Texture2D;
+        s.normal.background = Resources.Load("backgrounds/light", typeof(Texture2D)) as Texture2D;
       }
 
       return s;
