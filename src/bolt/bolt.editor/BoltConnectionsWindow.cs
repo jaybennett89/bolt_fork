@@ -16,9 +16,7 @@ public class BoltConnectionsWindow : BoltWindow {
   }
 
   void Header(string icon, string text) {
-    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
-    GUI.color = Color.white;
+    GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
     BoltEditorGUI.Button(icon);
     GUILayout.Label(text);
@@ -36,6 +34,8 @@ public class BoltConnectionsWindow : BoltWindow {
 
   new void OnGUI() {
     base.OnGUI();
+
+    GUILayout.BeginArea(new Rect(BoltEditorGUI.GLOBAL_INSET, BoltEditorGUI.GLOBAL_INSET, position.width - (BoltEditorGUI.GLOBAL_INSET * 2), position.height - (BoltEditorGUI.GLOBAL_INSET * 2)));
 
     if (!Application.isPlaying) {
       NatDeviceDetails = null;
@@ -67,6 +67,7 @@ public class BoltConnectionsWindow : BoltWindow {
     Header("mc_server", "LAN Servers");
     LanServers();
 
+    GUILayout.EndArea();
     GUILayout.EndScrollView();
   }
 
@@ -134,7 +135,7 @@ public class BoltConnectionsWindow : BoltWindow {
     GUIStyle s = new GUIStyle("Label");
     s.padding = new RectOffset();
     s.margin = new RectOffset(0, 0, 0, 2);
-    s.normal.textColor = selected ? BoltEditorSkin.Selected.IconColor : s.normal.textColor;
+    s.normal.textColor = selected ? BoltEditorGUI.HighlightColor : s.normal.textColor;
 
     if (GUILayout.Button(text.ToString(), s)) {
       clicked();

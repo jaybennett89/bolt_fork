@@ -25,12 +25,7 @@ public class BoltEditorWindow : BoltWindow {
     base.OnGUI();
 
     if (HasProject) {
-      scroll = GUILayout.BeginScrollView(scroll, false, true);
-
       Editor();
-
-      GUILayout.EndScrollView();
-
       Header();
     }
 
@@ -44,7 +39,11 @@ public class BoltEditorWindow : BoltWindow {
 
   void Editor() {
     if (Selected != null) {
-      GUILayout.Space(30);
+      GUILayout.BeginArea(new Rect(BoltEditorGUI.GLOBAL_INSET, 22, position.width - (BoltEditorGUI.GLOBAL_INSET * 2), position.height - 22));
+
+      scroll = GUILayout.BeginScrollView(scroll, false, false, GUIStyle.none, GUIStyle.none);
+
+      GUILayout.Space(5);
 
       BoltEditorGUI.WithLabel("Comment", () => {
         Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
@@ -65,6 +64,9 @@ public class BoltEditorWindow : BoltWindow {
       if (Selected is CommandDefinition) {
         EditCommand((CommandDefinition)Selected);
       }
+
+      GUILayout.EndScrollView();
+      GUILayout.EndArea();
     }
   }
 
@@ -257,11 +259,8 @@ public class BoltEditorWindow : BoltWindow {
     var cmdDef = def as CommandDefinition;
     var eventDef = def as EventDefinition;
 
-    GUILayout.BeginArea(new Rect(0, 0, position.width - 14, 25));
-
-    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
-    GUI.color = Color.white;
+    GUILayout.BeginArea(new Rect(BoltEditorGUI.GLOBAL_INSET, BoltEditorGUI.GLOBAL_INSET, position.width - (BoltEditorGUI.GLOBAL_INSET * 2), BoltEditorGUI.HEADER_HEIGHT));
+    GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
     if (def is StateDefinition) { BoltEditorGUI.Button("mc_state"); }
     if (def is StructDefinition) { BoltEditorGUI.Button("mc_struct"); }
@@ -302,7 +301,7 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
-    def.SortOrder = (SortOrder) EditorGUILayout.EnumPopup(def.SortOrder, GUILayout.Width(75));
+    def.SortOrder = (SortOrder)EditorGUILayout.EnumPopup(def.SortOrder, GUILayout.Width(75));
 
     GUILayout.EndHorizontal();
     GUILayout.EndArea();
@@ -313,7 +312,7 @@ public class BoltEditorWindow : BoltWindow {
 
     switch (def.SortOrder) {
       case SortOrder.Name: sortedList = list.OrderBy(x => x.Name).ToList(); break;
-      case SortOrder.Priority: sortedList = list.OrderBy(x => x.Priority).ToList(); break;
+      case SortOrder.Priority: sortedList = list.OrderByDescending(x => x.Priority).ToList(); break;
     }
 
     for (int i = 0; i < sortedList.Count; ++i) {
@@ -380,9 +379,7 @@ public class BoltEditorWindow : BoltWindow {
   void EditProperty(AssetDefinition def, PropertyDefinition p, bool first, bool last) {
     BeginBackground();
 
-    GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-    GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
-    GUI.color = Color.white;
+    GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.Button("mc_minus")) {
@@ -480,6 +477,9 @@ public class BoltEditorWindow : BoltWindow {
       if (p.PropertyType.HasSettings) {
         PropertyEditorRegistry.GetEditor(p.PropertyType.GetType()).Edit(def, p);
       }
+    }
+    else {
+      GUILayout.Space(2);
     }
 
     EditorGUILayout.EndVertical();

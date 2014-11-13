@@ -154,8 +154,26 @@ public class BoltProjectWindow : BoltWindow {
 
     GUILayout.FlexibleSpace();
 
+    Bolt.PrefabDatabase db = Bolt.PrefabDatabase.Instance;
+
+    if (db.ManualMode) {
+      if (BoltEditorGUI.Button("mc_refresh")) {
+        BoltCompiler.UpdatePrefabsDatabase();
+        Debug.Log("Upading prefab database...");
+      }
+
+      GUILayout.Space(8);
+    }
+
+    if (BoltEditorGUI.Button("mc_compile_assembly")) {
+      BoltUserAssemblyCompiler.Run();
+      Debug.Log("Compiling project... " + ProjectPath);
+    }
+
+    GUILayout.Space(8);
+
     if (BoltEditorGUI.Button("mc_save")) {
-      Save(true);
+      Save();
       Debug.Log("Saving project... " + ProjectPath);
     }
 
@@ -169,7 +187,7 @@ public class BoltProjectWindow : BoltWindow {
     r.yMin = r.yMin + 2;
     r.yMax = r.yMax - 1;
 
-    GUI.color = BoltEditorSkin.Selected.IconColor;
+    GUI.color = BoltEditorGUI.HighlightColor;
     GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
     GUI.color = Color.white;
   }
@@ -191,7 +209,7 @@ public class BoltProjectWindow : BoltWindow {
       style.alignment = TextAnchor.MiddleLeft;
 
       if (IsSelected(a)) {
-        style.normal.textColor = BoltEditorSkin.Selected.IconColor;
+        style.normal.textColor = BoltEditorGUI.HighlightColor;
       }
 
       if (GUILayout.Button(new GUIContent(a.Name), style)) {
