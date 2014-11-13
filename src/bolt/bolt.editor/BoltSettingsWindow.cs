@@ -112,7 +112,7 @@ public class BoltSettingsWindow : EditorWindow {
       var label = new GUIStyle(GUI.skin.label);
 
       Color c;
-      c = BoltEditorSkin.Selected.IconColor;
+      c = BoltEditorGUI.HighlightColor;
       c.a = File.Exists(dllPath) ? 1f : 0.5f;
 
       label.normal.textColor = c;
@@ -224,10 +224,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltAssetEditorGUI.Label("Log Unity To Console", () => {
       settings.logUncaughtExceptions = EditorGUILayout.Toggle(settings.logUncaughtExceptions);
-    });
-
-    BoltAssetEditorGUI.Label("Editor Skin", () => {
-      settings.editorSkin = EditorGUILayout.Popup(Mathf.Clamp(settings.editorSkin, 0, BoltEditorSkin.Count), BoltEditorSkin.All.Select(x => x.Name).ToArray());
     });
 
     var consoleEnabled = (settings._config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;

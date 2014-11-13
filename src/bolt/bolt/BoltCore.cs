@@ -494,7 +494,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Accept(endpoint, userToken);
+    _udpSocket.Accept(endpoint, userToken, null);
   }
 
   public static void RefuseConnection(UdpEndPoint endpoint) {
@@ -508,7 +508,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Refuse(endpoint);
+    _udpSocket.Refuse(endpoint, null);
   }
 
   internal static void Send() {
