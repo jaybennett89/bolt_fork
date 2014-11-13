@@ -5,15 +5,85 @@ using UnityEditor;
 using Bolt.Compiler;
 using System.IO;
 using System;
+using System.Threading;
+using System.Collections.Generic;
+
+[InitializeOnLoad]
+static class BoltBackgroundSaver {
+  static Thread thread;
+  static AutoResetEvent saveEvent;
+  static Queue<Project> saveQueue;
+
+  static BoltBackgroundSaver() {
+    saveEvent = new AutoResetEvent(false);
+    saveQueue = new Queue<Project>();
+
+    thread = new Thread(SaveThread);
+    thread.IsBackground = true;
+    thread.Start();
+  }
+
+  static void SaveThread() {
+    while (true) {
+      if (saveEvent.WaitOne()) {
+        Project project = null;
+
+        lock (saveQueue) {
+          while (saveQueue.Count > 0) {
+            project = saveQueue.Dequeue();
+          }
+        }
+
+        if (project != null) {
+          try {
+            Directory.CreateDirectory(Path.GetDirectoryName(BoltWindow.ProjectTempOldPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(BoltWindow.ProjectTempNewPath));
+
+            // copy current project
+            if (File.Exists(BoltWindow.ProjectPath)) {
+              File.Copy(BoltWindow.ProjectPath, BoltWindow.ProjectTempOldPath, true);
+            }
+
+            // write new project
+            File.WriteAllBytes(BoltWindow.ProjectTempNewPath, project.ToByteArray());
+
+            // copy new project to correct path
+            File.Copy(BoltWindow.ProjectTempNewPath, BoltWindow.ProjectPath, true);
+          }
+          catch (Exception exn) {
+            Debug.LogException(exn);
+          }
+        }
+      }
+    }
+  }
+
+  static public void Save(Project project) {
+    if ((thread == null) || (thread.IsAlive == false)) {
+      Debug.LogError("BOLT SAVE THREAD NOT RUNNING");
+      return;
+    }
+
+    lock (saveQueue) {
+      saveQueue.Enqueue(project.DeepClone());
+      saveEvent.Set();
+    }
+  }
+}
 
 public abstract class BoltWindow : EditorWindow {
   public static string ProjectPath {
     get { return "Assets/bolt/project.bytes"; }
   }
 
-  bool save;
+  public static string ProjectTempNewPath {
+    get { return "Temp/bolt/project_new.bytes"; }
+  }
 
-  float saveTime;
+  public static string ProjectTempOldPath {
+    get { return "Temp/bolt/project_old.bytes"; }
+  }
+
   float repaintTime;
 
   static internal Project Project;
@@ -28,16 +98,8 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void Save() {
-    Save(false);
-  }
-
-  protected void Save(bool instant) {
-    if (instant) {
-      SaveToDisk();
-    }
-    else {
-      save = true;
-      saveTime = Time.realtimeSinceStartup + 1f;
+    if (HasProject) {
+      BoltBackgroundSaver.Save(Project);
     }
   }
 
@@ -45,21 +107,6 @@ public abstract class BoltWindow : EditorWindow {
     if ((Repaints > 0) || ((repaintTime + 0.05f) < Time.realtimeSinceStartup)) {
       Repaint();
       repaintTime = Time.realtimeSinceStartup;
-    }
-
-    if (save && (saveTime < Time.realtimeSinceStartup)) {
-      SaveToDisk();
-    }
-  }
-
-  void SaveToDisk() {
-    if (HasProject) {
-      try {
-        File.WriteAllBytes(ProjectPath, Project.ToByteArray());
-      }
-      finally {
-        save = false;
-      }
     }
   }
 

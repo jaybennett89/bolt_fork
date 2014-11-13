@@ -21,5 +21,9 @@ namespace Bolt.Compiler {
 
       return Serializer.Deserialize<T>(ms);
     }
+
+    public static T DeepClone<T>(this T obj) {
+      return Serializer.DeepClone<T>(obj);
+    }
   }
 }

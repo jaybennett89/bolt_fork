@@ -148,8 +148,13 @@ public static class BoltInstaller {
 
   static void InstallIcons() {
     EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources", "icons"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources", "backgrounds"));
 
-    var icons = Resources.Where(x => x.Contains("Install.bolt.resources.icons")).ToArray();
+    var icons = 
+      Resources
+        .Where(x => x.Contains("Install.bolt.resources.icons"))
+        .Concat(Resources.Where(x => x.Contains("Install.bolt.resources.backgrounds")))
+        .ToArray();
 
     for (int i = 0; i < icons.Length; ++i) {
       Progress("Installing editor icons ... ", i, icons.Length);

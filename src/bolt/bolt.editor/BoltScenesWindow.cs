@@ -395,18 +395,14 @@ end tell'";
 
     foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes) {
       if (scene.enabled) {
-
         var sceneName = Path.GetFileNameWithoutExtension(scene.path);
 
         GUILayout.Space(2);
-
-        GUI.color = BoltEditorSkin.Selected.Variation.TintColor;
-        GUILayout.BeginHorizontal(BoltEditorGUI.BoxStyle(BoltEditorSkin.Selected.Background), GUILayout.Height(22));
-        GUI.color = Color.white;
+        GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
         var isCurrent = EditorApplication.currentScene == scene.path;
         GUIStyle label = new GUIStyle("Label");
-        label.normal.textColor = isCurrent ? BoltEditorSkin.Selected.Variation.TintColor : label.normal.textColor;
+        label.normal.textColor = isCurrent ? BoltEditorGUI.HighlightColor : label.normal.textColor;
         GUILayout.Label(sceneName);
 
         // Scene Edit Button
@@ -463,6 +459,7 @@ end tell'";
   }
 
   void OnGUI() {
+    GUILayout.BeginArea(new Rect(BoltEditorGUI.GLOBAL_INSET, BoltEditorGUI.GLOBAL_INSET, position.width - (BoltEditorGUI.GLOBAL_INSET * 2), position.height - (BoltEditorGUI.GLOBAL_INSET * 2)));
     GUILayout.Space(4);
 
     BoltEditorGUI.Header("Debug Start Settings", "mc_debugplay");
@@ -475,5 +472,7 @@ end tell'";
       EditorUtility.SetDirty(BoltRuntimeSettings.instance);
       AssetDatabase.SaveAssets();
     }
+
+    GUILayout.EndArea();
   }
 }

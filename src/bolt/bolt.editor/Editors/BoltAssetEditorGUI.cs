@@ -125,11 +125,11 @@ public static class BoltAssetEditorGUI {
       }
 
       if (EditorGUIUtility.isProSkin) {
-        style.normal.textColor = set ? BoltEditorSkin.Selected.IconColor : style.normal.textColor;
-        style.active.textColor = set ? BoltEditorSkin.Selected.IconColor : style.active.textColor;
+        style.normal.textColor = set ? BoltEditorGUI.HighlightColor : style.normal.textColor;
+        style.active.textColor = set ? BoltEditorGUI.HighlightColor : style.active.textColor;
       }
       else {
-        GUI.color = set ? BoltEditorSkin.Selected.IconColor : Color.white;
+        GUI.color = set ? BoltEditorGUI.HighlightColor : Color.white;
       }
 
       if (GUILayout.Button(flags[i], style, GUILayout.ExpandWidth(false), GUILayout.MinWidth(20))) {
@@ -239,7 +239,7 @@ public static class BoltAssetEditorGUI {
   }
 
   public static void EditPropertyEnabled(BoltAssetProperty p) {
-    GUI.color = p.enabled ? BoltEditorSkin.Selected.IconColor : Color.white;
+    GUI.color = p.enabled ? BoltEditorGUI.HighlightColor : Color.white;
     GUI.color = Color.white;
   }
 

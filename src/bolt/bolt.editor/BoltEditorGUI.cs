@@ -8,7 +8,21 @@ using System.Collections.Generic;
 using System.Reflection;
 
 public static class BoltEditorGUI {
+  public const int HEADER_HEIGHT = 23;
+  public const int GLOBAL_INSET = 1;
+
   public static string Tooltip = "";
+
+  public static Color HighlightColor {
+    get {
+      if (EditorGUIUtility.isProSkin) {
+        return BoltEditorGUI.ColorInt(99, 169, 203);
+      }
+      else {
+        return BoltEditorGUI.ColorInt(0, 43, 85);
+      }
+    }
+  }
 
   public static readonly Color Blue = new Color(0 / 255f, 162f / 255f, 232f / 255f);
   public static readonly Color LightBlue = new Color(0f / 255f, 232f / 255f, 226f / 255f);
@@ -308,12 +322,12 @@ public static class BoltEditorGUI {
   }
 
   public static bool Button(string icon) {
-    return IconButton(icon, BoltEditorSkin.Selected.IconColor);
+    return IconButton(icon, BoltEditorGUI.HighlightColor);
   }
 
   public static bool Button(string icon, bool enabled) {
     Color c;
-    c = BoltEditorSkin.Selected.IconColor;
+    c = BoltEditorGUI.HighlightColor;
     c.a = enabled ? 1f : 0.25f;
     return IconButton(icon, c) && enabled;
   }
@@ -325,7 +339,7 @@ public static class BoltEditorGUI {
   public static bool Toggle(string icon, bool enabled) {
     Color c;
 
-    c = BoltEditorSkin.Selected.IconColor;
+    c = BoltEditorGUI.HighlightColor;
     c.a = enabled ? 1f : 0.25f;
 
     if (IconButton(icon, c)) {
@@ -396,6 +410,26 @@ public static class BoltEditorGUI {
     });
 
     return result;
+  }
+
+  public static GUIStyle HeaderBackgorund {
+    get {
+      GUIStyle s;
+
+      s = new GUIStyle();
+      s.padding = new RectOffset(3, 3, 3, 0);
+      s.border = new RectOffset(3, 3, 3, 3);
+      s.margin = new RectOffset();
+
+      if (EditorGUIUtility.isProSkin) {
+        s.normal.background = Resources.Load("backgrounds/dark", typeof(Texture2D)) as Texture2D;
+      }
+      else {
+        s.normal.background = Resources.Load("backgrounds/light", typeof(Texture2D)) as Texture2D;
+      }
+
+      return s;
+    }
   }
 
   public static void WithColor(Color color, Action gui) {
