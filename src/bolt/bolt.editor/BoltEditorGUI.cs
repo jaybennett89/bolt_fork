@@ -434,6 +434,7 @@ public static class BoltEditorGUI {
       }
       else {
         s.normal.background = Resources.Load("backgrounds/light", typeof(Texture2D)) as Texture2D;
+        s.hover.background = Resources.Load("backgrounds/light_hover", typeof(Texture2D)) as Texture2D;
       }
 
       return s;

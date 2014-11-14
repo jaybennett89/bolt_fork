@@ -163,7 +163,8 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\IcoSphere.fbx" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ATTRIBUTIONS.html" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\ATTRIBUTION.txt" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ATTRIBUTION.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\documentation\DOCUMENTATION.txt" />
@@ -206,6 +207,9 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state2.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_struct.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_upload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\light_hover.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
