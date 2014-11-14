@@ -429,4 +429,8 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
       Entity.Render();
     }
   }
+
+  public static implicit operator UE.GameObject(BoltEntity entity) {
+    return entity == null ? null : entity.gameObject;
+  }
 }
