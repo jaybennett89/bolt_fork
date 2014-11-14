@@ -8,6 +8,9 @@ internal class EntityProxyEnvelope : BoltObject, IDisposable {
   public EntityProxy Proxy = null;
   public List<Priority> Written = new List<Priority>();
 
+  public IProtocolToken ControlTokenLost;
+  public IProtocolToken ControlTokenGained;
+
   public void Dispose() {
     Proxy = null;
     Flags = Bolt.ProxyFlags.ZERO;
@@ -74,6 +77,9 @@ internal partial class EntityProxy : BoltObject {
   public BoltConnection Connection;
   public Queue<EntityProxyEnvelope> Envelopes;
 
+  public IProtocolToken ControlTokenLost;
+  public IProtocolToken ControlTokenGained;
+
   public int Skipped;
   public float Priority;
 
@@ -85,8 +91,10 @@ internal partial class EntityProxy : BoltObject {
 
   public EntityProxyEnvelope CreateEnvelope() {
     EntityProxyEnvelope env = EntityProxyEnvelopePool.Acquire();
-    env.Flags = Flags;
     env.Proxy = this;
+    env.Flags = this.Flags;
+    env.ControlTokenLost = this.ControlTokenLost;
+    env.ControlTokenGained = this.ControlTokenGained;
     return env;
   }
 

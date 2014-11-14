@@ -11,7 +11,9 @@ public class PlayerCallbacks : Bolt.GlobalEventListener {
     PlayerCamera.Instantiate();
   }
 
-  public override void ControlOfEntityGained(BoltEntity arg) {
+  public override void ControlOfEntityGained(BoltEntity arg, Bolt.IProtocolToken token) {
+    BoltLog.Info("ControlGained-Token: {0}", token);
+
     // add audio listener to our character
     arg.gameObject.AddComponent<AudioListener>();
 

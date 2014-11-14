@@ -218,14 +218,22 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// Takes local control of this entity
   /// </summary>
   public void TakeControl() {
-    Entity.TakeControl();
+    Entity.TakeControl(null);
+  }
+
+  public void TakeControl(IProtocolToken token) {
+    Entity.TakeControl(token);
   }
 
   /// <summary>
   /// Releases local control of this entity
   /// </summary>
   public void ReleaseControl() {
-    Entity.ReleaseControl();
+    Entity.ReleaseControl(null);
+  }
+
+  public void ReleaseControl(IProtocolToken token) {
+    Entity.ReleaseControl(token);
   }
 
   /// <summary>
@@ -241,14 +249,25 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="connection">The connection to assign control to</param>
   public void AssignControl(BoltConnection connection) {
-    Entity.AssignControl(connection);
+    Entity.AssignControl(connection, null);
+  }
+
+  public void AssignControl(BoltConnection connection, IProtocolToken token) {
+    Entity.AssignControl(connection, token);
   }
 
   /// <summary>
   /// Revokes control of this entity from a connection
   /// </summary>
   public void RevokeControl() {
-    Entity.RevokeControl();
+    Entity.RevokeControl(null);
+  }
+
+  /// <summary>
+  /// Revokes control of this entity from a connection
+  /// </summary>
+  public void RevokeControl(IProtocolToken token) {
+    Entity.RevokeControl(token);
   }
 
   /// <summary>
@@ -362,7 +381,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     yield return new UE.WaitForSeconds(time);
 
     if (isAttached) {
-      BoltNetwork.Destroy(this);
+      BoltNetwork.Destroy(gameObject);
     }
   }
 

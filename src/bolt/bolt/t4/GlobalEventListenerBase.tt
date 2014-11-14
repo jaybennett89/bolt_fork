@@ -20,6 +20,12 @@ cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
 cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
 cbs.Add("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
 
+cbs.Add("ControlOfEntityLost", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+cbs.Add("ControlOfEntityGained", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+
+cbs.Add("EntityAttached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+cbs.Add("EntityDetached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+
 cbs.Add("EntityReceived", new[] { "BoltEntity", "entity" });
 cbs.Add("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" });
 

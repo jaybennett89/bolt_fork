@@ -59,5 +59,26 @@ namespace Bolt {
 
       return token;
     }
+
+    public static void WriteToken(this UdpPacket packet, IProtocolToken token) {
+      if (packet.WriteBool(token != null)) {
+        // write header byte
+        packet.WriteByte(Factory.GetTokenId(token));
+
+        // write token
+        token.Write(packet);
+      }
+    }
+
+    public static IProtocolToken ReadToken(this UdpPacket packet) {
+      IProtocolToken token = null;
+
+      if (packet.ReadBool()) {
+        token = Factory.NewToken(packet.ReadByte());
+        token.Read(packet);
+      }
+
+      return token;
+    }
   }
 }

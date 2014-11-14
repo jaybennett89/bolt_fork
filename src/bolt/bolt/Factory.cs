@@ -87,10 +87,22 @@ namespace Bolt {
     }
 
     internal static byte GetTokenId(IProtocolToken obj) {
+#if DEBUG
+      if (_token2id.ContainsKey(obj.GetType()) == false) {
+        throw new BoltException("Unknown token type {0}", obj.GetType());
+      }
+#endif
+
       return _token2id[obj.GetType()];
     }
 
     internal static IProtocolToken NewToken(byte id) {
+#if DEBUG
+      if (_id2token.ContainsKey(id) == false) {
+        throw new BoltException("Unknown token id {0}", id);
+      }
+#endif
+
       return (IProtocolToken)Activator.CreateInstance(_id2token[id]);
     }
 
@@ -149,7 +161,7 @@ namespace Bolt {
         throw new ArgumentException("Can only register 255 different token types");
       }
 
-      byte id = (byte)_token2id.Count;
+      byte id = (byte)(_token2id.Count + 1);
 
       _token2id.Add(type, id);
       _id2token.Add(id, type);

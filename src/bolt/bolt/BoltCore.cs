@@ -179,7 +179,7 @@ internal static class BoltCore {
     get { return _udpSocket != null; }
   }
 
-  public static void Destroy(BoltEntity entity) {
+  public static void Destroy(BoltEntity entity, IProtocolToken detachToken) {
     if (!entity.isOwner) {
       BoltLog.Warn("Only the owner can destroy an entity, ignoring call to Destroy().");
       return;
@@ -190,6 +190,7 @@ internal static class BoltCore {
       return;
     }
 
+    entity.Entity.DetachToken = detachToken;
     DestroyForce(entity.Entity);
   }
 
@@ -201,39 +202,7 @@ internal static class BoltCore {
     PrefabPool.Destroy(entity.UnityObject.gameObject);
   }
 
-  public static void Destroy(GameObject go) {
-    BoltEntity entity = go.GetComponent<BoltEntity>();
-
-    if (entity) {
-      Destroy(entity);
-    }
-    else {
-      BoltLog.Error("Can only destroy gameobjects with an BoltEntity component through BoltNetwork.Destroy");
-    }
-  }
-
-
-  public static BoltEntity Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation) {
-    return Instantiate(PrefabPool.LoadPrefab(prefabId), position, rotation);
-  }
-
-  public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    BoltEntity be = prefab.GetComponent<BoltEntity>();
-
-    if (!be) {
-      BoltLog.Error("Prefab '{0}' does not have a Bolt Entity component attached", prefab.name);
-      return null;
-    }
-
-    if (be.serializerGuid == UniqueId.None) {
-      BoltLog.Error("Prefab '{0}' does not have a serializer assigned", prefab.name);
-      return null;
-    }
-
-    return Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null);
-  }
-
-  static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller) {
+  internal static BoltEntity Instantiate(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation, InstantiateFlags instanceFlags, BoltConnection controller, IProtocolToken attachToken) {
     // prefab checks
     GameObject prefab = PrefabPool.LoadPrefab(prefabId);
     BoltEntity entity = prefab.GetComponent<BoltEntity>();
@@ -249,38 +218,36 @@ internal static class BoltCore {
     Entity eo;
     eo = Entity.CreateFor(prefabId, serializerId, position, rotation);
     eo.Initialize();
-
+    eo.AttachToken = attachToken;
     eo.Attach();
 
     return eo.UnityObject;
   }
 
-  public static GameObject Attach(GameObject gameObject) {
-    return Attach(gameObject, EntityFlags.ZERO);
-  }
-
-  public static GameObject Attach(GameObject gameObject, TypeId serializerId) {
-    return Attach(gameObject, serializerId, EntityFlags.ZERO);
-  }
-
   internal static GameObject Attach(GameObject gameObject, EntityFlags flags) {
-    BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags);
+    return Attach(gameObject, flags, null);
   }
 
-  internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags) {
+  internal static GameObject Attach(GameObject gameObject, EntityFlags flags, IProtocolToken attachToken) {
+    BoltEntity be = gameObject.GetComponent<BoltEntity>();
+    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags, null);
+  }
+
+  internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags, IProtocolToken attachToken) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
 
     Entity en;
     en = Entity.CreateFor(gameObject, new PrefabId(be._prefabId), serializerId, flags);
     en.Initialize();
+    en.AttachToken = attachToken;
     en.Attach();
 
     return en.UnityObject.gameObject;
   }
 
-  public static void Detach(BoltEntity entity) {
+  public static void Detach(BoltEntity entity, IProtocolToken detachToken) {
     Assert.NotNull(entity.Entity);
+    entity.Entity.DetachToken = detachToken;
     entity.Entity.Detach();
   }
 

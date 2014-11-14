@@ -16,7 +16,17 @@ namespace Bolt {
   }
 
   public interface ICommandInput {
+    IProtocolToken Token {
+      get;
+      set;
+    }
+  }
 
+  public interface ICommandResult {
+    IProtocolToken Token {
+      get;
+      set;
+    }
   }
 
   /// <summary>
@@ -64,6 +74,9 @@ namespace Bolt {
       get;
       set;
     }
+
+    internal IProtocolToken InputToken;
+    internal IProtocolToken ResultToken;
 
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }

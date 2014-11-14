@@ -2,17 +2,17 @@
 
 namespace Bolt {
   partial class Entity {
-    internal void TakeControl() {
+    internal void TakeControl(IProtocolToken token) {
       if (IsOwner) {
         if (HasControl) {
           BoltLog.Warn("You already have control of {0}", this);
         }
         else {
           // revoke any existing control
-          RevokeControl();
+          RevokeControl(null);
 
           // take control locally
-          TakeControlInternal();
+          TakeControlInternal(token);
         }
       }
       else {
@@ -20,16 +20,20 @@ namespace Bolt {
       }
     }
 
-    internal void TakeControlInternal() {
+    internal void TakeControlInternal(IProtocolToken token) {
       Assert.False(Flags & EntityFlags.HAS_CONTROL);
 
       Flags |= EntityFlags.HAS_CONTROL;
+
       CommandQueue.Clear();
       CommandSequence = 0;
       CommandLastExecuted = null;
 
       // call to serializer
       Serializer.OnControlGained();
+
+      // 
+      ControlTokenGained = token;
 
       // raise user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
@@ -38,12 +42,21 @@ namespace Bolt {
       foreach (IEntityBehaviour eb in Behaviours) {
         eb.ControlGained();
       }
+
+      if (token != null) {
+        foreach (IEntityBehaviour eb in Behaviours) {
+          eb.ControlGained(token);
+        }
+
+        // call user event
+        BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject, token);
+      }
     }
 
-    internal void ReleaseControl() {
+    internal void ReleaseControl(IProtocolToken token) {
       if (IsOwner) {
         if (HasControl) {
-          ReleaseControlInternal();
+          ReleaseControlInternal(token);
         }
         else {
           BoltLog.Warn("You are not controlling {0}", this);
@@ -54,7 +67,7 @@ namespace Bolt {
       }
     }
 
-    internal void ReleaseControlInternal() {
+    internal void ReleaseControlInternal(IProtocolToken token) {
       Assert.True(Flags & EntityFlags.HAS_CONTROL);
 
       Flags &= ~EntityFlags.HAS_CONTROL;
@@ -65,6 +78,9 @@ namespace Bolt {
       // call to serializer
       Serializer.OnControlLost();
 
+      // 
+      ControlTokenLost = token;
+
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         eb.ControlLost();
@@ -72,11 +88,23 @@ namespace Bolt {
 
       // call user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
+
+      // call to user behaviours
+      if (token != null) {
+        foreach (IEntityBehaviour eb in Behaviours) {
+          eb.ControlLost(token);
+        }
+
+        // call user event
+        BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject, token);
+      }
     }
 
-    internal void AssignControl(BoltConnection connection) {
+    internal void AssignControl(BoltConnection connection, IProtocolToken token) {
       if (IsOwner) {
-        if (connection._entityChannel.CreateOnRemote(this)) {
+        EntityProxy proxy;
+
+        if (connection._entityChannel.CreateOnRemote(this, out proxy)) {
           CommandLastExecuted = null;
           CommandSequence = 0;
           CommandQueue.Clear();
@@ -86,6 +114,10 @@ namespace Bolt {
 
           // clear idle state for the controller
           SetIdle(Controller, false);
+
+          // set token
+          proxy.ControlTokenLost = null;
+          proxy.ControlTokenGained = token;
         }
         else {
           BoltLog.Error("Could not create {0} on {1}, control not assigned", this, connection);
@@ -97,17 +129,23 @@ namespace Bolt {
       }
     }
 
-    internal void RevokeControl() {
+    internal void RevokeControl(IProtocolToken token) {
       if (IsOwner) {
         if (Controller) {
+          EntityProxy proxy;
+
           // force a replication of this
-          Controller._entityChannel.ForceSync(this);
+          Controller._entityChannel.ForceSync(this, out proxy);
           Controller = null;
 
           // clear out everything
           CommandLastExecuted = null;
           CommandSequence = 0;
           CommandQueue.Clear();
+
+          // set token
+          proxy.ControlTokenLost = token;
+          proxy.ControlTokenGained = null;
         }
       }
       else {
