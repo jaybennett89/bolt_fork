@@ -360,7 +360,7 @@ public static class BoltEditorGUI {
   }
 
   public static bool Toggle(string icon, bool enabled) {
-    if (IconButton(icon, enabled)) {
+    if (IconButton(icon, enabled ? 1f : 0.25f)) {
       return !enabled;
     }
 

@@ -165,6 +165,12 @@ namespace Bolt {
       Assert.False(IsAttached);
       Assert.True(NetworkId.Packed == 0UL);
 
+      // mark as don't destroy on load
+      UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
+
+      // assign network id
+      NetworkId = NetworkIdAllocator.Allocate();
+
       // add to entities list
       BoltCore._entities.AddLast(this);
 
@@ -178,9 +184,6 @@ namespace Bolt {
       foreach (IEntityBehaviour eb in Behaviours) {
         eb.Attached();
       }
-
-      // mark as don't destroy on load
-      UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
 
       // log
       BoltLog.Debug("Attached {0}", this);

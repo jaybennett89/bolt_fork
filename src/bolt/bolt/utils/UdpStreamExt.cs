@@ -357,6 +357,7 @@ public static class UdpStreamExtensions {
   }
 
   public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
+    Assert.True(id.Connection != uint.MaxValue);
     packet.WriteUInt(id.Connection);
     packet.WriteUInt(id.Entity);
   }
@@ -364,6 +365,7 @@ public static class UdpStreamExtensions {
   public static NetworkId ReadNetworkId(this UdpPacket packet) {
     uint connection = packet.ReadUInt();
     uint entity = packet.ReadUInt();
+    Assert.True(connection != uint.MaxValue);
     return new NetworkId(connection, entity);
   }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Bolt {
@@ -7,12 +6,24 @@ namespace Bolt {
     static uint EntityId;
     static uint ConnectionId;
 
-    public static void Reset(uint connectionId) {
-      if (connectionId > 0) {
-        BoltLog.Debug("Id allocator reset with id {0}", connectionId);
-      }
+    public static uint LocalConnectionId {
+      get { return ConnectionId; }
+    }
 
-      EntityId = 0;
+    public static void Reset(uint connectionId) {
+      BoltLog.Debug("Id allocator reset with id {0}", connectionId);
+      EntityId = 0u;
+      ConnectionId = connectionId;
+    }
+
+    public static void Assigned(uint connectionId) {
+      Assert.True(BoltCore.isClient);
+      Assert.True(connectionId > 0u);
+      Assert.True(connectionId != uint.MaxValue);
+      Assert.True(ConnectionId == uint.MaxValue);
+
+      BoltLog.Debug("Assigned id {0} from server", connectionId);
+
       ConnectionId = connectionId;
     }
 

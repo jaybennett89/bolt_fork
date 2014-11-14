@@ -285,6 +285,11 @@ internal static class BoltCore {
   }
 
   public static Bolt.Entity FindEntity(NetworkId id) {
+    // remap network id to local id
+    if ((id.Connection == uint.MaxValue) && (NetworkIdAllocator.LocalConnectionId != uint.MaxValue)) {
+      id = new NetworkId(NetworkIdAllocator.LocalConnectionId, id.Entity);
+    }
+
     var it = _entities.GetIterator();
 
     while (it.Next()) {
@@ -628,7 +633,15 @@ internal static class BoltCore {
 
   static void HandleConnected(UdpConnection udp) {
     if (isClient) {
-      Bolt.NetworkIdAllocator.Reset(udp.ConnectionId);
+      Bolt.NetworkIdAllocator.Assigned(udp.ConnectionId);
+
+      foreach (Entity eo in _entities) {
+        // if we have instantiated something, this MUST have uint.MaxValue as connection id
+        Assert.True(eo.NetworkId.Connection == uint.MaxValue);
+
+        // update with our received connection id
+        eo.NetworkId = new NetworkId(udp.ConnectionId, eo.NetworkId.Entity);
+      }
     }
 
     BoltConnection cn;
@@ -777,7 +790,7 @@ internal static class BoltCore {
       NetworkIdAllocator.Reset(1U);
     }
     else {
-      NetworkIdAllocator.Reset(0U);
+      NetworkIdAllocator.Reset(uint.MaxValue);
     }
 
     PrefabDatabase.BuildCache();
