@@ -15,12 +15,7 @@ public static class BoltEditorGUI {
 
   public static Color HighlightColor {
     get {
-      if (EditorGUIUtility.isProSkin) {
-        return Color.white;
-      }
-      else {
-        return BoltEditorGUI.ColorInt(0, 43, 85);
-      }
+      return Color.white;
     }
   }
 
