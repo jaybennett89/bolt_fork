@@ -104,12 +104,9 @@ public class BoltEditorWindow : BoltWindow {
   }
 
   void EditState(StateDefinition def) {
-    BoltEditorGUI.WithLabel("Is Abstract", () => {
-      def.IsAbstract = BoltEditorGUI.Toggle(def.IsAbstract);
-    });
-
-    BoltEditorGUI.WithLabel("Parent State", () => {
-      def.ParentGuid = BoltEditorGUI.AssetPopup(Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
+    BoltEditorGUI.WithLabel("Inheritance", () => {
+      def.IsAbstract = BoltEditorGUI.ToggleDropdown("Is Abstract", "Is Concrete", def.IsAbstract);
+      def.ParentGuid = BoltEditorGUI.AssetPopup("Parent: ", Project.States.Cast<AssetDefinition>(), def.ParentGuid, Project.GetInheritanceTree(def));
     });
 
     EditorGUI.BeginDisabledGroup(def.IsAbstract);

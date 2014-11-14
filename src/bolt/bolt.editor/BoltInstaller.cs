@@ -163,15 +163,28 @@ public static class BoltInstaller {
       InstallAsset(icons[i]);
 
       if (icons[i].EndsWith(".png")) {
-        // edit asset
-        EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
-          txt.textureFormat = TextureImporterFormat.ARGB32;
-          txt.wrapMode = TextureWrapMode.Clamp;
-          txt.filterMode = FilterMode.Bilinear;
-          txt.textureType = TextureImporterType.GUI;
-          txt.alphaIsTransparency = true;
-          txt.maxTextureSize = 32;
-        });
+        if (icons[i].Contains("backgrounds")) {
+          // edit asset
+          EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
+            txt.textureFormat = TextureImporterFormat.ARGB32;
+            txt.wrapMode = TextureWrapMode.Repeat;
+            txt.filterMode = FilterMode.Point;
+            txt.textureType = TextureImporterType.GUI;
+            txt.alphaIsTransparency = true;
+            txt.maxTextureSize = 1024;
+          });
+        }
+        else {
+          // edit asset
+          EditImporter<TextureImporter>(ResourceToAssetPath(icons[i]), txt => {
+            txt.textureFormat = TextureImporterFormat.ARGB32;
+            txt.wrapMode = TextureWrapMode.Clamp;
+            txt.filterMode = FilterMode.Bilinear;
+            txt.textureType = TextureImporterType.GUI;
+            txt.alphaIsTransparency = true;
+            txt.maxTextureSize = 32;
+          });
+        }
       }
     }
   }

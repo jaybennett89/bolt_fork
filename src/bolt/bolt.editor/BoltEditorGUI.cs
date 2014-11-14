@@ -249,8 +249,12 @@ public static class BoltEditorGUI {
   }
 
   public static Guid AssetPopup(IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
+    return AssetPopup("", assets, current, exclude);
+  }
+
+  public static Guid AssetPopup(string prefix, IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
     var filtered = assets.Where(x => !exclude.Contains(x.Guid)).ToArray();
-    var options = (new string[] { "-" }).Concat(filtered.Select(x => x.Name)).ToArray();
+    var options = (new string[] { prefix + "NONE" }).Concat(filtered.Select(x => prefix + x.Name)).ToArray();
     var selected = Array.FindIndex(filtered, x => x.Guid == current) + 1;
 
     selected = EditorGUILayout.Popup(selected, options);
