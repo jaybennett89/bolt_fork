@@ -82,7 +82,7 @@ partial class EntityChannel {
           int cmdWriteCount = 0;
 
           packet.stream.WriteBool(true);
-          packet.stream.PackNetworkId(proxy.NetId);
+          packet.stream.WriteNetworkId(proxy.NetworkId);
 
           var it = entity.CommandQueue.GetIterator();
 
@@ -208,7 +208,7 @@ partial class EntityChannel {
 
           int proxyPos = packet.stream.Position;
           packet.stream.WriteBool(true);
-          packet.stream.PackNetworkId(proxy.NetId);
+          packet.stream.WriteNetworkId(proxy.NetworkId);
 
           Command cmd = entity.CommandQueue.last;
 

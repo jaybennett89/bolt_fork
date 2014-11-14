@@ -123,12 +123,12 @@ partial class EntityChannel : BoltChannel {
 
       EntityProxy proxy;
       proxy = entity.CreateProxy();
-      proxy.NetId = entity.NetworkId;
+      proxy.NetworkId = entity.NetworkId;
       proxy.Flags = ProxyFlags.CREATE_REQUESTED;
       proxy.Filter = new Filter(1);
       proxy.Connection = connection;
 
-      _outgoing.Add(proxy.NetId, proxy);
+      _outgoing.Add(proxy.NetworkId, proxy);
 
       BoltLog.Debug("Created {0} on {1}", proxy, connection);
       return true;
@@ -153,8 +153,8 @@ partial class EntityChannel : BoltChannel {
   }
 
   public override void Pack(BoltPacket packet) {
-    int n = 0;
     int startPos = packet.stream.Position;
+
     foreach (EntityProxy proxy in _outgoing.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
@@ -218,14 +218,14 @@ partial class EntityChannel : BoltChannel {
 
       _prioritized.Add(proxy);
     }
-    if (n > 0) {
+    if (_prioritized.Count > 0) {
       _prioritized.Sort(EntityProxy.PriorityComparer.Instance);
 
       // write as many proxies into the packet as possible
 
       int failCount = 0;
 
-      for (int i = 0; i < n; ++i) {
+      for (int i = 0; i < _prioritized.Count; ++i) {
         if (failCount >= 2) {
           _prioritized[i].Skipped += 1;
         }
@@ -360,10 +360,9 @@ partial class EntityChannel : BoltChannel {
     EntityProxyEnvelope env = proxy.CreateEnvelope();
 
     packet.stream.WriteBool(true);
-    packet.stream.PackNetworkId(proxy.NetId);
+    packet.stream.WriteNetworkId(proxy.NetworkId);
 
     if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED) == false) {
-      // if the remote is the controller or not
       packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
 
       // data for first packet
@@ -375,8 +374,8 @@ partial class EntityChannel : BoltChannel {
         packet.stream.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
 
         if (packet.stream.WriteBool(proxy.Entity.IsSceneObject)) {
-          Assert.False(proxy.Entity.UniqueId.IsNone);
-          proxy.Entity.UniqueId.Pack(packet.stream);
+          Assert.False(proxy.Entity.SceneId.IsNone);
+          proxy.Entity.SceneId.Pack(packet.stream);
         }
       }
 
@@ -430,14 +429,14 @@ partial class EntityChannel : BoltChannel {
       return false;
 
     // grab networkid
-    var netId = packet.stream.ReadNetworkId();
+    var networkId = packet.stream.ReadNetworkId();
     var destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
     if (destroyRequested) {
       EntityProxy proxy;
 
-      if (_incomming.TryGetValue(netId, out proxy)) {
+      if (_incomming.TryGetValue(networkId, out proxy)) {
         if (proxy.Entity.HasControl) {
           proxy.Entity.ReleaseControlInternal();
         }
@@ -445,7 +444,7 @@ partial class EntityChannel : BoltChannel {
         DestroyIncommingProxy(proxy);
       }
       else {
-        BoltLog.Warn("Received destroy of {0} but no such proxy was found", netId);
+        BoltLog.Warn("Received destroy of {0} but no such proxy was found", networkId);
       }
     }
     else {
@@ -453,11 +452,11 @@ partial class EntityChannel : BoltChannel {
       bool isSceneObject = false;
       bool createRequested = packet.stream.ReadBool();
 
+      UniqueId sceneId = UniqueId.None;
       PrefabId prefabId = new PrefabId();
       TypeId serializerId = new TypeId();
       Vector3 spawnPosition = new Vector3();
       Quaternion spawnRotation = new Quaternion();
-      UniqueId uniqueId = UniqueId.None;
 
       if (createRequested) {
         prefabId = PrefabId.Read(packet.stream, 32);
@@ -466,15 +465,15 @@ partial class EntityChannel : BoltChannel {
         spawnRotation = packet.stream.ReadQuaternion();
         isSceneObject = packet.stream.ReadBool();
 
-        if (packet.stream.ReadBool()) {
-          uniqueId = UniqueId.Read(packet.stream);
+        if (isSceneObject) {
+          sceneId = UniqueId.Read(packet.stream);
         }
       }
 
       Entity entity = null;
       EntityProxy proxy = null;
 
-      if (createRequested && (_incomming.ContainsKey(netId) == false)) {
+      if (createRequested && (_incomming.ContainsKey(networkId) == false)) {
         // prefab checks (if applicable)
         {
           GameObject go = BoltCore.PrefabPool.LoadPrefab(prefabId);
@@ -489,7 +488,7 @@ partial class EntityChannel : BoltChannel {
         // create entity
 
         if (isSceneObject) {
-          GameObject go = BoltCore.FindSceneObject(uniqueId);
+          GameObject go = BoltCore.FindSceneObject(sceneId);
 
           if (!go) {
             go = BoltCore.PrefabPool.Instantiate(prefabId, spawnPosition, spawnRotation);
@@ -502,8 +501,8 @@ partial class EntityChannel : BoltChannel {
         }
 
         entity.Source = connection;
-        entity.UniqueId = uniqueId;
-        entity.NetworkId = netId;
+        entity.SceneId = sceneId;
+        entity.NetworkId = networkId;
 
         // handle case where we are given control (it needs to be true during the initialize, read and attached callbacks)
         if (isController) {
@@ -515,11 +514,11 @@ partial class EntityChannel : BoltChannel {
 
         // create proxy
         proxy = entity.CreateProxy();
-        proxy.NetId = netId;
+        proxy.NetworkId = networkId;
         proxy.Connection = connection;
 
         // register proxy
-        _incomming.Add(proxy.NetId, proxy);
+        _incomming.Add(proxy.NetworkId, proxy);
 
         // read packet
         entity.Serializer.Read(connection, packet.stream, packet.frame);
@@ -527,7 +526,7 @@ partial class EntityChannel : BoltChannel {
         // attach entity
         proxy.Entity.Attach();
 
-        // again for the given control case, we need to clear out the HAS_CONTROL flag or .TakeControl will complain
+        // assign control properly
         if (isController) {
           proxy.Entity.Flags &= ~EntityFlags.HAS_CONTROL;
           proxy.Entity.TakeControlInternal();
@@ -541,10 +540,10 @@ partial class EntityChannel : BoltChannel {
       }
       else {
         // find proxy
-        proxy = _incomming[netId];
+        proxy = _incomming[networkId];
 
         if (proxy == null) {
-          throw new BoltException("couldn't find proxy with id {0}", netId);
+          throw new BoltException("couldn't find proxy with id {0}", networkId);
         }
 
         // update control state yes/no
@@ -567,7 +566,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy(EntityProxy proxy) {
-    _outgoing.Remove(proxy.NetId);
+    _outgoing.Remove(proxy.NetworkId);
 
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
       CreateOnRemote(proxy.Entity);
@@ -575,7 +574,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   void DestroyIncommingProxy(EntityProxy proxy) {
-    _incomming.Remove(proxy.NetId);
+    _incomming.Remove(proxy.NetworkId);
 
     // destroy entity
     BoltCore.DestroyForce(proxy.Entity);

@@ -11,7 +11,7 @@ namespace Bolt {
 
     bool _canQueueCommands = false;
 
-    internal UniqueId UniqueId;
+    internal UniqueId SceneId;
     internal NetworkId NetworkId;
     internal PrefabId PrefabId;
     internal EntityFlags Flags;
@@ -163,13 +163,15 @@ namespace Bolt {
     internal void Attach() {
       Assert.NotNull(UnityObject);
       Assert.False(IsAttached);
-      Assert.True(NetworkId.Packed == 0UL);
+      Assert.True((NetworkId.Packed == 0UL) || (Source != null));
 
       // mark as don't destroy on load
       UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
 
       // assign network id
-      NetworkId = NetworkIdAllocator.Allocate();
+      if (Source == null) {
+        NetworkId = NetworkIdAllocator.Allocate();
+      }
 
       // add to entities list
       BoltCore._entities.AddLast(this);
@@ -252,8 +254,6 @@ namespace Bolt {
     }
 
     internal void Initialize() {
-      Assert.True(NetworkId.Packed == 0UL);
-
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
       PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;

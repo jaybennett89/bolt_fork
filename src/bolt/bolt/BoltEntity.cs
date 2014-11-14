@@ -110,7 +110,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
   /// </summary>
   public Bolt.UniqueId uniqueId {
-    get { return default(Bolt.UniqueId); }
+    get {
+      BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
+      return default(Bolt.UniqueId);
+    }
   }
 
   /// <summary>

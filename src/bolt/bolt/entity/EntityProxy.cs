@@ -63,7 +63,7 @@ internal partial class EntityProxy : BoltObject {
   public const int ID_BIT_COUNT = 10;
   public const int MAX_COUNT = 1 << ID_BIT_COUNT;
 
-  public NetworkId NetId;
+  public NetworkId NetworkId;
   public Bolt.State State;
   public Bolt.Filter Filter;
   public Bolt.BitArray Mask;
@@ -91,6 +91,6 @@ internal partial class EntityProxy : BoltObject {
   }
 
   public override string ToString() {
-    return string.Format("[Proxy {0} {1}]", NetId, ((object)Entity) ?? ((object)"NULL"));
+    return string.Format("[Proxy {0} {1}]", NetworkId, ((object)Entity) ?? ((object)"NULL"));
   }
 }

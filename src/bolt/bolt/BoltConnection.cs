@@ -39,7 +39,7 @@ public class BoltConnection : BoltObject {
   internal BoltRingBuffer<PacketStats> _packetStatsIn;
   internal BoltRingBuffer<PacketStats> _packetStatsOut;
 
-  internal bool _canReceiveEntities = false;
+  internal bool _canReceiveEntities = true;
   internal SceneLoadState _remoteSceneLoading;
 
   /// <summary>

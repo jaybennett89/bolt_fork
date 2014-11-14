@@ -983,7 +983,9 @@ internal static class BoltCore {
 
       // attach on server
       if (isServer) {
-        Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneGuid);
+        BoltEntity entity;
+        entity = Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>();
+        entity.Entity.SceneId = se.sceneGuid; 
       }
     }
 

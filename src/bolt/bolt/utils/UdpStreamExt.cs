@@ -344,7 +344,7 @@ public static class UdpStreamExtensions {
 
   internal static void WriteEntity(this UdpPacket packet, Entity entity) {
     if (packet.WriteBool((entity != null) && entity.IsAttached)) {
-      packet.PackNetworkId(entity.NetworkId);
+      packet.WriteNetworkId(entity.NetworkId);
     }
   }
 
@@ -356,7 +356,7 @@ public static class UdpStreamExtensions {
     return null;
   }
 
-  public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
+  public static void WriteNetworkId(this UdpPacket packet, NetworkId id) {
     Assert.True(id.Connection != uint.MaxValue);
     packet.WriteUInt(id.Connection);
     packet.WriteUInt(id.Entity);

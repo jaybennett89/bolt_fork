@@ -470,7 +470,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: b5907a8b9fa4ef549b9dd4f8a9e863eb, type: 2}
       propertyPath: _sceneGuid
-      value: 61ffb958-5157-45b7-b832-21a192830164
+      value: 3d2f0864-8061-4269-8409-05ec77081a5c
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
@@ -520,7 +520,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
       propertyPath: _sceneGuid
-      value: 7a0d5917-9511-45a1-9205-3004404b8537
+      value: 85c133ff-994d-4e83-b90d-928ed0de461d
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
@@ -613,12 +613,12 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: e6b99e69-1682-45cd-9e00-dbfbe183a4af
+  _sceneGuid: 61e56439-47dc-43f8-98b2-7c52744375b1
   _serializerGuid: 2f3355b6-af0d-41a1-98e8-a125b330bc8b
-  _prefabId: 1
+  _prefabId: 2
   _updateRate: 1
   _clientPredicted: 0
-  _allowInstantiateOnClient: 0
+  _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
 --- !u!114 &606553683
 MonoBehaviour:
@@ -666,9 +666,9 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: b48677ff-76ae-4d71-808b-80be75ea3016
+  _sceneGuid: 744805c7-d16d-42a3-884c-a697ddcd8f56
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 2
+  _prefabId: 3
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -760,12 +760,12 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 61ffb958-5157-45b7-b832-21a192830164
+  _sceneGuid: 3d2f0864-8061-4269-8409-05ec77081a5c
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 0
+  _prefabId: 1
   _updateRate: 1
   _clientPredicted: 0
-  _allowInstantiateOnClient: 0
+  _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
 --- !u!111 &663922312
 Animation:
@@ -891,7 +891,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
       propertyPath: _sceneGuid
-      value: 359cf3f6-14a7-4b3b-a116-2731f3a84c23
+      value: 6f4b3532-9640-4d89-861d-36a91751a752
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
@@ -1134,7 +1134,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
       propertyPath: _sceneGuid
-      value: b48677ff-76ae-4d71-808b-80be75ea3016
+      value: 744805c7-d16d-42a3-884c-a697ddcd8f56
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e6dd368eb36c92b429be2244b9da818a, type: 2}
@@ -1261,9 +1261,9 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 359cf3f6-14a7-4b3b-a116-2731f3a84c23
+  _sceneGuid: 6f4b3532-9640-4d89-861d-36a91751a752
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 2
+  _prefabId: 3
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -2438,9 +2438,9 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 7a0d5917-9511-45a1-9205-3004404b8537
+  _sceneGuid: 85c133ff-994d-4e83-b90d-928ed0de461d
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 2
+  _prefabId: 3
   _updateRate: 1
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
@@ -2572,7 +2572,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
       propertyPath: _sceneGuid
-      value: e6b99e69-1682-45cd-9e00-dbfbe183a4af
+      value: 61e56439-47dc-43f8-98b2-7c52744375b1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9e4c13062a8548e438c26a67020d9895, type: 2}
@@ -2696,7 +2696,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: b5907a8b9fa4ef549b9dd4f8a9e863eb, type: 2}
       propertyPath: _sceneGuid
-      value: 38a5bc33-13c5-40cf-b727-d9be8e6816cd
+      value: 86849f53-4b0b-4829-8fe6-d708974594fd
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
@@ -2904,12 +2904,12 @@ MonoBehaviour:
   m_Script: {fileID: -36112512, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneGuid: 38a5bc33-13c5-40cf-b727-d9be8e6816cd
+  _sceneGuid: 86849f53-4b0b-4829-8fe6-d708974594fd
   _serializerGuid: 9057449a-9b39-4c74-a467-9798e650ff20
-  _prefabId: 0
+  _prefabId: 1
   _updateRate: 1
   _clientPredicted: 0
-  _allowInstantiateOnClient: 0
+  _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
 --- !u!114 &1641960030
 MonoBehaviour:
