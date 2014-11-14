@@ -11,50 +11,20 @@ enum BoltEntityDestroyMode {
 }
 
 partial class EntityChannel : BoltChannel {
-  NetIdPool _outgoingProxiesNetworkIdPool;
-  EntityProxy[] _outgoingProxiesByPriority;
-
-  Dictionary<Bolt.NetId, EntityProxy> _outgoingProxiesByNetId;
-  Dictionary<Bolt.InstanceId, EntityProxy> _outgoingProxiesByInstanceId;
-
-  Dictionary<Bolt.NetId, EntityProxy> _incommingProxiesByNetId;
-  Dictionary<Bolt.InstanceId, EntityProxy> _incommingProxiesByInstanceId;
+  Dictionary<Bolt.NetworkId, EntityProxy> _outgoing;
+  Dictionary<Bolt.NetworkId, EntityProxy> _incomming;
+  List<EntityProxy> _prioritized;
 
   public EntityChannel() {
-    _outgoingProxiesNetworkIdPool = new NetIdPool(EntityProxy.MAX_COUNT);
-    _outgoingProxiesByPriority = new EntityProxy[EntityProxy.MAX_COUNT];
-
-    _outgoingProxiesByNetId = new Dictionary<Bolt.NetId, EntityProxy>(1024, Bolt.NetId.EqualityComparer.Instance);
-    _outgoingProxiesByInstanceId = new Dictionary<Bolt.InstanceId, EntityProxy>(1024, Bolt.InstanceId.EqualityComparer.Instance);
-
-    _incommingProxiesByNetId = new Dictionary<Bolt.NetId, EntityProxy>(1024, Bolt.NetId.EqualityComparer.Instance);
-    _incommingProxiesByInstanceId = new Dictionary<Bolt.InstanceId, EntityProxy>(1024, Bolt.InstanceId.EqualityComparer.Instance);
-
-    // BoltLog.Debug("Created entity channel with the ability to proxy {0} entities", EntityProxy.MAX_COUNT);
-  }
-
-  public Bolt.Entity GetIncommingEntity(Bolt.NetId netId) {
-    if (_incommingProxiesByNetId.ContainsKey(netId)) {
-      return _incommingProxiesByNetId[netId].Entity;
-    }
-
-    BoltLog.Warn("Unknown {0}", netId);
-    return null;
-  }
-
-  public Bolt.Entity GetOutgoingEntity(Bolt.NetId netId) {
-    if (_outgoingProxiesByNetId.ContainsKey(netId)) {
-      return _outgoingProxiesByNetId[netId].Entity;
-    }
-
-    BoltLog.Warn("Unknown {0}", netId);
-    return null;
+    _outgoing = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
+    _incomming = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
+    _prioritized = new List<EntityProxy>();
   }
 
   public void ForceSync(Bolt.Entity en) {
     EntityProxy proxy;
 
-    if (_outgoingProxiesByInstanceId.TryGetValue(en.InstanceId, out proxy)) {
+    if (_outgoing.TryGetValue(en.NetworkId, out proxy)) {
       proxy.Flags |= Bolt.ProxyFlags.FORCE_SYNC;
     }
   }
@@ -62,7 +32,7 @@ partial class EntityChannel : BoltChannel {
   public void SetIdle(Bolt.Entity entity, bool idle) {
     EntityProxy proxy;
 
-    if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
       if (idle) {
         proxy.Flags |= Bolt.ProxyFlags.IDLE;
       }
@@ -83,13 +53,13 @@ partial class EntityChannel : BoltChannel {
     }
 
     if (inScope) {
-      if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) {
+      if (_incomming.ContainsKey(entity.NetworkId)) {
         return;
       }
 
       EntityProxy proxy;
 
-      if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
+      if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
         if (proxy.Flags & Bolt.ProxyFlags.DESTROY_REQUESTED) {
           if (proxy.Flags & Bolt.ProxyFlags.DESTROY_PENDING) {
             proxy.Flags |= Bolt.ProxyFlags.DESTROY_IGNORE;
@@ -105,28 +75,19 @@ partial class EntityChannel : BoltChannel {
       }
     }
     else {
-      if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) {
+      if (_outgoing.ContainsKey(entity.NetworkId)) {
         DestroyOnRemote(entity, BoltEntityDestroyMode.OutOfScope);
       }
     }
   }
 
-  public NetId GetNetworkId(Entity entity) {
-    EntityProxy proxy;
-
-    if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) { return proxy.NetId; }
-    if (_incommingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) { return proxy.NetId; }
-
-    return new NetId(int.MaxValue);
-  }
-
   public bool ExistsOnRemote(Entity entity) {
     if (entity == null) { return false; }
-    if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
+    if (_incomming.ContainsKey(entity.NetworkId)) { return true; }
 
     EntityProxy proxy;
 
-    if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
       return (proxy.Flags & ProxyFlags.CREATE_DONE) && !(proxy.Flags & ProxyFlags.DESTROY_REQUESTED);
     }
 
@@ -134,13 +95,13 @@ partial class EntityChannel : BoltChannel {
   }
 
   public bool MightExistOnRemote(Bolt.Entity entity) {
-    return _incommingProxiesByInstanceId.ContainsKey(entity.InstanceId) || _outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId);
+    return _incomming.ContainsKey(entity.NetworkId) || _outgoing.ContainsKey(entity.NetworkId);
   }
 
   public void DestroyOnRemote(Bolt.Entity entity, BoltEntityDestroyMode mode) {
     EntityProxy proxy;
 
-    if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
       // if we dont have any pending sends for this and we have not created it;
       if (proxy.Envelopes.Count == 0 && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
         DestroyOutgoingProxy(proxy);
@@ -156,27 +117,18 @@ partial class EntityChannel : BoltChannel {
   public bool CreateOnRemote(Bolt.Entity entity) {
     try {
       if (ReferenceEquals(entity.Source, connection)) { return true; }
-      if (_incommingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
-      if (_outgoingProxiesByInstanceId.ContainsKey(entity.InstanceId)) { return true; }
+      if (_incomming.ContainsKey(entity.NetworkId)) { return true; }
+      if (_outgoing.ContainsKey(entity.NetworkId)) { return true; }
 
-      //BoltLog.Error("creating proxy {0} on {1}", entity, connection);
-
-      NetId id;
-
-      if (_outgoingProxiesNetworkIdPool.Acquire(out id) == false) {
-        BoltLog.Warn("{0} is already proxying the max amount of objects", connection);
-        return false;
-      }
 
       EntityProxy proxy;
       proxy = entity.CreateProxy();
-      proxy.NetId = id;
+      proxy.NetworkId = entity.NetworkId;
       proxy.Flags = ProxyFlags.CREATE_REQUESTED;
       proxy.Filter = new Filter(1);
       proxy.Connection = connection;
 
-      _outgoingProxiesByNetId.Add(proxy.NetId, proxy);
-      _outgoingProxiesByInstanceId.Add(entity.InstanceId, proxy);
+      _outgoing.Add(proxy.NetworkId, proxy);
 
       BoltLog.Debug("Created {0} on {1}", proxy, connection);
       return true;
@@ -188,7 +140,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   public override void StepRemoteFrame() {
-    foreach (EntityProxy proxy in _incommingProxiesByInstanceId.Values) {
+    foreach (EntityProxy proxy in _incomming.Values) {
       // skip ones we are in control of and that are client predicted
       if (proxy.Entity.HasPredictedControl) {
         continue;
@@ -200,20 +152,10 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  public float GetPriority(Entity entity) {
-    EntityProxy proxy;
-
-    if (_outgoingProxiesByInstanceId.TryGetValue(entity.InstanceId, out proxy)) {
-      return proxy.Priority;
-    }
-
-    return 0f;
-  }
-
   public override void Pack(BoltPacket packet) {
-    int n = 0;
     int startPos = packet.stream.Position;
-    foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values) {
+
+    foreach (EntityProxy proxy in _outgoing.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
           continue;
@@ -274,26 +216,23 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 21;
       }
 
-      // push
-      _outgoingProxiesByPriority[n++] = proxy;
+      _prioritized.Add(proxy);
     }
-    if (n > 0) {
-      // only if we have any proxies to sort
-      // sort proxies by their priority (highest to lowest)
-      Array.Sort(_outgoingProxiesByPriority, 0, n, EntityProxy.PriorityComparer.Instance);
+    if (_prioritized.Count > 0) {
+      _prioritized.Sort(EntityProxy.PriorityComparer.Instance);
 
       // write as many proxies into the packet as possible
 
       int failCount = 0;
 
-      for (int i = 0; i < n; ++i) {
+      for (int i = 0; i < _prioritized.Count; ++i) {
         if (failCount >= 2) {
-          _outgoingProxiesByPriority[i].Skipped += 1;
+          _prioritized[i].Skipped += 1;
         }
         else {
-          var result = PackUpdate(packet, _outgoingProxiesByPriority[i]);
+          var result = PackUpdate(packet, _prioritized[i]);
           if (result) {
-            _outgoingProxiesByPriority[i].Priority = 0;
+            _prioritized[i].Priority = 0;
           }
           else {
             failCount += 1; 
@@ -301,8 +240,7 @@ partial class EntityChannel : BoltChannel {
         }
       }
 
-      // clear priority array
-      Array.Clear(_outgoingProxiesByPriority, 0, _outgoingProxiesByPriority.Length);
+      _prioritized.Clear();
     }
 
     packet.stream.WriteStopMarker();
@@ -328,8 +266,8 @@ partial class EntityChannel : BoltChannel {
       var pending = env.Proxy.Envelopes.Dequeue();
 
       //BoltLog.Error("LOST ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
-      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
-      Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
+      //Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
+      //Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
 
       // copy back all priorities
       ApplyPropertyPriorities(env);
@@ -358,8 +296,8 @@ partial class EntityChannel : BoltChannel {
       var pending = env.Proxy.Envelopes.Dequeue();
 
       //BoltLog.Info("DELIVERED ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
-      Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
-      Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
+      //Assert.Same(env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId], string.Format("PROXY MISS-MATCH {0} <> {1}", env.Proxy, _outgoingProxiesByNetId[env.Proxy.NetId]));
+      //Assert.Same(env, pending, string.Format("ENVELOPE MISS-MATCH {0} <> {1}", env.PacketNumber, pending.PacketNumber));
 
       if (env.Flags & ProxyFlags.DESTROY_PENDING) {
         Assert.True(env.Proxy.Flags & ProxyFlags.DESTROY_PENDING);
@@ -380,13 +318,13 @@ partial class EntityChannel : BoltChannel {
   }
 
   public override void Disconnected() {
-    foreach (EntityProxy proxy in _outgoingProxiesByInstanceId.Values.ToArray()) {
+    foreach (EntityProxy proxy in _outgoing.Values.ToArray()) {
       if (proxy) {
         DestroyOutgoingProxy(proxy);
       }
     }
 
-    foreach (EntityProxy proxy in _incommingProxiesByNetId.Values.ToArray()) {
+    foreach (EntityProxy proxy in _incomming.Values.ToArray()) {
       if (proxy) {
         DestroyIncommingProxy(proxy);
       }
@@ -396,7 +334,7 @@ partial class EntityChannel : BoltChannel {
   public int GetSkippedUpdates(Entity en) {
     EntityProxy proxy;
 
-    if (_outgoingProxiesByInstanceId.TryGetValue(en.InstanceId, out proxy)) {
+    if (_outgoing.TryGetValue(en.NetworkId, out proxy)) {
       return proxy.Skipped;
     }
 
@@ -422,10 +360,9 @@ partial class EntityChannel : BoltChannel {
     EntityProxyEnvelope env = proxy.CreateEnvelope();
 
     packet.stream.WriteBool(true);
-    packet.stream.WriteNetworkId_old(proxy.NetId);
+    packet.stream.WriteNetworkId(proxy.NetworkId);
 
     if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED) == false) {
-      // if the remote is the controller or not
       packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
 
       // data for first packet
@@ -437,11 +374,8 @@ partial class EntityChannel : BoltChannel {
         packet.stream.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
 
         if (packet.stream.WriteBool(proxy.Entity.IsSceneObject)) {
-          Assert.False(proxy.Entity.UniqueId.IsNone);
-        }
-
-        if (packet.stream.WriteBool(proxy.Entity.UniqueId.IsNone == false)) {
-          proxy.Entity.UniqueId.Pack(packet.stream);
+          Assert.False(proxy.Entity.SceneId.IsNone);
+          proxy.Entity.SceneId.Pack(packet.stream);
         }
       }
 
@@ -495,14 +429,14 @@ partial class EntityChannel : BoltChannel {
       return false;
 
     // grab networkid
-    var netId = packet.stream.ReadNetworkId_Old();
+    var networkId = packet.stream.ReadNetworkId();
     var destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
     if (destroyRequested) {
       EntityProxy proxy;
 
-      if (_incommingProxiesByNetId.TryGetValue(netId, out proxy)) {
+      if (_incomming.TryGetValue(networkId, out proxy)) {
         if (proxy.Entity.HasControl) {
           proxy.Entity.ReleaseControlInternal();
         }
@@ -510,7 +444,7 @@ partial class EntityChannel : BoltChannel {
         DestroyIncommingProxy(proxy);
       }
       else {
-        BoltLog.Warn("Received destroy of {0} but no such proxy was found", netId);
+        BoltLog.Warn("Received destroy of {0} but no such proxy was found", networkId);
       }
     }
     else {
@@ -518,11 +452,11 @@ partial class EntityChannel : BoltChannel {
       bool isSceneObject = false;
       bool createRequested = packet.stream.ReadBool();
 
+      UniqueId sceneId = UniqueId.None;
       PrefabId prefabId = new PrefabId();
       TypeId serializerId = new TypeId();
       Vector3 spawnPosition = new Vector3();
       Quaternion spawnRotation = new Quaternion();
-      UniqueId uniqueId = UniqueId.None;
 
       if (createRequested) {
         prefabId = PrefabId.Read(packet.stream, 32);
@@ -531,15 +465,15 @@ partial class EntityChannel : BoltChannel {
         spawnRotation = packet.stream.ReadQuaternion();
         isSceneObject = packet.stream.ReadBool();
 
-        if (packet.stream.ReadBool()) {
-          uniqueId = UniqueId.Read(packet.stream);
+        if (isSceneObject) {
+          sceneId = UniqueId.Read(packet.stream);
         }
       }
 
       Entity entity = null;
       EntityProxy proxy = null;
 
-      if (createRequested && (_incommingProxiesByNetId.ContainsKey(netId) == false)) {
+      if (createRequested && (_incomming.ContainsKey(networkId) == false)) {
         // prefab checks (if applicable)
         {
           GameObject go = BoltCore.PrefabPool.LoadPrefab(prefabId);
@@ -554,7 +488,7 @@ partial class EntityChannel : BoltChannel {
         // create entity
 
         if (isSceneObject) {
-          GameObject go = BoltCore.FindSceneObject(uniqueId);
+          GameObject go = BoltCore.FindSceneObject(sceneId);
 
           if (!go) {
             go = BoltCore.PrefabPool.Instantiate(prefabId, spawnPosition, spawnRotation);
@@ -567,7 +501,8 @@ partial class EntityChannel : BoltChannel {
         }
 
         entity.Source = connection;
-        entity.UniqueId = uniqueId;
+        entity.SceneId = sceneId;
+        entity.NetworkId = networkId;
 
         // handle case where we are given control (it needs to be true during the initialize, read and attached callbacks)
         if (isController) {
@@ -579,12 +514,11 @@ partial class EntityChannel : BoltChannel {
 
         // create proxy
         proxy = entity.CreateProxy();
-        proxy.NetId = netId;
+        proxy.NetworkId = networkId;
         proxy.Connection = connection;
 
         // register proxy
-        _incommingProxiesByNetId.Add(netId, proxy);
-        _incommingProxiesByInstanceId.Add(proxy.Entity.InstanceId, proxy);
+        _incomming.Add(proxy.NetworkId, proxy);
 
         // read packet
         entity.Serializer.Read(connection, packet.stream, packet.frame);
@@ -592,7 +526,7 @@ partial class EntityChannel : BoltChannel {
         // attach entity
         proxy.Entity.Attach();
 
-        // again for the given control case, we need to clear out the HAS_CONTROL flag or .TakeControl will complain
+        // assign control properly
         if (isController) {
           proxy.Entity.Flags &= ~EntityFlags.HAS_CONTROL;
           proxy.Entity.TakeControlInternal();
@@ -606,10 +540,10 @@ partial class EntityChannel : BoltChannel {
       }
       else {
         // find proxy
-        proxy = _incommingProxiesByNetId[netId];
+        proxy = _incomming[networkId];
 
         if (proxy == null) {
-          throw new BoltException("couldn't find proxy with id {0}", netId);
+          throw new BoltException("couldn't find proxy with id {0}", networkId);
         }
 
         // update control state yes/no
@@ -632,9 +566,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy(EntityProxy proxy) {
-    _outgoingProxiesByNetId.Remove(proxy.NetId);
-    _outgoingProxiesNetworkIdPool.Release(proxy.NetId);
-    _outgoingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
+    _outgoing.Remove(proxy.NetworkId);
 
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
       CreateOnRemote(proxy.Entity);
@@ -642,8 +574,7 @@ partial class EntityChannel : BoltChannel {
   }
 
   void DestroyIncommingProxy(EntityProxy proxy) {
-    _incommingProxiesByInstanceId.Remove(proxy.Entity.InstanceId);
-    _incommingProxiesByNetId.Remove(proxy.NetId);
+    _incomming.Remove(proxy.NetworkId);
 
     // destroy entity
     BoltCore.DestroyForce(proxy.Entity);

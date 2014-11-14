@@ -284,11 +284,16 @@ internal static class BoltCore {
     entity.Entity.Detach();
   }
 
-  public static Bolt.Entity FindEntity(InstanceId id) {
+  public static Bolt.Entity FindEntity(NetworkId id) {
+    // remap network id to local id
+    if ((id.Connection == uint.MaxValue) && (NetworkIdAllocator.LocalConnectionId != uint.MaxValue)) {
+      id = new NetworkId(NetworkIdAllocator.LocalConnectionId, id.Entity);
+    }
+
     var it = _entities.GetIterator();
 
     while (it.Next()) {
-      if (it.val.InstanceId == id) {
+      if (it.val.NetworkId == id) {
         return it.val;
       }
     }
@@ -448,7 +453,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRefused:
-          BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint);
+          HandleConnectRefused(ev.EndPoint, (byte[])ev.Object0);
           break;
 
         case UdpEventType.ConnectAttempt:
@@ -470,20 +475,15 @@ internal static class BoltCore {
     }
   }
 
+  static void HandleConnectRefused(UdpEndPoint endpoint, byte[] token) {
+    BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint, token.ToToken());
+  }
+
   static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
-    if (token != null) {
-      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
-    }
-    else {
-      BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, null);
-    }
+    BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
   }
 
-  public static void AcceptConnection(UdpEndPoint endpoint) {
-    AcceptConnection(endpoint, null);
-  }
-
-  public static void AcceptConnection(UdpEndPoint endpoint, object userToken) {
+  public static void AcceptConnection(UdpEndPoint endpoint, object userToken, IProtocolToken protocolToken) {
     if (!isServer) {
       BoltLog.Error("AcceptConnection can only be called on the server");
       return;
@@ -494,10 +494,10 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Accept(endpoint, userToken, null);
+    _udpSocket.Accept(endpoint, userToken, protocolToken.ToByteArray());
   }
 
-  public static void RefuseConnection(UdpEndPoint endpoint) {
+  public static void RefuseConnection(UdpEndPoint endpoint, IProtocolToken token) {
     if (!isServer) {
       BoltLog.Error("RefuseConnection can only be called on the server");
       return;
@@ -508,7 +508,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Refuse(endpoint, null);
+    _udpSocket.Refuse(endpoint, token.ToByteArray());
   }
 
   internal static void Send() {
@@ -632,13 +632,28 @@ internal static class BoltCore {
   }
 
   static void HandleConnected(UdpConnection udp) {
-    BoltConnection cn = new BoltConnection(udp);
+    if (isClient) {
+      Bolt.NetworkIdAllocator.Assigned(udp.ConnectionId);
+
+      foreach (Entity eo in _entities) {
+        // if we have instantiated something, this MUST have uint.MaxValue as connection id
+        Assert.True(eo.NetworkId.Connection == uint.MaxValue);
+
+        // update with our received connection id
+        eo.NetworkId = new NetworkId(udp.ConnectionId, eo.NetworkId.Entity);
+      }
+    }
+
+    BoltConnection cn;
+    
+    cn = new BoltConnection(udp);
+    cn.AcceptToken = udp.AcceptToken.ToToken();
 
     // put on connection list
     _connections.AddLast(cn);
 
     // generic connected callback
-    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn);
+    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken);
 
     // spawn entities
     if (_config.scopeMode == ScopeMode.Automatic) {
@@ -768,13 +783,20 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
-    PrefabDatabase.BuildCache();
-
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
+    if (isServer) {
+      NetworkIdAllocator.Reset(1U);
+    }
+    else {
+      NetworkIdAllocator.Reset(uint.MaxValue);
+    }
+
+    PrefabDatabase.BuildCache();
+
 #if LOG
-    DebugInfo.ignoreList = new HashSet<InstanceId>();
+    DebugInfo.ignoreList = new HashSet<NetworkId>();
 
     if (BoltRuntimeSettings.instance.showDebugInfo) {
       DebugInfo.Show();
@@ -961,7 +983,9 @@ internal static class BoltCore {
 
       // attach on server
       if (isServer) {
-        Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>().SetUniqueId(se.sceneGuid);
+        BoltEntity entity;
+        entity = Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>();
+        entity.Entity.SceneId = se.sceneGuid; 
       }
     }
 

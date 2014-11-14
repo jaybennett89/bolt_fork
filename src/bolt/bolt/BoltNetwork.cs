@@ -181,16 +181,16 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="id">The id to look up</param>
   /// <returns>The entity if one was found, otherwise null</returns>
-  public static BoltEntity FindEntity(Bolt.UniqueId id) {
-    if (id.IsNone) {
-      BoltLog.Error("You can't look up entities with the 'None' id value");
+  public static BoltEntity FindEntity(Bolt.NetworkId id) {
+    if (id.Packed == 0) {
+      BoltLog.Error("You can't look up entities a zero network id");
       return null;
     }
 
     var it = BoltCore._entities.GetIterator();
 
     while (it.Next()) {
-      if (it.val.UniqueId == id) {
+      if (it.val.NetworkId.Packed == id.Packed) {
         return it.val.UnityObject;
       }
     }
@@ -321,12 +321,20 @@ public static class BoltNetwork {
   /// Accept a connection from a specific endpoint, only usable if Accept Mode has been set to Manual
   /// </summary>
   /// <param name="ep">The endpoint to access the connection from</param>
-  public static void Accept(UdpEndPoint ep) {
-    Accept(ep, null);
+  public static void Accept(UdpEndPoint endpoint) {
+    BoltCore.AcceptConnection(endpoint, null, null);
   }
 
-  public static void Accept(UdpEndPoint ep, object userToken) {
-    BoltCore.AcceptConnection(ep, userToken);
+  public static void Accept(UdpEndPoint endpoint, IProtocolToken token) {
+    BoltCore.AcceptConnection(endpoint, null, token);
+  }
+
+  public static void Accept(UdpEndPoint endpoint, object userToken) {
+    BoltCore.AcceptConnection(endpoint, userToken, null);
+  }
+
+  public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken token) {
+    BoltCore.AcceptConnection(endpoint, userToken, token);
   }
 
   /// <summary>
@@ -334,7 +342,11 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="ep">The endpoint to refuse the connection from</param>
   public static void Refuse(UdpEndPoint ep) {
-    BoltCore.RefuseConnection(ep);
+    BoltCore.RefuseConnection(ep, null);
+  }
+
+  public static void Refuse(UdpEndPoint ep, IProtocolToken token) {
+    BoltCore.RefuseConnection(ep, token);
   }
 
   /// <summary>

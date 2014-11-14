@@ -7,7 +7,7 @@ using UdpKit;
 namespace Bolt {
   class PropertySerializerEntity : PropertySerializerSimple {
     public override object GetDebugValue(State state) {
-      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset)));
+      Bolt.Entity entity = BoltCore.FindEntity(state.Frames.first.Data.ReadNetworkId(Settings.ByteOffset));
 
       if (entity) {
         return entity.ToString();
@@ -21,24 +21,24 @@ namespace Bolt {
     }
 
     protected override bool Pack(byte[] data,  BoltConnection connection, UdpPacket stream) {
-      Bolt.Entity entity = BoltCore.FindEntity(new InstanceId(Blit.ReadI32(data, Settings.ByteOffset)));
+      Bolt.Entity entity = BoltCore.FindEntity(data.ReadNetworkId(Settings.ByteOffset));
 
       if ((entity != null) && (connection._entityChannel.ExistsOnRemote(entity) == false)) {
         return false;
       }
 
-      stream.WriteEntity(entity, connection);
+      stream.WriteEntity(entity);
       return true;
     }
 
     protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Bolt.Entity entity = stream.ReadEntity(connection);
+      Bolt.Entity entity = stream.ReadEntity();
 
       if (entity) {
-        Blit.PackI32(data, Settings.ByteOffset, entity.InstanceId.Value);
+        data.PackNetworkId(Settings.ByteOffset, entity.NetworkId);
       }
       else {
-        Blit.PackI32(data, Settings.ByteOffset, 0);
+        data.PackNetworkId(Settings.ByteOffset, default(NetworkId));
       }
     }
   }

@@ -58,9 +58,11 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="NetworkMask.cs" />
+    <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
-    <Compile Include="DocumentationAttribute.cs" />
+    <Compile Include="Documentation.cs" />
     <Compile Include="GlobalEventListenerBase.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
@@ -119,10 +121,10 @@
       <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
-    <Compile Include="t4\BoltFlagsGenerated.cs">
+    <Compile Include="t4\Flags.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BoltFlagsGenerated.tt</DependentUpon>
+      <DependentUpon>Flags.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltGlobalBehaviour.cs" />
     <Compile Include="BoltId.cs" />
@@ -145,10 +147,10 @@
     <Compile Include="SceneLoadState.cs" />
     <Compile Include="state\Blit.cs" />
     <Compile Include="state\State.cs" />
-    <Compile Include="t4\BoltIds.cs">
+    <Compile Include="t4\Ids.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>BoltIds.tt</DependentUpon>
+      <DependentUpon>Ids.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltChannel.cs" />
     <Compile Include="BoltConnection.cs" />
@@ -162,14 +164,12 @@
     <Compile Include="BoltPacketPool.cs" />
     <Compile Include="BoltPoll.cs" />
     <Compile Include="BoltSend.cs" />
-    <Compile Include="BoltSerializer.cs" />
     <Compile Include="collections\BoltListNode.cs" />
     <Compile Include="command\CommandChannel.cs" />
     <Compile Include="BoltEntity.cs" />
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
     <Compile Include="event\Legacy\BoltEventEnums.cs" />
-    <Compile Include="UdpPlatform.cs" />
     <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
@@ -190,13 +190,13 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>
     </None>
-    <None Include="t4\BoltFlagsGenerated.tt">
+    <None Include="t4\Flags.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltFlagsGenerated.cs</LastGenOutput>
+      <LastGenOutput>Flags.cs</LastGenOutput>
     </None>
-    <None Include="t4\BoltIds.tt">
+    <None Include="t4\Ids.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>BoltIds.cs</LastGenOutput>
+      <LastGenOutput>Ids.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

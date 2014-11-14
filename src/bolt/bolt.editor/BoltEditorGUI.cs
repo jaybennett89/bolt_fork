@@ -15,12 +15,7 @@ public static class BoltEditorGUI {
 
   public static Color HighlightColor {
     get {
-      if (EditorGUIUtility.isProSkin) {
-        return BoltEditorGUI.ColorInt(99, 169, 203);
-      }
-      else {
-        return BoltEditorGUI.ColorInt(0, 43, 85);
-      }
+      return Color.white;
     }
   }
 
@@ -254,8 +249,12 @@ public static class BoltEditorGUI {
   }
 
   public static Guid AssetPopup(IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
+    return AssetPopup("", assets, current, exclude);
+  }
+
+  public static Guid AssetPopup(string prefix, IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
     var filtered = assets.Where(x => !exclude.Contains(x.Guid)).ToArray();
-    var options = (new string[] { "-" }).Concat(filtered.Select(x => x.Name)).ToArray();
+    var options = (new string[] { prefix + "NONE" }).Concat(filtered.Select(x => prefix + x.Name)).ToArray();
     var selected = Array.FindIndex(filtered, x => x.Guid == current) + 1;
 
     selected = EditorGUILayout.Popup(selected, options);
@@ -307,42 +306,60 @@ public static class BoltEditorGUI {
     return s;
   }
 
-  public static bool IconButton(string icon, Color color) {
+  public static void Icon(string icon, float alpha) {
     GUIStyle style;
     style = new GUIStyle(GUIStyle.none);
-    style.padding = new RectOffset();
+    style.padding = new RectOffset(0, 0, 0, 0);
     style.margin = new RectOffset(0, 0, 0, 0);
     style.contentOffset = new Vector2(0, 0);
 
-    GUI.color = color;
+    Color c;
+
+    c = HighlightColor;
+    c.a = alpha;
+
+    GUI.color = c;
+    GUILayout.Button(LoadIcon(icon), style, GUILayout.Width(16), GUILayout.Height(16));
+    GUI.color = Color.white;
+  }
+
+  public static void Icon(string icon) {
+    Icon(icon, 1f);
+  }
+
+  public static bool IconButton(string icon, float alpha) {
+    GUIStyle style;
+    style = new GUIStyle(GUIStyle.none);
+    style.padding = new RectOffset(0, 0, 0, 0);
+    style.margin = new RectOffset(0, 0, 0, 0);
+    style.contentOffset = new Vector2(0, 0);
+
+    Color c;
+    
+    c = HighlightColor;
+    c.a = alpha;
+
+    GUI.color = c;
     bool result = GUILayout.Button(LoadIcon(icon), style, GUILayout.Width(16), GUILayout.Height(16));
     GUI.color = Color.white;
 
     return result;
   }
 
-  public static bool Button(string icon) {
-    return IconButton(icon, BoltEditorGUI.HighlightColor);
+  public static bool IconButton(string icon) {
+    return IconButton(icon, 1f);
   }
 
-  public static bool Button(string icon, bool enabled) {
-    Color c;
-    c = BoltEditorGUI.HighlightColor;
-    c.a = enabled ? 1f : 0.25f;
-    return IconButton(icon, c) && enabled;
+  public static bool IconButton(string icon, bool enabled) {
+    return IconButton(icon, enabled ? 1f : 0.25f) && enabled;
   }
 
   public static bool Toggle(string on, string off, bool enabled) {
-    return Button(enabled ? on : off);
+    return IconButton(enabled ? on : off);
   }
 
   public static bool Toggle(string icon, bool enabled) {
-    Color c;
-
-    c = BoltEditorGUI.HighlightColor;
-    c.a = enabled ? 1f : 0.25f;
-
-    if (IconButton(icon, c)) {
+    if (IconButton(icon, enabled ? 1f : 0.25f)) {
       return !enabled;
     }
 
@@ -352,7 +369,7 @@ public static class BoltEditorGUI {
   public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(3, 0, 0, 5));
 
-    if (Button("mc_plus")) {
+    if (IconButton("mc_plus")) {
       list.Add(
         new PropertyDefinition {
           Name = "NewProperty",
@@ -374,15 +391,9 @@ public static class BoltEditorGUI {
   }
 
   public static void Header(string text, string icon) {
-    HeaderButton(text, icon, () => { });
-  }
-
-  public static void HeaderButton(string text, string icon, Action clicked) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
 
-    if (Button(icon)) {
-      clicked();
-    }
+    Icon(icon);
 
     GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
     s.margin.top = 0;
@@ -422,10 +433,12 @@ public static class BoltEditorGUI {
       s.margin = new RectOffset();
 
       if (EditorGUIUtility.isProSkin) {
-        s.normal.background = Resources.Load("background", typeof(Texture2D)) as Texture2D;
+        s.normal.background = Resources.Load("backgrounds/dark", typeof(Texture2D)) as Texture2D;
+        s.hover.background = Resources.Load("backgrounds/dark_hover", typeof(Texture2D)) as Texture2D;
       }
       else {
-        s.normal.background = Resources.Load("background_light", typeof(Texture2D)) as Texture2D;
+        s.normal.background = Resources.Load("backgrounds/light", typeof(Texture2D)) as Texture2D;
+        s.hover.background = Resources.Load("backgrounds/light_hover", typeof(Texture2D)) as Texture2D;
       }
 
       return s;

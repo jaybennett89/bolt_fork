@@ -8,8 +8,6 @@ partial class GlobalEventListenerBase {
    
   public virtual void ConnectFailed(UdpEndPoint arg) { }
    
-  public virtual void ConnectRefused(UdpEndPoint arg) { }
-   
   public virtual void EntityAttached(BoltEntity arg) { }
    
   public virtual void EntityDetached(BoltEntity arg) { }
@@ -24,13 +22,6 @@ partial class GlobalEventListenerBase {
     BoltLog.Debug("Invoking callback ConnectFailed");
     foreach (GlobalEventListenerBase cb in callbacks) {
       cb.ConnectFailed(arg);
-    }
-  }
-   
-  internal static void ConnectRefusedInvoke(UdpEndPoint arg) { 
-    BoltLog.Debug("Invoking callback ConnectRefused");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-      cb.ConnectRefused(arg);
     }
   }
    
@@ -130,13 +121,13 @@ partial class GlobalEventListenerBase {
   }
 
   
-  public virtual void Connected(BoltConnection connection) { 
+  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken token) { 
   }
 
-  internal static void ConnectedInvoke(BoltConnection connection) { 
+  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
     BoltLog.Debug("Invoking callback Connected");
     foreach (GlobalEventListenerBase cb in callbacks) {
-        cb.Connected(connection);
+        cb.Connected(connection, token);
     }
   }
 
@@ -159,6 +150,17 @@ partial class GlobalEventListenerBase {
     BoltLog.Debug("Invoking callback ConnectRequest");
     foreach (GlobalEventListenerBase cb in callbacks) {
         cb.ConnectRequest(endpoint, token);
+    }
+  }
+
+  
+  public virtual void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
+  }
+
+  internal static void ConnectRefusedInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback ConnectRefused");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.ConnectRefused(endpoint, token);
     }
   }
 

@@ -13,10 +13,11 @@ internal class BoltPacket : IDisposable {
     get { return BoltCore._udpConfig.PacketSize - UdpHeader.SIZE_BYTES; }
   }
 
+  internal Bolt.NetworkId NetworkIdBlock;
+
   internal int number;
   internal PacketStats stats;
   internal volatile bool pooled = true;
-  //internal BoltSingleList<EntityProxyEnvelope> envelopes = new BoltSingleList<EntityProxyEnvelope>();
   internal List<Bolt.EventReliable> eventReliable = new List<Bolt.EventReliable>();
   internal Queue<EntityProxyEnvelope> ProxyEnvelopes = new Queue<EntityProxyEnvelope>();
 

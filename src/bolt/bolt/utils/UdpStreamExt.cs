@@ -252,97 +252,121 @@ public static class UdpStreamExtensions {
     return m;
   }
 
-  internal static void WriteNetworkId_old(this UdpPacket stream, NetId id) {
-    Assert.True(id.Value >= 0);
-    Assert.True(id.Value < EntityProxy.MAX_COUNT);
+  //internal static void WriteNetworkId_old(this UdpPacket stream, NetId id) {
+  //  Assert.True(id.Value >= 0);
+  //  Assert.True(id.Value < EntityProxy.MAX_COUNT);
 
-    stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
+  //  stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
+  //}
+
+  //internal static NetId ReadNetworkId_Old(this UdpPacket stream) {
+  //  return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
+  //}
+
+  //internal static void WriteEntity(this UdpPacket stream, Entity en, BoltConnection cn) {
+  //  if (en == null) {
+  //    stream.WriteBool(false);
+  //    return;
+  //  }
+
+  //  NetId id = cn.GetNetworkId(en);
+
+  //  // one bit if we have it or not, at all
+  //  if (stream.WriteBool(id.Value != int.MaxValue)) {
+  //    // one bit which significes if this is an outgoing or incomming proxy
+  //    // if it's an incomming that means the sourceConnection is the same as this connection
+  //    // if it's an outgoing that means the sourceConnection is either null (it's local) 
+  //    // or it's a connection which which we received this object from
+  //    stream.WriteBool(ReferenceEquals(en.Source, cn));
+
+  //    // the actual network id
+  //    stream.WriteNetworkId_old(id);
+  //  }
+  //}
+
+  //internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn) {
+  //  NetId networkId;
+  //  return ReadEntity(stream, cn, out networkId);
+  //}
+
+  //internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn, out NetId networkId) {
+  //  if (stream.ReadBool()) {
+  //    // if this bool reads true, that means that the
+  //    // other end of the connection classifices this 
+  //    // entity as an incomming, which means it's outgoing for us
+  //    // and the reverse if it's false
+
+  //    if (stream.ReadBool()) {
+  //      networkId = stream.ReadNetworkId_Old();
+  //      return cn.GetOutgoingEntity(networkId);
+  //    }
+  //    else {
+  //      networkId = stream.ReadNetworkId_Old();
+  //      return cn.GetIncommingEntity(networkId);
+  //    }
+  //  }
+  //  else {
+  //    networkId = new NetId(int.MaxValue);
+  //    return null;
+  //  }
+  //}
+
+  //public static void PackUIntVB(this UdpPacket packet, uint v) {
+  //  uint b = 0U;
+
+  //  do {
+  //    b = v & 127U;
+  //    v = v >> 7;
+
+  //    if (v > 0) {
+  //      b |= 128U;
+  //    }
+
+  //    packet.WriteByte((byte)b);
+  //  } while ((b & 128U) == 128U);
+  //}
+
+  //public static uint ReadUIntVB(this UdpPacket packet) {
+  //  uint v = 0U;
+  //  uint b = 0U;
+
+  //  int s = 0;
+
+  //  do {
+  //    b = packet.ReadByte();
+  //    v = v | ((b & 127U) << s);
+  //    s = s + 7;
+
+  //  } while ((b & 128U) == 128U);
+
+  //  return v;
+  //}
+
+  internal static void WriteEntity(this UdpPacket packet, Entity entity) {
+    if (packet.WriteBool((entity != null) && entity.IsAttached)) {
+      packet.WriteNetworkId(entity.NetworkId);
+    }
   }
 
-  internal static NetId ReadNetworkId_Old(this UdpPacket stream) {
-    return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
-  }
-
-  internal static void WriteEntity(this UdpPacket stream, Entity en, BoltConnection cn) {
-    if (en == null) {
-      stream.WriteBool(false);
-      return;
+  internal static Entity ReadEntity(this UdpPacket packet) {
+    if (packet.ReadBool()) {
+      return BoltCore.FindEntity(packet.ReadNetworkId());
     }
 
-    NetId id = cn.GetNetworkId(en);
-
-    // one bit if we have it or not, at all
-    if (stream.WriteBool(id.Value != int.MaxValue)) {
-      // one bit which significes if this is an outgoing or incomming proxy
-      // if it's an incomming that means the sourceConnection is the same as this connection
-      // if it's an outgoing that means the sourceConnection is either null (it's local) 
-      // or it's a connection which which we received this object from
-      stream.WriteBool(ReferenceEquals(en.Source, cn));
-
-      // the actual network id
-      stream.WriteNetworkId_old(id);
-    }
+    return null;
   }
 
-  internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn) {
-    NetId networkId;
-    return ReadEntity(stream, cn, out networkId);
-  }
-
-  internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn, out NetId networkId) {
-    if (stream.ReadBool()) {
-      // if this bool reads true, that means that the
-      // other end of the connection classifices this 
-      // entity as an incomming, which means it's outgoing for us
-      // and the reverse if it's false
-
-      if (stream.ReadBool()) {
-        networkId = stream.ReadNetworkId_Old();
-        return cn.GetOutgoingEntity(networkId);
-      }
-      else {
-        networkId = stream.ReadNetworkId_Old();
-        return cn.GetIncommingEntity(networkId);
-      }
-    }
-    else {
-      networkId = new NetId(int.MaxValue);
-      return null;
-    }
-  }
-
-
-  public static void PackNetworkId(this UdpPacket packet, NetworkId id) {
-    ulong v = id.Value;
-    ulong b = 0UL;
-
-    do {
-      b = v & 127UL;
-      v = v >> 7;
-
-      if (v > 0) {
-        b |= 128UL;
-      }
-
-      packet.WriteByte((byte)b);
-
-    } while ((b & 128UL) == 128UL);
+  public static void WriteNetworkId(this UdpPacket packet, NetworkId id) {
+    Assert.True(id.Connection != uint.MaxValue);
+    packet.WriteUInt(id.Connection);
+    packet.WriteUInt(id.Entity);
   }
 
   public static NetworkId ReadNetworkId(this UdpPacket packet) {
-    ulong v = 0UL;
-    ulong b = 0UL;
-
-    int s = 0;
-
-    do {
-      b = packet.ReadByte();
-      v = v | ((b & 127UL) << s);
-      s = s + 7;
-
-    } while ((b & 128UL) == 128UL);
-
-    return new NetworkId(v);
+    uint connection = packet.ReadUInt();
+    uint entity = packet.ReadUInt();
+    Assert.True(connection != uint.MaxValue);
+    return new NetworkId(connection, entity);
   }
 
   internal static void WriteContinueMarker(this UdpPacket stream) {

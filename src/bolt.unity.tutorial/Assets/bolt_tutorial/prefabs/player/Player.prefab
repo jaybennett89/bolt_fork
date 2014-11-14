@@ -1914,7 +1914,7 @@ MonoBehaviour:
   _prefabId: 4
   _updateRate: 1
   _clientPredicted: 1
-  _allowInstantiateOnClient: 0
+  _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
 --- !u!114 &11400004
 MonoBehaviour:

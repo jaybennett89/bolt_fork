@@ -106,15 +106,14 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return new PrefabId(_prefabId); }
   }
 
-  public Bolt.InstanceId instanceId {
-    get { return Entity.InstanceId; }
-  }
-
   /// <summary>
   /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
   /// </summary>
   public Bolt.UniqueId uniqueId {
-    get { return Entity.UniqueId; }
+    get {
+      BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
+      return default(Bolt.UniqueId);
+    }
   }
 
   /// <summary>
@@ -122,6 +121,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   public BoltConnection source {
     get { return Entity.Source; }
+  }
+
+  public NetworkId networkId {
+    get { return Entity.NetworkId; }
   }
 
   /// <summary>
@@ -230,7 +233,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="id"></param>
   public void SetUniqueId(Bolt.UniqueId id) {
-    Entity.SetUniqueId(id);
+    BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
   }
 
   /// <summary>
@@ -315,7 +318,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public bool TryFindState<TState>(out TState state) {
     if (Entity.Serializer is TState) {
-      state = (TState) (object)Entity.Serializer;
+      state = (TState)(object)Entity.Serializer;
       return true;
     }
 
@@ -351,7 +354,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   internal void VerifyNotAttached() {
     if (isAttached) {
-      throw new BoltException("You can't modify a BoltEntity behaviour which is attached to Bolt");
+      throw new InvalidOperationException("You can't modify a BoltEntity behaviour which is attached to Bolt");
     }
   }
 
@@ -384,9 +387,13 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void OnDestroy() {
-    if (_entity && UE.Application.isPlaying) {
-      // log that his is happening
-      BoltLog.Warn("{0} is being destroyed or disabled without being detached, forcing detach", Entity);
+    if (_entity && _entity.IsAttached && UE.Application.isPlaying) {
+      if (_entity.IsOwner) {
+        BoltLog.Warn("{0} is being destroyed/disabled without being detached, forcing detach", Entity);
+      }
+      else {
+        BoltLog.Error("{0} is being destroyed/disabled without being detached by the owner, this will cause this peer to disconnect the next time it receives an update for this entity");
+      }
 
       // force detach
       _entity.Detach();

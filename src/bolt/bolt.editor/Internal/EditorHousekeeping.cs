@@ -49,7 +49,7 @@ namespace BoltEditor.Internal {
         var entity = BoltInternal.BoltCoreInternal.ChangedEditorEntities[i];
 
         if (entity) {
-          var entityPrefabType = UED.EditorUtility.GetPrefabType(entity);
+          var entityPrefabType = UED.PrefabUtility.GetPrefabType(entity);
 
           switch (entityPrefabType) {
             case UED.PrefabType.Prefab:

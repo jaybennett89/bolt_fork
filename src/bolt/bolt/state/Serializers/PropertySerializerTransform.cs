@@ -34,7 +34,6 @@ namespace Bolt {
     }
   }
 
-
   class PropertySerializerTransform : PropertySerializer {
     PropertyTransformCompressionSettings TransformCompression;
 
@@ -64,8 +63,10 @@ namespace Bolt {
       if (td.Simulate) {
         var p = state.Frames.first.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
         var r = state.Frames.first.Data.ReadQuaternion(Settings.ByteOffset + ROTATION_OFFSET).eulerAngles;
+
         var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F3"), p.y.ToString("F3"), p.z.ToString("F3"));
         var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F3"), r.y.ToString("F3"), r.z.ToString("F3"));
+
         return string.Format("{0} / {1}", pos, rot);
       }
       else {
@@ -86,6 +87,7 @@ namespace Bolt {
 
       var p = td.RenderDoubleBufferPosition.Previous;
       var c = td.RenderDoubleBufferPosition.Current;
+
       td.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
       td.Render.rotation = td.RenderDoubleBufferRotation.Current;
     }
@@ -156,15 +158,8 @@ namespace Bolt {
             break;
 
           case SmoothingAlgorithms.Extrapolation:
-            //BoltPoll.CALC.Start();
-            UE.Vector3 calc = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap); ;
-            //BoltPoll.CALC.Stop();
-
-            //BoltPoll.ASSIGN.Start();
-            td.Simulate.localPosition = calc;
-            //BoltPoll.ASSIGN.Stop();
-
-            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation);
+            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);            //BoltPoll.ASSIGN.Stop();
+            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation); 
             break;
         }
 
@@ -222,14 +217,14 @@ namespace Bolt {
     public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
       if (state.Entity.HasParent) {
         if (connection._entityChannel.ExistsOnRemote(state.Entity.Parent)) {
-          stream.WriteEntity(state.Entity.Parent, connection);
+          stream.WriteEntity(state.Entity.Parent);
         }
         else {
           return false;
         }
       }
       else {
-        stream.WriteEntity(null, connection);
+        stream.WriteEntity(null);
       }
 
       UE.Vector3 p = frame.Data.ReadVector3(Settings.ByteOffset + POSITION_OFFSET);
@@ -247,7 +242,7 @@ namespace Bolt {
     }
 
     public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
-      state.Entity.SetParentInternal(stream.ReadEntity(connection));
+      state.Entity.SetParentInternal(stream.ReadEntity());
 
       UE.Vector3 p = default(UE.Vector3);
       UE.Vector3 v = default(UE.Vector3);
