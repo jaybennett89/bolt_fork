@@ -318,6 +318,11 @@ partial class EntityChannel : BoltChannel {
         DestroyOutgoingProxy(env.Proxy);
       }
       else if (env.Flags & ProxyFlags.CREATE_REQUESTED) {
+        // if this token has been sent, clear it
+        if (ReferenceEquals(env.ControlTokenGained, env.Proxy.ControlTokenGained)) {
+          env.Proxy.ControlTokenGained = null;
+        }
+
         // clear out request / progress for create
         env.Proxy.Flags &= ~ProxyFlags.CREATE_REQUESTED;
 
