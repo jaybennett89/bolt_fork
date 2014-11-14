@@ -49,6 +49,9 @@ namespace Bolt {
     /// </summary>
     public virtual void Detached() { }
 
+    public virtual void Attached(IProtocolToken token) { }
+    public virtual void Detached(IProtocolToken token) { }
+
     /// <summary>
     /// Invoked each simulation step on the owner
     /// </summary>
@@ -69,6 +72,9 @@ namespace Bolt {
     /// </summary>
     public virtual void ControlLost() { }
 
+    public virtual void ControlLost(IProtocolToken token) { }
+    public virtual void ControlGained(IProtocolToken token) { }
+
     /// <summary>
     /// Invoked on the owner when a remote connection is controlling this entity but we have not received any command for the current simulation frame.
     /// </summary>
@@ -81,6 +87,8 @@ namespace Bolt {
     /// <param name="command">The command to execute</param>
     /// <param name="resetState">Indicates if we should reset the state of the local motor or not</param>
     public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
+
+
   }
 
   /// <summary>

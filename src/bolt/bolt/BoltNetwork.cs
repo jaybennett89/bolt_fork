@@ -231,63 +231,99 @@ public static class BoltNetwork {
     BoltCore.PrefabPool = pool;
   }
 
-  /// <summary>
-  /// Instantiates and attaches an instance of this prefab to Bolt 
-  /// </summary>
-  /// <param name="prefab">The prefab to use</param>
-  /// <returns>The new instance</returns>
+  /*
+   * Instantiate
+   * 
+   * */
+
   public static BoltEntity Instantiate(GameObject prefab) {
-    return BoltCore.Instantiate(prefab, Vector3.zero, Quaternion.identity);
+    return Instantiate(prefab, null, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(GameObject prefab, Vector3 position) {
-    return BoltCore.Instantiate(prefab, position, Quaternion.identity);
+  public static BoltEntity Instantiate(GameObject prefab, IProtocolToken token) {
+    return Instantiate(prefab, token, Vector3.zero, Quaternion.identity);
   }
 
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
-    return BoltCore.Instantiate(prefab, position, rotation);
+    return Instantiate(prefab, null, position, rotation);
   }
 
-  /// <summary>
-  /// Instantiates and attaches an instance of this prefab to Bolt 
-  /// </summary>
-  /// <param name="prefabId">The prefab id to create an instance of</param>
-  /// <returns>The new instance</returns>
+  public static BoltEntity Instantiate(GameObject prefab, IProtocolToken token, Vector3 position, Quaternion rotation) {
+    BoltEntity be = prefab.GetComponent<BoltEntity>();
+
+    if (!be) {
+      BoltLog.Error("Prefab '{0}' does not have a Bolt Entity component attached", prefab.name);
+      return null;
+    }
+
+    if (be.serializerGuid == UniqueId.None) {
+      BoltLog.Error("Prefab '{0}' does not have a serializer assigned", prefab.name);
+      return null;
+    }
+
+    return BoltCore.Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null, token);
+  }
+
   public static BoltEntity Instantiate(Bolt.PrefabId prefabId) {
-    return BoltCore.Instantiate(prefabId, Vector3.zero, Quaternion.identity);
+    return Instantiate(prefabId, null, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position) {
-    return BoltCore.Instantiate(prefabId, position, Quaternion.identity);
+  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, IProtocolToken token) {
+    return Instantiate(prefabId, token, Vector3.zero, Quaternion.identity);
   }
 
   public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position, Quaternion rotation) {
-    return BoltCore.Instantiate(prefabId, position, rotation);
+    return Instantiate(prefabId, null, position, rotation);
   }
 
-  /// <summary>
-  /// Attaches a manually configured entity to bolt
-  /// </summary>
-  /// <param name="gameObject">The game object that contains the Bolt Entity component</param>
-  /// <returns>The same object was was passed in</returns>
+  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, IProtocolToken token, Vector3 position, Quaternion rotation) {
+    return Instantiate(BoltCore.PrefabPool.LoadPrefab(prefabId), token, position, rotation);
+  }
+
+  /*
+   * Destroy
+   * 
+   * */
+
+  public static void Destroy(GameObject gameObject) {
+    Destroy(gameObject, null);
+  }
+
+  public static void Destroy(GameObject gameObject, IProtocolToken token) {
+    BoltEntity entity = gameObject.GetComponent<BoltEntity>();
+
+    if (entity) {
+      BoltCore.Destroy(entity, token);
+    }
+    else {
+      BoltLog.Error("Can only destroy gameobjects with an BoltEntity component through BoltNetwork.Destroy");
+    }
+  }
+
+  /*
+   * Attach
+   * 
+   * */
+
   public static GameObject Attach(GameObject gameObject) {
-    return BoltCore.Attach(gameObject);
+    return Attach(gameObject, null);
   }
 
-  public static GameObject Attach(GameObject gameObject, Bolt.TypeId serializerTypeId) {
-    return BoltCore.Attach(gameObject, serializerTypeId);
+  public static GameObject Attach(GameObject gameObject, IProtocolToken token) {
+    return BoltCore.Attach(gameObject, EntityFlags.ZERO, token);
   }
 
-  public static void Detach(BoltEntity entity) {
-    BoltCore.Detach(entity);
-  }
+  /*
+   * Detach
+   * 
+   * */
 
-  /// <summary>
-  /// Detaches an entity from bolt
-  /// </summary>
-  /// <param name="gameObject">The gameobject holding the entity</param>
   public static void Detach(GameObject gameObject) {
-    BoltCore.Detach(gameObject.GetComponent<BoltEntity>());
+    Detach(gameObject, null);
+  }
+
+  public static void Detach(GameObject gameObject, IProtocolToken token) {
+    BoltCore.Detach(gameObject.GetComponent<BoltEntity>(), token);
   }
 
   /// <summary>
@@ -365,18 +401,6 @@ public static class BoltNetwork {
     BoltCore._globalEventDispatcher.Remove(mb);
   }
 
-
-  public static void Destroy(BoltEntity entity) {
-    BoltCore.Destroy(entity);
-  }
-
-  /// <summary>
-  /// Destroy a bolt entity
-  /// </summary>
-  /// <param name="gameobject">The game object which contains the entity</param>
-  public static void Destroy(GameObject gameobject) {
-    BoltCore.Destroy(gameobject);
-  }
 
   /// <summary>
   /// Load a scene based on name, only possible on the Server

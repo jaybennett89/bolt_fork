@@ -165,6 +165,50 @@ partial class GlobalEventListenerBase {
   }
 
   
+  public virtual void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) { 
+  }
+
+  internal static void ControlOfEntityLostInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback ControlOfEntityLost");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.ControlOfEntityLost(entity, token);
+    }
+  }
+
+  
+  public virtual void ControlOfEntityGained(BoltEntity entity, Bolt.IProtocolToken token) { 
+  }
+
+  internal static void ControlOfEntityGainedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback ControlOfEntityGained");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.ControlOfEntityGained(entity, token);
+    }
+  }
+
+  
+  public virtual void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) { 
+  }
+
+  internal static void EntityAttachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback EntityAttached");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.EntityAttached(entity, token);
+    }
+  }
+
+  
+  public virtual void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) { 
+  }
+
+  internal static void EntityDetachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback EntityDetached");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+        cb.EntityDetached(entity, token);
+    }
+  }
+
+  
   public virtual void EntityReceived(BoltEntity entity) { 
   }
 

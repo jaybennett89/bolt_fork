@@ -54,7 +54,7 @@ public partial class Player : IDisposable {
 
     // destroy
     if (entity) {
-      BoltNetwork.Destroy(entity);
+      BoltNetwork.Destroy(entity.gameObject);
     }
 
     // while we have a team difference of more then 1 player
@@ -72,21 +72,11 @@ public partial class Player : IDisposable {
     }
   }
 
-  public void GiveControl(BoltEntity entity) {
-    if (connection == null) {
-      entity.TakeControl();
-    }
-    else {
-      entity.AssignControl(connection);
-    }
-  }
-
   public void InstantiateEntity() {
     float x = UE.Random.Range(-32f, +32f);
     float z = UE.Random.Range(-32f, +32f);
 
-    entity = BoltNetwork.Instantiate(BoltPrefabs.Player, RandomSpawn(), Quaternion.identity);
-    entity.SetUniqueId(Bolt.UniqueId.New());
+    entity = BoltNetwork.Instantiate(BoltPrefabs.Player, new TestToken(), RandomSpawn(), Quaternion.identity);
 
     using (var mod = state.Modify()) {
       mod.name = name;
@@ -96,10 +86,10 @@ public partial class Player : IDisposable {
         : TEAM_RED;
 
       if (isServer) {
-        entity.TakeControl();
+        entity.TakeControl(new TestToken());
       }
       else {
-        entity.AssignControl(connection);
+        entity.AssignControl(connection, new TestToken());
       }
     }
 

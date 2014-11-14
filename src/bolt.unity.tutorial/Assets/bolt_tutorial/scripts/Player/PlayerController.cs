@@ -67,7 +67,9 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     }
   }
 
-  public override void Attached() {
+  public override void Attached(Bolt.IProtocolToken token) {
+    BoltLog.Info("Attached-Token: {0}", token);
+
     Animator animator = GetComponentInChildren<Animator>();
 
     state.transform.SetTransforms(transform);
@@ -159,6 +161,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     input.pitch = pitch;
 
     input.weapon = weapon;
+    input.Token = new TestToken();
 
     entity.QueueInput(input);
   }
@@ -197,6 +200,10 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
             FireWeapon(cmd);
           }
         }
+      }
+
+      if (entity.isOwner) {
+        cmd.Result.Token = new TestToken();
       }
     }
   }

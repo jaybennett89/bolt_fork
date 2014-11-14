@@ -97,6 +97,8 @@ partial class EntityChannel {
 
                 WriteSequence(packet.stream, it.val.Sequence);
 
+                packet.stream.WriteToken(it.val.ResultToken);
+
                 it.val.PackResult(connection, packet.stream);
 
                 if (packet.stream.Overflowing) {
@@ -147,6 +149,7 @@ partial class EntityChannel {
 
           TypeId typeId = TypeId.Read(packet.stream);
           ushort sequence = ReadSequence(packet.stream);
+          IProtocolToken resultToken = packet.stream.ReadToken();
 
           Command cmd = null;
 
@@ -165,6 +168,9 @@ partial class EntityChannel {
           }
 
           if (cmd) {
+            cmd.ResultToken = resultToken;
+            cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
+
             if (cmd.Meta.SmoothFrames > 0) {
               cmd.SmoothTo = cmd.ResultData.CloneArray();
               cmd.SmoothFrom = cmd.ResultData.CloneArray();
@@ -178,7 +184,6 @@ partial class EntityChannel {
               cmd.ReadResult(connection, cmd.ResultData, packet.stream);
             }
 
-            cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
           }
           else {
             cmd = Factory.NewCommand(typeId);
@@ -233,8 +238,7 @@ partial class EntityChannel {
             WriteSequence(packet.stream, cmd.Sequence);
 
             packet.stream.WriteInt(cmd.ServerFrame);
-
-            ////BoltLog.Debug("packing cmd sequence {0}", cmd._sequence);
+            packet.stream.WriteToken(cmd.InputToken);
 
             cmd.PackInput(connection, packet.stream);
             cmd = entity.CommandQueue.Next(cmd);
@@ -281,6 +285,7 @@ partial class EntityChannel {
           Bolt.Command cmd = Factory.NewCommand(TypeId.Read(packet.stream));
           cmd.Sequence = ReadSequence(packet.stream);
           cmd.Frame = packet.stream.ReadInt();
+          cmd.InputToken = packet.stream.ReadToken();
           cmd.ReadInput(connection, packet.stream);
 
           // no proxy or entity

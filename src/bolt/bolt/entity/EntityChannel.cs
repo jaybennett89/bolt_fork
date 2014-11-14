@@ -29,6 +29,12 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
+  public void ForceSync(Bolt.Entity en, out EntityProxy proxy) {
+    if (_outgoing.TryGetValue(en.NetworkId, out proxy)) {
+      proxy.Flags |= Bolt.ProxyFlags.FORCE_SYNC;
+    }
+  }
+
   public void SetIdle(Bolt.Entity entity, bool idle) {
     EntityProxy proxy;
 
@@ -115,13 +121,15 @@ partial class EntityChannel : BoltChannel {
   }
 
   public bool CreateOnRemote(Bolt.Entity entity) {
+    EntityProxy proxy;
+    return CreateOnRemote(entity, out proxy);
+  }
+
+  public bool CreateOnRemote(Bolt.Entity entity, out EntityProxy proxy) {
     try {
-      if (ReferenceEquals(entity.Source, connection)) { return true; }
-      if (_incomming.ContainsKey(entity.NetworkId)) { return true; }
-      if (_outgoing.ContainsKey(entity.NetworkId)) { return true; }
+      if (_incomming.TryGetValue(entity.NetworkId, out proxy)) { return true; }
+      if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) { return true; }
 
-
-      EntityProxy proxy;
       proxy = entity.CreateProxy();
       proxy.NetworkId = entity.NetworkId;
       proxy.Flags = ProxyFlags.CREATE_REQUESTED;
@@ -130,11 +138,13 @@ partial class EntityChannel : BoltChannel {
 
       _outgoing.Add(proxy.NetworkId, proxy);
 
-      BoltLog.Debug("Created {0} on {1}", proxy, connection);
+      BoltLog.Debug("Created {0} on {1}", entity, connection);
       return true;
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
+
+      proxy = null;
       return false;
     }
   }
@@ -147,7 +157,6 @@ partial class EntityChannel : BoltChannel {
       }
 
       // simulate this entity
-
       proxy.Entity.Simulate();
     }
   }
@@ -219,28 +228,31 @@ partial class EntityChannel : BoltChannel {
       _prioritized.Add(proxy);
     }
     if (_prioritized.Count > 0) {
-      _prioritized.Sort(EntityProxy.PriorityComparer.Instance);
+      try {
+        _prioritized.Sort(EntityProxy.PriorityComparer.Instance);
 
-      // write as many proxies into the packet as possible
+        // write as many proxies into the packet as possible
 
-      int failCount = 0;
+        int failCount = 0;
 
-      for (int i = 0; i < _prioritized.Count; ++i) {
-        if (failCount >= 2) {
-          _prioritized[i].Skipped += 1;
-        }
-        else {
-          var result = PackUpdate(packet, _prioritized[i]);
-          if (result) {
-            _prioritized[i].Priority = 0;
+        for (int i = 0; i < _prioritized.Count; ++i) {
+          if (failCount >= 2) {
+            _prioritized[i].Skipped += 1;
           }
           else {
-            failCount += 1; 
+            var result = PackUpdate(packet, _prioritized[i]);
+            if (result) {
+              _prioritized[i].Priority = 0;
+            }
+            else {
+              failCount += 1;
+            }
           }
         }
       }
-
-      _prioritized.Clear();
+      finally {
+        _prioritized.Clear();
+      }
     }
 
     packet.stream.WriteStopMarker();
@@ -326,7 +338,7 @@ partial class EntityChannel : BoltChannel {
 
     foreach (EntityProxy proxy in _incomming.Values.ToArray()) {
       if (proxy) {
-        DestroyIncommingProxy(proxy);
+        DestroyIncommingProxy(proxy, null);
       }
     }
   }
@@ -362,11 +374,23 @@ partial class EntityChannel : BoltChannel {
     packet.stream.WriteBool(true);
     packet.stream.WriteNetworkId(proxy.NetworkId);
 
-    if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED) == false) {
-      packet.stream.WriteBool(ReferenceEquals(proxy.Entity.Controller, connection));
+    if (packet.stream.WriteBool(proxy.Entity.IsController(connection))) {
+      packet.stream.WriteToken(proxy.ControlTokenGained);
+      proxy.ControlTokenLost = null;
+    }
+    else {
+      packet.stream.WriteToken(proxy.ControlTokenLost);
+      proxy.ControlTokenGained = null;
+    }
 
+    if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED)) {
+      packet.stream.WriteToken(proxy.Entity.DetachToken);
+    }
+    else {
       // data for first packet
       if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
+        packet.stream.WriteToken(proxy.Entity.AttachToken);
+
         proxy.Entity.PrefabId.Pack(packet.stream, 32);
         proxy.Entity.Serializer.TypeId.Pack(packet.stream, 32);
 
@@ -425,30 +449,36 @@ partial class EntityChannel : BoltChannel {
   }
 
   bool ReadUpdate(BoltPacket packet) {
-    if (packet.stream.ReadBool() == false)
+    if (packet.stream.ReadBool() == false) {
       return false;
+    }
 
     // grab networkid
-    var networkId = packet.stream.ReadNetworkId();
-    var destroyRequested = packet.stream.ReadBool();
+    NetworkId networkId = packet.stream.ReadNetworkId();
+    bool isController = packet.stream.ReadBool();
+    IProtocolToken controlToken = packet.stream.ReadToken();
+
+    bool destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
     if (destroyRequested) {
       EntityProxy proxy;
+      IProtocolToken detachToken = packet.stream.ReadToken();
 
       if (_incomming.TryGetValue(networkId, out proxy)) {
         if (proxy.Entity.HasControl) {
-          proxy.Entity.ReleaseControlInternal();
+          proxy.Entity.ReleaseControlInternal(controlToken);
         }
 
-        DestroyIncommingProxy(proxy);
+        DestroyIncommingProxy(proxy, detachToken);
       }
       else {
         BoltLog.Warn("Received destroy of {0} but no such proxy was found", networkId);
       }
     }
     else {
-      bool isController = packet.stream.ReadBool();
+      IProtocolToken attachToken = null;
+
       bool isSceneObject = false;
       bool createRequested = packet.stream.ReadBool();
 
@@ -459,6 +489,7 @@ partial class EntityChannel : BoltChannel {
       Quaternion spawnRotation = new Quaternion();
 
       if (createRequested) {
+        attachToken = packet.stream.ReadToken();
         prefabId = PrefabId.Read(packet.stream, 32);
         serializerId = TypeId.Read(packet.stream, 32);
         spawnPosition = packet.stream.ReadVector3();
@@ -524,12 +555,13 @@ partial class EntityChannel : BoltChannel {
         entity.Serializer.Read(connection, packet.stream, packet.frame);
 
         // attach entity
+        proxy.Entity.AttachToken = attachToken;
         proxy.Entity.Attach();
 
         // assign control properly
         if (isController) {
           proxy.Entity.Flags &= ~EntityFlags.HAS_CONTROL;
-          proxy.Entity.TakeControlInternal();
+          proxy.Entity.TakeControlInternal(controlToken);
         }
 
         // log debug info
@@ -549,10 +581,10 @@ partial class EntityChannel : BoltChannel {
         // update control state yes/no
         if (proxy.Entity.HasControl ^ isController) {
           if (isController) {
-            proxy.Entity.TakeControlInternal();
+            proxy.Entity.TakeControlInternal(controlToken);
           }
           else {
-            proxy.Entity.ReleaseControlInternal();
+            proxy.Entity.ReleaseControlInternal(controlToken);
           }
         }
 
@@ -573,10 +605,11 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  void DestroyIncommingProxy(EntityProxy proxy) {
+  void DestroyIncommingProxy(EntityProxy proxy, IProtocolToken token) {
     _incomming.Remove(proxy.NetworkId);
 
     // destroy entity
+    proxy.Entity.DetachToken = token;
     BoltCore.DestroyForce(proxy.Entity);
   }
 }

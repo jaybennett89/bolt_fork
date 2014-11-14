@@ -75,6 +75,18 @@ namespace Bolt.Compiler {
         method.Statements.Expr("return new {0}()", Decorator.Definition.Name);
       });
 
+      type.DeclareProperty("Bolt.IProtocolToken", "Token", get => {
+        get.Expr("return InputToken");
+      }, set => {
+        set.Expr("InputToken = value");
+      }).PrivateImplementationType = new CodeTypeReference("Bolt.ICommandInput");
+
+      type.DeclareProperty("Bolt.IProtocolToken", "Token", get => {
+        get.Expr("return ResultToken");
+      }, set => {
+        set.Expr("ResultToken = value");
+      }).PrivateImplementationType = new CodeTypeReference("Bolt.ICommandResult");
+
       for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
         PropertyCodeEmitter.Create(Decorator.InputProperties[i]).EmitCommandMembers(type, "InputData", Decorator.InputInterfaceName);
       }
@@ -95,6 +107,7 @@ namespace Bolt.Compiler {
 
     void EmitResultInterface() {
       CodeTypeDeclaration type = Generator.DeclareInterface(Decorator.ResultInterfaceName);
+      type.BaseTypes.Add("Bolt.ICommandResult");
 
       for (int i = 0; i < Decorator.ResultProperties.Count; ++i) {
         PropertyCodeEmitter.Create(Decorator.ResultProperties[i]).EmitSimpleIntefaceMember(type, true, true);
