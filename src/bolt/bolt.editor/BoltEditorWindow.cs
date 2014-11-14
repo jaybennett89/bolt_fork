@@ -308,7 +308,6 @@ public class BoltEditorWindow : BoltWindow {
     List<PropertyDefinition> sortedList = list;
 
     switch (def.SortOrder) {
-      case SortOrder.Name: sortedList = list.OrderBy(x => x.Name).ToList(); break;
       case SortOrder.Priority: sortedList = list.OrderByDescending(x => x.Priority).ToList(); break;
     }
 
