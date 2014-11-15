@@ -197,6 +197,13 @@ public class BoltProjectWindow : BoltWindow {
 
     foreach (var a in assets.OrderBy(x => x.Name)) {
 
+      if (a.Groups.Contains("")) {
+        a.Groups = new HashSet<string>(a.Groups.Where(x => x != ""));
+
+        // save
+        Save();
+      }
+
       // check
       if (HasGroupSelected && !a.Groups.Contains(Project.ActiveGroup)) {
         continue;
