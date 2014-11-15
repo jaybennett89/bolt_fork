@@ -23,6 +23,7 @@ internal static class BoltCore {
 
   static internal bool _canReceiveEntities = true;
   static internal IPrefabPool PrefabPool = new DefaultPrefabPool();
+  static internal IEventFilter EventFilter = new DefaultEventFilter();
 
   static internal int _frame = 0;
   static internal BoltNetworkModes _mode = BoltNetworkModes.None;

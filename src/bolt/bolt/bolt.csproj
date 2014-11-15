@@ -58,6 +58,7 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="EventFilter.cs" />
     <Compile Include="NetworkMask.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />

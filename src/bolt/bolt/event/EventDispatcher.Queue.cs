@@ -12,7 +12,9 @@ namespace Bolt {
     }
 
     public static void Received(Event ev) {
-      _dispatchQueue.Enqueue(ev);
+      if (BoltCore.EventFilter.EventReceived(ev)) {
+        _dispatchQueue.Enqueue(ev);
+      }
     }
 
     public static void DispatchAllEvents() {
@@ -22,7 +24,6 @@ namespace Bolt {
     }
 
     static void Dispatch(Event ev) {
-
       switch (ev.Targets) {
         case Event.ENTITY_EVERYONE:
           Entity_Everyone(ev);

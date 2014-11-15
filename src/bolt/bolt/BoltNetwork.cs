@@ -223,6 +223,14 @@ public static class BoltNetwork {
     get { return UPnP.NatDevices; }
   }
 
+  public static void SetEventFilter(IEventFilter filter) {
+    if (filter == null) {
+      throw new ArgumentNullException("filter");
+    }
+
+    BoltCore.EventFilter = filter;
+  }
+
   public static void SetPrefabPool(IPrefabPool pool) {
     if (pool == null) {
       throw new ArgumentNullException("pool");
