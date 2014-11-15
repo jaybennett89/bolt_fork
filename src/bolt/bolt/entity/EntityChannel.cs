@@ -420,11 +420,12 @@ partial class EntityChannel : BoltChannel {
       return true;
     }
     else {
+      var isForce = proxy.Flags & ProxyFlags.FORCE_SYNC;
       var isCreate = proxy.Flags & ProxyFlags.CREATE_REQUESTED;
       var isDestroy = proxy.Flags & ProxyFlags.DESTROY_REQUESTED;
 
       // if we didn't pack anything and we are not creating or destroying this, just goto next
-      if ((packCount == 0) && !isCreate && !isDestroy) {
+      if ((packCount == 0) && !isCreate && !isDestroy && !isForce) {
         packet.stream.Position = pos;
         return true;
       }
