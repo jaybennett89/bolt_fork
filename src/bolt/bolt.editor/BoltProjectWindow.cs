@@ -244,10 +244,10 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (deleteMode) {
-        OverlayIcon("mc_minus_small", 0);
+        OverlayIcon("mc_minus_small", +1);
       }
       else {
-        OverlayIcon("mc_group", -1);
+        OverlayIcon("mc_group", 0);
       }
 
       GUILayout.EndHorizontal();
