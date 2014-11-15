@@ -1,7 +1,7 @@
 ﻿using UdpKit;
 
 namespace Bolt {
-  class PropertySerializerUniqueId : PropertySerializerSimple {
+  class PropertySerializerNetworkId : PropertySerializerSimple {
     public override int StateBits(State state, State.Frame frame) {
       return 16 * 8;
     }

@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  class PropertyCodeEmitterUniqueId : PropertyCodeEmitterSimple<PropertyDecoratorUniqueId> {
+  class PropertyCodeEmitterNetworkId : PropertyCodeEmitterSimple<PropertyDecoratorNetworkId> {
     public override string ReadMethod {
-      get { return "ReadUniqueId"; }
+      get { return "ReadNetworkId"; }
     }
 
     public override string PackMethod {
-      get { return "PackUniqueId"; }
+      get { return "PackNetworkId"; }
     }
   }
 }
