@@ -7,8 +7,6 @@ using UE = UnityEngine;
 
 namespace Bolt {
   partial class Entity : IBoltListNode, IPriorityCalculator {
-    static int _instanceIdCounter;
-
     bool _canQueueCommands = false;
 
     internal UniqueId SceneId;
@@ -108,6 +106,14 @@ namespace Bolt {
 
     public override string ToString() {
       return string.Format("[Entity {0} {1}]", NetworkId, Serializer);
+    }
+
+    public override bool Equals(object obj) {
+      return ReferenceEquals(this, obj);
+    }
+
+    public override int GetHashCode() {
+      return NetworkId.GetHashCode();
     }
 
     internal void SetParent(Entity entity) {

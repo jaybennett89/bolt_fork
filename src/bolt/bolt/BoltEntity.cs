@@ -107,16 +107,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
-  /// </summary>
-  public Bolt.UniqueId uniqueId {
-    get {
-      BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
-      return default(Bolt.UniqueId);
-    }
-  }
-
-  /// <summary>
   /// If this entity was created on another computer, contains the connection we received this entity from, otherwise null
   /// </summary>
   public BoltConnection source {
@@ -234,14 +224,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   public void ReleaseControl(IProtocolToken token) {
     Entity.ReleaseControl(token);
-  }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="id"></param>
-  public void SetUniqueId(Bolt.UniqueId id) {
-    BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
   }
 
   /// <summary>

@@ -3,6 +3,27 @@ using UdpKit;
 using UnityEngine;
 
 public static class UdpStreamExtensions {
+
+  public static void WriteUniqueId(this UdpPacket stream, UniqueId id) {
+    stream.WriteUInt(id.uint0);
+    stream.WriteUInt(id.uint1);
+    stream.WriteUInt(id.uint2);
+    stream.WriteUInt(id.uint3);
+  }
+
+  public static UniqueId ReadUniqueId(this UdpPacket stream) {
+    UniqueId id;
+
+    id = default(UniqueId);
+    id.uint0 = stream.ReadUInt();
+    id.uint1 = stream.ReadUInt();
+    id.uint2 = stream.ReadUInt();
+    id.uint3 = stream.ReadUInt();
+
+    return id;
+  }
+
+
   public static void WriteByteArraySimple(this UdpPacket stream, byte[] array, int maxLength) {
     if (stream.WriteBool(array != null)) {
       int length = Mathf.Min(array.Length, maxLength);

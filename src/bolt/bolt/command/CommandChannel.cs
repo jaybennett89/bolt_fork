@@ -7,18 +7,6 @@ using UnityEngine;
 partial class EntityChannel {
   public class CommandChannel : BoltChannel {
 
-    #region sequence
-
-    static void WriteSequence(UdpPacket stream, ushort sequence) {
-      stream.WriteUShort(sequence, Command.SEQ_BITS);
-    }
-
-    static ushort ReadSequence(UdpPacket stream) {
-      return stream.ReadUShort(Command.SEQ_BITS);
-    }
-
-    #endregion
-
     int pingFrames {
       get { return Mathf.CeilToInt((connection.udpConnection.AliasedPing * BoltCore._config.commandPingMultiplier) / BoltCore.frameDeltaTime); }
     }
@@ -92,11 +80,8 @@ partial class EntityChannel {
                 int cmdPos = packet.stream.Position;
 
                 packet.stream.WriteBool(true);
-
-                it.val.Meta.TypeId.Pack(packet.stream);
-
-                WriteSequence(packet.stream, it.val.Sequence);
-
+                packet.stream.WriteTypeId(it.val.Meta.TypeId);
+                packet.stream.WriteUShort(it.val.Sequence, Command.SEQ_BITS);
                 packet.stream.WriteToken(it.val.ResultToken);
 
                 it.val.PackResult(connection, packet.stream);
@@ -147,8 +132,8 @@ partial class EntityChannel {
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
 
-          TypeId typeId = TypeId.Read(packet.stream);
-          ushort sequence = ReadSequence(packet.stream);
+          TypeId typeId = packet.stream.ReadTypeId();
+          ushort sequence = packet.stream.ReadUShort(Command.SEQ_BITS);
           IProtocolToken resultToken = packet.stream.ReadToken();
 
           Command cmd = null;
@@ -232,11 +217,8 @@ partial class EntityChannel {
             int cmdPos = packet.stream.Position;
 
             packet.stream.WriteBool(true);
-
-            cmd.Meta.TypeId.Pack(packet.stream);
-
-            WriteSequence(packet.stream, cmd.Sequence);
-
+            packet.stream.WriteTypeId(cmd.Meta.TypeId);
+            packet.stream.WriteUShort(cmd.Sequence, Command.SEQ_BITS);
             packet.stream.WriteInt(cmd.ServerFrame);
             packet.stream.WriteToken(cmd.InputToken);
 
@@ -282,8 +264,8 @@ partial class EntityChannel {
         while (packet.stream.CanRead()) {
           if (packet.stream.ReadBool() == false) { break; }
 
-          Bolt.Command cmd = Factory.NewCommand(TypeId.Read(packet.stream));
-          cmd.Sequence = ReadSequence(packet.stream);
+          Bolt.Command cmd = Factory.NewCommand(packet.stream.ReadTypeId());
+          cmd.Sequence = packet.stream.ReadUShort(Command.SEQ_BITS);
           cmd.Frame = packet.stream.ReadInt();
           cmd.InputToken = packet.stream.ReadToken();
           cmd.ReadInput(connection, packet.stream);

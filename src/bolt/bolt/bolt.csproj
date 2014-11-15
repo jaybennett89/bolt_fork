@@ -127,7 +127,7 @@
       <DependentUpon>Flags.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltGlobalBehaviour.cs" />
-    <Compile Include="BoltId.cs" />
+    <Compile Include="UniqueId.cs" />
     <Compile Include="BoltGUI.cs" />
     <Compile Include="BoltNetwork.cs" />
     <Compile Include="BoltObjectPool.cs" />

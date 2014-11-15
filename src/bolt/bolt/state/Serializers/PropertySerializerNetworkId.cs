@@ -7,7 +7,7 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadUniqueId(state.Frames.first.Data, Settings.ByteOffset);
+      return Blit.ReadNetworkId(state.Frames.first.Data, Settings.ByteOffset);
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {

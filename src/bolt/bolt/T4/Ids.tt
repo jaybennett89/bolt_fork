@@ -4,8 +4,28 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>using System.Collections.Generic;
-<# foreach(string id in new string[]{ "PrefabId", "TypeId" }) { #>
 
+static class IdExtensions {
+<# foreach(string id in new string[]{ "PrefabId", "TypeId" }) { #>
+	public static void Write<#=id#>(this UdpKit.UdpPacket stream, Bolt.<#=id#> id, int bits) {
+		stream.WriteInt(id.Value, bits);
+	}
+	
+	public static void Write<#=id#>(this UdpKit.UdpPacket stream, Bolt.<#=id#> id) {
+		stream.Write<#=id#>(id, 32);
+	}
+
+	public static Bolt.<#=id#> Read<#=id#>(this UdpKit.UdpPacket stream, int bits) {
+		return new Bolt.<#=id#>(stream.ReadInt(bits));
+	}
+
+	public static Bolt.<#=id#> Read<#=id#>(this UdpKit.UdpPacket stream) {
+		return stream.Read<#=id#>(32);
+	}
+<# } #>
+}
+
+<# foreach(string id in new string[]{ "PrefabId", "TypeId" }) { #>
 namespace Bolt {
 [Documentation]
 [System.Serializable]
@@ -59,22 +79,6 @@ namespace Bolt {
     public override string ToString() {
       return string.Format("[<#=id#>:{0}]", Value);
     }
-
-	public void Pack(UdpKit.UdpPacket stream, int bits) {
-		stream.WriteInt(Value, bits);
-	}
-	
-	public void Pack(UdpKit.UdpPacket stream) {
-		stream.WriteInt(Value);
-	}
-
-	public static <#=id#> Read(UdpKit.UdpPacket stream, int bits) {
-		return new <#=id#>(stream.ReadInt(bits));
-	}
-	
-	public static <#=id#> Read(UdpKit.UdpPacket stream) {
-		return new <#=id#>(stream.ReadInt());
-	}
 
     public static bool operator ==(<#=id#> a, <#=id#> b) {
       return a.Value == b.Value;

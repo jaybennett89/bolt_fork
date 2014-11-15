@@ -202,7 +202,7 @@ namespace Bolt {
       stream.WriteContinueMarker();
 
       // type id of this event
-      ev.Meta.TypeId.Pack(stream);
+      stream.WriteTypeId(ev.Meta.TypeId);
 
       // targets of this event
       stream.WriteInt(ev.Targets, 5);
@@ -257,7 +257,7 @@ namespace Bolt {
     Event ReadEvent(UdpPacket stream, ref uint sequence) {
       Event ev;
 
-      ev = Factory.NewEvent(TypeId.Read(stream));
+      ev = Factory.NewEvent(stream.ReadTypeId());
       ev.Targets = stream.ReadInt(5);
       ev.SourceConnection = connection;
 

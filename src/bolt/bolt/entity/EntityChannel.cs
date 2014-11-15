@@ -396,15 +396,15 @@ partial class EntityChannel : BoltChannel {
       if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
         packet.stream.WriteToken(proxy.Entity.AttachToken);
 
-        proxy.Entity.PrefabId.Pack(packet.stream, 32);
-        proxy.Entity.Serializer.TypeId.Pack(packet.stream, 32);
+        packet.stream.WritePrefabId(proxy.Entity.PrefabId);
+        packet.stream.WriteTypeId(proxy.Entity.Serializer.TypeId);
 
         packet.stream.WriteVector3(proxy.Entity.UnityObject.transform.position);
         packet.stream.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
 
         if (packet.stream.WriteBool(proxy.Entity.IsSceneObject)) {
           Assert.False(proxy.Entity.SceneId.IsNone);
-          proxy.Entity.SceneId.Pack(packet.stream);
+          packet.stream.WriteUniqueId(proxy.Entity.SceneId);
         }
       }
 
@@ -496,14 +496,14 @@ partial class EntityChannel : BoltChannel {
 
       if (createRequested) {
         attachToken = packet.stream.ReadToken();
-        prefabId = PrefabId.Read(packet.stream, 32);
-        serializerId = TypeId.Read(packet.stream, 32);
+        prefabId = packet.stream.ReadPrefabId();
+        serializerId = packet.stream.ReadTypeId();
         spawnPosition = packet.stream.ReadVector3();
         spawnRotation = packet.stream.ReadQuaternion();
         isSceneObject = packet.stream.ReadBool();
 
         if (isSceneObject) {
-          sceneId = UniqueId.Read(packet.stream);
+          sceneId = packet.stream.ReadUniqueId();
         }
       }
 
