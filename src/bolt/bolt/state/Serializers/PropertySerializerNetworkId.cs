@@ -3,7 +3,7 @@
 namespace Bolt {
   class PropertySerializerNetworkId : PropertySerializerSimple {
     public override int StateBits(State state, State.Frame frame) {
-      return 16 * 8;
+      return 8 * 8;
     }
 
     public override object GetDebugValue(State state) {
@@ -11,21 +11,12 @@ namespace Bolt {
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Bolt.UniqueId id = Blit.ReadUniqueId(data, Settings.ByteOffset);
-      stream.WriteUInt(id.uint0);
-      stream.WriteUInt(id.uint1);
-      stream.WriteUInt(id.uint2);
-      stream.WriteUInt(id.uint3);
+      stream.WriteNetworkId(Blit.ReadNetworkId(data, Settings.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Bolt.UniqueId id = new UniqueId();
-      id.uint0 = stream.ReadUInt();
-      id.uint1 = stream.ReadUInt();
-      id.uint2 = stream.ReadUInt();
-      id.uint3 = stream.ReadUInt();
-      Blit.PackUniqueId(data, Settings.ByteOffset, id);
+      Blit.PackNetworkId(data, Settings.ByteOffset, stream.ReadNetworkId());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

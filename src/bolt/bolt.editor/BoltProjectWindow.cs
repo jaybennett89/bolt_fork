@@ -185,12 +185,12 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.EndHorizontal();
   }
 
-  void OverlayIcon(string icon) {
+  void OverlayIcon(string icon, int xOffset) {
     Rect r = GUILayoutUtility.GetLastRect();
-    r.xMin = r.xMax - 17;
-    r.xMax = r.xMax - 5;
-    r.yMin = r.yMin + 2;
-    r.yMax = r.yMax - 1;
+    r.xMin = (r.xMax - 19) + xOffset;
+    r.xMax = (r.xMax - 3) + xOffset;
+    r.yMin = r.yMin;
+    r.yMax = r.yMax + 1;
 
     GUI.color = BoltEditorGUI.HighlightColor;
     GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
@@ -244,10 +244,10 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (deleteMode) {
-        OverlayIcon("mc_minus");
+        OverlayIcon("mc_minus_small", 0);
       }
       else {
-        OverlayIcon("mc_group");
+        OverlayIcon("mc_group", -1);
       }
 
       GUILayout.EndHorizontal();
