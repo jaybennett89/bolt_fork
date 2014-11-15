@@ -6,35 +6,43 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #><#
 
-Dictionary<string, string[]> cbs = new Dictionary<string, string[]>();
-cbs.Add("BoltShutdown", new string[0]);
-cbs.Add("BoltStarted", new string[0]);
+List<Tuple<string, string[]>> callbacksList = new List<Tuple<string, string[]>>();
+callbacksList.Add(Tuple.Create("BoltShutdown", new string[0]));
+callbacksList.Add(Tuple.Create("BoltStarted", new string[0]));
 
-cbs.Add("SceneLoadLocalBegin", new[] { "string", "map" });
-cbs.Add("SceneLoadLocalDone", new[] { "string", "map" });
-cbs.Add("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" });
+callbacksList.Add(Tuple.Create("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" }));
 
-cbs.Add("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" });
-cbs.Add("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" });
-cbs.Add("Disconnected", new[] { "BoltConnection", "connection" });
-cbs.Add("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
-cbs.Add("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token"});
+callbacksList.Add(Tuple.Create("SceneLoadLocalBegin", new[] { "string", "map" }));
+callbacksList.Add(Tuple.Create("SceneLoadLocalDone", new[] { "string", "map" }));
+callbacksList.Add(Tuple.Create("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" }));
 
-cbs.Add("ControlOfEntityLost", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
-cbs.Add("ControlOfEntityGained", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+callbacksList.Add(Tuple.Create("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" }));
 
-cbs.Add("EntityAttached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
-cbs.Add("EntityDetached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"});
+callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection" }));
+callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" }));
 
-cbs.Add("EntityReceived", new[] { "BoltEntity", "entity" });
-cbs.Add("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" });
+callbacksList.Add(Tuple.Create("ConnectFailed", new []{"UdpEndPoint", "endpoint" }));
+callbacksList.Add(Tuple.Create("ConnectRequest", new []{"UdpEndPoint", "endpoint" }));
+callbacksList.Add(Tuple.Create("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token" }));
+callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint" }));
+callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token" }));
 
-List<Tuple<string, string>> callbacks = new List<Tuple<string, string>>();
-callbacks.Add(Tuple.Create<string, string>("ConnectFailed", "UdpEndPoint"));
-callbacks.Add(Tuple.Create<string, string>("EntityAttached", "BoltEntity"));
-callbacks.Add(Tuple.Create<string, string>("EntityDetached", "BoltEntity"));
-callbacks.Add(Tuple.Create<string, string>("ControlOfEntityGained", "BoltEntity"));
-callbacks.Add(Tuple.Create<string, string>("ControlOfEntityLost", "BoltEntity"));
+callbacksList.Add(Tuple.Create("Disconnected", new[] { "BoltConnection", "connection" }));
+
+callbacksList.Add(Tuple.Create("ControlOfEntityLost", new []{"BoltEntity", "entity"}));
+callbacksList.Add(Tuple.Create("ControlOfEntityGained", new []{"BoltEntity", "entity"}));
+
+callbacksList.Add(Tuple.Create("ControlOfEntityLost", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
+callbacksList.Add(Tuple.Create("ControlOfEntityGained", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
+
+callbacksList.Add(Tuple.Create("EntityAttached", new []{"BoltEntity", "entity"}));
+callbacksList.Add(Tuple.Create("EntityDetached", new []{"BoltEntity", "entity"}));
+
+callbacksList.Add(Tuple.Create("EntityAttached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
+callbacksList.Add(Tuple.Create("EntityDetached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
+
+callbacksList.Add(Tuple.Create("EntityReceived", new[] { "BoltEntity", "entity" }));
+
 #>
 using UdpKit;
 using UnityEngine;
@@ -42,32 +50,23 @@ using UnityEngine;
 namespace BoltInternal {
 
 partial class GlobalEventListenerBase {
-  <# foreach (var cb in callbacks) { #> 
-  public virtual void <#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { }
-  <# } #> 
-
-  <# foreach (var cb in callbacks) { #> 
-  internal static void <#= cb.Item1 #>Invoke(<#= (cb.Item2==null) ? "" : (cb.Item2 + " arg") #>) { 
-    BoltLog.Debug("Invoking callback <#= cb.Item1 #>");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-      cb.<#= cb.Item1 #>(<#= (cb.Item2==null) ? "" : ("arg") #>);
-    }
-  }
-  <# } #> 
-
-  <# foreach (var cb in cbs) { 
-    var pairs = cb.Value.Select((value, index) => new { value, index } ).GroupBy(x => x.index / 2, x => x.value);
+  <# foreach (var cb in callbacksList) { 
+	var name = cb.Item1;
+    var pairs = cb.Item2.Select((value, index) => new { value, index } ).GroupBy(x => x.index / 2, x => x.value);
     var args = String.Join(", ", pairs.Select(x => String.Join(" ", x.ToArray())).ToArray());
-    var callArgs = String.Join(", ", cb.Value.Select((value, index) => new { value, index } ).Where(x => x.index % 2 == 1).Select(x => x.value).ToArray());
+    var callArgs = String.Join(", ", cb.Item2.Select((value, index) => new { value, index } ).Where(x => x.index % 2 == 1).Select(x => x.value).ToArray());
   #>
 
-  public virtual void <#= cb.Key #>(<#= args #>) { 
-  }
+  public virtual void <#= name #>(<#= args #>) {  }
 
-  internal static void <#= cb.Key #>Invoke(<#= args #>) { 
-    BoltLog.Debug("Invoking callback <#= cb.Key #>");
+  internal static void <#= name #>Invoke(<#= args #>) { 
+    BoltLog.Debug("Invoking callback <#= name #>");
     foreach (GlobalEventListenerBase cb in callbacks) {
-        cb.<#= cb.Key #>(<#= callArgs #>);
+		try {
+			cb.<#= name #>(<#= callArgs #>);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
     }
   }
 

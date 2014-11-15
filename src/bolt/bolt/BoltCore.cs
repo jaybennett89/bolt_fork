@@ -443,10 +443,12 @@ internal static class BoltCore {
   }
 
   static void HandleConnectRefused(UdpEndPoint endpoint, byte[] token) {
+    BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint);
     BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint, token.ToToken());
   }
 
   static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
+    BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint);
     BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
   }
 
@@ -620,6 +622,7 @@ internal static class BoltCore {
     _connections.AddLast(cn);
 
     // generic connected callback
+    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn);
     BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken);
 
     // spawn entities
