@@ -79,7 +79,12 @@ public class BoltProjectWindow : BoltWindow {
 
       switch (Event.current.keyCode.ToString()) {
         case "Return":
-          addGroupTo.Groups.Add(addGroup);
+          addGroup = addGroup.Trim();
+
+          if (addGroup.Length > 0) {
+            addGroupTo.Groups.Add(addGroup);
+          }
+
           addGroup = null;
           addGroupTo = null;
           break;
