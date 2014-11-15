@@ -657,7 +657,7 @@ internal static class BoltCore {
   }
 
   static internal void UpdateActiveGlobalBehaviours(int index) {
-#if LOG
+#if DEBUG
     var useConsole = (_config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
     if (useConsole) {
       BoltConsole console = CreateGlobalBehaviour(typeof(BoltConsole)) as BoltConsole;
@@ -753,6 +753,10 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
+    // close any existing socket
+    Shutdown();
+
+
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
 
@@ -765,7 +769,7 @@ internal static class BoltCore {
 
     PrefabDatabase.BuildCache();
 
-#if LOG
+#if DEBUG
     DebugInfo.ignoreList = new HashSet<NetworkId>();
 
     if (BoltRuntimeSettings.instance.showDebugInfo) {
@@ -777,10 +781,8 @@ internal static class BoltCore {
     }
 #endif
 
-    // close any existing socket
-    Shutdown();
 
-#if LOG
+#if DEBUG
     // init loggers
     var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
     var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
@@ -888,7 +890,7 @@ internal static class BoltCore {
 #endif
 
   static void UdpLogWriter(uint level, string message) {
-#if LOG
+#if DEBUG
     switch (level) {
       case UdpLog.DEBUG:
       case UdpLog.TRACE:
