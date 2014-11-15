@@ -102,6 +102,10 @@ namespace Bolt {
 
     internal void AssignControl(BoltConnection connection, IProtocolToken token) {
       if (IsOwner) {
+        if (HasControl) {
+          ReleaseControl(null);
+        }
+
         EntityProxy proxy;
 
         if (connection._entityChannel.CreateOnRemote(this, out proxy)) {

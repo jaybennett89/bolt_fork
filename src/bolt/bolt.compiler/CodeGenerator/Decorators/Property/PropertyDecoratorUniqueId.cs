@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  class PropertyDecoratorUniqueId : PropertyDecorator<PropertyTypeUniqueId> {
+  class PropertyDecoratorNetworkId : PropertyDecorator<PropertyTypeNetworkId> {
     public override string ClrType {
-      get { return "Bolt.UniqueId"; }
+      get { return "Bolt.NetworkId"; }
     }
 
     public override int ByteSize {
-      get { return 16; }
+      get { return 8; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {
-      return new PropertyCodeEmitterUniqueId();
+      return new PropertyCodeEmitterNetworkId();
     }
   }
 }

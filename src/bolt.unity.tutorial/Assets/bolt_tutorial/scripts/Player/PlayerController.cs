@@ -35,8 +35,6 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void Update() {
-    state.NewProperty = entity;
-
     PollKeys(true);
 
     if (Input.GetKey(KeyCode.O)) {

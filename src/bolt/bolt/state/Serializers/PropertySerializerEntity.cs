@@ -17,7 +17,7 @@ namespace Bolt {
     }
 
     public override int StateBits(State state, State.Frame frame) {
-      return EntityProxy.ID_BIT_COUNT + 1;
+      return 8 * 8;
     }
 
     protected override bool Pack(byte[] data,  BoltConnection connection, UdpPacket stream) {

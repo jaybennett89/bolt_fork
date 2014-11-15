@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_DLL; LOG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BOLT_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
@@ -103,7 +103,7 @@
     <Compile Include="state\Serializers\PropertySerializerString.cs" />
     <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
     <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
-    <Compile Include="state\Serializers\PropertySerializerUniqueId.cs" />
+    <Compile Include="state\Serializers\PropertySerializerNetworkId.cs" />
     <Compile Include="state\Serializers\PropertySerializerVector.cs" />
     <Compile Include="state\Settings\Command.cs" />
     <Compile Include="state\Settings\Compression\Float.cs" />

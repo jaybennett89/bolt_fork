@@ -79,7 +79,12 @@ public class BoltProjectWindow : BoltWindow {
 
       switch (Event.current.keyCode.ToString()) {
         case "Return":
-          addGroupTo.Groups.Add(addGroup);
+          addGroup = addGroup.Trim();
+
+          if (addGroup.Length > 0) {
+            addGroupTo.Groups.Add(addGroup);
+          }
+
           addGroup = null;
           addGroupTo = null;
           break;
@@ -180,12 +185,12 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.EndHorizontal();
   }
 
-  void OverlayIcon(string icon) {
+  void OverlayIcon(string icon, int xOffset) {
     Rect r = GUILayoutUtility.GetLastRect();
-    r.xMin = r.xMax - 17;
-    r.xMax = r.xMax - 5;
-    r.yMin = r.yMin + 2;
-    r.yMax = r.yMax - 1;
+    r.xMin = (r.xMax - 19) + xOffset;
+    r.xMax = (r.xMax - 3) + xOffset;
+    r.yMin = r.yMin;
+    r.yMax = r.yMax + 1;
 
     GUI.color = BoltEditorGUI.HighlightColor;
     GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
@@ -196,6 +201,13 @@ public class BoltProjectWindow : BoltWindow {
     bool deleteMode = (Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control;
 
     foreach (var a in assets.OrderBy(x => x.Name)) {
+
+      if (a.Groups.Contains("")) {
+        a.Groups = new HashSet<string>(a.Groups.Where(x => x != ""));
+
+        // save
+        Save();
+      }
 
       // check
       if (HasGroupSelected && !a.Groups.Contains(Project.ActiveGroup)) {
@@ -232,10 +244,10 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (deleteMode) {
-        OverlayIcon("mc_minus");
+        OverlayIcon("mc_minus_small", 0);
       }
       else {
-        OverlayIcon("mc_group");
+        OverlayIcon("mc_group", -1);
       }
 
       GUILayout.EndHorizontal();

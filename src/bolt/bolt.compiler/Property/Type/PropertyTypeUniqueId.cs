@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract()]
-  public class PropertyTypeUniqueId : PropertyType {
+  public class PropertyTypeNetworkId : PropertyType {
     public override bool HasSettings {
       get { return false; }
     }
@@ -16,7 +16,7 @@ namespace Bolt.Compiler {
     }
 
     public override PropertyDecorator CreateDecorator() {
-      return new PropertyDecoratorUniqueId();
+      return new PropertyDecoratorNetworkId();
     }
   }
 }

@@ -63,9 +63,6 @@ internal partial class EntityProxy : BoltObject {
     }
   }
 
-  public const int ID_BIT_COUNT = 10;
-  public const int MAX_COUNT = 1 << ID_BIT_COUNT;
-
   public NetworkId NetworkId;
   public Bolt.State State;
   public Bolt.Filter Filter;
