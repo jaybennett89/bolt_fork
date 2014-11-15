@@ -16,7 +16,7 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     });
 
     if (PropertyType.PositionSelection != AxisSelections.Disabled) {
-      BoltEditorGUI.WithLabel("Snap Magnitude", () => {
+      BoltEditorGUI.WithLabel("Teleport Threshold", () => {
         Definition.StateAssetSettings.SnapMagnitude = EditorGUILayout.FloatField(Definition.StateAssetSettings.SnapMagnitude);
       });
 
