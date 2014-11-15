@@ -141,6 +141,10 @@ public static class BoltNetwork {
     get { return BoltCore.isServer; }
   }
 
+  public static bool isServerOrNotRunning {
+    get { return (isServer == true) || (isClient == false); }
+  }
+
   /// <summary>
   /// Returns true if this host is a client
   /// </summary>
