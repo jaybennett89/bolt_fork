@@ -100,19 +100,6 @@ namespace Bolt {
       }
     }
 
-    internal Command Clone() {
-      Command clone = (Command) MemberwiseClone();
-
-      ((IBoltListNode)clone).list = null;
-      ((IBoltListNode)clone).prev = null;
-      ((IBoltListNode)clone).next = null;
-
-      clone.InputData = clone.InputData.CloneArray();
-      clone.ResultData = clone.ResultData.CloneArray();
-
-      return clone;
-    }
-
     internal void PackInput(BoltConnection connection, UdpPacket stream) {
       for (int i = 0; i < Meta.InputSerializers.Length; ++i) {
         Meta.InputSerializers[i].CommandPack(this, InputData, connection, stream);

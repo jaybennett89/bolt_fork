@@ -190,14 +190,9 @@ partial class EntityChannel {
       foreach (EntityProxy proxy in incommingProxiesByNetworkId.Values) {
         Entity entity = proxy.Entity;
 
-        ////BoltLog.Debug("count: {0}", incommingProxiesByEntityId.Count);
-        ////BoltLog.Debug("packing cmd for {0}: {1}/{2}/{3}", entity, (bool) (entity), (bool) (entity._flags & BoltEntity.FLAG_IS_CONTROLLING), (bool) (entity._commands.count > 0));
-
         if (entity && entity.HasControl && (entity.CommandQueue.count > 0)) {
-          ////BoltLog.Debug("packing cmd for {0} #2", entity);
-
           int proxyPos = packet.stream.Position;
-          packet.stream.WriteBool(true);
+          packet.stream.WriteContinueMarker();
           packet.stream.WriteNetworkId(proxy.NetworkId);
 
           Command cmd = entity.CommandQueue.last;
@@ -216,7 +211,7 @@ partial class EntityChannel {
 
             int cmdPos = packet.stream.Position;
 
-            packet.stream.WriteBool(true);
+            packet.stream.WriteContinueMarker();
             packet.stream.WriteTypeId(cmd.Meta.TypeId);
             packet.stream.WriteUShort(cmd.Sequence, Command.SEQ_BITS);
             packet.stream.WriteInt(cmd.ServerFrame);
@@ -251,9 +246,7 @@ partial class EntityChannel {
       int maxFrame = BoltCore._frame;
       int minFrame = maxFrame - (BoltCore._config.commandDelayAllowed + pingFrames);
 
-      while (packet.stream.CanRead()) {
-        if (packet.stream.ReadBool() == false) { break; }
-
+      while (packet.stream.ReadStopMarker()) {
         NetworkId netId = packet.stream.ReadNetworkId();
         EntityProxy proxy = null;
 
@@ -261,9 +254,7 @@ partial class EntityChannel {
           proxy = outgoingProxiesByNetworkId[netId];
         }
 
-        while (packet.stream.CanRead()) {
-          if (packet.stream.ReadBool() == false) { break; }
-
+        while (packet.stream.ReadStopMarker()) {
           Bolt.Command cmd = Factory.NewCommand(packet.stream.ReadTypeId());
           cmd.Sequence = packet.stream.ReadUShort(Command.SEQ_BITS);
           cmd.Frame = packet.stream.ReadInt();

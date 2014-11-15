@@ -21,25 +21,12 @@ namespace Bolt {
     }
 
     protected override bool Pack(byte[] data,  BoltConnection connection, UdpPacket stream) {
-      Bolt.Entity entity = BoltCore.FindEntity(data.ReadNetworkId(Settings.ByteOffset));
-
-      if ((entity != null) && (connection._entityChannel.ExistsOnRemote(entity) == false)) {
-        return false;
-      }
-
-      stream.WriteEntity(entity);
+      stream.WriteNetworkId(data.ReadNetworkId(Settings.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Bolt.Entity entity = stream.ReadEntity();
-
-      if (entity) {
-        data.PackNetworkId(Settings.ByteOffset, entity.NetworkId);
-      }
-      else {
-        data.PackNetworkId(Settings.ByteOffset, default(NetworkId));
-      }
+      data.PackNetworkId(Settings.ByteOffset, stream.ReadNetworkId());
     }
   }
 }

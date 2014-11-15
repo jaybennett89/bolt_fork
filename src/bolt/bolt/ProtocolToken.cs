@@ -80,5 +80,14 @@ namespace Bolt {
 
       return token;
     }
+
+    public static void SerializeToken(this UdpPacket packet, ref IProtocolToken token) {
+      if (packet.Write) {
+        packet.WriteToken(token);
+      }
+      else {
+        token = packet.ReadToken();
+      }
+    }
   }
 }

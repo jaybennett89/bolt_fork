@@ -463,7 +463,6 @@ partial class EntityChannel : BoltChannel {
     NetworkId networkId = packet.stream.ReadNetworkId();
     bool isController = packet.stream.ReadBool();
     IProtocolToken controlToken = packet.stream.ReadToken();
-
     bool destroyRequested = packet.stream.ReadBool();
 
     // we're destroying this proxy
