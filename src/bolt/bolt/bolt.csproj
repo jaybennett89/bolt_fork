@@ -89,6 +89,7 @@
     <Compile Include="state\Arrays\TransformArray.cs" />
     <Compile Include="state\Auxiliary\Enums.cs" />
     <Compile Include="state\BitArray.cs" />
+    <Compile Include="state\BitSet.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\Indices.cs" />
