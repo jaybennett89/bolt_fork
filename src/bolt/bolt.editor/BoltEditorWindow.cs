@@ -45,9 +45,9 @@ public class BoltEditorWindow : BoltWindow {
 
       GUILayout.Space(5);
 
-      BoltEditorGUI.WithLabel("Comment", () => {
-        Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
-      });
+      //BoltEditorGUI.WithLabel("Comment", () => {
+      //  Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
+      //});
 
       if (Selected is StateDefinition) {
         EditState((StateDefinition)Selected);
@@ -418,9 +418,9 @@ public class BoltEditorWindow : BoltWindow {
     if (p.Expanded) {
       GUILayout.Space(2);
 
-      BoltEditorGUI.WithLabel("Comment", () => {
-        p.Comment = EditorGUILayout.TextField(p.Comment);
-      });
+      //BoltEditorGUI.WithLabel("Comment", () => {
+      //  p.Comment = EditorGUILayout.TextField(p.Comment);
+      //});
 
       if (def is StateDefinition || def is StructDefinition) {
         BoltEditorGUI.WithLabel("Replication", () => {
