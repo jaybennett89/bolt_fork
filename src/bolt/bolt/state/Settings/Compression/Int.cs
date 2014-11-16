@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 
 namespace Bolt {
   internal struct PropertyIntCompressionSettings {
@@ -37,7 +33,7 @@ namespace Bolt {
     }
 
     public int Read(UdpPacket stream) {
-      return stream.ReadInt(_bits) + _shift;
+      return stream.ReadInt(_bits) - _shift;
     }
   }
 
