@@ -1,94 +1,74 @@
 ﻿using System;
 
 namespace Bolt {
-  public class BitSet {
-    bool zero;
+  public struct BitSet {
+    ulong Bits0;
+    ulong Bits1;
+    ulong Bits2;
+    ulong Bits3;
 
-    readonly int size;
-    readonly ulong[] bits;
-
-    public int Size {
-      get { return size; }
+    public bool IsZero {
+      get {
+        return 
+          (Bits0 == 0UL) && 
+          (Bits1 == 0UL) && 
+          (Bits2 == 0UL) && 
+          (Bits3 == 0UL);
+      }
     }
 
-    public bool Zero {
-      get { return zero; }
-    }
+    public BitSet Set(int bit) {
+      BitSet self = this;
 
-    BitSet(int size, ulong[] bits) {
-      Assert.True(size <= (bits.Length * 64));
-
-      this.size = size;
-      this.bits = bits;
-      this.zero = false;
-    }
-
-    BitSet(int size) {
-      int length = size / 64;
-
-      if ((size % 64) > 0) {
-        length += 1;
+      switch (bit / 64) {
+        case 0: self.Bits0 |= (1UL << (bit % 64)); break;
+        case 1: self.Bits1 |= (1UL << (bit % 64)); break;
+        case 2: self.Bits2 |= (1UL << (bit % 64)); break;
+        case 3: self.Bits3 |= (1UL << (bit % 64)); break;
+        default:
+          throw new IndexOutOfRangeException();
       }
 
-      this.zero = true;
-      this.size = size;
-      this.bits = new ulong[length];
+      return self;
     }
 
-    public void Set(int bit) {
-      Assert.True(bit < this.size);
-      this.zero = false;
-      this.bits[bit / 64] |= (1UL << (bit % 64));
+    public BitSet Clear(int bit) {
+      BitSet self = this;
+
+      switch (bit / 64) {
+        case 0: self.Bits0 &= ~(1UL << (bit % 64)); break;
+        case 1: self.Bits1 &= ~(1UL << (bit % 64)); break;
+        case 2: self.Bits2 &= ~(1UL << (bit % 64)); break;
+        case 3: self.Bits3 &= ~(1UL << (bit % 64)); break;
+        default:
+          throw new IndexOutOfRangeException();
+      }
+
+      return self;
     }
 
-    public void Clear(int bit) {
-      Assert.True(bit < this.size);
-      this.bits[bit / 64] &= ~(1UL << (bit % 64));
+    public BitSet Combine(BitSet other) {
+      BitSet self = this;
+
+      self.Bits0 |= other.Bits0;
+      self.Bits1 |= other.Bits1;
+      self.Bits2 |= other.Bits2;
+      self.Bits3 |= other.Bits3;
+
+      return self;
     }
 
     public bool IsSet(int bit) {
-      Assert.True(bit < this.size);
-      return (bits[bit / 64] & (1UL << (bit % 64))) != 0UL;
-    }
+      ulong b = 1UL << (bit % 64);
 
-    public bool IsClear(int bit) {
-      Assert.True(bit < this.size);
-      return (bits[bit / 64] & (1UL << (bit % 64))) == 0UL;
-    }
-
-    public void Merge(BitSet set) {
-      Assert.True(this.size == set.size);
-      Assert.True(this.bits.Length == set.bits.Length);
-
-      for (int i = 0; i < this.bits.Length; ++i) {
-        this.bits[i] |= set.bits[i];
+      switch (bit / 64) {
+        case 0: return (Bits0 & b) == b;
+        case 1: return (Bits1 & b) == b;
+        case 2: return (Bits2 & b) == b;
+        case 3: return (Bits3 & b) == b;
+        default:
+          throw new IndexOutOfRangeException();
       }
-    }
-
-    public void ClearAll() {
-      // clear entire array
-      Array.Clear(this.bits, 0, this.bits.Length);
-
-      // set zero state
-      this.zero = true;
-    }
-
-    public static BitSet Create(int size, ulong[] bits) {
-      return new BitSet(size, bits);
-    }
-
-    public static BitSet Create(int size) {
-      return new BitSet(size);
-    }
-
-    public static BitSet CreateSet(int size) {
-      BitSet set = Create(size);
-
-      for (int i = 0; i < size; ++i) {
-        set.Set(i);
-      }
-
-      return set;
     }
   }
 }
