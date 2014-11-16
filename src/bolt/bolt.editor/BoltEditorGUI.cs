@@ -390,6 +390,16 @@ public static class BoltEditorGUI {
     EditorGUILayout.EndHorizontal();
   }
 
+  public static void Header(string text) {
+    EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
+
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 0;
+    GUILayout.Label(text, s);
+
+    EditorGUILayout.EndHorizontal();
+  }
+
   public static void Header(string text, string icon) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
 
@@ -513,6 +523,14 @@ public static class BoltEditorGUI {
 
   public static bool ToggleDropdown(string on, string off, bool enabled) {
     return EditorGUILayout.Popup(enabled ? 0 : 1, new[] { on, off }) == 0;
+  }
+
+  public static bool ToggleButton(string on, string off, bool enabled, params GUILayoutOption[] options) {
+    if (GUILayout.Button(enabled ? on : off, EditorStyles.miniButton, options)) {
+      return !enabled;
+    }
+
+    return enabled;
   }
 
   public static bool Toggle(bool value) {

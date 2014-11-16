@@ -10,9 +10,10 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
   protected override void Edit(bool array) {
     BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition);
 
+    BoltEditorGUI.Header("Position", "mc_position");
+
     BoltEditorGUI.WithLabel("Axes", () => {
-      PropertyType.PositionSelection = BoltEditorGUI.EditAxisSelection("Position: ", PropertyType.PositionSelection);
-      PropertyType.RotationSelection = BoltEditorGUI.EditAxisSelection("Rotation: ", PropertyType.RotationSelection);
+      PropertyType.PositionSelection = BoltEditorGUI.EditAxisSelection(PropertyType.PositionSelection);
     });
 
     if (PropertyType.PositionSelection != AxisSelections.Disabled) {
@@ -20,15 +21,22 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
         Definition.StateAssetSettings.SnapMagnitude = EditorGUILayout.FloatField(Definition.StateAssetSettings.SnapMagnitude);
       });
 
-      BoltEditorGUI.WithLabel("Position Axis Compression", () => {
+      BoltEditorGUI.WithLabel("Compression", () => {
         BoltEditorGUI.EditAxes(PropertyType.PositionCompression, PropertyType.PositionSelection);
       });
     }
 
+
+    BoltEditorGUI.Header("Rotation", "mc_rotation");
+
+    BoltEditorGUI.WithLabel("Axes", () => {
+      PropertyType.RotationSelection = BoltEditorGUI.EditAxisSelection(PropertyType.RotationSelection);
+    });
+
     if (PropertyType.RotationSelection != AxisSelections.Disabled) {
       var quaternion = PropertyType.RotationSelection == AxisSelections.XYZ;
 
-      BoltEditorGUI.WithLabel(quaternion ? "Quaternion Compression" : "Rotation Axis Compression", () => {
+      BoltEditorGUI.WithLabel(quaternion ? "Compression (Quaternion)" : "Compression (Euler)", () => {
         if (quaternion) {
           PropertyType.RotationCompressionQuaternion = BoltEditorGUI.EditFloatCompression(PropertyType.RotationCompressionQuaternion);
         }
