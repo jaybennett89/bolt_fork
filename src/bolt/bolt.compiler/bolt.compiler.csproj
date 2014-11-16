@@ -116,7 +116,7 @@
     <Compile Include="Property\Type\PropertyTypeString.cs" />
     <Compile Include="Property\Type\PropertyTypeTransform.cs" />
     <Compile Include="Property\Type\PropertyTypeTrigger.cs" />
-    <Compile Include="Property\Type\PropertyTypeUniqueId.cs" />
+    <Compile Include="Property\Type\PropertyTypeNetworkId.cs" />
     <Compile Include="Property\Type\PropertyTypeVector.cs" />
     <Compile Include="Type\AssetEnums.cs" />
     <Compile Include="Type\CommandDefinition.cs" />

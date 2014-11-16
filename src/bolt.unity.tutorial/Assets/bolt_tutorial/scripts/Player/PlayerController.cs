@@ -36,10 +36,6 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
   void Update() {
     PollKeys(true);
-
-    if (Input.GetKey(KeyCode.O)) {
-      BoltNetwork.Instantiate(BoltPrefabs.SceneCube, new Vector3(Random.value * 64f, 32f, Random.value * 64f), Quaternion.identity);
-    }
   }
 
   void PollKeys(bool mouse) {
