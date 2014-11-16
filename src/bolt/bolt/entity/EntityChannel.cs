@@ -23,15 +23,13 @@ partial class EntityChannel : BoltChannel {
 
   public void ForceSync(Bolt.Entity en) {
     EntityProxy proxy;
-
-    if (_outgoing.TryGetValue(en.NetworkId, out proxy)) {
-      proxy.Flags |= Bolt.ProxyFlags.FORCE_SYNC;
-    }
+    ForceSync(en, out proxy);
   }
 
   public void ForceSync(Bolt.Entity en, out EntityProxy proxy) {
     if (_outgoing.TryGetValue(en.NetworkId, out proxy)) {
       proxy.Flags |= Bolt.ProxyFlags.FORCE_SYNC;
+      proxy.Flags &= ~Bolt.ProxyFlags.IDLE;
     }
   }
 
@@ -120,33 +118,24 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  public bool CreateOnRemote(Bolt.Entity entity) {
+  public void CreateOnRemote(Bolt.Entity entity) {
     EntityProxy proxy;
-    return CreateOnRemote(entity, out proxy);
+    CreateOnRemote(entity, out proxy);
   }
 
-  public bool CreateOnRemote(Bolt.Entity entity, out EntityProxy proxy) {
-    try {
-      if (_incomming.TryGetValue(entity.NetworkId, out proxy)) { return true; }
-      if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) { return true; }
+  public void CreateOnRemote(Bolt.Entity entity, out EntityProxy proxy) {
+    if (_incomming.TryGetValue(entity.NetworkId, out proxy)) { return; }
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) { return; }
 
-      proxy = entity.CreateProxy();
-      proxy.NetworkId = entity.NetworkId;
-      proxy.Flags = ProxyFlags.CREATE_REQUESTED;
-      proxy.Filter = new Filter(1);
-      proxy.Connection = connection;
+    proxy = entity.CreateProxy();
+    proxy.NetworkId = entity.NetworkId;
+    proxy.Flags = ProxyFlags.CREATE_REQUESTED;
+    proxy.Filter = new Filter(1);
+    proxy.Connection = connection;
 
-      _outgoing.Add(proxy.NetworkId, proxy);
+    _outgoing.Add(proxy.NetworkId, proxy);
 
-      BoltLog.Debug("Created {0} on {1}", entity, connection);
-      return true;
-    }
-    catch (Exception exn) {
-      BoltLog.Exception(exn);
-
-      proxy = null;
-      return false;
-    }
+    BoltLog.Debug("Created {0} on {1}", entity, connection);
   }
 
   public override void StepRemoteFrame() {
@@ -580,7 +569,7 @@ partial class EntityChannel : BoltChannel {
         proxy = _incomming[networkId];
 
         if (proxy == null) {
-          throw new BoltException("couldn't find proxy with id {0}", networkId);
+          throw new BoltException("Couldn't find entity for {0}", networkId);
         }
 
         // update control state yes/no
@@ -603,18 +592,28 @@ partial class EntityChannel : BoltChannel {
   }
 
   void DestroyOutgoingProxy(EntityProxy proxy) {
+    // remove outgoing proxy index
     _outgoing.Remove(proxy.NetworkId);
 
+    // remove proxy from entity
+    if (proxy.Entity && proxy.Entity.IsAttached) {
+      proxy.Entity.Proxies.Remove(proxy);
+    }
+
+    // if we're told to ignore this destroy, instantly re-create the proxy
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
       CreateOnRemote(proxy.Entity);
     }
   }
 
   void DestroyIncommingProxy(EntityProxy proxy, IProtocolToken token) {
+    // remove incomming proxy
     _incomming.Remove(proxy.NetworkId);
 
     // destroy entity
     proxy.Entity.DetachToken = token;
+
+    // destroy entity
     BoltCore.DestroyForce(proxy.Entity);
   }
 }
