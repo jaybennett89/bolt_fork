@@ -32,9 +32,6 @@ namespace Bolt {
       // call to serializer
       Serializer.OnControlGained();
 
-      // 
-      ControlTokenGained = token;
-
       // raise user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject);
 
@@ -78,9 +75,6 @@ namespace Bolt {
       // call to serializer
       Serializer.OnControlLost();
 
-      // 
-      ControlTokenLost = token;
-
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         eb.ControlLost();
@@ -108,25 +102,17 @@ namespace Bolt {
 
         EntityProxy proxy;
 
-        if (connection._entityChannel.CreateOnRemote(this, out proxy)) {
-          CommandLastExecuted = null;
-          CommandSequence = 0;
-          CommandQueue.Clear();
+        CommandLastExecuted = null;
+        CommandSequence = 0;
+        CommandQueue.Clear();
 
-          Controller = connection;
-          Controller._entityChannel.ForceSync(this);
+        Controller = connection;
+        Controller._entityChannel.CreateOnRemote(this, out proxy);
+        Controller._entityChannel.ForceSync(this);
 
-          // clear idle state for the controller
-          SetIdle(Controller, false);
-
-          // set token
-          proxy.ControlTokenLost = null;
-          proxy.ControlTokenGained = token;
-        }
-        else {
-          BoltLog.Error("Could not create {0} on {1}, control not assigned", this, connection);
-        }
-
+        // set token
+        proxy.ControlTokenLost = null;
+        proxy.ControlTokenGained = token;
       }
       else {
         BoltLog.Error("You can not assign control of {0}, you are not the owner", this);

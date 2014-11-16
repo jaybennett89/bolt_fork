@@ -24,8 +24,6 @@ namespace Bolt {
 
     internal IProtocolToken DetachToken;
     internal IProtocolToken AttachToken;
-    internal IProtocolToken ControlTokenLost;
-    internal IProtocolToken ControlTokenGained;
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
