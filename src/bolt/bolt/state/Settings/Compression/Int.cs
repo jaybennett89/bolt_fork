@@ -33,7 +33,7 @@ namespace Bolt {
     }
 
     public int Read(UdpPacket stream) {
-      return stream.ReadInt(_bits) - _shift;
+      return stream.ReadInt(_bits) + -_shift;
     }
   }
 
