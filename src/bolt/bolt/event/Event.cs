@@ -4,7 +4,7 @@ using UdpKit;
 namespace Bolt {
   internal struct EventMetaData {
     internal TypeId TypeId;
-    internal int ByteSize;
+    internal int Size;
     internal PropertySerializer[] PropertySerializers;
   }
 
@@ -37,8 +37,8 @@ namespace Bolt {
     internal ReliabilityModes Reliability;
 
     internal uint Sequence;
-    internal byte[] Data;
     internal byte[] UserData;
+    internal NetworkValue[] Data;
 
     internal int Targets;
     internal bool Reliable;
@@ -80,7 +80,7 @@ namespace Bolt {
       Event clone;
 
       clone = (Event)MemberwiseClone();
-      clone.Data = new byte[Data.Length];
+      clone.Data = new NetworkValue[Data.Length];
 
       Array.Copy(Data, 0, clone.Data, 0, Data.Length);
 
@@ -89,7 +89,7 @@ namespace Bolt {
 
     internal Event(EventMetaData meta) {
       Meta = meta;
-      Data = new byte[Meta.ByteSize];
+      Data = new NetworkValue[Meta.Size];
     }
 
     internal void IncrementRefs() {

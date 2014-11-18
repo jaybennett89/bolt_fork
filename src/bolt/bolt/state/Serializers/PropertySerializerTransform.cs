@@ -38,14 +38,14 @@ namespace Bolt {
     PropertyTransformCompressionSettings TransformCompression;
 
     const int POSITION_OFFSET = 0;
-    const int VELOCITY_OFFSET = 12;
-    const int ROTATION_OFFSET = 24;
+    const int VELOCITY_OFFSET = 3;
+    const int ROTATION_OFFSET = 4;
 
     public void AddSettings(PropertyTransformCompressionSettings transformCompression) {
       TransformCompression = transformCompression;
     }
 
-    public override int StateBits(State state, State.NetworkFrame frame) {
+    public override int StateBits(State state, NetworkFrame frame) {
       int bits = 1;
 
       bits += TransformCompression.Position.BitsRequired;
@@ -59,10 +59,10 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+      var td = (TransformData)state.Objects[Settings.OffsetObjects];
       if (td.Simulate) {
-        var p = state.Frames.first.Data.ReadVector3(SettingsOld.ByteOffset + POSITION_OFFSET);
-        var r = state.Frames.first.Data.ReadQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET).eulerAngles;
+        var p = state.CurrentFrame.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3;
+        var r = state.CurrentFrame.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion;
 
         var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F3"), p.y.ToString("F3"), p.z.ToString("F3"));
         var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F3"), r.y.ToString("F3"), r.z.ToString("F3"));
@@ -75,11 +75,11 @@ namespace Bolt {
     }
 
     public override void OnInit(State state) {
-      state.Objects[StateSettings.ObjectOffset] = new TransformData();
+      state.Objects[Settings.OffsetObjects] = new TransformData();
     }
 
-    public override void OnRender(State state, State.NetworkFrame frame) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+    public override void OnRender(State state, NetworkFrame frame) {
+      var td = (TransformData)state.Objects[Settings.OffsetObjects];
 
       if (ReferenceEquals(td.Render, null)) {
         return;
@@ -93,7 +93,7 @@ namespace Bolt {
     }
 
     public override void OnParentChanged(State state, Entity newParent, Entity oldParent) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+      var td = (TransformData)state.Objects[Settings.OffsetObjects];
       if (newParent == null) {
         td.Simulate.transform.parent = null;
         UpdateTransformValues(state, oldParent.UnityObject.transform.localToWorldMatrix, UE.Matrix4x4.identity);
@@ -112,8 +112,8 @@ namespace Bolt {
       var it = state.Frames.GetIterator();
 
       while (it.Next()) {
-        UE.Vector3 p = it.val.Data.ReadVector3(SettingsOld.ByteOffset + POSITION_OFFSET);
-        UE.Quaternion r = it.val.Data.ReadQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET);
+        var p = it.val.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3;
+        var r = it.val.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion;
 
         float angle;
         UE.Vector3 axis;
@@ -129,22 +129,22 @@ namespace Bolt {
         r = UE.Quaternion.AngleAxis(angle, axis);
 
         // put back into frame
-        it.val.Data.PackVector3(SettingsOld.ByteOffset + POSITION_OFFSET, p);
-        it.val.Data.PackQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET, r);
+        it.val.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3 = p;
+        it.val.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion = r;
       }
     }
 
     public override void OnSimulateBefore(State state) {
       if (state.Entity.IsDummy) {
-        var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+        var td = (TransformData)state.Objects[Settings.OffsetObjects];
 
         if (ReferenceEquals(td.Simulate, null)) {
           return;
         }
 
-        var p = SettingsOld.ByteOffset + POSITION_OFFSET;
-        var v = SettingsOld.ByteOffset + VELOCITY_OFFSET;
-        var r = SettingsOld.ByteOffset + ROTATION_OFFSET;
+        var p = Settings.OffsetStorage + POSITION_OFFSET;
+        var v = Settings.OffsetStorage + VELOCITY_OFFSET;
+        var r = Settings.OffsetStorage + ROTATION_OFFSET;
         var snap = false;
 
         switch (SmoothingSettings.Algorithm) {
@@ -158,8 +158,8 @@ namespace Bolt {
             break;
 
           case SmoothingAlgorithms.Extrapolation:
-            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, v, state.Entity.Frame, SmoothingSettings, td.Simulate.localPosition, ref snap);            //BoltPoll.ASSIGN.Stop();
-            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings, td.Simulate.localRotation); 
+            td.Simulate.localPosition = Math.ExtrapolateVector(state.Frames, p, state.Entity.Frame, SmoothingSettings, ref snap);            //BoltPoll.ASSIGN.Stop();
+            td.Simulate.localRotation = Math.ExtrapolateQuaternion(state.Frames, r, state.Entity.Frame, SmoothingSettings);
             break;
         }
 
@@ -173,7 +173,7 @@ namespace Bolt {
     }
 
     public override void OnSimulateAfter(State state) {
-      var td = (TransformData)state.Frames.first.Objects[StateSettings.ObjectOffset];
+      var td = (TransformData)state.Objects[Settings.OffsetObjects];
 
       if (ReferenceEquals(td.Simulate, null)) {
         return;
@@ -182,12 +182,12 @@ namespace Bolt {
       var f = state.Frames.first;
 
       if (state.Entity.IsOwner) {
-        UE.Vector3 position = f.Data.ReadVector3(SettingsOld.ByteOffset + POSITION_OFFSET);
-        UE.Vector3 velocity = GetVelocity(td, position);
+        UE.Vector3 p = f.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3;
+        UE.Vector3 v = GetVelocity(td, p);
 
-        f.Data.PackVector3(SettingsOld.ByteOffset + POSITION_OFFSET, td.Simulate.localPosition);
-        f.Data.PackVector3(SettingsOld.ByteOffset + VELOCITY_OFFSET, velocity);
-        f.Data.PackQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET, td.Simulate.localRotation);
+        f.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3 = td.Simulate.localPosition;
+        f.Storage[Settings.OffsetStorage + VELOCITY_OFFSET].Vector3 = v;
+        f.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion = td.Simulate.localRotation;
       }
 
       td.RenderDoubleBufferPosition = td.RenderDoubleBufferPosition.Shift(td.Simulate.position);
@@ -214,7 +214,7 @@ namespace Bolt {
       }
     }
 
-    public override bool StatePack(State state, State.NetworkFrame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
+    public override bool StatePack(State state, NetworkFrame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
       if (state.Entity.HasParent) {
         if (connection._entityChannel.ExistsOnRemote(state.Entity.Parent)) {
           stream.WriteEntity(state.Entity.Parent);
@@ -227,48 +227,38 @@ namespace Bolt {
         stream.WriteEntity(null);
       }
 
-      UE.Vector3 p = frame.Data.ReadVector3(SettingsOld.ByteOffset + POSITION_OFFSET);
-      TransformCompression.Position.Pack(stream, p);
+      // position
+      TransformCompression.Position.Pack(stream, frame.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3);
 
       if (SmoothingSettings.Algorithm == SmoothingAlgorithms.Extrapolation) {
-        UE.Vector3 v = frame.Data.ReadVector3(SettingsOld.ByteOffset + VELOCITY_OFFSET);
-        TransformCompression.Position.Pack(stream, v);
+        // velocity
+        TransformCompression.Position.Pack(stream, frame.Storage[Settings.OffsetStorage + VELOCITY_OFFSET].Vector3);
       }
 
-      UE.Quaternion r = frame.Data.ReadQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET);
-      TransformCompression.Rotation.Pack(stream, r);
+      // rotation
+      TransformCompression.Rotation.Pack(stream, frame.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion);
 
       return true;
     }
 
-    public override void StateRead(State state, State.NetworkFrame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
+    public override void StateRead(State state, NetworkFrame frame, BoltConnection connection, UdpKit.UdpPacket stream) {
       state.Entity.SetParentInternal(stream.ReadEntity());
-
-      UE.Vector3 p = default(UE.Vector3);
-      UE.Vector3 v = default(UE.Vector3);
-      UE.Quaternion r = default(UE.Quaternion);
-
-      p = TransformCompression.Position.Read(stream);
+      
+      // position
+      frame.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3 = TransformCompression.Position.Read(stream);
 
       if (SmoothingSettings.Algorithm == SmoothingAlgorithms.Extrapolation) {
-        v = TransformCompression.Position.Read(stream);
+        // velocity
+        frame.Storage[Settings.OffsetStorage + VELOCITY_OFFSET].Vector3 = TransformCompression.Position.Read(stream);
       }
 
-      r = TransformCompression.Rotation.Read(stream);
-
-      frame.Data.PackVector3(SettingsOld.ByteOffset + POSITION_OFFSET, p);
-      frame.Data.PackVector3(SettingsOld.ByteOffset + VELOCITY_OFFSET, v);
-      frame.Data.PackQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET, r);
+      // rotation
+      frame.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion = TransformCompression.Rotation.Read(stream);
     }
 
     void PerformNone(TransformData td, State state) {
-      var f0 = state.Frames.first;
-
-      UE.Vector3 p0 = f0.Data.ReadVector3(SettingsOld.ByteOffset + POSITION_OFFSET);
-      UE.Quaternion r0 = f0.Data.ReadQuaternion(SettingsOld.ByteOffset + ROTATION_OFFSET);
-
-      td.Simulate.localPosition = p0;
-      td.Simulate.localRotation = r0;
+      td.Simulate.localPosition = state.CurrentFrame.Storage[Settings.OffsetStorage + POSITION_OFFSET].Vector3;
+      td.Simulate.localRotation = state.CurrentFrame.Storage[Settings.OffsetStorage + ROTATION_OFFSET].Quaternion;
     }
   }
 }

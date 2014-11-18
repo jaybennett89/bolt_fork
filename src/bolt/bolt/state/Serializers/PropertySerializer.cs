@@ -10,16 +10,11 @@ namespace Bolt {
 
   abstract class PropertySerializer {
     public PropertySerializerSettings Settings;
-    public PropertyStateSettings StateSettings;
     public PropertyCommandSettings CommandSettings;
     public PropertySmoothingSettings SmoothingSettings;
 
-    public void AddSettings(PropertySettings settings) {
-      SettingsOld = settings;
-    }
-
-    public void AddSettings(PropertyStateSettings stateSettings) {
-      StateSettings = stateSettings;
+    public void AddSettings(PropertySerializerSettings settings) {
+      Settings = settings;
     }
 
     public void AddSettings(PropertyCommandSettings commandSettings) {
@@ -40,9 +35,9 @@ namespace Bolt {
     public virtual bool EventPack(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
     public virtual void EventRead(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
 
-    public virtual void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) { }
+    public virtual void CommandPack(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void CommandRead(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) { }
 
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }
@@ -61,23 +56,23 @@ namespace Bolt {
     }
 
     public override bool StatePack(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
-      return Pack(frame.Data, connection, stream);
+      return Pack(frame.Storage, connection, stream);
     }
 
     public override void StateRead(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
-      Read(frame.Data, connection, stream);
+      Read(frame.Storage, connection, stream);
     }
 
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
+    public override void CommandPack(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
       Pack(data, connection, stream);
     }
 
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
+    public override void CommandRead(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
       Read(data, connection, stream);
     }
 
-    protected virtual bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    protected virtual void Read(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    protected virtual bool Pack(NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    protected virtual void Read(NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
   }
 
   abstract class PropertySerializerMecanim : PropertySerializerSimple {
@@ -121,11 +116,11 @@ namespace Bolt {
     protected virtual void PushMecanimValue(State state) { }
 
     void PullMecanimLayer(State state) {
-      state.Frames.first.Data.PackF32(SettingsOld.ByteOffset, state.Animator.GetLayerWeight(MecanimSettings.Layer));
+      state.CurrentFrame.Storage[Settings.OffsetStorage].Float0 = state.Animator.GetLayerWeight(MecanimSettings.Layer);
     }
 
     void PushMecanimLayer(State state) {
-      state.Animator.SetLayerWeight(MecanimSettings.Layer, state.Frames.first.Data.ReadF32(SettingsOld.ByteOffset));
+      state.Animator.SetLayerWeight(MecanimSettings.Layer, state.CurrentFrame.Storage[Settings.OffsetStorage].Float0);
     }
   }
 }

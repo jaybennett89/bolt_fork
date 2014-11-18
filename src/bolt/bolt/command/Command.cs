@@ -7,8 +7,8 @@ using UE = UnityEngine;
 
 namespace Bolt {
   internal struct CommandMetaData {
-    internal int InputByteSize;
-    internal int ResultByteSize;
+    internal int InputSize;
+    internal int ResultSize;
     internal int SmoothFrames;
     internal TypeId TypeId;
     internal PropertySerializer[] InputSerializers;
@@ -38,8 +38,8 @@ namespace Bolt {
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;
     internal const int SEQ_MASK = (1 << SEQ_BITS) - 1;
 
-    internal byte[] InputData;
-    internal byte[] ResultData;
+    internal NetworkValue[] InputData;
+    internal NetworkValue[] ResultData;
 
     internal int Frame;
     internal ushort Sequence;
@@ -47,8 +47,8 @@ namespace Bolt {
     internal int SmoothStart;
     internal int SmoothEnd;
 
-    internal byte[] SmoothFrom;
-    internal byte[] SmoothTo;
+    internal NetworkValue[] SmoothFrom;
+    internal NetworkValue[] SmoothTo;
 
     internal CommandFlags Flags;
     internal CommandMetaData Meta;
@@ -84,8 +84,8 @@ namespace Bolt {
 
     internal Command(CommandMetaData meta) {
       Meta = meta;
-      InputData = new byte[meta.InputByteSize];
-      ResultData = new byte[meta.ResultByteSize];
+      InputData = new NetworkValue[meta.InputSize];
+      ResultData = new NetworkValue[meta.ResultSize];
     }
 
     internal void VerifyCanSetInput() {
@@ -118,7 +118,7 @@ namespace Bolt {
       }
     }
 
-    internal void ReadResult(BoltConnection connection, byte[] array, UdpPacket stream) {
+    internal void ReadResult(BoltConnection connection, NetworkValue[] array, UdpPacket stream) {
       for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
         Meta.ResultSerializers[i].CommandRead(this, array, connection, stream);
       }

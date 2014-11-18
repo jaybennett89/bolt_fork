@@ -9,6 +9,8 @@ namespace Bolt {
     public int OffsetObjects;
     public int OffsetSerializers;
 
+    public ArrayIndices ArrayIndices;
+
     public int PropertyPriority;
     public String PropertyName;
     public List<String> PropertyPaths;
@@ -16,19 +18,6 @@ namespace Bolt {
 
     public String PropertyFullPath {
       get { return PropertyPaths[PropertyPaths.Count - 1]; }
-    }
-  }
-
-  internal struct PropertySettings {
-    public int SerializerOffset;
-    public int ByteOffset;
-    public String PropertyName;
-    public PropertyModes PropertyMode;
-
-    public PropertySettings(int offset, string name, PropertyModes mode) {
-      ByteOffset = SerializerOffset = offset;
-      PropertyName = name;
-      PropertyMode = mode;
     }
   }
 }

@@ -8,7 +8,6 @@ namespace Bolt {
   internal struct PropertyStateSettings {
     public int Priority;
     public int ByteLength;
-    public int ObjectOffset;
 
     public ArrayIndices CallbackIndices;
 

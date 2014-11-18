@@ -158,7 +158,7 @@ namespace Bolt {
 
       p = new EntityProxy();
       p.Entity = this;
-      p.Mask = Serializer.GetDefaultMask();
+      p.Changed = Serializer.GetDefaultMask();
 
       // add to list
       Proxies.AddLast(p);
@@ -540,7 +540,7 @@ namespace Bolt {
       get { return false; }
     }
 
-    float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {
+    float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, int skipped) {
       return skipped;
     }
 

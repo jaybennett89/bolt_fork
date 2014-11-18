@@ -8,22 +8,20 @@ using System.Text;
 /// Represents an array of transforms on a state
 /// </summary>
 [Documentation]
-public struct TransformArray {
-  internal Bolt.State.NetworkFrame frame;
-  internal int offsetObjects;
-  internal int offsetBytes;
-  internal int length;
+public class TransformArray {
+  internal Bolt.State state;
 
-  internal TransformArray(Bolt.State.NetworkFrame frame, int offsetBytes, int offsetObjects, int length) {
-    this.frame = frame;
-    this.offsetBytes = offsetBytes;
-    this.offsetObjects = offsetObjects;
+  internal int length;
+  internal int offsetObjects;
+  internal int offsetStorage;
+
+  internal TransformArray(Bolt.State state, int offsetStorage, int offsetObjects, int length) {
+    this.state = state;
     this.length = length;
+    this.offsetStorage = offsetStorage;
+    this.offsetObjects = offsetObjects;
   }
 
-  /// <summary>
-  /// The size of the array
-  /// </summary>
   public int Length {
     get {
       return length;
@@ -32,8 +30,24 @@ public struct TransformArray {
 
   public Bolt.TransformData this[int index] {
     get {
-      if (index < 0 || index >= length) throw new IndexOutOfRangeException();
-      return frame.Objects[offsetObjects + index] as Bolt.TransformData;
+      if (index < 0 || index >= length) {
+        throw new IndexOutOfRangeException();
+      }
+
+      return (Bolt.TransformData)state.Objects[offsetObjects + index];
+    }
+    set {
+      if (index < 0 || index >= length) {
+        throw new IndexOutOfRangeException();
+      }
+
+      Assert.True(
+        (state.Objects[offsetObjects + index] == null)
+        ||
+        (state.Objects[offsetObjects + index] is Bolt.TransformData)
+      );
+
+      state.Objects[offsetObjects + index] = value;
     }
   }
 }

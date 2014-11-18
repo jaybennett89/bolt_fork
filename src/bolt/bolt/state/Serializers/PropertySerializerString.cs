@@ -6,6 +6,16 @@ using System.Text;
 namespace Bolt {
   internal struct PropertyStringSettings {
     public Bolt.StringEncodings Encoding;
+    public Encoding EncodingClass {
+      get {
+        switch (Encoding) {
+          case StringEncodings.ASCII: return System.Text.Encoding.ASCII;
+          case StringEncodings.UTF8: return System.Text.Encoding.UTF8;
+        }
+
+        throw new NotImplementedException();
+      }
+    }
   }
 
   class PropertySerializerString : PropertySerializerSimple {
@@ -16,30 +26,24 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      var frame = state.Frames.first;
-      int length = Blit.ReadI32(frame.Data, SettingsOld.ByteOffset);
-
-      if (StringSettings.Encoding == StringEncodings.ASCII) {
-        return Encoding.ASCII.GetString(frame.Data, SettingsOld.ByteOffset + 4, length);
-      }
-      else {
-        return Encoding.UTF8.GetString(frame.Data, SettingsOld.ByteOffset + 4, length);
-      }
+      return state.CurrentFrame.Storage[Settings.OffsetStorage].String;
     }
 
-    public override int StateBits(State state, State.NetworkFrame frame) {
-      return 32 + (Blit.ReadI32(frame.Data, SettingsOld.ByteOffset) * 8);
+    public override int StateBits(State state, NetworkFrame frame) {
+      if (state.CurrentFrame.Storage[Settings.OffsetStorage].String == null) {
+        return 16;
+      }
+
+      return 16 + StringSettings.EncodingClass.GetByteCount(state.CurrentFrame.Storage[Settings.OffsetStorage].String);
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpKit.UdpPacket stream) {
-      stream.WriteInt(Blit.ReadI32(data, SettingsOld.ByteOffset));
-      stream.WriteByteArray(data, SettingsOld.ByteOffset + 4, Blit.ReadI32(data, SettingsOld.ByteOffset));
+    protected override bool Pack(NetworkValue[] data, BoltConnection connection, UdpKit.UdpPacket stream) {
+      stream.WriteString(data[Settings.OffsetStorage].String, StringSettings.EncodingClass);
       return true;
     }
 
-    protected override void Read(byte[] data,  BoltConnection connection, UdpKit.UdpPacket stream) {
-      Blit.PackI32(data, SettingsOld.ByteOffset, stream.ReadInt());
-      Blit.PackBytes(data, SettingsOld.ByteOffset + 4, stream.ReadByteArray(Blit.ReadI32(data, SettingsOld.ByteOffset)));
+    protected override void Read(NetworkValue[] data, BoltConnection connection, UdpKit.UdpPacket stream) {
+      data[Settings.OffsetStorage].String = stream.ReadString(StringSettings.EncodingClass);
     }
   }
 }

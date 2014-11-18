@@ -159,7 +159,7 @@ partial class EntityChannel : BoltChannel {
           continue;
         }
 
-        proxy.Mask.Clear();
+        proxy.Changed.ClearAll();
         proxy.Priority = 1 << 17;
       }
       else {
@@ -185,8 +185,7 @@ partial class EntityChannel : BoltChannel {
         }
         else {
           if ((proxy.Flags & ProxyFlags.CREATE_DONE) || (proxy.Envelopes.Count > 0)) {
-            var noDataToSend = proxy.Mask.AndCheck(proxy.Entity.Serializer.GetFilter(connection, proxy)) == false;
-            if (noDataToSend) {
+            if (proxy.Changed.IsZero) {
               continue;
             }
 
@@ -194,7 +193,7 @@ partial class EntityChannel : BoltChannel {
               proxy.Priority = 1 << 20;
             }
             else {
-              proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Mask, proxy.Skipped);
+              proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
               proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
             }
           }
@@ -352,7 +351,7 @@ partial class EntityChannel : BoltChannel {
       Priority p = env.Written[i];
 
       // set flag for sending this property again
-      env.Proxy.Mask.Set(p.PropertyIndex);
+      env.Proxy.Changed.Set(p.PropertyIndex);
 
       // increment priority
       env.Proxy.PropertyPriority[p.PropertyIndex].PriorityValue += p.PriorityValue;

@@ -63,5 +63,17 @@ namespace Bolt.Compiler {
       get { return AssetSettings as PropertyCommandSettings; }
     }
 
+    public void Oncreated() {
+      Enabled = true;
+      Expanded = true;
+
+      Priority = 1;
+
+      if (StateAssetSettings != null) {
+        StateAssetSettings.SnapMagnitude = 10f;
+      }
+
+      PropertyType.OnCreated();
+    }
   }
 }

@@ -117,7 +117,7 @@ namespace Bolt {
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
         for (int i = 0; i < MetaData.SerializerGroup.Serializers.Count; ++i) {
-          string label = MetaData.SerializerGroup.Serializers[i].StateSettings.PropertyPath;
+          string label = MetaData.SerializerGroup.Serializers[i].Settings.PropertyFullPath;
           object value = MetaData.SerializerGroup.Serializers[i].GetDebugValue(this);
 
           BoltNetworkInternal.DebugDrawer.Indent(label.Count(c => c == '.' || c == '['));
@@ -315,7 +315,7 @@ namespace Bolt {
 
           if (Callbacks.TryGetValue(p.Settings.PropertyPaths[i], out callbacksList)) {
             for (int n = 0; n < callbacksList.Count; ++n) {
-              callbacksList[n](this, p.Settings.PropertyFullPath, p.StateSettings.CallbackIndices);
+              callbacksList[n](this, p.Settings.PropertyFullPath, p.Settings.ArrayIndices);
             }
           }
         }
@@ -345,7 +345,7 @@ namespace Bolt {
         // if this property is set both in our filter and the proxy mask we can consider it for sending
         if (filter.IsSet(i) && env.Proxy.Changed.IsSet(i)) {
           // increment priority for this property
-          proxyPriority[i].PriorityValue += MetaData.SerializerGroup.Serializers[i].StateSettings.Priority;
+          proxyPriority[i].PriorityValue += MetaData.SerializerGroup.Serializers[i].Settings.PropertyPriority;
 
           // copy to our temp array
           tempPriority[tempCount] = proxyPriority[i];

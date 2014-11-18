@@ -77,13 +77,28 @@ public static class BoltEditorGUI {
   }
 
   public static void EditSmoothingAlgorithm(AssetDefinition adef, PropertyDefinition pdef) {
+    EditSmoothingAlgorithm(adef, pdef, true);
+  }
+
+  public static void EditSmoothingAlgorithm(AssetDefinition adef, PropertyDefinition pdef, bool allowExtrapolation) {
     if (adef is StateDefinition) {
-      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-        pdef.StateAssetSettings.SmoothingAlgorithm = (SmoothingAlgorithms)EditorGUILayout.EnumPopup(pdef.StateAssetSettings.SmoothingAlgorithm);
-      });
+      if (allowExtrapolation) {
+        BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+          pdef.StateAssetSettings.SmoothingAlgorithm = (SmoothingAlgorithms)EditorGUILayout.EnumPopup(pdef.StateAssetSettings.SmoothingAlgorithm);
+        });
+      }
+      else {
+        BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+          if (BoltEditorGUI.ToggleDropdown(SmoothingAlgorithms.Interpolation.ToString(), SmoothingAlgorithms.None.ToString(), pdef.StateAssetSettings.SmoothingAlgorithm != SmoothingAlgorithms.None)) {
+            pdef.StateAssetSettings.SmoothingAlgorithm = SmoothingAlgorithms.Interpolation;
+          }
+          else {
+            pdef.StateAssetSettings.SmoothingAlgorithm = SmoothingAlgorithms.None;
+          }
+        });
+      }
 
       if (pdef.StateAssetSettings.SmoothingAlgorithm == SmoothingAlgorithms.Extrapolation) {
-
         if (pdef.PropertyType is PropertyTypeTransform) {
           PropertyTypeTransform transform = (PropertyTypeTransform)pdef.PropertyType;
 
@@ -286,6 +301,7 @@ public static class BoltEditorGUI {
   public static PropertyType PropertyTypePopup(IEnumerable<Type> allTypes, PropertyType current, params GUILayoutOption[] options) {
     if (current == null) {
       current = (PropertyType)Activator.CreateInstance(allTypes.First());
+      current.OnCreated();
     }
 
     var types = allTypes.OrderBy(x => x.Name.Replace("PropertyType", "")).ToArray();
@@ -294,7 +310,8 @@ public static class BoltEditorGUI {
     var selectedNew = EditorGUILayout.Popup(selected, typesNames, options);
 
     if (selected != selectedNew) {
-      return (PropertyType)Activator.CreateInstance(types[selectedNew]);
+      current = (PropertyType)Activator.CreateInstance(types[selectedNew]);
+      current.OnCreated();
     }
 
     return current;

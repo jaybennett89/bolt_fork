@@ -87,8 +87,8 @@
     <Compile Include="state\Arrays\FloatArray.cs" />
     <Compile Include="state\Arrays\IntegerArray.cs" />
     <Compile Include="state\Arrays\TransformArray.cs" />
+    <Compile Include="state\Arrays\ValueArray.cs" />
     <Compile Include="state\Auxiliary\Enums.cs" />
-    <Compile Include="state\BitArray.cs" />
     <Compile Include="state\BitSet.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
@@ -96,6 +96,7 @@
     <Compile Include="state\NetworkArray.cs" />
     <Compile Include="state\NetworkFrame.cs" />
     <Compile Include="state\NetworkObject.cs" />
+    <Compile Include="state\NetworkTrigger.cs" />
     <Compile Include="state\Priority.cs" />
     <Compile Include="state\PropertyCallback.cs" />
     <Compile Include="state\SerializerGroup.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="state\Settings\Property.cs" />
     <Compile Include="state\Settings\Compression\Quaternion.cs" />
     <Compile Include="state\Settings\Smoothing.cs" />
-    <Compile Include="state\Settings\State.cs" />
     <Compile Include="state\Settings\Compression\Transform.cs" />
     <Compile Include="state\Settings\Compression\Vector.cs" />
     <Compile Include="state\StateMetaData.cs" />

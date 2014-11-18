@@ -9,7 +9,7 @@ namespace Bolt {
     internal int OffsetStorage;
     internal State State;
 
-    internal State.NetworkFrame CurrentFrame {
+    internal NetworkFrame CurrentFrame {
       get { return State.Frames.first; }
     }
 

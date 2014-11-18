@@ -7,7 +7,7 @@ using UnityEditor;
 
 class PropertyEditorQuaternion : PropertyEditor<PropertyTypeQuaternion> {
   protected override void Edit(bool array) {
-    BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition);
+    BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition, false);
 
     BoltEditorGUI.WithLabel("Axes", () => {
       PropertyType.Selection = BoltEditorGUI.EditAxisSelection(PropertyType.Selection);

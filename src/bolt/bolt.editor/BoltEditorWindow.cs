@@ -217,15 +217,11 @@ public class BoltEditorWindow : BoltWindow {
   PropertyDefinition CreateProperty(PropertyAssetSettings settings) {
     PropertyDefinition def = new PropertyDefinition {
       Name = "NewProperty",
-      Comment = "",
-      Deleted = false,
-      Enabled = true,
-      Expanded = true,
       PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
       AssetSettings = settings
     };
 
-    def.PropertyType.OnCreated();
+    def.Oncreated();
     return def;
   }
 
