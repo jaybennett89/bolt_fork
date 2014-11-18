@@ -13,8 +13,21 @@ Delete the asset store version if installed.
 # Windows
 
 1. Make sure you have a .NET SDK installed, if you have visual studio or any other .NET development tools already installed you most likely have it, otherwise install the latest version from this page http://msdn.microsoft.com/en-us/vstudio/aa496123.aspx
-2. If you downloaded the Bolt repository as a .zip file make sure to open up properties for the .zip file and click "Unblock" **before** you unpack it.
-3. Open a command line terminal and navigate to the root directory of the bolt repository.
-4. Run this command Build.bat -ev project C:\path\to\your\unity\project
-5. Open your Unity project and run "Bolt/Install Bolt" from the top menu bar
-6. Restart Unity
+2. Obtain the source for Bolt
+  a. Clone the Bolt repository
+    i. git clone https://github.com/BoltEngine/bolt.git 
+  b. If you downloaded the zip extract the contents to a working directory
+    i. https://github.com/BoltEngine/bolt/archive/master.zip
+3. In the Bolt Source directory Hold SHIFT then right click, select Open command window here
+4. Change to the 'src\bolt'
+  a. cd .\src\bolt
+5. Obtain the source for Bolt UDPKit
+  a. Clone the Bolt UDPKit
+    i. git clone https://github.com/BoltEngine/bolt_udpkit.git udpkit
+  b. If you downloaded the zip after extract the contents rename the folder to udpkit
+    i. https://github.com/BoltEngine/bolt_udpkit/archive/master.zip
+6. Change to the root of the Bolt source.
+  a. cd ..\..\
+7. Run Build.bat -ev project C:\path\to\your\unity\project
+8. Open your Unity project click Edit -> Bolt -> Install Bolt
+9. Restart Unity
