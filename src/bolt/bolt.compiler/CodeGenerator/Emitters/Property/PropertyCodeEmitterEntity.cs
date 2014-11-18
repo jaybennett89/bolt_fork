@@ -5,13 +5,6 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler{
-  class PropertyCodeEmitterEntity : PropertyCodeEmitterSimple<PropertyDecoratorEntity> {
-    public override string ReadMethod {
-      get { return "ReadEntity"; }
-    }
-
-    public override string PackMethod {
-      get { return "PackEntity"; }
-    }
+  class PropertyCodeEmitterEntity : PropertyCodeEmitter<PropertyDecoratorEntity> {
   }
 }

@@ -12,10 +12,16 @@ namespace Bolt.Compiler {
       }
     }
 
-    public override int ObjectSize {
-      get {
-        return ElementDecorator.ObjectSize * PropertyType.ElementCount;
-      }
+    public override int RequiredObjects {
+      get { return 1 + (ElementDecorator.RequiredObjects * PropertyType.ElementCount); }
+    }
+
+    public override int RequiredStorage {
+      get { return (ElementDecorator.RequiredStorage * PropertyType.ElementCount); }
+    }
+
+    public override int RequiredSerializers {
+      get { return ElementDecorator.RequiredSerializers * PropertyType.ElementCount; }
     }
 
     public PropertyDecorator ElementDecorator {
@@ -33,7 +39,7 @@ namespace Bolt.Compiler {
     public override string ClrType {
       get {
         if (ElementDecorator is PropertyDecoratorStruct) {
-          return ElementDecorator.ClrType + "Array";
+          return "Bolt.NetworkArray<" + ElementDecorator.ClrType + ">";
         }
 
         return ElementDecorator.GetType().Name.Replace("PropertyDecorator", "") + "Array";

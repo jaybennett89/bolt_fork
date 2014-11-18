@@ -13,29 +13,29 @@ namespace Bolt {
       IntCompression = intCompression;
     }
 
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.NetworkFrame frame) {
       return IntCompression.BitsRequired;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset);
+      return Blit.ReadI32(state.Frames.first.Data, SettingsOld.ByteOffset);
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetInteger(Settings.PropertyName, Blit.ReadI32(state.Frames.first.Data, Settings.ByteOffset));
+      state.Animator.SetInteger(SettingsOld.PropertyName, Blit.ReadI32(state.Frames.first.Data, SettingsOld.ByteOffset));
     }
 
     protected override void PullMecanimValue(State state) {
-      Blit.PackI32(state.Frames.first.Data, Settings.ByteOffset, state.Animator.GetInteger(Settings.PropertyName));
+      Blit.PackI32(state.Frames.first.Data, SettingsOld.ByteOffset, state.Animator.GetInteger(SettingsOld.PropertyName));
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      IntCompression.Pack(stream, Blit.ReadI32(data, Settings.ByteOffset));
+      IntCompression.Pack(stream, Blit.ReadI32(data, SettingsOld.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data,BoltConnection connection, UdpPacket stream) {
-      Blit.PackI32(data, Settings.ByteOffset, IntCompression.Read(stream));
+      Blit.PackI32(data, SettingsOld.ByteOffset, IntCompression.Read(stream));
     }
   }
 }

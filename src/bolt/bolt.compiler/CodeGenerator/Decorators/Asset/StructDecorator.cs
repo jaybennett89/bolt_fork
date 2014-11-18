@@ -5,6 +5,22 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class StructDecorator : AssetDecorator<StructDefinition> {
+    public int ObjectsCount {
+      get { return 1 + Properties.Select(x => x.RequiredObjects).Sum(); }
+    }
+
+    public int StorageCount {
+      get { return 1 + Properties.Select(x => x.RequiredStorage).Sum(); }
+    }
+
+    public int PropertyCount {
+      get { return Properties.Select(x => x.RequiredSerializers).Sum(); }
+    }
+
+    public override string PropertyMode {
+      get { return "State"; }
+    }
+
     public int ByteSize;
     public int ObjectSize;
     public bool FrameSizeCalculated;
@@ -38,6 +54,16 @@ namespace Bolt.Compiler {
       }
     }
 
+
+    public StructCodeEmitter Emitter() {
+      StructCodeEmitter emitter;
+      
+      emitter = new StructCodeEmitter();
+      emitter.Decorator = this;
+
+      return emitter;
+    }
+
     public IEnumerable<StructDecorator> Dependencies {
       get {
         foreach (PropertyDecorator pd in Properties) {
@@ -64,5 +90,7 @@ namespace Bolt.Compiler {
         }
       }
     }
+
+
   }
 }

@@ -5,7 +5,7 @@ namespace Bolt {
   [Documentation]
   public static class Math {
 
-    internal static float InterpolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+    internal static float InterpolateFloat(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadF32(offset);
 
@@ -31,7 +31,7 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, float snapLimit, ref bool snapped) {
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame, float snapLimit, ref bool snapped) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadVector3(offset);
 
@@ -64,7 +64,7 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame) {
+    internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame) {
       var f0 = frames.first;
       var p0 = f0.Data.ReadQuaternion(offset);
       if (p0 == default(UE.Quaternion)) {
@@ -96,7 +96,7 @@ namespace Bolt {
       }
     }
 
-    internal static float ExtrapolateFloat(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, float value) {
+    internal static float ExtrapolateFloat(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame, PropertySmoothingSettings settings, float value) {
       var f = frames.first;
 
       frame = UE.Mathf.Min(frame, f.Number + settings.ExtrapolationMaxFrames);
@@ -110,11 +110,11 @@ namespace Bolt {
       return v0 + ((v1 - v0) * t);
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int velocityOffset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, ref bool snapped) {
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.NetworkFrame> frames, int offset, int velocityOffset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, ref bool snapped) {
       return ExtrapolateVector(frames, offset, frame, settings, position, frames.first.Data.ReadVector3(velocityOffset), ref snapped);
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity, ref bool snapped) {
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Vector3 position, UE.Vector3 velocity, ref bool snapped) {
       var f = frames.first;
       var tolerance = settings.ExtrapolationErrorTolerance;
 
@@ -140,7 +140,7 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.Frame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
+    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<State.NetworkFrame> frames, int offset, int frame, PropertySmoothingSettings settings, UE.Quaternion rotation) {
       var r0 = rotation;
       if (r0 == default(UE.Quaternion)) {
         r0 = UE.Quaternion.identity;

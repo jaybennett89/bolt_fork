@@ -1,61 +1,126 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Bolt {
+  public struct BitSetIterator {
+    int number;
+    int numberBit;
+
+    BitSet set;
+
+    public BitSetIterator(BitSet set) {
+      this.number = 0;
+      this.numberBit = 0;
+      this.set = set;
+    }
+
+    public bool Next(out int bit) {
+      ulong bits;
+
+      while (true) {
+
+        switch (number) {
+          case 0: bits = set.Bits0; break;
+          case 1: bits = set.Bits1; break;
+          case 2: bits = set.Bits2; break;
+          case 3: bits = set.Bits3; break;
+
+          case 4:
+            bit = -1;
+            return false;
+
+          default:
+            throw new InvalidOperationException();
+        }
+
+        if (bits == 0) {
+          number = number + 1;
+          numberBit = 0;
+        }
+        else {
+          for (; numberBit < 64; ++numberBit) {
+            if ((bits & (1UL << numberBit)) != 0UL) {
+              switch (number) {
+                case 0: set.Bits0 &= ~(1UL << numberBit); break;
+                case 1: set.Bits1 &= ~(1UL << numberBit); break;
+                case 2: set.Bits2 &= ~(1UL << numberBit); break;
+                case 3: set.Bits3 &= ~(1UL << numberBit); break;
+              }
+
+              // set bit we found
+              bit = (number * 64) + numberBit;
+
+              // done!
+              return true;
+            }
+          }
+
+          throw new InvalidOperationException();
+        }
+      }
+    }
+  }
+
   public struct BitSet {
-    ulong Bits0;
-    ulong Bits1;
-    ulong Bits2;
-    ulong Bits3;
+    internal static readonly BitSet Full;
+
+    static BitSet() {
+      Full = default(BitSet);
+      Full.Bits0 = ulong.MaxValue;
+      Full.Bits1 = ulong.MaxValue;
+      Full.Bits2 = ulong.MaxValue;
+      Full.Bits3 = ulong.MaxValue;
+    }
+
+    internal ulong Bits0;
+    internal ulong Bits1;
+    internal ulong Bits2;
+    internal ulong Bits3;
 
     public bool IsZero {
       get {
-        return 
-          (Bits0 == 0UL) && 
-          (Bits1 == 0UL) && 
-          (Bits2 == 0UL) && 
+        return
+          (Bits0 == 0UL) &&
+          (Bits1 == 0UL) &&
+          (Bits2 == 0UL) &&
           (Bits3 == 0UL);
       }
     }
 
-    public BitSet Set(int bit) {
-      BitSet self = this;
-
+    public void Set(int bit) {
       switch (bit / 64) {
-        case 0: self.Bits0 |= (1UL << (bit % 64)); break;
-        case 1: self.Bits1 |= (1UL << (bit % 64)); break;
-        case 2: self.Bits2 |= (1UL << (bit % 64)); break;
-        case 3: self.Bits3 |= (1UL << (bit % 64)); break;
+        case 0: this.Bits0 |= (1UL << (bit % 64)); break;
+        case 1: this.Bits1 |= (1UL << (bit % 64)); break;
+        case 2: this.Bits2 |= (1UL << (bit % 64)); break;
+        case 3: this.Bits3 |= (1UL << (bit % 64)); break;
         default:
           throw new IndexOutOfRangeException();
       }
-
-      return self;
     }
 
-    public BitSet Clear(int bit) {
-      BitSet self = this;
-
+    public void Clear(int bit) {
       switch (bit / 64) {
-        case 0: self.Bits0 &= ~(1UL << (bit % 64)); break;
-        case 1: self.Bits1 &= ~(1UL << (bit % 64)); break;
-        case 2: self.Bits2 &= ~(1UL << (bit % 64)); break;
-        case 3: self.Bits3 &= ~(1UL << (bit % 64)); break;
+        case 0: this.Bits0 &= ~(1UL << (bit % 64)); break;
+        case 1: this.Bits1 &= ~(1UL << (bit % 64)); break;
+        case 2: this.Bits2 &= ~(1UL << (bit % 64)); break;
+        case 3: this.Bits3 &= ~(1UL << (bit % 64)); break;
         default:
           throw new IndexOutOfRangeException();
       }
-
-      return self;
     }
 
-    public BitSet Combine(BitSet other) {
-      BitSet self = this;
+    public void Combine(BitSet other) {
+      this.Bits0 |= other.Bits0;
+      this.Bits1 |= other.Bits1;
+      this.Bits2 |= other.Bits2;
+      this.Bits3 |= other.Bits3;
+    }
 
-      self.Bits0 |= other.Bits0;
-      self.Bits1 |= other.Bits1;
-      self.Bits2 |= other.Bits2;
-      self.Bits3 |= other.Bits3;
-
-      return self;
+    public void ClearAll() {
+      Bits0 = 0UL;
+      Bits1 = 0UL;
+      Bits2 = 0UL;
+      Bits3 = 0UL;
     }
 
     public bool IsSet(int bit) {
@@ -70,5 +135,10 @@ namespace Bolt {
           throw new IndexOutOfRangeException();
       }
     }
+
+    public BitSetIterator GetIterator() {
+      return new BitSetIterator(this);
+    }
+
   }
 }

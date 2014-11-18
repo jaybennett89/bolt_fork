@@ -5,15 +5,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  class PropertyCodeEmitterInteger : PropertyCodeEmitterSimple<PropertyDecoratorInteger> {
-    public override string ReadMethod {
-      get { return "ReadI32"; }
-    }
-
-    public override string PackMethod {
-      get { return "PackI32"; }
-    }
-
+  class PropertyCodeEmitterInteger : PropertyCodeEmitter<PropertyDecoratorInteger> {
     public override void AddSettingsArgument(List<string> settings) {
       if (Decorator.PropertyType.CompressionEnabled) {
         var pt = Decorator.PropertyType;

@@ -10,7 +10,15 @@ namespace Bolt.Compiler {
     public CodeGenerator Generator;
     public AssetDefinition Definition;
 
+    public bool IsStateOrStruct {
+      get { return (Definition is StructDefinition) || (Definition is StateDefinition); }
+    }
+
     public abstract Guid Guid {
+      get;
+    }
+
+    public abstract string PropertyMode {
       get;
     }
   }

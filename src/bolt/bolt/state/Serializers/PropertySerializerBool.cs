@@ -6,29 +6,29 @@ using UdpKit;
 
 namespace Bolt {
   class PropertySerializerBool : PropertySerializerMecanim {
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.NetworkFrame frame) {
       return 1;
     }
 
     public override object GetDebugValue(State state) {
-      return state.Frames.first.Data.ReadBool(Settings.ByteOffset);
+      return state.Frames.first.Data.ReadBool(SettingsOld.ByteOffset);
     }
 
     protected override void PullMecanimValue(State state) {
-      state.Frames.first.Data.PackBool(Settings.ByteOffset, state.Animator.GetBool(Settings.PropertyName));
+      state.Frames.first.Data.PackBool(SettingsOld.ByteOffset, state.Animator.GetBool(SettingsOld.PropertyName));
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetBool(Settings.PropertyName, state.Frames.first.Data.ReadBool(Settings.ByteOffset));
+      state.Animator.SetBool(SettingsOld.PropertyName, state.Frames.first.Data.ReadBool(SettingsOld.ByteOffset));
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      stream.WriteBool(Blit.ReadBool(data, Settings.ByteOffset));
+      stream.WriteBool(Blit.ReadBool(data, SettingsOld.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Blit.PackBool(data, Settings.ByteOffset, stream.ReadBool());
+      Blit.PackBool(data, SettingsOld.ByteOffset, stream.ReadBool());
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {

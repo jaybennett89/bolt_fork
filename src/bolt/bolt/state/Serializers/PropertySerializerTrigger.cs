@@ -7,11 +7,11 @@ using UdpKit;
 namespace Bolt {
   class PropertySerializerTrigger : PropertySerializerMecanim {
     int LocalOffset {
-      get { return Settings.ByteOffset + 8; }
+      get { return SettingsOld.ByteOffset + 8; }
     }
 
     int SendOffset {
-      get { return Settings.ByteOffset; }
+      get { return SettingsOld.ByteOffset; }
     }
 
     public new void AddSettings(PropertyStateSettings stateSettings) {
@@ -21,7 +21,7 @@ namespace Bolt {
       StateSettings.ByteLength = 8;
     }
 
-    public override void SetDynamic(State.Frame frame, object value) {
+    public override void SetDynamic(State.NetworkFrame frame, object value) {
       frame.Data.SetTrigger(BoltCore.frame, LocalOffset, true);
     }
 
@@ -29,11 +29,11 @@ namespace Bolt {
       return "TRIGGER";
     }
 
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.NetworkFrame frame) {
       return BoltCore.localSendRate * state.Entity.UpdateRate;
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
+    public override bool StatePack(State state, State.NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
       // shift data so it aligns with our local frame
       state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, false);
 
@@ -44,7 +44,7 @@ namespace Bolt {
       return true;
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
+    public override void StateRead(State state, State.NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
       int triggerBits = stream.ReadInt(BoltCore.remoteSendRate * state.Entity.UpdateRate);
 
       frame.Data.PackI32(LocalOffset, frame.Number);
@@ -61,7 +61,7 @@ namespace Bolt {
       }
     }
 
-    bool MecanimPushOrNone(State state, State.Frame f, bool push) {
+    bool MecanimPushOrNone(State state, State.NetworkFrame f, bool push) {
       var cb = (System.Action)state.Frames.first.Objects[StateSettings.ObjectOffset];
       int frame = f.Data.ReadI32(LocalOffset);
       int bits = f.Data.ReadI32(LocalOffset + 4);
@@ -82,7 +82,7 @@ namespace Bolt {
 
             // apply to mecanim
             if (push) {
-              state.Animator.SetTrigger(Settings.PropertyName);
+              state.Animator.SetTrigger(SettingsOld.PropertyName);
             }
 
             // perform callback
@@ -96,7 +96,7 @@ namespace Bolt {
       return true;
     }
 
-    bool InvokeForFrame(State state, State.Frame f) {
+    bool InvokeForFrame(State state, State.NetworkFrame f) {
       if (MecanimSettings.Enabled && state.Animator) {
         if (ShouldPullDataFromMecanim(state)) {
           return MecanimPull(state, f);
@@ -110,8 +110,8 @@ namespace Bolt {
       }
     }
 
-    bool MecanimPull(State state, State.Frame f) {
-      if ((state.Animator.GetBool(Settings.PropertyName) == true) && (state.Animator.IsInTransition(MecanimSettings.Layer) == false)) {
+    bool MecanimPull(State state, State.NetworkFrame f) {
+      if ((state.Animator.GetBool(SettingsOld.PropertyName) == true) && (state.Animator.IsInTransition(MecanimSettings.Layer) == false)) {
         state.Frames.first.Data.SetTrigger(BoltCore.frame, SendOffset, true);
 
         var cb = (System.Action)state.Frames.first.Objects[StateSettings.ObjectOffset];

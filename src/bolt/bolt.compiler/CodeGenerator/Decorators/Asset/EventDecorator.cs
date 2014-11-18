@@ -8,6 +8,10 @@ namespace Bolt.Compiler {
     public int ByteSize;
     public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
 
+    public override string PropertyMode {
+      get { return "Event"; }
+    }
+
     public string FactoryName {
       get { return Definition.Name + "Factory"; }
     }

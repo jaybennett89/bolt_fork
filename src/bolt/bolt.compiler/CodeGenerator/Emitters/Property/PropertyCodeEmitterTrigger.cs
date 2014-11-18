@@ -6,16 +6,6 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTrigger : PropertyCodeEmitter<PropertyDecoratorTrigger> {
-    public override void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
-      type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => { });
-    }
-
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      type.DeclareMethod(typeof(void).FullName, Decorator.SetMethodName, method => {
-        method.Statements.Expr("frame.Changed = true; Bolt.Blit.SetTrigger(frame.Data, frame.Number, offsetBytes + {0}, true)", Decorator.ByteOffset + 8);
-      });
-    }
-
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
 
@@ -26,26 +16,18 @@ namespace Bolt.Compiler {
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => {
-        get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.Name);
+        get.Expr("return _Root.{0}", Decorator.Definition.Name);
       }, set => {
-        set.Expr(" (new {0}(Frames.first, 0, 0)).{1} = value", decorator.RootStruct.Name, Decorator.Definition.Name);
+        set.Expr("_Root.{0} = value", Decorator.Definition.Name);
       });
-
-      if (Generator.AllowStatePropertySetters) {
-        type.DeclareMethod(typeof(void).FullName, Decorator.Definition.Name + "Trigger", method => {
-          method.Statements.Expr("_Modifier.frame = Frames.first");
-          method.Statements.Expr("_Modifier.frame.Changed = true");
-          method.Statements.Expr("_Modifier.{0}()", Decorator.SetMethodName);
-        });
-      }
     }
 
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
       // callback property
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => {
-        get.Expr("return (System.Action) frame.Objects[offsetObjects + {0}]", Decorator.ObjectOffset);
+        get.Expr("return state.Objects[this.OffsetObjects + {0}].Action", Decorator.OffsetObjects);
       }, set => {
-        set.Expr("frame.Objects[offsetObjects + {0}] = value", Decorator.ObjectOffset);
+        set.Expr("state.Objects[this.OffsetObjects + {0}].Action = value", Decorator.OffsetObjects);
       });
     }
   }

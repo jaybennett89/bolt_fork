@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bolt.compiler", "bolt.compiler\bolt.compiler.csproj", "{1B45BCEF-50BC-4277-B917-DEFB550C15FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{3E014118-F7C3-49CB-9089-DED2E032366A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{1B45BCEF-50BC-4277-B917-DEFB550C15FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B45BCEF-50BC-4277-B917-DEFB550C15FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B45BCEF-50BC-4277-B917-DEFB550C15FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E014118-F7C3-49CB-9089-DED2E032366A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E014118-F7C3-49CB-9089-DED2E032366A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E014118-F7C3-49CB-9089-DED2E032366A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E014118-F7C3-49CB-9089-DED2E032366A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

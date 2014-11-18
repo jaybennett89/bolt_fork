@@ -41,28 +41,28 @@ namespace Bolt.Compiler {
         ctor.Statements.Expr("_meta.ResultByteSize = {0}", Decorator.ResultByteSize);
         ctor.Statements.Expr("_meta.ResultSerializers = new Bolt.PropertySerializer[{0}]", Decorator.ResultProperties.Count);
 
-        for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
-          PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.InputProperties[i]);
-          CodeExpression expression = "_meta.InputSerializers[{0}]".Expr(i);
+        //for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
+        //  PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.InputProperties[i]);
+        //  CodeExpression expression = "_meta.InputSerializers[{0}]".Expr(i);
 
-          // create new serializer
-          ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
+        //  // create new serializer
+        //  ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
 
-          // amit add settings calls
-          emitter.EmitAddSettings(expression, ctor.Statements, null);
-        }
+        //  // amit add settings calls
+        //  emitter.EmitAddSettings(expression, ctor.Statements);
+        //}
 
-        for (int i = 0; i < Decorator.ResultProperties.Count; ++i) {
+        //for (int i = 0; i < Decorator.ResultProperties.Count; ++i) {
 
-          PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.ResultProperties[i]);
-          CodeExpression expression = "_meta.ResultSerializers[{0}]".Expr(i);
+        //  PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.ResultProperties[i]);
+        //  CodeExpression expression = "_meta.ResultSerializers[{0}]".Expr(i);
 
-          // create new serializer
-          ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
+        //  // create new serializer
+        //  ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
 
-          // amit add settings calls
-          emitter.EmitAddSettings(expression, ctor.Statements, null);
-        }
+        //  // amit add settings calls
+        //  emitter.EmitAddSettings(expression, ctor.Statements);
+        //}
       });
 
       type.DeclareConstructor(ctor => {

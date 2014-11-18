@@ -39,6 +39,11 @@ namespace Bolt {
       set { Object = value; }
     }
 
+    public System.Action Action {
+      get { return (System.Action)Object; }
+      set { Object = value; }
+    }
+
     //public Bolt.INetworkTransform INetworkTransform {
     //  get { return (Bolt.INetworkTransform)Object; }
     //  set { Object = value; }

@@ -6,8 +6,20 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
+
+    // OLD
     public int ByteOffset;
     public int ObjectOffset;
+
+    public abstract int ByteSize {
+      get;
+    }
+
+    // NEW
+
+    public int OffsetStorage;
+    public int OffsetObjects;
+    public int OffsetSerializers;
 
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
@@ -29,12 +41,16 @@ namespace Bolt.Compiler {
       get;
     }
 
-    public abstract int ByteSize {
-      get;
+    public virtual int RequiredObjects {
+      get { return 0; }
     }
 
-    public virtual int ObjectSize {
-      get { return 0; }
+    public virtual int RequiredStorage {
+      get { return 1; }
+    }
+
+    public virtual int RequiredSerializers {
+      get { return 1; }
     }
 
     public abstract PropertyCodeEmitter CreateEmitter();

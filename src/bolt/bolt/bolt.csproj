@@ -93,7 +93,12 @@
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\Indices.cs" />
+    <Compile Include="state\NetworkArray.cs" />
+    <Compile Include="state\NetworkFrame.cs" />
+    <Compile Include="state\NetworkObject.cs" />
     <Compile Include="state\Priority.cs" />
+    <Compile Include="state\PropertyCallback.cs" />
+    <Compile Include="state\SerializerGroup.cs" />
     <Compile Include="state\Serializers\PropertySerializer.cs" />
     <Compile Include="state\Serializers\PropertySerializerBool.cs" />
     <Compile Include="state\Serializers\PropertySerializerColor.cs" />
@@ -117,6 +122,7 @@
     <Compile Include="state\Settings\State.cs" />
     <Compile Include="state\Settings\Compression\Transform.cs" />
     <Compile Include="state\Settings\Compression\Vector.cs" />
+    <Compile Include="state\StateMetaData.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

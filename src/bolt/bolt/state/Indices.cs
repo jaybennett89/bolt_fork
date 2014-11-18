@@ -4,30 +4,26 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  /// <summary>
-  /// Contains the indices for all arrays that contain a specific property, in order
-  /// </summary>
   public struct ArrayIndices {
-    readonly int[] indices;
+    readonly bool hasValue;
+    readonly int index;
 
-    internal ArrayIndices(int[] indices) {
-      this.indices = indices;
+    internal ArrayIndices(int index) {
+      this.index = index;
+      this.hasValue = true;
     }
 
-    /// <summary>
-    /// The amount of indices
-    /// </summary>
     public int Length {
-      get { return (indices == null) ? 0 : indices.Length; }
+      get { return hasValue ? index : -1; }
     }
 
     public int this[int index] {
       get {
-        if (index < 0 || index >= Length) {
+        if (index < 0 || index > 0 || !hasValue) {
           throw new IndexOutOfRangeException();
         }
 
-        return this.indices[index];
+        return index;
       }
     }
   }

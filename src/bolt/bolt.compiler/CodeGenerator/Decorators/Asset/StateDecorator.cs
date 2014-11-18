@@ -27,6 +27,10 @@ namespace Bolt.Compiler {
       get { return Name + "_Factory"; }
     }
 
+    public override string PropertyMode {
+      get { return "State"; }
+    }
+
     public StateDecorator Parent {
       get { return Generator.FindState(Definition.ParentGuid); }
     }

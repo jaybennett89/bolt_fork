@@ -242,46 +242,19 @@ namespace Bolt.Compiler {
     }
 
     void EmitCodeObjectModel() {
-      foreach (StateDecorator s in States) {
-        StateCodeEmitter emitter;
-        emitter = new StateCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitInterface();
-      }
-
       foreach (StructDecorator s in Structs) {
         StructCodeEmitter emitter;
         emitter = new StructCodeEmitter();
         emitter.Decorator = s;
         emitter.EmitStruct();
-        emitter.EmitArray();
-      }
-
-      foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
-        emitter = new StructCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitModifierInterface();
-      }
-
-      foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
-        emitter = new StructCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitModifier();
       }
 
       foreach (StateDecorator s in States) {
         StateCodeEmitter emitter;
         emitter = new StateCodeEmitter();
         emitter.Decorator = s;
+        emitter.EmitInterface();
         emitter.EmitImplementationClass();
-      }
-
-      foreach (StateDecorator s in States) {
-        StateCodeEmitter emitter;
-        emitter = new StateCodeEmitter();
-        emitter.Decorator = s;
         emitter.EmitFactoryClass();
       }
 
@@ -291,7 +264,6 @@ namespace Bolt.Compiler {
         emitter.Decorator = d;
         emitter.EmitTypes();
       }
-
 
       foreach (CommandDecorator d in Commands) {
         CommandCodeEmitter emitter;
@@ -495,7 +467,7 @@ namespace Bolt.Compiler {
 
           // increment byte offset
           decorator.ByteSize += decorator.Properties[n].ByteSize;
-          decorator.ObjectSize += decorator.Properties[n].ObjectSize;
+          decorator.ObjectSize += decorator.Properties[n].RequiredObjects;
         }
 
         decorator.FrameSizeCalculated = true;
@@ -512,7 +484,7 @@ namespace Bolt.Compiler {
           state.AllProperties[i] = state.AllProperties[i].Combine(offsetBytes, offsetObjects);
 
           offsetBytes += state.AllProperties[i].Decorator.ByteSize;
-          offsetObjects += state.AllProperties[i].Decorator.ObjectSize;
+          offsetObjects += state.AllProperties[i].Decorator.RequiredObjects;
         }
       }
     }

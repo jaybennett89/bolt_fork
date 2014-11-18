@@ -9,12 +9,12 @@ using System.Text;
 /// </summary>
 [Documentation]
 public struct IntegerArray {
-  internal Bolt.State.Frame frame;
+  internal Bolt.State.NetworkFrame frame;
   internal int offsetObjects;
   internal int offsetBytes;
   internal int length;
 
-  internal IntegerArray(Bolt.State.Frame frame, int offsetBytes, int offsetObjects, int length) {
+  internal IntegerArray(Bolt.State.NetworkFrame frame, int offsetBytes, int offsetObjects, int length) {
     this.frame = frame;
     this.offsetBytes = offsetBytes;
     this.offsetObjects = offsetObjects;

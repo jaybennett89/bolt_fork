@@ -41,6 +41,15 @@ namespace Bolt.Compiler {
       Comment(member, true, "</summary>");
     }
 
+    public static void DeclareModifyObsolete(this CodeTypeMember member) {
+      member.DeclareObsolete("Modify and the using(var modify = ...) syntax is deprecated. Change properties directly instead.");
+    }
+
+    public static void DeclareObsolete(this CodeTypeMember member, string message) {
+      CodeAttributeArgument argument = new CodeAttributeArgument(new CodeSnippetExpression('"' + message + '"'));
+      member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Obsolete", argument));
+    }
+
     public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, string returnType, string methodName, Action<CodeMemberMethod> body) {
       CodeMemberMethod method;
 

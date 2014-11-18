@@ -63,10 +63,10 @@ internal partial class EntityProxy : BoltObject {
     }
   }
 
-  public NetworkId NetworkId;
+  public Bolt.NetworkId NetworkId;
   public Bolt.State State;
   public Bolt.Filter Filter;
-  public Bolt.BitArray Mask;
+  public Bolt.BitSet Changed;
   public Bolt.ProxyFlags Flags;
   public Bolt.Priority[] PropertyPriority;
 

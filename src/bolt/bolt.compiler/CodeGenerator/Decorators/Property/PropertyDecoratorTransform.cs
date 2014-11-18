@@ -11,6 +11,10 @@ namespace Bolt.Compiler {
       }
     }
 
+    public override int RequiredStorage {
+      get { return 4; }
+    }
+
     public override bool OnRenderCallback {
       get { return true; }
     }
@@ -23,7 +27,7 @@ namespace Bolt.Compiler {
       get { return true; }
     }
 
-    public override int ObjectSize {
+    public override int RequiredObjects {
       get { return 1; }
     }
 

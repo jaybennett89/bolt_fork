@@ -6,26 +6,12 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterArray : PropertyCodeEmitter<PropertyDecoratorArray> {
-    void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return new {0}(frame, offsetBytes + {1}, offsetObjects + {2}, {3})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset, Decorator.PropertyType.ElementCount);
+        get.Expr("return ({0}) (State.Objects[this.OffsetObjects + {1}])", Decorator.ClrType, Decorator.OffsetObjects);
       };
 
-      Action<CodeStatementCollection> setter = set => {
-        set.Expr("if (value.length != {0}) throw new ArgumentOutOfRangeException()", Decorator.PropertyType.ElementCount);
-        set.Expr("Array.Copy(value.frame.Data, value.offsetBytes, this.frame.Data, this.offsetBytes + {0}, {1})", Decorator.ByteOffset, Decorator.ByteSize);
-        set.Expr("Array.Copy(value.frame.Objects, value.offsetObjects, this.frame.Objects, this.offsetObjects + {0}, {1})", Decorator.ObjectOffset, Decorator.ObjectSize);
-      };
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
-    }
-
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, false);
-    }
-
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, null);
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
@@ -34,6 +20,25 @@ namespace Bolt.Compiler {
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       EmitSimpleIntefaceMember(type, true, false);
+    }
+
+    public override void EmitPropertySetup(DomBlock block, string group, string path) {
+      var tmp = block.TempVar();
+
+      block.Stmts.Expr("path.Push(\"{0}[]\")", Decorator.Definition.Name);
+
+      block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
+        PropertyTypeStruct sp = Decorator.PropertyType.ElementType as PropertyTypeStruct;
+
+        if (sp != null) {
+          body.Expr("{0}.PropertySetup({1}, {2})", Generator.FindStruct(sp.StructGuid).Name, group, path);
+        }
+        else {
+          PropertyCodeEmitter.Create(Decorator.ElementDecorator).EmitPropertySetup(new DomBlock(body, tmp + "_"), group, path);
+        }
+      });
+
+      block.Stmts.Expr("path.Pop()", Decorator.Definition.Name);
     }
   }
 }

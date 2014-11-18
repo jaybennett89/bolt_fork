@@ -10,12 +10,12 @@ using System.Threading;
 /// </summary>
 [Documentation]
 public struct EntityArray {
-  internal Bolt.State.Frame frame;
+  internal Bolt.State.NetworkFrame frame;
   internal int offsetObjects;
   internal int offsetBytes;
   internal int length;
 
-  internal EntityArray(Bolt.State.Frame frame, int offsetBytes, int offsetObjects, int length) {
+  internal EntityArray(Bolt.State.NetworkFrame frame, int offsetBytes, int offsetObjects, int length) {
     this.frame = frame;
     this.offsetBytes = offsetBytes;
     this.offsetObjects = offsetObjects;

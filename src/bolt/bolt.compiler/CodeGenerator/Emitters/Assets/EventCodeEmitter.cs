@@ -69,10 +69,10 @@ namespace Bolt.Compiler {
           CodeExpression expression = "_meta.PropertySerializers[{0}]".Expr(i);
 
           // create new 
-          ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
+          //ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
 
           // amit add settings calls
-          emitter.EmitAddSettings(expression, ctor.Statements, null);
+          emitter.EmitAddSettings(expression, ctor.Statements);
         }
       });
 

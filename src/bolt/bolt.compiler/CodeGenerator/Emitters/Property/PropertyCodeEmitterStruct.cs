@@ -8,23 +8,18 @@ namespace Bolt.Compiler {
   public class PropertyCodeEmitterStruct : PropertyCodeEmitter<PropertyDecoratorStruct> {
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return new {0}(frame, offsetBytes + {1}, offsetObjects + {2})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset);
+        get.Expr("return ({0})(State.Objects[this.OffsetObjects + {1}])", Decorator.ClrType, Decorator.ObjectOffset);
       };
 
-      Action<CodeStatementCollection> setter = set => {
-        set.Expr("Array.Copy(value.frame.Data, value.offsetBytes, this.frame.Data, this.offsetBytes + {0}, {1})", Decorator.ByteOffset, Decorator.ByteSize);
-        set.Expr("Array.Copy(value.frame.Objects, value.offsetObjects, this.frame.Objects, this.offsetObjects + {0}, {1})", Decorator.ObjectOffset, Decorator.ObjectSize);
-      };
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, null);
     }
 
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, false);
     }
 
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
+    public override void EmitPropertySetup(DomBlock block, string group, string path) {
+      block.Stmts.Expr("{0}.PropertySetup({1}, {2})", Decorator.Struct.Name, group, path);
     }
   }
 }

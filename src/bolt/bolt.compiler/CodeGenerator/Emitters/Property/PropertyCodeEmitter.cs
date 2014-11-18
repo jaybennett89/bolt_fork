@@ -12,12 +12,12 @@ namespace Bolt.Compiler {
       get { return Decorator.Generator; }
     }
 
-    public virtual string SerializerClassName {
-      get { return "Bolt.PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
+    public virtual string StorageField {
+      get { return GetType().Name.Replace("PropertyCodeEmitter", ""); }
     }
 
-    public CodeExpression GetCreateSerializerExpression() {
-      return "new {0}()".Expr(SerializerClassName);
+    public virtual string SerializerClassName {
+      get { return "Bolt.PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
     public virtual void AddSettingsArgument(List<string> settings) {
@@ -25,56 +25,51 @@ namespace Bolt.Compiler {
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, Generator.AllowStatePropertySetters);
+      EmitSimpleIntefaceMember(type, true, true);
     }
 
     public virtual void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       EmitForwardStateMember(decorator, type, true);
     }
 
-    public virtual void EmitStructMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
-    }
+    public virtual void EmitObjectMembers(CodeTypeDeclaration type) {
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+        get.Expr("return CurrentFrame.Storage[this.OffsetStorage + {0}].{1}", Decorator.OffsetStorage, StorageField);
+      }, set => {
+        set.Expr("CurrentFrame.Storage[this.OffsetStorage + {0}].{1} = value", Decorator.OffsetStorage, StorageField);
 
-    public virtual void EmitModifierMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
-    }
-
-    public virtual void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, true);
+        if (Decorator.DefiningAsset.IsStateOrStruct) {
+          set.Expr("CurrentFrame.PropertyChanged(this.OffsetSerializers + {0})", Decorator.OffsetSerializers);
+        }
+      });
     }
 
     public virtual void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
-      throw new NotImplementedException();
     }
 
     public virtual void EmitEventMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
     }
 
-    public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, StateProperty sp) {
+    public virtual void EmitPropertySetup(DomBlock block, string group, string path) {
+      string tmp = block.TempVar();
+      block.Stmts.Expr("{0} {1}", SerializerClassName, tmp);
+      block.Stmts.Expr("{1} = new {0}()", SerializerClassName, tmp);
+
+      EmitAddSettings(tmp.Expr(), block.Stmts);
+
+      block.Stmts.Expr("{0}.AddSerializer({1}, {2}, {3}, {4}, {5})", group, tmp, this.Decorator.RequiredStorage, this.Decorator.RequiredObjects, this.Decorator.RequiredSerializers, path);
+    }
+
+    public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements) {
       List<string> settings = new List<string>();
 
-      // property settings 
-      if ((Decorator.DefiningAsset is StateDecorator) || (Decorator.DefiningAsset is StructDecorator)) {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.State)", sp.OffsetBytes, Decorator.Definition.Name));
-        settings.Add(string.Format("new Bolt.PropertyStateSettings({0}, {1}, {2}, \"{3}\", {4}, {5})",
-          Decorator.Definition.Priority,
-          Decorator.ByteSize,
-          sp.OffsetObjects,
-          sp.PropertyPath,
-          sp.CallbackPathsExpression(),
-          sp.CallbackIndicesExpression()
-        ));
-      }
-      else {
-        settings.Add(string.Format(
-          "new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.{2})", 
-          Decorator.ByteOffset, 
-          Decorator.Definition.Name,
-          Decorator.DefiningAsset is EventDecorator ? "Event" : "Command"
-        ));
-      }
+      // serializer settings
+      settings.Add(string.Format(
+        "new Bolt.PropertySerializerSettings(\"{0}\", {1}, Bolt.PropertyModes.{2})",
+        Decorator.Definition.Name,
+        Decorator.Definition.Priority,
+        Decorator.DefiningAsset.PropertyMode
+      ));
 
       // command settings
       if (Decorator.DefiningAsset is CommandDecorator) {
@@ -96,8 +91,9 @@ namespace Bolt.Compiler {
       // collecting property specific settings
       AddSettingsArgument(settings);
 
+      // emit add settings calls
       for (int n = 0; n < settings.Count; ++n) {
-        statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));
+        statements.Add(new CodeMethodInvokeExpression(expr, "AddSettings", new CodeSnippetExpression(settings[n])));
       }
     }
 
@@ -116,15 +112,14 @@ namespace Bolt.Compiler {
     protected void EmitForwardStateMember(StateDecorator decorator, CodeTypeDeclaration type, bool allowSetter) {
       Action<CodeStatementCollection> setter = null;
 
-      if (Generator.AllowStatePropertySetters && allowSetter) {
+      if (allowSetter) {
         setter = set => {
-          set.Expr("_Modifier.frame = Frames.first");
-          set.Expr("_Modifier.{0} = value", Decorator.Definition.Name);
+          set.Expr("_Root.{0} = value", Decorator.Definition.Name);
         };
       }
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
-        get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.Name);
+        get.Expr("return _Root.{0}", Decorator.Definition.Name);
       }, setter);
     }
 
@@ -144,57 +139,9 @@ namespace Bolt.Compiler {
 
       return emitter;
     }
-
   }
 
   public abstract class PropertyCodeEmitter<T> : PropertyCodeEmitter where T : PropertyDecorator {
     public new T Decorator { get { return (T)base.Decorator; } }
-  }
-
-
-  public abstract class PropertyCodeEmitterSimple<T> : PropertyCodeEmitter<T> where T : PropertyDecorator {
-    public abstract string ReadMethod {
-      get;
-    }
-
-    public abstract string PackMethod {
-      get;
-    }
-
-    string Get(object data, object offset) {
-      return string.Format("return Bolt.Blit.{2}({0}, {1})", data, offset, ReadMethod);
-    }
-
-    string Set(object data, object offset) {
-      if ((Decorator.DefiningAsset is StructDecorator) || (Decorator.DefiningAsset is StateDecorator)) {
-        return string.Format("frame.Changed = true; Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
-      }
-      else {
-        return string.Format("Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
-      }
-    }
-
-    void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
-      var offset = "offsetBytes + " + Decorator.ByteOffset;
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("frame.Data", offset), emitSetter ? Set("frame.Data", offset) : null);
-    }
-
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, false);
-    }
-
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
-    }
-
-    public override void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
-      CodeMemberProperty property;
-      property = type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get(bytes, Decorator.ByteOffset), Set(bytes, Decorator.ByteOffset));
-      property.PrivateImplementationType = new CodeTypeReference(implType);
-    }
-
-    public override void EmitEventMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", Decorator.ByteOffset), Set("Data", Decorator.ByteOffset));
-    }
   }
 }

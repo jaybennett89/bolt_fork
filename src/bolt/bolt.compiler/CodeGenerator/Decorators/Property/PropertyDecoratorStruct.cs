@@ -19,7 +19,7 @@ namespace Bolt.Compiler {
       }
     }
 
-    public override int ObjectSize {
+    public override int RequiredObjects {
       get {
         // make sure we actually calculated the property size for this struct
         Assert.True(Struct.FrameSizeCalculated);

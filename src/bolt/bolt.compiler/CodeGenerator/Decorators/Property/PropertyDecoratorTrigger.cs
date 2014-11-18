@@ -13,7 +13,7 @@ namespace Bolt.Compiler {
       get { return 16; }
     }
 
-    public override int ObjectSize {
+    public override int RequiredObjects {
       get { return 1; }
     }
 

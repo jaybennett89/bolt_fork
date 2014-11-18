@@ -15,6 +15,10 @@ namespace Bolt.Compiler {
       get { return Definition.Name + "Factory"; }
     }
 
+    public override string PropertyMode {
+      get { return "Command"; }
+    }
+
     public string InterfaceName {
       get { return "I" + Definition.Name; }
     }

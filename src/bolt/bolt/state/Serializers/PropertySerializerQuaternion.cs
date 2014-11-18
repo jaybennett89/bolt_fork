@@ -16,7 +16,7 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      var q = Blit.ReadQuaternion(state.Frames.first.Data, Settings.ByteOffset).eulerAngles;
+      var q = Blit.ReadQuaternion(state.Frames.first.Data, SettingsOld.ByteOffset).eulerAngles;
       return string.Format("X:{0} Y:{1} Z:{2}", q.x.ToString("F3"), q.y.ToString("F3"), q.z.ToString("F3"));
     }
 
@@ -26,33 +26,33 @@ namespace Bolt {
 
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
-            f.Data.PackQuaternion(Settings.ByteOffset, Bolt.Math.InterpolateQuaternion(state.Frames, Settings.ByteOffset + 16, state.Entity.Frame));
+            f.Data.PackQuaternion(SettingsOld.ByteOffset, Bolt.Math.InterpolateQuaternion(state.Frames, SettingsOld.ByteOffset + 16, state.Entity.Frame));
             break;
 
           case SmoothingAlgorithms.Extrapolation:
-            f.Data.PackQuaternion(Settings.ByteOffset, Bolt.Math.ExtrapolateQuaternion(state.Frames, Settings.ByteOffset + 16, state.Entity.Frame, SmoothingSettings, f.Data.ReadQuaternion(Settings.ByteOffset)));
+            f.Data.PackQuaternion(SettingsOld.ByteOffset, Bolt.Math.ExtrapolateQuaternion(state.Frames, SettingsOld.ByteOffset + 16, state.Entity.Frame, SmoothingSettings, f.Data.ReadQuaternion(SettingsOld.ByteOffset)));
             break;
         }
       }
     }
 
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, State.NetworkFrame frame) {
       return QuaternionCompression.BitsRequired;
     }
 
     protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      QuaternionCompression.Pack(stream, Blit.ReadQuaternion(data, Settings.ByteOffset));
+      QuaternionCompression.Pack(stream, Blit.ReadQuaternion(data, SettingsOld.ByteOffset));
       return true;
     }
 
     protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Blit.PackQuaternion(data, Settings.ByteOffset, QuaternionCompression.Read(stream));
+      Blit.PackQuaternion(data, SettingsOld.ByteOffset, QuaternionCompression.Read(stream));
     }
 
     public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-      var v0 = from.ReadQuaternion(Settings.ByteOffset);
-      var v1 = to.ReadQuaternion(Settings.ByteOffset);
-      into.PackQuaternion(Settings.ByteOffset, UE.Quaternion.Lerp(v0, v1, t));
+      var v0 = from.ReadQuaternion(SettingsOld.ByteOffset);
+      var v1 = to.ReadQuaternion(SettingsOld.ByteOffset);
+      into.PackQuaternion(SettingsOld.ByteOffset, UE.Quaternion.Lerp(v0, v1, t));
     }
   }
 }
