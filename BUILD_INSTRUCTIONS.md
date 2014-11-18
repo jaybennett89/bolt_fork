@@ -19,7 +19,7 @@ Delete the asset store version if installed.
   * If you downloaded the zip extract the contents to a working directory
     * https://github.com/BoltEngine/bolt/archive/master.zip
 3. In the Bolt Source directory Hold SHIFT then right click, select Open command window here
-4. Change to the 'src\bolt'
+4. Change to the 'src\bolt' directory
   * cd .\src\bolt
 5. Obtain the source for Bolt UDPKit
   * Clone the Bolt UDPKit
@@ -27,7 +27,7 @@ Delete the asset store version if installed.
   * If you downloaded the zip after extract the contents rename the folder to udpkit
     * https://github.com/BoltEngine/bolt_udpkit/archive/master.zip
 6. Change to the root of the Bolt source.
-  * cd ..\..\
+  * cd ..\\..\\
 7. Run Build.bat -ev project C:\path\to\your\unity\project
 8. Open your Unity project click Edit -> Bolt -> Install Bolt
 9. Restart Unity
