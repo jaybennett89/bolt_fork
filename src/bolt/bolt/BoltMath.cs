@@ -31,32 +31,37 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Vector3 InterpolateVector(BoltDoubleList<NetworkFrame> frames, int offset, int frame, float snapLimit, ref bool snapped) {
-      var f0 = frames.first;
-      var p0 = f0.Storage[offset].Vector3;
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<NetworkStorage> frames, int offset, int frame, float snapLimit) {
+      bool snapped = false;
+      return InterpolateVector(frames, offset, frame, snapLimit, ref snapped);
+    }
 
-      if ((frames.count == 1) || (f0.Number >= frame)) {
+    internal static UE.Vector3 InterpolateVector(BoltDoubleList<NetworkStorage> frames, int offset, int frame, float snapLimit, ref bool snapped) {
+      var f0 = frames.first;
+      var p0 = f0.Values[offset].Vector3;
+
+      if ((frames.count == 1) || (f0.Frame >= frame)) {
         return p0;
       }
       else {
         var f1 = frames.Next(f0);
-        var p1 = f1.Storage[offset].Vector3;
+        var p1 = f1.Values[offset].Vector3;
 
-        Assert.True(f1.Number > f0.Number);
-        Assert.True(f1.Number > frame);
+        Assert.True(f1.Frame > f0.Frame);
+        Assert.True(f1.Frame > frame);
 
         if ((p0 - p1).sqrMagnitude > (snapLimit * snapLimit)) {
           snapped = true;
           return p1;
         }
         else {
-          int f0Frame = f0.Number;
+          int f0Frame = f0.Frame;
 
-          if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
-            f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+          if (f0Frame < (f1.Frame - BoltCore.remoteSendRate * 2)) {
+            f0Frame = f1.Frame - BoltCore.remoteSendRate * 2;
           }
 
-          float t = f1.Number - f0Frame;
+          float t = f1.Frame - f0Frame;
           float d = frame - f0Frame;
 
           return UE.Vector3.Lerp(p0, p1, d / t);
@@ -64,39 +69,39 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<NetworkFrame> frames, int offset, int frame) {
+    internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<NetworkStorage> frames, int offset, int frame) {
       var f0 = frames.first;
-      var p0 = f0.Storage[offset].Quaternion;
+      var p0 = f0.Values[offset].Quaternion;
       if (p0 == default(UE.Quaternion)) {
         p0 = UE.Quaternion.identity;
       }
 
-      if ((frames.count == 1) || (f0.Number >= frame)) {
+      if ((frames.count == 1) || (f0.Frame >= frame)) {
         return p0;
       }
       else {
         var f1 = frames.Next(f0);
-        var p1 = f1.Storage[offset].Quaternion;
+        var p1 = f1.Values[offset].Quaternion;
         if (p1 == default(UE.Quaternion)) {
           p1 = UE.Quaternion.identity;
         }
 
-        Assert.True(f1.Number > f0.Number);
-        Assert.True(f1.Number > frame);
+        Assert.True(f1.Frame > f0.Frame);
+        Assert.True(f1.Frame > frame);
 
-        int f0Frame = f0.Number;
-        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
-          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        int f0Frame = f0.Frame;
+        if (f0Frame < (f1.Frame - BoltCore.remoteSendRate * 2)) {
+          f0Frame = f1.Frame - BoltCore.remoteSendRate * 2;
         }
 
-        float t = f1.Number - f0Frame;
+        float t = f1.Frame - f0Frame;
         float d = frame - f0Frame;
 
         return UE.Quaternion.Lerp(p0, p1, d / t);
       }
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<NetworkFrame> frames, int offset, int frame, PropertySmoothingSettings settings, ref bool snapped) {
+    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<NetworkStorage> frames, int offset, int frame, PropertySmoothingSettings settings, ref bool snapped) {
       throw new NotImplementedException();
       //var f = frames.first;
       //var tolerance = settings.ExtrapolationErrorTolerance;
@@ -123,7 +128,7 @@ namespace Bolt {
       //}
     }
 
-    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<NetworkFrame> frames, int offset, int frame, PropertySmoothingSettings settings) {
+    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<NetworkStorage> frames, int offset, int frame, PropertySmoothingSettings settings) {
       throw new NotImplementedException();
 
       //var r0 = rotation;

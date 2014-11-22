@@ -3,23 +3,43 @@ using System.Collections.Generic;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTransform : PropertyCodeEmitter<PropertyDecoratorTransform> {
-    public override void AddSettingsArgument(List<string> settings) {
-      var position = Generator.CreateVectorCompressionExpression(Decorator.PropertyType.PositionCompression, Decorator.PropertyType.PositionSelection);
-      var rotation = Generator.CreateRotationCompressionExpression(Decorator.PropertyType.RotationCompression, Decorator.PropertyType.RotationCompressionQuaternion, Decorator.PropertyType.RotationSelection);
-      settings.Add(string.Format("Bolt.PropertyTransformCompressionSettings.Create({0}, {1})", position, rotation));
-      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
+    public override string StorageField {
+      get { return "Transform"; }
+    }
+
+    public override void AddSettings(CodeExpression expr, CodeStatementCollection stmts) {
+      var pt = Decorator.PropertyType;
+
+      EmitVectorSettings(expr, stmts, pt.PositionCompression, pt.PositionSelection);
+      EmitQuaternionSettings(expr, stmts, pt.RotationCompression, pt.RotationCompressionQuaternion, pt.RotationSelection);
+
+      switch (Decorator.Definition.StateAssetSettings.SmoothingAlgorithm) {
+        case SmoothingAlgorithms.Interpolation:
+          EmitInterpolationSettings(expr, stmts);
+          break;
+
+        case SmoothingAlgorithms.Extrapolation:
+          EmitExtrapolationSettings(expr, stmts);
+          break;
+      }
     }
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
+      EmitSimpleIntefaceMember(type, true, false);
+    }
 
-      });
+    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
+      EmitForwardStateMember(decorator, type, false);
     }
 
     public override void EmitObjectMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
-        get.Expr("return (Bolt.TransformData) CurrentFrame.Objects[this.OffsetObjects + {0}]", Decorator.ObjectOffset);
+      type.DeclareProperty("Bolt.NetworkTransform", Decorator.Definition.Name, get => {
+        EmitVerifySerializer(get, "");
+        get.Expr("return Storage.Values[this.OffsetStorage + {0}].Transform", Decorator.OffsetStorage);
       });
+    }
+
+    void EmitExtrapolationSettings(CodeExpression expr, CodeStatementCollection stmts) {
     }
   }
 }

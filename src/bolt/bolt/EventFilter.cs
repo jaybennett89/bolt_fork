@@ -1,10 +1,10 @@
 ﻿namespace Bolt {
   public interface IEventFilter {
-    bool EventReceived(Event ev);
+    bool EventReceived(NetworkEvent ev);
   }
 
   public class DefaultEventFilter : IEventFilter {
-    bool IEventFilter.EventReceived(Event ev) {
+    bool IEventFilter.EventReceived(NetworkEvent ev) {
       return true;
     }
   }

@@ -187,7 +187,6 @@ public static class BoltNetwork {
   /// <returns>The entity if one was found, otherwise null</returns>
   public static BoltEntity FindEntity(Bolt.NetworkId id) {
     if (id.Packed == 0) {
-      BoltLog.Error("You can't look up entities a zero network id");
       return null;
     }
 

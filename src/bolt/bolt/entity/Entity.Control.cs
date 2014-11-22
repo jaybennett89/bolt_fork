@@ -148,19 +148,19 @@ namespace Bolt {
       if (_canQueueCommands) {
         // owner
         if (IsOwner) {
-          cmd.Frame = BoltCore.serverFrame;
+          cmd.ServerFrame = BoltCore.serverFrame;
           cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
         }
 
         // controller
         else if (CommandQueue.count < BoltCore._config.commandQueueSize) {
-          cmd.Frame = BoltCore.serverFrame;
+          cmd.ServerFrame = BoltCore.serverFrame;
           cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
         }
 
         // not allowed
         else {
-          BoltLog.Error("Command queue for {0} is full", this);
+          BoltLog.Error("RootCommand queue for {0} is full", this);
           return false;
         }
 

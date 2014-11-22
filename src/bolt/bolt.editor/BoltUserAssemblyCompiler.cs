@@ -173,6 +173,10 @@ class BoltUserAssemblyCompiler {
       args += "-define:UNITY_NOT_PRO ";
     }
 
+    if (BoltCore.isDebugMode) {
+      args += "-define:DEBUG ";
+    }
+
     Process p = new Process();
     p.StartInfo.FileName = monoPath;
     p.StartInfo.Arguments = string.Format(args + sourceFileList, csharpCompilerPath, boltUserAssemblyPath, assemblyReferencesList, Mathf.Clamp(BoltRuntimeSettings.instance.compilationWarnLevel, 0, 4));

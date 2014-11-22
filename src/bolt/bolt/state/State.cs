@@ -11,7 +11,7 @@ namespace Bolt {
   /// Base interface for all states
   /// </summary>
   [Documentation]
-  public interface IState {
+  public interface IState : IDisposable {
     UE.Animator Animator {
       get;
     }
@@ -64,7 +64,7 @@ namespace Bolt {
 
     internal readonly int PropertyIdBits;
     internal readonly int PacketMaxPropertiesBits;
-    internal readonly object[] Objects;
+    internal readonly StateObjectGroup Objects;
 
     internal readonly BoltDoubleList<NetworkFrame> Frames = new BoltDoubleList<NetworkFrame>();
     internal readonly Dictionary<string, List<PropertyCallback>> Callbacks = new Dictionary<string, List<PropertyCallback>>();
@@ -84,10 +84,14 @@ namespace Bolt {
     }
 
     protected State(StateMetaData meta) {
+      if (meta.FramePool == null) {
+        meta.FramePool = new NetworkFramePool(meta.SerializerGroup.StorageCount);
+      }
+
       MetaData = meta;
       MetaData.PacketMaxProperties = System.Math.Max(System.Math.Min(MetaData.PacketMaxProperties, 255), 1);
 
-      Objects = new object[MetaData.SerializerGroup.ObjectsCount];
+      Objects = new StateObjectGroup(this);
       TempPriority = new Priority[MetaData.SerializerGroup.Serializers.Count];
 
       PropertyIdBits = Bolt.Math.BitsRequired(MetaData.SerializerGroup.Serializers.Count);
@@ -96,10 +100,14 @@ namespace Bolt {
       SetupObjects();
 
 #if DEBUG
-      for (int i = 0; i < Objects.Length; ++i) {
+      for (int i = 0; i < Objects.ObjectsCount; ++i) {
         Assert.NotNull(Objects[i]);
       }
 #endif
+
+      Assert.True(Objects.ObjectsCount == MetaData.SerializerGroup.ObjectsCount, "Objects.ObjectsCount == MetaData.SerializerGroup.ObjectsCount");
+      Assert.True(Objects.StorageCount == MetaData.SerializerGroup.StorageCount, "Objects.StorageCount == MetaData.SerializerGroup.StorageCount");
+      Assert.True(Objects.SerializerCount == MetaData.SerializerGroup.Serializers.Count, "Objects.SerializerCount == MetaData.SerializerGroup.Serializers.Count");
     }
 
     UE.Animator IState.Animator {
@@ -108,12 +116,16 @@ namespace Bolt {
 
     protected abstract void SetupObjects();
 
+    public void VerifySerializer(Type type, string name, int serializer, int storage, int objects) {
+      MetaData.SerializerGroup.Serializers[serializer].Verify(type, name, serializer, storage, objects);
+    }
+
     public void DebugInfo() {
       if (BoltNetworkInternal.DebugDrawer != null) {
         BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
         BoltNetworkInternal.DebugDrawer.LabelField("Animator", Animator ? Animator.gameObject.name : "NOT ASSIGNED");
         BoltNetworkInternal.DebugDrawer.LabelField("State Type", Factory.GetFactory(TypeId).TypeObject);
-        BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count.ToString());
+        BoltNetworkInternal.DebugDrawer.LabelField("ServerFrame Buffer Size", Frames.count.ToString());
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
         for (int i = 0; i < MetaData.SerializerGroup.Serializers.Count; ++i) {
@@ -165,7 +177,7 @@ namespace Bolt {
     }
 
     bool VerifyCallbackPath(string path) {
-      if (MetaData.SerializerGroup.SerializerPaths.Contains(path)) {
+      if (MetaData.SerializerGroup.Paths.Contains(path)) {
         return true;
       }
 
@@ -256,7 +268,6 @@ namespace Bolt {
     }
 
     public void OnSimulateBefore() {
-
       if (Entity.IsOwner || Entity.HasPredictedControl) {
         Frames.first.Number = BoltCore.frame;
       }
@@ -469,10 +480,10 @@ namespace Bolt {
 
     public BitSet GetFilter(BoltConnection connection, EntityProxy proxy) {
       if (Entity.IsController(connection)) {
-        return MetaData.ControllerFilter;
+        return MetaData.Filters[31];
       }
 
-      return BitSet.Full;
+      return MetaData.Filters[30];
     }
 
     public void SetDynamic(string property, object value) {
@@ -482,6 +493,10 @@ namespace Bolt {
           break;
         }
       }
+    }
+
+    void IDisposable.Dispose() {
+
     }
   }
 }

@@ -14,6 +14,14 @@ namespace Bolt {
       get { return stmts; }
     }
 
+    public void Add(CodeExpression expression) {
+      Stmts.Add(expression);
+    }
+
+    public void Add(CodeStatement statement) {
+      Stmts.Add(statement);
+    }
+
     public DomBlock(CodeStatementCollection stmts, string prefix) {
       this.stmts = stmts;
       this.prefix = prefix;

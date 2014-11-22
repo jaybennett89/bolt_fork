@@ -6,6 +6,11 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTrigger : PropertyCodeEmitter<PropertyDecoratorTrigger> {
+    public override string StorageField
+    {
+      get { return "Action"; }
+    }
+
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
 
@@ -20,14 +25,20 @@ namespace Bolt.Compiler {
       }, set => {
         set.Expr("_Root.{0} = value", Decorator.Definition.Name);
       });
+
+      type.DeclareMethod(typeof(void).FullName, Decorator.TriggerMethod, method => {
+        method.Statements.Expr("_Root.{0}();", Decorator.TriggerMethod);
+      });
     }
 
     public override void EmitObjectMembers(CodeTypeDeclaration type) {
-      // callback property
-      type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => {
-        get.Expr("return state.Objects[this.OffsetObjects + {0}].Action", Decorator.OffsetObjects);
-      }, set => {
-        set.Expr("state.Objects[this.OffsetObjects + {0}].Action = value", Decorator.OffsetObjects);
+      EmitSimplePropertyMembers(type, new CodeSnippetExpression("Storage"), null, false);
+
+      type.DeclareMethod(typeof(void).FullName, Decorator.TriggerMethod, method => {
+        method.Statements.Expr("Storage.Values[this.OffsetStorage + {0}].TriggerLocal.Update(BoltCore.frame, true)", Decorator.OffsetStorage);
+
+        // flag this property as changed
+        EmitPropertyChanged(method.Statements, new CodeSnippetExpression("Storage"));
       });
     }
   }

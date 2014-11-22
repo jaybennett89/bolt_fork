@@ -48,7 +48,7 @@ namespace Bolt {
     /// <param name="connection">The connection we are calculating priority for</param>
     /// <param name="evnt">The event we are calculating priority for</param>
     /// <returns>The priority of the event</returns>
-    float CalculateEventPriority(BoltConnection connection, Event evnt);
+    float CalculateEventPriority(BoltConnection connection, NetworkEvent evnt);
 
     bool Always { get; }
   }

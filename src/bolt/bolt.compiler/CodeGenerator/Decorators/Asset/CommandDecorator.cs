@@ -5,30 +5,13 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class CommandDecorator : AssetDecorator<CommandDefinition> {
-    public int InputByteSize;
-    public int ResultByteSize;
-
-    public List<PropertyDecorator> InputProperties = new List<PropertyDecorator>();
-    public List<PropertyDecorator> ResultProperties = new List<PropertyDecorator>();
-
-    public string FactoryName {
-      get { return Definition.Name + "Factory"; }
+    public override string FactoryInterface {
+      get { return "Bolt.ICommandFactory"; }
     }
 
-    public override string PropertyMode {
-      get { return "Command"; }
-    }
-
-    public string InterfaceName {
-      get { return "I" + Definition.Name; }
-    }
-
-    public string InputInterfaceName {
-      get { return InterfaceName + "Input"; }
-    }
-
-    public string ResultInterfaceName {
-      get { return InterfaceName + "Result"; }
+    public override List<PropertyDecorator> Properties {
+      get;
+      set;
     }
   }
 }

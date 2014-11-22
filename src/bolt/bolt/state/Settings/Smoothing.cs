@@ -4,6 +4,19 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
+  internal struct PropertyInterpolationSettings {
+    public bool Enabled;
+    public float SnapMagnitude;
+  }
+
+  internal struct PropertyExtrapolationSettings {
+    public bool Enabled;
+    public int MaxFrames;
+    public int CorrectionFrames;
+    public float ErrorTolerance;
+    public ExtrapolationVelocityModes VelocityMode;
+  }
+
   internal struct PropertySmoothingSettings {
     public SmoothingAlgorithms Algorithm;
     public float SnapMagnitude;
@@ -11,6 +24,7 @@ namespace Bolt {
     public int ExtrapolationCorrectionFrames;
     public float ExtrapolationErrorTolerance;
     public ExtrapolationVelocityModes ExtrapolationVelocityMode;
+    public bool SmoothCommandCorrections;
 
     public static PropertySmoothingSettings CreateInterpolation(float snapMagnitude) {
       return new PropertySmoothingSettings {

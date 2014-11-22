@@ -9,10 +9,6 @@ namespace Bolt.Compiler {
       get { return typeof(int).FullName; }
     }
 
-    public override int ByteSize {
-      get { return 4; }
-    }
-
     public override bool OnSimulateAfterCallback {
       get {
         if (Definition.StateAssetSettings != null) {

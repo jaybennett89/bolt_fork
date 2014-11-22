@@ -37,13 +37,13 @@ namespace Bolt.Compiler {
       type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
       type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
 
-      type.DeclareProperty("Bolt.UniqueId", "TypeUniqueId", get => {
+      type.DeclareProperty("Bolt.UniqueId", "TypeKey", get => {
         get.Expr("return new Bolt.UniqueId({0})", Decorator.Definition.Guid.ToByteArray().Join(", "));
       });
 
       type.DeclareMethod(typeof(object).FullName, "Create", method => method.Statements.Expr("return new {0}()", Decorator.Name));
       type.DeclareMethod(typeof(void).FullName, "Dispatch", method => {
-        method.DeclareParameter("Bolt.Event", "ev");
+        method.DeclareParameter("Bolt.NetworkEvent", "ev");
         method.DeclareParameter(typeof(object).FullName, "target");
         method.Statements.Expr("if (target is {0}) (({0})target).OnEvent(({1})ev)", Decorator.ListenerName, Decorator.Name);
       });
@@ -56,29 +56,18 @@ namespace Bolt.Compiler {
 
       type = Generator.DeclareClass(Decorator.Definition.Name);
       type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
-      type.BaseTypes.Add("Bolt.Event");
+      type.BaseTypes.Add("Bolt.NetworkEvent");
 
-      type.DeclareField("Bolt.EventMetaData", "_meta").Attributes = MemberAttributes.Static;
+      type.DeclareField("Bolt.EventMetaData", "_Meta").Attributes = MemberAttributes.Static;
       type.DeclareConstructorStatic(ctor => {
-        ctor.Statements.Expr("_meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
-        ctor.Statements.Expr("_meta.ByteSize = {0}", Decorator.ByteSize);
-        ctor.Statements.Expr("_meta.PropertySerializers = new Bolt.PropertySerializer[{0}]", Decorator.Properties.Count);
-
-        for (int i = 0; i < Decorator.Properties.Count; ++i) {
-          PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.Properties[i]);
-          CodeExpression expression = "_meta.PropertySerializers[{0}]".Expr(i);
-
-          // create new 
-          //ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
-
-          // amit add settings calls
-          emitter.EmitAddSettings(expression, ctor.Statements);
-        }
+        ctor.Statements.Expr("_Meta = new Bolt.EventMetaData()");
+        ctor.Statements.Expr("_Meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
+        ctor.Statements.Expr("PropertySetup(_Meta.SerializerGroup, new Stack<string>())");
       });
 
       type.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
-        ctor.BaseConstructorArgs.Add("_meta".Expr());
+        ctor.BaseConstructorArgs.Add("_Meta".Expr());
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
@@ -154,25 +143,25 @@ namespace Bolt.Compiler {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltConnection", "connection");
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, Bolt.ReliabilityModes.ReliableOrdered)");
+        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_SPECIFIC_CONNECTION, connection, Bolt.ReliabilityModes.ReliableOrdered)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltConnection", "connection");
         method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, reliability)");
+        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_SPECIFIC_CONNECTION, connection, reliability)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, Bolt.ReliabilityModes.ReliableOrdered)");
+        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_EVERYONE, null, Bolt.ReliabilityModes.ReliableOrdered)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
-        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, reliability)");
+        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_EVERYONE, null, reliability)");
       });
 
       for (int i = 0; i < Decorator.Properties.Count; ++i) {

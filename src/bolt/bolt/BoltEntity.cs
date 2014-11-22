@@ -261,12 +261,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// Queue a command not his entity for execution. This is called on a client which is 
-  /// controlling a proxied entity the command will also be sent to the server.
+  /// Queue a Data not his entity for execution. This is called on a client which is 
+  /// controlling a proxied entity the Data will also be sent to the server.
   /// </summary>
-  /// <param name="command">The command to queue</param>
-  public bool QueueInput(Bolt.ICommandInput command) {
-    return Entity.QueueInput((Bolt.Command)(object)command);
+  /// <param name="data">The Data to queue</param>
+  public bool QueueInput(Bolt.NetworkCommand_Data data) {
+    return Entity.QueueInput(data.RootCommand);
   }
 
   /// <summary>

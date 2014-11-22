@@ -5,19 +5,13 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class EventDecorator : AssetDecorator<EventDefinition> {
-    public int ByteSize;
-    public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
-
-    public override string PropertyMode {
-      get { return "Event"; }
+    public override string FactoryInterface {
+      get { return "Bolt.IEventFactory"; }
     }
 
-    public string FactoryName {
-      get { return Definition.Name + "Factory"; }
-    }
-
-    public string ListenerName {
-      get { return "I" + Definition.Name + "Listener"; }
+    public override List<PropertyDecorator> Properties {
+      get;
+      set;
     }
   }
 }

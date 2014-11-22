@@ -20,11 +20,11 @@ namespace Bolt {
 
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
-            f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.InterpolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.Frame);
+            //f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.InterpolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.ServerFrame);
             break;
 
           case SmoothingAlgorithms.Extrapolation:
-            f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.ExtrapolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.Frame, SmoothingSettings);
+            //f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.ExtrapolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.ServerFrame, SmoothingSettings);
             break;
         }
       }

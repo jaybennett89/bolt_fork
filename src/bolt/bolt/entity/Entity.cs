@@ -544,7 +544,7 @@ namespace Bolt {
       return skipped;
     }
 
-    float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, Event evnt) {
+    float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, NetworkEvent evnt) {
       if (HasControl) {
         return 3;
       }

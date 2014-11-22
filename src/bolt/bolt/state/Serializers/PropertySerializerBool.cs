@@ -11,24 +11,24 @@ namespace Bolt {
     }
 
     public override object GetDebugValue(State state) {
-      return state.CurrentFrame.Storage[Settings.OffsetStorage].Boolean;
+      return state.CurrentFrame.Storage[Settings.OffsetStorage].Bool;
     }
 
     protected override void PullMecanimValue(State state) {
-      state.CurrentFrame.Storage[Settings.OffsetStorage].Boolean = state.Animator.GetBool(Settings.PropertyName);
+      state.CurrentFrame.Storage[Settings.OffsetStorage].Bool = state.Animator.GetBool(Settings.PropertyName);
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetBool(Settings.PropertyName, state.CurrentFrame.Storage[Settings.OffsetStorage].Boolean);
+      state.Animator.SetBool(Settings.PropertyName, state.CurrentFrame.Storage[Settings.OffsetStorage].Bool);
     }
 
     protected override bool Pack(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
-      stream.WriteBool(storage[Settings.OffsetStorage].Boolean);
+      stream.WriteBool(storage[Settings.OffsetStorage].Bool);
       return true;
     }
 
     protected override void Read(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
-      storage[Settings.OffsetStorage].Boolean = stream.ReadBool();
+      storage[Settings.OffsetStorage].Bool = stream.ReadBool();
     }
 
     public override void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) {

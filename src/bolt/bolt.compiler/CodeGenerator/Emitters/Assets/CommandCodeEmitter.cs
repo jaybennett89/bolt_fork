@@ -18,6 +18,10 @@ namespace Bolt.Compiler {
       EmitFactoryClass();
     }
 
+    void EmitPropertySetup(CodeTypeDeclaration type, string suffix, List<PropertyDecorator> properties) {
+
+    }
+
     void EmitClass() {
       CodeTypeDeclaration type;
 
@@ -30,44 +34,21 @@ namespace Bolt.Compiler {
       type.DeclareProperty(Decorator.InputInterfaceName, "Input", get => get.Expr("return ({0})this", Decorator.InputInterfaceName));
       type.DeclareProperty(Decorator.ResultInterfaceName, "Result", get => get.Expr("return ({0})this", Decorator.ResultInterfaceName));
 
-      type.DeclareField("Bolt.CommandMetaData", "_meta").Attributes = MemberAttributes.Static;
+      type.DeclareField("Bolt.CommandMetaData", "_Meta").Attributes = MemberAttributes.Static;
       type.DeclareConstructorStatic(ctor => {
-        ctor.Statements.Expr("_meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
-        ctor.Statements.Expr("_meta.SmoothFrames = {0}", Decorator.Definition.SmoothFrames);
-
-        ctor.Statements.Expr("_meta.InputByteSize = {0}", Decorator.InputByteSize);
-        ctor.Statements.Expr("_meta.InputSerializers = new Bolt.PropertySerializer[{0}]", Decorator.InputProperties.Count);
-
-        ctor.Statements.Expr("_meta.ResultByteSize = {0}", Decorator.ResultByteSize);
-        ctor.Statements.Expr("_meta.ResultSerializers = new Bolt.PropertySerializer[{0}]", Decorator.ResultProperties.Count);
-
-        //for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
-        //  PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.InputProperties[i]);
-        //  CodeExpression expression = "_meta.InputSerializers[{0}]".Expr(i);
-
-        //  // create new serializer
-        //  ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
-
-        //  // amit add settings calls
-        //  emitter.EmitAddSettings(expression, ctor.Statements);
-        //}
-
-        //for (int i = 0; i < Decorator.ResultProperties.Count; ++i) {
-
-        //  PropertyCodeEmitter emitter = PropertyCodeEmitter.Create(Decorator.ResultProperties[i]);
-        //  CodeExpression expression = "_meta.ResultSerializers[{0}]".Expr(i);
-
-        //  // create new serializer
-        //  ctor.Statements.Assign(expression, emitter.GetCreateSerializerExpression());
-
-        //  // amit add settings calls
-        //  emitter.EmitAddSettings(expression, ctor.Statements);
-        //}
+        ctor.Statements.Expr("_Meta = new Bolt.CommandMetaData()");
+        ctor.Statements.Expr("_Meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
+        ctor.Statements.Expr("_Meta.SmoothFrames = {0}", Decorator.Definition.SmoothFrames);
+        ctor.Statements.Expr("PropertySetup_Input(_Meta.InputSerializers, new Stack<string>())");
+        ctor.Statements.Expr("PropertySetup_Result(_Meta.ResultSerializers, new Stack<string>())");
       });
+
+      EmitPropertySetup(type, "Input", Decorator.InputProperties);
+      EmitPropertySetup(type, "Result", Decorator.ResultProperties);
 
       type.DeclareConstructor(ctor => {
         ctor.Attributes = MemberAttributes.Assembly;
-        ctor.BaseConstructorArgs.Add("_meta".Expr());
+        ctor.BaseConstructorArgs.Add("_Meta".Expr());
       });
 
       type.DeclareMethod(Decorator.InputInterfaceName, "Create", method => {
@@ -88,11 +69,11 @@ namespace Bolt.Compiler {
       }).PrivateImplementationType = new CodeTypeReference("Bolt.ICommandResult");
 
       for (int i = 0; i < Decorator.InputProperties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.InputProperties[i]).EmitCommandMembers(type, "InputData", Decorator.InputInterfaceName);
+        PropertyCodeEmitter.Create(Decorator.InputProperties[i]).EmitCommandMembers(type, new CodeSnippetExpression("this.InputData"), new CodeTypeReference(Decorator.InputInterfaceName), "_Input");
       }
 
       for (int i = 0; i < Decorator.ResultProperties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.ResultProperties[i]).EmitCommandMembers(type, "ResultData", Decorator.ResultInterfaceName);
+        PropertyCodeEmitter.Create(Decorator.ResultProperties[i]).EmitCommandMembers(type, new CodeSnippetExpression("this.ResultData"), new CodeTypeReference(Decorator.ResultInterfaceName), "_Result");
       }
     }
 
@@ -123,7 +104,7 @@ namespace Bolt.Compiler {
       type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
       type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
 
-      type.DeclareProperty("Bolt.UniqueId", "TypeUniqueId", get => {
+      type.DeclareProperty("Bolt.UniqueId", "TypeKey", get => {
         get.Expr("return new Bolt.UniqueId({0})", Decorator.Definition.Guid.ToByteArray().Join(", "));
       });
 

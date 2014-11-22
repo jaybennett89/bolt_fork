@@ -1,40 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class AssetDecorator {
     public uint TypeId;
+
+    public int CountStorage;
+    public int CountObjects;
+    public int CountProperties;
+
     public CodeGenerator Generator;
     public AssetDefinition Definition;
 
-    public bool IsStateOrStruct {
-      get { return (Definition is StructDefinition) || (Definition is StateDefinition); }
+    public virtual Guid Guid {
+      get { return Definition.Guid; }
     }
 
-    public abstract Guid Guid {
-      get;
+    public virtual string Name {
+      get { return Definition.Name; }
     }
 
-    public abstract string PropertyMode {
-      get;
+    public virtual string NameMeta {
+      get { return Definition.Name; }
     }
+
+    public virtual string BaseClass {
+      get { return "Bolt.NetworkObj"; }
+    }
+
+    public virtual string BaseClassMeta {
+      get { return BaseClass + "_Meta"; }
+    }
+
+    public virtual bool EmitInterface {
+      get { return false; }
+    }
+
+    public virtual bool EmitPropertyChanged {
+      get { return true; }
+    }
+
+    public abstract string FactoryInterface { get; }
+    public abstract List<PropertyDecorator> Properties { get; set; }
   }
 
   public abstract class AssetDecorator<T> : AssetDecorator where T : AssetDefinition {
     public new T Definition {
       get { return (T)base.Definition; }
       set { base.Definition = value; }
-    }
-
-    public sealed override Guid Guid {
-      get { return Definition.Guid; }
-    }
-
-    public string Name {
-      get { return Path.GetFileNameWithoutExtension(Definition.Name); }
     }
   }
 }

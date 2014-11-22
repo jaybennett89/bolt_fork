@@ -24,7 +24,7 @@ public class BoltEntityEditor : Editor {
 
     serializerIds =
       serializerFactories
-        .Select(x => x.TypeUniqueId)
+        .Select(x => x.TypeKey)
         .ToArray();
   }
 

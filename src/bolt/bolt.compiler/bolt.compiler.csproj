@@ -42,11 +42,11 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state\Auxiliary\Enums.cs">
-      <Link>Auxiliary\Enums.cs</Link>
+    <Compile Include="..\bolt\state\BitSet.cs">
+      <Link>Auxiliary\BitSet.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state\BitArray.cs">
-      <Link>BitArray.cs</Link>
+    <Compile Include="..\bolt\state\Enums.cs">
+      <Link>Auxiliary\Enums.cs</Link>
     </Compile>
     <Compile Include="Assert.cs" />
     <Compile Include="AssetFolder.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\StateDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\AssetDecorator.cs" />
-    <Compile Include="CodeGenerator\Decorators\Asset\StructDecorator.cs" />
+    <Compile Include="CodeGenerator\Decorators\Asset\ObjectDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorArray.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorBool.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorColor.cs" />
@@ -73,12 +73,8 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorVector.cs" />
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\DomBlock.cs" />
-    <Compile Include="CodeGenerator\Emitters\Assets\CommandCodeEmitter.cs" />
-    <Compile Include="CodeGenerator\Emitters\Assets\EventCodeEmitter.cs" />
-    <Compile Include="CodeGenerator\Emitters\Assets\StructCodeEmitter.cs" />
-    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
-    <Compile Include="CodeGenerator\Emitters\Assets\StateCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\AssetCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterArray.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterBool.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterColor.cs" />

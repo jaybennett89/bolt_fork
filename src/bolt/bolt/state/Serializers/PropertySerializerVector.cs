@@ -22,7 +22,7 @@ namespace Bolt {
           case SmoothingAlgorithms.Extrapolation:
             var snap = false;
             var snapMagnitude = SmoothingSettings.SnapMagnitude == 0f ? 1 << 16 : SmoothingSettings.SnapMagnitude;
-            f.Storage[Settings.OffsetStorage].Vector3 = Bolt.Math.InterpolateVector(state.Frames, Settings.OffsetStorage + 1, state.Entity.Frame, snapMagnitude, ref snap);
+            //f.Storage[Settings.OffsetStorage].Vector3 = Bolt.Math.InterpolateVector(state.Frames, Settings.OffsetStorage + 1, state.Entity.ServerFrame, snapMagnitude, ref snap);
             break;
         }
       }
@@ -51,7 +51,7 @@ namespace Bolt {
       var v1 = to[Settings.OffsetStorage].Vector3;
       var m = (v1 - v0).sqrMagnitude;
 
-      if ((CommandSettings.SmoothCorrections == false) || (m > (CommandSettings.SnapMagnitude * CommandSettings.SnapMagnitude))) {
+      if ((CommandSettings.SmoothCorrections == false) || (m > (SmoothingSettings.SnapMagnitude * SmoothingSettings.SnapMagnitude))) {
         into[Settings.OffsetStorage].Vector3 = v1;
       }
       else {

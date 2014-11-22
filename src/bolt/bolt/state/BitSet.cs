@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+#if BOLT_COMPILER_DLL
+namespace Bolt.Compiler {
+#else
 namespace Bolt {
+#endif
+
   public struct BitSetIterator {
     int number;
     int numberBit;
@@ -76,6 +81,13 @@ namespace Bolt {
     internal ulong Bits1;
     internal ulong Bits2;
     internal ulong Bits3;
+
+    internal BitSet(ulong bits0, ulong bits1, ulong bits2, ulong bits3) {
+      Bits0 = bits0;
+      Bits1 = bits1;
+      Bits2 = bits2;
+      Bits3 = bits3;
+    }
 
     public bool IsZero {
       get {

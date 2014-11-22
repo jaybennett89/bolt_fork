@@ -59,6 +59,7 @@
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="EventFilter.cs" />
+    <Compile Include="event\NetworkEvent_Meta.cs" />
     <Compile Include="NetworkMask.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="entity\Entity.Control.cs" />
     <Compile Include="entity\Entity.cs" />
     <Compile Include="entity\EntityInterfaces.cs" />
-    <Compile Include="event\Event.cs" />
+    <Compile Include="event\NetworkEvent.cs" />
     <Compile Include="event\EventChannel.cs" />
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
@@ -83,21 +84,44 @@
     <Compile Include="internal\BoltCoreInternal.cs" />
     <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
-    <Compile Include="state\Arrays\EntityArray.cs" />
-    <Compile Include="state\Arrays\FloatArray.cs" />
-    <Compile Include="state\Arrays\IntegerArray.cs" />
-    <Compile Include="state\Arrays\TransformArray.cs" />
-    <Compile Include="state\Arrays\ValueArray.cs" />
-    <Compile Include="state\Auxiliary\Enums.cs" />
+    <Compile Include="state\Arrays\Entity.cs" />
+    <Compile Include="state\Arrays\Float.cs" />
+    <Compile Include="state\Arrays\Integer.cs" />
+    <Compile Include="state\Arrays\PrefabId.cs" />
+    <Compile Include="state\Arrays\Quaternion.cs" />
+    <Compile Include="state\Arrays\String.cs" />
+    <Compile Include="state\Arrays\Transform.cs" />
+    <Compile Include="state\NetworkArray_Values.cs" />
+    <Compile Include="state\Arrays\Vector.cs" />
+    <Compile Include="state\Enums.cs" />
     <Compile Include="state\BitSet.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\Indices.cs" />
-    <Compile Include="state\NetworkArray.cs" />
+    <Compile Include="state\NetworkArray_Objects.cs" />
+    <Compile Include="state\NetworkArray_Meta.cs" />
     <Compile Include="state\NetworkFrame.cs" />
     <Compile Include="state\NetworkObject.cs" />
+    <Compile Include="state\NetworkObj_Meta.cs" />
+    <Compile Include="state\NetworkPropertyInfo.cs" />
+    <Compile Include="state\NetworkState.cs" />
+    <Compile Include="state\NetworkObj.cs" />
+    <Compile Include="state\Properties\Color.cs" />
+    <Compile Include="state\Properties\Entity.cs" />
+    <Compile Include="state\Properties\Float.cs" />
+    <Compile Include="state\Properties\Integer.cs" />
+    <Compile Include="state\NetworkProperty.cs" />
+    <Compile Include="state\NetworkTransform.cs" />
     <Compile Include="state\NetworkTrigger.cs" />
     <Compile Include="state\Priority.cs" />
+    <Compile Include="state\Properties\Bool.cs" />
+    <Compile Include="state\Properties\NetworkId.cs" />
+    <Compile Include="state\Properties\PrefabId.cs" />
+    <Compile Include="state\Properties\Quaternion.cs" />
+    <Compile Include="state\Properties\String.cs" />
+    <Compile Include="state\Properties\Transform.cs" />
+    <Compile Include="state\Properties\Trigger.cs" />
+    <Compile Include="state\Properties\Vector.cs" />
     <Compile Include="state\PropertyCallback.cs" />
     <Compile Include="state\SerializerGroup.cs" />
     <Compile Include="state\Serializers\PropertySerializer.cs" />
@@ -123,6 +147,7 @@
     <Compile Include="state\Settings\Compression\Transform.cs" />
     <Compile Include="state\Settings\Compression\Vector.cs" />
     <Compile Include="state\StateMetaData.cs" />
+    <Compile Include="state\NetworkState_Meta.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -194,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />
+    <Compile Include="state\NetworkState.EntitySerializer.cs" />
     <None Include="t4\GlobalEventListenerBase.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>

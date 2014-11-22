@@ -1,19 +1,16 @@
-﻿using Bolt;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Bolt {
   interface IFactory {
     Type TypeObject { get; }
     TypeId TypeId { get; }
-    UniqueId TypeUniqueId { get; }
+    UniqueId TypeKey { get; }
     object Create();
   }
 
   interface IEventFactory : IFactory {
-    void Dispatch(Event ev, object target);
+    void Dispatch(NetworkEvent ev, object target);
   }
 
   interface ISerializerFactory : IFactory {
@@ -26,61 +23,63 @@ namespace Bolt {
     static Dictionary<byte, Type> _id2token = new Dictionary<byte, Type>();
     static Dictionary<Type, byte> _token2id = new Dictionary<Type, byte>();
 
-    static Dictionary<UniqueId, IFactory> _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>();
-    static Dictionary<TypeId, IFactory> _factoriesByTypeId = new Dictionary<TypeId, IFactory>();
+    static Dictionary<Type, IFactory> _factoriesByType = new Dictionary<Type, IFactory>();
+    static Dictionary<TypeId, IFactory> _factoriesById = new Dictionary<TypeId, IFactory>();
+    static Dictionary<UniqueId, IFactory> _factoriesByKey = new Dictionary<UniqueId, IFactory>();
 
     internal static bool IsEmpty {
-      get { return _factoriesByTypeId.Count == 0; }
+      get { return _factoriesById.Count == 0; }
     }
 
-    internal static void Register(Bolt.IFactory factory) {
-      _factoriesByUniqueId.Add(factory.TypeUniqueId, factory);
-      _factoriesByTypeId.Add(factory.TypeId, factory);
+    internal static void Register(IFactory factory) {
+      _factoriesById.Add(factory.TypeId, factory);
+      _factoriesByKey.Add(factory.TypeKey, factory);
+      _factoriesByType.Add(factory.TypeObject, factory);
     }
 
-    internal static Bolt.IFactory GetFactory(TypeId id) {
+    internal static IFactory GetFactory(TypeId id) {
 #if DEBUG
-      if (!_factoriesByTypeId.ContainsKey(id)) {
+      if (!_factoriesById.ContainsKey(id)) {
         BoltLog.Error("Unknown factory {0}", id);
         return null;
       }
 #endif
 
-      return _factoriesByTypeId[id];
+      return _factoriesById[id];
     }
 
-    internal static Bolt.IFactory GetFactory(UniqueId id) {
+    internal static IFactory GetFactory(UniqueId id) {
 #if DEBUG
-      if (!_factoriesByUniqueId.ContainsKey(id)) {
+      if (!_factoriesByKey.ContainsKey(id)) {
         BoltLog.Error("Unknown factory {0}", id);
         return null;
       }
 #endif
 
-      return _factoriesByUniqueId[id];
+      return _factoriesByKey[id];
     }
 
     internal static IEventFactory GetEventFactory(TypeId id) {
-      return (IEventFactory)_factoriesByTypeId[id];
+      return (IEventFactory)_factoriesById[id];
     }
 
     internal static IEventFactory GetEventFactory(UniqueId id) {
-      return (IEventFactory)_factoriesByUniqueId[id];
+      return (IEventFactory)_factoriesByKey[id];
     }
 
-    internal static Event NewEvent(TypeId id) {
-      Event ev;
+    internal static NetworkEvent NewEvent(TypeId id) {
+      NetworkEvent ev;
 
-      ev = (Event)Create(id);
+      ev = (NetworkEvent)Create(id);
       ev.IncrementRefs();
 
       return ev;
     }
 
-    internal static Event NewEvent(UniqueId id) {
-      Event ev;
+    internal static NetworkEvent NewEvent(UniqueId id) {
+      NetworkEvent ev;
 
-      ev = (Event)Create(id);
+      ev = (NetworkEvent)Create(id);
       ev.IncrementRefs();
 
       return ev;
@@ -114,7 +113,7 @@ namespace Bolt {
       return (Command)Create(id);
     }
 
-    internal static IEntitySerializer NewSerializer(Bolt.TypeId id) {
+    internal static IEntitySerializer NewSerializer(TypeId id) {
       return (IEntitySerializer)Create(id);
     }
 
@@ -124,36 +123,36 @@ namespace Bolt {
 
     static object Create(TypeId id) {
 #if DEBUG
-      if (_factoriesByTypeId.ContainsKey(id) == false) {
+      if (_factoriesById.ContainsKey(id) == false) {
         BoltLog.Error("Unknown {0}", id);
       }
 #endif
 
-      return _factoriesByTypeId[id].Create();
+      return _factoriesById[id].Create();
     }
 
     static object Create(UniqueId id) {
 #if DEBUG
-      if (_factoriesByUniqueId.ContainsKey(id) == false) {
+      if (_factoriesByKey.ContainsKey(id) == false) {
         BoltLog.Error("Unknown {0}", id);
       }
 #endif
 
-      return _factoriesByUniqueId[id].Create();
+      return _factoriesByKey[id].Create();
     }
 
     internal static void UnregisterAll() {
       _token2id.Clear();
       _id2token.Clear();
 
-      _factoriesByTypeId.Clear();
-      _factoriesByUniqueId.Clear();
+      _factoriesById.Clear();
+      _factoriesByKey.Clear();
 
       _token2id = new Dictionary<Type, byte>();
       _id2token = new Dictionary<byte, Type>();
 
-      _factoriesByTypeId = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
-      _factoriesByUniqueId = new Dictionary<UniqueId, IFactory>(128, UniqueId.EqualityComparer.Instance);
+      _factoriesById = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
+      _factoriesByKey = new Dictionary<UniqueId, IFactory>(128, UniqueId.EqualityComparer.Instance);
     }
 
     internal static void RegisterTokenClass(Type type) {

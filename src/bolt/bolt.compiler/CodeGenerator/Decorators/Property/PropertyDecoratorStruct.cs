@@ -5,40 +5,32 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyDecoratorStruct : PropertyDecorator<PropertyTypeStruct> {
-    public StructDecorator Struct {
+    public ObjectDecorator Object {
       get { return Generator.FindStruct(PropertyType.StructGuid); }
     }
 
-    public override int ByteSize {
-      get {
-        // make sure we actually calculated the byte size for this struct
-        Assert.True(Struct.FrameSizeCalculated);
-
-        // return value
-        return Struct.ByteSize;
-      }
+    public override int RequiredObjects {
+      get { return Object.CountObjects; }
     }
 
-    public override int RequiredObjects {
-      get {
-        // make sure we actually calculated the property size for this struct
-        Assert.True(Struct.FrameSizeCalculated);
+    public override int RequiredStorage {
+      get { return Object.CountStorage; }
+    }
 
-        // return value
-        return Struct.ObjectSize;
-      }
+    public override int RequiredProperties {
+      get { return Object.CountProperties; }
     }
 
     public override string ClrType {
-      get { return Struct.Name; }
+      get { return Object.Name; }
+    }
+
+    public override string PropertyClassName {
+      get { return null; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterStruct();
-    }
-
-    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
-      Struct.FindAllProperties(all, p.Combine(Definition.Filters, Definition.Controller).AddCallbackPath(Definition.Name));
     }
   }
 }

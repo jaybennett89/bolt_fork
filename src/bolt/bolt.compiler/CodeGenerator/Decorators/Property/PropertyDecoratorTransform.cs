@@ -5,14 +5,8 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyDecoratorTransform : PropertyDecorator<PropertyTypeTransform> {
-    public override int ByteSize {
-      get {
-        return 12 + 12 + 16;
-      }
-    }
-
     public override int RequiredStorage {
-      get { return 4; }
+      get { return 3; }
     }
 
     public override bool OnRenderCallback {
@@ -28,11 +22,11 @@ namespace Bolt.Compiler {
     }
 
     public override int RequiredObjects {
-      get { return 1; }
+      get { return 0; }
     }
 
     public override string ClrType {
-      get { return "UE.Transform"; }
+      get { return "Bolt.NetworkTransform"; }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {

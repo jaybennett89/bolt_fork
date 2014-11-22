@@ -47,7 +47,7 @@ namespace Bolt {
       var t_history = f.Storage[Settings.OffsetStorage].TriggerLocal.History;
 
       if (t_history != 0) {
-        var cb = (System.Action)state.Objects[Settings.OffsetObjects];
+        var cb = state.CurrentFrame.Storage[Settings.OffsetObjects].Action;
 
         for (int i = 31; i >= 0; --i) {
           if (t_frame - i > state.Entity.Frame) {
@@ -95,7 +95,7 @@ namespace Bolt {
       if ((state.Animator.GetBool(Settings.PropertyName) == true) && (state.Animator.IsInTransition(MecanimSettings.Layer) == false)) {
         f.Storage[Settings.OffsetStorage].TriggerSend.Update(BoltCore.frame, true);
 
-        var cb = (System.Action)state.Objects[Settings.OffsetObjects];
+        var cb = state.CurrentFrame.Storage[Settings.OffsetObjects].Action;
         if (cb != null) {
           cb();
         }

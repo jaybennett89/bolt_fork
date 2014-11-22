@@ -14,7 +14,7 @@ partial class BoltCompiler {
               dec = new CommandDecorator();
               dec.Definition = def;
 
-              file.EmitLine("Bolt.Factory.Register(new {0}());", dec.FactoryName);
+              file.EmitLine("Bolt.Factory.Register({0}.Instance);", dec.NameMeta);
             }
 
             // Events

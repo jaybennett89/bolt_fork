@@ -6,9 +6,13 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterFloat : PropertyCodeEmitter<PropertyDecoratorFloat> {
-    public override void AddSettingsArgument(List<string> settings) {
-      settings.Add(Generator.CreateFloatCompressionExpression(Decorator.PropertyType.Compression));
-      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
+    public override string StorageField {
+      get { return "Float0"; }
+    }
+
+    public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
+      EmitFloatSettings(expr, statements, Decorator.PropertyType.Compression);
+      EmitInterpolationSettings(expr, statements);
     }
   }
 }

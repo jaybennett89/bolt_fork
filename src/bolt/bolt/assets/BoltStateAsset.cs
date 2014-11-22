@@ -11,7 +11,7 @@ public class BoltStateAsset : BoltCompilableAsset {
   public string className { get { return name; } }
   public string serializerclassName { get { return className + "Serializer"; } }
   public string factoryName { get { return className + "Factory"; } }
-  public string frameclassName { get { return className + "Frame"; } }
+  public string frameclassName { get { return className + "ServerFrame"; } }
   public string interfaceName { get { return "I" + className; } }
 
   public IEnumerable<BoltAssetProperty> defaultProperties {

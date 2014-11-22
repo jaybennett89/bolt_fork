@@ -18,15 +18,15 @@ namespace Bolt {
 #if NATIVE_DIFF
     [SuppressUnmanagedCodeSecurity]
     [DllImport("BoltFastCompare", ExactSpelling = true)]
-    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
+    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* Data);
 
-    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] result) {
+    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] Data) {
       int count = 0;
 
       fixed (byte* aPtr = a) {
         fixed (byte* bPtr = b) {
           fixed (Block* blocksPtr = blocks) {
-            fixed (int* resultPtr = result) {
+            fixed (int* resultPtr = Data) {
               count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
             }
           }

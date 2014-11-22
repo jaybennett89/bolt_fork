@@ -8,7 +8,7 @@ namespace Bolt {
   [StructLayout(LayoutKind.Explicit)]
   internal struct NetworkValue {
     [FieldOffset(0)]
-    public System.Boolean Boolean;
+    public System.Boolean Bool;
 
     [FieldOffset(0)]
     public System.Int32 Int0;
@@ -54,6 +54,11 @@ namespace Bolt {
 
     public System.String String {
       get { return (System.String)Object; }
+      set { Object = value; }
+    }
+
+    public Bolt.NetworkTransform Transform {
+      get { return (Bolt.NetworkTransform)Object; }
       set { Object = value; }
     }
 

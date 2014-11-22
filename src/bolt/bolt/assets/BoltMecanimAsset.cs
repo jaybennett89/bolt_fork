@@ -6,7 +6,7 @@ public class BoltMecanimAsset : BoltCompilableAsset {
   public RuntimeAnimatorController controller = null;
   public BoltAssetProperty[] properties = new BoltAssetProperty[0];
   public string interfaceName { get { return "I" + name; } }
-  public string frameclassName { get { return name + "Frame"; } }
+  public string frameclassName { get { return name + "ServerFrame"; } }
 
   public IEnumerable<BoltAssetProperty> allProperties {
     get {

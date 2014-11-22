@@ -6,19 +6,11 @@ using System.Text;
 namespace Bolt.Compiler {
   public class PropertyDecoratorTrigger : PropertyDecorator {
     public override string ClrType {
-      get { throw new NotImplementedException(); }
+      get { return "System.Action"; }
     }
 
-    public override int ByteSize {
-      get { return 16; }
-    }
-
-    public override int RequiredObjects {
-      get { return 1; }
-    }
-
-    public string SetMethodName {
-      get { return Definition.Name; }
+    public string TriggerMethod {
+      get { return Definition.Name + "Trigger"; }
     }
 
     public override bool OnSimulateAfterCallback {
@@ -27,14 +19,6 @@ namespace Bolt.Compiler {
 
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterTrigger();
-    }
-
-    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
-      all.Add(
-        p
-          .Combine(Definition.Filters, Definition.Controller)
-          .Combine(all.Count, this)
-      );
     }
   }
 }

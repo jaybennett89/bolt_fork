@@ -21,8 +21,8 @@ namespace Bolt {
   class PropertySerializerString : PropertySerializerSimple {
     PropertyStringSettings StringSettings;
 
-    public void AddSettings(PropertyStringSettings stringSettings) {
-      StringSettings = stringSettings;
+    public void AddStringSettings(StringEncodings encoding) {
+      StringSettings.Encoding = encoding;
     }
 
     public override object GetDebugValue(State state) {

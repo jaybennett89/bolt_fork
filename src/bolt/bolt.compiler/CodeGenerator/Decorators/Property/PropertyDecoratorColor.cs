@@ -9,10 +9,6 @@ namespace Bolt.Compiler {
       get { return "UE.Color"; }
     }
 
-    public override int ByteSize {
-      get { return 16; }
-    }
-
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterColor();
     }

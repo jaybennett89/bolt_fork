@@ -6,20 +6,11 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
-
-    // OLD
-    public int ByteOffset;
-    public int ObjectOffset;
-
-    public abstract int ByteSize {
-      get;
-    }
-
     // NEW
 
     public int OffsetStorage;
     public int OffsetObjects;
-    public int OffsetSerializers;
+    public int OffsetProperties;
 
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
@@ -49,8 +40,12 @@ namespace Bolt.Compiler {
       get { return 1; }
     }
 
-    public virtual int RequiredSerializers {
+    public virtual int RequiredProperties {
       get { return 1; }
+    }
+
+    public virtual string PropertyClassName {
+      get { return "Bolt.NetworkProperty_" + GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
     public abstract PropertyCodeEmitter CreateEmitter();
@@ -68,18 +63,6 @@ namespace Bolt.Compiler {
       decorator.DefiningAsset = asset;
 
       return decorator;
-    }
-
-    public virtual void FindAllProperties(List<StateProperty> all, StateProperty p) {
-      if (Definition.IsArrayElement == false) {
-        p = p.AddCallbackPath(Definition.Name);
-      }
-
-      all.Add(
-        p
-          .Combine(Definition.Filters, Definition.Controller)
-          .Combine(all.Count, this)
-      );
     }
   }
 
