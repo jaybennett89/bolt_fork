@@ -9,9 +9,25 @@ namespace Bolt.Compiler {
       get { return "Bolt.IEventFactory"; }
     }
 
+    public override string BaseClass {
+      get { return "Bolt.NetworkEvent"; }
+    }
+
+    public override bool EmitPropertyChanged {
+      get { return false; }
+    }
+
     public override List<PropertyDecorator> Properties {
       get;
       set;
+    }
+
+    public string ListenerInterface {
+      get { return "I" + Name + "Listener"; }
+    }
+
+    public EventDecorator(EventDefinition def) {
+      Definition = def;
     }
   }
 }

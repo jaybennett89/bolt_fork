@@ -108,6 +108,8 @@ namespace Bolt {
         default:
           throw new IndexOutOfRangeException();
       }
+
+      Assert.False(IsZero);
     }
 
     public void Clear(int bit) {

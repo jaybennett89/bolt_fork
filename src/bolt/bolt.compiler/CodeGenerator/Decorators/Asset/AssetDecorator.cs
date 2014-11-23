@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Bolt.Compiler {
   public abstract class AssetDecorator {
@@ -21,7 +22,15 @@ namespace Bolt.Compiler {
     }
 
     public virtual string NameMeta {
-      get { return Definition.Name; }
+      get { return Definition.Name + "_Meta"; }
+    }
+
+    public virtual string BaseInterface {
+      get { throw new NotSupportedException(); }
+    }
+
+    public virtual IEnumerable<string> ParentInterfaces {
+      get { yield break; }
     }
 
     public virtual string BaseClass {
@@ -32,7 +41,15 @@ namespace Bolt.Compiler {
       get { return BaseClass + "_Meta"; }
     }
 
-    public virtual bool EmitInterface {
+    public virtual string NameInterface {
+      get { return "I" + Name; }
+    }
+
+    public virtual bool EmitLegacyModifyMethod {
+      get { return false; }
+    }
+
+    public virtual bool EmitAsInterface {
       get { return false; }
     }
 

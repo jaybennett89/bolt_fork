@@ -7,8 +7,7 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  internal class NetworkProperty_Vector : NetworkProperty
-  {
+  internal class NetworkProperty_Vector : NetworkProperty {
     PropertyVectorCompressionSettings Compression;
 
     public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
@@ -39,25 +38,20 @@ namespace Bolt {
       }
     }
 
-    public override void SmoothCommandCorrection(NetworkObj obj, NetworkStorage from, NetworkStorage to, NetworkStorage storage, float t)
-    {
-      if (Interpolation.Enabled)
-      {
+    public override void SmoothCommandCorrection(NetworkObj obj, NetworkStorage from, NetworkStorage to, NetworkStorage storage, float t) {
+      if (Interpolation.Enabled) {
         var v0 = from.Values[obj[this]].Vector3;
         var v1 = to.Values[obj[this]].Vector3;
         var m = (v1 - v0).sqrMagnitude;
 
-        if (m < (Interpolation.SnapMagnitude*Interpolation.SnapMagnitude))
-        {
+        if (m < (Interpolation.SnapMagnitude * Interpolation.SnapMagnitude)) {
           storage.Values[obj[this]].Vector3 = UE.Vector3.Lerp(v0, v1, t);
         }
-        else
-        {
+        else {
           storage.Values[obj[this]].Vector3 = v1;
         }
       }
-      else
-      {
+      else {
         storage.Values[obj[this]].Vector3 = to.Values[obj[this]].Vector3;
       }
     }

@@ -1,74 +1,15 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
+﻿using System.CodeDom;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace Bolt.Compiler {
-  class EventCodeEmitter : AssetCodeEmitter {
-    public new EventDecorator Decorator {
-      get { return (EventDecorator)base.Decorator; }
-      set { base.Decorator = value; }
-    }
-
-    public void EmitTypes() {
-      EmitClass();
-      EmitFactory();
+  class EventCodeEmitter : AssetCodeEmitter<EventDecorator> {
+    public override void Emit() {
+      base.Emit();
       EmitListenerInterface();
     }
 
-    void EmitListenerInterface() {
-      CodeTypeDeclaration type;
-
-      type = Generator.DeclareInterface(Decorator.ListenerName);
-      type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {
-        method.DeclareParameter(Decorator.Name, "evnt");
-      });
-    }
-
-    void EmitFactory() {
-      CodeTypeDeclaration type;
-
-      type = Generator.DeclareClass(Decorator.FactoryName);
-      type.TypeAttributes = TypeAttributes.NotPublic;
-      type.BaseTypes.Add("Bolt.IEventFactory");
-
-      type.DeclareProperty("System.Type", "TypeObject", get => get.Expr("return typeof({0})", Decorator.Name));
-      type.DeclareProperty("Bolt.TypeId", "TypeId", get => get.Expr("return new Bolt.TypeId({0})", Decorator.TypeId));
-
-      type.DeclareProperty("Bolt.UniqueId", "TypeKey", get => {
-        get.Expr("return new Bolt.UniqueId({0})", Decorator.Definition.Guid.ToByteArray().Join(", "));
-      });
-
-      type.DeclareMethod(typeof(object).FullName, "Create", method => method.Statements.Expr("return new {0}()", Decorator.Name));
-      type.DeclareMethod(typeof(void).FullName, "Dispatch", method => {
-        method.DeclareParameter("Bolt.NetworkEvent", "ev");
-        method.DeclareParameter(typeof(object).FullName, "target");
-        method.Statements.Expr("if (target is {0}) (({0})target).OnEvent(({1})ev)", Decorator.ListenerName, Decorator.Name);
-      });
-    }
-
-    void EmitClass() {
-
-
-      CodeTypeDeclaration type;
-
-      type = Generator.DeclareClass(Decorator.Definition.Name);
-      type.CommentSummary(cm => { cm.CommentDoc(Decorator.Definition.Comment ?? ""); });
-      type.BaseTypes.Add("Bolt.NetworkEvent");
-
-      type.DeclareField("Bolt.EventMetaData", "_Meta").Attributes = MemberAttributes.Static;
-      type.DeclareConstructorStatic(ctor => {
-        ctor.Statements.Expr("_Meta = new Bolt.EventMetaData()");
-        ctor.Statements.Expr("_Meta.TypeId = new Bolt.TypeId({0})", Decorator.TypeId);
-        ctor.Statements.Expr("PropertySetup(_Meta.SerializerGroup, new Stack<string>())");
-      });
-
-      type.DeclareConstructor(ctor => {
-        ctor.Attributes = MemberAttributes.Assembly;
-        ctor.BaseConstructorArgs.Add("_Meta".Expr());
-      });
+    protected override void EmitObjectMembers(CodeTypeDeclaration type) {
+      base.EmitObjectMembers(type);
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
@@ -163,10 +104,30 @@ namespace Bolt.Compiler {
         method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
         method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_EVERYONE, null, reliability)");
       });
+    }
 
-      for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitEventMembers(type);
-      }
+    void EmitListenerInterface() {
+      var type = Generator.DeclareInterface(Decorator.ListenerInterface);
+
+      type.DeclareMethod(typeof(void), "OnEvent", method => {
+        method.DeclareParameter(Decorator.Name, "ev");
+      });
+    }
+
+    protected override void EmitFactory() {
+      base.EmitFactory();
+
+      MetaType.DeclareMethod(typeof(void), "Dispatch", method => {
+        method.DeclareParameter("Bolt.NetworkEvent", "ev");
+        method.DeclareParameter(typeof(object).FullName, "target");
+
+        DomBlock block = new DomBlock(method.Statements);
+
+        var tmp = block.TempVar();
+
+        block.Stmts.Expr("{0} {1} = target as {0}", Decorator.ListenerInterface, tmp);
+        block.Stmts.Expr("if ({0} != null) {{ {0}.OnEvent(({1})ev); }}", tmp, Decorator.Name);
+      }).PrivateImplementationType = new CodeTypeReference(Decorator.FactoryInterface);
     }
   }
 }

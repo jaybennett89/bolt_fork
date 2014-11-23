@@ -11,7 +11,7 @@ namespace Bolt.Compiler {
         get.Expr("return ({0})(Objects[this.OffsetObjects + {1}])", Decorator.ClrType, Decorator.OffsetObjects);
       };
 
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, null);
+      type.DeclareProperty(Decorator.Object.EmitAsInterface ? Decorator.Object.NameInterface : Decorator.Object.Name, Decorator.Definition.Name, getter, null);
     }
 
     public override void EmitObjectMembers(CodeTypeDeclaration type) {

@@ -41,14 +41,14 @@ namespace Bolt.Compiler {
       var tmp = block.TempVar();
       var element = Decorator.ElementDecorator;
 
-      offsets.OffsetStorage = "{0} + ({1} * {2}) /*storage:{2}*/".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
-      offsets.OffsetProperties = "{0} + ({1} * {2}) /*properties:{2}*/".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
+      offsets.OffsetStorage = "{0} + ({1} * {2}) /*required-storage:{2}*/".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
+      offsets.OffsetProperties = "{0} + ({1} * {2}) /*required-properties:{2}*/".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
 
       if (element.RequiredObjects == 0) {
-        offsets.OffsetObjects = "0 /*objects:{0}*/".Expr(element.RequiredObjects);
+        offsets.OffsetObjects = "0 /*required-objects:{0}*/".Expr(element.RequiredObjects);
       }
       else {
-        offsets.OffsetObjects = "{0} + ({1} * {2}) /*objects:{2}*/".Expr(Decorator.OffsetObjects + 1, tmp, element.RequiredObjects);
+        offsets.OffsetObjects = "{0} + ({1} * {2}) /*required-objects:{2}*/".Expr(Decorator.OffsetObjects + 1, tmp, element.RequiredObjects);
       }
 
       block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {

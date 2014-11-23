@@ -34,6 +34,18 @@
 
       Properties[offsetProperties].Property = property;
       Properties[offsetProperties].OffsetObjects = offsetObjects;
+
+      for (int i = 0; i < 32; ++i) {
+        int f = 1 << i;
+
+        // this can't be set already or something is wrong
+        Assert.False(Filters[i].IsSet(offsetProperties));
+
+        // if property is included in this filter, flag it
+        if ((property.PropertyFilters & f) == f) {
+          Filters[i].Set(offsetProperties);
+        }
+      }
     }
 
     internal void CopyProperties(int offsetProperties, int offsetObjects, NetworkObj_Meta meta) {

@@ -251,10 +251,6 @@ public class BoltSettingsWindow : EditorWindow {
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
     });
 
-    BoltAssetEditorGUI.Label("Property Setters", () => {
-      settings.allowStatePropertySetters = BoltEditorGUI.ToggleDropdown("Directly on state property", "Only through 'Modify' call", settings.allowStatePropertySetters);
-    });
-
     BoltAssetEditorGUI.Label("Prefab Mode", () => {
       PrefabDatabase.Instance.ManualMode = BoltEditorGUI.ToggleDropdown("Manual", "Automatic", PrefabDatabase.Instance.ManualMode);
     });

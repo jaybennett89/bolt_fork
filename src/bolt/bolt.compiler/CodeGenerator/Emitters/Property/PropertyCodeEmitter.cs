@@ -62,24 +62,27 @@ namespace Bolt.Compiler {
 
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
+      var property = 
+        type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+          get.Add(
+            new CodeMethodReturnStatement(
+              new CodeFieldReferenceExpression(index, StorageField)
+            )
+          );
+        }, set => {
+          set.Add(new CodeAssignStatement(
+            new CodeFieldReferenceExpression(index, StorageField),
+            new CodeVariableReferenceExpression("value")
+          ));
 
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
-        get.Add(
-          new CodeMethodReturnStatement(
-            new CodeFieldReferenceExpression(index, StorageField)
-          )
-        );
-      }, set => {
-        set.Add(new CodeAssignStatement(
-          new CodeFieldReferenceExpression(index, StorageField),
-          new CodeVariableReferenceExpression("value")
-        ));
+          if (changed) {
+            EmitPropertyChanged(set, storage);
+          }
 
-        if (changed) {
-          EmitPropertyChanged(set, storage);
-        }
-
-      }).PrivateImplementationType = interfaceType;
+        });
+      
+      property.PrivateImplementationType = interfaceType;
+      property.Attributes = Decorator.Attributes;
     }
 
     public void EmitPropertyChanged(CodeStatementCollection stmt, CodeExpression storage) {
@@ -90,9 +93,9 @@ namespace Bolt.Compiler {
 
     public virtual void EmitMetaSetup(DomBlock block) {
       Offsets offsets = new Offsets();
-      offsets.OffsetStorage = "{0} /*storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
-      offsets.OffsetProperties = "{0} /*properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
-      offsets.OffsetObjects = "{0} /*objects:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
+      offsets.OffsetStorage = "{0} /*required-storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
+      offsets.OffsetProperties = "{0} /*required-properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
+      offsets.OffsetObjects = "{0} /*required-objects:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
 
       EmitMetaSetup(block, offsets);
     }
@@ -105,20 +108,14 @@ namespace Bolt.Compiler {
 
       EmitAddSettings(tmp, block.Stmts, offsets);
 
-      int filters = (1 << 30);
-
-      if (Decorator.Definition.Controller) {
-        filters |= (1 << 31);
-      }
-
       block.Stmts.Add("this".Expr().Call("AddProperty", offsets.OffsetProperties, offsets.OffsetObjects, tmp));
     }
 
     public virtual void EmitObjectSetup(DomBlock block) {
       Offsets offsets = new Offsets();
-      offsets.OffsetStorage = "offsets.OffsetStorage + {0} /*storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
-      offsets.OffsetObjects = "offsets.OffsetObjects + {0} /*object:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
-      offsets.OffsetProperties = "offsets.OffsetProperties + {0} /*properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
+      offsets.OffsetStorage = "offsets.OffsetStorage + {0} /*required-storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
+      offsets.OffsetObjects = "offsets.OffsetObjects + {0} /*required-object:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
+      offsets.OffsetProperties = "offsets.OffsetProperties + {0} /*required-properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
 
       EmitObjectSetup(block, offsets);
     }
@@ -137,13 +134,13 @@ namespace Bolt.Compiler {
 
       if (s != null) {
         if (s.SmoothingAlgorithm != SmoothingAlgorithms.None) {
-          statements.Add(expr.Call("Settings_Interpolation", s.SnapMagnitude.Literal(), false.Literal()));
+          statements.Add(expr.Call("Settings_Interpolation", s.SnapMagnitude.Literal()));
         }
       }
 
       if (c != null) {
         if (c.SmoothCorrection) {
-          statements.Add(expr.Call("Settings_Interpolation", c.SnapMagnitude.Literal(), c.SmoothCorrection.Literal()));
+          statements.Add(expr.Call("Settings_Interpolation", c.SnapMagnitude.Literal()));
         }
       }
     }
@@ -202,9 +199,16 @@ namespace Bolt.Compiler {
     }
 
     public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, Offsets offsets) {
+      int filters = (1 << 30);
+
+      if (Decorator.Definition.Controller) {
+        filters |= (1 << 31);
+      }
+
       statements.Call(expr, "Settings_Property",
         Decorator.Definition.Name.Literal(),
-        Decorator.Definition.Priority.Literal()
+        Decorator.Definition.Priority.Literal(),
+        filters.Literal()
       );
 
       statements.Call(expr, "Settings_Offsets",

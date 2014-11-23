@@ -5,26 +5,26 @@ namespace Bolt {
   [Documentation]
   public static class Math {
 
-    internal static float InterpolateFloat(BoltDoubleList<NetworkFrame> frames, int offset, int frame) {
+    internal static float InterpolateFloat(BoltDoubleList<NetworkStorage> frames, int offset, int frame) {
       var f0 = frames.first;
-      var p0 = f0.Storage[offset].Float1;
+      var p0 = f0.Values[offset].Float1;
 
-      if ((frames.count == 1) || (f0.Number >= frame)) {
+      if ((frames.count == 1) || (f0.Frame >= frame)) {
         return p0;
       }
       else {
         var f1 = frames.Next(f0);
-        var p1 = f1.Storage[offset].Float1;
+        var p1 = f1.Values[offset].Float1;
 
-        Assert.True(f1.Number > f0.Number);
-        Assert.True(f1.Number > frame);
+        Assert.True(f1.Frame > f0.Frame);
+        Assert.True(f1.Frame > frame);
 
-        int f0Frame = f0.Number;
-        if (f0Frame < (f1.Number - BoltCore.remoteSendRate * 2)) {
-          f0Frame = f1.Number - BoltCore.remoteSendRate * 2;
+        int f0Frame = f0.Frame;
+        if (f0Frame < (f1.Frame - BoltCore.remoteSendRate * 2)) {
+          f0Frame = f1.Frame - BoltCore.remoteSendRate * 2;
         }
 
-        float t = f1.Number - f0Frame;
+        float t = f1.Frame - f0Frame;
         float d = frame - f0Frame;
 
         return UE.Mathf.Lerp(p0, p1, d / t);

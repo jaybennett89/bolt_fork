@@ -6,17 +6,17 @@ namespace Bolt {
     public Int32 OffsetStorage;
     public Int32 OffsetProperties;
 
+    public int PropertyFilters;
     public String PropertyName;
     public Int32 PropertyPriority; 
-    public PropertyModes PropertyMode;
     public NetworkObj_Meta PropertyMeta;
 
     public PropertyInterpolationSettings Interpolation;
 
-    public void Settings_Property(string name, int priority, PropertyModes mode) {
+    public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
-      PropertyMode = mode;
       PropertyPriority = priority;
+      PropertyFilters = filters;
     }
 
     public void Settings_Offsets(Int32 properties, Int32 storage) {
@@ -60,7 +60,7 @@ namespace Bolt {
     public override void OnSimulateAfter(NetworkObj obj) {
       NetworkState state = (NetworkState)obj.Root;
 
-      if (MecanimMode != Bolt.MecanimMode.Disabled) {
+      if (MecanimMode != MecanimMode.Disabled) {
         if (state.Animator) {
           if (MecanimMode == MecanimMode.LayerWeight) {
             if (ShouldPullDataFromMecanim(state)) {

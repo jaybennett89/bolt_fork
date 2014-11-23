@@ -36,6 +36,12 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
   void Update() {
     PollKeys(true);
+
+    if (entity.isOwner && entity.hasControl && Input.GetKey(KeyCode.L)) {
+      for (int i = 0; i < 100; ++i) {
+        BoltNetwork.Instantiate(BoltPrefabs.SceneCube);
+      }
+    }
   }
 
   void PollKeys(bool mouse) {
@@ -66,14 +72,12 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   public override void Attached(Bolt.IProtocolToken token) {
     BoltLog.Info("Attached-Token: {0}", token);
 
-    Animator animator = GetComponentInChildren<Animator>();
-
-    state.transform.SetTransforms(transform);
-    state.SetAnimator(animator);
+    state.transform1.SetTransforms(transform);
+    state.SetAnimator(GetComponentInChildren<Animator>());
 
     // setting layerweights 
-    animator.SetLayerWeight(0, 1);
-    animator.SetLayerWeight(1, 1);
+    state.Animator.SetLayerWeight(0, 1);
+    state.Animator.SetLayerWeight(1, 1);
 
     state.Fire += OnFire;
     state.AddCallback("weapon", WeaponChanged);
@@ -224,7 +228,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
       // JUMP
       if (_motor.jumpStartedThisFrame) {
-        mod.Jump();
+        mod.JumpTrigger();
       }
     }
   }
@@ -234,7 +238,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
       activeWeapon.fireFrame = BoltNetwork.serverFrame;
 
-      state.Modify().Fire();
+      state.FireTrigger();
 
       // if we are the owner and the active weapon is a hitscan weapon, do logic
       if (entity.isOwner) {

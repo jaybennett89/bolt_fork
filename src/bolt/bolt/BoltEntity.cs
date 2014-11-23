@@ -265,8 +265,8 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// controlling a proxied entity the Data will also be sent to the server.
   /// </summary>
   /// <param name="data">The Data to queue</param>
-  public bool QueueInput(Bolt.NetworkCommand_Data data) {
-    return Entity.QueueInput(data.RootCommand);
+  public bool QueueInput(INetworkCommandData data) {
+    return Entity.QueueInput(((NetworkCommand_Data)data).RootCommand);
   }
 
   /// <summary>

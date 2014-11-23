@@ -14,8 +14,34 @@ namespace Bolt.Compiler {
       get { return "Bolt.ISerializerFactory"; }
     }
 
+    public override string BaseClass {
+      get { return "Bolt.NetworkState"; }
+    }
+
+    public override bool EmitAsInterface {
+      get { return true; }
+    }
+
+    public override bool EmitLegacyModifyMethod {
+      get { return true; }
+    }
+
+    public override string BaseInterface {
+      get {
+        if (HasParent) {
+          return Parent.NameInterface;
+        }
+
+        return "Bolt.IState";
+      }
+    }
+
+    public override IEnumerable<string> ParentInterfaces {
+      get { return ParentList.Select(x => x.NameInterface); }
+    }
+
     public override List<PropertyDecorator> Properties {
-      get;
+      get; 
       set;
     }
 
@@ -39,5 +65,8 @@ namespace Bolt.Compiler {
       }
     }
 
+    public StateDecorator(StateDefinition def) {
+      Definition = def;
+    }
   }
 }

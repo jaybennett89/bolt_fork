@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UE = UnityEngine;
+﻿using UE = UnityEngine;
 
 namespace Bolt {
   [Documentation]
@@ -30,6 +26,11 @@ namespace Bolt {
         Render = render;
         RenderDoubleBufferPosition = DoubleBuffer<UE.Vector3>.InitBuffer(simulate.position);
         RenderDoubleBufferRotation = DoubleBuffer<UE.Quaternion>.InitBuffer(simulate.rotation);
+      }
+      else {
+        Render = null;
+        RenderDoubleBufferPosition = DoubleBuffer<UE.Vector3>.InitBuffer(UE.Vector3.zero);
+        RenderDoubleBufferRotation = DoubleBuffer<UE.Quaternion>.InitBuffer(UE.Quaternion.identity);
       }
 
       Simulate = simulate;

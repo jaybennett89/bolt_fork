@@ -51,7 +51,6 @@
     <Compile Include="Assert.cs" />
     <Compile Include="AssetFolder.cs" />
     <Compile Include="CodeGenerator\CodeGenerator.cs" />
-    <Compile Include="CodeGenerator\CodeGenerator.Dom.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\CommandDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Asset\EventDecorator.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecorator.cs" />
@@ -74,6 +73,9 @@
     <Compile Include="CodeGenerator\Dom.cs" />
     <Compile Include="CodeGenerator\DomBlock.cs" />
     <Compile Include="CodeGenerator\Emitters\Assets\AssetCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\CommandCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\EventCodeEmitter.cs" />
+    <Compile Include="CodeGenerator\Emitters\Assets\StateCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitter.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterArray.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterBool.cs" />

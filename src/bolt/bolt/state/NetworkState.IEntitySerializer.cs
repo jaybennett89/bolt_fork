@@ -18,6 +18,13 @@ namespace Bolt {
     }
 
     void IEntitySerializer.OnInitialized() {
+      NetworkStorage storage;
+
+      storage = AllocateStorage();
+      storage.Frame = Entity.IsOwner ? BoltCore.frame : -1;
+
+      Frames.AddLast(storage);
+
       for (int i = 0; i < Meta.Properties.Length; ++i) {
         var p = Meta.Properties[i];
         p.Property.OnInit(Objects[p.OffsetObjects]);
@@ -49,12 +56,12 @@ namespace Bolt {
         }
       }
 
-      InvokeCallbacks();
-
       for (int i = 0; i < Meta.Properties.Length; ++i) {
         var p = Meta.Properties[i];
         p.Property.OnSimulateBefore(Objects[p.OffsetObjects]);
       }
+
+      InvokeCallbacks();
     }
 
     void IEntitySerializer.OnSimulateAfter() {
@@ -87,14 +94,33 @@ namespace Bolt {
 
     BitSet IEntitySerializer.GetFilter(BoltConnection connection, EntityProxy proxy) {
       if (Entity.IsController(connection)) {
-        return Meta.Filters[32];
+        return Meta.Filters[31];
       }
 
-      return Meta.Filters[31];
+      return Meta.Filters[30];
     }
 
     void IEntitySerializer.DebugInfo() {
+      if (BoltNetworkInternal.DebugDrawer != null) {
+        BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
+        BoltNetworkInternal.DebugDrawer.LabelField("Type", Factory.GetFactory(Meta.TypeId).TypeObject);
+        BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count);
 
+        BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
+
+        for (int i = 0; i < Meta.Properties.Length; ++i) {
+          var pi = Meta.Properties[i];
+          string label = pi.Property.PropertyName;
+          object value = pi.Property.DebugValue(Objects[pi.OffsetObjects], Storage);
+
+          if (value != null) {
+            BoltNetworkInternal.DebugDrawer.LabelField(label, value.ToString());
+          }
+          else {
+            BoltNetworkInternal.DebugDrawer.LabelField(label, "N/A");
+          }
+        }
+      }
     }
 
     void IEntitySerializer.InitProxy(EntityProxy p) {
@@ -154,14 +180,14 @@ namespace Bolt {
 
     void PackProperties(BoltConnection connection, UdpPacket packet, EntityProxyEnvelope env, Priority[] priority, int count) {
       int propertyCountPtr = packet.Ptr;
-      packet.WriteByte(0, PacketMaxPropertiesBits);
+      packet.WriteByte(0, Meta.PacketMaxPropertiesBits);
 
       // how many bits can we write at the most
       int bits = System.Math.Min(Meta.PacketMaxBits, packet.Size - packet.Position);
 
       for (int i = 0; i < count; ++i) {
         // this means we can even fit another property id
-        if (bits <= PacketPropertyIdBits) {
+        if (bits <= Meta.PropertyIdBits) {
           break;
         }
 
@@ -177,12 +203,12 @@ namespace Bolt {
           break;
         }
 
-        int b = PacketPropertyIdBits + pi.Property.BitCount(Objects[pi.OffsetObjects]);
+        int b = Meta.PropertyIdBits + pi.Property.BitCount(Objects[pi.OffsetObjects]);
         int ptr = packet.Ptr;
 
         if (bits >= b) {
           // write property id
-          packet.WriteInt(p.PropertyIndex, PacketPropertyIdBits);
+          packet.WriteInt(p.PropertyIndex, Meta.PropertyIdBits);
 
           if (pi.Property.Write(connection, Objects[pi.OffsetObjects], Storage, packet)) {
 #if DEBUG
@@ -213,43 +239,38 @@ namespace Bolt {
       Assert.True(env.Written.Count <= Meta.PacketMaxProperties);
 
       // write the amount of properties
-      UdpPacket.WriteByteAt(packet.Data, propertyCountPtr, PacketMaxPropertiesBits, (byte)env.Written.Count);
+      UdpPacket.WriteByteAt(packet.Data, propertyCountPtr, Meta.PacketMaxPropertiesBits, (byte)env.Written.Count);
     }
 
     void IEntitySerializer.Read(BoltConnection connection, UdpPacket packet, int frame) {
-      int count = packet.ReadByte(PacketMaxPropertiesBits);
+      int count = packet.ReadByte(Meta.PacketMaxPropertiesBits);
       var storage = default(NetworkStorage);
 
-      if (Frames.count == 0) {
-        storage = AllocateStorage();
-        storage.Frame = frame;
+      if (Entity.HasPredictedControl) {
+        Assert.True(Frames.count == 1);
 
-        Frames.AddLast(storage);
-
-        if (Entity.HasPredictedControl) {
-          storage.Frame = BoltCore.frame;
-        }
+        storage = Frames.first;
+        storage.Frame = BoltCore.frame;
       }
       else {
-        if (Entity.HasPredictedControl) {
-          Assert.True(Frames.count == 1);
-
+        if (Frames.first.Frame == -1) {
           storage = Frames.first;
-          storage.Frame = BoltCore.frame;
+          storage.Frame = frame;
         }
         else {
           storage = DuplicateStorage(Frames.last);
           storage.Frame = frame;
           storage.Changed.ClearAll();
+
           Frames.AddLast(storage);
         }
       }
 
       while (--count >= 0) {
-        var propertyIndex = packet.ReadInt(PacketPropertyIdBits);
+        var propertyIndex = packet.ReadInt(Meta.PropertyIdBits);
         var propertyInfo = Meta.Properties[propertyIndex];
 
-		// make sure this is the correct one
+        // make sure this is the correct one
         Assert.True(propertyIndex == Objects[propertyInfo.OffsetObjects].OffsetProperties + propertyInfo.Property.OffsetProperties);
 
         // read data into frame

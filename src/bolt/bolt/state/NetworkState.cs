@@ -6,13 +6,10 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  public abstract partial class NetworkState : NetworkObj {
+  internal abstract partial class NetworkState : NetworkObj_Root {
     internal Entity Entity;
     internal List<UE.Animator> Animators = new List<UE.Animator>();
     internal new NetworkState_Meta Meta;
-
-    internal int PacketPropertyIdBits;
-    internal int PacketMaxPropertiesBits;
 
     internal BitSet PropertyDefaultMask;
     internal Priority[] PropertyPriorityTemp;
@@ -23,10 +20,6 @@ namespace Bolt {
 
     public UE.Animator Animator {
       get { return Animators[0]; }
-    }
-
-    public IEnumerable<UE.Animator> AllAnimators {
-      get { return Animators; }
     }
 
     internal sealed override NetworkStorage Storage {

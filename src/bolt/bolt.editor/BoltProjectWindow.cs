@@ -118,7 +118,7 @@ public class BoltProjectWindow : BoltWindow {
       BoltEditorGUI.Header("States", "mc_state");
       DisplayAssetList(Project.States.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Structs", "mc_struct");
+      BoltEditorGUI.Header("Objects", "mc_struct");
       DisplayAssetList(Project.Structs.Cast<AssetDefinition>());
 
       BoltEditorGUI.Header("Commands", "mc_command");

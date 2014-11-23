@@ -11,6 +11,10 @@ namespace Bolt.Compiler {
       set;
     }
 
+    public override bool EmitLegacyModifyMethod {
+      get { return true; }
+    }
+
     public IEnumerable<ObjectDecorator> Dependencies {
       get {
         foreach (PropertyDecorator pd in Properties) {
@@ -38,5 +42,8 @@ namespace Bolt.Compiler {
       }
     }
 
+    public ObjectDecorator(StructDefinition def) {
+      Definition = def;
+    }
   }
 }

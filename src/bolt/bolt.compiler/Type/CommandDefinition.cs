@@ -15,6 +15,9 @@ namespace Bolt.Compiler {
     [ProtoMember(52)]
     public int SmoothFrames;
 
+    [ProtoIgnore]
+    public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
+
     public override IEnumerable<Type> AllowedPropertyTypes {
       get { return EventDefinition.AllowedEventAndCommandPropertyTypes(); }
     }

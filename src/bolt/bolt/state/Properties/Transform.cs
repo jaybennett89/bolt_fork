@@ -43,8 +43,7 @@ namespace Bolt {
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
       var nt = obj.Storage.Values[obj[this]].Transform;
 
-      if (nt != null && nt.Simulate)
-      {
+      if (nt != null && nt.Simulate) {
         var p = obj.Storage.Values[obj[this] + POSITION].Vector3;
         var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
@@ -70,11 +69,11 @@ namespace Bolt {
         packet.WriteEntity(null);
       }
 
-      PositionCompression.Pack(packet, obj.Storage.Values[obj[this] + POSITION].Vector3);
-      RotationCompression.Pack(packet, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
+      PositionCompression.Pack(packet, storage.Values[obj[this] + POSITION].Vector3);
+      RotationCompression.Pack(packet, storage.Values[obj[this] + ROTATION].Quaternion);
 
       if (Extrapolation.Enabled) {
-        PositionCompression.Pack(packet, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
+        PositionCompression.Pack(packet, storage.Values[obj[this] + VELOCITY].Vector3);
       }
 
       return true;
@@ -83,16 +82,16 @@ namespace Bolt {
     public override void Read(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpPacket packet) {
       obj.RootState.Entity.SetParentInternal(packet.ReadEntity());
 
-      obj.Storage.Values[obj[this] + POSITION].Vector3 = PositionCompression.Read(packet);
-      obj.Storage.Values[obj[this] + ROTATION].Quaternion = RotationCompression.Read(packet);
+      storage.Values[obj[this] + POSITION].Vector3 = PositionCompression.Read(packet);
+      storage.Values[obj[this] + ROTATION].Quaternion = RotationCompression.Read(packet);
 
       if (Extrapolation.Enabled) {
-        obj.Storage.Values[obj[this] + VELOCITY].Vector3 = PositionCompression.Read(packet);
+        storage.Values[obj[this] + VELOCITY].Vector3 = PositionCompression.Read(packet);
       }
     }
 
     public override void OnRender(NetworkObj obj) {
-      var nt = obj.Storage.Values[obj[this]].Transform;
+      var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
       if (nt != null && nt.Render) {
         var p = nt.RenderDoubleBufferPosition.Previous;
         var c = nt.RenderDoubleBufferPosition.Current;
@@ -102,17 +101,15 @@ namespace Bolt {
       }
     }
 
-    public override void OnSimulateAfter(NetworkObj obj)
-    {
+    public override void OnSimulateAfter(NetworkObj obj) {
       var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
-      if (nt != null)
-      {
-        if (obj.RootState.Entity.IsOwner)
-        {
+
+      if (nt != null && nt.Simulate) {
+        if (obj.RootState.Entity.IsOwner) {
           var oldPosition = obj.Storage.Values[obj[this] + POSITION].Vector3;
           var oldVelocity = obj.Storage.Values[obj[this] + VELOCITY].Vector3;
           var oldRotation = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
-          
+
           obj.Storage.Values[obj[this] + POSITION].Vector3 = nt.Simulate.localPosition;
           obj.Storage.Values[obj[this] + VELOCITY].Vector3 = CalculateVelocity(nt, oldPosition);
           obj.Storage.Values[obj[this] + ROTATION].Quaternion = nt.Simulate.localRotation;
@@ -121,8 +118,7 @@ namespace Bolt {
           var velocityChanged = oldVelocity != obj.Storage.Values[obj[this] + VELOCITY].Vector3;
           var rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
-          if (positionChanged || velocityChanged || rotationChanged)
-          {
+          if (positionChanged || velocityChanged || rotationChanged) {
             obj.Storage.PropertyChanged(obj[this]);
           }
         }
@@ -132,20 +128,15 @@ namespace Bolt {
       }
     }
 
-    public override void OnSimulateBefore(NetworkObj obj)
-    {
-      if (obj.RootState.Entity.IsDummy)
-      {
+    public override void OnSimulateBefore(NetworkObj obj) {
+      if (obj.RootState.Entity.IsDummy) {
         var nt = obj.Storage.Values[obj[this]].Transform;
-        if (nt != null && nt.Simulate)
-        {
+        if (nt != null && nt.Simulate) {
           var snapped = false;
-          if (Extrapolation.Enabled)
-          {
+          if (Extrapolation.Enabled) {
             throw new NotImplementedException();
           }
-          else if (Interpolation.Enabled)
-          {
+          else if (Interpolation.Enabled) {
             // position
             nt.Simulate.localPosition = Math.InterpolateVector(
               obj.RootState.Frames,
@@ -153,17 +144,16 @@ namespace Bolt {
               obj.RootState.Entity.Frame,
               Interpolation.SnapMagnitude,
               ref snapped
-              );
+            );
 
             // rotation
             nt.Simulate.localRotation = Math.InterpolateQuaternion(
               obj.RootState.Frames,
               obj[this] + ROTATION,
               obj.RootState.Entity.Frame
-              );
+            );
           }
-          else
-          {
+          else {
             // always snapped on this
             snapped = true;
 
@@ -174,8 +164,7 @@ namespace Bolt {
             nt.Simulate.localRotation = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
           }
 
-          if (snapped)
-          {
+          if (snapped) {
             nt.RenderDoubleBufferPosition =
               nt.RenderDoubleBufferPosition.Shift(nt.Simulate.position).Shift(nt.Simulate.position);
           }
@@ -183,23 +172,18 @@ namespace Bolt {
       }
     }
 
-    public override void OnParentChanged(NetworkObj obj, Entity newParent, Entity oldParent)
-    {
+    public override void OnParentChanged(NetworkObj obj, Entity newParent, Entity oldParent) {
       var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
-      if (nt != null && nt.Simulate)
-      {
-        if (newParent == null)
-        {
+      if (nt != null && nt.Simulate) {
+        if (newParent == null) {
           nt.Simulate.transform.parent = null;
           UpdateTransformValues(obj, oldParent.UnityObject.transform.localToWorldMatrix, UE.Matrix4x4.identity);
         }
-        else if (oldParent == null)
-        {
+        else if (oldParent == null) {
           nt.Simulate.transform.parent = newParent.UnityObject.transform;
           UpdateTransformValues(obj, UE.Matrix4x4.identity, newParent.UnityObject.transform.worldToLocalMatrix);
         }
-        else
-        {
+        else {
           nt.Simulate.transform.parent = newParent.UnityObject.transform;
           UpdateTransformValues(obj, oldParent.UnityObject.transform.localToWorldMatrix,
             newParent.UnityObject.transform.worldToLocalMatrix);

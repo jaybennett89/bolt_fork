@@ -11,14 +11,6 @@ namespace Bolt.Compiler {
       get { return "Action"; }
     }
 
-    public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => { }, set => { });
-
-      if (Generator.AllowStatePropertySetters) {
-        type.DeclareMethod(typeof(void).FullName, Decorator.Definition.Name + "Trigger", mtd => { });
-      }
-    }
-
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       type.DeclareProperty(typeof(System.Action).FullName, Decorator.Definition.Name, get => {
         get.Expr("return _Root.{0}", Decorator.Definition.Name);

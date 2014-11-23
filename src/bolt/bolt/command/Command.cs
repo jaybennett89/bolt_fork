@@ -1,29 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  public abstract class NetworkCommand_Data : NetworkObj {
+  public interface INetworkCommandData {
+    IProtocolToken Token {
+      get;
+      set;
+    }
+  }
+
+  internal abstract class NetworkCommand_Data : NetworkObj, INetworkCommandData {
     public IProtocolToken Token {
       get;
       set;
     }
 
-    internal Command RootCommand
-    {
-      get { return (Command) Root; }
+    internal Command RootCommand {
+      get { return (Command)Root; }
+    }
+
+    IProtocolToken INetworkCommandData.Token {
+      get { return this.Token; }
+      set { this.Token = value; }
     }
 
     internal NetworkCommand_Data(NetworkObj_Meta meta)
       : base(meta) {
     }
+
   }
 
-  internal abstract class Command_Meta : NetworkObj_Meta
-  {
+  internal abstract class Command_Meta : NetworkObj_Meta {
     internal int SmoothFrames;
   }
 
@@ -31,15 +38,26 @@ namespace Bolt {
   /// Base class that all commands inherit from
   /// </summary>
   [Documentation]
-  public abstract class Command : NetworkObj, IBoltListNode {
+  public abstract class Command : NetworkObj_Root, IBoltListNode {
     internal const int SEQ_BITS = 8;
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;
     internal const int SEQ_MASK = (1 << SEQ_BITS) - 1;
 
+    NetworkStorage storage;
+
     internal new Command_Meta Meta;
 
-    internal NetworkCommand_Data Input;
-    internal NetworkCommand_Data Result;
+    internal override NetworkStorage Storage {
+      get { return storage; }
+    }
+
+    internal NetworkCommand_Data InputObject {
+      get { return (NetworkCommand_Data)Objects[1]; }
+    }
+
+    internal NetworkCommand_Data ResultObject {
+      get { return (NetworkCommand_Data)Objects[2]; }
+    }
 
     internal int SmoothFrameFrom;
     internal int SmoothFrameTo;
@@ -53,10 +71,9 @@ namespace Bolt {
     /// <summary>
     /// The value of the BoltNetwork.serverFrame property of the computer this command was created on
     /// </summary>
-    public int ServerFrame
-    {
-      get; 
-      internal set; 
+    public int ServerFrame {
+      get;
+      internal set;
     }
 
     /// <summary>
@@ -78,9 +95,10 @@ namespace Bolt {
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
 
-    internal Command(Command_Meta meta) : base(meta)
-    {
+    internal Command(Command_Meta meta)
+      : base(meta) {
       Meta = meta;
+      storage = AllocateStorage();
     }
 
     internal void VerifyCanSetInput() {
@@ -96,27 +114,26 @@ namespace Bolt {
     }
 
     internal void PackInput(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < Input.Meta.Properties.Length; ++i) {
-        Input.Meta.Properties[i].Property.Write(connection, Input, Storage, packet);
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
       }
     }
 
     internal void ReadInput(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < Input.Meta.Properties.Length; ++i) {
-        Input.Meta.Properties[i].Property.Read(connection, Input, Storage, packet);
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
       }
     }
 
     internal void PackResult(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < Result.Meta.Properties.Length; ++i) {
-        Result.Meta.Properties[i].Property.Write(connection, Result, Storage, packet);
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
       }
     }
 
-    internal void ReadResult(BoltConnection connection, UdpPacket packet)
-    {
-      for (int i = 0; i < Result.Meta.Properties.Length; ++i) {
-        Result.Meta.Properties[i].Property.Write(connection, Result, SmoothStorageTo ?? Storage, packet);
+    internal void ReadResult(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, SmoothStorageTo ?? Storage, packet);
       }
     }
 
@@ -128,17 +145,14 @@ namespace Bolt {
       SmoothFrameTo = SmoothFrameFrom + Meta.SmoothFrames;
     }
 
-    internal void SmoothCorrection()
-    {
-      if (SmoothStorageFrom != null && SmoothStorageTo != null) 
-      {
+    internal void SmoothCorrection() {
+      if (SmoothStorageFrom != null && SmoothStorageTo != null) {
         float max = SmoothFrameTo - SmoothFrameFrom;
         float current = BoltCore.frame - SmoothFrameFrom;
         float t = UE.Mathf.Clamp01(current / max);
 
-        for (int i = 0; i < Result.Meta.Properties.Length; ++i)
-        {
-          Result.Meta.Properties[i].Property.SmoothCommandCorrection(Result, SmoothStorageFrom, SmoothStorageTo, Storage, t);
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          ResultObject.Meta.Properties[i].Property.SmoothCommandCorrection(ResultObject, SmoothStorageFrom, SmoothStorageTo, Storage, t);
         }
       }
     }

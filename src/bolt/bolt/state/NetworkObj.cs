@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 
 namespace Bolt {
+  public abstract class NetworkObj_Root : NetworkObj {
+    internal NetworkObj_Root(NetworkObj_Meta meta)
+      : base(meta) {
+      InitRoot();
+    }
+  }
+
   public abstract class NetworkObj {
     internal NetworkObj Root;
     internal List<NetworkObj> RootObjects;
@@ -39,7 +46,7 @@ namespace Bolt {
     }
 
     internal void Init(NetworkObj root, NetworkObj_Meta.Offsets offsets) {
-      Meta.InitObject(this, Root, offsets);
+      Meta.InitObject(this, root, offsets);
     }
 
     internal NetworkStorage AllocateStorage() {
@@ -63,8 +70,7 @@ namespace Bolt {
     }
 
     internal int this[NetworkProperty property] {
-      get
-      {
+      get {
 #if DEBUG
         Assert.NotNull(property);
 

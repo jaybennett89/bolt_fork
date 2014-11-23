@@ -231,10 +231,13 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
+    BoltEditorGUI.Header("Input", "mc_input");
+    GUILayout.Space(2);
     EditPropertyList(def, def.Input);
 
     // add button
-    GUILayout.Label("Data", EditorStyles.boldLabel);
+    BoltEditorGUI.Header("Result", "mc_position");
+    GUILayout.Space(2);
     EditPropertyList(def, def.Result);
   }
 

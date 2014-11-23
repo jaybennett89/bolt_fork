@@ -6,7 +6,7 @@ namespace Bolt {
   /// Base class that all events inherit from
   /// </summary>
   [Documentation]
-  public abstract class NetworkEvent : NetworkObj, IDisposable {
+  public abstract class NetworkEvent : NetworkObj_Root, IDisposable {
     internal const byte ENTITY_EVERYONE = 1;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
@@ -49,15 +49,13 @@ namespace Bolt {
       get { return !IsEntityEvent; }
     }
 
-    internal override NetworkStorage Storage
-    {
-      get { return storage; } 
+    internal override NetworkStorage Storage {
+      get { return storage; }
     }
 
-    public byte[] BinaryData
-    {
-      get; 
-      set; 
+    public byte[] BinaryData {
+      get;
+      set;
     }
 
     internal bool IsEntityEvent {
@@ -72,8 +70,8 @@ namespace Bolt {
       }
     }
 
-    internal NetworkEvent(NetworkEvent_Meta meta) : base(meta)
-    {
+    internal NetworkEvent(NetworkEvent_Meta meta)
+      : base(meta) {
       Meta = meta;
       storage = AllocateStorage();
     }
@@ -108,7 +106,7 @@ namespace Bolt {
     }
 
     internal void DecrementRefs() {
-    
+
     }
   }
 }

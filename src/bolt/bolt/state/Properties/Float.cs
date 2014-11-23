@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 
 namespace Bolt {
   internal class NetworkProperty_Float : NetworkProperty_Mecanim {
@@ -34,9 +30,8 @@ namespace Bolt {
     }
 
     protected override void PushMecanimValue(NetworkState state) {
-      for (int i = 0; i < state.Animators.Count; ++i)
-      {
-        state.Animators[i].SetFloat(PropertyName, state.Storage.Values[state[this]].Float0);
+      for (int i = 0; i < state.Animators.Count; ++i) {
+        state.Animators[i].SetFloat(PropertyName, state.Storage.Values[state[this]].Float0, MecanimDamping, BoltNetwork.frameDeltaTime);
       }
     }
   }

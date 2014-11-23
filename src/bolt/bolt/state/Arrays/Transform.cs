@@ -5,8 +5,7 @@ using UnityEngine;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_Transform : NetworkArray_Values<NetworkTransform> {
-    public new NetworkTransform this[int index]
-    {
+    public new NetworkTransform this[int index] {
       get { return base[index]; }
     }
 

@@ -6,8 +6,6 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
-    // NEW
-
     public int OffsetStorage;
     public int OffsetObjects;
     public int OffsetProperties;
@@ -15,6 +13,7 @@ namespace Bolt.Compiler {
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
+    public MemberAttributes Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
     public virtual bool OnRenderCallback {
       get { return false; }

@@ -68,6 +68,10 @@ namespace Bolt.Compiler {
       return new CodeFieldReferenceExpression(expr, field);
     }
 
+    public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, Type returnType, string methodName, Action<CodeMemberMethod> body) {
+      return DeclareMethod(type, returnType.FullName, methodName, body);
+    }
+
     public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, string returnType, string methodName, Action<CodeMemberMethod> body) {
       CodeMemberMethod method;
 
@@ -78,6 +82,11 @@ namespace Bolt.Compiler {
 
       if (body != null) {
         body(method);
+
+        if (type.IsInterface)
+        {
+          method.Statements.Clear();
+        }
       }
 
       type.Members.Add(method);
@@ -112,13 +121,20 @@ namespace Bolt.Compiler {
       prop.Name = propertyName;
       prop.Type = new CodeTypeReference(propertyType);
       prop.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+      prop.HasGet = (getter != null);
+      prop.HasSet = (setter != null);
 
-      if (prop.HasGet = (getter != null)) {
+      if (prop.HasGet) {
         getter(prop.GetStatements);
       }
 
-      if (prop.HasSet = (setter != null)) {
+      if (prop.HasSet) {
         setter(prop.SetStatements);
+      }
+
+      if (type.IsInterface) {
+        prop.GetStatements.Clear();
+        prop.SetStatements.Clear();
       }
 
       type.Members.Add(prop);
