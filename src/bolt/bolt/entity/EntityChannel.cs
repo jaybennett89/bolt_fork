@@ -605,6 +605,10 @@ partial class EntityChannel : BoltChannel {
   void DestroyOutgoingProxy(EntityProxy proxy) {
     _outgoing.Remove(proxy.NetworkId);
 
+    if (proxy.Entity) {
+      proxy.Entity.Proxies.Remove(proxy);
+    }
+
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
       CreateOnRemote(proxy.Entity);
     }

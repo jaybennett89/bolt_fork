@@ -5,8 +5,19 @@ using UnityEngine;
 public class BoltPoll : MonoBehaviour {
   public static Stopwatch Timer = new Stopwatch();
 
-  protected void Awake () {
+  protected void Awake() {
     DontDestroyOnLoad(gameObject);
+  }
+
+  protected void Update() {
+    if (Time.timeScale != 1f) {
+      // log this error
+      BoltLog.Error("Time.timeScale value is incorrect: {0}", Time.timeScale);
+      BoltLog.Error("Time.timeScale has been set to 1.0f by Bolt");
+
+      // force this
+      Time.timeScale = 1f;
+    }
   }
 
   protected void FixedUpdate() {
@@ -28,15 +39,15 @@ public class BoltPoll : MonoBehaviour {
     //BoltLog.Info("TIMER: " + Timer.Elapsed);
   }
 
-  protected void OnDisable () {
-    BoltCore.Shutdown();
-  }
-  
-  protected void OnDestroy () {
+  protected void OnDisable() {
     BoltCore.Shutdown();
   }
 
-  protected void OnApplicationQuit () {
+  protected void OnDestroy() {
+    BoltCore.Shutdown();
+  }
+
+  protected void OnApplicationQuit() {
     BoltCore.Shutdown();
   }
 }
