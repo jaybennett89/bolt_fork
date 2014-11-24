@@ -4,6 +4,10 @@ namespace Bolt {
   internal class NetworkProperty_Float : NetworkProperty_Mecanim {
     PropertyFloatCompressionSettings Compression;
 
+    public override bool WantOnSimulateBeforeCallback {
+      get { return Interpolation.Enabled; }
+    }
+
     public void Settings_Float(PropertyFloatCompressionSettings compression) {
       Compression = compression;
     }

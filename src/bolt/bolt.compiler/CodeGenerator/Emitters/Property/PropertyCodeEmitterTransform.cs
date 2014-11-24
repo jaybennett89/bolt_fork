@@ -34,12 +34,12 @@ namespace Bolt.Compiler {
 
     public override void EmitObjectMembers(CodeTypeDeclaration type) {
       type.DeclareProperty("Bolt.NetworkTransform", Decorator.Definition.Name, get => {
-        EmitVerifySerializer(get, "");
         get.Expr("return Storage.Values[this.OffsetStorage + {0}].Transform", Decorator.OffsetStorage);
       });
     }
 
     void EmitExtrapolationSettings(CodeExpression expr, CodeStatementCollection stmts) {
+      throw new System.NotImplementedException();
     }
   }
 }

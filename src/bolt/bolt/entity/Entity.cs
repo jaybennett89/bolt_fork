@@ -74,9 +74,7 @@ namespace Bolt {
       get { return Flags & EntityFlags.ATTACHED; }
     }
 
-    internal bool IsOwner {
-      get { return ReferenceEquals(Source, null); }
-    }
+    internal bool IsOwner;
 
     internal bool IsDummy {
       get { return !IsOwner && !HasPredictedControl; }
@@ -320,6 +318,8 @@ namespace Bolt {
     }
 
     internal void Initialize() {
+      IsOwner = ReferenceEquals(Source, null);
+
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
       PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;

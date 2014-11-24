@@ -12,6 +12,18 @@ namespace Bolt {
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
 
+    public override bool WantOnRenderCallback {
+      get { return true; }
+    }
+
+    public override bool WantOnSimulateAfterCallback {
+      get { return true; }
+    }
+
+    public override bool WantOnSimulateBeforeCallback {
+      get { return true; }
+    }
+
     public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
       PositionCompression = PropertyVectorCompressionSettings.Create(x, y, z);
     }

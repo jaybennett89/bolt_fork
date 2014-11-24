@@ -130,7 +130,6 @@ partial class EntityChannel : BoltChannel {
     proxy = entity.CreateProxy();
     proxy.NetworkId = entity.NetworkId;
     proxy.Flags = ProxyFlags.CREATE_REQUESTED;
-    proxy.Filter = new Filter(1);
     proxy.Connection = connection;
 
     _outgoing.Add(proxy.NetworkId, proxy);

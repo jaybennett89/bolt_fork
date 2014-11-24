@@ -17,7 +17,7 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
 
   void OnGUI() {
     GUILayout.Label("ENTITY COUNT: " + BoltNetwork.entities.Count() + " POLL TIME: " + Bolt.DebugInfo.PollTime);
-  }i
+  }
 
   void FixedUpdate() {
     foreach (Player p in Player.allPlayers) {

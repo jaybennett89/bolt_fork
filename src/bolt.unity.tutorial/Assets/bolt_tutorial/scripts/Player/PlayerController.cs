@@ -39,7 +39,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
     if (entity.isOwner && entity.hasControl && Input.GetKey(KeyCode.L)) {
       for (int i = 0; i < 100; ++i) {
-        BoltNetwork.Instantiate(BoltPrefabs.SceneCube);
+        BoltNetwork.Instantiate(BoltPrefabs.SceneCube, new Vector3(Random.value * 512, Random.value * 512, Random.value * 512), Quaternion.identity);
       }
     }
   }

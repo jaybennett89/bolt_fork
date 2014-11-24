@@ -13,7 +13,7 @@ internal class EntityProxyEnvelope : BoltObject, IDisposable {
 
   public void Dispose() {
     Proxy = null;
-    Flags = Bolt.ProxyFlags.ZERO;
+    Flags = ProxyFlags.ZERO;
 
     Written.Clear();
 
@@ -50,7 +50,7 @@ static class EntityProxyEnvelopePool {
   }
 }
 
-internal partial class EntityProxy : BoltObject {
+internal class EntityProxy : BoltObject {
   public class PriorityComparer : IComparer<EntityProxy> {
     public static readonly PriorityComparer Instance = new PriorityComparer();
 
@@ -63,14 +63,13 @@ internal partial class EntityProxy : BoltObject {
     }
   }
 
-  public Bolt.NetworkState State;
-  public Bolt.NetworkId NetworkId;
-  public Bolt.Filter Filter;
-  public Bolt.BitSet Changed;
-  public Bolt.ProxyFlags Flags;
-  public Bolt.Priority[] PropertyPriority;
+  public NetworkState State;
+  public NetworkId NetworkId;
+  public BitSet Changed;
+  public ProxyFlags Flags;
+  public Priority[] PropertyPriority;
 
-  public Bolt.Entity Entity;
+  public Entity Entity;
   public BoltConnection Connection;
   public Queue<EntityProxyEnvelope> Envelopes;
 

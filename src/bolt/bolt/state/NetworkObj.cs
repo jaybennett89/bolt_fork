@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Bolt {
   public abstract class NetworkObj_Root : NetworkObj {
@@ -10,7 +11,8 @@ namespace Bolt {
   }
 
   public abstract class NetworkObj {
-    internal NetworkObj Root;
+    internal String Path;
+    internal NetworkObj Parent;
     internal List<NetworkObj> RootObjects;
     internal readonly NetworkObj_Meta Meta;
 
@@ -27,6 +29,18 @@ namespace Bolt {
       Objects.Add(this);
     }
 
+    internal NetworkObj Root {
+      get {
+        NetworkObj root = this;
+
+        while (root.Parent != null) {
+          root = root.Parent;
+        }
+
+        return root;
+      }
+    }
+
     internal List<NetworkObj> Objects {
       get { return Root.RootObjects; }
     }
@@ -41,12 +55,16 @@ namespace Bolt {
 
     internal void InitRoot() {
       RootObjects = new List<NetworkObj>(Meta.CountObjects);
-      Meta.InitObject(this, this, new NetworkObj_Meta.Offsets());
+
+      Path = null;
+      Meta.InitObject(this, null, new NetworkObj_Meta.Offsets());
+
       Assert.True(RootObjects.Count == Meta.CountObjects, "RootObjects.Count == Meta.CountObjects");
     }
 
-    internal void Init(NetworkObj root, NetworkObj_Meta.Offsets offsets) {
-      Meta.InitObject(this, root, offsets);
+    internal void Init(string path, NetworkObj parent, NetworkObj_Meta.Offsets offsets) {
+      Path = path;
+      Meta.InitObject(this, parent, offsets);
     }
 
     internal NetworkStorage AllocateStorage() {

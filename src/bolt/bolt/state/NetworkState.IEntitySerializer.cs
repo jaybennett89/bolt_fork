@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UdpKit;
 
 namespace Bolt {
@@ -11,8 +8,8 @@ namespace Bolt {
     }
 
     void IEntitySerializer.OnRender() {
-      for (int i = 0; i < Meta.Properties.Length; ++i) {
-        var p = Meta.Properties[i];
+      for (int i = 0; i < Meta.OnRenderCallback.Count; ++i) {
+        var p = Meta.OnRenderCallback[i];
         p.Property.OnRender(Objects[p.OffsetObjects]);
       }
     }
@@ -56,18 +53,24 @@ namespace Bolt {
         }
       }
 
-      for (int i = 0; i < Meta.Properties.Length; ++i) {
-        var p = Meta.Properties[i];
-        p.Property.OnSimulateBefore(Objects[p.OffsetObjects]);
+      int count = Meta.OnSimulateBeforeCallback.Count;
+      if (count > 0) {
+        for (int i = 0; i < count; ++i) {
+          var p = Meta.OnSimulateBeforeCallback[i];
+          p.Property.OnSimulateBefore(Objects[p.OffsetObjects]);
+        }
       }
 
       InvokeCallbacks();
     }
 
     void IEntitySerializer.OnSimulateAfter() {
-      for (int i = 0; i < Meta.Properties.Length; ++i) {
-        var p = Meta.Properties[i];
-        p.Property.OnSimulateAfter(Objects[p.OffsetObjects]);
+      int count = Meta.OnSimulateAfterCallback.Count;
+      if (count > 0) {
+        for (int i = 0; i < count; ++i) {
+          var p = Meta.OnSimulateAfterCallback[i];
+          p.Property.OnSimulateAfter(Objects[p.OffsetObjects]);
+        }
       }
 
       InvokeCallbacks();

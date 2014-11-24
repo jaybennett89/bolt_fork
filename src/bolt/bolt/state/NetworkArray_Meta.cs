@@ -10,7 +10,7 @@
 
     }
 
-    internal override void InitObject(NetworkObj obj, NetworkObj_Meta.Offsets offsets) {
+    internal override void InitObject(NetworkObj obj, Offsets offsets) {
 
     }
   }

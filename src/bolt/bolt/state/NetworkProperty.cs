@@ -8,10 +8,14 @@ namespace Bolt {
 
     public int PropertyFilters;
     public String PropertyName;
-    public Int32 PropertyPriority; 
+    public Int32 PropertyPriority;
     public NetworkObj_Meta PropertyMeta;
 
     public PropertyInterpolationSettings Interpolation;
+
+    public virtual bool WantOnRenderCallback { get { return false; } }
+    public virtual bool WantOnSimulateAfterCallback { get { return false; } }
+    public virtual bool WantOnSimulateBeforeCallback { get { return false; } }
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
@@ -49,6 +53,10 @@ namespace Bolt {
     public MecanimDirection MecanimDirection;
     public float MecanimDamping;
     public int MecanimLayer;
+
+    public override bool WantOnSimulateAfterCallback {
+      get { return true; }
+    }
 
     public void Settings_Mecanim(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
       MecanimMode = mode;
@@ -97,9 +105,8 @@ namespace Bolt {
     }
 
     void PushMecanimLayer(NetworkState state) {
-      for (int i = 0; i < state.Animators.Count; ++i)
-      {
-        state.Animators[i].SetLayerWeight(MecanimLayer, state.Storage.Values[state[this]].Float0); 
+      for (int i = 0; i < state.Animators.Count; ++i) {
+        state.Animators[i].SetLayerWeight(MecanimLayer, state.Storage.Values[state[this]].Float0);
       }
     }
   }

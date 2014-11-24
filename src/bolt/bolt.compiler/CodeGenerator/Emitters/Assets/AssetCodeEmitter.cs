@@ -134,6 +134,8 @@ namespace Bolt.Compiler {
           block.Stmts.Comment("Property: " + Decorator.Properties[i].Definition.Name);
           PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitMetaSetup(block);
         }
+
+        block.Stmts.Expr("base.InitMeta()");
       });
 
       // emit factory interface

@@ -46,23 +46,9 @@ namespace Bolt.Compiler {
     public virtual void EmitEventMembers(CodeTypeDeclaration type) {
     }
 
-    protected void EmitVerifySerializer(CodeStatementCollection stmts, string suffix) {
-      //stmts.IfDef("DEBUG", block => {
-      //  block.Expr(
-      //    "this.VerifySerializer{5}(typeof({0}), \"{1}\", this.OffsetSerializers + {2}, this.OffsetStorage + {3}, this.OffsetObjects + {4})",
-      //    this.SerializerClassName,
-      //    this.Decorator.Definition.Name,
-      //    this.Decorator.OffsetSerializers,
-      //    this.Decorator.OffsetStorage,
-      //    this.Decorator.OffsetObjects,
-      //    suffix
-      //  );
-      //});
-    }
-
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
-      var property = 
+      var property =
         type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
           get.Add(
             new CodeMethodReturnStatement(
@@ -80,7 +66,7 @@ namespace Bolt.Compiler {
           }
 
         });
-      
+
       property.PrivateImplementationType = interfaceType;
       property.Attributes = Decorator.Attributes;
     }
@@ -195,7 +181,7 @@ namespace Bolt.Compiler {
     public void EmitInitObject(string type, DomBlock block, Offsets offsets, params CodeExpression[] ctorArguments) {
       var tmp = block.Stmts.Var(type, block.TempVar());
       block.Stmts.Add(tmp.Assign(type.New(ctorArguments)));
-      block.Stmts.Add(tmp.Call("Init", "obj".Expr().Field("Root"), "Bolt.NetworkObj_Meta.Offsets".New(offsets.OffsetProperties, offsets.OffsetStorage, offsets.OffsetObjects)));
+      block.Stmts.Add(tmp.Call("Init", Decorator.Definition.Name.Literal(), "obj".Expr(), "Bolt.NetworkObj_Meta.Offsets".New(offsets.OffsetProperties, offsets.OffsetStorage, offsets.OffsetObjects)));
     }
 
     public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, Offsets offsets) {

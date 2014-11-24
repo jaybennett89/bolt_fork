@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using UE = UnityEngine;
+﻿using UE = UnityEngine;
 
 static class BoltGUI {
   public static UE.Color Orange = new UE.Color(255 / 255f, 220 / 255f, 21 / 255f);

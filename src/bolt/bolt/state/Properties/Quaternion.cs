@@ -5,6 +5,10 @@ namespace Bolt {
   internal class NetworkProperty_Quaternion : NetworkProperty {
     PropertyQuaternionCompression Compression;
 
+    public override bool WantOnSimulateBeforeCallback {
+      get { return Interpolation.Enabled; }
+    }
+
     public void Settings_Quaternion(PropertyFloatCompressionSettings compression) {
       Compression = PropertyQuaternionCompression.Create(compression);
     }
