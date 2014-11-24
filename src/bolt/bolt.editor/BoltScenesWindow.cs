@@ -69,7 +69,7 @@ public class BoltScenesWindow : EditorWindow {
           if (File.Exists(paths[i])) return paths[i];
         }
 
-        throw new BoltException("Could not find executable at any of the following paths: ", paths.Join(", "));
+        throw new BoltException("Could not find executable at any of the following paths: ", BoltUtils.Join(paths, ", "));
       }
 
       return playerPath;

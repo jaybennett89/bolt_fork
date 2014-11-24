@@ -12,15 +12,15 @@ namespace Bolt {
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
 
-    public override bool WantOnRenderCallback {
+    public override bool WantsOnRender {
       get { return true; }
     }
 
-    public override bool WantOnSimulateAfterCallback {
+    public override bool WantsOnSimulateAfter {
       get { return true; }
     }
 
-    public override bool WantOnSimulateBeforeCallback {
+    public override bool WantsOnSimulateBefore {
       get { return true; }
     }
 

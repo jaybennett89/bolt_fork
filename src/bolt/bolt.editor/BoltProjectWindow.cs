@@ -115,16 +115,16 @@ public class BoltProjectWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (HasProject) {
-      BoltEditorGUI.Header("States", "mc_state");
+      Header("States", "mc_state");
       DisplayAssetList(Project.States.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Objects", "mc_struct");
+      Header("Objects", "mc_struct");
       DisplayAssetList(Project.Structs.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Commands", "mc_command");
+      Header("Commands", "mc_command");
       DisplayAssetList(Project.Commands.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Events", "mc_event");
+      Header("Events", "mc_event");
       DisplayAssetList(Project.Events.Cast<AssetDefinition>());
 
       if (BoltEditorGUI.IsRightClick) {
@@ -149,6 +149,10 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.BeginArea(new Rect(4, position.height - 20, position.width - 8, 16));
     Footer();
     GUILayout.EndArea();
+  }
+
+  void Header(string text, string icon) {
+    BoltEditorGUI.Header(text, icon);
   }
 
   void Footer() {

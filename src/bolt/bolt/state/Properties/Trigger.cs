@@ -4,6 +4,10 @@
       return "TRIGGER";
     }
 
+    public override bool AllowCallbacks {
+      get { return false; }
+    }
+
     public override int BitCount(NetworkObj obj) {
       return 32;
     }

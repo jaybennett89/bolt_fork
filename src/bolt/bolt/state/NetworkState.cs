@@ -15,8 +15,6 @@ namespace Bolt {
     internal Priority[] PropertyPriorityTemp;
 
     internal BoltDoubleList<NetworkStorage> Frames = new BoltDoubleList<NetworkStorage>();
-    internal Dictionary<string, List<PropertyCallback>> Callbacks = new Dictionary<string, List<PropertyCallback>>();
-    internal Dictionary<string, List<PropertyCallbackSimple>> CallbacksSimple = new Dictionary<string, List<PropertyCallbackSimple>>();
 
     public UE.Animator Animator {
       get { return Animators[0]; }
@@ -40,34 +38,5 @@ namespace Bolt {
       Animators.Add(animator);
     }
 
-    void InvokeCallbacks() {
-      if (Frames.first.Changed.IsZero) {
-        return;
-      }
-
-      // merge into default mask
-      PropertyDefaultMask.Combine(Frames.first.Changed);
-
-      var bits = Frames.first.Changed.GetIterator();
-      var propertyIndex = -1;
-
-      while (bits.Next(out propertyIndex)) {
-        InvokeCallbacksForProperty(propertyIndex);
-      }
-
-      if (Entity.Proxies.count > 0) {
-        var proxies = Entity.Proxies.GetIterator();
-
-        while (proxies.Next()) {
-          proxies.val.Changed.Combine(Frames.first.Changed);
-        }
-      }
-
-      Frames.first.Changed.ClearAll();
-    }
-
-    void InvokeCallbacksForProperty(int propertyIndex) {
-
-    }
   }
 }

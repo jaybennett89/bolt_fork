@@ -40,12 +40,6 @@ namespace Bolt.Compiler {
       EmitSimplePropertyMembers(type, new CodeSnippetExpression("Storage"), null, true);
     }
 
-    public virtual void EmitCommandMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, string suffix) {
-    }
-
-    public virtual void EmitEventMembers(CodeTypeDeclaration type) {
-    }
-
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
       var property =
@@ -56,15 +50,21 @@ namespace Bolt.Compiler {
             )
           );
         }, set => {
+          if (changed) {
+            set.Add("{0} oldValue".Expr(Decorator.ClrType));
+            set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
+          }
+
           set.Add(new CodeAssignStatement(
             new CodeFieldReferenceExpression(index, StorageField),
             new CodeVariableReferenceExpression("value")
           ));
 
           if (changed) {
-            EmitPropertyChanged(set, storage);
+            set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
+              EmitPropertyChanged(body, storage);
+            });
           }
-
         });
 
       property.PrivateImplementationType = interfaceType;
@@ -87,6 +87,10 @@ namespace Bolt.Compiler {
     }
 
     public virtual void EmitMetaSetup(DomBlock block, Offsets offsets) {
+      EmitMetaSetup(block, offsets, null);
+    }
+
+    public virtual void EmitMetaSetup(DomBlock block, Offsets offsets, CodeExpression indexExpression) {
       var tmp = block.Stmts.Var(SerializerClassName, block.TempVar());
 
       block.Stmts.Assign(tmp, SerializerClassName.New());
@@ -94,7 +98,7 @@ namespace Bolt.Compiler {
 
       EmitAddSettings(tmp, block.Stmts, offsets);
 
-      block.Stmts.Add("this".Expr().Call("AddProperty", offsets.OffsetProperties, offsets.OffsetObjects, tmp));
+      block.Stmts.Add("this".Expr().Call("AddProperty", offsets.OffsetProperties, offsets.OffsetObjects, tmp, indexExpression ?? (-1).Literal()));
     }
 
     public virtual void EmitObjectSetup(DomBlock block) {
@@ -181,7 +185,7 @@ namespace Bolt.Compiler {
     public void EmitInitObject(string type, DomBlock block, Offsets offsets, params CodeExpression[] ctorArguments) {
       var tmp = block.Stmts.Var(type, block.TempVar());
       block.Stmts.Add(tmp.Assign(type.New(ctorArguments)));
-      block.Stmts.Add(tmp.Call("Init", Decorator.Definition.Name.Literal(), "obj".Expr(), "Bolt.NetworkObj_Meta.Offsets".New(offsets.OffsetProperties, offsets.OffsetStorage, offsets.OffsetObjects)));
+      block.Stmts.Add(tmp.Call("Init", Decorator.Definition.Name.Literal(), "obj.Root".Expr(), "Bolt.NetworkObj_Meta.Offsets".New(offsets.OffsetProperties, offsets.OffsetStorage, offsets.OffsetObjects)));
     }
 
     public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, Offsets offsets) {

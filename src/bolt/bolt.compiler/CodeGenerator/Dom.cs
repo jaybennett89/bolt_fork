@@ -83,8 +83,7 @@ namespace Bolt.Compiler {
       if (body != null) {
         body(method);
 
-        if (type.IsInterface)
-        {
+        if (type.IsInterface) {
           method.Statements.Clear();
         }
       }
@@ -223,6 +222,14 @@ namespace Bolt.Compiler {
 
     public static void Stmt(this CodeStatementCollection stmts, string text, params object[] args) {
       stmts.Add(new CodeSnippetStatement(string.Format(text, args)));
+    }
+
+    public static void If(this CodeStatementCollection stmts, CodeExpression condition, Action<CodeStatementCollection> body) {
+      CodeStatementCollection ifTrue = new CodeStatementCollection();
+
+      body(ifTrue);
+
+      stmts.Add(new CodeConditionStatement(condition, ifTrue.Cast<CodeStatement>().ToArray()));
     }
 
     public static CodeExpression Index(this CodeExpression expr, params CodeExpression[] indices) {

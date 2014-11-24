@@ -10,7 +10,7 @@ namespace Bolt {
   internal class NetworkProperty_Vector : NetworkProperty {
     PropertyVectorCompressionSettings Compression;
 
-    public override bool WantOnSimulateBeforeCallback {
+    public override bool WantsOnSimulateBefore {
       get { return Interpolation.Enabled; }
     }
 

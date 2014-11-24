@@ -176,8 +176,8 @@
     <Compile Include="RuntimeSettings.cs" />
     <Compile Include="BoltCore.cs" />
     <Compile Include="BoltObject.cs" />
-    <Compile Include="BoltPacket.cs" />
-    <Compile Include="BoltPacketPool.cs" />
+    <Compile Include="Packet.cs" />
+    <Compile Include="PacketPool.cs" />
     <Compile Include="BoltPoll.cs" />
     <Compile Include="BoltSend.cs" />
     <Compile Include="collections\BoltListNode.cs" />

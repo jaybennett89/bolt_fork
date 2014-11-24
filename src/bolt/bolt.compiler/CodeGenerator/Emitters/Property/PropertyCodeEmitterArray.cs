@@ -24,15 +24,16 @@ namespace Bolt.Compiler {
       EmitInitObject(Decorator.ClrType, block, offsets, Decorator.PropertyType.ElementCount.Literal());
 
       if (Decorator.PropertyType.ElementType is PropertyTypeStruct) {
-        var tmp1 = block.TempVar();
+        var tmp = block.TempVar();
         var element = (PropertyDecoratorStruct)Decorator.ElementDecorator;
+        element.Definition.Name += "[]";
 
-        offsets.OffsetStorage = "offsets.OffsetStorage + {0} + ({1} * {2})".Expr(Decorator.OffsetStorage, tmp1, element.RequiredStorage);
-        offsets.OffsetObjects = "offsets.OffsetObjects + {0} + ({1} * {2})".Expr(Decorator.OffsetObjects + 1, tmp1, element.RequiredObjects);
-        offsets.OffsetProperties = "offsets.OffsetProperties + {0} + ({1} * {2})".Expr(Decorator.OffsetProperties, tmp1, element.RequiredProperties);
+        offsets.OffsetStorage = "offsets.OffsetStorage + {0} + ({1} * {2})".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
+        offsets.OffsetObjects = "offsets.OffsetObjects + {0} + ({1} * {2})".Expr(Decorator.OffsetObjects + 1, tmp, element.RequiredObjects);
+        offsets.OffsetProperties = "offsets.OffsetProperties + {0} + ({1} * {2})".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
 
-        block.Stmts.For(tmp1, tmp1 + " < " + Decorator.PropertyType.ElementCount, body => {
-          PropertyCodeEmitter.Create(element).EmitObjectSetup(new DomBlock(body, tmp1 + "_"), offsets);
+        block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
+          PropertyCodeEmitter.Create(element).EmitObjectSetup(new DomBlock(body, tmp + "_"), offsets);
         });
       }
     }
@@ -40,6 +41,7 @@ namespace Bolt.Compiler {
     public override void EmitMetaSetup(DomBlock block, Offsets offsets) {
       var tmp = block.TempVar();
       var element = Decorator.ElementDecorator;
+      element.Definition.Name += "[]";
 
       offsets.OffsetStorage = "{0} + ({1} * {2}) /*required-storage:{2}*/".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
       offsets.OffsetProperties = "{0} + ({1} * {2}) /*required-properties:{2}*/".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
@@ -52,7 +54,7 @@ namespace Bolt.Compiler {
       }
 
       block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
-        PropertyCodeEmitter.Create(element).EmitMetaSetup(new DomBlock(body, tmp + "_"), offsets);
+        PropertyCodeEmitter.Create(element).EmitMetaSetup(new DomBlock(body, tmp + "_"), offsets, tmp.Expr());
       });
     }
   }

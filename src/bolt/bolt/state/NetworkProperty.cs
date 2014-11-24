@@ -13,9 +13,10 @@ namespace Bolt {
 
     public PropertyInterpolationSettings Interpolation;
 
-    public virtual bool WantOnRenderCallback { get { return false; } }
-    public virtual bool WantOnSimulateAfterCallback { get { return false; } }
-    public virtual bool WantOnSimulateBeforeCallback { get { return false; } }
+    public virtual bool AllowCallbacks { get { return true; } }
+    public virtual bool WantsOnRender { get { return false; } }
+    public virtual bool WantsOnSimulateAfter { get { return false; } }
+    public virtual bool WantsOnSimulateBefore { get { return false; } }
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
@@ -54,7 +55,7 @@ namespace Bolt {
     public float MecanimDamping;
     public int MecanimLayer;
 
-    public override bool WantOnSimulateAfterCallback {
+    public override bool WantsOnSimulateAfter {
       get { return true; }
     }
 

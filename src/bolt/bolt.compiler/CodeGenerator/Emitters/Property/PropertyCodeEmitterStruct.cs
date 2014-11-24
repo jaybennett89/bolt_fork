@@ -26,8 +26,14 @@ namespace Bolt.Compiler {
       EmitSimpleIntefaceMember(type, true, false);
     }
 
-    public override void EmitMetaSetup(DomBlock block, Offsets offsets) {
-      block.Add("this".Expr().Call("CopyProperties", offsets.OffsetProperties, offsets.OffsetObjects, Decorator.Object.NameMeta.Expr().Field("Instance"), Decorator.Definition.Name.Literal()));
+    public override void EmitMetaSetup(DomBlock block, Offsets offsets, CodeExpression indexExpression) {
+      block.Add("this".Expr().Call("CopyProperties",
+        offsets.OffsetProperties,
+        offsets.OffsetObjects,
+        Decorator.Object.NameMeta.Expr().Field("Instance"),
+        Decorator.Definition.Name.Literal(),
+        indexExpression ?? (-1).Literal()
+      ));
     }
 
     public override void EmitObjectSetup(DomBlock block, Offsets offsets) {

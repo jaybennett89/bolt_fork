@@ -8,8 +8,8 @@ namespace Bolt {
     }
 
     void IEntitySerializer.OnRender() {
-      for (int i = 0; i < Meta.OnRenderCallback.Count; ++i) {
-        var p = Meta.OnRenderCallback[i];
+      for (int i = 0; i < Meta.OnRender.Count; ++i) {
+        var p = Meta.OnRender[i];
         p.Property.OnRender(Objects[p.OffsetObjects]);
       }
     }
@@ -53,10 +53,10 @@ namespace Bolt {
         }
       }
 
-      int count = Meta.OnSimulateBeforeCallback.Count;
+      int count = Meta.OnSimulateBefore.Count;
       if (count > 0) {
         for (int i = 0; i < count; ++i) {
-          var p = Meta.OnSimulateBeforeCallback[i];
+          var p = Meta.OnSimulateBefore[i];
           p.Property.OnSimulateBefore(Objects[p.OffsetObjects]);
         }
       }
@@ -65,10 +65,10 @@ namespace Bolt {
     }
 
     void IEntitySerializer.OnSimulateAfter() {
-      int count = Meta.OnSimulateAfterCallback.Count;
+      int count = Meta.OnSimulateAfter.Count;
       if (count > 0) {
         for (int i = 0; i < count; ++i) {
-          var p = Meta.OnSimulateAfterCallback[i];
+          var p = Meta.OnSimulateAfter[i];
           p.Property.OnSimulateAfter(Objects[p.OffsetObjects]);
         }
       }
@@ -135,13 +135,9 @@ namespace Bolt {
     }
 
     int IEntitySerializer.Pack(BoltConnection connection, UdpPacket stream, EntityProxyEnvelope env) {
+      int propertyCount = 0;
+
       BitSet filter = ((IEntitySerializer)this).GetFilter(connection, env.Proxy);
-
-      if (Meta.PropertiesTempPriority == null) {
-        Meta.PropertiesTempPriority = new Priority[Meta.CountProperties];
-      }
-
-      int tempCount = 0;
 
       Priority[] tempPriority = Meta.PropertiesTempPriority;
       Priority[] proxyPriority = env.Proxy.PropertyPriority;
@@ -155,18 +151,18 @@ namespace Bolt {
           proxyPriority[i].PriorityValue += Meta.Properties[i].Property.PropertyPriority;
 
           // copy to our temp array
-          tempPriority[tempCount] = proxyPriority[i];
+          tempPriority[propertyCount] = proxyPriority[i];
 
           // increment temp count
-          tempCount += 1;
+          propertyCount += 1;
         }
       }
 
       // sort temp array based on priority
-      Array.Sort<Priority>(tempPriority, 0, tempCount, Priority.Comparer.Instance);
+      Array.Sort<Priority>(tempPriority, 0, propertyCount, Priority.Comparer.Instance);
 
       // write into stream
-      PackProperties(connection, stream, env, tempPriority, tempCount);
+      PackProperties(connection, stream, env, tempPriority, propertyCount);
 
       for (int i = 0; i < env.Written.Count; ++i) {
         Priority p = env.Written[i];

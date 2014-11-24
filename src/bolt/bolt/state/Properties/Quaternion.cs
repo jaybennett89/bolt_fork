@@ -5,7 +5,7 @@ namespace Bolt {
   internal class NetworkProperty_Quaternion : NetworkProperty {
     PropertyQuaternionCompression Compression;
 
-    public override bool WantOnSimulateBeforeCallback {
+    public override bool WantsOnSimulateBefore {
       get { return Interpolation.Enabled; }
     }
 

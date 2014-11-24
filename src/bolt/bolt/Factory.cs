@@ -164,6 +164,8 @@ namespace Bolt {
 
       _token2id.Add(type, id);
       _id2token.Add(id, type);
+
+      BoltLog.Debug("Registered token class {0} as id {1}", type, id);
     }
   }
 }

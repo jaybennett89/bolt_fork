@@ -1,27 +1,30 @@
 ﻿using System;
 
-abstract class BoltChannel {
-  BoltConnection _cn;
+namespace Bolt {
+  abstract class BoltChannel {
+    BoltConnection _cn;
 
-  public BoltConnection connection {
-    get { return _cn; }
-    internal set {
-      if (_cn == null) {
-        _cn = value;
-      } else {
-        throw new InvalidOperationException();
+    public BoltConnection connection {
+      get { return _cn; }
+      internal set {
+        if (_cn == null) {
+          _cn = value;
+        }
+        else {
+          throw new InvalidOperationException();
+        }
       }
     }
+
+    public abstract void Pack(Packet packet);
+    public abstract void Read(Packet packet);
+
+    public virtual void Lost(Packet packet) { }
+    public virtual void Delivered(Packet packet) { }
+
+    public virtual void ReadDone() { }
+    public virtual void StepRemoteFrame() { }
+    public virtual void RemoteFrameReset(int oldFrame, int newFrame) { }
+    public virtual void Disconnected() { }
   }
-
-  public abstract void Pack (BoltPacket packet);
-  public abstract void Read (BoltPacket packet);
-
-  public virtual void Lost (BoltPacket packet) { }
-  public virtual void Delivered (BoltPacket packet) { }
-
-  public virtual void ReadDone () { }
-  public virtual void StepRemoteFrame () { }
-  public virtual void RemoteFrameReset (int oldFrame, int newFrame) { }
-  public virtual void Disconnected () { }
 }

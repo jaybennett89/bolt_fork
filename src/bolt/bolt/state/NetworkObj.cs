@@ -12,7 +12,7 @@ namespace Bolt {
 
   public abstract class NetworkObj {
     internal String Path;
-    internal NetworkObj Parent;
+    internal NetworkObj Root;
     internal List<NetworkObj> RootObjects;
     internal readonly NetworkObj_Meta Meta;
 
@@ -27,18 +27,6 @@ namespace Bolt {
     internal void Add() {
       Assert.True(OffsetObjects == Objects.Count);
       Objects.Add(this);
-    }
-
-    internal NetworkObj Root {
-      get {
-        NetworkObj root = this;
-
-        while (root.Parent != null) {
-          root = root.Parent;
-        }
-
-        return root;
-      }
     }
 
     internal List<NetworkObj> Objects {
@@ -57,7 +45,7 @@ namespace Bolt {
       RootObjects = new List<NetworkObj>(Meta.CountObjects);
 
       Path = null;
-      Meta.InitObject(this, null, new NetworkObj_Meta.Offsets());
+      Meta.InitObject(this, this, new NetworkObj_Meta.Offsets());
 
       Assert.True(RootObjects.Count == Meta.CountObjects, "RootObjects.Count == Meta.CountObjects");
     }

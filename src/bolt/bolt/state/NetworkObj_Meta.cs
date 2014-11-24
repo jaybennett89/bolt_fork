@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Bolt {
   internal abstract class NetworkObj_Meta {
+    static readonly int[] ZeroIndices = new int[0];
+    static readonly string[] ZeroPaths = new string[0];
+
     internal struct Offsets {
       internal int OffsetStorage;
       internal int OffsetObjects;
@@ -19,9 +22,11 @@ namespace Bolt {
     internal BitSet[] Filters;
     internal Priority[] PropertiesTempPriority;
     internal NetworkPropertyInfo[] Properties;
-    internal List<NetworkPropertyInfo> OnRenderCallback = new List<NetworkPropertyInfo>();
-    internal List<NetworkPropertyInfo> OnSimulateAfterCallback = new List<NetworkPropertyInfo>();
-    internal List<NetworkPropertyInfo> OnSimulateBeforeCallback = new List<NetworkPropertyInfo>();
+
+    internal HashSet<string> CallbackPaths = new HashSet<string>();
+    internal List<NetworkPropertyInfo> OnRender = new List<NetworkPropertyInfo>();
+    internal List<NetworkPropertyInfo> OnSimulateAfter = new List<NetworkPropertyInfo>();
+    internal List<NetworkPropertyInfo> OnSimulateBefore = new List<NetworkPropertyInfo>();
 
     internal int CountObjects;
     internal int CountStorage;
@@ -57,48 +62,75 @@ namespace Bolt {
       }
     }
 
-    internal void AddProperty(int offsetProperties, int offsetObjects, NetworkProperty property) {
+    internal void AddProperty(int offsetProperties, int offsetObjects, NetworkProperty property, int arrayIndex) {
       AddPropertyToArray(offsetProperties, offsetObjects, property);
-      Properties[offsetProperties].Path = new NetworkPropertyPath { Next = null, Name = property.PropertyName };
+
+      Properties[offsetProperties].Paths =
+        property.AllowCallbacks
+        ? new string[] { property.PropertyName }
+        : ZeroPaths;
+
+      Properties[offsetProperties].Indices =
+        (arrayIndex >= 0) && property.AllowCallbacks
+        ? new int[] { arrayIndex }
+        : ZeroIndices;
+
+      CallbackPaths.Add(property.PropertyName);
     }
 
-    void AddCopiedProperty(int offsetProperties, int offsetObjects, NetworkProperty property, NetworkPropertyPath path, string prefix) {
-      AddPropertyToArray(offsetProperties, offsetObjects, property);
-      Properties[offsetProperties].Path = new NetworkPropertyPath { Next = path, Name = prefix };
+    void AddCopiedProperty(int offsetProperties, int offsetObjects, NetworkPropertyInfo property, string prefix, int arrayIndex) {
+      AddPropertyToArray(offsetProperties, offsetObjects, property.Property);
+
+      Properties[offsetProperties].Indices =
+        (arrayIndex >= 0) && property.Property.AllowCallbacks
+        ? property.Indices.AddFirst(arrayIndex)
+        : ZeroIndices;
+
+      Properties[offsetProperties].Paths =
+        property.Property.AllowCallbacks
+        ? property.Paths.Select(x => prefix + "." + x).ToArray().AddFirst(prefix)
+        : ZeroPaths;
+
+      if (property.Property.AllowCallbacks) {
+        for (int i = 0; i < Properties[offsetProperties].Paths.Length; ++i) {
+          CallbackPaths.Add(Properties[offsetProperties].Paths[i]);
+        }
+      }
     }
 
-    internal void CopyProperties(int offsetProperties, int offsetObjects, NetworkObj_Meta meta, string prefix) {
+    internal void CopyProperties(int offsetProperties, int offsetObjects, NetworkObj_Meta meta, string prefix, int arrayIndex) {
       for (int i = 0; i < meta.Properties.Length; ++i) {
-        AddCopiedProperty(offsetProperties + i, offsetObjects + meta.Properties[i].OffsetObjects, meta.Properties[i].Property, meta.Properties[i].Path, prefix);
+        AddCopiedProperty(offsetProperties + i, offsetObjects + meta.Properties[i].OffsetObjects, meta.Properties[i], prefix, arrayIndex);
       }
     }
 
     internal abstract void InitObject(NetworkObj obj, Offsets offsets);
 
     internal virtual void InitMeta() {
+      // setup state callbacks
       for (int i = 0; i < Properties.Length; ++i) {
-        if (Properties[i].Property.WantOnRenderCallback) {
-          OnRenderCallback.Add(Properties[i]);
+        if (Properties[i].Property.AllowCallbacks) {
+          BoltLog.Info("{0}: Paths = {1}, Indices = {2}", Properties[i].Paths[Properties[i].Paths.Length - 1], Properties[i].Paths.Join(", "), Properties[i].Indices.Join(", "));
         }
 
-        if (Properties[i].Property.WantOnSimulateAfterCallback) {
-          OnSimulateAfterCallback.Add(Properties[i]);
+        if (Properties[i].Property.WantsOnRender) {
+          OnRender.Add(Properties[i]);
         }
 
-        if (Properties[i].Property.WantOnSimulateBeforeCallback) {
-          OnSimulateBeforeCallback.Add(Properties[i]);
+        if (Properties[i].Property.WantsOnSimulateAfter) {
+          OnSimulateAfter.Add(Properties[i]);
         }
 
-        BoltLog.Info("Path for {0}: {1}",
-          Properties[i].Property.PropertyName,
-          string.Join(".", Properties[i].Path.ToArray())
-        );
+        if (Properties[i].Property.WantsOnSimulateBefore) {
+          OnSimulateBefore.Add(Properties[i]);
+        }
       }
 
+      PropertiesTempPriority = new Priority[Properties.Length];
     }
 
-    internal void InitObject(NetworkObj obj, NetworkObj parent, Offsets offsets) {
-      obj.Parent = parent;
+    internal void InitObject(NetworkObj obj, NetworkObj root, Offsets offsets) {
+      obj.Root = root;
 
       obj.OffsetStorage = offsets.OffsetStorage;
       obj.OffsetObjects = offsets.OffsetObjects;

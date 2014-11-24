@@ -149,8 +149,8 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  public override void Pack(BoltPacket packet) {
-    int startPos = packet.stream.Position;
+  public override void Pack(Packet packet) {
+    int startPos = packet.UdpPacket.Position;
 
     foreach (EntityProxy proxy in _outgoing.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
@@ -163,7 +163,7 @@ partial class EntityChannel : BoltChannel {
       }
       else {
         // check update rate of this entity
-        if ((packet.number % proxy.Entity.UpdateRate) != 0) {
+        if ((packet.Number % proxy.Entity.UpdateRate) != 0) {
           continue;
         }
 
@@ -242,26 +242,26 @@ partial class EntityChannel : BoltChannel {
       }
     }
 
-    packet.stream.WriteStopMarker();
-    packet.stats.StateBits = packet.stream.Position - startPos;
+    packet.UdpPacket.WriteStopMarker();
+    packet.Stats.StateBits = packet.UdpPacket.Position - startPos;
   }
 
-  public override void Read(BoltPacket packet) {
-    int startPtr = packet.stream.Position;
+  public override void Read(Packet packet) {
+    int startPtr = packet.UdpPacket.Position;
 
     // unpack all of our data
-    while (packet.stream.CanRead()) {
+    while (packet.UdpPacket.CanRead()) {
       if (ReadUpdate(packet) == false) {
         break;
       }
     }
 
-    packet.stats.StateBits = packet.stream.Position - startPtr;
+    packet.Stats.StateBits = packet.UdpPacket.Position - startPtr;
   }
 
-  public override void Lost(BoltPacket packet) {
-    while (packet.ProxyEnvelopes.Count > 0) {
-      var env = packet.ProxyEnvelopes.Dequeue();
+  public override void Lost(Packet packet) {
+    while (packet.EntityUpdates.Count > 0) {
+      var env = packet.EntityUpdates.Dequeue();
       var pending = env.Proxy.Envelopes.Dequeue();
 
       //BoltLog.Error("LOST ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
@@ -289,9 +289,9 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  public override void Delivered(BoltPacket packet) {
-    while (packet.ProxyEnvelopes.Count > 0) {
-      var env = packet.ProxyEnvelopes.Dequeue();
+  public override void Delivered(Packet packet) {
+    while (packet.EntityUpdates.Count > 0) {
+      var env = packet.EntityUpdates.Dequeue();
       var pending = env.Proxy.Envelopes.Dequeue();
 
       //BoltLog.Info("DELIVERED ENV {0}, IN TRANSIT: {1}", env.Proxy, env.Proxy.Envelopes.Count);
@@ -357,53 +357,53 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  bool PackUpdate(BoltPacket packet, EntityProxy proxy) {
-    int pos = packet.stream.Position;
+  bool PackUpdate(Packet packet, EntityProxy proxy) {
+    int pos = packet.UdpPacket.Position;
     int packCount = 0;
 
     EntityProxyEnvelope env = proxy.CreateEnvelope();
 
-    packet.stream.WriteBool(true);
-    packet.stream.WriteNetworkId(proxy.NetworkId);
+    packet.UdpPacket.WriteBool(true);
+    packet.UdpPacket.WriteNetworkId(proxy.NetworkId);
 
-    if (packet.stream.WriteBool(proxy.Entity.IsController(connection))) {
-      packet.stream.WriteToken(proxy.ControlTokenGained);
+    if (packet.UdpPacket.WriteBool(proxy.Entity.IsController(connection))) {
+      packet.UdpPacket.WriteToken(proxy.ControlTokenGained);
       proxy.ControlTokenLost = null;
     }
     else {
-      packet.stream.WriteToken(proxy.ControlTokenLost);
+      packet.UdpPacket.WriteToken(proxy.ControlTokenLost);
       proxy.ControlTokenGained = null;
     }
 
-    if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED)) {
-      packet.stream.WriteToken(proxy.Entity.DetachToken);
+    if (packet.UdpPacket.WriteBool(proxy.Flags & ProxyFlags.DESTROY_REQUESTED)) {
+      packet.UdpPacket.WriteToken(proxy.Entity.DetachToken);
     }
     else {
       // data for first packet
-      if (packet.stream.WriteBool(proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
-        packet.stream.WriteToken(proxy.Entity.AttachToken);
+      if (packet.UdpPacket.WriteBool(proxy.Flags & ProxyFlags.CREATE_REQUESTED)) {
+        packet.UdpPacket.WriteToken(proxy.Entity.AttachToken);
 
-        packet.stream.WritePrefabId(proxy.Entity.PrefabId);
-        packet.stream.WriteTypeId(proxy.Entity.Serializer.TypeId);
+        packet.UdpPacket.WritePrefabId(proxy.Entity.PrefabId);
+        packet.UdpPacket.WriteTypeId(proxy.Entity.Serializer.TypeId);
 
-        packet.stream.WriteVector3(proxy.Entity.UnityObject.transform.position);
-        packet.stream.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
+        packet.UdpPacket.WriteVector3(proxy.Entity.UnityObject.transform.position);
+        packet.UdpPacket.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
 
-        if (packet.stream.WriteBool(proxy.Entity.IsSceneObject)) {
+        if (packet.UdpPacket.WriteBool(proxy.Entity.IsSceneObject)) {
           Assert.False(proxy.Entity.SceneId.IsNone);
-          packet.stream.WriteUniqueId(proxy.Entity.SceneId);
+          packet.UdpPacket.WriteUniqueId(proxy.Entity.SceneId);
         }
       }
 
-      packCount = proxy.Entity.Serializer.Pack(connection, packet.stream, env);
+      packCount = proxy.Entity.Serializer.Pack(connection, packet.UdpPacket, env);
     }
 
-    if (packet.stream.Overflowing) {
-      packet.stream.Position = pos;
+    if (packet.UdpPacket.Overflowing) {
+      packet.UdpPacket.Position = pos;
       return false;
     }
     if (packCount == -1) {
-      packet.stream.Position = pos;
+      packet.UdpPacket.Position = pos;
       return true;
     }
     else {
@@ -413,7 +413,7 @@ partial class EntityChannel : BoltChannel {
 
       // if we didn't pack anything and we are not creating or destroying this, just goto next
       if ((packCount == 0) && !isCreate && !isDestroy && !isForce) {
-        packet.stream.Position = pos;
+        packet.UdpPacket.Position = pos;
         return true;
       }
 
@@ -427,10 +427,10 @@ partial class EntityChannel : BoltChannel {
       proxy.Skipped = 0;
 
       // set packet number
-      env.PacketNumber = packet.number;
+      env.PacketNumber = packet.Number;
 
       // put on packets list
-      packet.ProxyEnvelopes.Enqueue(env);
+      packet.EntityUpdates.Enqueue(env);
 
       // put on proxies pending queue
       // BoltLog.Info("adding envelope to {0}, count: {1}", proxy, proxy.Envelopes.Count + 1);
@@ -441,21 +441,21 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  bool ReadUpdate(BoltPacket packet) {
-    if (packet.stream.ReadBool() == false) {
+  bool ReadUpdate(Packet packet) {
+    if (packet.UdpPacket.ReadBool() == false) {
       return false;
     }
 
     // grab networkid
-    NetworkId networkId = packet.stream.ReadNetworkId();
-    bool isController = packet.stream.ReadBool();
-    IProtocolToken controlToken = packet.stream.ReadToken();
-    bool destroyRequested = packet.stream.ReadBool();
+    NetworkId networkId = packet.UdpPacket.ReadNetworkId();
+    bool isController = packet.UdpPacket.ReadBool();
+    IProtocolToken controlToken = packet.UdpPacket.ReadToken();
+    bool destroyRequested = packet.UdpPacket.ReadBool();
 
     // we're destroying this proxy
     if (destroyRequested) {
       EntityProxy proxy;
-      IProtocolToken detachToken = packet.stream.ReadToken();
+      IProtocolToken detachToken = packet.UdpPacket.ReadToken();
 
       if (_incomming.TryGetValue(networkId, out proxy)) {
         if (proxy.Entity.HasControl) {
@@ -472,7 +472,7 @@ partial class EntityChannel : BoltChannel {
       IProtocolToken attachToken = null;
 
       bool isSceneObject = false;
-      bool createRequested = packet.stream.ReadBool();
+      bool createRequested = packet.UdpPacket.ReadBool();
 
       UniqueId sceneId = UniqueId.None;
       PrefabId prefabId = new PrefabId();
@@ -481,15 +481,15 @@ partial class EntityChannel : BoltChannel {
       Quaternion spawnRotation = new Quaternion();
 
       if (createRequested) {
-        attachToken = packet.stream.ReadToken();
-        prefabId = packet.stream.ReadPrefabId();
-        serializerId = packet.stream.ReadTypeId();
-        spawnPosition = packet.stream.ReadVector3();
-        spawnRotation = packet.stream.ReadQuaternion();
-        isSceneObject = packet.stream.ReadBool();
+        attachToken = packet.UdpPacket.ReadToken();
+        prefabId = packet.UdpPacket.ReadPrefabId();
+        serializerId = packet.UdpPacket.ReadTypeId();
+        spawnPosition = packet.UdpPacket.ReadVector3();
+        spawnRotation = packet.UdpPacket.ReadQuaternion();
+        isSceneObject = packet.UdpPacket.ReadBool();
 
         if (isSceneObject) {
-          sceneId = packet.stream.ReadUniqueId();
+          sceneId = packet.UdpPacket.ReadUniqueId();
         }
       }
 
@@ -544,7 +544,7 @@ partial class EntityChannel : BoltChannel {
         _incomming.Add(proxy.NetworkId, proxy);
 
         // read packet
-        entity.Serializer.Read(connection, packet.stream, packet.frame);
+        entity.Serializer.Read(connection, packet.UdpPacket, packet.Frame);
 
         // attach entity
         proxy.Entity.AttachToken = attachToken;
@@ -581,7 +581,7 @@ partial class EntityChannel : BoltChannel {
         }
 
         // read update
-        proxy.Entity.Serializer.Read(connection, packet.stream, packet.frame);
+        proxy.Entity.Serializer.Read(connection, packet.UdpPacket, packet.Frame);
       }
 
     }

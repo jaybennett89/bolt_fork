@@ -4,7 +4,6 @@ using UE = UnityEngine;
 namespace Bolt {
   [Documentation]
   public static class Math {
-
     internal static float InterpolateFloat(BoltDoubleList<NetworkStorage> frames, int offset, int frame) {
       var f0 = frames.first;
       var p0 = f0.Values[offset].Float1;

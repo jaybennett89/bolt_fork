@@ -447,8 +447,16 @@ public class BoltEditorWindow : BoltWindow {
             p.StateAssetSettings.MecanimDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimDirection);
 
             switch (p.StateAssetSettings.MecanimMode) {
-              case MecanimMode.Parameter: p.StateAssetSettings.MecanimDamping = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.MecanimDamping, "Damping Time"); break;
-              case MecanimMode.LayerWeight: p.StateAssetSettings.MecanimLayer = BoltEditorGUI.IntFieldOverlay(p.StateAssetSettings.MecanimLayer, "Layer Index"); break;
+              case MecanimMode.Parameter:
+                if (p.StateAssetSettings.MecanimDirection == MecanimDirection.UsingBoltProperties) {
+                  p.StateAssetSettings.MecanimDamping = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.MecanimDamping, "Damping Time");
+                }
+
+                break;
+
+              case MecanimMode.LayerWeight:
+                p.StateAssetSettings.MecanimLayer = BoltEditorGUI.IntFieldOverlay(p.StateAssetSettings.MecanimLayer, "Layer Index");
+                break;
             }
 
             EditorGUI.EndDisabledGroup();

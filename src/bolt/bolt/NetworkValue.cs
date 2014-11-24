@@ -66,5 +66,17 @@ namespace Bolt {
       get { return (System.Action)Object; }
       set { Object = value; }
     }
+
+    public static bool Diff(Boolean a, Boolean b) { return a != b; }
+    public static bool Diff(Int32 a, Int32 b) { return a != b; }
+    public static bool Diff(Single a, Single b) { return a != b; }
+    public static bool Diff(NetworkId a, NetworkId b) { return a != b; }
+    public static bool Diff(PrefabId a, PrefabId b) { return a != b; }
+    public static bool Diff(NetworkTrigger a, NetworkTrigger b) { return a != b; }
+    public static bool Diff(UnityEngine.Vector2 a, UnityEngine.Vector2 b) { return a != b; }
+    public static bool Diff(UnityEngine.Vector3 a, UnityEngine.Vector3 b) { return a != b; }
+    public static bool Diff(UnityEngine.Quaternion a, UnityEngine.Quaternion b) { return a != b; }
+    public static bool Diff(UnityEngine.Color a, UnityEngine.Color b) { return a != b; }
+    public static bool Diff(System.Object a, System.Object b) { return ReferenceEquals(a, b) == false; }
   }
 }

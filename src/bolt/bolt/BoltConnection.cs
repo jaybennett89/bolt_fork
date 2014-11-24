@@ -300,23 +300,23 @@ public class BoltConnection : BoltObject {
 
   internal void Send() {
     try {
-      BoltPacket packet = BoltPacketPool.Acquire();
-      packet.stats = new PacketStats();
-      packet.number = ++_packetCounter;
-      packet.frame = BoltCore.frame;
-      packet.stream.UserToken = packet;
-      packet.stream.WriteInt(packet.frame);
+      Packet packet = PacketPool.Acquire();
+      packet.Stats = new PacketStats();
+      packet.Number = ++_packetCounter;
+      packet.Frame = BoltCore.frame;
+      packet.UdpPacket.UserToken = packet;
+      packet.UdpPacket.WriteInt(packet.Frame);
 
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Pack(packet);
       }
 
-      Assert.False(packet.stream.Overflowing);
+      Assert.False(packet.UdpPacket.Overflowing);
 
-      _udp.Send(packet.stream);
+      _udp.Send(packet.UdpPacket);
 
-      _bitsSecondOutAcc += packet.stream.Position;
-      _packetStatsOut.Enqueue(packet.stats);
+      _bitsSecondOutAcc += packet.UdpPacket.Position;
+      _packetStatsOut.Enqueue(packet.Stats);
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
@@ -327,17 +327,17 @@ public class BoltConnection : BoltObject {
   //internal void PacketReceived(BoltPacket packet) {
   internal void PacketReceived(UdpPacket stream) {
     try {
-      BoltPacket packet = new BoltPacket();
-      packet.stream = stream;
-      packet.frame = packet.stream.ReadInt();
-      packet.stats = new PacketStats();
+      Packet packet = new Packet();
+      packet.UdpPacket = stream;
+      packet.Frame = packet.UdpPacket.ReadInt();
+      packet.Stats = new PacketStats();
 
-      if (packet.frame > _remoteFrameActual) {
+      if (packet.Frame > _remoteFrameActual) {
         _remoteFrameAdjust = true;
-        _remoteFrameActual = packet.frame;
+        _remoteFrameActual = packet.Frame;
       }
 
-      _bitsSecondInAcc += packet.stream.Size;
+      _bitsSecondInAcc += packet.UdpPacket.Size;
       _packetsReceived += 1;
 
       for (int i = 0; i < _channels.Length; ++i) {
@@ -348,8 +348,8 @@ public class BoltConnection : BoltObject {
         _channels[i].ReadDone();
       }
 
-      _packetStatsIn.Enqueue(packet.stats);
-      Assert.False(packet.stream.Overflowing);
+      _packetStatsIn.Enqueue(packet.Stats);
+      Assert.False(packet.UdpPacket.Overflowing);
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
@@ -358,10 +358,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketDelivered(BoltPacket packet) {
+  internal void PacketDelivered(Packet packet) {
     try {
-      Assert.True((notifyPacketNumber + 1) == packet.number, "notify packet number did not match");
-      notifyPacketNumber = packet.number;
+      Assert.True((notifyPacketNumber + 1) == packet.Number, "notify packet number did not match");
+      notifyPacketNumber = packet.Number;
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Delivered(packet);
       }
@@ -372,10 +372,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal void PacketLost(BoltPacket packet) {
+  internal void PacketLost(Packet packet) {
     try {
-      Assert.True((notifyPacketNumber + 1) == packet.number, "notify packet number did not match");
-      notifyPacketNumber = packet.number;
+      Assert.True((notifyPacketNumber + 1) == packet.Number, "notify packet number did not match");
+      notifyPacketNumber = packet.Number;
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Lost(packet);
       }

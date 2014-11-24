@@ -27,5 +27,13 @@ namespace Bolt {
         this.Frame = frame;
       }
     }
+
+    public static bool operator ==(NetworkTrigger a, NetworkTrigger b) {
+      return a.Frame == b.Frame && a.History == b.History;
+    }
+
+    public static bool operator !=(NetworkTrigger a, NetworkTrigger b) {
+      return a.Frame != b.Frame || a.History != b.History;
+    }
   }
 }

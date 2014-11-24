@@ -417,7 +417,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectFailed:
-          BoltInternal.GlobalEventListenerBase.ConnectFailedInvoke(ev.EndPoint);
+          HandleConnectFailed(ev.EndPoint);
           break;
 
         case UdpEventType.ConnectRefused:
@@ -429,11 +429,11 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.PacketLost:
-          ev.Connection.GetBoltConnection().PacketLost((BoltPacket)ev.Packet.UserToken);
+          ev.Connection.GetBoltConnection().PacketLost((Packet)ev.Packet.UserToken);
           break;
 
         case UdpEventType.PacketDelivered:
-          ev.Connection.GetBoltConnection().PacketDelivered((BoltPacket)ev.Packet.UserToken);
+          ev.Connection.GetBoltConnection().PacketDelivered((Packet)ev.Packet.UserToken);
           break;
 
         case UdpEventType.PacketReceived:
@@ -443,9 +443,23 @@ internal static class BoltCore {
     }
   }
 
+  static void HandleConnectFailed(UdpEndPoint endpoint) {
+    try {
+      BoltInternal.GlobalEventListenerBase.ConnectFailedInvoke(endpoint);
+    }
+    finally {
+      Shutdown();
+    }
+  }
+
   static void HandleConnectRefused(UdpEndPoint endpoint, byte[] token) {
-    BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint);
-    BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint, token.ToToken());
+    try {
+      BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint);
+      BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint, token.ToToken());
+    }
+    finally {
+      Shutdown();
+    }
   }
 
   static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
