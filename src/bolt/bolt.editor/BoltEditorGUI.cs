@@ -109,7 +109,6 @@ public static class BoltEditorGUI {
 
         BoltEditorGUI.WithLabel("Extrapolation Settings", () => {
           pdef.StateAssetSettings.ExtrapolationMaxFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationMaxFrames, "Max Frames");
-          pdef.StateAssetSettings.ExtrapolationCorrectionFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationCorrectionFrames, "Correction Frames");
           pdef.StateAssetSettings.ExtrapolationErrorTolerance = FloatFieldOverlay(pdef.StateAssetSettings.ExtrapolationErrorTolerance, "Error Tolerance");
         });
       }

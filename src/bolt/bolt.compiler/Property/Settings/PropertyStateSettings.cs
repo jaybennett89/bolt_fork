@@ -13,7 +13,7 @@ namespace Bolt.Compiler {
     public float ExtrapolationErrorTolerance = 0.25f;
 
     [ProtoMember(18)]
-    public int ExtrapolationCorrectionFrames = 6;
+    public int _ExtrapolationCorrectionFrames = 6;
 
     [ProtoMember(19)]
     public int ExtrapolationMaxFrames = 9;
