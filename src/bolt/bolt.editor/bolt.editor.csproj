@@ -204,7 +204,6 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_server.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_settings.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state.png" />
-    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state2.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_struct.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_upload.png" />
   </ItemGroup>
@@ -214,6 +213,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_bubble.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_minus_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller_only.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ping.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ping_sim.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_position.png" />
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_rotation.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

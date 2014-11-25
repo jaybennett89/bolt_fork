@@ -273,7 +273,7 @@ public class BoltSettingsWindow : EditorWindow {
     Header("Connection", "mc_connection");
     Connection();
 
-    Header("Latency Simulation", "mc_state2");
+    Header("Latency Simulation", "mc_ping_sim");
     Simulation();
 
     Header("Miscellaneous", "mc_settings");
