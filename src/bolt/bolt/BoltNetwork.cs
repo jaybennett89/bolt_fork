@@ -143,7 +143,11 @@ public static class BoltNetwork {
   }
 
   public static bool isServerOrNotRunning {
-    get { return (isServer == true) || (isClient == false); }
+    get { return isServer || (isClient == false); }
+  }
+
+  public static bool isConnected {
+    get { return isServer || (isClient && BoltCore._connections.count > 0); }
   }
 
   /// <summary>
@@ -152,6 +156,7 @@ public static class BoltNetwork {
   public static bool isClient {
     get { return BoltCore.isClient; }
   }
+
 
   /// <summary>
   /// If bolt is running
