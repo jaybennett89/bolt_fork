@@ -598,7 +598,6 @@ partial class EntityChannel : BoltChannel {
       proxy.Entity.Proxies.Remove(proxy);
     }
 
-    // if we're told to ignore this destroy, instantly re-create the proxy
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
       CreateOnRemote(proxy.Entity);
     }

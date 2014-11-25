@@ -326,6 +326,7 @@ internal static class BoltCore {
 
       Factory.UnregisterAll();
       BoltLog.RemoveAll();
+      BoltConsole.Clear();
     }
   }
 
@@ -562,10 +563,6 @@ internal static class BoltCore {
 
   internal static void Poll() {
     if (hasSocket) {
-      if (UE.Time.timeScale != 1f) {
-        BoltLog.Error("Time.timeScale is not 1, value: {0}", UE.Time.timeScale);
-      }
-
       _frame += 1;
 
       BoltCore.UpdateUPnP();
@@ -771,9 +768,10 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
+    BoltConsole.Clear();
+
     // close any existing socket
     Shutdown();
-
 
     var isServer = mode == BoltNetworkModes.Server;
     var isClient = mode == BoltNetworkModes.Client;
