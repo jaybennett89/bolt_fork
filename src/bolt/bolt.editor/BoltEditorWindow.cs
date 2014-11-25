@@ -389,7 +389,25 @@ public class BoltEditorWindow : BoltWindow {
 
     if (def is StateDefinition || def is StructDefinition) {
       p.Name = BoltEditorGUI.TextFieldOverlay(p.Name, p.Priority.ToString(), GUILayout.Width(181));
-      p.Controller = BoltEditorGUI.Toggle("mc_controller", p.Controller);
+
+      switch (p.ReplicationMode) {
+        case ReplicationMode.Everyone:
+          BoltEditorGUI.Toggle("mc_controller_plus", true);
+          break;
+
+        case ReplicationMode.EveryoneExceptController:
+          BoltEditorGUI.Toggle("mc_controller", false);
+          break;
+
+        case ReplicationMode.OnlyOwnerAndController:
+          BoltEditorGUI.Toggle("mc_controller_only", true);
+          break;
+
+        case ReplicationMode.OnlyOwner:
+          BoltEditorGUI.Toggle("mc_owner_only", true);
+          break;
+      }
+
     }
     else {
       p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
@@ -414,6 +432,12 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndHorizontal();
 
+    if (p.Controller) {
+      p.ReplicationMode = ReplicationMode.Everyone;
+      p.Controller = false;
+      Save();
+    }
+
     if (p.Expanded) {
       GUILayout.Space(2);
 
@@ -424,7 +448,7 @@ public class BoltEditorWindow : BoltWindow {
       if (def is StateDefinition || def is StructDefinition) {
         BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
-          p.Controller = BoltEditorGUI.ToggleDropdown("Replicate To Controller", "Don't Replicate To Controller", p.Controller);
+          p.ReplicationMode = (ReplicationMode)EditorGUILayout.EnumPopup(p.ReplicationMode);
         });
       }
 

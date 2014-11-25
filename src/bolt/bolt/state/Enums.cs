@@ -28,6 +28,18 @@ namespace Bolt {
     Disabled = 0,
   }
 
+#if BOLT_COMPILER_DLL
+  [ProtoContract(EnumPassthru = true)]
+  public
+#else
+  internal
+#endif
+ enum ReplicationMode {
+    EveryoneExceptController = 0,
+    Everyone = 1,
+    OnlyOwnerAndController = 2,
+    OnlyOwner = 3
+  }
 
 #if BOLT_COMPILER_DLL
   [ProtoContract(EnumPassthru = true)]

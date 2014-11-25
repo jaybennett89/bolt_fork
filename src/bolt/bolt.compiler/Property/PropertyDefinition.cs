@@ -36,6 +36,9 @@ namespace Bolt.Compiler {
     [ProtoMember(10)]
     public bool Controller;
 
+    [ProtoMember(11)]
+    public ReplicationMode ReplicationMode;
+
     [ProtoMember(7)]
     public string Comment;
 

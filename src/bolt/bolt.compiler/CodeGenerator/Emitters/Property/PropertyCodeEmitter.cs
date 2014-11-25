@@ -189,10 +189,26 @@ namespace Bolt.Compiler {
     }
 
     public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, Offsets offsets) {
-      int filters = (1 << 30);
-
+      // fix for transfer from old system
       if (Decorator.Definition.Controller) {
-        filters |= (1 << 31);
+        Decorator.Definition.ReplicationMode = ReplicationMode.Everyone;
+      }
+
+      int filters = 0;
+
+      switch (Decorator.Definition.ReplicationMode) {
+        case ReplicationMode.Everyone:
+          filters |= (1 << 30);
+          filters |= (1 << 31);
+          break;
+
+        case ReplicationMode.EveryoneExceptController:
+          filters |= (1 << 30);
+          break;
+
+        case ReplicationMode.OnlyOwnerAndController:
+          filters |= (1 << 31);
+          break;
       }
 
       statements.Call(expr, "Settings_Property",

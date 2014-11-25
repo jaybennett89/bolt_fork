@@ -221,6 +221,12 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_position.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_rotation.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_owner_only.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller_plus.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
