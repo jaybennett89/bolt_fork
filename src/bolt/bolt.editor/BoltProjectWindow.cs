@@ -131,8 +131,8 @@ public class BoltProjectWindow : BoltWindow {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("New State"), false, () => NewAsset(new StateDefinition()));
         menu.AddItem(new GUIContent("New Object"), false, () => NewAsset(new StructDefinition()));
-        menu.AddItem(new GUIContent("New NetworkEvent"), false, () => NewAsset(new EventDefinition()));
-        menu.AddItem(new GUIContent("New RootCommand"), false, () => NewAsset(new CommandDefinition()));
+        menu.AddItem(new GUIContent("New Event"), false, () => NewAsset(new EventDefinition()));
+        menu.AddItem(new GUIContent("New Command"), false, () => NewAsset(new CommandDefinition()));
         menu.ShowAsContext();
       }
     }
