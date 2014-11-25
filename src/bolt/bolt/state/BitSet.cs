@@ -153,6 +153,5 @@ namespace Bolt {
     public BitSetIterator GetIterator() {
       return new BitSetIterator(this);
     }
-
   }
 }
