@@ -50,11 +50,10 @@ namespace Bolt.Compiler {
       return States.First(x => x.Guid == guid);
     }
 
-    public void GenerateCode(string file, bool allowStatePropertySetters) {
+    public void GenerateCode(string file) {
       CodeGenerator cg;
 
       cg = new CodeGenerator();
-      cg.AllowStatePropertySetters = allowStatePropertySetters;
       cg.Run(this, file);
     }
 

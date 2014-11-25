@@ -118,13 +118,27 @@ partial class GlobalEventListenerBase {
   }
 
   
-  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken token) {  }
+  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {  }
 
-  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
+  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken) { 
     BoltLog.Debug("Invoking callback Connected");
     foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.Connected(connection, token);
+			cb.Connected(connection, acceptToken);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
+  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {  }
+
+  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) { 
+    BoltLog.Debug("Invoking callback Connected");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.Connected(connection, acceptToken, connectToken);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -209,6 +223,20 @@ partial class GlobalEventListenerBase {
     foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Disconnected(connection);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
+  public virtual void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {  }
+
+  internal static void DisconnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
+    BoltLog.Debug("Invoking callback Disconnected");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.Disconnected(connection, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}

@@ -36,6 +36,9 @@ namespace Bolt.Compiler {
     [ProtoMember(10)]
     public bool Controller;
 
+    [ProtoMember(11)]
+    public ReplicationMode ReplicationMode;
+
     [ProtoMember(7)]
     public string Comment;
 
@@ -63,5 +66,17 @@ namespace Bolt.Compiler {
       get { return AssetSettings as PropertyCommandSettings; }
     }
 
+    public void Oncreated() {
+      Enabled = true;
+      Expanded = true;
+
+      Priority = 1;
+
+      if (StateAssetSettings != null) {
+        StateAssetSettings.SnapMagnitude = 10f;
+      }
+
+      PropertyType.OnCreated();
+    }
   }
 }

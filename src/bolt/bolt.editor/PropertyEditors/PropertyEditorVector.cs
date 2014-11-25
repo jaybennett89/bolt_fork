@@ -7,7 +7,7 @@ using UnityEditor;
 
 class PropertyEditorVector : PropertyEditor<PropertyTypeVector> {
   protected override void Edit(bool array) {
-    BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition);
+    BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition, false);
 
     BoltEditorGUI.WithLabel("Axes", () => {
       PropertyType.Selection = BoltEditorGUI.EditAxisSelection(PropertyType.Selection);
@@ -16,7 +16,7 @@ class PropertyEditorVector : PropertyEditor<PropertyTypeVector> {
     var cmdSettings = Definition.CommandAssetSettings;
     var stateSettings = Definition.StateAssetSettings;
 
-    BoltEditorGUI.WithLabel("Snap Magnitude", () => {
+    BoltEditorGUI.WithLabel("Teleport Threshold", () => {
       if (cmdSettings != null) {
         cmdSettings.SnapMagnitude = EditorGUILayout.FloatField(cmdSettings.SnapMagnitude);
       }

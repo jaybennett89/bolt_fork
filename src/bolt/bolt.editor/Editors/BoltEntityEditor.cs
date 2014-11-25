@@ -24,7 +24,7 @@ public class BoltEntityEditor : Editor {
 
     serializerIds =
       serializerFactories
-        .Select(x => x.TypeUniqueId)
+        .Select(x => x.TypeKey)
         .ToArray();
   }
 
@@ -140,7 +140,6 @@ public class BoltEntityEditor : Editor {
 
     if (entity.isAttached) {
       EditorGUILayout.Toggle("Is Owner", entity.isOwner);
-      EditorGUILayout.LabelField("UniqueId", entity.uniqueId.IdString);
 
       if (entity.source != null) {
         EditorGUILayout.LabelField("Source", entity.source.remoteEndPoint.ToString());

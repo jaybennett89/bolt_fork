@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Stopwatch = System.Diagnostics.Stopwatch;
 
 [BoltExecutionOrder(10000)]
 public class BoltSend : MonoBehaviour {

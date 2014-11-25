@@ -14,63 +14,54 @@ namespace Bolt {
       CompressionSettings = compressionSettings;
     }
 
-    public new void AddSettings(PropertyStateSettings stateSettings) {
-      Assert.True(stateSettings.ByteLength == 8);
-      StateSettings = stateSettings;
-      StateSettings.ByteLength = 4;
-    }
-
     public override void OnSimulateBefore(State state) {
       if (state.Entity.IsDummy) {
-        var f = state.Frames.first;
+        var f = state.CurrentFrame;
 
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
-            f.Data.PackF32(Settings.ByteOffset, Bolt.Math.InterpolateFloat(state.Frames, Settings.ByteOffset + 4, state.Entity.Frame));
-            break;
-
-          case SmoothingAlgorithms.Extrapolation:
-            f.Data.PackF32(Settings.ByteOffset, Bolt.Math.ExtrapolateFloat(state.Frames, Settings.ByteOffset + 4, state.Entity.Frame, SmoothingSettings, f.Data.ReadF32(Settings.ByteOffset)));
+            f.Storage[Settings.OffsetStorage].Float0 = Bolt.Math.InterpolateFloat(state.Frames, Settings.OffsetStorage, state.Entity.Frame);
             break;
         }
       }
     }
 
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, NetworkFrame frame) {
       return CompressionSettings.BitsRequired;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset);
+      return state.CurrentFrame.Storage[Settings.OffsetStorage].Float0;
     }
 
     protected override void PullMecanimValue(State state) {
-      state.Frames.first.Data.PackF32(Settings.ByteOffset, state.Animator.GetFloat(Settings.PropertyName));
+      state.CurrentFrame.Storage[Settings.OffsetStorage].Float0 = state.Animator.GetFloat(Settings.PropertyName);
     }
 
     protected override void PushMecanimValue(State state) {
-      state.Animator.SetFloat(Settings.PropertyName, Blit.ReadF32(state.Frames.first.Data, Settings.ByteOffset), MecanimSettings.Damping, BoltCore.frameDeltaTime);
+      state.Animator.SetFloat(Settings.PropertyName, state.CurrentFrame.Storage[Settings.OffsetStorage].Float0, MecanimSettings.Damping, BoltCore.frameDeltaTime);
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      CompressionSettings.Pack(stream, Blit.ReadF32(data, Settings.ByteOffset));
+    protected override bool Pack(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
+      CompressionSettings.Pack(stream, storage[Settings.OffsetStorage].Float0);
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      int offset = Settings.ByteOffset;
+    protected override void Read(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
+      float vale = CompressionSettings.Read(stream);
 
       if (Settings.PropertyMode == PropertyModes.State && SmoothingSettings.Algorithm != SmoothingAlgorithms.None) {
-        offset += 4;
+        storage[Settings.OffsetStorage].Float1 = vale;
       }
-
-      Blit.PackF32(data, offset, CompressionSettings.Read(stream));
+      else {
+        storage[Settings.OffsetStorage].Float0 = vale;
+      }
     }
 
-    public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-      float v0 = from.ReadF32(Settings.ByteOffset);
-      float v1 = to.ReadF32(Settings.ByteOffset);
-      into.PackF32(Settings.ByteOffset, UE.Mathf.Lerp(v0, v1, t));
+    public override void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) {
+      float v0 = from[Settings.OffsetStorage].Float0;
+      float v1 = to[Settings.OffsetStorage].Float0;
+      into[Settings.OffsetStorage].Float0 = UE.Mathf.Lerp(v0, v1, t);
     }
   }
 }

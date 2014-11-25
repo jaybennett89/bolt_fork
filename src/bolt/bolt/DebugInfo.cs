@@ -230,7 +230,7 @@ namespace Bolt {
           debugInfoScroll = GUILayout.BeginScrollView(debugInfoScroll, false, false, GUIStyle.none, GUIStyle.none);
           GUILayout.BeginVertical();
 
-          var state = (State)entity.Serializer;
+          var state = (NetworkState)entity.Serializer;
 
           if (Input.GetKeyDown(KeyCode.L)) {
             BoltNetworkInternal.DebugDrawer.SelectGameObject(entity.UnityObject.gameObject);
@@ -242,9 +242,9 @@ namespace Bolt {
 
           LabelField("World Position", entity.UnityObject.transform.position);
 
-          LabelField("Frame Count", state.Frames.count);
-          LabelField("Frame Latest Number", state.Frames.last.Number);
-          LabelField("Frame Server Number", BoltNetwork.serverFrame);
+          LabelField("ServerFrame Count", state.Frames.count);
+          LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
+          LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
           LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
           entity.Serializer.DebugInfo();

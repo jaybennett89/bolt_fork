@@ -5,24 +5,21 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  class PropertyCodeEmitterInteger : PropertyCodeEmitterSimple<PropertyDecoratorInteger> {
-    public override string ReadMethod {
-      get { return "ReadI32"; }
+  class PropertyCodeEmitterInteger : PropertyCodeEmitter<PropertyDecoratorInteger> {
+    public override string StorageField {
+      get { return "Int0"; }
     }
 
-    public override string PackMethod {
-      get { return "PackI32"; }
-    }
-
-    public override void AddSettingsArgument(List<string> settings) {
+    public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
       if (Decorator.PropertyType.CompressionEnabled) {
-        var pt = Decorator.PropertyType;
-        settings.Add(string.Format("Bolt.PropertyIntCompressionSettings.Create({0}, {1})", pt.BitsRequired, -pt.MinValue));
+        statements.Call(expr, "Settings_Integer",
+          "Bolt.PropertyIntCompressionSettings.Create({0}, {1})".Expr( Decorator.PropertyType.BitsRequired, -Decorator.PropertyType.MinValue)
+        );
       }
       else {
-        settings.Add("Bolt.PropertyIntCompressionSettings.Create()");
+        statements.Call(expr, "Settings_Integer", "Bolt.PropertyIntCompressionSettings.Create()".Expr());
       }
-    }
 
+    }
   }
 }

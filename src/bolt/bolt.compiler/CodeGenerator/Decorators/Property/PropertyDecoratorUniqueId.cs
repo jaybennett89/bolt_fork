@@ -9,10 +9,6 @@ namespace Bolt.Compiler {
       get { return "Bolt.NetworkId"; }
     }
 
-    public override int ByteSize {
-      get { return 8; }
-    }
-
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterNetworkId();
     }

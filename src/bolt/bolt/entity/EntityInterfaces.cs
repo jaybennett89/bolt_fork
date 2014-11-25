@@ -40,7 +40,7 @@ namespace Bolt {
     /// <param name="mask">The mask of properties with updated values we want to replicate</param>
     /// <param name="skipped">How many packets since we sent an update for this entity</param>
     /// <returns>The priority of the entity</returns>
-    float CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped);
+    float CalculateStatePriority(BoltConnection connection, int skipped);
 
     /// <summary>
     /// Called for calculating the priority of an event sent to this entity for the connection passed in
@@ -48,7 +48,7 @@ namespace Bolt {
     /// <param name="connection">The connection we are calculating priority for</param>
     /// <param name="evnt">The event we are calculating priority for</param>
     /// <returns>The priority of the event</returns>
-    float CalculateEventPriority(BoltConnection connection, Event evnt);
+    float CalculateEventPriority(BoltConnection connection, NetworkEvent evnt);
 
     bool Always { get; }
   }
@@ -71,8 +71,8 @@ namespace Bolt {
     void OnControlGained();
     void OnControlLost();
 
-    BitArray GetDefaultMask();
-    BitArray GetFilter(BoltConnection connection, EntityProxy proxy);
+    BitSet GetDefaultMask();
+    BitSet GetFilter(BoltConnection connection, EntityProxy proxy);
 
     void DebugInfo();
     void InitProxy(EntityProxy p);

@@ -5,15 +5,29 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class EventDecorator : AssetDecorator<EventDefinition> {
-    public int ByteSize;
-    public List<PropertyDecorator> Properties = new List<PropertyDecorator>();
-
-    public string FactoryName {
-      get { return Definition.Name + "Factory"; }
+    public override string FactoryInterface {
+      get { return "Bolt.IEventFactory"; }
     }
 
-    public string ListenerName {
-      get { return "I" + Definition.Name + "Listener"; }
+    public override string BaseClass {
+      get { return "Bolt.NetworkEvent"; }
+    }
+
+    public override bool EmitPropertyChanged {
+      get { return false; }
+    }
+
+    public override List<PropertyDecorator> Properties {
+      get;
+      set;
+    }
+
+    public string ListenerInterface {
+      get { return "I" + Name + "Listener"; }
+    }
+
+    public EventDecorator(EventDefinition def) {
+      Definition = def;
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using Bolt;
 using System;
 using System.Collections;
+using BoltInternal;
 using UE = UnityEngine;
 
 [Documentation]
@@ -11,17 +12,17 @@ public class BoltEntitySettingsModifier : IDisposable {
     _entity = entity;
   }
 
-  public Bolt.PrefabId prefabId {
+  public PrefabId prefabId {
     get { return _entity.prefabId; }
     set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
   }
 
-  public Bolt.UniqueId sceneId {
+  public UniqueId sceneId {
     get { return _entity.sceneGuid; }
     set { _entity.VerifyNotAttached(); _entity.sceneGuid = value; }
   }
 
-  public Bolt.UniqueId serializerId {
+  public UniqueId serializerId {
     get { return _entity.serializerGuid; }
     set { _entity.VerifyNotAttached(); _entity.serializerGuid = value; }
   }
@@ -55,7 +56,7 @@ public class BoltEntitySettingsModifier : IDisposable {
 [UE.ExecuteInEditMode]
 [BoltExecutionOrder(-2500)]
 public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
-  internal Bolt.Entity _entity;
+  internal Entity _entity;
 
   [UE.SerializeField]
   internal string _sceneGuid;
@@ -78,7 +79,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _persistThroughSceneLoads = false;
 
-  internal Bolt.Entity Entity {
+  internal Entity Entity {
     get {
       if (_entity == null) {
         throw new BoltException("You can't access any Bolt specific methods or properties on an entity which is detached");
@@ -88,13 +89,13 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     }
   }
 
-  internal Bolt.UniqueId sceneGuid {
-    get { return Bolt.UniqueId.Parse(_sceneGuid); }
+  internal UniqueId sceneGuid {
+    get { return UniqueId.Parse(_sceneGuid); }
     set { _sceneGuid = value.guid.ToString(); }
   }
 
-  internal Bolt.UniqueId serializerGuid {
-    get { return Bolt.UniqueId.Parse(_serializerGuid); }
+  internal UniqueId serializerGuid {
+    get { return UniqueId.Parse(_serializerGuid); }
     set { _serializerGuid = value.guid.ToString(); }
   }
 
@@ -102,18 +103,8 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
 
-  public Bolt.PrefabId prefabId {
+  public PrefabId prefabId {
     get { return new PrefabId(_prefabId); }
-  }
-
-  /// <summary>
-  /// The unique id of this object, can be assigned by calling BoltEntity.SetUniqueId
-  /// </summary>
-  public Bolt.UniqueId uniqueId {
-    get {
-      BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
-      return default(Bolt.UniqueId);
-    }
   }
 
   /// <summary>
@@ -237,14 +228,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="id"></param>
-  public void SetUniqueId(Bolt.UniqueId id) {
-    BoltLog.Error("SetUniqueId is deprecated, all entities are now assigned a unique id automatically found through BoltEntity.networkId");
-  }
-
-  /// <summary>
   /// Assigns control of this entity to a connection
   /// </summary>
   /// <param name="connection">The connection to assign control to</param>
@@ -279,12 +262,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
-  /// Queue a command not his entity for execution. This is called on a client which is 
-  /// controlling a proxied entity the command will also be sent to the server.
+  /// Queue a Data not his entity for execution. This is called on a client which is 
+  /// controlling a proxied entity the Data will also be sent to the server.
   /// </summary>
-  /// <param name="command">The command to queue</param>
-  public bool QueueInput(Bolt.ICommandInput command) {
-    return Entity.QueueInput((Bolt.Command)(object)command);
+  /// <param name="data">The Data to queue</param>
+  public bool QueueInput(INetworkCommandData data) {
+    return Entity.QueueInput(((NetworkCommand_Data)data).RootCommand);
   }
 
   /// <summary>
@@ -292,17 +275,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// will not receive update state for this entity as long as it's idle.
   /// </summary>
   /// <param name="connection">The connection to idle the entity on</param>
-  public void Idle(BoltConnection connection) {
-    Entity.SetIdle(connection, true);
-  }
-
-  /// <summary>
-  /// Wakes this entity up from being idle on the supplied connection, this means that the
-  /// connection will start receiving updated state for this entity
-  /// </summary>
-  /// <param name="connection">The connection to wake the entity up on</param>
-  public void Wakeup(BoltConnection connection) {
-    Entity.SetIdle(connection, false);
+  /// <param name="idle">If this should be idle or not</param>
+  public void Idle(BoltConnection connection, bool idle) {
+    Entity.SetIdle(connection, idle);
   }
 
   /// <summary>
@@ -389,12 +364,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     // only in the editor
     if ((UE.Application.isEditor == true) && (UE.Application.isPlaying == false)) {
       // check if we don't have a valid scene guid
-      if (sceneGuid == Bolt.UniqueId.None) {
+      if (sceneGuid == UniqueId.None) {
         // set a new one
-        sceneGuid = Bolt.UniqueId.New();
+        sceneGuid = UniqueId.New();
 
         // tell editor to save us
-        BoltInternal.BoltCoreInternal.ChangedEditorEntities.Add(this);
+        BoltCoreInternal.ChangedEditorEntities.Add(this);
       }
     }
   }

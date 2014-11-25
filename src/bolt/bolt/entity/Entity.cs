@@ -7,8 +7,6 @@ using UE = UnityEngine;
 
 namespace Bolt {
   partial class Entity : IBoltListNode, IPriorityCalculator {
-    static int _instanceIdCounter;
-
     bool _canQueueCommands = false;
 
     internal UniqueId SceneId;
@@ -26,8 +24,6 @@ namespace Bolt {
 
     internal IProtocolToken DetachToken;
     internal IProtocolToken AttachToken;
-    internal IProtocolToken ControlTokenLost;
-    internal IProtocolToken ControlTokenGained;
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
@@ -78,9 +74,7 @@ namespace Bolt {
       get { return Flags & EntityFlags.ATTACHED; }
     }
 
-    internal bool IsOwner {
-      get { return ReferenceEquals(Source, null); }
-    }
+    internal bool IsOwner;
 
     internal bool IsDummy {
       get { return !IsOwner && !HasPredictedControl; }
@@ -108,6 +102,14 @@ namespace Bolt {
 
     public override string ToString() {
       return string.Format("[Entity {0} {1}]", NetworkId, Serializer);
+    }
+
+    public override bool Equals(object obj) {
+      return ReferenceEquals(this, obj);
+    }
+
+    public override int GetHashCode() {
+      return NetworkId.GetHashCode();
     }
 
     internal void SetParent(Entity entity) {
@@ -154,7 +156,7 @@ namespace Bolt {
 
       p = new EntityProxy();
       p.Entity = this;
-      p.Mask = Serializer.GetDefaultMask();
+      p.Changed = Serializer.GetDefaultMask();
 
       // add to list
       Proxies.AddLast(p);
@@ -316,6 +318,8 @@ namespace Bolt {
     }
 
     internal void Initialize() {
+      IsOwner = ReferenceEquals(Source, null);
+
       // grab all behaviours
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
       PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;
@@ -536,11 +540,11 @@ namespace Bolt {
       get { return false; }
     }
 
-    float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, BitArray mask, int skipped) {
+    float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, int skipped) {
       return skipped;
     }
 
-    float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, Event evnt) {
+    float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, NetworkEvent evnt) {
       if (HasControl) {
         return 3;
       }

@@ -6,26 +6,10 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterArray : PropertyCodeEmitter<PropertyDecoratorArray> {
-    void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
-      Action<CodeStatementCollection> getter = get => {
-        get.Expr("return new {0}(frame, offsetBytes + {1}, offsetObjects + {2}, {3})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset, Decorator.PropertyType.ElementCount);
-      };
-
-      Action<CodeStatementCollection> setter = set => {
-        set.Expr("if (value.length != {0}) throw new ArgumentOutOfRangeException()", Decorator.PropertyType.ElementCount);
-        set.Expr("Array.Copy(value.frame.Data, value.offsetBytes, this.frame.Data, this.offsetBytes + {0}, {1})", Decorator.ByteOffset, Decorator.ByteSize);
-        set.Expr("Array.Copy(value.frame.Objects, value.offsetObjects, this.frame.Objects, this.offsetObjects + {0}, {1})", Decorator.ObjectOffset, Decorator.ObjectSize);
-      };
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
-    }
-
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, false);
-    }
-
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
+      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+        get.Expr("return ({0}) (Objects[this.OffsetObjects + {1}])", Decorator.ClrType, Decorator.OffsetObjects);
+      });
     }
 
     public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
@@ -34,6 +18,44 @@ namespace Bolt.Compiler {
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
       EmitSimpleIntefaceMember(type, true, false);
+    }
+
+    public override void EmitObjectSetup(DomBlock block, Offsets offsets) {
+      EmitInitObject(Decorator.ClrType, block, offsets, Decorator.PropertyType.ElementCount.Literal());
+
+      if (Decorator.PropertyType.ElementType is PropertyTypeStruct) {
+        var tmp = block.TempVar();
+        var element = (PropertyDecoratorStruct)Decorator.ElementDecorator;
+        element.Definition.Name += "[]";
+
+        offsets.OffsetStorage = "offsets.OffsetStorage + {0} + ({1} * {2})".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
+        offsets.OffsetObjects = "offsets.OffsetObjects + {0} + ({1} * {2})".Expr(Decorator.OffsetObjects + 1, tmp, element.RequiredObjects);
+        offsets.OffsetProperties = "offsets.OffsetProperties + {0} + ({1} * {2})".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
+
+        block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
+          PropertyCodeEmitter.Create(element).EmitObjectSetup(new DomBlock(body, tmp + "_"), offsets);
+        });
+      }
+    }
+
+    public override void EmitMetaSetup(DomBlock block, Offsets offsets) {
+      var tmp = block.TempVar();
+      var element = Decorator.ElementDecorator;
+      element.Definition.Name += "[]";
+
+      offsets.OffsetStorage = "{0} + ({1} * {2}) /*required-storage:{2}*/".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
+      offsets.OffsetProperties = "{0} + ({1} * {2}) /*required-properties:{2}*/".Expr(Decorator.OffsetProperties, tmp, element.RequiredProperties);
+
+      if (element.RequiredObjects == 0) {
+        offsets.OffsetObjects = "0 /*required-objects:{0}*/".Expr(element.RequiredObjects);
+      }
+      else {
+        offsets.OffsetObjects = "{0} + ({1} * {2}) /*required-objects:{2}*/".Expr(Decorator.OffsetObjects + 1, tmp, element.RequiredObjects);
+      }
+
+      block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
+        PropertyCodeEmitter.Create(element).EmitMetaSetup(new DomBlock(body, tmp + "_"), offsets, tmp.Expr());
+      });
     }
   }
 }

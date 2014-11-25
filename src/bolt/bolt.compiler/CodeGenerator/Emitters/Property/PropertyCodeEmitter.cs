@@ -1,104 +1,241 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyCodeEmitter {
+    public struct Offsets {
+      public CodeExpression OffsetStorage;
+      public CodeExpression OffsetObjects;
+      public CodeExpression OffsetProperties;
+    }
+
     public PropertyDecorator Decorator;
 
     public CodeGenerator Generator {
       get { return Decorator.Generator; }
     }
 
+    public virtual string StorageField {
+      get { return GetType().Name.Replace("PropertyCodeEmitter", ""); }
+    }
+
     public virtual string SerializerClassName {
-      get { return "Bolt.PropertySerializer" + Decorator.GetType().Name.Replace("PropertyDecorator", ""); }
+      get { return Decorator.PropertyClassName; }
     }
 
-    public CodeExpression GetCreateSerializerExpression() {
-      return "new {0}()".Expr(SerializerClassName);
-    }
-
-    public virtual void AddSettingsArgument(List<string> settings) {
+    public virtual void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
 
     }
 
     public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, Generator.AllowStatePropertySetters);
+      EmitSimpleIntefaceMember(type, true, true);
     }
 
     public virtual void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
       EmitForwardStateMember(decorator, type, true);
     }
 
-    public virtual void EmitStructMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
+    public virtual void EmitObjectMembers(CodeTypeDeclaration type) {
+      EmitSimplePropertyMembers(type, new CodeSnippetExpression("Storage"), null, true);
     }
 
-    public virtual void EmitModifierMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
+    public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed) {
+      var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
+      var property =
+        type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+          get.Add(
+            new CodeMethodReturnStatement(
+              new CodeFieldReferenceExpression(index, StorageField)
+            )
+          );
+        }, set => {
+          if (changed) {
+            set.Add("{0} oldValue".Expr(Decorator.ClrType));
+            set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
+          }
+
+          set.Add(new CodeAssignStatement(
+            new CodeFieldReferenceExpression(index, StorageField),
+            new CodeVariableReferenceExpression("value")
+          ));
+
+          if (changed) {
+            set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
+              EmitPropertyChanged(body, storage);
+            });
+          }
+        });
+
+      property.PrivateImplementationType = interfaceType;
+      property.Attributes = Decorator.Attributes;
     }
 
-    public virtual void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, true);
+    public void EmitPropertyChanged(CodeStatementCollection stmt, CodeExpression storage) {
+      if (Decorator.DefiningAsset.EmitPropertyChanged) {
+        stmt.Add(storage.Call("PropertyChanged", "this.OffsetProperties + {0}".Expr(Decorator.OffsetProperties)));
+      }
     }
 
-    public virtual void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
-      throw new NotImplementedException();
+    public virtual void EmitMetaSetup(DomBlock block) {
+      Offsets offsets = new Offsets();
+      offsets.OffsetStorage = "{0} /*required-storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
+      offsets.OffsetProperties = "{0} /*required-properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
+      offsets.OffsetObjects = "{0} /*required-objects:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
+
+      EmitMetaSetup(block, offsets);
     }
 
-    public virtual void EmitEventMembers(CodeTypeDeclaration type) {
-      throw new NotImplementedException();
+    public virtual void EmitMetaSetup(DomBlock block, Offsets offsets) {
+      EmitMetaSetup(block, offsets, null);
     }
 
-    public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, StateProperty sp) {
-      List<string> settings = new List<string>();
+    public virtual void EmitMetaSetup(DomBlock block, Offsets offsets, CodeExpression indexExpression) {
+      var tmp = block.Stmts.Var(SerializerClassName, block.TempVar());
 
-      // property settings 
-      if ((Decorator.DefiningAsset is StateDecorator) || (Decorator.DefiningAsset is StructDecorator)) {
-        settings.Add(string.Format("new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.State)", sp.OffsetBytes, Decorator.Definition.Name));
-        settings.Add(string.Format("new Bolt.PropertyStateSettings({0}, {1}, {2}, \"{3}\", {4}, {5})",
-          Decorator.Definition.Priority,
-          Decorator.ByteSize,
-          sp.OffsetObjects,
-          sp.PropertyPath,
-          sp.CallbackPathsExpression(),
-          sp.CallbackIndicesExpression()
-        ));
+      block.Stmts.Assign(tmp, SerializerClassName.New());
+      block.Stmts.Assign(tmp.Field("PropertyMeta"), "this".Expr());
+
+      EmitAddSettings(tmp, block.Stmts, offsets);
+
+      block.Stmts.Add("this".Expr().Call("AddProperty", offsets.OffsetProperties, offsets.OffsetObjects, tmp, indexExpression ?? (-1).Literal()));
+    }
+
+    public virtual void EmitObjectSetup(DomBlock block) {
+      Offsets offsets = new Offsets();
+      offsets.OffsetStorage = "offsets.OffsetStorage + {0} /*required-storage:{1}*/".Expr(Decorator.OffsetStorage, Decorator.RequiredStorage);
+      offsets.OffsetObjects = "offsets.OffsetObjects + {0} /*required-object:{1}*/".Expr(Decorator.OffsetObjects, Decorator.RequiredObjects);
+      offsets.OffsetProperties = "offsets.OffsetProperties + {0} /*required-properties:{1}*/".Expr(Decorator.OffsetProperties, Decorator.RequiredProperties);
+
+      EmitObjectSetup(block, offsets);
+    }
+
+    public virtual void EmitObjectSetup(DomBlock block, Offsets offsets) {
+      Assert.True(this.Decorator.RequiredObjects == 0);
+      block.Stmts.Comment("EMPTY");
+
+      // add storage
+      //block.Stmts.Expr("{0}.AddSerializer({1})", group, this.Decorator.RequiredStorage);
+    }
+
+    public void EmitInterpolationSettings(CodeExpression expr, CodeStatementCollection statements) {
+      var s = Decorator.Definition.StateAssetSettings;
+      var c = Decorator.Definition.CommandAssetSettings;
+
+      if (s != null) {
+        if (s.SmoothingAlgorithm != SmoothingAlgorithms.None) {
+          statements.Add(expr.Call("Settings_Interpolation", s.SnapMagnitude.Literal()));
+        }
+      }
+
+      if (c != null) {
+        if (c.SmoothCorrection) {
+          statements.Add(expr.Call("Settings_Interpolation", c.SnapMagnitude.Literal()));
+        }
+      }
+    }
+
+    public CodeExpression CreateFloatCompressionExpression(FloatCompression c, bool enabled) {
+      if (c == null) {
+        c = FloatCompression.Default();
+      }
+
+      if (enabled) {
+        if (c.Enabled) {
+          return "Bolt.PropertyFloatCompressionSettings.Create({0}, {1}f, {2}f, {3}f)".Expr(c.BitsRequired, c.Shift, c.Pack, c.Read);
+        }
+        else {
+          return "Bolt.PropertyFloatCompressionSettings.Create()".Expr();
+        }
       }
       else {
-        settings.Add(string.Format(
-          "new Bolt.PropertySettings({0}, \"{1}\", Bolt.PropertyModes.{2})", 
-          Decorator.ByteOffset, 
-          Decorator.Definition.Name,
-          Decorator.DefiningAsset is EventDecorator ? "Event" : "Command"
-        ));
+        return "default(Bolt.PropertyFloatCompressionSettings)".Expr();
+      }
+    }
+
+    public List<CodeExpression> CreateAxisCompressionExpression(FloatCompression[] axes, AxisSelections selection) {
+      if (axes == null) {
+        selection = AxisSelections.XYZ;
       }
 
-      // command settings
-      if (Decorator.DefiningAsset is CommandDecorator) {
-        settings.Add(Generator.CreateCommandSettings(Decorator.Definition));
+      List<CodeExpression> args = new List<CodeExpression>();
+      args.Add(CreateFloatCompressionExpression(axes[Axis.X], (selection & AxisSelections.X) == AxisSelections.X));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Y], (selection & AxisSelections.Y) == AxisSelections.Y));
+      args.Add(CreateFloatCompressionExpression(axes[Axis.Z], (selection & AxisSelections.Z) == AxisSelections.Z));
+      return args;
+    }
+
+    public void EmitFloatSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression c) {
+      statements.Call(expr, "Settings_Float", CreateFloatCompressionExpression(c, true));
+    }
+
+    public void EmitVectorSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, AxisSelections selection) {
+      statements.Call(expr, "Settings_Vector", CreateAxisCompressionExpression(axes, selection).ToArray());
+    }
+
+    public void EmitQuaternionSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
+      if (axes == null || quaternion == null || selection == AxisSelections.XYZ) {
+        statements.Call(expr, "Settings_Quaternion", CreateFloatCompressionExpression(quaternion, true));
       }
+      else {
+        statements.Call(expr, "Settings_QuaternionEuler", CreateAxisCompressionExpression(axes, selection).ToArray());
+      }
+    }
+
+    public void EmitInitObject(string type, DomBlock block, Offsets offsets, params CodeExpression[] ctorArguments) {
+      var tmp = block.Stmts.Var(type, block.TempVar());
+      block.Stmts.Add(tmp.Assign(type.New(ctorArguments)));
+      block.Stmts.Add(tmp.Call("Init", Decorator.Definition.Name.Literal(), "obj.Root".Expr(), "Bolt.NetworkObj_Meta.Offsets".New(offsets.OffsetProperties, offsets.OffsetStorage, offsets.OffsetObjects)));
+    }
+
+    public void EmitAddSettings(CodeExpression expr, CodeStatementCollection statements, Offsets offsets) {
+      // fix for transfer from old system
+      if (Decorator.Definition.Controller) {
+        Decorator.Definition.ReplicationMode = ReplicationMode.Everyone;
+      }
+
+      int filters = 0;
+
+      switch (Decorator.Definition.ReplicationMode) {
+        case ReplicationMode.Everyone:
+          filters |= (1 << 30);
+          filters |= (1 << 31);
+          break;
+
+        case ReplicationMode.EveryoneExceptController:
+          filters |= (1 << 30);
+          break;
+
+        case ReplicationMode.OnlyOwnerAndController:
+          filters |= (1 << 31);
+          break;
+      }
+
+      statements.Call(expr, "Settings_Property",
+        Decorator.Definition.Name.Literal(),
+        Decorator.Definition.Priority.Literal(),
+        filters.Literal()
+      );
+
+      statements.Call(expr, "Settings_Offsets",
+        offsets.OffsetProperties,
+        offsets.OffsetStorage
+      );
 
       // mecanim for states settings
       if ((Decorator.DefiningAsset is StateDecorator) && Decorator.Definition.PropertyType.MecanimApplicable) {
         var s = Decorator.Definition.StateAssetSettings;
 
-        settings.Add(string.Format("new Bolt.PropertyMecanimSettings(Bolt.MecanimMode.{0}, Bolt.MecanimDirection.{1}, {2}f, {3})",
-          s.MecanimMode,
-          s.MecanimDirection,
-          s.MecanimDamping,
-          s.MecanimLayer
-        ));
+        statements.Call(expr, "Settings_Mecanim",
+          s.MecanimMode.Literal(),
+          s.MecanimDirection.Literal(),
+          s.MecanimDamping.Literal(),
+          s.MecanimLayer.Literal()
+        );
       }
 
       // collecting property specific settings
-      AddSettingsArgument(settings);
-
-      for (int n = 0; n < settings.Count; ++n) {
-        statements.Add(new CodeMethodInvokeExpression(new CodeCastExpression(SerializerClassName, expr), "AddSettings", new CodeSnippetExpression(settings[n])));
-      }
+      AddSettings(expr, statements);
     }
 
     public void EmitSimpleIntefaceMember(CodeTypeDeclaration type, bool get, bool set) {
@@ -116,24 +253,15 @@ namespace Bolt.Compiler {
     protected void EmitForwardStateMember(StateDecorator decorator, CodeTypeDeclaration type, bool allowSetter) {
       Action<CodeStatementCollection> setter = null;
 
-      if (Generator.AllowStatePropertySetters && allowSetter) {
+      if (allowSetter) {
         setter = set => {
-          set.Expr("_Modifier.frame = Frames.first");
-          set.Expr("_Modifier.{0} = value", Decorator.Definition.Name);
+          set.Expr("_Root.{0} = value", Decorator.Definition.Name);
         };
       }
 
       type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
-        get.Expr("return (new {0}(Frames.first, 0, 0)).{1}", decorator.RootStruct.Name, Decorator.Definition.Name);
+        get.Expr("return _Root.{0}", Decorator.Definition.Name);
       }, setter);
-    }
-
-    protected string CallbackDelegateType {
-      get {
-        return Decorator.DefiningAsset is StateDecorator
-        ? String.Format("Action<{0}>", ((StateDecorator)Decorator.DefiningAsset).InterfaceName)
-        : String.Format("Action<{0}>", Decorator.DefiningAsset.Definition.Name);
-      }
     }
 
     public static PropertyCodeEmitter Create(PropertyDecorator decorator) {
@@ -144,57 +272,9 @@ namespace Bolt.Compiler {
 
       return emitter;
     }
-
   }
 
   public abstract class PropertyCodeEmitter<T> : PropertyCodeEmitter where T : PropertyDecorator {
     public new T Decorator { get { return (T)base.Decorator; } }
-  }
-
-
-  public abstract class PropertyCodeEmitterSimple<T> : PropertyCodeEmitter<T> where T : PropertyDecorator {
-    public abstract string ReadMethod {
-      get;
-    }
-
-    public abstract string PackMethod {
-      get;
-    }
-
-    string Get(object data, object offset) {
-      return string.Format("return Bolt.Blit.{2}({0}, {1})", data, offset, ReadMethod);
-    }
-
-    string Set(object data, object offset) {
-      if ((Decorator.DefiningAsset is StructDecorator) || (Decorator.DefiningAsset is StateDecorator)) {
-        return string.Format("frame.Changed = true; Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
-      }
-      else {
-        return string.Format("Bolt.Blit.{2}({0}, {1}, value)", data, offset, PackMethod);
-      }
-    }
-
-    void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
-      var offset = "offsetBytes + " + Decorator.ByteOffset;
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("frame.Data", offset), emitSetter ? Set("frame.Data", offset) : null);
-    }
-
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, false);
-    }
-
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
-    }
-
-    public override void EmitCommandMembers(CodeTypeDeclaration type, string bytes, string implType) {
-      CodeMemberProperty property;
-      property = type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get(bytes, Decorator.ByteOffset), Set(bytes, Decorator.ByteOffset));
-      property.PrivateImplementationType = new CodeTypeReference(implType);
-    }
-
-    public override void EmitEventMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, Get("Data", Decorator.ByteOffset), Set("Data", Decorator.ByteOffset));
-    }
   }
 }

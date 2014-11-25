@@ -35,10 +35,41 @@ namespace Bolt.Compiler {
       statements.Add(new CodeCommentStatement(string.Format(comment, args)));
     }
 
+    public static void Call(this CodeStatementCollection stmts, CodeExpression expr, string method, params CodeExpression[] args) {
+      stmts.Add(new CodeMethodInvokeExpression(expr, method, args));
+    }
+
+    public static CodeExpression Call(this CodeExpression expr, string method, params CodeExpression[] args) {
+      return new CodeMethodInvokeExpression(expr, method, args);
+    }
+
     public static void CommentSummary(this CodeTypeMember member, Action<CodeTypeMember> commenter) {
       Comment(member, true, "<summary>");
       commenter(member);
       Comment(member, true, "</summary>");
+    }
+
+    public static void DeclareModifyObsolete(this CodeTypeMember member) {
+      member.DeclareObsolete("Modify and the using(var modify = ...) syntax is deprecated. Change properties directly instead.");
+    }
+
+    public static void DeclareObsolete(this CodeTypeMember member, string message) {
+      CodeAttributeArgument argument = new CodeAttributeArgument(new CodeSnippetExpression('"' + message + '"'));
+      member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Obsolete", argument));
+    }
+
+    public static void IfDef(this CodeStatementCollection stmts, string symbol, Action<CodeStatementCollection> ifdef) {
+      stmts.Add(new CodeSnippetStatement("#if " + symbol));
+      ifdef(stmts);
+      stmts.Add(new CodeSnippetStatement("#endif"));
+    }
+
+    public static CodeExpression Field(this CodeExpression expr, string field) {
+      return new CodeFieldReferenceExpression(expr, field);
+    }
+
+    public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, Type returnType, string methodName, Action<CodeMemberMethod> body) {
+      return DeclareMethod(type, returnType.FullName, methodName, body);
     }
 
     public static CodeMemberMethod DeclareMethod(this CodeTypeDeclaration type, string returnType, string methodName, Action<CodeMemberMethod> body) {
@@ -51,6 +82,10 @@ namespace Bolt.Compiler {
 
       if (body != null) {
         body(method);
+
+        if (type.IsInterface) {
+          method.Statements.Clear();
+        }
       }
 
       type.Members.Add(method);
@@ -85,13 +120,20 @@ namespace Bolt.Compiler {
       prop.Name = propertyName;
       prop.Type = new CodeTypeReference(propertyType);
       prop.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+      prop.HasGet = (getter != null);
+      prop.HasSet = (setter != null);
 
-      if (prop.HasGet = (getter != null)) {
+      if (prop.HasGet) {
         getter(prop.GetStatements);
       }
 
-      if (prop.HasSet = (setter != null)) {
+      if (prop.HasSet) {
         setter(prop.SetStatements);
+      }
+
+      if (type.IsInterface) {
+        prop.GetStatements.Clear();
+        prop.SetStatements.Clear();
       }
 
       type.Members.Add(prop);
@@ -130,12 +172,12 @@ namespace Bolt.Compiler {
       return field;
     }
 
-    public static void For(this CodeStatementCollection stmts, string variableName, string testExpression, Action<CodeStatementCollection> body) {
+    public static void For(this CodeStatementCollection stmts, string variableName, CodeExpression testExpression, Action<CodeStatementCollection> body) {
       CodeIterationStatement it;
 
       it = new CodeIterationStatement();
       it.InitStatement = ("int " + variableName + " = 0").Stmt();
-      it.TestExpression = testExpression.Expr();
+      it.TestExpression = testExpression;
       it.IncrementStatement = ("++" + variableName).Stmt();
 
       body(it.Statements);
@@ -143,16 +185,35 @@ namespace Bolt.Compiler {
       stmts.Add(it);
     }
 
-    public static void DeclareParameter(this CodeMemberProperty method, string paramType, string paramName) {
-      method.Parameters.Add(new CodeParameterDeclarationExpression(paramType, paramName));
+    public static void For(this CodeStatementCollection stmts, string variableName, string testExpression, Action<CodeStatementCollection> body) {
+      stmts.For(variableName, testExpression.Expr(), body);
     }
 
-    public static void DeclareParameter(this CodeMemberMethod method, string paramType, string paramName) {
+    public static CodeVariableReferenceExpression DeclareParameter(this CodeMemberProperty method, string paramType, string paramName) {
       method.Parameters.Add(new CodeParameterDeclarationExpression(paramType, paramName));
+      return new CodeVariableReferenceExpression(paramName);
+    }
+
+    public static CodeVariableReferenceExpression DeclareParameter(this CodeMemberMethod method, string paramType, string paramName) {
+      method.Parameters.Add(new CodeParameterDeclarationExpression(paramType, paramName));
+      return new CodeVariableReferenceExpression(paramName);
     }
 
     public static void Assign(this CodeStatementCollection stmts, CodeExpression left, CodeExpression right) {
       stmts.Add(new CodeAssignStatement(left, right));
+    }
+
+    public static CodeVariableReferenceExpression Var(this CodeStatementCollection stmts, string type, string name) {
+      stmts.Expr("{0} {1}", type, name);
+      return new CodeVariableReferenceExpression(name);
+    }
+
+    public static CodeExpression New(this string type, params CodeExpression[] arguments) {
+      return new CodeTypeReference(type).New(arguments);
+    }
+
+    public static CodeExpression New(this CodeTypeReference type, params CodeExpression[] arguments) {
+      return new CodeObjectCreateExpression(type, arguments);
     }
 
     public static void Expr(this CodeStatementCollection stmts, string text, params object[] args) {
@@ -163,20 +224,52 @@ namespace Bolt.Compiler {
       stmts.Add(new CodeSnippetStatement(string.Format(text, args)));
     }
 
+    public static void If(this CodeStatementCollection stmts, CodeExpression condition, Action<CodeStatementCollection> body) {
+      CodeStatementCollection ifTrue = new CodeStatementCollection();
+
+      body(ifTrue);
+
+      stmts.Add(new CodeConditionStatement(condition, ifTrue.Cast<CodeStatement>().ToArray()));
+    }
+
+    public static CodeExpression Index(this CodeExpression expr, params CodeExpression[] indices) {
+      return new CodeIndexerExpression(expr, indices);
+    }
+
+    public static CodeStatement Assign(this CodeExpression left, CodeExpression right) {
+      return new CodeAssignStatement(left, right);
+    }
+
+    public static CodeExpression Expr(this string text) {
+      return new CodeSnippetExpression(text);
+    }
+
     public static CodeExpression Expr(this string text, params object[] args) {
       return new CodeSnippetExpression(string.Format(text, args));
     }
 
+    public static CodeExpression Literal(this Enum value) {
+      return (value.GetType().FullName.Replace("Bolt.Compiler", "Bolt") + "." + value.ToString()).Expr();
+    }
+
+    public static CodeExpression Literal(this string text) {
+      return new CodeSnippetExpression('"' + text + '"');
+    }
+
+    public static CodeExpression Literal(this bool value) {
+      return new CodeSnippetExpression(value.ToString().ToLowerInvariant());
+    }
+
+    public static CodeExpression Literal(this float value) {
+      return new CodeSnippetExpression(value.ToString() + "f");
+    }
+
+    public static CodeExpression Literal(this int integer) {
+      return new CodeSnippetExpression(integer.ToString());
+    }
+
     public static CodeSnippetStatement Stmt(this string text, params object[] args) {
       return new CodeSnippetStatement(string.Format(text, args));
-    }
-
-    public static string Indent(this string text, int indent) {
-      return (new string(' ', indent * 2) + text);
-    }
-
-    public static CodeExpression Expr(this int integer) {
-      return new CodeSnippetExpression(integer.ToString());
     }
 
     public static CodeTypeDeclaration DeclareInterface(this CodeNamespace ns, string name, params string[] inherits) {

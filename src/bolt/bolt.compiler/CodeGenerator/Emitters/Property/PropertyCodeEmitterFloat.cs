@@ -5,18 +5,14 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  public class PropertyCodeEmitterFloat : PropertyCodeEmitterSimple<PropertyDecoratorFloat> {
-    public override string ReadMethod {
-      get { return "ReadF32"; }
+  public class PropertyCodeEmitterFloat : PropertyCodeEmitter<PropertyDecoratorFloat> {
+    public override string StorageField {
+      get { return "Float0"; }
     }
 
-    public override string PackMethod {
-      get { return "PackF32"; }
-    }
-
-    public override void AddSettingsArgument(List<string> settings) {
-      settings.Add(Generator.CreateFloatCompressionExpression(Decorator.PropertyType.Compression));
-      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
+    public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
+      EmitFloatSettings(expr, statements, Decorator.PropertyType.Compression);
+      EmitInterpolationSettings(expr, statements);
     }
   }
 }

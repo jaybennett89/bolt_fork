@@ -115,24 +115,24 @@ public class BoltProjectWindow : BoltWindow {
     EditorGUILayout.EndHorizontal();
 
     if (HasProject) {
-      BoltEditorGUI.Header("States", "mc_state");
+      Header("States", "mc_state");
       DisplayAssetList(Project.States.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Structs", "mc_struct");
+      Header("Objects", "mc_struct");
       DisplayAssetList(Project.Structs.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Commands", "mc_command");
+      Header("Commands", "mc_command");
       DisplayAssetList(Project.Commands.Cast<AssetDefinition>());
 
-      BoltEditorGUI.Header("Events", "mc_event");
+      Header("Events", "mc_event");
       DisplayAssetList(Project.Events.Cast<AssetDefinition>());
 
       if (BoltEditorGUI.IsRightClick) {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("New State"), false, () => NewAsset(new StateDefinition()));
-        menu.AddItem(new GUIContent("New Struct"), false, () => NewAsset(new StructDefinition()));
-        menu.AddItem(new GUIContent("New Event"), false, () => NewAsset(new EventDefinition()));
-        menu.AddItem(new GUIContent("New Command"), false, () => NewAsset(new CommandDefinition()));
+        menu.AddItem(new GUIContent("New Object"), false, () => NewAsset(new StructDefinition()));
+        menu.AddItem(new GUIContent("New NetworkEvent"), false, () => NewAsset(new EventDefinition()));
+        menu.AddItem(new GUIContent("New RootCommand"), false, () => NewAsset(new CommandDefinition()));
         menu.ShowAsContext();
       }
     }
@@ -149,6 +149,10 @@ public class BoltProjectWindow : BoltWindow {
     GUILayout.BeginArea(new Rect(4, position.height - 20, position.width - 8, 16));
     Footer();
     GUILayout.EndArea();
+  }
+
+  void Header(string text, string icon) {
+    BoltEditorGUI.Header(text, icon);
   }
 
   void Footer() {
@@ -244,10 +248,10 @@ public class BoltProjectWindow : BoltWindow {
       }
 
       if (deleteMode) {
-        OverlayIcon("mc_minus_small", 0);
+        OverlayIcon("mc_minus_small", +1);
       }
       else {
-        OverlayIcon("mc_group", -1);
+        OverlayIcon("mc_group", 0);
       }
 
       GUILayout.EndHorizontal();

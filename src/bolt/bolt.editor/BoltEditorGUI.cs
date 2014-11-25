@@ -77,13 +77,28 @@ public static class BoltEditorGUI {
   }
 
   public static void EditSmoothingAlgorithm(AssetDefinition adef, PropertyDefinition pdef) {
+    EditSmoothingAlgorithm(adef, pdef, true);
+  }
+
+  public static void EditSmoothingAlgorithm(AssetDefinition adef, PropertyDefinition pdef, bool allowExtrapolation) {
     if (adef is StateDefinition) {
-      BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
-        pdef.StateAssetSettings.SmoothingAlgorithm = (SmoothingAlgorithms)EditorGUILayout.EnumPopup(pdef.StateAssetSettings.SmoothingAlgorithm);
-      });
+      if (allowExtrapolation) {
+        BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+          pdef.StateAssetSettings.SmoothingAlgorithm = (SmoothingAlgorithms)EditorGUILayout.EnumPopup(pdef.StateAssetSettings.SmoothingAlgorithm);
+        });
+      }
+      else {
+        BoltEditorGUI.WithLabel("Smoothing Algorithm", () => {
+          if (BoltEditorGUI.ToggleDropdown(SmoothingAlgorithms.Interpolation.ToString(), SmoothingAlgorithms.None.ToString(), pdef.StateAssetSettings.SmoothingAlgorithm != SmoothingAlgorithms.None)) {
+            pdef.StateAssetSettings.SmoothingAlgorithm = SmoothingAlgorithms.Interpolation;
+          }
+          else {
+            pdef.StateAssetSettings.SmoothingAlgorithm = SmoothingAlgorithms.None;
+          }
+        });
+      }
 
       if (pdef.StateAssetSettings.SmoothingAlgorithm == SmoothingAlgorithms.Extrapolation) {
-
         if (pdef.PropertyType is PropertyTypeTransform) {
           PropertyTypeTransform transform = (PropertyTypeTransform)pdef.PropertyType;
 
@@ -94,7 +109,6 @@ public static class BoltEditorGUI {
 
         BoltEditorGUI.WithLabel("Extrapolation Settings", () => {
           pdef.StateAssetSettings.ExtrapolationMaxFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationMaxFrames, "Max Frames");
-          pdef.StateAssetSettings.ExtrapolationCorrectionFrames = IntFieldOverlay(pdef.StateAssetSettings.ExtrapolationCorrectionFrames, "Correction Frames");
           pdef.StateAssetSettings.ExtrapolationErrorTolerance = FloatFieldOverlay(pdef.StateAssetSettings.ExtrapolationErrorTolerance, "Error Tolerance");
         });
       }
@@ -286,6 +300,7 @@ public static class BoltEditorGUI {
   public static PropertyType PropertyTypePopup(IEnumerable<Type> allTypes, PropertyType current, params GUILayoutOption[] options) {
     if (current == null) {
       current = (PropertyType)Activator.CreateInstance(allTypes.First());
+      current.OnCreated();
     }
 
     var types = allTypes.OrderBy(x => x.Name.Replace("PropertyType", "")).ToArray();
@@ -294,7 +309,8 @@ public static class BoltEditorGUI {
     var selectedNew = EditorGUILayout.Popup(selected, typesNames, options);
 
     if (selected != selectedNew) {
-      return (PropertyType)Activator.CreateInstance(types[selectedNew]);
+      current = (PropertyType)Activator.CreateInstance(types[selectedNew]);
+      current.OnCreated();
     }
 
     return current;
@@ -382,6 +398,16 @@ public static class BoltEditorGUI {
         }
       );
     }
+
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 0;
+    GUILayout.Label(text, s);
+
+    EditorGUILayout.EndHorizontal();
+  }
+
+  public static void Header(string text) {
+    EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
 
     GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
     s.margin.top = 0;
@@ -513,6 +539,14 @@ public static class BoltEditorGUI {
 
   public static bool ToggleDropdown(string on, string off, bool enabled) {
     return EditorGUILayout.Popup(enabled ? 0 : 1, new[] { on, off }) == 0;
+  }
+
+  public static bool ToggleButton(string on, string off, bool enabled, params GUILayoutOption[] options) {
+    if (GUILayout.Button(enabled ? on : off, EditorStyles.miniButton, options)) {
+      return !enabled;
+    }
+
+    return enabled;
   }
 
   public static bool Toggle(bool value) {

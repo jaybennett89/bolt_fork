@@ -4,15 +4,20 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  internal struct PropertySettings {
-    public int ByteOffset;
+  internal struct PropertySerializerSettings {
+    public int OffsetStorage;
+    public int OffsetObjects;
+    public int OffsetSerializers;
+
+    public ArrayIndices ArrayIndices;
+
+    public int PropertyPriority;
     public String PropertyName;
+    public List<String> PropertyPaths;
     public PropertyModes PropertyMode;
 
-    public PropertySettings(int offset, string name, PropertyModes mode) {
-      ByteOffset = offset;
-      PropertyName = name;
-      PropertyMode = mode;
+    public String PropertyFullPath {
+      get { return PropertyPaths[PropertyPaths.Count - 1]; }
     }
   }
 }

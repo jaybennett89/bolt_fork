@@ -62,9 +62,6 @@ public class BoltRuntimeSettings : ScriptableObject {
   public int compilationWarnLevel = 4;
 
   [SerializeField]
-  public bool allowStatePropertySetters = true;
-
-  [SerializeField]
   public int editorSkin = 4;
 
   [SerializeField]

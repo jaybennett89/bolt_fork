@@ -9,14 +9,8 @@ namespace Bolt {
       QuaternionCompression = quaternionCompression;
     }
 
-    public new void AddSettings(PropertyStateSettings stateSettings) {
-      Assert.True(stateSettings.ByteLength == 32);
-      StateSettings = stateSettings;
-      StateSettings.ByteLength = 16;
-    }
-
     public override object GetDebugValue(State state) {
-      var q = Blit.ReadQuaternion(state.Frames.first.Data, Settings.ByteOffset).eulerAngles;
+      var q = state.CurrentFrame.Storage[Settings.OffsetStorage].Quaternion;
       return string.Format("X:{0} Y:{1} Z:{2}", q.x.ToString("F3"), q.y.ToString("F3"), q.z.ToString("F3"));
     }
 
@@ -26,33 +20,33 @@ namespace Bolt {
 
         switch (SmoothingSettings.Algorithm) {
           case SmoothingAlgorithms.Interpolation:
-            f.Data.PackQuaternion(Settings.ByteOffset, Bolt.Math.InterpolateQuaternion(state.Frames, Settings.ByteOffset + 16, state.Entity.Frame));
+            //f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.InterpolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.ServerFrame);
             break;
 
           case SmoothingAlgorithms.Extrapolation:
-            f.Data.PackQuaternion(Settings.ByteOffset, Bolt.Math.ExtrapolateQuaternion(state.Frames, Settings.ByteOffset + 16, state.Entity.Frame, SmoothingSettings, f.Data.ReadQuaternion(Settings.ByteOffset)));
+            //f.Storage[Settings.OffsetStorage].Quaternion = Bolt.Math.ExtrapolateQuaternion(state.Frames, Settings.OffsetStorage, state.Entity.ServerFrame, SmoothingSettings);
             break;
         }
       }
     }
 
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, NetworkFrame frame) {
       return QuaternionCompression.BitsRequired;
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      QuaternionCompression.Pack(stream, Blit.ReadQuaternion(data, Settings.ByteOffset));
+    protected override bool Pack(NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
+      QuaternionCompression.Pack(stream, data[Settings.OffsetStorage].Quaternion);
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Blit.PackQuaternion(data, Settings.ByteOffset, QuaternionCompression.Read(stream));
+    protected override void Read(NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
+      data[Settings.OffsetStorage].Quaternion = QuaternionCompression.Read(stream);
     }
 
-    public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
-      var v0 = from.ReadQuaternion(Settings.ByteOffset);
-      var v1 = to.ReadQuaternion(Settings.ByteOffset);
-      into.PackQuaternion(Settings.ByteOffset, UE.Quaternion.Lerp(v0, v1, t));
+    public override void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) {
+      var v0 = from[Settings.OffsetStorage].Quaternion;
+      var v1 = to[Settings.OffsetStorage].Quaternion;
+      into[Settings.OffsetStorage].Quaternion = UE.Quaternion.Lerp(v0, v1, t);
     }
   }
 }

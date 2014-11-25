@@ -251,10 +251,6 @@ public class BoltSettingsWindow : EditorWindow {
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
     });
 
-    BoltAssetEditorGUI.Label("Property Setters", () => {
-      settings.allowStatePropertySetters = BoltEditorGUI.ToggleDropdown("Directly on state property", "Only through 'Modify' call", settings.allowStatePropertySetters);
-    });
-
     BoltAssetEditorGUI.Label("Prefab Mode", () => {
       PrefabDatabase.Instance.ManualMode = BoltEditorGUI.ToggleDropdown("Manual", "Automatic", PrefabDatabase.Instance.ManualMode);
     });
@@ -262,24 +258,28 @@ public class BoltSettingsWindow : EditorWindow {
 
   Vector2 scrollPos = Vector2.zero;
 
+  void Header(string text, string icon) {
+    //GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
+    BoltEditorGUI.Header(text, icon);
+    //GUILayout.EndHorizontal();
+  }
+
   void OnGUI() {
     scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-    GUILayout.Space(4);
-
-    BoltEditorGUI.Header("Replication", "mc_replication");
+    Header("Replication", "mc_replication");
     Replication();
 
-    BoltEditorGUI.Header("Connection", "mc_connection");
+    Header("Connection", "mc_connection");
     Connection();
 
-    BoltEditorGUI.Header("Latency Simulation", "mc_state2");
+    Header("Latency Simulation", "mc_ping_sim");
     Simulation();
 
-    BoltEditorGUI.Header("Miscellaneous", "mc_settings");
+    Header("Miscellaneous", "mc_settings");
     Miscellaneous();
 
-    BoltEditorGUI.Header("Compiler", "mc_compile");
+    Header("Compiler", "mc_compile");
     Compiler();
 
 

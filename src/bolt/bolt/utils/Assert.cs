@@ -47,6 +47,11 @@ internal static class Assert {
   }
 
   [Conditional("DEBUG")]
+  internal static void Null(object a, string msg) {
+    True(ReferenceEquals(a, null), msg);
+  }
+
+  [Conditional("DEBUG")]
   internal static void NotNull(object a) {
     False(ReferenceEquals(a, null), "object was null");
   }

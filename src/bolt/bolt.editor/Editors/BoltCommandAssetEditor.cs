@@ -16,10 +16,10 @@ public class BoltCommandAssetEditor : Editor {
     EditorGUI.BeginDisabledGroup(true);
     BoltCommandAsset asset = (BoltCommandAsset) target;
 
-    BoltAssetEditorGUI.HeaderPropertyList("controller", "Input", ref asset.inputProperties);
+    BoltAssetEditorGUI.HeaderPropertyList("controller", "Data", ref asset.inputProperties);
     asset.inputProperties = BoltAssetEditorGUI.EditPropertyArray(asset.inputProperties, BoltAssetPropertyEditMode.Command, false);
 
-    BoltAssetEditorGUI.HeaderPropertyList("result", "Result", ref asset.stateProperties);
+    BoltAssetEditorGUI.HeaderPropertyList("Data", "Data", ref asset.stateProperties);
     asset.stateProperties = BoltAssetEditorGUI.EditPropertyArray(asset.stateProperties, BoltAssetPropertyEditMode.Command, false);
 
     EditorGUI.EndDisabledGroup();

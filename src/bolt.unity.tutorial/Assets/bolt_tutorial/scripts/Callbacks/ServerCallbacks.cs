@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,10 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
       Player.CreateServerPlayer();
       Player.serverPlayer.name = "SERVER";
     }
+  }
+
+  void OnGUI() {
+    GUILayout.Label("ENTITY COUNT: " + BoltNetwork.entities.Count() + " POLL TIME: " + Bolt.DebugInfo.PollTime);
   }
 
   void FixedUpdate() {

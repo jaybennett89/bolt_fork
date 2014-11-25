@@ -2,16 +2,16 @@
 
 namespace Bolt {
   class SceneLoadChannel : BoltChannel {
-    public override void Pack(BoltPacket packet) {
-      var s = packet.stream;
+    public override void Pack(Packet packet) {
+      var s = packet.UdpPacket;
       s.WriteBool(BoltCore._canReceiveEntities);
       s.WriteInt(BoltCore._localSceneLoading.State, 7);
       s.WriteInt(BoltCore._localSceneLoading.Scene.Index, 8);
       s.WriteInt(BoltCore._localSceneLoading.Scene.Token, 8);
     }
 
-    public override void Read(BoltPacket packet) {
-      var s = packet.stream;
+    public override void Read(Packet packet) {
+      var s = packet.UdpPacket;
 
       connection._canReceiveEntities = s.ReadBool();
 

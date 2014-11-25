@@ -58,6 +58,8 @@
     <Compile Include="assets\BoltMecanimAsset.cs" />
     <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="EventFilter.cs" />
+    <Compile Include="event\NetworkEvent_Meta.cs" />
     <Compile Include="NetworkMask.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
@@ -72,7 +74,7 @@
     <Compile Include="entity\Entity.Control.cs" />
     <Compile Include="entity\Entity.cs" />
     <Compile Include="entity\EntityInterfaces.cs" />
-    <Compile Include="event\Event.cs" />
+    <Compile Include="event\NetworkEvent.cs" />
     <Compile Include="event\EventChannel.cs" />
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
@@ -82,39 +84,56 @@
     <Compile Include="internal\BoltCoreInternal.cs" />
     <Compile Include="PrefabPool.cs" />
     <Compile Include="SceneLoadChannel.cs" />
-    <Compile Include="state\Arrays\EntityArray.cs" />
-    <Compile Include="state\Arrays\FloatArray.cs" />
-    <Compile Include="state\Arrays\IntegerArray.cs" />
-    <Compile Include="state\Arrays\TransformArray.cs" />
-    <Compile Include="state\Auxiliary\Enums.cs" />
-    <Compile Include="state\BitArray.cs" />
+    <Compile Include="state\Arrays\Entity.cs" />
+    <Compile Include="state\Arrays\Float.cs" />
+    <Compile Include="state\Arrays\Integer.cs" />
+    <Compile Include="state\Arrays\PrefabId.cs" />
+    <Compile Include="state\Arrays\Quaternion.cs" />
+    <Compile Include="state\Arrays\String.cs" />
+    <Compile Include="state\Arrays\Transform.cs" />
+    <Compile Include="state\IState.cs" />
+    <Compile Include="state\NetworkArray_Values.cs" />
+    <Compile Include="state\Arrays\Vector.cs" />
+    <Compile Include="state\Enums.cs" />
+    <Compile Include="state\BitSet.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\Indices.cs" />
+    <Compile Include="state\NetworkArray_Objects.cs" />
+    <Compile Include="state\NetworkArray_Meta.cs" />
+    <Compile Include="state\NetworkStorage.cs" />
+    <Compile Include="state\NetworkObj_Meta.cs" />
+    <Compile Include="state\NetworkPropertyInfo.cs" />
+    <Compile Include="state\NetworkState.cs" />
+    <Compile Include="state\NetworkObj.cs" />
+    <Compile Include="state\Properties\Color.cs" />
+    <Compile Include="state\Properties\Entity.cs" />
+    <Compile Include="state\Properties\Float.cs" />
+    <Compile Include="state\Properties\Integer.cs" />
+    <Compile Include="state\NetworkProperty.cs" />
+    <Compile Include="state\NetworkTransform.cs" />
+    <Compile Include="state\NetworkTrigger.cs" />
     <Compile Include="state\Priority.cs" />
-    <Compile Include="state\Serializers\PropertySerializer.cs" />
-    <Compile Include="state\Serializers\PropertySerializerBool.cs" />
-    <Compile Include="state\Serializers\PropertySerializerColor.cs" />
-    <Compile Include="state\Serializers\PropertySerializerEntity.cs" />
-    <Compile Include="state\Serializers\PropertySerializerFloat.cs" />
-    <Compile Include="state\Serializers\PropertySerializerInteger.cs" />
-    <Compile Include="state\Serializers\PropertySerializerPrefabId.cs" />
-    <Compile Include="state\Serializers\PropertySerializerQuaternion.cs" />
-    <Compile Include="state\Serializers\PropertySerializerString.cs" />
-    <Compile Include="state\Serializers\PropertySerializerTransform.cs" />
-    <Compile Include="state\Serializers\PropertySerializerTrigger.cs" />
-    <Compile Include="state\Serializers\PropertySerializerNetworkId.cs" />
-    <Compile Include="state\Serializers\PropertySerializerVector.cs" />
+    <Compile Include="state\Properties\Bool.cs" />
+    <Compile Include="state\Properties\NetworkId.cs" />
+    <Compile Include="state\Properties\PrefabId.cs" />
+    <Compile Include="state\Properties\Quaternion.cs" />
+    <Compile Include="state\Properties\String.cs" />
+    <Compile Include="state\Properties\Transform.cs" />
+    <Compile Include="state\Properties\Trigger.cs" />
+    <Compile Include="state\Properties\Vector.cs" />
+    <Compile Include="state\PropertyCallback.cs" />
     <Compile Include="state\Settings\Command.cs" />
     <Compile Include="state\Settings\Compression\Float.cs" />
     <Compile Include="state\Settings\Compression\Int.cs" />
+    <Compile Include="state\Settings\Extrapolation.cs" />
     <Compile Include="state\Settings\Mecanim.cs" />
-    <Compile Include="state\Settings\Property.cs" />
     <Compile Include="state\Settings\Compression\Quaternion.cs" />
-    <Compile Include="state\Settings\Smoothing.cs" />
-    <Compile Include="state\Settings\State.cs" />
+    <Compile Include="state\Settings\Interpolation.cs" />
     <Compile Include="state\Settings\Compression\Transform.cs" />
     <Compile Include="state\Settings\Compression\Vector.cs" />
+    <Compile Include="state\NetworkState_Meta.cs" />
+    <Compile Include="state\Settings\String.cs" />
     <Compile Include="t4\GlobalEventListenerBase.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -127,7 +146,7 @@
       <DependentUpon>Flags.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltGlobalBehaviour.cs" />
-    <Compile Include="BoltId.cs" />
+    <Compile Include="UniqueId.cs" />
     <Compile Include="BoltGUI.cs" />
     <Compile Include="BoltNetwork.cs" />
     <Compile Include="BoltObjectPool.cs" />
@@ -145,8 +164,6 @@
     <Compile Include="hitbox\BoltHitboxWorldSnapshot.cs" />
     <Compile Include="hitbox\BoltPhysicsHits.cs" />
     <Compile Include="SceneLoadState.cs" />
-    <Compile Include="state\Blit.cs" />
-    <Compile Include="state\State.cs" />
     <Compile Include="t4\Ids.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -160,8 +177,8 @@
     <Compile Include="RuntimeSettings.cs" />
     <Compile Include="BoltCore.cs" />
     <Compile Include="BoltObject.cs" />
-    <Compile Include="BoltPacket.cs" />
-    <Compile Include="BoltPacketPool.cs" />
+    <Compile Include="Packet.cs" />
+    <Compile Include="PacketPool.cs" />
     <Compile Include="BoltPoll.cs" />
     <Compile Include="BoltSend.cs" />
     <Compile Include="collections\BoltListNode.cs" />
@@ -175,7 +192,6 @@
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />
     <Compile Include="BoltExtensions.cs" />
-    <Compile Include="state\NetIdPool.cs" />
     <Compile Include="collections\BoltSingleList.cs" />
     <Compile Include="BoltMath.cs" />
     <Compile Include="collections\BoltRingBuffer.cs" />
@@ -186,6 +202,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />
+    <Compile Include="state\NetworkState.IEntitySerializer.cs" />
+    <Compile Include="state\NetworkState.IState.cs" />
     <None Include="t4\GlobalEventListenerBase.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>

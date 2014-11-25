@@ -2,24 +2,24 @@
 
 namespace Bolt {
   class PropertySerializerNetworkId : PropertySerializerSimple {
-    public override int StateBits(State state, State.Frame frame) {
+    public override int StateBits(State state, NetworkFrame frame) {
       return 8 * 8;
     }
 
     public override object GetDebugValue(State state) {
-      return Blit.ReadUniqueId(state.Frames.first.Data, Settings.ByteOffset);
+      return state.CurrentFrame.Storage[Settings.OffsetStorage].NetworkId;
     }
 
-    protected override bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) {
-      stream.WriteNetworkId(Blit.ReadNetworkId(data, Settings.ByteOffset));
+    protected override bool Pack(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
+      stream.WriteNetworkId(storage[Settings.OffsetStorage].NetworkId);
       return true;
     }
 
-    protected override void Read(byte[] data, BoltConnection connection, UdpPacket stream) {
-      Blit.PackNetworkId(data, Settings.ByteOffset, stream.ReadNetworkId());
+    protected override void Read(NetworkValue[] storage, BoltConnection connection, UdpPacket stream) {
+      storage[Settings.OffsetStorage].NetworkId = stream.ReadNetworkId();
     }
 
-    public override void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) {
+    public override void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) {
 
     }
   }

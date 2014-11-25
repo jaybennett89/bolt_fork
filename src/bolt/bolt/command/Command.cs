@@ -1,63 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UdpKit;
+﻿using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
-  internal struct CommandMetaData {
-    internal int InputByteSize;
-    internal int ResultByteSize;
+  public interface INetworkCommandData {
+    IProtocolToken Token {
+      get;
+      set;
+    }
+  }
+
+  internal abstract class NetworkCommand_Data : NetworkObj, INetworkCommandData {
+    public IProtocolToken Token {
+      get;
+      set;
+    }
+
+    internal Command RootCommand {
+      get { return (Command)Root; }
+    }
+
+    IProtocolToken INetworkCommandData.Token {
+      get { return this.Token; }
+      set { this.Token = value; }
+    }
+
+    internal NetworkCommand_Data(NetworkObj_Meta meta)
+      : base(meta) {
+    }
+
+  }
+
+  internal abstract class Command_Meta : NetworkObj_Meta {
     internal int SmoothFrames;
-    internal TypeId TypeId;
-    internal PropertySerializer[] InputSerializers;
-    internal PropertySerializer[] ResultSerializers;
-  }
-
-  public interface ICommandInput {
-    IProtocolToken Token {
-      get;
-      set;
-    }
-  }
-
-  public interface ICommandResult {
-    IProtocolToken Token {
-      get;
-      set;
-    }
   }
 
   /// <summary>
   /// Base class that all commands inherit from
   /// </summary>
   [Documentation]
-  public abstract class Command : IBoltListNode {
+  public abstract class Command : NetworkObj_Root, IBoltListNode {
     internal const int SEQ_BITS = 8;
     internal const int SEQ_SHIFT = 16 - SEQ_BITS;
     internal const int SEQ_MASK = (1 << SEQ_BITS) - 1;
 
-    internal byte[] InputData;
-    internal byte[] ResultData;
+    NetworkStorage storage;
 
-    internal int Frame;
+    internal new Command_Meta Meta;
+
+    internal override NetworkStorage Storage {
+      get { return storage; }
+    }
+
+    internal NetworkCommand_Data InputObject {
+      get { return (NetworkCommand_Data)Objects[1]; }
+    }
+
+    internal NetworkCommand_Data ResultObject {
+      get { return (NetworkCommand_Data)Objects[2]; }
+    }
+
+    internal int SmoothFrameFrom;
+    internal int SmoothFrameTo;
+
+    internal NetworkStorage SmoothStorageFrom;
+    internal NetworkStorage SmoothStorageTo;
+
     internal ushort Sequence;
-
-    internal int SmoothStart;
-    internal int SmoothEnd;
-
-    internal byte[] SmoothFrom;
-    internal byte[] SmoothTo;
-
     internal CommandFlags Flags;
-    internal CommandMetaData Meta;
 
     /// <summary>
     /// The value of the BoltNetwork.serverFrame property of the computer this command was created on
     /// </summary>
     public int ServerFrame {
-      get { return Frame; }
+      get;
+      internal set;
     }
 
     /// <summary>
@@ -75,76 +91,68 @@ namespace Bolt {
       set;
     }
 
-    internal IProtocolToken InputToken;
-    internal IProtocolToken ResultToken;
-
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
     object IBoltListNode.list { get; set; }
 
-    internal Command(CommandMetaData meta) {
+    internal Command(Command_Meta meta)
+      : base(meta) {
       Meta = meta;
-      InputData = new byte[meta.InputByteSize];
-      ResultData = new byte[meta.ResultByteSize];
+      storage = AllocateStorage();
     }
 
     internal void VerifyCanSetInput() {
       if (Flags & CommandFlags.HAS_EXECUTED) {
-        throw new BoltException("You can not change the input of a command after it has executed");
+        throw new BoltException("You can not change the Data of a command after it has executed");
       }
     }
 
     internal void VerifyCanSetResult() {
       if (Flags & CommandFlags.CORRECTION_RECEIVED) {
-        throw new BoltException("You can not change the result of a command after it has been corrected");
+        throw new BoltException("You can not change the Data of a command after it has been corrected");
       }
     }
 
-    internal Command Clone() {
-      Command clone = (Command) MemberwiseClone();
-
-      ((IBoltListNode)clone).list = null;
-      ((IBoltListNode)clone).prev = null;
-      ((IBoltListNode)clone).next = null;
-
-      clone.InputData = clone.InputData.CloneArray();
-      clone.ResultData = clone.ResultData.CloneArray();
-
-      return clone;
-    }
-
-    internal void PackInput(BoltConnection connection, UdpPacket stream) {
-      for (int i = 0; i < Meta.InputSerializers.Length; ++i) {
-        Meta.InputSerializers[i].CommandPack(this, InputData, connection, stream);
+    internal void PackInput(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
       }
     }
 
-    internal void ReadInput(BoltConnection connection, UdpPacket stream) {
-      for (int i = 0; i < Meta.InputSerializers.Length; ++i) {
-        Meta.InputSerializers[i].CommandRead(this, InputData, connection, stream);
+    internal void ReadInput(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
       }
     }
 
-    internal void PackResult(BoltConnection connection, UdpPacket stream) {
-      for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
-        Meta.ResultSerializers[i].CommandPack(this, ResultData, connection, stream);
+    internal void PackResult(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
       }
     }
 
-    internal void ReadResult(BoltConnection connection, byte[] array, UdpPacket stream) {
-      for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
-        Meta.ResultSerializers[i].CommandRead(this, array, connection, stream);
+    internal void ReadResult(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, SmoothStorageTo ?? Storage, packet);
       }
+    }
+
+    internal void BeginSmoothing() {
+      SmoothStorageFrom = DuplicateStorage(Storage);
+      SmoothStorageTo = DuplicateStorage(Storage);
+
+      SmoothFrameFrom = BoltCore.frame;
+      SmoothFrameTo = SmoothFrameFrom + Meta.SmoothFrames;
     }
 
     internal void SmoothCorrection() {
-      if (SmoothFrom != null && SmoothTo != null) {
-        float max = SmoothEnd - SmoothStart;
-        float current = BoltCore.frame - SmoothStart;
+      if (SmoothStorageFrom != null && SmoothStorageTo != null) {
+        float max = SmoothFrameTo - SmoothFrameFrom;
+        float current = BoltCore.frame - SmoothFrameFrom;
         float t = UE.Mathf.Clamp01(current / max);
 
-        for (int i = 0; i < Meta.ResultSerializers.Length; ++i) {
-          Meta.ResultSerializers[i].CommandSmooth(SmoothFrom, SmoothTo, this.ResultData, t);
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          ResultObject.Meta.Properties[i].Property.SmoothCommandCorrection(ResultObject, SmoothStorageFrom, SmoothStorageTo, Storage, t);
         }
       }
     }

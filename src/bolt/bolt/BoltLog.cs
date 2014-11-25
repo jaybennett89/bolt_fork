@@ -40,19 +40,19 @@ public static class BoltLog {
       }
     }
 
-    public void Info(string message) {
+    void IWriter.Info(string message) {
       Queue(message);
     }
 
-    public void Debug(string message) {
+    void IWriter.Debug(string message) {
       Queue(message);
     }
 
-    public void Warn(string message) {
+    void IWriter.Warn(string message) {
       Queue(message);
     }
 
-    public void Error(string message) {
+    void IWriter.Error(string message) {
       Queue(message);
     }
 
@@ -95,25 +95,25 @@ public static class BoltLog {
         threadEvent.Close();
       }
       catch (Exception exn) {
-        BoltLog.Exception(exn);
+        Exception(exn);
       }
     }
   }
 
   public class Console : IWriter {
-    public void Info(string message) {
+    void IWriter.Info(string message) {
       BoltConsole.Write(message, BoltGUI.Sky);
     }
 
-    public void Debug(string message) {
+    void IWriter.Debug(string message) {
       BoltConsole.Write(message, BoltGUI.Green);
     }
 
-    public void Warn(string message) {
+    void IWriter.Warn(string message) {
       BoltConsole.Write(message, BoltGUI.Orange);
     }
 
-    public void Error(string message) {
+    void IWriter.Error(string message) {
       BoltConsole.Write(message, BoltGUI.Error);
     }
 
@@ -123,19 +123,19 @@ public static class BoltLog {
   }
 
   public class SystemOut : IWriter {
-    public void Info(string message) {
+    void IWriter.Info(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Debug(string message) {
+    void IWriter.Debug(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Warn(string message) {
+    void IWriter.Warn(string message) {
       SYS.Console.Out.WriteLine(message);
     }
 
-    public void Error(string message) {
+    void IWriter.Error(string message) {
       SYS.Console.Error.WriteLine(message);
     }
 
@@ -145,19 +145,19 @@ public static class BoltLog {
   }
 
   public class Unity : IWriter {
-    public void Info(string message) {
+    void IWriter.Info(string message) {
       UE.Debug.Log(message);
     }
 
-    public void Debug(string message) {
+    void IWriter.Debug(string message) {
       UE.Debug.Log(message);
     }
 
-    public void Warn(string message) {
+    void IWriter.Warn(string message) {
       UE.Debug.LogWarning(message);
     }
 
-    public void Error(string message) {
+    void IWriter.Error(string message) {
       UE.Debug.LogError(message);
     }
 

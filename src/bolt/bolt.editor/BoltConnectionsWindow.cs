@@ -158,8 +158,8 @@ public class BoltConnectionsWindow : BoltWindow {
     GUILayout.BeginHorizontal(s);
 
     EachConnection(MakeHeader("mc_ipaddress", "Address"), c => StatsButton(c, c.udpConnection.RemoteEndPoint));
-    EachConnection(MakeHeader("mc_state2", "Ping (Network)"), c => StatsButton(c, Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f) + " ms"));
-    EachConnection(MakeHeader("mc_state2", "Ping (Aliased)"), c => StatsButton(c, Mathf.FloorToInt(c.udpConnection.AliasedPing * 1000f) + " ms"));
+    EachConnection(MakeHeader("mc_ping", "Ping (Network)"), c => StatsButton(c, Mathf.FloorToInt(c.udpConnection.NetworkPing * 1000f) + " ms"));
+    EachConnection(MakeHeader("mc_ping", "Ping (Aliased)"), c => StatsButton(c, Mathf.FloorToInt(c.udpConnection.AliasedPing * 1000f) + " ms"));
     EachConnection(MakeHeader("mc_download", "Download"), c => StatsButton(c, Math.Round((c.bitsPerSecondIn / 8f) / 1000f, 2) + " kb/s"));
     EachConnection(MakeHeader("mc_upload", "Upload"), c => StatsButton(c, Math.Round((c.bitsPerSecondOut / 8f) / 1000f, 2) + " kb/s"));
 

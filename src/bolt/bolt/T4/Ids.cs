@@ -1,5 +1,38 @@
 ﻿using System.Collections.Generic;
 
+static class IdExtensions {
+	public static void WritePrefabId(this UdpKit.UdpPacket stream, Bolt.PrefabId id, int bits) {
+		stream.WriteInt(id.Value, bits);
+	}
+	
+	public static void WritePrefabId(this UdpKit.UdpPacket stream, Bolt.PrefabId id) {
+		stream.WritePrefabId(id, 32);
+	}
+
+	public static Bolt.PrefabId ReadPrefabId(this UdpKit.UdpPacket stream, int bits) {
+		return new Bolt.PrefabId(stream.ReadInt(bits));
+	}
+
+	public static Bolt.PrefabId ReadPrefabId(this UdpKit.UdpPacket stream) {
+		return stream.ReadPrefabId(32);
+	}
+	public static void WriteTypeId(this UdpKit.UdpPacket stream, Bolt.TypeId id, int bits) {
+		stream.WriteInt(id.Value, bits);
+	}
+	
+	public static void WriteTypeId(this UdpKit.UdpPacket stream, Bolt.TypeId id) {
+		stream.WriteTypeId(id, 32);
+	}
+
+	public static Bolt.TypeId ReadTypeId(this UdpKit.UdpPacket stream, int bits) {
+		return new Bolt.TypeId(stream.ReadInt(bits));
+	}
+
+	public static Bolt.TypeId ReadTypeId(this UdpKit.UdpPacket stream) {
+		return stream.ReadTypeId(32);
+	}
+}
+
 namespace Bolt {
 [Documentation]
 [System.Serializable]
@@ -54,22 +87,6 @@ namespace Bolt {
       return string.Format("[PrefabId:{0}]", Value);
     }
 
-	public void Pack(UdpKit.UdpPacket stream, int bits) {
-		stream.WriteInt(Value, bits);
-	}
-	
-	public void Pack(UdpKit.UdpPacket stream) {
-		stream.WriteInt(Value);
-	}
-
-	public static PrefabId Read(UdpKit.UdpPacket stream, int bits) {
-		return new PrefabId(stream.ReadInt(bits));
-	}
-	
-	public static PrefabId Read(UdpKit.UdpPacket stream) {
-		return new PrefabId(stream.ReadInt());
-	}
-
     public static bool operator ==(PrefabId a, PrefabId b) {
       return a.Value == b.Value;
     }
@@ -79,7 +96,6 @@ namespace Bolt {
     }
   }
 }
-
 namespace Bolt {
 [Documentation]
 [System.Serializable]
@@ -133,22 +149,6 @@ namespace Bolt {
     public override string ToString() {
       return string.Format("[TypeId:{0}]", Value);
     }
-
-	public void Pack(UdpKit.UdpPacket stream, int bits) {
-		stream.WriteInt(Value, bits);
-	}
-	
-	public void Pack(UdpKit.UdpPacket stream) {
-		stream.WriteInt(Value);
-	}
-
-	public static TypeId Read(UdpKit.UdpPacket stream, int bits) {
-		return new TypeId(stream.ReadInt(bits));
-	}
-	
-	public static TypeId Read(UdpKit.UdpPacket stream) {
-		return new TypeId(stream.ReadInt());
-	}
 
     public static bool operator ==(TypeId a, TypeId b) {
       return a.Value == b.Value;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UdpKit;
 
 namespace Bolt {
@@ -9,21 +10,19 @@ namespace Bolt {
   }
 
   abstract class PropertySerializer {
-    public PropertySettings Settings;
-    public PropertyStateSettings StateSettings;
+    public PropertySerializerSettings Settings;
     public PropertyCommandSettings CommandSettings;
     public PropertySmoothingSettings SmoothingSettings;
 
-    public void AddSettings(PropertySettings settings) {
-      Settings = settings;
+    public void AddSerializerSettings(string propertyName, int propertyPriority, PropertyModes propertyMode) {
+      Settings.PropertyName = propertyName;
+      Settings.PropertyMode = propertyMode;
+      Settings.PropertyPriority = propertyPriority;
+      Settings.PropertyPaths = new List<string>();
     }
 
-    public void AddSettings(PropertyStateSettings stateSettings) {
-      StateSettings = stateSettings;
-    }
-
-    public void AddSettings(PropertyCommandSettings commandSettings) {
-      CommandSettings = commandSettings;
+    public void AddCommandSettings(bool smoothCorrections) {
+      CommandSettings.SmoothCorrections = smoothCorrections;
     }
 
     public void AddSettings(PropertySmoothingSettings smoothingSettings) {
@@ -31,53 +30,64 @@ namespace Bolt {
     }
 
     public virtual object GetDebugValue(State state) { return null; }
-    public virtual void SetDynamic(State.Frame frame, object value) { throw new NotSupportedException(); }
+    public virtual void SetDynamic(NetworkFrame frame, object value) { throw new NotSupportedException(); }
 
-    public virtual int StateBits(State state, State.Frame frame) { throw new NotSupportedException(); }
-    public virtual bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual int StateBits(State state, NetworkFrame frame) { throw new NotSupportedException(); }
+    public virtual bool StatePack(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void StateRead(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
 
-    public virtual bool EventPack(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void EventRead(Event data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual bool EventPack(NetworkEvent data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void EventRead(NetworkEvent data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
 
-    public virtual void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    public virtual void CommandSmooth(byte[] from, byte[] to, byte[] into, float t) { }
+    public virtual void CommandPack(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void CommandRead(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    public virtual void CommandSmooth(NetworkValue[] from, NetworkValue[] to, NetworkValue[] into, float t) { }
+
+    public virtual void CreateObjects(State state) { }
 
     public virtual void OnInit(State state) { }
     public virtual void OnSimulateBefore(State state) { }
     public virtual void OnSimulateAfter(State state) { }
-    public virtual void OnRender(State state, State.Frame frame) { }
+    public virtual void OnRender(State state, NetworkFrame frame) { }
     public virtual void OnParentChanged(State state, Entity newParent, Entity oldParent) { }
+
+    internal void Verify(Type type, string name, int serializer, int storage, int objects) {
+      Assert.True(ReferenceEquals(this.GetType(), type), "ReferenceEquals(this.GetType(), type)");
+      Assert.True(this.Settings.PropertyName == name, "{0} == {1} /* this.Settings.PropertyName == name */", this.Settings.PropertyName, name);
+      Assert.True(this.Settings.OffsetObjects == objects, "this.Settings.OffsetObjects == objects");
+      Assert.True(this.Settings.OffsetStorage == storage, "this.Settings.OffsetStorage == storage");
+      Assert.True(this.Settings.OffsetSerializers == serializer, "this.Settings.OffsetSerializers == serializer");
+    }
   }
 
   abstract class PropertySerializerSimple : PropertySerializer {
-    public override bool EventPack(Event data, BoltConnection connection, UdpPacket stream) {
-      return Pack(data.Data, connection, stream);
+    public override bool EventPack(NetworkEvent data, BoltConnection connection, UdpPacket stream) {
+      //return Pack(data.Data, connection, stream);
+      return true;
     }
 
-    public override void EventRead(Event data, BoltConnection connection, UdpPacket stream) {
-      Read(data.Data, connection, stream);
+    public override void EventRead(NetworkEvent data, BoltConnection connection, UdpPacket stream) {
+      //Read(data.Data, connection, stream);
     }
 
-    public override bool StatePack(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
-      return Pack(frame.Data, connection, stream);
+    public override bool StatePack(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
+      return Pack(frame.Storage, connection, stream);
     }
 
-    public override void StateRead(State state, State.Frame frame, BoltConnection connection, UdpPacket stream) {
-      Read(frame.Data, connection, stream);
+    public override void StateRead(State state, NetworkFrame frame, BoltConnection connection, UdpPacket stream) {
+      Read(frame.Storage, connection, stream);
     }
 
-    public override void CommandPack(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
+    public override void CommandPack(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
       Pack(data, connection, stream);
     }
 
-    public override void CommandRead(Command cmd, byte[] data, BoltConnection connection, UdpPacket stream) {
+    public override void CommandRead(Command cmd, NetworkValue[] data, BoltConnection connection, UdpPacket stream) {
       Read(data, connection, stream);
     }
 
-    protected virtual bool Pack(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
-    protected virtual void Read(byte[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    protected virtual bool Pack(NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
+    protected virtual void Read(NetworkValue[] data, BoltConnection connection, UdpPacket stream) { throw new NotSupportedException(); }
   }
 
   abstract class PropertySerializerMecanim : PropertySerializerSimple {
@@ -87,8 +97,11 @@ namespace Bolt {
       return MecanimSettings.Direction == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl);
     }
 
-    public void AddSettings(PropertyMecanimSettings mecanimSettings) {
-      MecanimSettings = mecanimSettings;
+    public void AddMecanimSettings(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
+      MecanimSettings.Mode = mode;
+      MecanimSettings.Direction = direction;
+      MecanimSettings.Damping = damping;
+      MecanimSettings.Layer = layer;
     }
 
     public override void OnSimulateAfter(State state) {
@@ -121,11 +134,11 @@ namespace Bolt {
     protected virtual void PushMecanimValue(State state) { }
 
     void PullMecanimLayer(State state) {
-      state.Frames.first.Data.PackF32(Settings.ByteOffset, state.Animator.GetLayerWeight(MecanimSettings.Layer));
+      state.CurrentFrame.Storage[Settings.OffsetStorage].Float0 = state.Animator.GetLayerWeight(MecanimSettings.Layer);
     }
 
     void PushMecanimLayer(State state) {
-      state.Animator.SetLayerWeight(MecanimSettings.Layer, state.Frames.first.Data.ReadF32(Settings.ByteOffset));
+      state.Animator.SetLayerWeight(MecanimSettings.Layer, state.CurrentFrame.Storage[Settings.OffsetStorage].Float0);
     }
   }
 }

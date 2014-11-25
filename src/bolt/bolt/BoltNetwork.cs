@@ -1,6 +1,7 @@
 ﻿using Bolt;
 using System;
 using System.Collections.Generic;
+using BoltInternal;
 using UdpKit;
 using UnityEngine;
 
@@ -21,8 +22,8 @@ public static class BoltNetworkInternal {
 
   public static Action EnvironmentSetup;
   public static Action EnvironmentReset;
-  public static BoltInternal.IDebugDrawer DebugDrawer;
-  public static BoltInternal.NatCommunicator NatCommunicator;
+  public static IDebugDrawer DebugDrawer;
+  public static NatCommunicator NatCommunicator;
 
   public static Func<UdpPlatform> CreateUdpPlatform;
   public static Func<UdpIPv4Address> GetBroadcastAddress;
@@ -43,7 +44,7 @@ public static class BoltNetworkInternal {
 /// Holds global methods and properties for starting and
 /// stopping bolt, instantiating prefabs and other utils
 /// </summary>
-[DocumentationAttribute]
+[Documentation]
 public static class BoltNetwork {
   public static void SetCanReceiveEntities(bool canReceiveEntities) {
     BoltCore._canReceiveEntities = canReceiveEntities;
@@ -141,12 +142,21 @@ public static class BoltNetwork {
     get { return BoltCore.isServer; }
   }
 
+  public static bool isServerOrNotRunning {
+    get { return isServer || (isClient == false); }
+  }
+
+  public static bool isConnected {
+    get { return isServer || (isClient && BoltCore._connections.count > 0); }
+  }
+
   /// <summary>
   /// Returns true if this host is a client
   /// </summary>
   public static bool isClient {
     get { return BoltCore.isClient; }
   }
+
 
   /// <summary>
   /// If bolt is running
@@ -165,7 +175,7 @@ public static class BoltNetwork {
   /// <summary>
   /// The scoping mode active
   /// </summary>
-  public static Bolt.ScopeMode scopeMode {
+  public static ScopeMode scopeMode {
     get { return BoltCore._config.scopeMode; }
   }
 
@@ -181,9 +191,8 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="id">The id to look up</param>
   /// <returns>The entity if one was found, otherwise null</returns>
-  public static BoltEntity FindEntity(Bolt.NetworkId id) {
+  public static BoltEntity FindEntity(NetworkId id) {
     if (id.Packed == 0) {
-      BoltLog.Error("You can't look up entities a zero network id");
       return null;
     }
 
@@ -219,8 +228,16 @@ public static class BoltNetwork {
     UPnP.ClosePort(port);
   }
 
-  public static IEnumerable<Bolt.INatDevice> NatDevicesUPnP {
+  public static IEnumerable<INatDevice> NatDevicesUPnP {
     get { return UPnP.NatDevices; }
+  }
+
+  public static void SetEventFilter(IEventFilter filter) {
+    if (filter == null) {
+      throw new ArgumentNullException("filter");
+    }
+
+    BoltCore.EventFilter = filter;
   }
 
   public static void SetPrefabPool(IPrefabPool pool) {
@@ -264,19 +281,19 @@ public static class BoltNetwork {
     return BoltCore.Instantiate(new PrefabId(be._prefabId), Factory.GetFactory(be.serializerGuid).TypeId, position, rotation, InstantiateFlags.ZERO, null, token);
   }
 
-  public static BoltEntity Instantiate(Bolt.PrefabId prefabId) {
+  public static BoltEntity Instantiate(PrefabId prefabId) {
     return Instantiate(prefabId, null, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, IProtocolToken token) {
+  public static BoltEntity Instantiate(PrefabId prefabId, IProtocolToken token) {
     return Instantiate(prefabId, token, Vector3.zero, Quaternion.identity);
   }
 
-  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, Vector3 position, Quaternion rotation) {
+  public static BoltEntity Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation) {
     return Instantiate(prefabId, null, position, rotation);
   }
 
-  public static BoltEntity Instantiate(Bolt.PrefabId prefabId, IProtocolToken token, Vector3 position, Quaternion rotation) {
+  public static BoltEntity Instantiate(PrefabId prefabId, IProtocolToken token, Vector3 position, Quaternion rotation) {
     return Instantiate(BoltCore.PrefabPool.LoadPrefab(prefabId), token, position, rotation);
   }
 

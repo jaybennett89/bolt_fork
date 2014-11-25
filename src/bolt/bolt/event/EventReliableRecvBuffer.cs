@@ -20,7 +20,7 @@ namespace Bolt {
     uint sequenceNext;
     uint sequenceMask;
 
-    readonly Node[] nodes;
+    readonly Node[] nodes; 
 
     public EventReliableRecvBuffer(int windowBits, int sequenceBits) {
       nodes = new Node[1 << windowBits];

@@ -19,7 +19,8 @@ callbacksList.Add(Tuple.Create("SceneLoadRemoteDone", new[] { "BoltConnection", 
 callbacksList.Add(Tuple.Create("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" }));
 
 callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection" }));
-callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" }));
+callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "acceptToken" }));
+callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "acceptToken", "Bolt.IProtocolToken", "connectToken" }));
 
 callbacksList.Add(Tuple.Create("ConnectFailed", new []{"UdpEndPoint", "endpoint" }));
 callbacksList.Add(Tuple.Create("ConnectRequest", new []{"UdpEndPoint", "endpoint" }));
@@ -28,6 +29,7 @@ callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint
 callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token" }));
 
 callbacksList.Add(Tuple.Create("Disconnected", new[] { "BoltConnection", "connection" }));
+callbacksList.Add(Tuple.Create("Disconnected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" }));
 
 callbacksList.Add(Tuple.Create("ControlOfEntityLost", new []{"BoltEntity", "entity"}));
 callbacksList.Add(Tuple.Create("ControlOfEntityGained", new []{"BoltEntity", "entity"}));

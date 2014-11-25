@@ -56,5 +56,9 @@ namespace Bolt.Compiler {
     public override PropertyDecorator CreateDecorator() {
       return new PropertyDecoratorArray();
     }
+
+    public override void OnCreated() {
+      ElementCount = 8;
+    }
   }
 }

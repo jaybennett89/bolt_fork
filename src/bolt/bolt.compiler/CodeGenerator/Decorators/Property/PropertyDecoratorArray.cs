@@ -6,16 +6,20 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class PropertyDecoratorArray : PropertyDecorator<PropertyTypeArray> {
-    public override int ByteSize {
-      get {
-        return ElementDecorator.ByteSize * PropertyType.ElementCount;
-      }
+    public override int RequiredObjects {
+      get { return 1 + (ElementDecorator.RequiredObjects * PropertyType.ElementCount); }
     }
 
-    public override int ObjectSize {
-      get {
-        return ElementDecorator.ObjectSize * PropertyType.ElementCount;
-      }
+    public override int RequiredStorage {
+      get { return (ElementDecorator.RequiredStorage * PropertyType.ElementCount); }
+    }
+
+    public override int RequiredProperties {
+      get { return (ElementDecorator.RequiredProperties * PropertyType.ElementCount); }
+    }
+
+    public override string PropertyClassName {
+      get { return null; }
     }
 
     public PropertyDecorator ElementDecorator {
@@ -33,40 +37,15 @@ namespace Bolt.Compiler {
     public override string ClrType {
       get {
         if (ElementDecorator is PropertyDecoratorStruct) {
-          return ElementDecorator.ClrType + "Array";
+          return "Bolt.NetworkArray_Objects<" + ElementDecorator.ClrType + ">";
         }
 
-        return ElementDecorator.GetType().Name.Replace("PropertyDecorator", "") + "Array";
+        return "Bolt.NetworkArray_" + ElementDecorator.GetType().Name.Replace("PropertyDecorator", "");
       }
     }
 
     public override PropertyCodeEmitter CreateEmitter() {
       return new PropertyCodeEmitterArray();
-    }
-
-    public override void FindAllProperties(List<StateProperty> all, StateProperty p) {
-      var structType = PropertyType.ElementType as PropertyTypeStruct;
-      var structDec = default(StructDecorator);
-
-      if ((structType != null) && (structType.StructGuid != Guid.Empty)) {
-        structDec = Generator.FindStruct(structType.StructGuid);
-
-        if (structDec == null) {
-          return;
-        }
-      }
-
-      for (int i = 0; i < PropertyType.ElementCount; ++i) {
-        StateProperty elementProperty =
-          p.Combine(Definition.Filters, Definition.Controller).AddCallbackPath(Definition.Name + "[]").AddIndex(i);
-
-        if (structDec != null) {
-          structDec.FindAllProperties(all, elementProperty);
-        }
-        else {
-          ElementDecorator.FindAllProperties(all, elementProperty);
-        }
-      }
     }
   }
 }

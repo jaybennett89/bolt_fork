@@ -45,9 +45,9 @@ public class BoltEditorWindow : BoltWindow {
 
       GUILayout.Space(5);
 
-      BoltEditorGUI.WithLabel("Comment", () => {
-        Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
-      });
+      //BoltEditorGUI.WithLabel("Comment", () => {
+      //  Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
+      //});
 
       if (Selected is StateDefinition) {
         EditState((StateDefinition)Selected);
@@ -217,15 +217,11 @@ public class BoltEditorWindow : BoltWindow {
   PropertyDefinition CreateProperty(PropertyAssetSettings settings) {
     PropertyDefinition def = new PropertyDefinition {
       Name = "NewProperty",
-      Comment = "",
-      Deleted = false,
-      Enabled = true,
-      Expanded = true,
       PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
       AssetSettings = settings
     };
 
-    def.PropertyType.OnCreated();
+    def.Oncreated();
     return def;
   }
 
@@ -235,10 +231,13 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
+    BoltEditorGUI.Header("Input", "mc_input");
+    GUILayout.Space(2);
     EditPropertyList(def, def.Input);
 
     // add button
-    GUILayout.Label("Result", EditorStyles.boldLabel);
+    BoltEditorGUI.Header("Result", "mc_position");
+    GUILayout.Space(2);
     EditPropertyList(def, def.Result);
   }
 
@@ -269,12 +268,12 @@ public class BoltEditorWindow : BoltWindow {
     def.Name = EditorGUILayout.TextField(def.Name);
 
     if (cmdDef != null) {
-      if (GUILayout.Button("New Input", EditorStyles.miniButtonLeft, GUILayout.Width(75))) {
+      if (GUILayout.Button("New Data", EditorStyles.miniButtonLeft, GUILayout.Width(75))) {
         cmdDef.Input.Add(CreateProperty(new PropertyCommandSettings()));
         Save();
       }
 
-      if (GUILayout.Button("New Result", EditorStyles.miniButtonRight, GUILayout.Width(75))) {
+      if (GUILayout.Button("New Data", EditorStyles.miniButtonRight, GUILayout.Width(75))) {
         cmdDef.Result.Add(CreateProperty(new PropertyCommandSettings()));
         Save();
       }
@@ -390,7 +389,25 @@ public class BoltEditorWindow : BoltWindow {
 
     if (def is StateDefinition || def is StructDefinition) {
       p.Name = BoltEditorGUI.TextFieldOverlay(p.Name, p.Priority.ToString(), GUILayout.Width(181));
-      p.Controller = BoltEditorGUI.Toggle("mc_controller", p.Controller);
+
+      switch (p.ReplicationMode) {
+        case ReplicationMode.Everyone:
+          BoltEditorGUI.Toggle("mc_controller_plus", true);
+          break;
+
+        case ReplicationMode.EveryoneExceptController:
+          BoltEditorGUI.Toggle("mc_controller", false);
+          break;
+
+        case ReplicationMode.OnlyOwnerAndController:
+          BoltEditorGUI.Toggle("mc_controller_only", true);
+          break;
+
+        case ReplicationMode.OnlyOwner:
+          BoltEditorGUI.Toggle("mc_owner_only", true);
+          break;
+      }
+
     }
     else {
       p.Name = EditorGUILayout.TextField(p.Name, GUILayout.Width(200));
@@ -415,17 +432,23 @@ public class BoltEditorWindow : BoltWindow {
     EditorGUI.EndDisabledGroup();
     EditorGUILayout.EndHorizontal();
 
+    if (p.Controller) {
+      p.ReplicationMode = ReplicationMode.Everyone;
+      p.Controller = false;
+      Save();
+    }
+
     if (p.Expanded) {
       GUILayout.Space(2);
 
-      BoltEditorGUI.WithLabel("Comment", () => {
-        p.Comment = EditorGUILayout.TextField(p.Comment);
-      });
+      //BoltEditorGUI.WithLabel("Comment", () => {
+      //  p.Comment = EditorGUILayout.TextField(p.Comment);
+      //});
 
       if (def is StateDefinition || def is StructDefinition) {
         BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
-          p.Controller = BoltEditorGUI.ToggleDropdown("Replicate To Controller", "Don't Replicate To Controller", p.Controller);
+          p.ReplicationMode = (ReplicationMode)EditorGUILayout.EnumPopup(p.ReplicationMode);
         });
       }
 
@@ -448,8 +471,16 @@ public class BoltEditorWindow : BoltWindow {
             p.StateAssetSettings.MecanimDirection = (MecanimDirection)EditorGUILayout.EnumPopup(p.StateAssetSettings.MecanimDirection);
 
             switch (p.StateAssetSettings.MecanimMode) {
-              case MecanimMode.Parameter: p.StateAssetSettings.MecanimDamping = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.MecanimDamping, "Damping Time"); break;
-              case MecanimMode.LayerWeight: p.StateAssetSettings.MecanimLayer = BoltEditorGUI.IntFieldOverlay(p.StateAssetSettings.MecanimLayer, "Layer Index"); break;
+              case MecanimMode.Parameter:
+                if (p.StateAssetSettings.MecanimDirection == MecanimDirection.UsingBoltProperties) {
+                  p.StateAssetSettings.MecanimDamping = BoltEditorGUI.FloatFieldOverlay(p.StateAssetSettings.MecanimDamping, "Damping Time");
+                }
+
+                break;
+
+              case MecanimMode.LayerWeight:
+                p.StateAssetSettings.MecanimLayer = BoltEditorGUI.IntFieldOverlay(p.StateAssetSettings.MecanimLayer, "Layer Index");
+                break;
             }
 
             EditorGUI.EndDisabledGroup();

@@ -3,39 +3,52 @@ using System.Collections.Generic;
 
 namespace Bolt.Compiler {
   public class PropertyCodeEmitterTransform : PropertyCodeEmitter<PropertyDecoratorTransform> {
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-
+    public override string StorageField {
+      get { return "Transform"; }
     }
 
-    public override void EmitModifierInterfaceMembers(CodeTypeDeclaration type) {
+    public override void AddSettings(CodeExpression expr, CodeStatementCollection stmts) {
+      var pt = Decorator.PropertyType;
 
-    }
+      EmitVectorSettings(expr, stmts, pt.PositionCompression, pt.PositionSelection);
+      EmitQuaternionSettings(expr, stmts, pt.RotationCompression, pt.RotationCompressionQuaternion, pt.RotationSelection);
 
-    public override void AddSettingsArgument(List<string> settings) {
-      var position = Generator.CreateVectorCompressionExpression(Decorator.PropertyType.PositionCompression, Decorator.PropertyType.PositionSelection);
-      var rotation = Generator.CreateRotationCompressionExpression(Decorator.PropertyType.RotationCompression, Decorator.PropertyType.RotationCompressionQuaternion, Decorator.PropertyType.RotationSelection);
-      settings.Add(string.Format("Bolt.PropertyTransformCompressionSettings.Create({0}, {1})", position, rotation));
-      settings.Add(Generator.CreateSmoothingSettings(Decorator.Definition));
-    }
+      switch (Decorator.Definition.StateAssetSettings.SmoothingAlgorithm) {
+        case SmoothingAlgorithms.Interpolation:
+          EmitInterpolationSettings(expr, stmts);
+          break;
 
-    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
-        get.Expr("return (Bolt.TransformData) Frames.first.Objects[{0}]", Decorator.ObjectOffset);
-      }, set => {
-        set.Expr("Frames.first.Objects[{0}] = value", Decorator.ObjectOffset);
-      });
+        case SmoothingAlgorithms.Extrapolation:
+          EmitExtrapolationSettings(expr, stmts);
+          break;
+      }
     }
 
     public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      type.DeclareProperty("Bolt.TransformData", Decorator.Definition.Name, get => {
+      EmitSimpleIntefaceMember(type, true, false);
+    }
 
-      }, (set) => {
+    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
+      EmitForwardStateMember(decorator, type, false);
+    }
 
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
+      type.DeclareProperty("Bolt.NetworkTransform", Decorator.Definition.Name, get => {
+        get.Expr("return Storage.Values[this.OffsetStorage + {0}].Transform", Decorator.OffsetStorage);
       });
     }
 
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
+    void EmitExtrapolationSettings(CodeExpression expr, CodeStatementCollection stmts) {
+      var s = Decorator.Definition.StateAssetSettings;
 
+      stmts.Call(expr, "Settings_Extrapolation", 
+        "Bolt.PropertyExtrapolationSettings".Expr().Call("Create",
+          s.ExtrapolationMaxFrames.Literal(),
+          s.ExtrapolationErrorTolerance.Literal(),
+          s.SnapMagnitude.Literal(),
+          Decorator.PropertyType.ExtrapolationVelocityMode.Literal()
+        )
+      );
     }
   }
 }

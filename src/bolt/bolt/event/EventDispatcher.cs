@@ -6,7 +6,7 @@ namespace Bolt {
   partial class EventDispatcher {
     List<UE.MonoBehaviour> _targets = new List<UE.MonoBehaviour>();
 
-    void Raise(Event ev) {
+    void Raise(NetworkEvent ev) {
       IEventFactory factory = Factory.GetEventFactory(ev.Meta.TypeId);
 
       for (int i = 0; i < _targets.Count; ++i) {
@@ -28,7 +28,7 @@ namespace Bolt {
             factory.Dispatch(ev, mb);
           }
           catch (Exception exn) {
-            BoltLog.Error("User code throw exception when invoking {0}", ev);
+            BoltLog.Error("User code threw exception when invoking {0}", ev);
             BoltLog.Exception(exn);
           }
 

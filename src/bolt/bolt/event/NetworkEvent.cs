@@ -2,18 +2,11 @@
 using UdpKit;
 
 namespace Bolt {
-  internal struct EventMetaData {
-    internal TypeId TypeId;
-    internal int ByteSize;
-    internal PropertySerializer[] PropertySerializers;
-  }
-
   /// <summary>
   /// Base class that all events inherit from
   /// </summary>
   [Documentation]
-  public abstract class Event : IDisposable {
-
+  public abstract class NetworkEvent : NetworkObj_Root, IDisposable {
     internal const byte ENTITY_EVERYONE = 1;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
@@ -31,14 +24,10 @@ namespace Bolt {
     internal const int RELIABLE_WINDOW_BITS = 10;
     internal const int RELIABLE_SEQUENCE_BITS = 12;
 
-    int refs;
-
-    internal EventMetaData Meta;
-    internal ReliabilityModes Reliability;
+    NetworkStorage storage;
 
     internal uint Sequence;
-    internal byte[] Data;
-    internal byte[] UserData;
+    internal ReliabilityModes Reliability;
 
     internal int Targets;
     internal bool Reliable;
@@ -46,7 +35,14 @@ namespace Bolt {
     internal BoltConnection TargetConnection;
     internal BoltConnection SourceConnection;
 
+    internal new NetworkEvent_Meta Meta;
+
+    [Obsolete("Use NetworkEvent.FromSelf instead")]
     public bool IsFromLocalComputer {
+      get { return ReferenceEquals(SourceConnection, null); }
+    }
+
+    public bool FromSelf {
       get { return ReferenceEquals(SourceConnection, null); }
     }
 
@@ -58,14 +54,17 @@ namespace Bolt {
       get { return !IsEntityEvent; }
     }
 
+    internal override NetworkStorage Storage {
+      get { return storage; }
+    }
+
     public byte[] BinaryData {
-      get { return UserData; }
-      set { UserData = value; }
+      get;
+      set;
     }
 
     internal bool IsEntityEvent {
       get {
-        VerifyIsActive();
         return
           Targets == ENTITY_EVERYONE ||
           Targets == ENTITY_EVERYONE_EXCEPT_OWNER ||
@@ -76,29 +75,19 @@ namespace Bolt {
       }
     }
 
-    internal Event Clone() {
-      Event clone;
-
-      clone = (Event)MemberwiseClone();
-      clone.Data = new byte[Data.Length];
-
-      Array.Copy(Data, 0, clone.Data, 0, Data.Length);
-
-      return clone;
-    }
-
-    internal Event(EventMetaData meta) {
+    internal NetworkEvent(NetworkEvent_Meta meta)
+      : base(meta) {
       Meta = meta;
-      Data = new byte[Meta.ByteSize];
+      storage = AllocateStorage();
     }
 
     internal void IncrementRefs() {
-      refs += 1;
+
     }
 
-    internal bool Pack(BoltConnection connection, UdpPacket stream) {
-      for (int i = 0; i < Meta.PropertySerializers.Length; ++i) {
-        if (Meta.PropertySerializers[i].EventPack(this, connection, stream) == false) {
+    internal bool Pack(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        if (Meta.Properties[i].Property.Write(connection, this, storage, packet)) {
           return false;
         }
       }
@@ -106,9 +95,9 @@ namespace Bolt {
       return true;
     }
 
-    internal void Read(BoltConnection connection, UdpPacket stream) {
-      for (int i = 0; i < Meta.PropertySerializers.Length; ++i) {
-        Meta.PropertySerializers[i].EventRead(this, connection, stream);
+    internal void Read(BoltConnection connection, UdpPacket packet) {
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        Meta.Properties[i].Property.Read(connection, this, storage, packet);
       }
     }
 
@@ -116,20 +105,13 @@ namespace Bolt {
       EventDispatcher.Enqueue(this);
     }
 
+    [Obsolete("The using(var ev = ...) syntax is deprecated. Use the .Send method directly instead")]
     void IDisposable.Dispose() {
       Send();
     }
 
-    void VerifyIsActive() {
-      Assert.True(refs > 0);
-    }
-
     internal void DecrementRefs() {
-      VerifyIsActive();
 
-      if (--refs == 0) {
-
-      }
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.CodeDom;
 using ProtoBuf;
@@ -9,14 +10,13 @@ using System.CodeDom.Compiler;
 using System.Reflection;
 
 namespace Bolt.Compiler {
-  public partial class CodeGenerator {
+  public class CodeGenerator {
     Project Project;
 
     public List<StateDecorator> States;
-    public List<StructDecorator> Structs;
+    public List<ObjectDecorator> Objects;
     public List<EventDecorator> Events;
     public List<CommandDecorator> Commands;
-    public bool AllowStatePropertySetters = false;
 
     public CodeNamespace CodeNamespace;
     public CodeNamespace CodeNamespaceBolt;
@@ -29,7 +29,7 @@ namespace Bolt.Compiler {
 
     public CodeGenerator() {
       States = new List<StateDecorator>();
-      Structs = new List<StructDecorator>();
+      Objects = new List<ObjectDecorator>();
       Events = new List<EventDecorator>();
       Commands = new List<CommandDecorator>();
     }
@@ -48,6 +48,9 @@ namespace Bolt.Compiler {
 
       // resets all data on the context/assets
       DecorateDefinitions();
+
+      // create automagical asset objects
+      CreateCommandObjects();
 
       // sort all states by inheritance
       SortStatesByHierarchy();
@@ -68,83 +71,6 @@ namespace Bolt.Compiler {
       GenerateSourceCode(file);
     }
 
-    public string CreateCommandSettings(PropertyDefinition p) {
-      var s = p.CommandAssetSettings;
-      if (s != null) {
-        return string.Format("Bolt.PropertyCommandSettings.Create({0}, {1}f)", s.SmoothCorrection.ToString().ToLower(), s.SnapMagnitude);
-      }
-
-      return "default(Bolt.PropertyCommandSettings)";
-    }
-
-    public string CreateSmoothingSettings(PropertyDefinition p) {
-      var s = p.StateAssetSettings;
-      if (s != null) {
-        var t = p.PropertyType as PropertyTypeTransform;
-
-        switch (s.SmoothingAlgorithm) {
-          case SmoothingAlgorithms.Interpolation:
-            return string.Format("Bolt.PropertySmoothingSettings.CreateInterpolation({0}f)", s.SnapMagnitude);
-
-          case SmoothingAlgorithms.Extrapolation:
-            return string.Format("Bolt.PropertySmoothingSettings.CreateExtrapolation({0}, {1}, {2}f, {3}f, {4})",
-              s.ExtrapolationMaxFrames,
-              s.ExtrapolationCorrectionFrames,
-              s.ExtrapolationErrorTolerance,
-              s.SnapMagnitude,
-              t == null
-                ? "default(Bolt.ExtrapolationVelocityModes)"
-                : string.Format("Bolt.ExtrapolationVelocityModes.{0}", t.ExtrapolationVelocityMode)
-            );
-        }
-      }
-
-      return "default(Bolt.PropertySmoothingSettings)";
-    }
-
-    public string CreateFloatCompressionExpression(FloatCompression c) {
-      return CreateFloatCompressionExpression(c, true);
-    }
-
-    public string CreateVectorCompressionExpression(FloatCompression[] axes, AxisSelections selection) {
-      if (axes == null) {
-        selection = AxisSelections.XYZ;
-      }
-
-      List<string> args = new List<string>();
-      args.Add(CreateFloatCompressionExpression(axes[Axis.X], (selection & AxisSelections.X) == AxisSelections.X));
-      args.Add(CreateFloatCompressionExpression(axes[Axis.Y], (selection & AxisSelections.Y) == AxisSelections.Y));
-      args.Add(CreateFloatCompressionExpression(axes[Axis.Z], (selection & AxisSelections.Z) == AxisSelections.Z));
-      return string.Format("Bolt.PropertyVectorCompressionSettings.Create({0})", args.Join(", "));
-    }
-
-    public string CreateRotationCompressionExpression(FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
-      if (axes == null || quaternion == null || selection == AxisSelections.XYZ) {
-        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateFloatCompressionExpression(quaternion));
-      }
-      else {
-        return string.Format("Bolt.PropertyQuaternionCompression.Create({0})", CreateVectorCompressionExpression(axes, selection));
-      }
-    }
-
-    public string CreateFloatCompressionExpression(FloatCompression c, bool enabled) {
-      if (c == null) {
-        c = FloatCompression.Default();
-      }
-
-      if (enabled) {
-        if (c.Enabled) {
-          return string.Format("Bolt.PropertyFloatCompressionSettings.Create({0}, {1}f, {2}f, {3}f)", c.BitsRequired, c.Shift, c.Pack, c.Read);
-        }
-        else {
-          return string.Format("Bolt.PropertyFloatCompressionSettings.Create()");
-        }
-      }
-      else {
-        return string.Format("default(Bolt.PropertyFloatCompressionSettings)");
-      }
-    }
-
     public FilterDefinition FindFilter(int index) {
       return Filters.First(x => x.Index == index);
     }
@@ -153,40 +79,49 @@ namespace Bolt.Compiler {
       return States.First(x => x.Definition.Guid == guid);
     }
 
-    public StructDecorator FindStruct(Guid guid) {
-      return Structs.First(x => x.Definition.Guid == guid);
+    public ObjectDecorator FindStruct(Guid guid) {
+      return Objects.First(x => x.Definition.Guid == guid);
     }
 
     public bool HasState(Guid guid) {
       return States.Any(x => x.Guid == guid);
     }
 
+    public CodeTypeDeclaration DeclareInterface(string name, params string[] inherits) {
+      return CodeNamespace.DeclareInterface(name, inherits);
+    }
+
+    public CodeTypeDeclaration DeclareStruct(string name) {
+      return CodeNamespace.DeclareStruct(name);
+    }
+
+    public CodeTypeDeclaration DeclareClass(string name) {
+      return CodeNamespace.DeclareClass(name);
+    }
+
     void DecorateDefinitions() {
       foreach (StateDefinition def in Project.States) {
         StateDecorator decorator;
 
-        decorator = new StateDecorator();
-        decorator.Definition = def;
+        decorator = new StateDecorator(def);
         decorator.Generator = this;
 
         States.Add(decorator);
       }
 
       foreach (StructDefinition def in Project.Structs) {
-        StructDecorator decorator;
+        ObjectDecorator decorator;
 
-        decorator = new StructDecorator();
-        decorator.Definition = def;
+        decorator = new ObjectDecorator(def);
         decorator.Generator = this;
 
-        Structs.Add(decorator);
+        Objects.Add(decorator);
       }
 
       foreach (EventDefinition def in Project.Events) {
         EventDecorator decorator;
 
-        decorator = new EventDecorator();
-        decorator.Definition = def;
+        decorator = new EventDecorator(def);
         decorator.Generator = this;
 
         Events.Add(decorator);
@@ -195,11 +130,66 @@ namespace Bolt.Compiler {
       foreach (CommandDefinition def in Project.Commands) {
         CommandDecorator decorator;
 
-        decorator = new CommandDecorator();
-        decorator.Definition = def;
+        decorator = new CommandDecorator(def);
         decorator.Generator = this;
 
         Commands.Add(decorator);
+      }
+    }
+
+    ObjectDecorator CreateCommandObjectDefintion(AssetDecorator asset, string suffix) {
+      StructDefinition def;
+
+      def = new StructDefinition();
+      def.Deleted = false;
+      def.Enabled = true;
+      def.Guid = Guid.NewGuid();
+      def.Name = asset.Name + suffix;
+      def.Project = asset.Definition.Project;
+
+      ObjectDecorator decorator;
+
+      decorator = new CommandObjectDecorator(def);
+      decorator.Generator = this;
+
+      return decorator;
+    }
+
+    PropertyDefinition CreateObjectProperty(string name, ObjectDecorator propertyType) {
+      PropertyDefinition def;
+
+      def = new PropertyDefinition();
+      def.Name = name;
+      def.Replicated = true;
+      def.Enabled = true;
+      def.Deleted = false;
+      def.PropertyType = new PropertyTypeStruct() {
+        Context = Project,
+        StructGuid = propertyType.Guid
+      };
+
+      return def;
+    }
+
+    void CreateCommandObjects() {
+      foreach (CommandDecorator command in Commands) {
+        ObjectDecorator input;
+        input = CreateCommandObjectDefintion(command, "Input");
+        input.Definition.Properties = command.Definition.Input;
+
+        ObjectDecorator result;
+        result = CreateCommandObjectDefintion(command, "Result");
+        result.Definition.Properties = command.Definition.Result;
+
+        Objects.Add(input);
+        Objects.Add(result);
+
+        command.Properties = new List<PropertyDecorator>();
+        command.Definition.Properties = new List<PropertyDefinition>()
+        {
+          CreateObjectProperty("Input", input),
+          CreateObjectProperty("Result", result)
+        };
       }
     }
 
@@ -218,7 +208,7 @@ namespace Bolt.Compiler {
         decorator.TypeId = ++typeId;
       }
 
-      foreach (StructDecorator decorator in Structs) {
+      foreach (ObjectDecorator decorator in Objects) {
         decorator.TypeId = ++typeId;
       }
     }
@@ -242,68 +232,36 @@ namespace Bolt.Compiler {
     }
 
     void EmitCodeObjectModel() {
-      foreach (StateDecorator s in States) {
-        StateCodeEmitter emitter;
-        emitter = new StateCodeEmitter();
+      foreach (ObjectDecorator s in Objects) {
+        AssetCodeEmitter emitter;
+        emitter = new AssetCodeEmitter();
         emitter.Decorator = s;
-        emitter.EmitInterface();
-      }
-
-      foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
-        emitter = new StructCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitStruct();
-        emitter.EmitArray();
-      }
-
-      foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
-        emitter = new StructCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitModifierInterface();
-      }
-
-      foreach (StructDecorator s in Structs) {
-        StructCodeEmitter emitter;
-        emitter = new StructCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitModifier();
+        emitter.Emit();
       }
 
       foreach (StateDecorator s in States) {
         StateCodeEmitter emitter;
         emitter = new StateCodeEmitter();
         emitter.Decorator = s;
-        emitter.EmitImplementationClass();
-      }
-
-      foreach (StateDecorator s in States) {
-        StateCodeEmitter emitter;
-        emitter = new StateCodeEmitter();
-        emitter.Decorator = s;
-        emitter.EmitFactoryClass();
+        emitter.Emit();
       }
 
       foreach (EventDecorator d in Events) {
         EventCodeEmitter emitter;
         emitter = new EventCodeEmitter();
         emitter.Decorator = d;
-        emitter.EmitTypes();
+        emitter.Emit();
       }
-
 
       foreach (CommandDecorator d in Commands) {
         CommandCodeEmitter emitter;
         emitter = new CommandCodeEmitter();
         emitter.Decorator = d;
-        emitter.EmitTypes();
+        emitter.Emit();
       }
 
       EmitEventBaseClasses();
       EmitStateTypeIdLookup();
-
-      //EmitFilters();
     }
 
     void EmitStateTypeIdLookup() {
@@ -317,7 +275,7 @@ namespace Bolt.Compiler {
           continue;
         }
 
-        var field = type.DeclareField("Bolt.UniqueId", s.InterfaceName);
+        var field = type.DeclareField("Bolt.UniqueId", s.NameInterface);
         field.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         field.InitExpression = new CodeSnippetExpression(string.Format("new Bolt.UniqueId({0})", s.Guid.ToByteArray().Join(", ")));
       }
@@ -342,26 +300,16 @@ namespace Bolt.Compiler {
     }
 
     void EmitEventMethodOverride(CodeTypeDeclaration type, EventDecorator d) {
-      type.BaseTypes.Add(d.ListenerName);
+      type.BaseTypes.Add(d.ListenerInterface);
 
       type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {
         method.DeclareParameter(d.Name, "evnt");
       }).Attributes = MemberAttributes.Public;
     }
 
-    void EmitFilters() {
-      CodeTypeDeclaration type = DeclareStruct("BoltFilters");
-
-      foreach (FilterDefinition filter in Filters) {
-        type.DeclareProperty("Bolt.Filter", filter.Name, get => {
-          get.Expr("return new Bolt.Filter({0})", 1 << filter.Index);
-        }).Attributes |= MemberAttributes.Static;
-      }
-    }
-
     void DecorateProperties() {
-      // Structs
-      foreach (StructDecorator s in Structs) {
+      // Objects
+      foreach (ObjectDecorator s in Objects) {
         s.Properties = PropertyDecorator.Decorate(s.Definition.Properties, s);
       }
 
@@ -370,14 +318,15 @@ namespace Bolt.Compiler {
         d.Properties = PropertyDecorator.Decorate(d.Definition.Properties, d);
       }
 
-      // Events
+      // Commands
       foreach (CommandDecorator d in Commands) {
-        d.InputProperties = PropertyDecorator.Decorate(d.Definition.Input, d);
-        d.ResultProperties = PropertyDecorator.Decorate(d.Definition.Result, d);
+        d.Properties = PropertyDecorator.Decorate(d.Definition.Properties, d);
       }
 
       // States
       foreach (StateDecorator s in States) {
+        s.Properties = new List<PropertyDecorator>();
+
         // decorate and clone all parent properties, in order
         foreach (StateDecorator parent in s.ParentList) {
           s.Properties.AddRange(PropertyDecorator.Decorate(parent.Definition.Properties, parent));
@@ -385,38 +334,16 @@ namespace Bolt.Compiler {
 
         // decorate own properties
         s.Properties.AddRange(PropertyDecorator.Decorate(s.Definition.Properties, s));
-
-        // setup root struct definition
-        StructDefinition rootDef = new StructDefinition();
-        rootDef.Enabled = s.Definition.Enabled;
-        rootDef.Guid = s.Definition.Guid;
-        rootDef.Comment = s.Definition.Comment;
-        rootDef.Name = s.Definition.Name;
-        rootDef.Properties = new List<PropertyDefinition>(s.Definition.Properties);
-
-        // setup root struct decorator
-        StructDecorator rootDec = new StructDecorator();
-        rootDec.Definition = rootDef;
-        rootDec.TypeId = s.TypeId;
-        rootDec.Generator = s.Generator;
-        rootDec.Properties = s.Properties;
-        rootDec.SourceState = s;
-
-        // store on state decorator
-        s.RootStruct = rootDec;
-
-        // and in our struct list
-        Structs.Add(rootDec);
       }
     }
 
     void OrderStructsByDependancies() {
-      List<StructDecorator> structs = Structs.Where(x => x.Dependencies.Count() == 0).ToList();
-      List<StructDecorator> structsWithDeps = Structs.Where(x => x.Dependencies.Count() != 0).ToList();
+      List<ObjectDecorator> structs = Objects.Where(x => x.Dependencies.Count() == 0).ToList();
+      List<ObjectDecorator> structsWithDeps = Objects.Where(x => x.Dependencies.Count() != 0).ToList();
 
       while (structsWithDeps.Count > 0) {
         for (int i = 0; i < structsWithDeps.Count; ++i) {
-          StructDecorator s = structsWithDeps[i];
+          ObjectDecorator s = structsWithDeps[i];
 
           if (s.Dependencies.All(x => structs.Any(y => y.Guid == x.Guid))) {
             // remove from deps list
@@ -431,88 +358,40 @@ namespace Bolt.Compiler {
         }
       }
 
-      Structs = structs;
+      Objects = structs;
     }
 
     void CreateCompilationModel() {
-      // Calculate size for events
-      for (int i = 0; i < Events.Count; ++i) {
-        EventDecorator decorator = Events[i];
-
-        for (int n = 0; n < decorator.Properties.Count; ++n) {
-          decorator.Properties[n].ByteOffset = decorator.ByteSize;
-          decorator.ByteSize += decorator.Properties[n].ByteSize;
-        }
-      }
-
-      // Calculate size for commands
-      for (int i = 0; i < Commands.Count; ++i) {
-        CommandDecorator decorator = Commands[i];
-
-        for (int n = 0; n < decorator.InputProperties.Count; ++n) {
-          decorator.InputProperties[n].ByteOffset = decorator.InputByteSize;
-          decorator.InputByteSize += decorator.InputProperties[n].ByteSize;
-        }
-
-        for (int n = 0; n < decorator.ResultProperties.Count; ++n) {
-          decorator.ResultProperties[n].ByteOffset = decorator.ResultByteSize;
-          decorator.ResultByteSize += decorator.ResultProperties[n].ByteSize;
-        }
-      }
-
       // order all structs by their dependancies
       OrderStructsByDependancies();
 
-      // sort, index and assign bits for properties
-      for (int i = 0; i < Structs.Count; ++i) {
-        StructDecorator decorator = Structs[i];
+      CountProperties(Objects);
+      CountProperties(Events);
+      CountProperties(Commands);
+      CountProperties(States);
+    }
 
-        // properties are sorted in this order:
-        // - Values
-        // - Triggers
-        // - Structs
-        // - Arrays
-        decorator.Properties =
-          decorator.Properties.Where(x => x.Definition.PropertyType.IsValue)
-            .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeTrigger))
-            .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeStruct))
-            .Concat(decorator.Properties.Where(x => x.Definition.PropertyType is PropertyTypeArray))
-            .ToList();
-      }
+    void CountProperties<T>(IList<T> assets) where T : AssetDecorator {
+      for (int i = 0; i < assets.Count; ++i) {
+        AssetDecorator decorator;
 
-      // calculate sizes for all structs
-      for (int i = 0; i < Structs.Count; ++i) {
-        StructDecorator decorator;
+        decorator = assets[i];
+        decorator.CountObjects = 1;
 
-        decorator = Structs[i];
-        decorator.ByteSize = 0;
-        decorator.ObjectSize = 0;
+        for (int p = 0; p < decorator.Properties.Count; ++p) {
+          if (decorator.Properties[p].RequiredObjects == 0) {
+            decorator.Properties[p].OffsetObjects = 0;
+          }
+          else {
+            decorator.Properties[p].OffsetObjects = decorator.CountObjects;
+          }
 
-        for (int n = 0; n < decorator.Properties.Count; ++n) {
-          // copy byte offset to property
-          decorator.Properties[n].ByteOffset = decorator.ByteSize;
-          decorator.Properties[n].ObjectOffset = decorator.ObjectSize;
+          decorator.Properties[p].OffsetStorage = decorator.CountStorage;
+          decorator.Properties[p].OffsetProperties = decorator.CountProperties;
 
-          // increment byte offset
-          decorator.ByteSize += decorator.Properties[n].ByteSize;
-          decorator.ObjectSize += decorator.Properties[n].ObjectSize;
-        }
-
-        decorator.FrameSizeCalculated = true;
-      }
-
-      // calculate absolute property indexes and filters for all properties
-      foreach (var state in States) {
-        state.RootStruct.FindAllProperties(state.AllProperties, new StateProperty());
-
-        int offsetBytes = 0;
-        int offsetObjects = 0;
-
-        for (int i = 0; i < state.AllProperties.Count; ++i) {
-          state.AllProperties[i] = state.AllProperties[i].Combine(offsetBytes, offsetObjects);
-
-          offsetBytes += state.AllProperties[i].Decorator.ByteSize;
-          offsetObjects += state.AllProperties[i].Decorator.ObjectSize;
+          decorator.CountObjects += decorator.Properties[p].RequiredObjects;
+          decorator.CountStorage += decorator.Properties[p].RequiredStorage;
+          decorator.CountProperties += decorator.Properties[p].RequiredProperties;
         }
       }
     }
@@ -545,6 +424,5 @@ namespace Bolt.Compiler {
 
       File.WriteAllText(file, sb.ToString());
     }
-
   }
 }

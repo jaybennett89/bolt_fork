@@ -136,13 +136,6 @@ namespace Bolt {
       this.byte15 = byte15;
     }
 
-    public void Pack(UdpPacket stream) {
-      stream.WriteUInt(uint0);
-      stream.WriteUInt(uint1);
-      stream.WriteUInt(uint2);
-      stream.WriteUInt(uint3);
-    }
-
     public byte[] ToByteArray() {
       return guid.ToByteArray();
     }
@@ -197,18 +190,6 @@ namespace Bolt {
       }
     }
 
-    public static UniqueId Read(UdpPacket stream) {
-      UniqueId id;
-
-      id = default(UniqueId);
-      id.uint0 = stream.ReadUInt();
-      id.uint1 = stream.ReadUInt();
-      id.uint2 = stream.ReadUInt();
-      id.uint3 = stream.ReadUInt();
-
-      return id;
-    }
-
     public static bool operator ==(UniqueId a, UniqueId b) {
       return a.guid == b.guid;
     }
@@ -216,7 +197,5 @@ namespace Bolt {
     public static bool operator !=(UniqueId a, UniqueId b) {
       return a.guid != b.guid;
     }
-
   }
-
 }

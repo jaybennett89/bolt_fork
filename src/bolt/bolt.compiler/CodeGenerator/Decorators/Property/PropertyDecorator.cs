@@ -6,12 +6,14 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public abstract class PropertyDecorator {
-    public int ByteOffset;
-    public int ObjectOffset;
+    public int OffsetStorage;
+    public int OffsetObjects;
+    public int OffsetProperties;
 
     public CodeGenerator Generator;
     public AssetDecorator DefiningAsset;
     public PropertyDefinition Definition;
+    public MemberAttributes Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
     public virtual bool OnRenderCallback {
       get { return false; }
@@ -29,12 +31,20 @@ namespace Bolt.Compiler {
       get;
     }
 
-    public abstract int ByteSize {
-      get;
+    public virtual int RequiredObjects {
+      get { return 0; }
     }
 
-    public virtual int ObjectSize {
-      get { return 0; }
+    public virtual int RequiredStorage {
+      get { return 1; }
+    }
+
+    public virtual int RequiredProperties {
+      get { return 1; }
+    }
+
+    public virtual string PropertyClassName {
+      get { return "Bolt.NetworkProperty_" + GetType().Name.Replace("PropertyDecorator", ""); }
     }
 
     public abstract PropertyCodeEmitter CreateEmitter();
@@ -52,18 +62,6 @@ namespace Bolt.Compiler {
       decorator.DefiningAsset = asset;
 
       return decorator;
-    }
-
-    public virtual void FindAllProperties(List<StateProperty> all, StateProperty p) {
-      if (Definition.IsArrayElement == false) {
-        p = p.AddCallbackPath(Definition.Name);
-      }
-
-      all.Add(
-        p
-          .Combine(Definition.Filters, Definition.Controller)
-          .Combine(all.Count, this)
-      );
     }
   }
 

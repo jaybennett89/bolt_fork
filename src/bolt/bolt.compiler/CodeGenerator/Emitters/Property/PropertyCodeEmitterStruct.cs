@@ -8,23 +8,36 @@ namespace Bolt.Compiler {
   public class PropertyCodeEmitterStruct : PropertyCodeEmitter<PropertyDecoratorStruct> {
     void DeclareProperty(CodeTypeDeclaration type, bool emitSetter) {
       Action<CodeStatementCollection> getter = get => {
-        get.Expr("return new {0}(frame, offsetBytes + {1}, offsetObjects + {2})", Decorator.ClrType, Decorator.ByteOffset, Decorator.ObjectOffset);
+        get.Expr("return ({0})(Objects[this.OffsetObjects + {1}])", Decorator.ClrType, Decorator.OffsetObjects);
       };
 
-      Action<CodeStatementCollection> setter = set => {
-        set.Expr("Array.Copy(value.frame.Data, value.offsetBytes, this.frame.Data, this.offsetBytes + {0}, {1})", Decorator.ByteOffset, Decorator.ByteSize);
-        set.Expr("Array.Copy(value.frame.Objects, value.offsetObjects, this.frame.Objects, this.offsetObjects + {0}, {1})", Decorator.ObjectOffset, Decorator.ObjectSize);
-      };
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, getter, emitSetter ? setter : null);
+      type.DeclareProperty(Decorator.Object.EmitAsInterface ? Decorator.Object.NameInterface : Decorator.Object.Name, Decorator.Definition.Name, getter, null);
     }
 
-    public override void EmitStructMembers(CodeTypeDeclaration type) {
+    public override void EmitObjectMembers(CodeTypeDeclaration type) {
       DeclareProperty(type, false);
     }
 
-    public override void EmitModifierMembers(CodeTypeDeclaration type) {
-      DeclareProperty(type, true);
+    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
+      EmitForwardStateMember(decorator, type, false);
+    }
+
+    public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
+      EmitSimpleIntefaceMember(type, true, false);
+    }
+
+    public override void EmitMetaSetup(DomBlock block, Offsets offsets, CodeExpression indexExpression) {
+      block.Add("this".Expr().Call("CopyProperties",
+        offsets.OffsetProperties,
+        offsets.OffsetObjects,
+        Decorator.Object.NameMeta.Expr().Field("Instance"),
+        Decorator.Definition.Name.Literal(),
+        indexExpression ?? (-1).Literal()
+      ));
+    }
+
+    public override void EmitObjectSetup(DomBlock block, Offsets offsets) {
+      EmitInitObject(Decorator.ClrType, block, offsets);
     }
   }
 }

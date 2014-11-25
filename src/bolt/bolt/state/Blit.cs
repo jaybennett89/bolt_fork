@@ -18,15 +18,15 @@ namespace Bolt {
 #if NATIVE_DIFF
     [SuppressUnmanagedCodeSecurity]
     [DllImport("BoltFastCompare", ExactSpelling = true)]
-    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* result);
+    static extern unsafe int BoltFastCompare(byte* a, byte* b, Block* blocks, uint size, int* Data);
 
-    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] result) {
+    public unsafe static int Diff(byte[] a, byte[] b, Block[] blocks, int[] Data) {
       int count = 0;
 
       fixed (byte* aPtr = a) {
         fixed (byte* bPtr = b) {
           fixed (Block* blocksPtr = blocks) {
-            fixed (int* resultPtr = result) {
+            fixed (int* resultPtr = Data) {
               count = BoltFastCompare(aPtr, bPtr, blocksPtr, (uint)blocks.Length, resultPtr);
             }
           }
@@ -112,22 +112,6 @@ namespace Bolt {
 
     public static PrefabId ReadPrefabId(this byte[] data, int offset) {
       return new PrefabId(data.ReadI32(offset));
-    }
-
-    public static UniqueId ReadUniqueId(this byte[] data, int offset) {
-      UniqueId id = new UniqueId();
-      id.uint0 = data.ReadU32(offset + 0);
-      id.uint1 = data.ReadU32(offset + 4);
-      id.uint2 = data.ReadU32(offset + 8);
-      id.uint3 = data.ReadU32(offset + 12);
-      return id;
-    }
-
-    public static void PackUniqueId(this byte[] data, int offset, UniqueId value) {
-      data.PackU32(offset + 0, value.uint0);
-      data.PackU32(offset + 4, value.uint1);
-      data.PackU32(offset + 8, value.uint2);
-      data.PackU32(offset + 12, value.uint3);
     }
 
     public static void PackU32(this byte[] data, int offset, uint value) {
