@@ -57,6 +57,11 @@ public class BoltConnection : BoltObject {
     get { return _remoteFrameEstimated; }
   }
 
+  public IProtocolToken ConnectToken {
+    get;
+    internal set;
+  }
+
   public IProtocolToken AcceptToken {
     get;
     internal set;
@@ -167,11 +172,15 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  public void Disconnect() {
+    Disconnect(null);
+  }
+
   /// <summary>
   /// Disconnect this connection
   /// </summary>
-  public void Disconnect() {
-    _udp.Disconnect();
+  public void Disconnect(IProtocolToken token) {
+    _udp.Disconnect(token.ToByteArray());
   }
 
   public int GetSkippedUpdates(BoltEntity en) {

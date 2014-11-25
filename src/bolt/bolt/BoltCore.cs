@@ -409,7 +409,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.Disconnected:
-          HandleDisconnected(ev.Connection.GetBoltConnection());
+          HandleDisconnected(ev.Connection.GetBoltConnection(), (byte[])ev.Object0);
           break;
 
         case UdpEventType.ConnectRequest:
@@ -629,9 +629,10 @@ internal static class BoltCore {
     }
 
     BoltConnection cn;
-    
+
     cn = new BoltConnection(udp);
     cn.AcceptToken = udp.AcceptToken.ToToken();
+    cn.ConnectToken = udp.ConnectToken.ToToken();
 
     // put on connection list
     _connections.AddLast(cn);
@@ -639,6 +640,7 @@ internal static class BoltCore {
     // generic connected callback
     BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn);
     BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken);
+    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken, cn.ConnectToken);
 
     // spawn entities
     if (_config.scopeMode == ScopeMode.Automatic) {
@@ -648,9 +650,10 @@ internal static class BoltCore {
     }
   }
 
-  static void HandleDisconnected(BoltConnection cn) {
+  static void HandleDisconnected(BoltConnection cn, byte[] token) {
     // generic disconnected callback
     BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn);
+    BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn, token.ToToken());
 
     if (hasSocket) {
       // cleanup                                                      
@@ -972,7 +975,7 @@ internal static class BoltCore {
       if (isServer) {
         BoltEntity entity;
         entity = Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>();
-        entity.Entity.SceneId = se.sceneGuid; 
+        entity.Entity.SceneId = se.sceneGuid;
       }
     }
 

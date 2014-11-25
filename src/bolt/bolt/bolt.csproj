@@ -126,9 +126,10 @@
     <Compile Include="state\Settings\Command.cs" />
     <Compile Include="state\Settings\Compression\Float.cs" />
     <Compile Include="state\Settings\Compression\Int.cs" />
+    <Compile Include="state\Settings\Extrapolation.cs" />
     <Compile Include="state\Settings\Mecanim.cs" />
     <Compile Include="state\Settings\Compression\Quaternion.cs" />
-    <Compile Include="state\Settings\Smoothing.cs" />
+    <Compile Include="state\Settings\Interpolation.cs" />
     <Compile Include="state\Settings\Compression\Transform.cs" />
     <Compile Include="state\Settings\Compression\Vector.cs" />
     <Compile Include="state\NetworkState_Meta.cs" />

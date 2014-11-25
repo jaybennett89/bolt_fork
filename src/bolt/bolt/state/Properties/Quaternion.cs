@@ -17,6 +17,10 @@ namespace Bolt {
       Compression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z));
     }
 
+    public override void OnInit(NetworkObj obj) {
+      obj.Storage.Values[obj[this]].Quaternion = UE.Quaternion.identity;
+    }
+
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
       return storage.Values[obj[this]].NetworkId;
     }

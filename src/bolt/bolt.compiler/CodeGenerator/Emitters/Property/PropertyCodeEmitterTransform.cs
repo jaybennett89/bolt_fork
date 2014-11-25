@@ -39,7 +39,16 @@ namespace Bolt.Compiler {
     }
 
     void EmitExtrapolationSettings(CodeExpression expr, CodeStatementCollection stmts) {
-      throw new System.NotImplementedException();
+      var s = Decorator.Definition.StateAssetSettings;
+
+      stmts.Call(expr, "Settings_Extrapolation", 
+        "Bolt.PropertyExtrapolationSettings".Expr().Call("Create",
+          s.ExtrapolationMaxFrames.Literal(),
+          s.ExtrapolationErrorTolerance.Literal(),
+          s.SnapMagnitude.Literal(),
+          Decorator.PropertyType.ExtrapolationVelocityMode.Literal()
+        )
+      );
     }
   }
 }

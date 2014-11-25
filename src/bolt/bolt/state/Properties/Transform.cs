@@ -50,6 +50,7 @@ namespace Bolt {
 
     public override void OnInit(NetworkObj obj) {
       obj.Storage.Values[obj[this] + POSITION].Transform = new NetworkTransform();
+      obj.Storage.Values[obj[this] + ROTATION].Quaternion = UE.Quaternion.identity;
     }
 
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
@@ -146,7 +147,29 @@ namespace Bolt {
         if (nt != null && nt.Simulate) {
           var snapped = false;
           if (Extrapolation.Enabled) {
-            throw new NotImplementedException();
+            UE.Vector3 pos;
+            UE.Quaternion rot;
+
+            pos = Math.ExtrapolateVector(
+              /* currentPosition */   nt.Simulate.localPosition,
+              /* receivedPosition */  obj.Storage.Values[obj[this] + POSITION].Vector3,
+              /* receivedVelocity */  obj.Storage.Values[obj[this] + VELOCITY].Vector3,
+              /* receivedFrame */     obj.RootState.Frames.first.Frame,
+              /* entityFrame */       obj.RootState.Entity.Frame,
+              /* extrapolation */     Extrapolation,
+              /* snapping */          ref snapped
+            );
+
+            rot = Math.ExtrapolateQuaternion(
+              /* currentRotation */   nt.Simulate.localRotation,
+              /* receivedRotation */  obj.Storage.Values[obj[this] + ROTATION].Quaternion,
+              /* receivedFrame */     obj.RootState.Frames.first.Frame,
+              /* entityFrame */       obj.RootState.Entity.Frame,
+              /* extrapolation */     Extrapolation
+            );
+
+            nt.Simulate.localPosition = nt.Clamper(obj.RootState.Entity.UnityObject, pos);
+            nt.Simulate.localRotation = rot;
           }
           else if (Interpolation.Enabled) {
             // position
@@ -178,7 +201,9 @@ namespace Bolt {
 
           if (snapped) {
             nt.RenderDoubleBufferPosition =
-              nt.RenderDoubleBufferPosition.Shift(nt.Simulate.position).Shift(nt.Simulate.position);
+              nt.RenderDoubleBufferPosition
+                .Shift(nt.Simulate.position)
+                .Shift(nt.Simulate.position);
           }
         }
       }

@@ -100,62 +100,46 @@ namespace Bolt {
       }
     }
 
-    internal static UE.Vector3 ExtrapolateVector(BoltDoubleList<NetworkStorage> frames, int offset, int frame, PropertySmoothingSettings settings, ref bool snapped) {
-      throw new NotImplementedException();
-      //var f = frames.first;
-      //var tolerance = settings.ExtrapolationErrorTolerance;
+    internal static UE.Vector3 ExtrapolateVector(UE.Vector3 cpos, UE.Vector3 rpos, UE.Vector3 rvel, int recievedFrame, int entityFrame, PropertyExtrapolationSettings settings, ref bool snapped) {
+      rvel *= BoltNetwork.frameDeltaTime;
 
-      //UE.Vector3 p = f.Data.ReadVector3(offset);
-      //UE.Vector3 v = velocity * BoltNetwork.frameDeltaTime;
+      float d = System.Math.Min(settings.MaxFrames, (entityFrame + 1) - recievedFrame);
+      float t = d / System.Math.Max(1, settings.MaxFrames);
 
-      //float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - f.Number);
-      //float t = d / System.Math.Max(1, settings.ExtrapolationCorrectionFrames);
+      UE.Vector3 p0 = cpos + (rvel);
+      UE.Vector3 p1 = rpos + (rvel * d);
 
-      //UE.Vector3 p0 = position + v;
-      //UE.Vector3 p1 = p + (v * d);
+      float sqrMag = (p1 - p0).sqrMagnitude;
 
-      //if ((p1 - p0).sqrMagnitude > (settings.SnapMagnitude * settings.SnapMagnitude)) {
-      //  snapped = true;
-      //  return p1;
-      //}
-      //else {
-      //  //if (velocity.magnitude < 0.1f && ((p1 - p0).magnitude < tolerance)) {
-      //  //  return position;
-      //  //}
+      if ((settings.SnapMagnitude > 0) && sqrMag > (settings.SnapMagnitude * settings.SnapMagnitude)) {
+        snapped = true;
+        return p1;
+      }
+      else {
+        //TODO: implement error tolerance
+        //if (rvel.sqrMagnitude < sqrMag) {
+        //  return p0;
+        //}
 
-      //  return UE.Vector3.Lerp(p0, p1, t);
-      //}
+        return UE.Vector3.Lerp(p0, p1, t);
+      }
     }
 
-    internal static UE.Quaternion ExtrapolateQuaternion(BoltDoubleList<NetworkStorage> frames, int offset, int frame, PropertySmoothingSettings settings) {
-      throw new NotImplementedException();
+    internal static UE.Quaternion ExtrapolateQuaternion(UE.Quaternion cquat, UE.Quaternion rquat, int recievedFrame, int entityFrame, PropertyExtrapolationSettings settings) {
+      var r = rquat * UE.Quaternion.Inverse(cquat);
+      float d = System.Math.Min(settings.MaxFrames, (entityFrame + 1) - recievedFrame);
+      float t = d / (float)System.Math.Max(1, settings.MaxFrames);
 
-      //var r0 = rotation;
-      //if (r0 == default(UE.Quaternion)) {
-      //  r0 = UE.Quaternion.identity;
-      //}
+      float r_angle;
+      UE.Vector3 r_axis;
 
-      //var r1 = frames.first.Data.ReadQuaternion(offset);
-      //if (r1 == default(UE.Quaternion)) {
-      //  r1 = UE.Quaternion.identity;
-      //}
+      r.ToAngleAxis(out r_angle, out r_axis);
 
-      //var r2 = r1 * UE.Quaternion.Inverse(r0);
-      //float d = System.Math.Min(settings.ExtrapolationMaxFrames, (frame + 1) - frames.first.Number);
-      //float t = d / System.Math.Max(2, settings.ExtrapolationCorrectionFrames);
+      if (r_angle > 180) {
+        r_angle -= 360;
+      }
 
-      //float r2_angle;
-      //UE.Vector3 r2_axis;
-
-      //r2.ToAngleAxis(out r2_angle, out r2_axis);
-
-      //if (r2_angle > 180) {
-      //  r2_angle -= 360;
-      //}
-
-      //r2_angle = (r2_angle * t) % 360f;
-
-      //return UE.Quaternion.AngleAxis(r2_angle, r2_axis) * r0;
+      return UE.Quaternion.AngleAxis((r_angle * t) % 360f, r_axis) * cquat;
     }
 
     internal static int SequenceDistance(uint from, uint to, int shift) {

@@ -5,6 +5,7 @@ namespace Bolt {
   public class NetworkTransform {
     internal UE.Transform Render;
     internal UE.Transform Simulate;
+    internal System.Func<BoltEntity, UE.Vector3, UE.Vector3> Clamper = (entity, position) => position;
 
     internal DoubleBuffer<UE.Vector3> RenderDoubleBufferPosition;
     internal DoubleBuffer<UE.Quaternion> RenderDoubleBufferRotation;
@@ -15,6 +16,11 @@ namespace Bolt {
 
     public UE.Quaternion Rotation {
       get { return RenderDoubleBufferRotation.Current; }
+    }
+
+    public void SetExtrapolationClamper(System.Func<BoltEntity, UE.Vector3, UE.Vector3> clamper) {
+      Assert.NotNull(clamper);
+      Clamper = clamper;
     }
 
     public void SetTransforms(UE.Transform simulate) {
