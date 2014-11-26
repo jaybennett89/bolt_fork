@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Bolt {
   public struct Priority {
@@ -13,11 +10,15 @@ namespace Bolt {
       }
 
       int IComparer<Priority>.Compare(Priority x, Priority y) {
-        return y.PriorityValue - x.PriorityValue;
+        return y.PropertyPriority - x.PropertyPriority;
       }
     }
 
     public int PropertyIndex;
-    public int PriorityValue;
+    public int PropertyPriority;
+
+#if DEBUG
+    public int PropertyUpdated;
+#endif
   }
 }

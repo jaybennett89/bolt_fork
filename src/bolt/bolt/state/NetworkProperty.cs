@@ -1,5 +1,6 @@
 ﻿using System;
 using UdpKit;
+using UE = UnityEngine;
 
 namespace Bolt {
   internal abstract class NetworkProperty {
@@ -20,8 +21,8 @@ namespace Bolt {
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
-      PropertyPriority = priority;
       PropertyFilters = filters;
+      PropertyPriority = UE.Mathf.Clamp(priority, 1, 100);
     }
 
     public void Settings_Offsets(Int32 properties, Int32 storage) {

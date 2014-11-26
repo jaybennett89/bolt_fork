@@ -35,7 +35,7 @@ namespace Bolt {
         SetValue(this.OffsetStorage + (index * _stride), value);
 
         // set changed
-        Storage.PropertyChanged(this.OffsetProperties + (index * _stride));
+        Storage.PropertyChanged(this.OffsetProperties + index);
       }
     }
 

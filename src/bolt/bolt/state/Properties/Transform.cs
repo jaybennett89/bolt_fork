@@ -136,7 +136,7 @@ namespace Bolt {
           var rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
           if (positionChanged || velocityChanged || rotationChanged) {
-            obj.Storage.PropertyChanged(obj[this]);
+            obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
           }
         }
 
