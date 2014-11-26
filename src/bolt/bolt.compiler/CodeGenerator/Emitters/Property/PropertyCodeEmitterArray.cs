@@ -21,11 +21,13 @@ namespace Bolt.Compiler {
     }
 
     public override void EmitObjectSetup(DomBlock block, Offsets offsets) {
-      EmitInitObject(Decorator.ClrType, block, offsets, Decorator.PropertyType.ElementCount.Literal());
+      var element = Decorator.ElementDecorator;
 
-      if (Decorator.PropertyType.ElementType is PropertyTypeStruct) {
+      if (element is PropertyDecoratorStruct) {
+        var structDecorator = (PropertyDecoratorStruct)element;
+        EmitInitObject(Decorator.ClrType, block, offsets, /* size */ Decorator.PropertyType.ElementCount.Literal(), /* stride */ structDecorator.RequiredObjects.Literal());
+
         var tmp = block.TempVar();
-        var element = (PropertyDecoratorStruct)Decorator.ElementDecorator;
         element.Definition.Name += "[]";
 
         offsets.OffsetStorage = "offsets.OffsetStorage + {0} + ({1} * {2})".Expr(Decorator.OffsetStorage, tmp, element.RequiredStorage);
@@ -35,6 +37,9 @@ namespace Bolt.Compiler {
         block.Stmts.For(tmp, tmp + " < " + Decorator.PropertyType.ElementCount, body => {
           PropertyCodeEmitter.Create(element).EmitObjectSetup(new DomBlock(body, tmp + "_"), offsets);
         });
+      }
+      else {
+        EmitInitObject(Decorator.ClrType, block, offsets, /* size */ Decorator.PropertyType.ElementCount.Literal(), /* stride */ element.RequiredStorage.Literal());
       }
     }
 

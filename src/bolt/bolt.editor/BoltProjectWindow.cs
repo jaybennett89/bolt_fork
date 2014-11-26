@@ -65,7 +65,7 @@ public class BoltProjectWindow : BoltWindow {
   new void OnGUI() {
     base.OnGUI();
 
-    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 16));
+    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 22));
     scroll = GUILayout.BeginScrollView(scroll, false, false);
 
     EditorGUILayout.BeginHorizontal();

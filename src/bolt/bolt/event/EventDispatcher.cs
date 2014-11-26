@@ -6,7 +6,7 @@ namespace Bolt {
   partial class EventDispatcher {
     List<UE.MonoBehaviour> _targets = new List<UE.MonoBehaviour>();
 
-    void Raise(NetworkEvent ev) {
+    void Raise(Event ev) {
       IEventFactory factory = Factory.GetEventFactory(ev.Meta.TypeId);
 
       for (int i = 0; i < _targets.Count; ++i) {

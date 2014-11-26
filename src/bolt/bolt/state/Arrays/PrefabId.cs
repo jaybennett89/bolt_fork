@@ -5,8 +5,9 @@ using UnityEngine;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_PrefabId : NetworkArray_Values<PrefabId> {
-    internal NetworkArray_PrefabId(int length)
-      : base(length) {
+    internal NetworkArray_PrefabId(int length, int stride)
+      : base(length, stride) {
+      Assert.True(stride == 1);
     }
 
     protected override PrefabId GetValue(int index) {

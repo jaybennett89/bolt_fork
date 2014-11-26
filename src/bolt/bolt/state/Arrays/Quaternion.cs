@@ -5,8 +5,9 @@ using UnityEngine;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_Quaternion : NetworkArray_Values<Quaternion> {
-    internal NetworkArray_Quaternion(int length)
-      : base(length) {
+    internal NetworkArray_Quaternion(int length, int stride)
+      : base(length, stride) {
+      Assert.True((stride == 1) || (stride == 2));
     }
 
     protected override Quaternion GetValue(int index) {

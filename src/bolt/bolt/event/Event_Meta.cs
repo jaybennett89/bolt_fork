@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  internal abstract class NetworkEvent_Meta : NetworkObj_Meta {
+  internal abstract class Event_Meta : NetworkObj_Meta {
 
   }
 }

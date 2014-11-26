@@ -172,6 +172,18 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  public void SetStreamBandwidth(int bytesPerSecond) {
+    udpConnection.StreamBandwidth(bytesPerSecond);
+  }
+
+  public void Stream(UdpChannelName channel, byte[] data) {
+    udpConnection.Stream(channel, data);
+  }
+
+  public void Stream(UdpChannelName channel, UdpChannelData data) {
+    udpConnection.Stream(channel, data);
+  }
+
   public void Disconnect() {
     Disconnect(null);
   }

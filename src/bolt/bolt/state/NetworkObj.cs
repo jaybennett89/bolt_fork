@@ -10,7 +10,7 @@ namespace Bolt {
     }
   }
 
-  public abstract class NetworkObj {
+  public abstract class NetworkObj : IDisposable {
     internal String Path;
     internal NetworkObj Root;
     internal List<NetworkObj> RootObjects;
@@ -90,6 +90,9 @@ namespace Bolt {
 
         return this.OffsetStorage + property.OffsetStorage;
       }
+    }
+
+    void IDisposable.Dispose() {
     }
   }
 }

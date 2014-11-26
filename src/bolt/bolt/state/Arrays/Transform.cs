@@ -9,8 +9,9 @@ namespace Bolt {
       get { return base[index]; }
     }
 
-    internal NetworkArray_Transform(int length)
-      : base(length) {
+    internal NetworkArray_Transform(int length, int stride)
+      : base(length, stride) {
+      Assert.True(stride == 3);
     }
 
     protected override NetworkTransform GetValue(int index) {

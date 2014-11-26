@@ -35,7 +35,7 @@ namespace Bolt.Compiler {
         InterfaceType.BaseTypes.Add(Decorator.BaseInterface);
 
         EmitModifyMethod(InterfaceType, Decorator.NameInterface, null, Decorator.ParentInterfaces.Any());
-        EmitObjectMembers(InterfaceType);
+        EmitObjectMembers(InterfaceType, false);
       }
     }
 
@@ -69,12 +69,14 @@ namespace Bolt.Compiler {
         EmitObjectCtor(ctor);
       });
 
-      EmitObjectMembers(ObjectType);
+      EmitObjectMembers(ObjectType, true);
     }
 
-    protected virtual void EmitObjectMembers(CodeTypeDeclaration type) {
+    protected virtual void EmitObjectMembers(CodeTypeDeclaration type, bool inherited) {
       for (int i = 0; i < Decorator.Properties.Count; ++i) {
-        PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitObjectMembers(type);
+        if (inherited || ReferenceEquals(Decorator.Properties[i].DefiningAsset, Decorator)) {
+          PropertyCodeEmitter.Create(Decorator.Properties[i]).EmitObjectMembers(type);
+        }
       }
     }
 

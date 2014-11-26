@@ -8,8 +8,9 @@ using System.Threading;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_Entity : NetworkArray_Values<BoltEntity> {
-    internal NetworkArray_Entity(int length)
-      : base(length) {
+    internal NetworkArray_Entity(int length, int stride)
+      : base(length, stride) {
+      Assert.True(stride == 1);
     }
 
     protected override BoltEntity GetValue(int index) {

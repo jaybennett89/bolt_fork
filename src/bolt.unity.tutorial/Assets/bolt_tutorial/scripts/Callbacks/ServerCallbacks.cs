@@ -33,6 +33,11 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
   }
 
   public override void Connected(BoltConnection c, Bolt.IProtocolToken token) {
+
+    using (var ev = LogEvent.Raise(c)) {
+      ev.message = "RELIABLE TO CONNECTION";
+    }
+
     c.userToken = new Player();
     c.GetPlayer().connection = c;
     c.GetPlayer().name = "CLIENT:" + c.remoteEndPoint.Port;

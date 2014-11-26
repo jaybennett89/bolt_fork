@@ -150,6 +150,10 @@ public static class BoltNetwork {
     get { return isServer || (isClient && BoltCore._connections.count > 0); }
   }
 
+  public static UdpChannelName CreateStreamChannel(UdpChannelConfig channel) {
+    return new UdpChannelName();
+  }
+
   /// <summary>
   /// Returns true if this host is a client
   /// </summary>
@@ -199,7 +203,7 @@ public static class BoltNetwork {
     var it = BoltCore._entities.GetIterator();
 
     while (it.Next()) {
-      if (it.val.NetworkId.Packed == id.Packed) {
+      if (it.val.IsAttached && it.val.UnityObject && it.val.NetworkId.Packed == id.Packed) {
         return it.val.UnityObject;
       }
     }

@@ -16,10 +16,10 @@ namespace Bolt {
     }
 
     public bool Skipped;
-    public NetworkEvent NetworkEvent;
+    public Event NetworkEvent;
     public float Priority;
 
-    public static EventUnreliable Wrap(NetworkEvent ev) {
+    public static EventUnreliable Wrap(Event ev) {
       EventUnreliable r;
 
       r.NetworkEvent = ev;
@@ -31,14 +31,14 @@ namespace Bolt {
   }
 
   struct EventReliable {
-    public NetworkEvent NetworkEvent;
+    public Event NetworkEvent;
     public uint Sequence;
 
-    public static EventReliable Wrap(NetworkEvent ev) {
+    public static EventReliable Wrap(Event ev) {
       return Wrap(ev, 0);
     }
 
-    public static EventReliable Wrap(Bolt.NetworkEvent ev, uint sequence) {
+    public static EventReliable Wrap(Bolt.Event ev, uint sequence) {
       EventReliable r;
 
       r.NetworkEvent = ev;
@@ -55,11 +55,11 @@ namespace Bolt {
 
     public EventChannel() {
       unreliableSend = new List<EventUnreliable>(256);
-      reliableOrderedSend = new EventReliableSendBuffer(NetworkEvent.RELIABLE_WINDOW_BITS, NetworkEvent.RELIABLE_SEQUENCE_BITS);
-      reliableOrderedRecv = new EventReliableRecvBuffer(NetworkEvent.RELIABLE_WINDOW_BITS, NetworkEvent.RELIABLE_SEQUENCE_BITS);
+      reliableOrderedSend = new EventReliableSendBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
+      reliableOrderedRecv = new EventReliableRecvBuffer(Event.RELIABLE_WINDOW_BITS, Event.RELIABLE_SEQUENCE_BITS);
     }
 
-    public void Queue(NetworkEvent ev) {
+    public void Queue(Event ev) {
       if (ev.Reliability == ReliabilityModes.Unreliable) {
         // push on unreliable send queue
         unreliableSend.Add(EventUnreliable.Wrap(ev));
@@ -145,6 +145,10 @@ namespace Bolt {
         bool notOverMaxBits = (packet.UdpPacket.Ptr - ptrStart) <= maxBits;
         bool notOverflowing = packet.UdpPacket.Overflowing == false;
 
+        if (packOk == false) {
+          BoltLog.Error("Reliable failed to pack, this means all other reliable events will stall");
+        }
+
         if (packOk && notOverMaxBits && notOverflowing) {
           packet.ReliableEvents.Add(reliable);
         }
@@ -196,7 +200,7 @@ namespace Bolt {
       packet.Stats.EventBits = packet.UdpPacket.Position - startPos;
     }
 
-    bool PackEvent(NetworkEvent ev, UdpPacket stream, uint sequence) {
+    bool PackEvent(Event ev, UdpPacket stream, uint sequence) {
       BoltLog.Debug("sending event {0}", ev);
 
       stream.WriteContinueMarker();
@@ -209,7 +213,7 @@ namespace Bolt {
 
       if (stream.WriteBool(ev.Reliability == ReliabilityModes.ReliableOrdered)) {
         // write sequence number for reliable events
-        stream.WriteUInt(sequence, NetworkEvent.RELIABLE_SEQUENCE_BITS);
+        stream.WriteUInt(sequence, Event.RELIABLE_SEQUENCE_BITS);
       }
       else {
         if (ev.IsEntityEvent) {
@@ -227,7 +231,7 @@ namespace Bolt {
 
       while (packet.UdpPacket.ReadStopMarker()) {
         uint sequence = 0;
-        NetworkEvent ev = ReadEvent(packet.UdpPacket, ref sequence);
+        Event ev = ReadEvent(packet.UdpPacket, ref sequence);
 
         BoltLog.Debug("recv event {0}", ev);
         if (ev.Reliability == ReliabilityModes.Unreliable) {
@@ -254,15 +258,15 @@ namespace Bolt {
       packet.Stats.EventBits = packet.UdpPacket.Position - startPtr;
     }
 
-    NetworkEvent ReadEvent(UdpPacket stream, ref uint sequence) {
-      NetworkEvent ev;
+    Event ReadEvent(UdpPacket stream, ref uint sequence) {
+      Event ev;
 
       ev = Factory.NewEvent(stream.ReadTypeId());
       ev.Targets = stream.ReadInt(5);
       ev.SourceConnection = connection;
 
       if (stream.ReadBool()) {
-        sequence = stream.ReadUInt(NetworkEvent.RELIABLE_SEQUENCE_BITS);
+        sequence = stream.ReadUInt(Event.RELIABLE_SEQUENCE_BITS);
 
         // assign relability mode
         ev.Reliability = ReliabilityModes.ReliableOrdered;

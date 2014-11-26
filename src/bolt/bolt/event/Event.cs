@@ -6,7 +6,7 @@ namespace Bolt {
   /// Base class that all events inherit from
   /// </summary>
   [Documentation]
-  public abstract class NetworkEvent : NetworkObj_Root, IDisposable {
+  public abstract class Event : NetworkObj_Root, IDisposable {
     internal const byte ENTITY_EVERYONE = 1;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
@@ -35,9 +35,9 @@ namespace Bolt {
     internal BoltConnection TargetConnection;
     internal BoltConnection SourceConnection;
 
-    internal new NetworkEvent_Meta Meta;
+    internal new Event_Meta Meta;
 
-    [Obsolete("Use NetworkEvent.FromSelf instead")]
+    [Obsolete("Use Event.FromSelf instead")]
     public bool IsFromLocalComputer {
       get { return ReferenceEquals(SourceConnection, null); }
     }
@@ -75,7 +75,7 @@ namespace Bolt {
       }
     }
 
-    internal NetworkEvent(NetworkEvent_Meta meta)
+    internal Event(Event_Meta meta)
       : base(meta) {
       Meta = meta;
       storage = AllocateStorage();
@@ -87,7 +87,7 @@ namespace Bolt {
 
     internal bool Pack(BoltConnection connection, UdpPacket packet) {
       for (int i = 0; i < Meta.Properties.Length; ++i) {
-        if (Meta.Properties[i].Property.Write(connection, this, storage, packet)) {
+        if (Meta.Properties[i].Property.Write(connection, this, storage, packet) == false) {
           return false;
         }
       }

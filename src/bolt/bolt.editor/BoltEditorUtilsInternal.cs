@@ -59,10 +59,6 @@ static class BoltEditorUtilsInternal {
     }
   }
 
-  public static void SynchronizeWithController(BoltMecanimAsset asset) {
-
-  }
-
   public static void InstallAsset(string file, Func<byte[]> data) {
     if (!File.Exists(file)) {
       InstallAsset(file, data());

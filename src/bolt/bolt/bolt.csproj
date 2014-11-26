@@ -49,17 +49,9 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="assets\BoltAssetEnums.cs" />
-    <Compile Include="assets\BoltAssetProperty.cs" />
-    <Compile Include="assets\BoltAssetPropertyGroup.cs" />
-    <Compile Include="assets\BoltCommandAsset.cs" />
-    <Compile Include="assets\BoltCompilableAsset.cs" />
-    <Compile Include="assets\BoltEventAsset.cs" />
-    <Compile Include="assets\BoltMecanimAsset.cs" />
-    <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="EventFilter.cs" />
-    <Compile Include="event\NetworkEvent_Meta.cs" />
+    <Compile Include="event\Event_Meta.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
@@ -73,7 +65,7 @@
     <Compile Include="entity\Entity.Control.cs" />
     <Compile Include="entity\Entity.cs" />
     <Compile Include="entity\EntityInterfaces.cs" />
-    <Compile Include="event\NetworkEvent.cs" />
+    <Compile Include="event\Event.cs" />
     <Compile Include="event\EventChannel.cs" />
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
@@ -185,7 +177,6 @@
     <Compile Include="BoltEntity.cs" />
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
-    <Compile Include="event\Legacy\BoltEventEnums.cs" />
     <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />

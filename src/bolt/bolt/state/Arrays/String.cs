@@ -5,8 +5,9 @@ using UnityEngine;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_String : NetworkArray_Values<String> {
-    internal NetworkArray_String(int length)
-      : base(length) {
+    internal NetworkArray_String(int length, int stride)
+      : base(length, stride) {
+      Assert.True(stride == 1);
     }
 
     protected override String GetValue(int index) {
