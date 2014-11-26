@@ -348,7 +348,7 @@ internal static class BoltCore {
     DisableLanBroadcast();
 
     // connect
-    _udpSocket.Connect(endpoint, (token == null) ? null : token.ToByteArray());
+    _udpSocket.Connect(endpoint, token.ToByteArray());
   }
 
   public static void SetSessionData(string serverName, string userData) {
@@ -410,11 +410,11 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.Disconnected:
-          HandleDisconnected(ev.Connection.GetBoltConnection(), (byte[])ev.Object0);
+          HandleDisconnected(ev.Connection.GetBoltConnection(), ev.DisconnectToken);
           break;
 
         case UdpEventType.ConnectRequest:
-          HandleConnectRequest(ev.EndPoint, (byte[])ev.Object0);
+          HandleConnectRequest(ev.EndPoint, ev.ConnectToken);
           break;
 
         case UdpEventType.ConnectFailed:
@@ -422,7 +422,7 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.ConnectRefused:
-          HandleConnectRefused(ev.EndPoint, (byte[])ev.Object0);
+          HandleConnectRefused(ev.EndPoint, ev.RefusedToken);
           break;
 
         case UdpEventType.ConnectAttempt:

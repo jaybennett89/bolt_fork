@@ -12,6 +12,10 @@ namespace Bolt {
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
 
+    public override bool AllowCallbacks {
+      get { return false; }
+    }
+
     public override bool WantsOnRender {
       get { return true; }
     }
@@ -132,7 +136,7 @@ namespace Bolt {
           var rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
           if (positionChanged || velocityChanged || rotationChanged) {
-            obj.Storage.PropertyChanged(obj[this]);
+            obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
           }
         }
 

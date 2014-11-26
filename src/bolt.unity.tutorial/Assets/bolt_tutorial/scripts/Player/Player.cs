@@ -31,10 +31,6 @@ public partial class Player : IDisposable {
         mod.Dead = true;
         mod.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
       }
-
-      using (var ev = LogEvent.Raise(Bolt.GlobalTargets.Everyone)) {
-        ev.message = name + " died";
-      }
     }
   }
 

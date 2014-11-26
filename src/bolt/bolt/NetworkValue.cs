@@ -67,6 +67,20 @@ namespace Bolt {
       set { Object = value; }
     }
 
+    public BoltEntity Entity {
+      get {
+        return BoltNetwork.FindEntity(NetworkId);
+      }
+      set {
+        if (value && value.isAttached) {
+          NetworkId = value.networkId;
+        }
+        else {
+          NetworkId = new NetworkId();
+        }
+      }
+    }
+
     public static bool Diff(Boolean a, Boolean b) { return a != b; }
     public static bool Diff(Int32 a, Int32 b) { return a != b; }
     public static bool Diff(Single a, Single b) { return a != b; }

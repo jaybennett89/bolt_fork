@@ -5,8 +5,9 @@ using UnityEngine;
 namespace Bolt {
   [Documentation]
   public class NetworkArray_Integer : NetworkArray_Values<Int32> {
-    internal NetworkArray_Integer(int length)
-      : base(length) {
+    internal NetworkArray_Integer(int length, int stride)
+      : base(length, stride) {
+      Assert.True(stride == 1);
     }
 
     protected override Int32 GetValue(int index) {

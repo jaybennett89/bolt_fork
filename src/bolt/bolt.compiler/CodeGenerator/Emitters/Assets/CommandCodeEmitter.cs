@@ -2,8 +2,8 @@
 
 namespace Bolt.Compiler {
   class CommandCodeEmitter : AssetCodeEmitter<CommandDecorator> {
-    protected override void EmitObjectMembers(CodeTypeDeclaration type) {
-      base.EmitObjectMembers(type);
+    protected override void EmitObjectMembers(CodeTypeDeclaration type, bool inherited) {
+      base.EmitObjectMembers(type, inherited);
 
       type.DeclareMethod("I" + Decorator.Name + "Input", "Create", method => {
         method.Attributes |= MemberAttributes.Static;

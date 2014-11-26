@@ -10,7 +10,7 @@ namespace Bolt.Compiler {
     }
 
     public override string BaseClass {
-      get { return "Bolt.NetworkEvent"; }
+      get { return "Bolt.Event"; }
     }
 
     public override bool EmitPropertyChanged {

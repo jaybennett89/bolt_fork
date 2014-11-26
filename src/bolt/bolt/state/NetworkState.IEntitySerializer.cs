@@ -111,10 +111,19 @@ namespace Bolt {
 
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
+
         for (int i = 0; i < Meta.Properties.Length; ++i) {
           var pi = Meta.Properties[i];
           string label = pi.Property.PropertyName;
           object value = pi.Property.DebugValue(Objects[pi.OffsetObjects], Storage);
+
+          if (!Entity.IsOwner) {
+            EntityProxy proxy;
+
+            if (Entity.Source._entityChannel.TryFindProxy(Entity, out proxy)) {
+              label = "(" + proxy.PropertyPriority[i].PropertyUpdated + ") " + label;
+            }
+          }
 
           if (value != null) {
             BoltNetworkInternal.DebugDrawer.LabelField(label, value.ToString());
@@ -148,7 +157,7 @@ namespace Bolt {
         // if this property is set both in our filter and the proxy mask we can consider it for sending
         if (filter.IsSet(i) && env.Proxy.Changed.IsSet(i)) {
           // increment priority for this property
-          proxyPriority[i].PriorityValue += Meta.Properties[i].Property.PropertyPriority;
+          proxyPriority[i].PropertyPriority += Meta.Properties[i].Property.PropertyPriority;
 
           // copy to our temp array
           tempPriority[propertyCount] = proxyPriority[i];
@@ -168,7 +177,7 @@ namespace Bolt {
         Priority p = env.Written[i];
 
         // clear priority for written property
-        env.Proxy.PropertyPriority[p.PropertyIndex].PriorityValue = 0;
+        env.Proxy.PropertyPriority[p.PropertyIndex].PropertyPriority = 0;
 
         // clear mask for it
         env.Proxy.Changed.Clear(p.PropertyIndex);
@@ -198,7 +207,7 @@ namespace Bolt {
         Priority p = priority[i];
         NetworkPropertyInfo pi = Meta.Properties[p.PropertyIndex];
 
-        if (p.PriorityValue == 0) {
+        if (p.PropertyPriority == 0) {
           break;
         }
 
@@ -210,12 +219,14 @@ namespace Bolt {
           packet.WriteInt(p.PropertyIndex, Meta.PropertyIdBits);
 
           if (pi.Property.Write(connection, Objects[pi.OffsetObjects], Storage, packet)) {
+
 #if DEBUG
             int totalBits = packet.Position - ptr;
             if (totalBits != b) {
-              BoltLog.Warn("Property of type {0} did not write the correct amount of bits, written: {1}, expected: {2}", pi.Property, totalBits, b);
+              //BoltLog.Warn("Property of type {0} did not write the correct amount of bits, written: {1}, expected: {2}", pi.Property, totalBits, b);
             }
 #endif
+
             if (packet.Overflowing) {
               packet.Ptr = ptr;
               break;
@@ -268,6 +279,16 @@ namespace Bolt {
       while (--count >= 0) {
         var propertyIndex = packet.ReadInt(Meta.PropertyIdBits);
         var propertyInfo = Meta.Properties[propertyIndex];
+
+#if DEBUG
+        if (!Entity.IsOwner) {
+          EntityProxy proxy;
+
+          if (Entity.Source._entityChannel.TryFindProxy(Entity, out proxy)) {
+            proxy.PropertyPriority[propertyIndex].PropertyUpdated = frame;
+          }
+        }
+#endif
 
         // make sure this is the correct one
         Assert.True(propertyIndex == Objects[propertyInfo.OffsetObjects].OffsetProperties + propertyInfo.Property.OffsetProperties);

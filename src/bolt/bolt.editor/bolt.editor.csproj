@@ -26,9 +26,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;BOLT_EDITOR_DLL</DefineConstants>
+    <DefineConstants>BOLT_EDITOR_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -88,13 +88,9 @@
     <Compile Include="BoltWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
     <Compile Include="Editors\BoltAssetEditorGUI.cs" />
-    <Compile Include="Editors\BoltCommandAssetEditor.cs" />
-    <Compile Include="Editors\BoltEventAssetEditor.cs" />
     <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
-    <Compile Include="Editors\BoltMecanimAssetEditor.cs" />
     <Compile Include="Editors\BoltPrefabDatabaseEditor.cs" />
     <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />
-    <Compile Include="Editors\BoltStateAssetEditor.cs" />
     <Compile Include="BoltUserAssemblyCompiler.cs" />
     <Compile Include="BoltEditorUtilsInternal.cs" />
     <Compile Include="Editors\BoltEntityEditor.cs" />

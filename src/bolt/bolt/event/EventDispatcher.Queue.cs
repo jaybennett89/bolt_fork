@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Bolt {
   partial class EventDispatcher {
-    static Queue<NetworkEvent> _dispatchQueue = new Queue<NetworkEvent>();
+    static Queue<Event> _dispatchQueue = new Queue<Event>();
 
-    public static void Enqueue(NetworkEvent ev) {
+    public static void Enqueue(Event ev) {
       _dispatchQueue.Enqueue(ev);
     }
 
-    public static void Received(NetworkEvent ev) {
+    public static void Received(Event ev) {
       if (BoltCore.EventFilter.EventReceived(ev)) {
         _dispatchQueue.Enqueue(ev);
       }
@@ -23,69 +23,69 @@ namespace Bolt {
       }
     }
 
-    static void Dispatch(NetworkEvent ev) {
+    static void Dispatch(Event ev) {
       switch (ev.Targets) {
-        case NetworkEvent.ENTITY_EVERYONE:
+        case Event.ENTITY_EVERYONE:
           Entity_Everyone(ev);
           break;
 
-        case NetworkEvent.ENTITY_EVERYONE_EXCEPT_CONTROLLER:
+        case Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER:
           Entity_Everyone_Except_Controller(ev);
           break;
 
-        case NetworkEvent.ENTITY_EVERYONE_EXCEPT_OWNER:
+        case Event.ENTITY_EVERYONE_EXCEPT_OWNER:
           Entity_Everyone_Except_Owner(ev);
           break;
 
-        case NetworkEvent.ENTITY_ONLY_CONTROLLER:
+        case Event.ENTITY_ONLY_CONTROLLER:
           Entity_Only_Controller(ev);
           break;
 
-        case NetworkEvent.ENTITY_ONLY_OWNER:
+        case Event.ENTITY_ONLY_OWNER:
           Entity_Only_Owner(ev);
           break;
 
-        case NetworkEvent.ENTITY_ONLY_SELF:
+        case Event.ENTITY_ONLY_SELF:
           Entity_Only_Self(ev);
           break;
 
-        case NetworkEvent.GLOBAL_EVERYONE:
+        case Event.GLOBAL_EVERYONE:
           Global_Everyone(ev);
           break;
 
-        case NetworkEvent.GLOBAL_OTHERS:
+        case Event.GLOBAL_OTHERS:
           Global_Others(ev);
           break;
 
-        case NetworkEvent.GLOBAL_ALL_CLIENTS:
+        case Event.GLOBAL_ALL_CLIENTS:
           Global_All_Clients(ev);
           break;
 
-        case NetworkEvent.GLOBAL_ONLY_SERVER:
+        case Event.GLOBAL_ONLY_SERVER:
           Global_Server(ev);
           break;
 
-        case NetworkEvent.GLOBAL_SPECIFIC_CONNECTION:
+        case Event.GLOBAL_SPECIFIC_CONNECTION:
           Global_Specific_Connection(ev);
           break;
 
-        case NetworkEvent.GLOBAL_ONLY_SELF:
+        case Event.GLOBAL_ONLY_SELF:
           Global_Only_Self(ev);
           break;
       }
     }
 
-    static void Global_Only_Self(NetworkEvent ev) {
+    static void Global_Only_Self(Event ev) {
       RaiseLocal(ev);
     }
 
-    static void Entity_Only_Self(NetworkEvent ev) {
+    static void Entity_Only_Self(Event ev) {
       if (ev.TargetEntity) {
         RaiseLocal(ev);
       }
     }
 
-    static void Entity_Only_Owner(NetworkEvent ev) {
+    static void Entity_Only_Owner(Event ev) {
       if (ev.TargetEntity) {
         if (ev.TargetEntity.IsOwner) {
           RaiseLocal(ev);
@@ -97,7 +97,7 @@ namespace Bolt {
       }
     }
 
-    static void Entity_Only_Controller(NetworkEvent ev) {
+    static void Entity_Only_Controller(Event ev) {
       if (ev.TargetEntity) {
         if (ev.TargetEntity.HasControl) {
           RaiseLocal(ev);
@@ -121,7 +121,7 @@ namespace Bolt {
       }
     }
 
-    static void Entity_Everyone_Except_Owner(NetworkEvent ev) {
+    static void Entity_Everyone_Except_Owner(Event ev) {
       if (ev.TargetEntity != null) {
         var it = BoltCore._connections.GetIterator();
 
@@ -139,7 +139,7 @@ namespace Bolt {
       }
     }
 
-    static void Entity_Everyone_Except_Controller(NetworkEvent ev) {
+    static void Entity_Everyone_Except_Controller(Event ev) {
       if (ev.TargetEntity != null) {
         var it = BoltCore._connections.GetIterator();
 
@@ -161,7 +161,7 @@ namespace Bolt {
       }
     }
 
-    static void Entity_Everyone(NetworkEvent ev) {
+    static void Entity_Everyone(Event ev) {
       var it = BoltCore._connections.GetIterator();
 
       if (ev.TargetEntity != null) {
@@ -177,7 +177,7 @@ namespace Bolt {
       }
     }
 
-    static void Global_Specific_Connection(NetworkEvent ev) {
+    static void Global_Specific_Connection(Event ev) {
       if (ev.IsFromLocalComputer) {
         ev.TargetConnection._eventChannel.Queue(ev);
       }
@@ -186,7 +186,7 @@ namespace Bolt {
       }
     }
 
-    static void Global_Server(NetworkEvent ev) {
+    static void Global_Server(Event ev) {
       if (BoltCore.isServer) {
         RaiseLocal(ev);
       }
@@ -195,7 +195,7 @@ namespace Bolt {
       }
     }
 
-    static void Global_All_Clients(NetworkEvent ev) {
+    static void Global_All_Clients(Event ev) {
       var it = BoltCore._connections.GetIterator();
 
       while (it.Next()) {
@@ -211,7 +211,7 @@ namespace Bolt {
       }
     }
 
-    static void Global_Others(NetworkEvent ev) {
+    static void Global_Others(Event ev) {
       var it = BoltCore._connections.GetIterator();
 
       while (it.Next()) {
@@ -227,7 +227,7 @@ namespace Bolt {
       }
     }
 
-    static void Global_Everyone(NetworkEvent ev) {
+    static void Global_Everyone(Event ev) {
       var it = BoltCore._connections.GetIterator();
 
       while (it.Next()) {
@@ -242,7 +242,7 @@ namespace Bolt {
     }
 
 
-    static void RaiseLocal(NetworkEvent ev) {
+    static void RaiseLocal(Event ev) {
       try {
         BoltLog.Debug("Raising {0}", ev);
 

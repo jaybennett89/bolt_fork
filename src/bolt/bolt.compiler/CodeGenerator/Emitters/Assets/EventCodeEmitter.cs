@@ -8,8 +8,8 @@ namespace Bolt.Compiler {
       EmitListenerInterface();
     }
 
-    protected override void EmitObjectMembers(CodeTypeDeclaration type) {
-      base.EmitObjectMembers(type);
+    protected override void EmitObjectMembers(CodeTypeDeclaration type, bool inherited) {
+      base.EmitObjectMembers(type, inherited);
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
@@ -84,25 +84,25 @@ namespace Bolt.Compiler {
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltConnection", "connection");
-        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_SPECIFIC_CONNECTION, connection, Bolt.ReliabilityModes.ReliableOrdered)");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, Bolt.ReliabilityModes.ReliableOrdered)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("BoltConnection", "connection");
         method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
-        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_SPECIFIC_CONNECTION, connection, reliability)");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_SPECIFIC_CONNECTION, connection, reliability)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_EVERYONE, null, Bolt.ReliabilityModes.ReliableOrdered)");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, Bolt.ReliabilityModes.ReliableOrdered)");
       });
 
       type.DeclareMethod(Decorator.Definition.Name, "Raise", method => {
         method.Attributes = MemberAttributes.Public | MemberAttributes.Static;
         method.DeclareParameter("Bolt.ReliabilityModes", "reliability");
-        method.Statements.Expr("return Raise(Bolt.NetworkEvent.GLOBAL_EVERYONE, null, reliability)");
+        method.Statements.Expr("return Raise(Bolt.Event.GLOBAL_EVERYONE, null, reliability)");
       });
     }
 
@@ -118,7 +118,7 @@ namespace Bolt.Compiler {
       base.EmitFactory();
 
       MetaType.DeclareMethod(typeof(void), "Dispatch", method => {
-        method.DeclareParameter("Bolt.NetworkEvent", "ev");
+        method.DeclareParameter("Bolt.Event", "ev");
         method.DeclareParameter(typeof(object).FullName, "target");
 
         DomBlock block = new DomBlock(method.Statements);

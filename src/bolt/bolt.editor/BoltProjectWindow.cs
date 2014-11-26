@@ -65,7 +65,7 @@ public class BoltProjectWindow : BoltWindow {
   new void OnGUI() {
     base.OnGUI();
 
-    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 16));
+    GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 22));
     scroll = GUILayout.BeginScrollView(scroll, false, false);
 
     EditorGUILayout.BeginHorizontal();
@@ -131,8 +131,8 @@ public class BoltProjectWindow : BoltWindow {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("New State"), false, () => NewAsset(new StateDefinition()));
         menu.AddItem(new GUIContent("New Object"), false, () => NewAsset(new StructDefinition()));
-        menu.AddItem(new GUIContent("New NetworkEvent"), false, () => NewAsset(new EventDefinition()));
-        menu.AddItem(new GUIContent("New RootCommand"), false, () => NewAsset(new CommandDefinition()));
+        menu.AddItem(new GUIContent("New Event"), false, () => NewAsset(new EventDefinition()));
+        menu.AddItem(new GUIContent("New Command"), false, () => NewAsset(new CommandDefinition()));
         menu.ShowAsContext();
       }
     }

@@ -33,6 +33,10 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
+  public bool TryFindProxy(Bolt.Entity en, out EntityProxy proxy) {
+    return _incomming.TryGetValue(en.NetworkId, out proxy) || _outgoing.TryGetValue(en.NetworkId, out proxy);
+  }
+
   public void SetIdle(Bolt.Entity entity, bool idle) {
     EntityProxy proxy;
 
@@ -152,6 +156,9 @@ partial class EntityChannel : BoltChannel {
   public override void Pack(Packet packet) {
     int startPos = packet.UdpPacket.Position;
 
+    // always clear before starting
+    _prioritized.Clear();
+
     foreach (EntityProxy proxy in _outgoing.Values) {
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
@@ -214,6 +221,7 @@ partial class EntityChannel : BoltChannel {
 
       _prioritized.Add(proxy);
     }
+
     if (_prioritized.Count > 0) {
       try {
         _prioritized.Sort(EntityProxy.PriorityComparer.Instance);
@@ -353,7 +361,7 @@ partial class EntityChannel : BoltChannel {
       env.Proxy.Changed.Set(p.PropertyIndex);
 
       // increment priority
-      env.Proxy.PropertyPriority[p.PropertyIndex].PriorityValue += p.PriorityValue;
+      env.Proxy.PropertyPriority[p.PropertyIndex].PropertyPriority += p.PropertyPriority;
     }
   }
 

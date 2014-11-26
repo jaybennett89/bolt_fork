@@ -10,7 +10,7 @@ namespace Bolt {
   }
 
   interface IEventFactory : IFactory {
-    void Dispatch(NetworkEvent ev, object target);
+    void Dispatch(Event ev, object target);
   }
 
   interface ISerializerFactory : IFactory {
@@ -67,19 +67,19 @@ namespace Bolt {
       return (IEventFactory)_factoriesByKey[id];
     }
 
-    internal static NetworkEvent NewEvent(TypeId id) {
-      NetworkEvent ev;
+    internal static Event NewEvent(TypeId id) {
+      Event ev;
 
-      ev = (NetworkEvent)Create(id);
+      ev = (Event)Create(id);
       ev.IncrementRefs();
 
       return ev;
     }
 
-    internal static NetworkEvent NewEvent(UniqueId id) {
-      NetworkEvent ev;
+    internal static Event NewEvent(UniqueId id) {
+      Event ev;
 
-      ev = (NetworkEvent)Create(id);
+      ev = (Event)Create(id);
       ev.IncrementRefs();
 
       return ev;

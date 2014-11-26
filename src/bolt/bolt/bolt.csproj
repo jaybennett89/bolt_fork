@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <NoWarn>1591,0618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,7 +33,7 @@
     <DefineConstants>BOLT_DLL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,18 +49,9 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="assets\BoltAssetEnums.cs" />
-    <Compile Include="assets\BoltAssetProperty.cs" />
-    <Compile Include="assets\BoltAssetPropertyGroup.cs" />
-    <Compile Include="assets\BoltCommandAsset.cs" />
-    <Compile Include="assets\BoltCompilableAsset.cs" />
-    <Compile Include="assets\BoltEventAsset.cs" />
-    <Compile Include="assets\BoltMecanimAsset.cs" />
-    <Compile Include="assets\BoltStateAsset.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="EventFilter.cs" />
-    <Compile Include="event\NetworkEvent_Meta.cs" />
-    <Compile Include="NetworkMask.cs" />
+    <Compile Include="event\Event_Meta.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
@@ -74,7 +65,7 @@
     <Compile Include="entity\Entity.Control.cs" />
     <Compile Include="entity\Entity.cs" />
     <Compile Include="entity\EntityInterfaces.cs" />
-    <Compile Include="event\NetworkEvent.cs" />
+    <Compile Include="event\Event.cs" />
     <Compile Include="event\EventChannel.cs" />
     <Compile Include="event\EventDispatcher.cs" />
     <Compile Include="event\EventEnums.cs" />
@@ -186,7 +177,6 @@
     <Compile Include="BoltEntity.cs" />
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
-    <Compile Include="event\Legacy\BoltEventEnums.cs" />
     <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />
