@@ -384,30 +384,34 @@ public static class BoltNetwork {
     return BoltPhysics.OverlapSphere(origin, radius, frame);
   }
 
-  /// <summary>
-  /// Accept a connection from a specific endpoint, only usable if Accept Mode has been set to Manual
-  /// </summary>
-  /// <param name="ep">The endpoint to access the connection from</param>
+  /*
+   * Accept
+   * */
+
   public static void Accept(UdpEndPoint endpoint) {
-    BoltCore.AcceptConnection(endpoint, null, null);
+    BoltCore.AcceptConnection(endpoint, null, null, null);
   }
 
-  public static void Accept(UdpEndPoint endpoint, IProtocolToken token) {
-    BoltCore.AcceptConnection(endpoint, null, token);
+  public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken) {
+    BoltCore.AcceptConnection(endpoint, null, acceptToken, null);
   }
 
   public static void Accept(UdpEndPoint endpoint, object userToken) {
-    BoltCore.AcceptConnection(endpoint, userToken, null);
+    BoltCore.AcceptConnection(endpoint, userToken, null, null);
   }
 
-  public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken token) {
-    BoltCore.AcceptConnection(endpoint, userToken, token);
+  public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken, IProtocolToken connectToken) {
+    BoltCore.AcceptConnection(endpoint, null, acceptToken, connectToken);
   }
 
-  /// <summary>
-  /// Refuse a connection from a specific endpoint, only usable if Accept Mode has been set to Manual 
-  /// </summary>
-  /// <param name="ep">The endpoint to refuse the connection from</param>
+  public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
+    BoltCore.AcceptConnection(endpoint, userToken, acceptToken, connectToken);
+  }
+
+  /*
+   * Refuse
+   * */
+
   public static void Refuse(UdpEndPoint ep) {
     BoltCore.RefuseConnection(ep, null);
   }
