@@ -79,6 +79,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _persistThroughSceneLoads = false;
 
+  [UE.SerializeField]
+  internal bool _alwaysProxy = false;
+
   internal Entity Entity {
     get {
       if (_entity == null) {

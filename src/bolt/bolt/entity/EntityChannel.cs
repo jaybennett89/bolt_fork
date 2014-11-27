@@ -181,8 +181,10 @@ partial class EntityChannel : BoltChannel {
         }
 
         // if this connection is loading a map dont send any creates or state updates
-        if (connection.isLoadingMap || BoltSceneLoader.IsLoading || !connection._canReceiveEntities) {
-          continue;
+        if (proxy.Entity.UnityObject._alwaysProxy == false) {
+          if (connection.isLoadingMap || BoltSceneLoader.IsLoading || (connection._canReceiveEntities == false)) {
+            continue;
+          }
         }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {

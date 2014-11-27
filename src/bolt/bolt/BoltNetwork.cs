@@ -57,6 +57,16 @@ public static class BoltNetwork {
     get { return BoltCore.frame; }
   }
 
+  public static int maxConnections {
+    get {
+      if (isRunning) {
+        return isClient ? 1 : BoltCore._config.serverConnectionLimit;
+      }
+
+      return 0;
+    }
+  }
+
   /// <summary>
   /// The current server simulation frame number
   /// </summary>
