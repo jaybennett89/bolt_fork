@@ -147,12 +147,14 @@ namespace Bolt {
 
       _factoriesById.Clear();
       _factoriesByKey.Clear();
+      _factoriesByType.Clear();
 
       _token2id = new Dictionary<Type, byte>();
       _id2token = new Dictionary<byte, Type>();
 
       _factoriesById = new Dictionary<TypeId, IFactory>(128, TypeId.EqualityComparer.Instance);
       _factoriesByKey = new Dictionary<UniqueId, IFactory>(128, UniqueId.EqualityComparer.Instance);
+      _factoriesByType = new Dictionary<Type, IFactory>();
     }
 
     internal static void RegisterTokenClass(Type type) {
