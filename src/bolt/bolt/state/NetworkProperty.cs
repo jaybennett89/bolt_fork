@@ -40,6 +40,7 @@ namespace Bolt {
 
     public virtual object DebugValue(NetworkObj obj, NetworkStorage storage) { return "NONE"; }
     public virtual int BitCount(NetworkObj obj) { return -1; }
+    public virtual void SetDynamic(NetworkObj obj, object value) { throw new NotSupportedException(); }
 
     public virtual void OnInit(NetworkObj obj) { }
     public virtual void OnRender(NetworkObj obj) { }

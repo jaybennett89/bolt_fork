@@ -12,6 +12,11 @@
       return 32;
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      obj.Storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, false);
+      obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+    }
+
     public override bool Write(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
       // adjust trigger
       storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, false);
