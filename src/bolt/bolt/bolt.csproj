@@ -92,6 +92,7 @@
     <Compile Include="state\Indices.cs" />
     <Compile Include="state\NetworkArray_Objects.cs" />
     <Compile Include="state\NetworkArray_Meta.cs" />
+    <Compile Include="state\NetworkProperty_Mecanim.cs" />
     <Compile Include="state\NetworkStorage.cs" />
     <Compile Include="state\NetworkObj_Meta.cs" />
     <Compile Include="state\NetworkPropertyInfo.cs" />

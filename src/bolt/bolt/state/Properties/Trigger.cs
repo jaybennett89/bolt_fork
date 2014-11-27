@@ -12,6 +12,11 @@
       return 32;
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      obj.Storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
+      obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+    }
+
     public override bool Write(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
       // adjust trigger
       storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, false);
@@ -52,7 +57,7 @@
 
     bool MecanimPull(NetworkObj obj, NetworkStorage storage) {
       if (obj.RootState.Animator.GetBool(PropertyName) && (obj.RootState.Animator.IsInTransition(MecanimLayer) == false)) {
-        storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
+        SetDynamic(obj, null);
 
         var cb = obj.Storage.Values[obj[this]].Action;
         if (cb != null) {
@@ -82,16 +87,13 @@
           // update send trigger
           storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
 
-          if (push)
-          {
-            for (int a = 0; a < obj.RootState.Animators.Count; ++a)
-            {
+          if (push) {
+            for (int a = 0; a < obj.RootState.Animators.Count; ++a) {
               obj.RootState.Animators[a].SetTrigger(PropertyName);
             }
           }
 
-          if (t_callback != null)
-          {
+          if (t_callback != null) {
             t_callback();
           }
         }
