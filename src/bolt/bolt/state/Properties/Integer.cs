@@ -26,7 +26,14 @@ namespace Bolt {
     }
 
     protected override void PullMecanimValue(NetworkState state) {
-      state.Storage.Values[state[this]].Int0 = state.Animator.GetInteger(PropertyName);
+      int newValue = state.Animator.GetInteger(PropertyName);
+      int oldValue = state.Storage.Values[state[this]].Int0;
+
+      state.Storage.Values[state[this]].Int0 = newValue;
+
+      if (NetworkValue.Diff(newValue, oldValue)) {
+        state.Storage.PropertyChanged(state.OffsetProperties + this.OffsetProperties);
+      }
     }
 
     protected override void PushMecanimValue(NetworkState state) {
