@@ -80,6 +80,12 @@ namespace Bolt {
     }
 
     void IState.SetDynamic(string property, object value) {
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyName == property)) {
+          Meta.Properties[i].Property.SetDynamic(this, value);
+          return;
+        }
+      }
     }
 
     void IDisposable.Dispose() {
