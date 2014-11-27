@@ -138,12 +138,8 @@ public class BoltSettingsWindow : EditorWindow {
           SwitchAsset(bytesPath, dllPath);
         }
       }
+
       EditorGUILayout.EndHorizontal();
-
-      if (File.Exists(dllPath)) {
-        EditorGUILayout.HelpBox("The UPnP feature is currently experimental and has not been tested thoroughly.", MessageType.Warning);
-      }
-
       EditorGUILayout.EndVertical();
     });
   }
