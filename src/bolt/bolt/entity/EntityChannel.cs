@@ -186,37 +186,26 @@ partial class EntityChannel : BoltChannel {
         }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
-          proxy.Priority = 1 << 19;
-
+          proxy.Priority = 1 << 20;
         }
         else {
-          if ((proxy.Flags & ProxyFlags.CREATE_DONE) || (proxy.Envelopes.Count > 0)) {
+          if (proxy.Flags & ProxyFlags.CREATE_DONE) {
             if (proxy.Changed.IsZero) {
               continue;
             }
 
-            if (proxy.Entity.PriorityCalculator.Always) {
-              proxy.Priority = 1 << 20;
-            }
-            else {
-              proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
-              proxy.Priority = Mathf.Clamp(proxy.Priority, 0, 1 << 16);
-            }
+            proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
+            proxy.Priority = Mathf.Clamp(proxy.Priority, 0, Mathf.Min(1 << 16, BoltCore._config.maxEntityPriority));
           }
           else {
-            if (proxy.Entity.PriorityCalculator.Always) {
-              proxy.Priority = 1 << 20;
-            }
-            else {
-              proxy.Priority = 1 << 18;
-            }
+            proxy.Priority = 1 << 18;
           }
         }
       }
 
       // if this is the controller give it the max priority
       if (proxy.Entity.IsController(connection)) {
-        proxy.Priority = 1 << 21;
+        proxy.Priority = 1 << 19;
       }
 
       _prioritized.Add(proxy);

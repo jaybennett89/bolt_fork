@@ -29,8 +29,13 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
     });
 
-    BoltAssetEditorGUI.Label("Packet Interval", () => {
+    BoltAssetEditorGUI.Label("Network Tick Rate", () => {
       settings._config.serverSendRate = BoltEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
+    });
+
+    BoltAssetEditorGUI.Label("Max Priorities", () => {
+      settings._config.maxEntityPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxEntityPriority, "Entity"), 1, 1 << 16);
+      settings._config.maxPropertyPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxPropertyPriority, "Proprerty"), 1, 1 << 11);
     });
 
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
