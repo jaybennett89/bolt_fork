@@ -1,5 +1,6 @@
 ﻿using System;
 using UdpKit;
+using UE = UnityEngine;
 
 namespace Bolt {
   partial class NetworkState : IEntitySerializer {
@@ -158,6 +159,7 @@ namespace Bolt {
         if (filter.IsSet(i) && env.Proxy.Changed.IsSet(i)) {
           // increment priority for this property
           proxyPriority[i].PropertyPriority += Meta.Properties[i].Property.PropertyPriority;
+          proxyPriority[i].PropertyPriority = UE.Mathf.Clamp(proxyPriority[i].PropertyPriority, 0, BoltCore._config.maxPropertyPriority);
 
           // copy to our temp array
           tempPriority[propertyCount] = proxyPriority[i];

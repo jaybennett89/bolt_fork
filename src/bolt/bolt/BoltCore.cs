@@ -468,7 +468,7 @@ internal static class BoltCore {
     BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
   }
 
-  public static void AcceptConnection(UdpEndPoint endpoint, object userToken, IProtocolToken protocolToken) {
+  public static void AcceptConnection(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
     if (!isServer) {
       BoltLog.Error("AcceptConnection can only be called on the server");
       return;
@@ -479,7 +479,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Accept(endpoint, userToken, protocolToken.ToByteArray());
+    _udpSocket.Accept(endpoint, userToken, acceptToken.ToByteArray(), connectToken.ToByteArray());
   }
 
   public static void RefuseConnection(UdpEndPoint endpoint, IProtocolToken token) {

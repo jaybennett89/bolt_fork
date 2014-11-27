@@ -19,6 +19,10 @@ namespace Bolt.Compiler {
         yield return typeof(PropertyTypeStruct);
         yield return typeof(PropertyTypeEntity);
         yield return typeof(PropertyTypeInteger);
+        yield return typeof(PropertyTypeString);
+        yield return typeof(PropertyTypeVector);
+        yield return typeof(PropertyTypeQuaternion);
+        yield return typeof(PropertyTypePrefabId);
         yield return typeof(PropertyTypeTransform);
       }
     }

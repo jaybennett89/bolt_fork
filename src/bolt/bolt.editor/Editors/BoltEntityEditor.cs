@@ -111,6 +111,7 @@ public class BoltEntityEditor : Editor {
     entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);
     entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Client Can Instantiate", entity._allowInstantiateOnClient);
     entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Dont Destroy On Load", entity._persistThroughSceneLoads);
+    entity._alwaysProxy = EditorGUILayout.Toggle("Ignore Map Load", entity._alwaysProxy);
 
     EditorGUI.EndDisabledGroup();
 
