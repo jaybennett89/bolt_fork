@@ -249,6 +249,28 @@ namespace BoltInternal {
       }
     }
 
+    static void NatUtility_OpenPort_Finish(NatDeviceState device, int port) {
+      try {
+        var natMapping = device.PortMappings.Values.FirstOrDefault(p => p.Internal == port && p.External == port);
+        if (natMapping != null) {
+          // set this port as open
+          natMapping.Status = Bolt.NatPortMappingStatus.Open;
+
+          // tell user about this
+          portChanges.Enqueue(new NatPortMappingChanged { Device = device, Mapping = natMapping.Clone() });
+
+          // meep
+          BoltLog.Info("Changed {0} on {1}", natMapping, device);
+        }
+        else {
+          BoltLog.Warn("Received incorrect port mapping result from {0}", device);
+        }
+      }
+      catch (Exception exn) {
+        BoltLog.Exception(exn);
+      }
+    }
+
     static void NatUtility_OpenPort(NatDeviceState device, int port) {
       lock (syncLock) {
         Mapping mapping = new Mapping(Protocol.Udp, port, port);
@@ -257,19 +279,15 @@ namespace BoltInternal {
             try {
               device.Nat.EndCreatePortMap(ar);
 
-              var natMapping = device.PortMappings.Values.FirstOrDefault(p => p.Internal == port && p.External == port);
-              if (natMapping != null) {
-                // set this port as open
-                natMapping.Status = Bolt.NatPortMappingStatus.Open;
-
-                // tell user about this
-                portChanges.Enqueue(new NatPortMappingChanged { Device = device, Mapping = natMapping.Clone() });
-
-                // meep
-                BoltLog.Info("Changed {0} on {1}", natMapping, device);
+              // finish this
+              NatUtility_OpenPort_Finish(device, port);
+            }
+            catch (MappingException exn) {
+              if (exn.ErrorCode == 718) {
+                NatUtility_OpenPort_Finish(device, port);
               }
               else {
-                BoltLog.Warn("Received incorrect port mapping result from {0}", device);
+                BoltLog.Exception(exn);
               }
             }
             catch (Exception exn) {
