@@ -52,7 +52,7 @@ partial class EntityChannel : BoltChannel {
 
   public void SetScope(Entity entity, bool inScope) {
     if (BoltCore._config.scopeMode == Bolt.ScopeMode.Automatic) {
-      BoltLog.Warn("SetScope has no effect when Scope Mode is set to Automatic");
+      BoltLog.Error("SetScope has no effect when Scope Mode is set to Automatic");
       return;
     }
 
