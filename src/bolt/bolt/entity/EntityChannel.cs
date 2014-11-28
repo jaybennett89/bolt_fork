@@ -1,14 +1,7 @@
 ﻿using Bolt;
-using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using System.Diagnostics;
-
-enum BoltEntityDestroyMode {
-  OutOfScope,
-  LocalDestroy
-}
 
 partial class EntityChannel : BoltChannel {
   Dictionary<Bolt.NetworkId, EntityProxy> _outgoing;
@@ -52,7 +45,7 @@ partial class EntityChannel : BoltChannel {
 
   public void SetScope(Entity entity, bool inScope) {
     if (BoltCore._config.scopeMode == Bolt.ScopeMode.Automatic) {
-      BoltLog.Warn("SetScope has no effect when Scope Mode is set to Automatic");
+      BoltLog.Error("SetScope has no effect when Scope Mode is set to Automatic");
       return;
     }
 
@@ -84,7 +77,7 @@ partial class EntityChannel : BoltChannel {
     }
     else {
       if (_outgoing.ContainsKey(entity.NetworkId)) {
-        DestroyOnRemote(entity, BoltEntityDestroyMode.OutOfScope);
+        DestroyOnRemote(entity);
       }
     }
   }
@@ -106,7 +99,7 @@ partial class EntityChannel : BoltChannel {
     return _incomming.ContainsKey(entity.NetworkId) || _outgoing.ContainsKey(entity.NetworkId);
   }
 
-  public void DestroyOnRemote(Bolt.Entity entity, BoltEntityDestroyMode mode) {
+  public void DestroyOnRemote(Bolt.Entity entity) {
     EntityProxy proxy;
 
     if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
