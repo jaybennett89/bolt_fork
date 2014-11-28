@@ -241,7 +241,7 @@ namespace Bolt {
       var it = BoltCore._connections.GetIterator();
 
       while (it.Next()) {
-        it.val._entityChannel.DestroyOnRemote(this, BoltEntityDestroyMode.LocalDestroy);
+        it.val._entityChannel.DestroyOnRemote(this);
       }
 
       // call out to behaviours
