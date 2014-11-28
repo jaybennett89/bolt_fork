@@ -525,25 +525,19 @@ internal static class BoltCore {
       // send data on all connections
       {
         var it = _connections.GetIterator();
-        var localNotLoadingAndCanReceive = (BoltSceneLoader.IsLoading == false) && _canReceiveEntities;
+        var localDoneLoading = (BoltSceneLoader.IsLoading == false);
 
         while (it.Next()) {
-          var sendRateMultiplier = it.val.SendRateMultiplier;
-          var remoteNotLoadingAndCanReceive = (it.val.isLoadingMap == false) && it.val._canReceiveEntities;
-          var modifiedSendRate = localSendRate * sendRateMultiplier;
+          var remoteDoneLoading = (it.val.isLoadingMap == false);
+          var modifiedSendRate = localSendRate * it.val.SendRateMultiplier;
 
           // if both connection and local can receive entities, use local sendrate
-          if (localNotLoadingAndCanReceive && remoteNotLoadingAndCanReceive && ((_frame % modifiedSendRate) == 0)) {
+          if (localDoneLoading && remoteDoneLoading && ((_frame % modifiedSendRate) == 0)) {
             it.val.Send();
 
-            if (sendRateMultiplier != 1) {
-              BoltLog.Debug("Send Rate: {0} / {1}", modifiedSendRate, sendRateMultiplier);
+            if (it.val.SendRateMultiplier != 1) {
+              BoltLog.Debug("Send Rate: {0} / {1}", modifiedSendRate, it.val.SendRateMultiplier);
             }
-          }
-
-          // if not, only send 1 packet/second
-          else if ((_frame % framesPerSecond) == 0) {
-            it.val.Send();
           }
         }
       }

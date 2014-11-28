@@ -25,7 +25,7 @@ namespace Bolt {
       NetworkState state = (NetworkState)obj.Root;
 
       if (MecanimMode != MecanimMode.Disabled) {
-        if (state.Animator) {
+        if (state.Animators.Count > 0) {
           if (MecanimMode == MecanimMode.LayerWeight) {
             if (ShouldPullDataFromMecanim(state)) {
               PullMecanimLayer(state);
