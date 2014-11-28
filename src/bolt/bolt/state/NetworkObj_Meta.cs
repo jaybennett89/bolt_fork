@@ -109,20 +109,16 @@ namespace Bolt {
     internal virtual void InitMeta() {
       // setup state callbacks
       for (int i = 0; i < Properties.Length; ++i) {
-        //if (Properties[i].Property.AllowCallbacks) {
-        //  BoltLog.Info("{0}: Paths = {1}, Indices = {2}", Properties[i].Paths[Properties[i].Paths.Length - 1], Properties[i].Paths.Join(", "), Properties[i].Indices.Join(", "));
-        //}
-
         if (Properties[i].Property.WantsOnRender) {
           OnRender.Add(Properties[i]);
         }
 
-        if (Properties[i].Property.WantsOnSimulateAfter) {
-          OnSimulateAfter.Add(Properties[i]);
-        }
-
         if (Properties[i].Property.WantsOnSimulateBefore) {
           OnSimulateBefore.Add(Properties[i]);
+        }
+
+        if (Properties[i].Property.WantsOnSimulateAfter) {
+          OnSimulateAfter.Add(Properties[i]);
         }
       }
 
