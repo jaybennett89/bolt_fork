@@ -22,7 +22,7 @@ namespace Bolt {
     }
 
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
-      return storage.Values[obj[this]].NetworkId;
+      return storage.Values[obj[this]].Quaternion;
     }
 
     public override int BitCount(NetworkObj obj) {

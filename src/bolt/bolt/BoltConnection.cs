@@ -176,18 +176,6 @@ public class BoltConnection : BoltObject {
     _canReceiveEntities = canReceive;
   }
 
-  public void SetStreamBandwidth(int bytesPerSecond) {
-    udpConnection.StreamBandwidth(bytesPerSecond);
-  }
-
-  public void Stream(UdpChannelName channel, byte[] data) {
-    udpConnection.Stream(channel, data);
-  }
-
-  public void Stream(UdpChannelName channel, UdpChannelData data) {
-    udpConnection.Stream(channel, data);
-  }
-
   public void Disconnect() {
     Disconnect(null);
   }
@@ -249,8 +237,14 @@ public class BoltConnection : BoltObject {
   int notifyPacketNumber = 0;
 
   internal void AdjustRemoteFrame() {
-    if (_packetsReceived == 0)
+    if (_packetsReceived == 0) {
       return;
+    }
+
+    if (BoltCore._config.disableDejitterBuffer) {
+      _remoteFrameEstimated = _remoteFrameActual;
+      return;
+    }
 
     int rate = BoltCore.remoteSendRate;
     int delay = BoltCore.localInterpolationDelay;

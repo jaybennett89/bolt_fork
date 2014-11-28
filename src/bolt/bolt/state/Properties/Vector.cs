@@ -19,7 +19,7 @@ namespace Bolt {
     }
 
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
-      return storage.Values[obj[this]].NetworkId;
+      return storage.Values[obj[this]].Vector3;
     }
 
     public override int BitCount(NetworkObj obj) {
