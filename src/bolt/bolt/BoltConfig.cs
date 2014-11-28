@@ -35,6 +35,8 @@ public sealed class BoltConfig {
   public Bolt.ScopeMode scopeMode = Bolt.ScopeMode.Automatic;
   public BoltConfigLogTargets logTargets = BoltConfigLogTargets.Console | BoltConfigLogTargets.Unity;
 
+  public bool disableDejitterBuffer;
+
   public int clientSendRate;
   public int clientDejitterDelay;
   public int clientDejitterDelayMin;

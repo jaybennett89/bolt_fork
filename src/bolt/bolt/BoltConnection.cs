@@ -237,8 +237,14 @@ public class BoltConnection : BoltObject {
   int notifyPacketNumber = 0;
 
   internal void AdjustRemoteFrame() {
-    if (_packetsReceived == 0)
+    if (_packetsReceived == 0) {
       return;
+    }
+
+    if (BoltCore._config.disableDejitterBuffer) {
+      _remoteFrameEstimated = _remoteFrameActual;
+      return;
+    }
 
     int rate = BoltCore.remoteSendRate;
     int delay = BoltCore.localInterpolationDelay;

@@ -38,11 +38,19 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.maxPropertyPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxPropertyPriority, "Proprerty"), 1, 1 << 11);
     });
 
+    BoltAssetEditorGUI.Label("Disable Dejitter Buffer", () => {
+      settings._config.disableDejitterBuffer = EditorGUILayout.Toggle(settings._config.disableDejitterBuffer);
+    });
+
+    EditorGUI.BeginDisabledGroup(settings._config.disableDejitterBuffer);
+
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
       settings._config.serverDejitterDelayMin = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min");
       settings._config.serverDejitterDelay = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");
       settings._config.serverDejitterDelayMax = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
     });
+
+    EditorGUI.EndDisabledGroup();
 
     BoltAssetEditorGUI.Label("Scoping Mode", () => {
       Bolt.ScopeMode previous = settings._config.scopeMode;
