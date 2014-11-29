@@ -28,22 +28,18 @@ namespace Bolt.Compiler {
 
     }
 
-    public virtual void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, true);
-    }
-
-    public virtual void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      EmitForwardStateMember(decorator, type, true);
-    }
-
     public virtual void EmitObjectMembers(CodeTypeDeclaration type) {
       EmitSimplePropertyMembers(type, new CodeSnippetExpression("Storage"), null, true);
     }
 
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed) {
+      EmitSimplePropertyMembers(type, storage, interfaceType, changed, Decorator.Definition.Name);
+    }
+
+    public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
       var property =
-        type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
+        type.DeclareProperty(Decorator.ClrType, name, get => {
           get.Add(
             new CodeMethodReturnStatement(
               new CodeFieldReferenceExpression(index, StorageField)
@@ -248,20 +244,6 @@ namespace Bolt.Compiler {
       else if (set) {
         type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, null, (_) => { });
       }
-    }
-
-    protected void EmitForwardStateMember(StateDecorator decorator, CodeTypeDeclaration type, bool allowSetter) {
-      Action<CodeStatementCollection> setter = null;
-
-      if (allowSetter) {
-        setter = set => {
-          set.Expr("_Root.{0} = value", Decorator.Definition.Name);
-        };
-      }
-
-      type.DeclareProperty(Decorator.ClrType, Decorator.Definition.Name, get => {
-        get.Expr("return _Root.{0}", Decorator.Definition.Name);
-      }, setter);
     }
 
     public static PropertyCodeEmitter Create(PropertyDecorator decorator) {

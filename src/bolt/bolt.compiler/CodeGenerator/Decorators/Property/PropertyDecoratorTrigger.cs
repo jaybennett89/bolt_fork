@@ -9,8 +9,12 @@ namespace Bolt.Compiler {
       get { return "System.Action"; }
     }
 
+    public string TriggerListener {
+      get { return "On" + Definition.Name; }
+    }
+
     public string TriggerMethod {
-      get { return Definition.Name + "Trigger"; }
+      get { return Definition.Name; }
     }
 
     public override bool OnSimulateAfterCallback {

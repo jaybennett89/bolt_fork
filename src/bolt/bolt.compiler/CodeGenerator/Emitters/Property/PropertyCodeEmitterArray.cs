@@ -12,14 +12,6 @@ namespace Bolt.Compiler {
       });
     }
 
-    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      EmitForwardStateMember(decorator, type, false);
-    }
-
-    public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, false);
-    }
-
     public override void EmitObjectSetup(DomBlock block, Offsets offsets) {
       var element = Decorator.ElementDecorator;
 

@@ -18,14 +18,6 @@ namespace Bolt.Compiler {
       DeclareProperty(type, false);
     }
 
-    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      EmitForwardStateMember(decorator, type, false);
-    }
-
-    public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, false);
-    }
-
     public override void EmitMetaSetup(DomBlock block, Offsets offsets, CodeExpression indexExpression) {
       block.Add("this".Expr().Call("CopyProperties",
         offsets.OffsetProperties,
