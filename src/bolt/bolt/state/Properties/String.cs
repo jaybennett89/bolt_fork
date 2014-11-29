@@ -13,6 +13,10 @@ namespace Bolt {
     }
 
     public override int BitCount(NetworkObj obj) {
+      if (obj.Storage.Values[obj[this]].String == null) {
+        return 16;
+      }
+
       return 16 + StringSettings.EncodingClass.GetByteCount(obj.Storage.Values[obj[this]].String);
     }
 
