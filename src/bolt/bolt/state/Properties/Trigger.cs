@@ -13,7 +13,7 @@
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {
-      obj.Storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
+      obj.Storage.Values[obj[this]].TriggerLocal.Update(BoltCore.frame, true);
       obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
     }
 

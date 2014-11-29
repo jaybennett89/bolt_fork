@@ -525,14 +525,12 @@ internal static class BoltCore {
       // send data on all connections
       {
         var it = _connections.GetIterator();
-        var localDoneLoading = (BoltSceneLoader.IsLoading == false);
 
         while (it.Next()) {
-          var remoteDoneLoading = (it.val.isLoadingMap == false);
           var modifiedSendRate = localSendRate * it.val.SendRateMultiplier;
 
           // if both connection and local can receive entities, use local sendrate
-          if (localDoneLoading && remoteDoneLoading && ((_frame % modifiedSendRate) == 0)) {
+          if ((_frame % modifiedSendRate) == 0) {
             it.val.Send();
 
             if (it.val.SendRateMultiplier != 1) {
