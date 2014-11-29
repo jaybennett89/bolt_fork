@@ -105,6 +105,7 @@ namespace Bolt {
     }
 
     void IEntitySerializer.DebugInfo() {
+#if DEBUG
       if (BoltNetworkInternal.DebugDrawer != null) {
         BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
         BoltNetworkInternal.DebugDrawer.LabelField("Type", Factory.GetFactory(Meta.TypeId).TypeObject);
@@ -134,6 +135,7 @@ namespace Bolt {
           }
         }
       }
+#endif
     }
 
     void IEntitySerializer.InitProxy(EntityProxy p) {
