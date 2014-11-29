@@ -4,23 +4,33 @@ using UE = UnityEngine;
 
 namespace Bolt {
   partial class EventDispatcher {
-    List<UE.MonoBehaviour> _targets = new List<UE.MonoBehaviour>();
+    struct EventListener {
+      public IEventListener Listener;
+      public UE.GameObject GameObject;
+      public UE.MonoBehaviour Behaviour;
+    }
+
+    List<EventListener> _targets = new List<EventListener>();
 
     void Raise(Event ev) {
       IEventFactory factory = Factory.GetEventFactory(ev.Meta.TypeId);
 
       for (int i = 0; i < _targets.Count; ++i) {
-        UE.MonoBehaviour mb = _targets[i];
+        EventListener mb = _targets[i];
 
-        if (mb) {
+        if (mb.Behaviour) {
           // dont call on disabled behaviours
-          if (mb.enabled == false) {
-            continue;
+          if (mb.Behaviour.enabled == false) {
+            if ((mb.Listener == null) || (mb.Listener.InvokeIfDisabled == false)) {
+              continue;
+            }
           }
 
           // dont call on behaviours attached to inactive game objects
-          if (mb.gameObject.activeInHierarchy == false) {
-            continue;
+          if (mb.GameObject.activeInHierarchy == false) {
+            if ((mb.Listener == null) || (mb.Listener.InvokeIfGameObjectIsInactive == false)) {
+              continue;
+            }
           }
 
           // invoke event
@@ -46,14 +56,15 @@ namespace Bolt {
     }
 
     public void Add(UE.MonoBehaviour behaviour) {
-#if DEBUG
-      if (_targets.Contains(behaviour)) {
-        BoltLog.Warn("Behaviour is already registered in this dispatcher, ignoring call to Add.");
-        return;
-      }
-#endif
 
-      _targets.Add(behaviour);
+      for (int i = 0; i < _targets.Count; ++i) {
+        if (ReferenceEquals(_targets[i].Behaviour, behaviour)) {
+          BoltLog.Warn("Behaviour is already registered in this dispatcher, ignoring call to Add.");
+          return;
+        }
+      }
+
+      _targets.Add(new EventListener { Behaviour = behaviour, GameObject = behaviour.gameObject, Listener = behaviour as IEventListener });
     }
 
     public void Remove(UE.MonoBehaviour behaviour) {
