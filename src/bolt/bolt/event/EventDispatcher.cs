@@ -68,15 +68,20 @@ namespace Bolt {
     }
 
     public void Remove(UE.MonoBehaviour behaviour) {
-      var success = _targets.Remove(behaviour);
-      if (success == false) {
-        BoltLog.Warn("Behaviour not available in this dispatcher, ignoring call to Remove.");
+
+      for (int i = 0; i < _targets.Count; ++i) {
+        if (ReferenceEquals(_targets[i].Behaviour, behaviour)) {
+          _targets.RemoveAt(i);
+          return;
+        }
       }
+
+      BoltLog.Warn("Behaviour not available in this dispatcher, ignoring call to Remove.");
     }
 
     public void Clear() {
       for (int i = 0; i < _targets.Count; ++i) {
-        var mb = _targets[i] as BoltInternal.GlobalEventListenerBase;
+        var mb = _targets[i].Behaviour as BoltInternal.GlobalEventListenerBase;
         if (mb != null) {
           if (mb.PersistBetweenStartupAndShutdown()) {
             continue;
