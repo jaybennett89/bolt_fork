@@ -35,7 +35,7 @@ namespace Bolt {
 
           // invoke event
           try {
-            factory.Dispatch(ev, mb);
+            factory.Dispatch(ev, mb.Behaviour);
           }
           catch (Exception exn) {
             BoltLog.Error("User code threw exception when invoking {0}", ev);
