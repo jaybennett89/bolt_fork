@@ -24,14 +24,6 @@ namespace Bolt.Compiler {
       }
     }
 
-    public override void EmitStateInterfaceMembers(CodeTypeDeclaration type) {
-      EmitSimpleIntefaceMember(type, true, false);
-    }
-
-    public override void EmitStateMembers(StateDecorator decorator, CodeTypeDeclaration type) {
-      EmitForwardStateMember(decorator, type, false);
-    }
-
     public override void EmitObjectMembers(CodeTypeDeclaration type) {
       type.DeclareProperty("Bolt.NetworkTransform", Decorator.Definition.Name, get => {
         get.Expr("return Storage.Values[this.OffsetStorage + {0}].Transform", Decorator.OffsetStorage);
