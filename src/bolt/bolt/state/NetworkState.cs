@@ -17,7 +17,7 @@ namespace Bolt {
     internal BoltDoubleList<NetworkStorage> Frames = new BoltDoubleList<NetworkStorage>();
 
     public UE.Animator Animator {
-      get { return Animators[0]; }
+      get { return Animators.Count > 0 ? Animators[0] : null; }
     }
 
     internal sealed override NetworkStorage Storage {
@@ -31,12 +31,16 @@ namespace Bolt {
 
     public void SetAnimator(UE.Animator animator) {
       Animators.Clear();
-      Animators.Add(animator);
+
+      if (animator) {
+        Animators.Add(animator);
+      }
     }
 
     public void AddAnimator(UE.Animator animator) {
-      Animators.Add(animator);
+      if (animator) {
+        Animators.Add(animator);
+      }
     }
-
   }
 }
