@@ -242,6 +242,7 @@ public class BoltConnection : BoltObject {
     }
 
     if (BoltCore._config.disableDejitterBuffer) {
+      _framesToStep = Mathf.Max(1, _remoteFrameActual - _remoteFrameEstimated);
       _remoteFrameEstimated = _remoteFrameActual;
       return;
     }
