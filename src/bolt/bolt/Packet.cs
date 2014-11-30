@@ -5,10 +5,6 @@ using UdpKit;
 
 namespace Bolt {
   internal class Packet : IDisposable {
-    public static int MaxSize {
-      get { return BoltCore._udpConfig.PacketSize - UdpHeader.SIZE_BYTES; }
-    }
-
     public volatile bool Pooled = true;
 
     public int Frame;

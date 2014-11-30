@@ -430,11 +430,15 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.PacketLost:
-          ev.Connection.GetBoltConnection().PacketLost((Packet)ev.Packet.UserToken);
+          using (var packet = (Packet)ev.Packet.UserToken) {
+            ev.Connection.GetBoltConnection().PacketLost(packet);
+          }
           break;
 
         case UdpEventType.PacketDelivered:
-          ev.Connection.GetBoltConnection().PacketDelivered((Packet)ev.Packet.UserToken);
+          using (var packet = (Packet)ev.Packet.UserToken) {
+            ev.Connection.GetBoltConnection().PacketDelivered(packet);
+          }
           break;
 
         case UdpEventType.PacketReceived:
@@ -985,4 +989,7 @@ internal static class BoltCore {
     return null;
   }
 
+  internal static UdpPacket AllocateUdpPacket() {
+    return _udpSocket.PacketPool.Acquire();
+  }
 }

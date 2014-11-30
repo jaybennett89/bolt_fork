@@ -321,9 +321,10 @@ public class BoltConnection : BoltObject {
   internal void Send() {
     try {
       Packet packet = PacketPool.Acquire();
-      packet.Stats = new PacketStats();
-      packet.Number = ++_packetCounter;
       packet.Frame = BoltCore.frame;
+      packet.Number = ++_packetCounter;
+
+      packet.UdpPacket = BoltCore.AllocateUdpPacket();
       packet.UdpPacket.UserToken = packet;
       packet.UdpPacket.WriteInt(packet.Frame);
 
@@ -345,31 +346,33 @@ public class BoltConnection : BoltObject {
   }
 
   //internal void PacketReceived(BoltPacket packet) {
-  internal void PacketReceived(UdpPacket stream) {
+  internal void PacketReceived(UdpPacket udpPacket) {
     try {
-      Packet packet = new Packet();
-      packet.UdpPacket = stream;
-      packet.Frame = packet.UdpPacket.ReadInt();
-      packet.Stats = new PacketStats();
+      using (Packet packet = PacketPool.Acquire()) {
+        packet.UdpPacket = udpPacket;
+        packet.Frame = packet.UdpPacket.ReadInt();
 
-      if (packet.Frame > _remoteFrameActual) {
-        _remoteFrameAdjust = true;
-        _remoteFrameActual = packet.Frame;
+        if (packet.Frame > _remoteFrameActual) {
+          _remoteFrameAdjust = true;
+          _remoteFrameActual = packet.Frame;
+        }
+
+        _bitsSecondInAcc += packet.UdpPacket.Size;
+        _packetsReceived += 1;
+
+        for (int i = 0; i < _channels.Length; ++i) {
+          _channels[i].Read(packet);
+        }
+
+        for (int i = 0; i < _channels.Length; ++i) {
+          _channels[i].ReadDone();
+        }
+
+        _packetStatsIn.Enqueue(packet.Stats);
+
+        Assert.False(udpPacket.Overflowing);
       }
 
-      _bitsSecondInAcc += packet.UdpPacket.Size;
-      _packetsReceived += 1;
-
-      for (int i = 0; i < _channels.Length; ++i) {
-        _channels[i].Read(packet);
-      }
-
-      for (int i = 0; i < _channels.Length; ++i) {
-        _channels[i].ReadDone();
-      }
-
-      _packetStatsIn.Enqueue(packet.Stats);
-      Assert.False(packet.UdpPacket.Overflowing);
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
