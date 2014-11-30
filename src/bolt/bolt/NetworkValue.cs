@@ -49,6 +49,9 @@ namespace Bolt {
     [FieldOffset(0)]
     public UnityEngine.Color Color;
 
+    [FieldOffset(0)]
+    public UdpKit.UdpDataKey DataKey;
+
     [FieldOffset(16)]
     public System.Object Object;
 
@@ -77,6 +80,24 @@ namespace Bolt {
         }
         else {
           NetworkId = new NetworkId();
+        }
+      }
+    }
+
+    public UdpKit.UdpStreamData StreamData {
+      get {
+        return BoltCore.FindStreamData(DataKey);
+      }
+      set {
+        if (value != null) {
+          if (value.Key.IsZero) {
+            throw new BoltException("Can't assign data with zero key");
+          }
+
+          DataKey = value.Key;
+        }
+        else {
+          DataKey = default(UdpKit.UdpDataKey);
         }
       }
     }

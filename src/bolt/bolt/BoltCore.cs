@@ -992,4 +992,16 @@ internal static class BoltCore {
   internal static UdpPacket AllocateUdpPacket() {
     return _udpSocket.PacketPool.Acquire();
   }
+
+  internal static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
+    return _udpSocket.StreamChannelCreate(name, mode, priority);
+  }
+
+  internal static UdpStreamData CreateStreamData(byte[] data) {
+    return _udpSocket.StreamDataCreate(data);
+  }
+
+  internal static UdpStreamData FindStreamData(UdpDataKey data) {
+    return _udpSocket.StreamDataFind(data);
+  }
 }
