@@ -7,7 +7,6 @@ public class AutoDisable : MonoBehaviour {
   int frames = 3;
 
   void OnEnable() {
-    Debug.Log("ENABLED");
     remaining = frames;
   }
 

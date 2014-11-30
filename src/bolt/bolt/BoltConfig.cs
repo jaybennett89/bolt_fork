@@ -28,7 +28,7 @@ public enum BoltConfigLogTargets {
 [Serializable]
 public sealed class BoltConfig {
   public int framesPerSecond = 60;
-  public int packetSize = 1024;
+  public int packetSize = 1280;
   public int packetMaxEventSize = 512;
   public int maxEntityPriority = 1 << 16;
   public int maxPropertyPriority = 1 << 11;
