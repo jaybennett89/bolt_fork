@@ -164,9 +164,9 @@ public static class BoltNetwork {
     return BoltCore.CreateStreamChannel(name, mode, priority);
   }
 
-  public static UdpStreamData CreateStreamData(byte[] data) {
-    return BoltCore.CreateStreamData(data);
-  }
+  //public static UdpStreamData CreateStreamData(byte[] data) {
+  //  return BoltCore.CreateStreamData(data);
+  //}
 
   /// <summary>
   /// Returns true if this host is a client

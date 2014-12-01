@@ -871,7 +871,7 @@ internal static class BoltCore {
     _udpConfig.AllowIncommingConnections = isServer;
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
-    _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
+    _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
     // create and start socket
@@ -997,11 +997,11 @@ internal static class BoltCore {
     return _udpSocket.StreamChannelCreate(name, mode, priority);
   }
 
-  internal static UdpStreamData CreateStreamData(byte[] data) {
-    return _udpSocket.StreamDataCreate(data);
-  }
+  //internal static UdpStreamData CreateStreamData(byte[] data) {
+  //  return _udpSocket.StreamDataCreate(data);
+  //}
 
-  internal static UdpStreamData FindStreamData(UdpDataKey data) {
-    return _udpSocket.StreamDataFind(data);
-  }
+  //internal static UdpStreamData FindStreamData(UdpDataKey data) {
+  //  return _udpSocket.StreamDataFind(data);
+  //}
 }
