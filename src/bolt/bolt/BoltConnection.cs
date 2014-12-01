@@ -172,6 +172,10 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  public void StreamBytes(UdpChannelName channel, byte[] data) {
+    _udp.StreamBytes(channel, data);
+  }
+
   public void SetCanReceiveEntities(bool canReceive) {
     _canReceiveEntities = canReceive;
   }

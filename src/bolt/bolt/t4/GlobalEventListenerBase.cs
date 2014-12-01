@@ -34,6 +34,20 @@ partial class GlobalEventListenerBase {
   }
 
   
+  public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
+
+  internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
+    BoltLog.Debug("Invoking callback StreamDataReceived");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.StreamDataReceived(connection, data);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
   public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) {  }
 
   internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 

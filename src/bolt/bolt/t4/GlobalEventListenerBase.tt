@@ -10,6 +10,7 @@ List<Tuple<string, string[]>> callbacksList = new List<Tuple<string, string[]>>(
 callbacksList.Add(Tuple.Create("BoltShutdown", new string[0]));
 callbacksList.Add(Tuple.Create("BoltStarted", new string[0]));
 
+callbacksList.Add(Tuple.Create("StreamDataReceived", new[] { "BoltConnection", "connection", "UdpStreamData", "data" }));
 callbacksList.Add(Tuple.Create("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" }));
 
 callbacksList.Add(Tuple.Create("SceneLoadLocalBegin", new[] { "string", "map" }));

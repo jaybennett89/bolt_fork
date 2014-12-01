@@ -444,6 +444,13 @@ internal static class BoltCore {
         case UdpEventType.PacketReceived:
           ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
           break;
+
+        case UdpEventType.StreamDataReceived:
+          BoltInternal.GlobalEventListenerBase.StreamDataReceivedInvoke(
+            ev.Connection.GetBoltConnection(),
+            ev.StreamData
+          );
+          break;
       }
     }
   }
