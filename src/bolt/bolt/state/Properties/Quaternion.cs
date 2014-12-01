@@ -17,6 +17,19 @@ namespace Bolt {
       Compression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z));
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (UE.Quaternion)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Quaternion, v)) {
+        obj.Storage.Values[obj[this]].Quaternion = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].Quaternion;
+    }
+
     public override void OnInit(NetworkObj obj) {
       obj.Storage.Values[obj[this]].Quaternion = UE.Quaternion.identity;
     }

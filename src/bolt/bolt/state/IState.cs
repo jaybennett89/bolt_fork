@@ -59,5 +59,12 @@ namespace Bolt {
     /// <param name="property"></param>
     /// <param name="value"></param>
     void SetDynamic(string property, object value);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    object GetDynamic(string property);
   }
 }

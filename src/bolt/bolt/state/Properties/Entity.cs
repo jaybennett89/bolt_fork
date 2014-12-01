@@ -10,6 +10,19 @@ namespace Bolt {
       return 64;
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (BoltEntity)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Entity, v)) {
+        obj.Storage.Values[obj[this]].Entity = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].Entity;
+    }
+
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
       Bolt.Entity entity = BoltCore.FindEntity(storage.Values[obj[this]].NetworkId);
 

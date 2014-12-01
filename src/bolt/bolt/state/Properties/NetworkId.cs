@@ -6,6 +6,19 @@ namespace Bolt {
       return storage.Values[obj[this]].NetworkId;
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (NetworkId)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].NetworkId, v)) {
+        obj.Storage.Values[obj[this]].NetworkId = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].NetworkId;
+    }
+
     public override int BitCount(NetworkObj obj) {
       return 64;
     }

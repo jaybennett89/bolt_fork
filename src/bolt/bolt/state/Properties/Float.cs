@@ -8,6 +8,19 @@ namespace Bolt {
       get { return Interpolation.Enabled; }
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (float)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Float0, v)) {
+        obj.Storage.Values[obj[this]].Float0 = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].Float0;
+    }
+
     public void Settings_Float(PropertyFloatCompressionSettings compression) {
       Compression = compression;
     }

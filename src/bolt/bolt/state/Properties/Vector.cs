@@ -14,6 +14,19 @@ namespace Bolt {
       get { return Interpolation.Enabled; }
     }
 
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].Vector3;
+    }
+
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (UE.Vector3)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Vector3, v)) {
+        obj.Storage.Values[obj[this]].Vector3 = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
     public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
       Compression = PropertyVectorCompressionSettings.Create(x, y, z);
     }

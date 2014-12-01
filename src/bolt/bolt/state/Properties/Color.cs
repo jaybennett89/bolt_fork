@@ -11,6 +11,19 @@ namespace Bolt {
       return 32;
     }
 
+    public override void SetDynamic(NetworkObj obj, object value) {
+      var v = (Color)value;
+
+      if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Color, v)) {
+        obj.Storage.Values[obj[this]].Color = v;
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+      }
+    }
+
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this]].Color;
+    }
+
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {
       return storage.Values[obj[this]].Color;
     }
