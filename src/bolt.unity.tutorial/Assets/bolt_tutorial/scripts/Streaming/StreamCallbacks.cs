@@ -6,7 +6,7 @@ using System.Text;
 public class StreamCallbacks : Bolt.GlobalEventListener {
   public static UdpKit.UdpChannelName TextChannel;
 
-  public override void BoltStarted() {
+  public override void RegisterStreamChannels() {
     TextChannel = BoltNetwork.CreateStreamChannel("Text", UdpKit.UdpChannelMode.Reliable, 1);
   }
 

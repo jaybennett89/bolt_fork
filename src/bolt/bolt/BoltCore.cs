@@ -884,8 +884,12 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    //_udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
     _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
+
+    // have to register channels BEFORE the socket starts
+    BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
+
+    // 
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
@@ -1001,6 +1005,10 @@ internal static class BoltCore {
   }
 
   internal static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
+    if (_udpSocket.State != UdpSocketState.Created) {
+      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.RegisterStreamChannels callback.");
+    }
+
     return _udpSocket.StreamChannelCreate(name, mode, priority);
   }
 
