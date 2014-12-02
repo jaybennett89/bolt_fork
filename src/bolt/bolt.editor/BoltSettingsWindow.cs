@@ -24,7 +24,7 @@ public class BoltSettingsWindow : EditorWindow {
 
   void Replication() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
-     
+
     BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
       settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
     });
@@ -45,9 +45,9 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUI.BeginDisabledGroup(settings._config.disableDejitterBuffer);
 
     BoltAssetEditorGUI.Label("Dejitter Delay", () => {
-      settings._config.serverDejitterDelayMin = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min");
-      settings._config.serverDejitterDelay = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames");
-      settings._config.serverDejitterDelayMax = BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max");
+      settings._config.serverDejitterDelayMin = Mathf.Max(0, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min"));
+      settings._config.serverDejitterDelay = Mathf.Max(1, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames"));
+      settings._config.serverDejitterDelayMax = Mathf.Max(settings._config.serverDejitterDelay + 1, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max"));
     });
 
     EditorGUI.EndDisabledGroup();
