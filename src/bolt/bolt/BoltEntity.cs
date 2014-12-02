@@ -200,7 +200,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   /// <param name="parent">The parent of this entity</param>
   public void SetParent(BoltEntity parent) {
-    if (parent) {
+    if (parent && parent.isAttached) {
       Entity.SetParent(parent.Entity);
     }
     else {

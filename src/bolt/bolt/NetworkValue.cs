@@ -49,6 +49,9 @@ namespace Bolt {
     [FieldOffset(0)]
     public UnityEngine.Color Color;
 
+    [FieldOffset(0)]
+    public UdpKit.UdpDataKey DataKey;
+
     [FieldOffset(16)]
     public System.Object Object;
 
@@ -80,6 +83,24 @@ namespace Bolt {
         }
       }
     }
+
+    //public UdpKit.UdpStreamData StreamData {
+    //  get {
+    //    return BoltCore.FindStreamData(DataKey);
+    //  }
+    //  set {
+    //    if (value != null) {
+    //      if (value.Key.IsZero) {
+    //        throw new BoltException("Can't assign data with zero key");
+    //      }
+
+    //      DataKey = value.Key;
+    //    }
+    //    else {
+    //      DataKey = default(UdpKit.UdpDataKey);
+    //    }
+    //  }
+    //}
 
     public static bool Diff(Boolean a, Boolean b) { return a != b; }
     public static bool Diff(Int32 a, Int32 b) { return a != b; }

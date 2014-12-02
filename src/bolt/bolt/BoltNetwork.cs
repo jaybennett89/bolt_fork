@@ -160,9 +160,13 @@ public static class BoltNetwork {
     get { return isServer || (isClient && BoltCore._connections.count > 0); }
   }
 
-  public static UdpChannelName CreateStreamChannel(UdpChannelConfig channel) {
-    return new UdpChannelName();
+  public static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
+    return BoltCore.CreateStreamChannel(name, mode, priority);
   }
+
+  //public static UdpStreamData CreateStreamData(byte[] data) {
+  //  return BoltCore.CreateStreamData(data);
+  //}
 
   /// <summary>
   /// Returns true if this host is a client

@@ -430,15 +430,26 @@ internal static class BoltCore {
           break;
 
         case UdpEventType.PacketLost:
-          ev.Connection.GetBoltConnection().PacketLost((Packet)ev.Packet.UserToken);
+          using (var packet = (Packet)ev.Packet.UserToken) {
+            ev.Connection.GetBoltConnection().PacketLost(packet);
+          }
           break;
 
         case UdpEventType.PacketDelivered:
-          ev.Connection.GetBoltConnection().PacketDelivered((Packet)ev.Packet.UserToken);
+          using (var packet = (Packet)ev.Packet.UserToken) {
+            ev.Connection.GetBoltConnection().PacketDelivered(packet);
+          }
           break;
 
         case UdpEventType.PacketReceived:
           ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
+          break;
+
+        case UdpEventType.StreamDataReceived:
+          BoltInternal.GlobalEventListenerBase.StreamDataReceivedInvoke(
+            ev.Connection.GetBoltConnection(),
+            ev.StreamData
+          );
           break;
       }
     }
@@ -867,14 +878,18 @@ internal static class BoltCore {
     _udpConfig.AllowIncommingConnections = isServer;
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
-    _udpConfig.PacketSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
+    _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
     _udpConfig.UseAvailableEventEvent = false;
 
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    //_udpSocket = UdpSocket.Create(new UdpKit.UdpPlatformManaged(), () => new BoltSerializer(), _udpConfig);
     _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
+
+    // have to register channels BEFORE the socket starts
+    BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
+
+    // 
     _udpSocket.Start(endpoint);
 
     // init all global behaviours
@@ -985,4 +1000,23 @@ internal static class BoltCore {
     return null;
   }
 
+  internal static UdpPacket AllocateUdpPacket() {
+    return _udpSocket.PacketPool.Acquire();
+  }
+
+  internal static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
+    if (_udpSocket.State != UdpSocketState.Created) {
+      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.RegisterStreamChannels callback.");
+    }
+
+    return _udpSocket.StreamChannelCreate(name, mode, priority);
+  }
+
+  //internal static UdpStreamData CreateStreamData(byte[] data) {
+  //  return _udpSocket.StreamDataCreate(data);
+  //}
+
+  //internal static UdpStreamData FindStreamData(UdpDataKey data) {
+  //  return _udpSocket.StreamDataFind(data);
+  //}
 }

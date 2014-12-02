@@ -88,6 +88,16 @@ namespace Bolt {
       }
     }
 
+    object IState.GetDynamic(string property) {
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyName == property)) {
+          return Meta.Properties[i].Property.GetDynamic(this);
+        }
+      }
+
+      throw new ArgumentException(string.Format("Unknown property {0}", property));
+    }
+
     void IDisposable.Dispose() {
     }
 
@@ -137,5 +147,6 @@ namespace Bolt {
         }
       }
     }
+
   }
 }

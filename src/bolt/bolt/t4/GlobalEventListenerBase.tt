@@ -10,13 +10,14 @@ List<Tuple<string, string[]>> callbacksList = new List<Tuple<string, string[]>>(
 callbacksList.Add(Tuple.Create("BoltShutdown", new string[0]));
 callbacksList.Add(Tuple.Create("BoltStarted", new string[0]));
 
+callbacksList.Add(Tuple.Create("StreamDataReceived", new[] { "BoltConnection", "connection", "UdpStreamData", "data" }));
+callbacksList.Add(Tuple.Create("RegisterStreamChannels", new string[0]));
+
 callbacksList.Add(Tuple.Create("PortMappingChanged", new[] { "Bolt.INatDevice", "device", "Bolt.IPortMapping", "portMapping" }));
 
 callbacksList.Add(Tuple.Create("SceneLoadLocalBegin", new[] { "string", "map" }));
 callbacksList.Add(Tuple.Create("SceneLoadLocalDone", new[] { "string", "map" }));
 callbacksList.Add(Tuple.Create("SceneLoadRemoteDone", new[] { "BoltConnection", "connection" }));
-
-callbacksList.Add(Tuple.Create("ConnectAttempt", new[] { "UdpKit.UdpEndPoint", "endpoint" }));
 
 callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection" }));
 callbacksList.Add(Tuple.Create("Connected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "acceptToken" }));
@@ -27,6 +28,7 @@ callbacksList.Add(Tuple.Create("ConnectRequest", new []{"UdpEndPoint", "endpoint
 callbacksList.Add(Tuple.Create("ConnectRequest", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token" }));
 callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint" }));
 callbacksList.Add(Tuple.Create("ConnectRefused", new []{"UdpEndPoint", "endpoint", "Bolt.IProtocolToken", "token" }));
+callbacksList.Add(Tuple.Create("ConnectAttempt", new []{"UdpEndPoint", "endpoint" }));
 
 callbacksList.Add(Tuple.Create("Disconnected", new[] { "BoltConnection", "connection" }));
 callbacksList.Add(Tuple.Create("Disconnected", new[] { "BoltConnection", "connection", "Bolt.IProtocolToken", "token" }));
@@ -43,9 +45,9 @@ callbacksList.Add(Tuple.Create("EntityDetached", new []{"BoltEntity", "entity"})
 callbacksList.Add(Tuple.Create("EntityAttached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
 callbacksList.Add(Tuple.Create("EntityDetached", new []{"BoltEntity", "entity", "Bolt.IProtocolToken", "token"}));
 
-callbacksList.Add(Tuple.Create("EntityReceived", new[] { "BoltEntity", "entity" }));
-
+callbacksList.Add(Tuple.Create("EntityReceived", new[] {"BoltEntity", "entity"}));
 #>
+
 using UdpKit;
 using UnityEngine;
 

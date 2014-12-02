@@ -79,7 +79,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     state.Animator.SetLayerWeight(0, 1);
     state.Animator.SetLayerWeight(1, 1);
 
-    state.Fire += OnFire;
+    state.OnFire += OnFire;
     state.AddCallback("weapon", WeaponChanged);
 
     // setup weapon
@@ -213,7 +213,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
       // JUMP
       if (_motor.jumpStartedThisFrame) {
-        mod.JumpTrigger();
+        mod.Jump();
       }
     }
   }
@@ -223,7 +223,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
       activeWeapon.fireFrame = BoltNetwork.serverFrame;
 
-      state.FireTrigger();
+      state.Fire();
 
       // if we are the owner and the active weapon is a hitscan weapon, do logic
       if (entity.isOwner) {

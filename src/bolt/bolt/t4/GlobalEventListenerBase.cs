@@ -1,4 +1,5 @@
 ﻿ 
+
 using UdpKit;
 using UnityEngine;
 
@@ -27,6 +28,34 @@ partial class GlobalEventListenerBase {
     foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStarted();
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
+  public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
+
+  internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
+    BoltLog.Debug("Invoking callback StreamDataReceived");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.StreamDataReceived(connection, data);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
+  public virtual void RegisterStreamChannels() {  }
+
+  internal static void RegisterStreamChannelsInvoke() { 
+    BoltLog.Debug("Invoking callback RegisterStreamChannels");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.RegisterStreamChannels();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -83,20 +112,6 @@ partial class GlobalEventListenerBase {
     foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadRemoteDone(connection);
-		} catch(System.Exception exn) {
-			BoltLog.Exception(exn);
-		}
-    }
-  }
-
-  
-  public virtual void ConnectAttempt(UdpKit.UdpEndPoint endpoint) {  }
-
-  internal static void ConnectAttemptInvoke(UdpKit.UdpEndPoint endpoint) { 
-    BoltLog.Debug("Invoking callback ConnectAttempt");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-		try {
-			cb.ConnectAttempt(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -209,6 +224,20 @@ partial class GlobalEventListenerBase {
     foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRefused(endpoint, token);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+    }
+  }
+
+  
+  public virtual void ConnectAttempt(UdpEndPoint endpoint) {  }
+
+  internal static void ConnectAttemptInvoke(UdpEndPoint endpoint) { 
+    BoltLog.Debug("Invoking callback ConnectAttempt");
+    foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.ConnectAttempt(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}

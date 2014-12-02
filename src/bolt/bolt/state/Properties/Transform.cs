@@ -12,22 +12,6 @@ namespace Bolt {
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
 
-    public override bool AllowCallbacks {
-      get { return false; }
-    }
-
-    public override bool WantsOnRender {
-      get { return true; }
-    }
-
-    public override bool WantsOnSimulateAfter {
-      get { return true; }
-    }
-
-    public override bool WantsOnSimulateBefore {
-      get { return true; }
-    }
-
     public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
       PositionCompression = PropertyVectorCompressionSettings.Create(x, y, z);
     }
@@ -42,6 +26,22 @@ namespace Bolt {
 
     public void Settings_Extrapolation(PropertyExtrapolationSettings extrapolation) {
       Extrapolation = extrapolation;
+    }
+
+    public override bool AllowCallbacks {
+      get { return false; }
+    }
+
+    public override bool WantsOnRender {
+      get { return true; }
+    }
+
+    public override bool WantsOnSimulateAfter {
+      get { return true; }
+    }
+
+    public override bool WantsOnSimulateBefore {
+      get { return true; }
     }
 
     public override int BitCount(NetworkObj obj) {
