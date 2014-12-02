@@ -886,14 +886,14 @@ internal static class BoltCore {
 
     _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
 
+    // init all global behaviours
+    UpdateActiveGlobalBehaviours(-1);
+
     // have to register channels BEFORE the socket starts
     BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
 
     // 
     _udpSocket.Start(endpoint);
-
-    // init all global behaviours
-    UpdateActiveGlobalBehaviours(-1);
 
     // tell user that we started
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();

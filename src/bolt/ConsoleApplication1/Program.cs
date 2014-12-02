@@ -10,7 +10,8 @@ using UdpKit;
 namespace ConsoleApplication1 {
   class Program {
 
-    static UdpChannelName channel; 
+    static UdpChannelName channel;
+    static byte[] data = new byte[1024 * 1024];
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     static void Log(string msg, params object[] args) {
@@ -28,7 +29,7 @@ namespace ConsoleApplication1 {
 
           switch (ev.EventType) {
             case UdpEventType.Connected:
-              ev.Connection.StreamBytes(channel, Encoding.ASCII.GetBytes("HEY"));
+              ev.Connection.StreamBytes(channel, data);
               break;
 
             case UdpEventType.StreamDataReceived:
@@ -51,11 +52,14 @@ namespace ConsoleApplication1 {
     static void Main(string[] args) {
       UdpLog.SetWriter((lvl, msg) => Log(msg));
 
-      UdpSocket server = new UdpSocket(new UdpPlatformManaged());
+      UdpConfig config = new UdpConfig();
+      config.ConnectionTimeout = 1000000000;
+
+      UdpSocket server = new UdpSocket(new UdpPlatformManaged(), config);
       channel = server.StreamChannelCreate("Text", UdpChannelMode.Reliable, 1);
       server.Start(new UdpEndPoint(UdpIPv4Address.Localhost, 40000));
 
-      UdpSocket client = new UdpSocket(new UdpPlatformManaged());
+      UdpSocket client = new UdpSocket(new UdpPlatformManaged(), config);
       channel = client.StreamChannelCreate("Text", UdpChannelMode.Reliable, 1);
       client.Start(UdpEndPoint.Any);
       client.Connect(new UdpEndPoint(UdpIPv4Address.Localhost, 40000));
