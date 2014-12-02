@@ -1,6 +1,5 @@
 ﻿using Bolt;
 using System;
-using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
 
@@ -238,16 +237,21 @@ public class BoltConnection : BoltObject {
     return _framesToStep > 0;
   }
 
-  int notifyPacketNumber = 0;
-
   internal void AdjustRemoteFrame() {
     if (_packetsReceived == 0) {
       return;
     }
 
     if (BoltCore._config.disableDejitterBuffer) {
-      _framesToStep = Mathf.Max(0, _remoteFrameActual - _remoteFrameEstimated);
-      _remoteFrameEstimated = _remoteFrameActual;
+      if (_remoteFrameAdjust) {
+        _framesToStep = Mathf.Max(0, _remoteFrameActual - _remoteFrameEstimated);
+        _remoteFrameEstimated = _remoteFrameActual;
+        _remoteFrameAdjust = false;
+      }
+      else {
+        _framesToStep = 1;
+      }
+
       return;
     }
 
@@ -349,7 +353,6 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  //internal void PacketReceived(BoltPacket packet) {
   internal void PacketReceived(UdpPacket udpPacket) {
     try {
       using (Packet packet = PacketPool.Acquire()) {
@@ -387,8 +390,6 @@ public class BoltConnection : BoltObject {
 
   internal void PacketDelivered(Packet packet) {
     try {
-      Assert.True((notifyPacketNumber + 1) == packet.Number, "notify packet number did not match");
-      notifyPacketNumber = packet.Number;
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Delivered(packet);
       }
@@ -401,8 +402,6 @@ public class BoltConnection : BoltObject {
 
   internal void PacketLost(Packet packet) {
     try {
-      Assert.True((notifyPacketNumber + 1) == packet.Number, "notify packet number did not match");
-      notifyPacketNumber = packet.Number;
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Lost(packet);
       }
@@ -416,5 +415,4 @@ public class BoltConnection : BoltObject {
   public static implicit operator bool(BoltConnection cn) {
     return cn != null;
   }
-
 }

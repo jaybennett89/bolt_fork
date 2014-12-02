@@ -332,36 +332,36 @@ public static class UdpStreamExtensions {
   //  }
   //}
 
-  //public static void PackUIntVB(this UdpPacket packet, uint v) {
-  //  uint b = 0U;
+  public static void WRiteUIntVB(this UdpPacket packet, uint v) {
+    uint b = 0U;
 
-  //  do {
-  //    b = v & 127U;
-  //    v = v >> 7;
+    do {
+      b = v & 127U;
+      v = v >> 7;
 
-  //    if (v > 0) {
-  //      b |= 128U;
-  //    }
+      if (v > 0) {
+        b |= 128U;
+      }
 
-  //    packet.WriteByte((byte)b);
-  //  } while ((b & 128U) == 128U);
-  //}
+      packet.WriteByte((byte)b);
+    } while (v != 0);
+  }
 
-  //public static uint ReadUIntVB(this UdpPacket packet) {
-  //  uint v = 0U;
-  //  uint b = 0U;
+  public static uint ReadUIntVB(this UdpPacket packet) {
+    uint v = 0U;
+    uint b = 0U;
 
-  //  int s = 0;
+    int s = 0;
 
-  //  do {
-  //    b = packet.ReadByte();
-  //    v = v | ((b & 127U) << s);
-  //    s = s + 7;
+    do {
+      b = packet.ReadByte();
+      v = v | ((b & 127U) << s);
+      s = s + 7;
 
-  //  } while ((b & 128U) == 128U);
+    } while (b > 127U);
 
-  //  return v;
-  //}
+    return v;
+  }
 
   internal static void WriteEntity(this UdpPacket packet, Entity entity) {
     if (packet.WriteBool((entity != null) && entity.IsAttached)) {
@@ -379,13 +379,13 @@ public static class UdpStreamExtensions {
 
   public static void WriteNetworkId(this UdpPacket packet, NetworkId id) {
     Assert.True(id.Connection != uint.MaxValue);
-    packet.WriteUInt(id.Connection);
-    packet.WriteUInt(id.Entity);
+    packet.WRiteUIntVB(id.Connection);
+    packet.WRiteUIntVB(id.Entity);
   }
 
   public static NetworkId ReadNetworkId(this UdpPacket packet) {
-    uint connection = packet.ReadUInt();
-    uint entity = packet.ReadUInt();
+    uint connection = packet.ReadUIntVB();
+    uint entity = packet.ReadUIntVB();
     Assert.True(connection != uint.MaxValue);
     return new NetworkId(connection, entity);
   }
