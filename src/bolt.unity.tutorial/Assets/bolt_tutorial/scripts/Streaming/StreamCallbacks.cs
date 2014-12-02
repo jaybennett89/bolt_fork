@@ -19,7 +19,7 @@ public class StreamCallbacks : Bolt.GlobalEventListener {
   }
 
   public override void Connected(BoltConnection connection) {
-    Texture2D logo = (Texture2D)Resources.Load("body_diff_brown", typeof(Texture2D));
+    Texture2D logo = (Texture2D)Resources.Load("BoltLogo", typeof(Texture2D));
     connection.StreamBytes(TextureChannel, logo.EncodeToPNG());
   }
 
