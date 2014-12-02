@@ -332,20 +332,20 @@ public static class UdpStreamExtensions {
   //  }
   //}
 
-  //public static void PackUIntVB(this UdpPacket packet, uint v) {
-  //  uint b = 0U;
+  public static void PackUIntVB(this UdpPacket packet, uint v) {
+    uint b = 0U;
 
-  //  do {
-  //    b = v & 127U;
-  //    v = v >> 7;
+    do {
+      b = v & 127U;
+      v = v >> 7;
 
-  //    if (v > 0) {
-  //      b |= 128U;
-  //    }
+      if (v > 0) {
+        b |= 128U;
+      }
 
-  //    packet.WriteByte((byte)b);
-  //  } while ((b & 128U) == 128U);
-  //}
+      packet.WriteByte((byte)b);
+    } while ((b & 128U) == 128U);
+  }
 
   //public static uint ReadUIntVB(this UdpPacket packet) {
   //  uint v = 0U;
