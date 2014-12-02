@@ -8,6 +8,12 @@ namespace Bolt {
       get { return Interpolation.Enabled; }
     }
 
+    public override void OnSimulateBefore(NetworkObj obj) {
+      if (Interpolation.Enabled) {
+        obj.Storage.Values[obj[this]].Float0 = Math.InterpolateFloat(obj.RootState.Frames, obj[this], obj.RootState.Entity.Frame);
+      }
+    }
+
     public override void SetDynamic(NetworkObj obj, object value) {
       var v = (float)value;
 
@@ -39,7 +45,12 @@ namespace Bolt {
     }
 
     public override void Read(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpPacket packet) {
-      storage.Values[obj[this]].Float0 = Compression.Read(packet);
+      if (Interpolation.Enabled) {
+        storage.Values[obj[this]].Float1 = Compression.Read(packet);
+      }
+      else {
+        storage.Values[obj[this]].Float0 = Compression.Read(packet);
+      }
     }
 
     protected override void PullMecanimValue(NetworkState state) {

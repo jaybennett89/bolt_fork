@@ -4,17 +4,28 @@ using System.Text;
 
 [BoltGlobalBehaviour]
 public class StreamCallbacks : Bolt.GlobalEventListener {
-  public static UdpKit.UdpChannelName TextChannel;
+  public static UdpKit.UdpChannelName TextureChannel;
+  public static Texture2D Logo;
 
   public override void RegisterStreamChannels() {
-    TextChannel = BoltNetwork.CreateStreamChannel("Text", UdpKit.UdpChannelMode.Reliable, 1);
+    TextureChannel = BoltNetwork.CreateStreamChannel("Texture", UdpKit.UdpChannelMode.Reliable, 1);
   }
 
   public override void StreamDataReceived(BoltConnection connection, UdpKit.UdpStreamData data) {
-    BoltLog.Info("{0}: {1}", data.Channel, Encoding.UTF8.GetString(data.Data));
+    BoltLog.Info("received texture");
+
+    Logo = new Texture2D(4096, 4096);
+    Logo.LoadImage(data.Data);
   }
 
   public override void Connected(BoltConnection connection) {
-    connection.StreamBytes(TextChannel, Encoding.UTF8.GetBytes("TEST"));
+    Texture2D logo = (Texture2D)Resources.Load("BoltLogo", typeof(Texture2D));
+    connection.StreamBytes(TextureChannel, logo.EncodeToPNG());
+  }
+
+  void OnGUI() {
+    if (Logo != null) {
+      GUI.DrawTexture(new Rect(0, 0, 256, 256), Logo);
+    }
   }
 }
