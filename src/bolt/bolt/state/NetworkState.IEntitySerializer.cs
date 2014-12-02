@@ -113,7 +113,6 @@ namespace Bolt {
 
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
-
         for (int i = 0; i < Meta.Properties.Length; ++i) {
           var pi = Meta.Properties[i];
           string label = pi.Property.PropertyName;
@@ -268,6 +267,8 @@ namespace Bolt {
       }
       else {
         if (Frames.first.Frame == -1) {
+          Assert.True(Frames.count == 1);
+
           storage = Frames.first;
           storage.Frame = frame;
         }
