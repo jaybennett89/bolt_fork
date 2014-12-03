@@ -273,66 +273,15 @@ public static class UdpStreamExtensions {
     return m;
   }
 
-  //internal static void WriteNetworkId_old(this UdpPacket stream, NetId id) {
-  //  Assert.True(id.Value >= 0);
-  //  Assert.True(id.Value < EntityProxy.MAX_COUNT);
+  public static void WriteIntVB(this UdpPacket packet, int v) {
+    packet.WriteUIntVB((uint)v);
+  }
 
-  //  stream.WriteInt(id.Value, EntityProxy.ID_BIT_COUNT);
-  //}
+  public static int ReadIntVB(this UdpPacket packet) {
+    return (int)packet.ReadUIntVB();
+  }
 
-  //internal static NetId ReadNetworkId_Old(this UdpPacket stream) {
-  //  return new NetId(stream.ReadInt(EntityProxy.ID_BIT_COUNT));
-  //}
-
-  //internal static void WriteEntity(this UdpPacket stream, Entity en, BoltConnection cn) {
-  //  if (en == null) {
-  //    stream.WriteBool(false);
-  //    return;
-  //  }
-
-  //  NetId id = cn.GetNetworkId(en);
-
-  //  // one bit if we have it or not, at all
-  //  if (stream.WriteBool(id.Value != int.MaxValue)) {
-  //    // one bit which significes if this is an outgoing or incomming proxy
-  //    // if it's an incomming that means the sourceConnection is the same as this connection
-  //    // if it's an outgoing that means the sourceConnection is either null (it's local) 
-  //    // or it's a connection which which we received this object from
-  //    stream.WriteBool(ReferenceEquals(en.Source, cn));
-
-  //    // the actual network id
-  //    stream.WriteNetworkId_old(id);
-  //  }
-  //}
-
-  //internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn) {
-  //  NetId networkId;
-  //  return ReadEntity(stream, cn, out networkId);
-  //}
-
-  //internal static Entity ReadEntity(this UdpPacket stream, BoltConnection cn, out NetId networkId) {
-  //  if (stream.ReadBool()) {
-  //    // if this bool reads true, that means that the
-  //    // other end of the connection classifices this 
-  //    // entity as an incomming, which means it's outgoing for us
-  //    // and the reverse if it's false
-
-  //    if (stream.ReadBool()) {
-  //      networkId = stream.ReadNetworkId_Old();
-  //      return cn.GetOutgoingEntity(networkId);
-  //    }
-  //    else {
-  //      networkId = stream.ReadNetworkId_Old();
-  //      return cn.GetIncommingEntity(networkId);
-  //    }
-  //  }
-  //  else {
-  //    networkId = new NetId(int.MaxValue);
-  //    return null;
-  //  }
-  //}
-
-  public static void WRiteUIntVB(this UdpPacket packet, uint v) {
+  public static void WriteUIntVB(this UdpPacket packet, uint v) {
     uint b = 0U;
 
     do {
@@ -379,8 +328,8 @@ public static class UdpStreamExtensions {
 
   public static void WriteNetworkId(this UdpPacket packet, NetworkId id) {
     Assert.True(id.Connection != uint.MaxValue);
-    packet.WRiteUIntVB(id.Connection);
-    packet.WRiteUIntVB(id.Entity);
+    packet.WriteUIntVB(id.Connection);
+    packet.WriteUIntVB(id.Entity);
   }
 
   public static NetworkId ReadNetworkId(this UdpPacket packet) {

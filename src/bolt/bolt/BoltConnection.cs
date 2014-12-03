@@ -338,7 +338,7 @@ public class BoltConnection : BoltObject {
 
       packet.UdpPacket = BoltCore.AllocateUdpPacket();
       packet.UdpPacket.UserToken = packet;
-      packet.UdpPacket.WriteInt(packet.Frame);
+      packet.UdpPacket.WriteIntVB(packet.Frame);
 
       for (int i = 0; i < _channels.Length; ++i) {
         _channels[i].Pack(packet);
@@ -361,7 +361,7 @@ public class BoltConnection : BoltObject {
     try {
       using (Packet packet = PacketPool.Acquire()) {
         packet.UdpPacket = udpPacket;
-        packet.Frame = packet.UdpPacket.ReadInt();
+        packet.Frame = packet.UdpPacket.ReadIntVB();
 
         if (packet.Frame > _remoteFrameActual) {
           _remoteFrameAdjust = true;
@@ -383,7 +383,6 @@ public class BoltConnection : BoltObject {
 
         Assert.False(udpPacket.Overflowing);
       }
-
     }
     catch (Exception exn) {
       BoltLog.Exception(exn);
