@@ -175,6 +175,10 @@ public class BoltConnection : BoltObject {
     _udp.StreamBytes(channel, data);
   }
 
+  public void SetStreamBandwidth(int bytesPerSecond) {
+    _udp.StreamSetBandwidth(bytesPerSecond);
+  }
+
   public void SetCanReceiveEntities(bool canReceive) {
     _canReceiveEntities = canReceive;
   }
