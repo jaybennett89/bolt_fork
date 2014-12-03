@@ -28,6 +28,22 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     return new BoltIterator<T>(_first, _count);
   }
 
+  public T this[int index] {
+    get {
+      if (index < 0 || index >= _count) {
+        throw new IndexOutOfRangeException(index.ToString());
+      }
+
+      T val = first;
+
+      while (index-- > 0) {
+        val = Next(val);
+      }
+
+      return val;
+    }
+  }
+
   public bool IsFirst (T node) {
     VerifyInList(node);
 

@@ -22,13 +22,13 @@
       storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, false);
 
       // write history
-      packet.WriteInt(storage.Values[obj[this]].TriggerSend.History);
+      packet.WriteInt(storage.Values[obj[this]].TriggerSend.History, obj.RootState.Entity.SendRate);
       return true;
     }
 
     public override void Read(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
       storage.Values[obj[this]].TriggerLocal.Frame = storage.Frame;
-      storage.Values[obj[this]].TriggerLocal.History = packet.ReadInt();
+      storage.Values[obj[this]].TriggerLocal.History = packet.ReadInt(obj.RootState.Entity.SendRate);
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
@@ -73,7 +73,7 @@
       var t_history = storage.Values[obj[this]].TriggerLocal.History;
       var t_callback = storage.Values[obj[this]].Action;
 
-      for (int i = 31; (i >= 0) && (t_history != 0); --i) {
+      for (int i = (obj.RootState.Entity.SendRate - 1); (i >= 0) && (t_history != 0); --i) {
         if (t_frame - i > obj.RootState.Entity.Frame) {
           return false;
         }
