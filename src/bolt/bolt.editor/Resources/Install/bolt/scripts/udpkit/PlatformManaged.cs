@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PSM
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -138,6 +138,13 @@ namespace UdpKit {
         socket.Bind(ConvertEndPoint(endpoint));
         return true;
       } catch (SocketException exn) {
+#if UNITY_PSM
+        // because sockets on PSVita are weird.
+        if (exn.SocketErrorCode == SocketError.Fault) {
+          return true;
+        }
+#endif
+
         socketError = exn.SocketErrorCode;
         return false;
       }

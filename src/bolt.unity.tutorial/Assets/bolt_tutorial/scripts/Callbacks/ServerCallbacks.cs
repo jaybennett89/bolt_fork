@@ -15,10 +15,6 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
   }
 
-  void OnGUI() {
-    GUILayout.Label("ENTITY COUNT: " + BoltNetwork.entities.Count() + " POLL TIME: " + Bolt.DebugInfo.PollTime);
-  }
-
   void FixedUpdate() {
     foreach (Player p in Player.allPlayers) {
       // if we have an entity, it's dead but our spawn frame has passed
@@ -36,6 +32,8 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     c.userToken = new Player();
     c.GetPlayer().connection = c;
     c.GetPlayer().name = "CLIENT:" + c.remoteEndPoint.Port;
+
+    c.SetStreamBandwidth(1024 * 1024);
   }
 
   public override void SceneLoadRemoteDone(BoltConnection connection) {
