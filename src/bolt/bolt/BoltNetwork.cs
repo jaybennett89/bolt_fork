@@ -450,7 +450,18 @@ public static class BoltNetwork {
   }
 
   static void LoadScene(string scene, IProtocolToken token) {
-    BoltCore.LoadScene(BoltNetworkInternal.GetSceneIndex(scene), token);
+    int sceneIndex = -1;
+
+    try {
+      sceneIndex = BoltNetworkInternal.GetSceneIndex(scene);
+    }
+    catch(Exception exn) {
+      BoltLog.Error("Exceptiont thrown while trying to find index of scene '{0}'", scene);
+      BoltLog.Exception(exn);
+      return;
+    }
+
+    BoltCore.LoadScene(sceneIndex, token);
   }
 
   /// <summary>
