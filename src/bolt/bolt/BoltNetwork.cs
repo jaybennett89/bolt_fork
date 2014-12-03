@@ -446,7 +446,11 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="scene">The scene to load</param>
   public static void LoadScene(string scene) {
-    BoltCore.LoadScene(BoltNetworkInternal.GetSceneIndex(scene));
+    LoadScene(scene, null);
+  }
+
+  static void LoadScene(string scene, IProtocolToken token) {
+    BoltCore.LoadScene(BoltNetworkInternal.GetSceneIndex(scene), token);
   }
 
   /// <summary>

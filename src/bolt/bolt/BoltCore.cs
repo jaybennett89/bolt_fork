@@ -269,14 +269,14 @@ internal static class BoltCore {
     return null;
   }
 
-  public static void LoadScene(int index) {
+  public static void LoadScene(int index, IProtocolToken token) {
     if (isServer == false) {
       BoltLog.Error("You are not the server, only the server can initiate a scene load");
       return;
     }
 
     // pass to internal call
-    LoadSceneInternal(_localSceneLoading.BeginLoad(index));
+    LoadSceneInternal(_localSceneLoading.BeginLoad(index, token));
   }
 
 

@@ -6,17 +6,18 @@
 
     public int State;
     public Scene Scene;
+    public IProtocolToken Token;
 
-    public SceneLoadState BeginLoad(int index) {
-      return new SceneLoadState { Scene = new Scene(index, (this.Scene.Token + 1) & 255), State = SceneLoadState.STATE_LOADING };
+    public SceneLoadState BeginLoad(int index, IProtocolToken token) {
+      return new SceneLoadState { Scene = new Scene(index, (this.Scene.Token + 1) & 255), State = SceneLoadState.STATE_LOADING, Token = token };
     }
 
     public static SceneLoadState DefaultRemote() {
-      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_CALLBACK_INVOKED };
+      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_CALLBACK_INVOKED, Token = null };
     }
 
     public static SceneLoadState DefaultLocal() {
-      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_LOADING_DONE };
+      return new SceneLoadState() { Scene = new Scene(255, 255), State = SceneLoadState.STATE_LOADING_DONE, Token = null };
     }
   }
 
