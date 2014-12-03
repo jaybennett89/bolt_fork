@@ -27,6 +27,7 @@ namespace Bolt {
     internal List<NetworkPropertyInfo> OnRender = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnSimulateAfter = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnSimulateBefore = new List<NetworkPropertyInfo>();
+    internal List<NetworkPropertyInfo> OnControlGainedLost = new List<NetworkPropertyInfo>();
 
     internal int CountObjects;
     internal int CountStorage;
@@ -107,7 +108,6 @@ namespace Bolt {
     internal abstract void InitObject(NetworkObj obj, Offsets offsets);
 
     internal virtual void InitMeta() {
-      // setup state callbacks
       for (int i = 0; i < Properties.Length; ++i) {
         if (Properties[i].Property.WantsOnRender) {
           OnRender.Add(Properties[i]);
@@ -119,6 +119,10 @@ namespace Bolt {
 
         if (Properties[i].Property.WantsOnSimulateAfter) {
           OnSimulateAfter.Add(Properties[i]);
+        }
+
+        if (Properties[i].Property.WantsOnControlGainedLost) {
+          OnControlGainedLost.Add(Properties[i]);
         }
       }
 
