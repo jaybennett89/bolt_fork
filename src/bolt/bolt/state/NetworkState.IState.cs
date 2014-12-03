@@ -102,29 +102,31 @@ namespace Bolt {
     }
 
     void InvokeCallbacks() {
-      if (Frames.first.Changed.IsZero) {
-        return;
-      }
+      while (Frames.first.Changed.IsZero == false) {
+        // merge into default mask
+        PropertyDefaultMask.Combine(Frames.first.Changed);
 
-      // merge into default mask
-      PropertyDefaultMask.Combine(Frames.first.Changed);
+        // merge into proxies
+        if (Entity.Proxies.count > 0) {
+          var proxies = Entity.Proxies.GetIterator();
 
-      var bits = Frames.first.Changed.GetIterator();
-      var propertyIndex = -1;
+          while (proxies.Next()) {
+            proxies.val.Changed.Combine(Frames.first.Changed);
+          }
+        }
 
-      while (bits.Next(out propertyIndex)) {
-        InvokeCallbacksForProperty(propertyIndex);
-      }
+        // invoke callbacks and clear set flags
+        var bits = Frames.first.Changed.GetIterator();
+        var propertyIndex = -1;
 
-      if (Entity.Proxies.count > 0) {
-        var proxies = Entity.Proxies.GetIterator();
+        while (bits.Next(out propertyIndex)) {
+          // clear this property
+          Frames.first.Changed.Clear(propertyIndex);
 
-        while (proxies.Next()) {
-          proxies.val.Changed.Combine(Frames.first.Changed);
+          // invoke callbacks
+          InvokeCallbacksForProperty(propertyIndex);
         }
       }
-
-      Frames.first.Changed.ClearAll();
     }
 
     void InvokeCallbacksForProperty(int propertyIndex) {
