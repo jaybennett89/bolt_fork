@@ -50,8 +50,7 @@ namespace Bolt {
     }
 
     protected override void PushMecanimValue(NetworkState state) {
-      for (int i = 0; i < state.Animators.Count; ++i)
-      {
+      for (int i = 0; i < state.Animators.Count; ++i) {
         state.Animators[i].SetInteger(PropertyName, state.Storage.Values[state[this]].Int0);
       }
     }

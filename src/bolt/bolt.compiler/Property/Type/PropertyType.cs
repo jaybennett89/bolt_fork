@@ -24,6 +24,9 @@ namespace Bolt.Compiler {
     public Project Context;
 
     [ProtoIgnore]
+    public virtual IEnumerable<Type> Excludes { get { yield break; } }
+
+    [ProtoIgnore]
     public virtual bool Compilable { get { return true; } }
 
     [ProtoIgnore]

@@ -206,7 +206,7 @@ partial class EntityChannel {
             packet.UdpPacket.WriteContinueMarker();
             packet.UdpPacket.WriteTypeId(cmd.Meta.TypeId);
             packet.UdpPacket.WriteUShort(cmd.Sequence, Command.SEQ_BITS);
-            packet.UdpPacket.WriteInt(cmd.ServerFrame);
+            packet.UdpPacket.WriteIntVB(cmd.ServerFrame);
             packet.UdpPacket.WriteToken(cmd.InputObject.Token);
 
             cmd.PackInput(connection, packet.UdpPacket);
@@ -249,7 +249,7 @@ partial class EntityChannel {
         while (packet.UdpPacket.ReadStopMarker()) {
           Bolt.Command cmd = Factory.NewCommand(packet.UdpPacket.ReadTypeId());
           cmd.Sequence = packet.UdpPacket.ReadUShort(Command.SEQ_BITS);
-          cmd.ServerFrame = packet.UdpPacket.ReadInt();
+          cmd.ServerFrame = packet.UdpPacket.ReadIntVB();
           cmd.InputObject.Token = packet.UdpPacket.ReadToken();
           cmd.ReadInput(connection, packet.UdpPacket);
 

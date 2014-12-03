@@ -268,12 +268,12 @@ public class BoltEditorWindow : BoltWindow {
     def.Name = EditorGUILayout.TextField(def.Name);
 
     if (cmdDef != null) {
-      if (GUILayout.Button("New Data", EditorStyles.miniButtonLeft, GUILayout.Width(75))) {
+      if (GUILayout.Button("New Input", EditorStyles.miniButtonLeft, GUILayout.Width(75))) {
         cmdDef.Input.Add(CreateProperty(new PropertyCommandSettings()));
         Save();
       }
 
-      if (GUILayout.Button("New Data", EditorStyles.miniButtonRight, GUILayout.Width(75))) {
+      if (GUILayout.Button("New Result", EditorStyles.miniButtonRight, GUILayout.Width(75))) {
         cmdDef.Result.Add(CreateProperty(new PropertyCommandSettings()));
         Save();
       }

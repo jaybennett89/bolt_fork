@@ -32,6 +32,7 @@ namespace Bolt {
       if (BoltCore.isClient) {
         if (connection._remoteSceneLoading.Scene != BoltCore._localSceneLoading.Scene) {
           SceneLoadState localLoading;
+          localLoading.Token = null;
           localLoading.Scene = connection._remoteSceneLoading.Scene;
           localLoading.State = SceneLoadState.STATE_LOADING;
 

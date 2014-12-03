@@ -1,35 +1,19 @@
 ﻿using System.Collections.Generic;
 
 static class IdExtensions {
-	public static void WritePrefabId(this UdpKit.UdpPacket stream, Bolt.PrefabId id, int bits) {
-		stream.WriteInt(id.Value, bits);
-	}
-	
 	public static void WritePrefabId(this UdpKit.UdpPacket stream, Bolt.PrefabId id) {
-		stream.WritePrefabId(id, 32);
-	}
-
-	public static Bolt.PrefabId ReadPrefabId(this UdpKit.UdpPacket stream, int bits) {
-		return new Bolt.PrefabId(stream.ReadInt(bits));
+		stream.WriteIntVB(id.Value);
 	}
 
 	public static Bolt.PrefabId ReadPrefabId(this UdpKit.UdpPacket stream) {
-		return stream.ReadPrefabId(32);
+		return new Bolt.PrefabId(stream.ReadIntVB());
 	}
-	public static void WriteTypeId(this UdpKit.UdpPacket stream, Bolt.TypeId id, int bits) {
-		stream.WriteInt(id.Value, bits);
-	}
-	
 	public static void WriteTypeId(this UdpKit.UdpPacket stream, Bolt.TypeId id) {
-		stream.WriteTypeId(id, 32);
-	}
-
-	public static Bolt.TypeId ReadTypeId(this UdpKit.UdpPacket stream, int bits) {
-		return new Bolt.TypeId(stream.ReadInt(bits));
+		stream.WriteIntVB(id.Value);
 	}
 
 	public static Bolt.TypeId ReadTypeId(this UdpKit.UdpPacket stream) {
-		return stream.ReadTypeId(32);
+		return new Bolt.TypeId(stream.ReadIntVB());
 	}
 }
 
