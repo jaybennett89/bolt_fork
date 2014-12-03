@@ -15,9 +15,11 @@ namespace Bolt {
     public PropertyInterpolationSettings Interpolation;
 
     public virtual bool AllowCallbacks { get { return true; } }
+
     public virtual bool WantsOnRender { get { return false; } }
     public virtual bool WantsOnSimulateAfter { get { return false; } }
     public virtual bool WantsOnSimulateBefore { get { return false; } }
+    public virtual bool WantsOnControlGainedLost { get { return false; } }
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
@@ -48,6 +50,9 @@ namespace Bolt {
     public virtual void OnSimulateBefore(NetworkObj obj) { }
     public virtual void OnSimulateAfter(NetworkObj obj) { }
     public virtual void OnParentChanged(NetworkObj obj, Entity newParent, Entity oldParent) { }
+
+    public virtual void OnControlGained(NetworkObj obj) { }
+    public virtual void OnControlLost(NetworkObj obj) { }
 
     public virtual void SmoothCommandCorrection(NetworkObj obj, NetworkStorage from, NetworkStorage to, NetworkStorage storage, float t) { }
   }
