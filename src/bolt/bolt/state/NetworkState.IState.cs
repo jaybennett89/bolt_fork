@@ -103,27 +103,29 @@ namespace Bolt {
 
     void InvokeCallbacks() {
       while (Frames.first.Changed.IsZero == false) {
-        // merge into default mask
-        PropertyDefaultMask.Combine(Frames.first.Changed);
+        // store changed bits
+        var bits = Frames.first.Changed;
 
-        // merge into proxies
+        // clear all changed bits
+        Frames.first.Changed.ClearAll();
+
+        // merge into default mask
+        PropertyDefaultMask.Combine(bits);
+
+        // merge into proxy masks
         if (Entity.Proxies.count > 0) {
           var proxies = Entity.Proxies.GetIterator();
 
           while (proxies.Next()) {
-            proxies.val.Changed.Combine(Frames.first.Changed);
+            proxies.val.Changed.Combine(bits);
           }
         }
 
-        // invoke callbacks and clear set flags
-        var bits = Frames.first.Changed.GetIterator();
+        // invoke callbacks
+        var bitsIterator = bits.GetIterator();
         var propertyIndex = -1;
 
-        while (bits.Next(out propertyIndex)) {
-          // clear this property
-          Frames.first.Changed.Clear(propertyIndex);
-
-          // invoke callbacks
+        while (bitsIterator.Next(out propertyIndex)) {
           InvokeCallbacksForProperty(propertyIndex);
         }
       }
