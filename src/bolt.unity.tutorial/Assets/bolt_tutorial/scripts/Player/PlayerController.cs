@@ -95,7 +95,11 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     _weapons[state.weapon].gameObject.SetActive(true);
   }
 
+  int c = 0;
+
   void OnFire() {
+    BoltLog.Info("FIRE: " + ++c);
+
     // play sfx
     _weaponSfxSource.PlayOneShot(activeWeapon.fireSound);
 
