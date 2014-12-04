@@ -189,6 +189,11 @@ partial class EntityChannel : BoltChannel {
               continue;
             }
 
+            // check for idle flag
+            if (proxy.Flags & ProxyFlags.IDLE) {
+              continue;
+            }
+
             proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
             proxy.Priority = Mathf.Clamp(proxy.Priority, 0, Mathf.Min(1 << 16, BoltCore._config.maxEntityPriority));
           }
