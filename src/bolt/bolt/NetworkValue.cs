@@ -49,8 +49,8 @@ namespace Bolt {
     [FieldOffset(0)]
     public UnityEngine.Color Color;
 
-    [FieldOffset(0)]
-    public UdpKit.UdpDataKey DataKey;
+    //[FieldOffset(0)]
+    //public UdpKit.UdpDataKey DataKey;
 
     [FieldOffset(16)]
     public System.Object Object;

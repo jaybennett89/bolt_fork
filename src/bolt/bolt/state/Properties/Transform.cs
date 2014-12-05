@@ -226,8 +226,7 @@ namespace Bolt {
         }
         else {
           nt.Simulate.transform.parent = newParent.UnityObject.transform;
-          UpdateTransformValues(obj, oldParent.UnityObject.transform.localToWorldMatrix,
-            newParent.UnityObject.transform.worldToLocalMatrix);
+          UpdateTransformValues(obj, oldParent.UnityObject.transform.localToWorldMatrix, newParent.UnityObject.transform.worldToLocalMatrix);
         }
       }
     }

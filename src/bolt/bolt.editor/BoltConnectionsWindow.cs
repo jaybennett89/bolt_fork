@@ -78,9 +78,10 @@ public class BoltConnectionsWindow : BoltWindow {
 
     var sessions = BoltNetwork.isRunning ? BoltNetwork.GetSessions() : new UdpKit.UdpSession[0];
 
-    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "Name"), c => StatsLabel(c.ServerName));
+    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "Name"), c => StatsLabel(c.Name));
     Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_ipaddress", "End Point"), c => StatsLabel(c.EndPoint));
-    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_bubble", "User Data"), c => StatsLabel(c.UserData ?? ""));
+
+    //Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_bubble", "User Data"), c => StatsLabel(c.Data ?? ""));
 
     GUILayout.EndHorizontal();
     GUILayout.Space(4);
