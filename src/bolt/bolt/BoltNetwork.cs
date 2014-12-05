@@ -25,14 +25,12 @@ public static class BoltNetworkInternal {
   public static IDebugDrawer DebugDrawer;
   public static NatCommunicator NatCommunicator;
 
-  public static Func<UdpPlatform> CreateUdpPlatform;
-  public static Func<UdpIPv4Address> GetBroadcastAddress;
   public static Func<int, string> GetSceneName;
   public static Func<string, int> GetSceneIndex;
   public static Func<List<STuple<BoltGlobalBehaviourAttribute, Type>>> GetGlobalBehaviourTypes;
 
-  public static void __Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
-    BoltCore.Initialize(mode, endpoint, config);
+  public static void __Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform platform) {
+    BoltCore.Initialize(mode, endpoint, config, platform);
   }
 
   public static void __Shutdown() {
@@ -481,8 +479,8 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="serverName">Name of the server</param>
   /// <param name="userData">User definable data</param>
-  public static void SetSessionData(string serverName, string userData) {
-    BoltCore.SetSessionData(serverName, userData);
+  public static void SetHostInfo(string serverName, IProtocolToken token) {
+    BoltCore.SetHostInfo(serverName, token);
   }
 
   /// <summary>
@@ -512,6 +510,6 @@ public static class BoltNetwork {
   }
 
   public static void EnableLanBroadcast(ushort port) {
-    EnableLanBroadcast(new UdpEndPoint(BoltNetworkInternal.GetBroadcastAddress(), port));
+    EnableLanBroadcast(new UdpEndPoint(BoltCore._udpPlatform.GetBroadcastAddress() , port));
   }
 }
