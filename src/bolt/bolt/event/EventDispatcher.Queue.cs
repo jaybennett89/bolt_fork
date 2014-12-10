@@ -178,7 +178,7 @@ namespace Bolt {
     }
 
     static void Global_Specific_Connection(Event ev) {
-      if (ev.IsFromLocalComputer) {
+      if (ev.FromSelf) {
         ev.TargetConnection._eventChannel.Queue(ev);
       }
       else {
@@ -222,7 +222,7 @@ namespace Bolt {
         it.val._eventChannel.Queue(ev);
       }
 
-      if (ev.IsFromLocalComputer == false) {
+      if (ev.FromSelf == false) {
         RaiseLocal(ev);
       }
     }

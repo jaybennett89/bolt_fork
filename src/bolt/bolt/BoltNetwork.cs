@@ -382,6 +382,16 @@ public static class BoltNetwork {
     return BoltPhysics.OverlapSphere(origin, radius);
   }
 
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <example>
+  /// 
+  /// </example>
+  /// <param name="origin"></param>
+  /// <param name="radius"></param>
+  /// <param name="frame"></param>
+  /// <returns></returns>
   public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius, int frame) {
     return BoltPhysics.OverlapSphere(origin, radius, frame);
   }
@@ -453,7 +463,7 @@ public static class BoltNetwork {
     try {
       sceneIndex = BoltNetworkInternal.GetSceneIndex(scene);
     }
-    catch(Exception exn) {
+    catch (Exception exn) {
       BoltLog.Error("Exceptiont thrown while trying to find index of scene '{0}'", scene);
       BoltLog.Exception(exn);
       return;
@@ -510,6 +520,6 @@ public static class BoltNetwork {
   }
 
   public static void EnableLanBroadcast(ushort port) {
-    EnableLanBroadcast(new UdpEndPoint(BoltCore._udpPlatform.GetBroadcastAddress() , port));
+    EnableLanBroadcast(new UdpEndPoint(BoltCore._udpPlatform.GetBroadcastAddress(), port));
   }
 }

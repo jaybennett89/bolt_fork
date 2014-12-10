@@ -37,11 +37,6 @@ namespace Bolt {
 
     internal new Event_Meta Meta;
 
-    [Obsolete("Use Event.FromSelf instead")]
-    public bool IsFromLocalComputer {
-      get { return ReferenceEquals(SourceConnection, null); }
-    }
-
     public bool FromSelf {
       get { return ReferenceEquals(SourceConnection, null); }
     }

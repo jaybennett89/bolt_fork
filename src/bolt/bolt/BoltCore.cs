@@ -372,12 +372,12 @@ internal static class BoltCore {
       BoltLog.Error("Incorrect broadcast endpoint: {0}", endpoint);
     }
     else {
-      _udpSocket.EnableLanBroadcast(endpoint);
+      _udpSocket.LanBroadcastEnable(endpoint);
     }
   }
 
   public static void DisableLanBroadcast() {
-    _udpSocket.DisableLanBroadcast();
+    _udpSocket.LanBroadcastDisable();
   }
 
   static void AdjustEstimatedRemoteFrames() {
