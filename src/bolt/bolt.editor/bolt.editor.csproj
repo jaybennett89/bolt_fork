@@ -113,12 +113,12 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetInterface.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetPlatform.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetSocket.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\Native\NativePInvoke.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\Native\NativePlatform.cs" />
-    <Compile Include="Resources\Install\bolt\scripts\udpkit\Native\NativeSocket.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetInterface.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetPlatform.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetSocket.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativePInvoke.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativePlatform.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativeSocket.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\bolt.compiler\bolt.compiler.csproj">
