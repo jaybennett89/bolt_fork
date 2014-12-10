@@ -222,7 +222,7 @@ namespace Bolt {
         }
       }
 
-      stream.WriteByteArraySimple(ev.BinaryData, BoltCore._config.packetSize / 2);
+      stream.WriteByteArrayLengthPrefixed(ev.BinaryData, BoltCore._config.packetSize / 2);
       return ev.Pack(connection, stream);
     }
 

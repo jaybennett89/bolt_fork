@@ -113,11 +113,12 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\upnp\BoltUPnP.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltPOI.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltUnityDebugDrawer.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetInterface.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetPlatform.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetSocket.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativePInvoke.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativePlatform.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Native\NativeSocket.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\bolt.compiler\bolt.compiler.csproj">
@@ -137,13 +138,16 @@
     <Compile Include="Compiler\BoltCompiler.CompileMaps.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltPOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltDebugStart.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltDebugStartSettings.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltInit.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltLauncher.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltNetworkUtils.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltUnityDebugDrawer.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\editor\BoltExecutionOrderManager.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\PlatformManaged.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\PlatformMobile.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\upnp\BoltUPnP.cs" />
     <EmbeddedResource Include="Resources\Install\Plugins\Android\libudpkit_android.so" />
     <EmbeddedResource Include="Resources\Install\Plugins\iOS\libudpkit_ios.a" />
   </ItemGroup>

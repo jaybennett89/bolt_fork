@@ -55,14 +55,12 @@ public static class BoltLauncher {
     BoltNetworkInternal.NatCommunicator = new BoltInternal.StandaloneNatCommunicator();
 #endif
 
-    BoltNetworkInternal.CreateUdpPlatform = BoltNetworkUtils.CreateUdpPlatform;
-    BoltNetworkInternal.GetBroadcastAddress = BoltNetworkUtils.FindBroadcastAddress;
     BoltNetworkInternal.GetSceneName = GetSceneName;
     BoltNetworkInternal.GetSceneIndex = GetSceneIndex;
     BoltNetworkInternal.GetGlobalBehaviourTypes = GetGlobalBehaviourTypes;
     BoltNetworkInternal.EnvironmentSetup = BoltInternal.BoltNetworkInternal_User.EnvironmentSetup;
     BoltNetworkInternal.EnvironmentReset = BoltInternal.BoltNetworkInternal_User.EnvironmentReset;
-    BoltNetworkInternal.__Initialize(modes, endpoint, config);
+    BoltNetworkInternal.__Initialize(modes, endpoint, config, CreateUdpPlatform());
   }
 
   static int GetSceneIndex(string name) {
@@ -93,4 +91,15 @@ public static class BoltLauncher {
 
     return result;
   }
+
+  public static UdpPlatform CreateUdpPlatform() {
+#if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
+    return new NativePlatform();
+#elif (UNITY_PS4 || UNITY_PSM) && !UNITY_EDITOR
+    return new DotNetPlatform();
+#else
+    return new DotNetPlatform();
+#endif
+  }
+
 }

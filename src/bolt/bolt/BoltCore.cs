@@ -17,7 +17,9 @@ public enum BoltNetworkModes {
 
 
 internal static class BoltCore {
-  static UdpSocket _udpSocket;
+  internal static UdpSocket _udpSocket;
+  internal static UdpPlatform _udpPlatform;
+
   static internal Stopwatch _timer = new Stopwatch();
   static internal SceneLoadState _localSceneLoading;
 
@@ -351,13 +353,18 @@ internal static class BoltCore {
     _udpSocket.Connect(endpoint, token.ToByteArray());
   }
 
-  public static void SetSessionData(string serverName, string userData) {
+  public static void SetHostInfo(string serverName, IProtocolToken token) {
     if (BoltCore.isServer == false) {
       BoltLog.Error("Only the server can call SetSessionData");
       return;
     }
 
-    _udpSocket.SetSessionData(serverName, userData);
+    if (token == null) {
+      BoltLog.Error("You must specify a protocol token for session info");
+      return;
+    }
+
+    _udpSocket.SetHostInfo(serverName, token.ToByteArray());
   }
 
   public static void EnableLanBroadcast(UdpEndPoint endpoint) {
@@ -365,12 +372,12 @@ internal static class BoltCore {
       BoltLog.Error("Incorrect broadcast endpoint: {0}", endpoint);
     }
     else {
-      _udpSocket.EnableLanBroadcast(endpoint, isServer);
+      _udpSocket.LanBroadcastEnable(endpoint);
     }
   }
 
   public static void DisableLanBroadcast() {
-    _udpSocket.DisableLanBroadcast();
+    _udpSocket.LanBroadcastDisable();
   }
 
   static void AdjustEstimatedRemoteFrames() {
@@ -770,7 +777,9 @@ internal static class BoltCore {
     }
   }
 
-  internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config) {
+  internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform udpPlatform) {
+    _udpPlatform = udpPlatform;
+
     BoltConsole.Clear();
 
     // close any existing socket
@@ -884,7 +893,7 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
-    _udpSocket = new UdpSocket(BoltNetworkInternal.CreateUdpPlatform(), _udpConfig);
+    _udpSocket = new UdpSocket(udpPlatform, _udpConfig);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);
@@ -893,7 +902,7 @@ internal static class BoltCore {
     BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
 
     // 
-    _udpSocket.Start(endpoint);
+    _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));
 
     // tell user that we started
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();

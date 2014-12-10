@@ -3,8 +3,9 @@
 *.sln
 *.pdb
 *.dll
+*.opensdf
+*.sdf
 
-udpkit
 build
 upload
 Temp
@@ -13,11 +14,13 @@ Gizmos
 Gizmos.meta
 Plugins
 Plugins.meta
+Debug
 
 **/Assets/tutorial*
 
 Bolt_DebugStart_Build
 Bolt_Log*
+/src/bolt/Debug
 /src/bolt.unity.samples/*
 **/Assets/bolt/assemblies
 **/Assets/bolt/assemblies.meta
