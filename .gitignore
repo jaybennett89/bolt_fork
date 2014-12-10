@@ -6,7 +6,6 @@
 *.opensdf
 *.sdf
 
-udpkit
 build
 upload
 Temp
@@ -22,7 +21,6 @@ Bolt_DebugStart_Build
 Bolt_Log*
 /src/bolt/Debug
 /src/bolt/dev_*
-/src/bolt/udpkit*
 /src/bolt.unity.samples/*
 **/Assets/bolt/assemblies
 **/Assets/bolt/assemblies.meta
