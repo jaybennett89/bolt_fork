@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dev_host", "dev_host\dev_ho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dev_client", "dev_client\dev_client.csproj", "{987918CE-5AE6-468A-AD3A-9F2B62064869}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udpkit.winsock", "udpkit\native\udpkit.winsock\udpkit.winsock.vcxproj", "{CE0570DD-F462-476B-B78A-0B363092852A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winsock", "udpkit\native\winsock\winsock.vcxproj", "{CE0570DD-F462-476B-B78A-0B363092852A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
