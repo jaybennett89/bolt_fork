@@ -39,7 +39,6 @@ namespace UdpKit {
       MasterServer.Peer.Message_Send<Protocol.MasterServer_NatProbeInfo>(MasterServer.EndPoint);
     }
 
-
     void MasterServer_Update(uint now) {
       if (MasterServer.EndPoint == UdpEndPoint.Any) {
         return;
