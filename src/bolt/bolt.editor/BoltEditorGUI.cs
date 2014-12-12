@@ -41,20 +41,9 @@ public static class BoltEditorGUI {
   } 
 
   public static AxisSelections EditAxisSelection(AxisSelections value) {
-    return EditAxisSelection(null, value);
-  }
-
-  public static AxisSelections EditAxisSelection(string prefix, AxisSelections value) {
     var values = Enum.GetValues(typeof(AxisSelections)).Cast<AxisSelections>().ToArray();
-    var names = values.Select(x => x.ToString());
-    AxisSelections selection = values[EditorGUILayout.Popup(Array.IndexOf(values, value), names.Select(x => (prefix ?? "") + x).ToArray())];
-
-    if (prefix == null && selection == AxisSelections.Disabled) {
-      Debug.LogError("Can't disable axis selection on standalone properties");
-      selection = AxisSelections.XYZ;
-    }
-
-    return selection;
+    var names = values.Select(x => x.ToString()).ToArray();
+    return values[EditorGUILayout.Popup(Array.IndexOf(values, value), names)];
   }
 
   public static void EditAxes(FloatCompression[] compression, AxisSelections selection) {
