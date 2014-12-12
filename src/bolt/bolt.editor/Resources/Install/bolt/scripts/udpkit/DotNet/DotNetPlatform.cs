@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PS4 || UNITY_PSM
+using System.Collections;
 using UdpKit;
 using System.Linq;
 using System.Net;
@@ -196,3 +197,4 @@ public class DotNetPlatform : UdpPlatform {
 #endif
 
 }
+#endif

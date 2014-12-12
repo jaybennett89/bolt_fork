@@ -1,4 +1,5 @@
-﻿using System;
+﻿﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PS4 || UNITY_PSM
+using System;
 using System.Net;
 using System.Net.Sockets;
 using UdpKit;
@@ -161,3 +162,4 @@ class DotNetSocket : UdpPlatformSocket {
   }
 
 }
+#endif

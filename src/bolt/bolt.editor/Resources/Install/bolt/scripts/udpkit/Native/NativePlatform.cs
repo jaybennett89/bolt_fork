@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+using UnityEngine;
 using System.Collections;
 
 public class NativePlatform : UdpKit.UdpPlatform {
@@ -70,3 +71,4 @@ public class NativePlatform : UdpKit.UdpPlatform {
   }
 #endif
 }
+#endif
