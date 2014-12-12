@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{66A5F183-3065-4A77-A109-779D7984990F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UdpKit</RootNamespace>
+    <AssemblyName>udpkit</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;UDPKIT_DLL_UDPKIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591,0618</NoWarn>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>UDPKIT_DLL_UDPKIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;UDPKIT_DLL_UDPKIT</DefineConstants>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>UDPKIT_DLL_UDPKIT</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Socket\ByteBlit.cs" />
+    <Compile Include="Collections\Map.cs" />
+    <Compile Include="CRC32.cs" />
+    <Compile Include="MasterServer\Config.cs" />
+    <Compile Include="MasterServer\Server.cs" />
+    <Compile Include="NAT\Peer.cs" />
+    <Compile Include="NAT\Probe\Result.cs" />
+    <Compile Include="NAT\Probe\Server.cs" />
+    <Compile Include="NAT\Punch\Config.cs" />
+    <Compile Include="NAT\Punch\Server.cs" />
+    <Compile Include="NAT\UPnP\Client.cs" />
+    <Compile Include="NAT\UPnP\Result.cs" />
+    <Compile Include="Platform\PlatformInterface.cs" />
+    <Compile Include="Platform\Platform.cs" />
+    <Compile Include="Platform\PlatformSocket.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_HostKeepAlive.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_Introduce.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_IntroduceInfo.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_NatProbeInfo.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_Session_ListRequest.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_Session_Info.cs" />
+    <Compile Include="Protocol\Message.cs" />
+    <Compile Include="Protocol\MasterServer\MasterServer_HostRegister.cs" />
+    <Compile Include="Protocol\Peer.cs" />
+    <Compile Include="Protocol\Probe\NatProbe_HairpinTest.cs" />
+    <Compile Include="Protocol\Probe\NatProbe_Query.cs" />
+    <Compile Include="Protocol\Probe\NatProbe_Result.cs" />
+    <Compile Include="Protocol\Probe\NatProbe_UnsolicitedTest.cs" />
+    <Compile Include="Protocol\Punch\NatPunch_PeerRegister.cs" />
+    <Compile Include="Protocol\Punch\NatPunch_PunchInfo.cs" />
+    <Compile Include="Protocol\Query.cs" />
+    <Compile Include="Protocol\Result.cs" />
+    <Compile Include="Protocol\Socket\Socket_Ping.cs" />
+    <Compile Include="Protocol\Socket\Socket_Punch.cs" />
+    <Compile Include="Socket\Socket.NatProbe.cs" />
+    <Compile Include="Socket\Socket.Session.cs" />
+    <Compile Include="Socket\Socket.MasterServer.cs" />
+    <Compile Include="Socket\Socket.SocketPeer.cs" />
+    <Compile Include="Socket\Socket.Stream.cs" />
+    <Compile Include="stream\udpChannelConfig.cs" />
+    <Compile Include="stream\udpStreamData.cs" />
+    <Compile Include="stream\udpChannelName.cs" />
+    <Compile Include="stream\udpChannelStreamer.cs" />
+    <Compile Include="stream\udpChannelStreamerData.cs" />
+    <Compile Include="connection\Connection.Commands.cs" />
+    <Compile Include="connection\Connection.Packet.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="stream\udpDataKey.cs" />
+    <Compile Include="stream\udpStreamChannel.cs" />
+    <Compile Include="Socket\Socket.InternalEvents.cs" />
+    <Compile Include="stream\udpStreamOpBlock.cs" />
+    <Compile Include="udpDict.cs" />
+    <Compile Include="udpPipe.cs" />
+    <Compile Include="udpPipeHandle.cs" />
+    <Compile Include="udpSession.cs" />
+    <Compile Include="udpBag.cs" />
+    <Compile Include="Socket\Socket.BroadcastHandler.cs" />
+    <Compile Include="udpAddress.cs" />
+    <Compile Include="udpAssert.cs" />
+    <Compile Include="Socket\Socket.SessionHandler.cs" />
+    <Compile Include="Socket\Socket.LatencySimulation.cs" />
+    <Compile Include="udpPacket.cs" />
+    <Compile Include="udpByteConverter.cs" />
+    <Compile Include="udpConfig.cs" />
+    <Compile Include="connection\Connection.cs" />
+    <Compile Include="udpEndpoint.cs" />
+    <Compile Include="udpEvent.cs" />
+    <Compile Include="udpException.cs" />
+    <Compile Include="udpLog.cs" />
+    <Compile Include="udpMath.cs" />
+    <Compile Include="udpPlatform.cs" />
+    <Compile Include="udpRingBuffer.cs" />
+    <Compile Include="udpSet.cs" />
+    <Compile Include="Socket\Socket.cs" />
+    <Compile Include="udpPacketPool.cs" />
+    <Compile Include="Thread.cs" />
+    <Compile Include="udpUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="connection\Connection.Stream.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Socket\Socket.NatUPnP.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
