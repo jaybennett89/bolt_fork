@@ -51,10 +51,17 @@ namespace Bolt {
         int f = 1 << i;
 
         // this can't be set
-        Assert.False(Filters[i].IsSet(offsetProperties));
+        if (Filters[i] != null) {
+          Assert.False(Filters[i].IsSet(offsetProperties));
+        }
 
         // if property is included in this filter, flag it
         if ((property.PropertyFilters & f) == f) {
+
+          if (Filters[i] == null) {
+            Filters[i] = new BitSet();
+          }
+
           Filters[i].Set(offsetProperties);
 
           // now it must be set
