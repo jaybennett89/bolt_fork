@@ -11,7 +11,7 @@ namespace Bolt {
     internal List<UE.Animator> Animators = new List<UE.Animator>();
     internal new NetworkState_Meta Meta;
 
-    internal BitSet PropertyDefaultMask;
+    internal BitSet PropertyDefaultMask = new BitSet();
     internal Priority[] PropertyPriorityTemp;
 
     internal BoltDoubleList<NetworkStorage> Frames = new BoltDoubleList<NetworkStorage>();
