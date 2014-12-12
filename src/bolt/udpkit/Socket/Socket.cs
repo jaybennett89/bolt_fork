@@ -435,11 +435,7 @@ namespace UdpKit {
       bool started = false;
 
       while (state == UdpSocketState.Created || state == UdpSocketState.Running) {
-#if DEBUG
-        {
-#else
         try {
-#endif
           if (created == false) {
             UdpLog.Info("socket created");
             created = true;
@@ -469,17 +465,16 @@ namespace UdpKit {
             Session_Update(now);
             Socket_Update(now);
 
+
             frame += 1;
           }
 
           UdpLog.Info("socket closed");
           return;
         }
-#if !DEBUG
         catch (Exception exn) {
           UdpLog.Error(exn.ToString());
         }
-#endif
       }
     }
 

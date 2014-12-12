@@ -332,6 +332,7 @@ public class BoltConnection : BoltObject {
 
   internal void Send() {
     try {
+
       Packet packet = PacketPool.Acquire();
       packet.Frame = BoltCore.frame;
       packet.Number = ++_packetCounter;

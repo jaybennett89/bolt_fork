@@ -89,9 +89,11 @@ namespace UdpKit {
     RecvInfo Recv;
 
     public UdpPipeConfig Config;
-
-    public UdpSocket Socket;
     public UdpConnection Connection;
+
+    public UdpSocket Socket {
+      get { return Connection.Socket; }
+    }
 
     public byte Id {
       get { return Config.PipeId; }

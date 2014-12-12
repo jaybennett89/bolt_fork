@@ -59,7 +59,9 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconnect(ev); break;
           case UdpEvent.INTERNAL_CLOSE: OnEventClose(ev); return;
-          case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
+          case UdpEvent.INTERNAL_SEND:
+            OnEventSend(ev); 
+            break;
 
           case UdpEvent.INTERNAL_LANBROADCAST_ENABLE: OnEvent_LanBroadcast_Enable(ev); break;
           case UdpEvent.INTERNAL_LANBROADCAST_DISABLE: OnEvent_LanBroadcast_Disable(ev); break;
