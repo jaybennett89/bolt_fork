@@ -57,7 +57,7 @@
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
     <Compile Include="Documentation.cs" />
-    <Compile Include="GlobalEventListenerBase.cs" />
+    <Compile Include="GlobalEventListener.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -131,10 +131,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BitSet.tt</DependentUpon>
     </Compile>
-    <Compile Include="t4\GlobalEventListenerBase.cs">
+    <Compile Include="t4\GlobalEventListener.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
+      <DependentUpon>GlobalEventListener.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
     <Compile Include="t4\Flags.cs">
@@ -204,9 +204,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BitSet.cs</LastGenOutput>
     </None>
-    <None Include="t4\GlobalEventListenerBase.tt">
+    <None Include="t4\GlobalEventListener.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>
+      <LastGenOutput>GlobalEventListener.cs</LastGenOutput>
     </None>
     <None Include="t4\Flags.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
