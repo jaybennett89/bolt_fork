@@ -35,7 +35,7 @@ let rootDir = currentDirectory
 let unityDir =
   if (hasBuildParam "project")
     then environVar "project"
-    else "./src/bolt.unity"
+    else "./src/bolt.unity.tutorial"
 
 let unityPath = 
   if hasBuildParam "unity" then 
