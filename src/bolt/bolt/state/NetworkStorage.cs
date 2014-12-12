@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt {
-  internal class NetworkStorage : IBoltListNode {
+  internal class NetworkStorage : BitSet, IBoltListNode {
     public int Frame;
-    public BitSet Changed;
     public NetworkObj Root;
     public NetworkValue[] Values;
 
@@ -15,8 +14,7 @@ namespace Bolt {
     }
 
     public void PropertyChanged(int property) {
-      Changed.Set(property);
-      Assert.False(Changed.IsZero);
+      Set(property);
     }
 
     object IBoltListNode.prev {

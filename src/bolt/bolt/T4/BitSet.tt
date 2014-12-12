@@ -1,0 +1,185 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+<#
+const int SIZE = 16;
+
+#>
+
+using System;
+
+namespace Bolt {
+
+	public class BitSet : BoltObject {
+		public const int BITSET_LONGS = <#=SIZE#>;
+		internal static readonly BitSet Full;
+
+		static BitSet() {
+		  Full = new BitSet();
+		  
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			Full.Bits<#=i#> |= uint.MaxValue; 
+			<# } #>
+		}
+
+
+		<# for(int i = 0; i < SIZE; ++i) { #>
+			ulong Bits<#=i#>;
+		<# } #>
+
+		public BitSet(
+		
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			
+				ulong bits<#=i#>
+
+				<# if(i + 1 < SIZE) { #> , <# } #>
+
+			<# } #>
+		) {
+			<# for(int i = 0; i < SIZE; ++i) { #>
+				this.Bits<#=i#> = bits<#=i#>;
+			<# } #>
+		}
+		
+		
+
+		public BitSet() {
+		}
+
+		public bool IsZero {
+		  get {
+			return
+				<# for(int i = 0; i < SIZE; ++i) { #>
+				(this.Bits<#=i#> == 0UL) &&
+				<# } #>
+				true;
+		  }
+		}
+
+		public void Set(int bit) {
+		  switch (bit / 64) {
+			
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			case <#=i#>: this.Bits<#=i#> |= (1UL << (bit % 64)); break;
+			<# } #>
+
+			default:
+			  throw new IndexOutOfRangeException();
+		  }
+
+		  Assert.False(IsZero);
+		}
+
+		public void Clear(int bit) {
+		  switch (bit / 64) {
+
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			case <#=i#>: this.Bits<#=i#> &= ~(1UL << (bit % 64)); break;
+			<# } #>
+
+			default:
+			  throw new IndexOutOfRangeException();
+		  }
+		}
+
+
+		public void Combine(BitSet other) {
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			this.Bits<#=i#> |= other.Bits<#=i#>;
+			<# } #>
+		}
+
+		public void ClearAll() {
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			this.Bits<#=i#> = 0UL;
+			<# } #>
+		}
+		
+		public bool IsSet(int bit) {
+		  ulong b = 1UL << (bit % 64); 
+
+		  switch (bit / 64) {
+
+			<# for(int i = 0; i < SIZE; ++i) { #>
+			case <#=i#>: return (this.Bits<#=i#> & b) == b;
+			<# } #>
+
+			default:
+			  throw new IndexOutOfRangeException();
+		  }
+		}
+		
+		public Iterator GetIterator() {
+		  return new Iterator(this);
+		}
+
+		  public struct Iterator {
+			int number;
+			int numberBit;
+
+			BitSet set;
+
+			public Iterator(BitSet set) {
+			  this.number = 0;
+			  this.numberBit = 0;
+			  this.set = set;
+			}
+
+			public bool Next(out int bit) {
+			  ulong bits;
+
+			  while (true) {
+
+				switch (number) {
+
+				<# for(int i = 0; i < SIZE; ++i) { #>
+					case <#=i#>: bits = set.Bits<#=i#>; break;
+				<# } #>
+
+				  case <#=SIZE#>:
+					bit = -1;
+					return false;
+
+				  default:
+					throw new InvalidOperationException();
+				}
+
+				if (bits == 0) {
+				  number = number + 1;
+				  numberBit = 0;
+				}
+				else {
+				  for (; numberBit < 64; ++numberBit) {
+					if ((bits & (1UL << numberBit)) != 0UL) {
+					  switch (number) {
+						<# for(int i = 0; i < SIZE; ++i) { #>
+							case <#=i#>: set.Bits<#=i#> &= ~(1UL << numberBit); break;
+						<# } #>
+						
+						default:
+						throw new InvalidOperationException();
+					  }
+
+					  // set bit we found
+					  bit = (number * 64) + numberBit;
+
+					  // done!
+					  return true;
+					}
+				  }
+
+				  throw new InvalidOperationException();
+				}
+			  }
+			}
+		  }
+
+	}
+
+	
+}

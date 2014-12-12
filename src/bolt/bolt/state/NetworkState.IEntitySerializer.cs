@@ -47,7 +47,7 @@ namespace Bolt {
       else {
         while ((Frames.count > 1) && (Entity.Frame >= Frames.Next(Frames.first).Frame)) {
           // combine changed properties
-          Frames.Next(Frames.first).Changed.Combine(Frames.first.Changed);
+          Frames.Next(Frames.first).Combine(Frames.first);
 
           // free it
           FreeStorage(Frames.RemoveFirst());
@@ -80,7 +80,7 @@ namespace Bolt {
     void IEntitySerializer.OnControlGained() {
       while (Frames.count > 1) {
         // compact all changes into last frame
-        Frames.last.Changed.Combine(Frames.first.Changed);
+        Frames.last.Combine(Frames.first);
 
         // remove first frame
         FreeStorage(Frames.RemoveFirst());
@@ -275,7 +275,7 @@ namespace Bolt {
         else {
           storage = DuplicateStorage(Frames.last);
           storage.Frame = frame;
-          storage.Changed.ClearAll();
+          storage.ClearAll();
 
           Frames.AddLast(storage);
         }
@@ -302,7 +302,7 @@ namespace Bolt {
         propertyInfo.Property.Read(connection, Objects[propertyInfo.OffsetObjects], storage, packet);
 
         // set changed flag
-        storage.Changed.Set(propertyIndex);
+        storage.Set(propertyIndex);
       }
     }
   }

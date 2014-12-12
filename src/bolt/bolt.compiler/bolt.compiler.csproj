@@ -43,9 +43,6 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\bolt\state\BitSet.cs">
-      <Link>Auxiliary\BitSet.cs</Link>
-    </Compile>
     <Compile Include="..\bolt\state\Enums.cs">
       <Link>Auxiliary\Enums.cs</Link>
     </Compile>
