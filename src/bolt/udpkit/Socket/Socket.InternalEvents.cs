@@ -258,7 +258,6 @@ namespace UdpKit {
     void OnEvent_Stream_CreateChannel(UdpEvent ev) {
       UdpStreamChannel c = new UdpStreamChannel();
       c.Config = ev.ChannelConfig;
-      c.Name = ev.ChannelName;
 
       if (streamChannels.ContainsKey(c.Name)) {
         UdpLog.Error("Duplicate channel id '{0}', not creating channel '{1}'", c.Name);
@@ -266,7 +265,7 @@ namespace UdpKit {
       }
 
       streamChannels.Add(c.Name, c);
-      UdpLog.Debug("Channel {0} created", ev.ChannelName);
+      UdpLog.Debug("Channel {0} created", c.Name);
     }
   }
 }

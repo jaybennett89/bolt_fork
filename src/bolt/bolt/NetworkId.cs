@@ -67,6 +67,17 @@ namespace Bolt {
     [FieldOffset(4)]
     internal readonly uint Entity;
 
+    public ulong PackedValue {
+      get { return Packed; }
+    }
+
+    public NetworkId(ulong packed) {
+      Entity = 0;
+      Connection = 0;
+
+      Packed = packed;
+    }
+
     internal NetworkId(uint connection, uint entity) {
       Packed = 0UL;
       Entity = entity;
