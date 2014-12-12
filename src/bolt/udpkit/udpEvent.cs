@@ -110,16 +110,6 @@ namespace UdpKit {
       set { integer0 = value; }
     }
 
-    internal int ChannelPriority {
-      get { return integer1; }
-      set { integer1 = value; }
-    }
-
-    internal UdpChannelMode ChannelMode {
-      get { return (UdpChannelMode)integer2; }
-      set { integer2 = (int)value; }
-    }
-
     internal string ChannelNameString {
       get { return (string)Object0; }
       set {
@@ -128,38 +118,17 @@ namespace UdpKit {
       }
     }
 
-    //internal bool IsServer {
-    //  get { return integer2 == 1; }
-    //  set { integer2 = value ? 1 : 0; }
-    //}
-
     internal UdpSocketMode SocketMode {
       get { return (UdpSocketMode)integer2; }
       set { integer2 = (int)value; }
     }
 
     internal UdpChannelName ChannelName {
-      get { return new UdpChannelName(ChannelNameId, (string)Object0); }
+      get { return new UdpChannelName(integer0, (string)Object0); }
       set {
-        ChannelNameId = value.Id;
-        ChannelNameString = value.Name;
-      }
-    }
-
-    internal UdpChannelConfig ChannelConfig {
-      get {
-        UdpChannelConfig channel;
-        channel.ChannelName.Name = ChannelNameString;
-        channel.ChannelName.Id = ChannelNameId;
-        channel.Priority = ChannelPriority;
-        channel.Mode = ChannelMode;
-        return channel;
-      }
-      set {
-        ChannelNameString = value.ChannelName.Name;
-        ChannelNameId = value.ChannelName.Id;
-        ChannelPriority = value.Priority;
-        ChannelMode = value.Mode;
+        UdpAssert.Assert(Object0 == null);
+        integer0 = value.Id;
+        Object0 = value.Name;
       }
     }
 
@@ -232,6 +201,11 @@ namespace UdpKit {
 
     public string HostName {
       get { return (string)Object0; }
+      set { UdpAssert.Assert(Object0 == null); Object0 = value; }
+    }
+
+    internal UdpChannelConfig ChannelConfig {
+      get { return (UdpChannelConfig)Object0; }
       set { UdpAssert.Assert(Object0 == null); Object0 = value; }
     }
 
