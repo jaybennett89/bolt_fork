@@ -112,34 +112,6 @@ public static class BoltEditorGUI {
     }
   }
 
-  public static GUIStyle ImageButtonStyle {
-    get {
-      GUIStyle style;
-      style = new GUIStyle();
-      style.margin = new RectOffset(0, 0, 0, 0);
-      return style;
-    }
-  }
-
-  public static GUIStyle ParameterBackgroundStyle {
-    get {
-      GUIStyle style;
-      style = new GUIStyle("ObjectFieldThumb");
-      style.padding = new RectOffset(5, 5, 5, 5);
-      style.margin = new RectOffset(5, 5, 0, 5);
-      return style;
-    }
-  }
-
-  public static GUIStyle WhiteTextureBackgroundStyle {
-    get {
-      GUIStyle bg;
-      bg = new GUIStyle(GUIStyle.none);
-      bg.normal.background = EditorGUIUtility.whiteTexture;
-      return bg;
-    }
-  }
-
   public static Color ToUnityColor(this Color4 c) {
     return new Color(c.R, c.G, c.B, c.A);
   }
@@ -170,13 +142,6 @@ public static class BoltEditorGUI {
     EditorGUI.BeginDisabledGroup(true);
     gui();
     EditorGUI.EndDisabledGroup();
-  }
-
-  public static GUIStyle PropertiesAddTextStyle {
-    get {
-      GUIStyle s = new GUIStyle(AccentText);
-      return s;
-    }
   }
 
   public static GUIStyle InheritanceSeparatorStyle {
@@ -240,15 +205,6 @@ public static class BoltEditorGUI {
 
   public static Texture2D LoadIcon(string name) {
     return Resources.Load("icons/" + name, typeof(Texture2D)) as Texture2D;
-  }
-
-  public static void LabelClickable(string label, System.Action onClick) {
-    LabelClickable(label, GUI.skin.label, onClick);
-  }
-
-  public static void LabelClickable(string label, GUIStyle style, System.Action onClick) {
-    GUILayout.Label(label, style);
-    MakeClickable(onClick);
   }
 
   public static Guid AssetPopup(IEnumerable<AssetDefinition> assets, Guid current, IEnumerable<Guid> exclude) {
@@ -371,29 +327,6 @@ public static class BoltEditorGUI {
     return enabled;
   }
 
-  public static void AddButton(string text, List<PropertyDefinition> list, Func<PropertyAssetSettings> newSettings) {
-    EditorGUILayout.BeginHorizontal(PaddingStyle(3, 0, 0, 5));
-
-    if (IconButton("mc_plus")) {
-      list.Add(
-        new PropertyDefinition {
-          Name = "NewProperty",
-          Comment = "",
-          Deleted = false,
-          Enabled = true,
-          Expanded = true,
-          PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
-          AssetSettings = newSettings()
-        }
-      );
-    }
-
-    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
-    s.margin.top = 0;
-    GUILayout.Label(text, s);
-
-    EditorGUILayout.EndHorizontal();
-  }
 
   public static void Header(string text) {
     EditorGUILayout.BeginHorizontal(PaddingStyle(5, 0, 0, 0));
@@ -428,16 +361,6 @@ public static class BoltEditorGUI {
     return priority;
   }
 
-  public static bool LabelButton(string label, bool enabled, float opacity, params GUILayoutOption[] options) {
-    bool result = false;
-
-    WithColor(enabled ? Color.white : ColorOpacity(opacity), () => {
-      result = GUILayout.Button(label, BoltEditorGUI.MiniLabelButtonStyle, options);
-    });
-
-    return result;
-  }
-
   public static GUIStyle HeaderBackgorund {
     get {
       GUIStyle s;
@@ -457,17 +380,6 @@ public static class BoltEditorGUI {
       }
 
       return s;
-    }
-  }
-
-  public static void WithColor(Color color, Action gui) {
-    GUI.color = color;
-
-    try {
-      gui();
-    }
-    finally {
-      GUI.color = Color.white;
     }
   }
 
@@ -520,12 +432,6 @@ public static class BoltEditorGUI {
     }
   }
 
-  static void ToggleDisabled() {
-    EditorGUI.BeginDisabledGroup(true);
-    Toggle(true);
-    EditorGUI.EndDisabledGroup();
-  }
-
   public static bool ToggleDropdown(string on, string off, bool enabled) {
     return EditorGUILayout.Popup(enabled ? 0 : 1, new[] { on, off }) == 0;
   }
@@ -545,38 +451,6 @@ public static class BoltEditorGUI {
     return EditorGUILayout.Toggle(value, toggle, GUILayout.Width(15));
   }
 
-  public static void SettingsSection(string label, Action gui) {
-    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
-
-    GUILayout.Label(label, BoltEditorGUI.AccentText);
-    EditorGUILayout.EndHorizontal();
-    gui();
-  }
-
-  public static void SettingsSectionDouble(string left, string right, Action gui) {
-    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
-    GUILayout.Label(left, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
-    GUILayout.FlexibleSpace();
-    GUILayout.Label(right, BoltEditorGUI.AccentText, GUILayout.ExpandWidth(false));
-    EditorGUILayout.EndHorizontal();
-
-    gui();
-  }
-
-  public static void SettingsSectionToggle(string label, ref bool enabled, Action gui, params GUILayoutOption[] options) {
-    EditorGUILayout.BeginHorizontal(SettingSectionStyle);
-
-    GUILayout.Label(label, BoltEditorGUI.AccentText, options);
-
-    enabled = Toggle(enabled);
-
-    EditorGUILayout.EndHorizontal();
-
-    EditorGUI.BeginDisabledGroup(!enabled);
-    gui();
-    EditorGUI.EndDisabledGroup();
-  }
-
   public static FloatCompression EditFloatCompression(FloatCompression c) {
     if (c == null) {
       c = FloatCompression.Default();
@@ -592,14 +466,5 @@ public static class BoltEditorGUI {
     EditorGUI.EndDisabledGroup();
 
     return c;
-  }
-
-  static void MakeClickable(System.Action onClick) {
-    Rect r = GUILayoutUtility.GetLastRect();
-
-    if (IsLeftClick && r.Contains(Event.current.mousePosition)) {
-      onClick();
-      UseEvent();
-    }
   }
 }
