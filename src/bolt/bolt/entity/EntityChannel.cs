@@ -158,7 +158,7 @@ partial class EntityChannel : BoltChannel {
           continue;
         }
 
-        proxy.Changed.ClearAll();
+        proxy.ClearAll();
         proxy.Priority = 1 << 17;
       }
       else {
@@ -185,7 +185,7 @@ partial class EntityChannel : BoltChannel {
         }
         else {
           if (proxy.Flags & ProxyFlags.CREATE_DONE) {
-            if (proxy.Changed.IsZero) {
+            if (proxy.IsZero) {
               continue;
             }
 
@@ -347,7 +347,7 @@ partial class EntityChannel : BoltChannel {
       Priority p = env.Written[i];
 
       // set flag for sending this property again
-      env.Proxy.Changed.Set(p.PropertyIndex);
+      env.Proxy.Set(p.PropertyIndex);
 
       // increment priority
       env.Proxy.PropertyPriority[p.PropertyIndex].PropertyPriority += p.PropertyPriority;

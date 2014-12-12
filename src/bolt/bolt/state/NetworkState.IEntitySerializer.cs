@@ -157,7 +157,7 @@ namespace Bolt {
         Assert.True(proxyPriority[i].PropertyIndex == i);
 
         // if this property is set both in our filter and the proxy mask we can consider it for sending
-        if (filter.IsSet(i) && env.Proxy.Changed.IsSet(i)) {
+        if (filter.IsSet(i) && env.Proxy.IsSet(i)) {
           // increment priority for this property
           proxyPriority[i].PropertyPriority += Meta.Properties[i].Property.PropertyPriority;
           proxyPriority[i].PropertyPriority = UE.Mathf.Clamp(proxyPriority[i].PropertyPriority, 0, BoltCore._config.maxPropertyPriority);
@@ -183,7 +183,7 @@ namespace Bolt {
         env.Proxy.PropertyPriority[p.PropertyIndex].PropertyPriority = 0;
 
         // clear mask for it
-        env.Proxy.Changed.Clear(p.PropertyIndex);
+        env.Proxy.Clear(p.PropertyIndex);
       }
 
       return env.Written.Count;

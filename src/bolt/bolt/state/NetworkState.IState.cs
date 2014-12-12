@@ -111,7 +111,7 @@ namespace Bolt {
           var proxies = Entity.Proxies.GetIterator();
 
           while (proxies.Next()) {
-            proxies.val.Changed.Combine(Frames.first);
+            proxies.val.Combine(Frames.first);
           }
         }
 

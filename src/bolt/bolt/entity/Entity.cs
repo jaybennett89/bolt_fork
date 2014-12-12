@@ -156,7 +156,7 @@ namespace Bolt {
 
       p = new EntityProxy();
       p.Entity = this;
-      p.Changed = Serializer.GetDefaultMask();
+      p.Combine(Serializer.GetDefaultMask());
 
       // add to list
       Proxies.AddLast(p);

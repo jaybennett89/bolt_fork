@@ -57,7 +57,6 @@ internal class EntityProxy : BitSet {
 
   public NetworkState State;
   public NetworkId NetworkId;
-  public BitSet Changed;
   public ProxyFlags Flags;
   public Priority[] PropertyPriority;
 
