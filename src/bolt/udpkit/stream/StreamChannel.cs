@@ -5,7 +5,10 @@ using System.Text;
 
 namespace UdpKit {
   class UdpStreamChannel {
-    public UdpChannelName Name;
+    public UdpChannelName Name {
+      get { return Config.ChannelName; }
+    }
+
     public UdpChannelConfig Config;
   }
 }
