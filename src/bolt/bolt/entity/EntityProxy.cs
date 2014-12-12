@@ -34,23 +34,15 @@ static class EntityProxyEnvelopePool {
       obj = new EntityProxyEnvelope();
     }
 
-#if DEBUG
-    Assert.True(obj._pooled);
-    obj._pooled = false;
-#endif
     return obj;
   }
 
   internal static void Release(EntityProxyEnvelope obj) {
-#if DEBUG
-    Assert.False(obj._pooled);
-    obj._pooled = true;
-#endif
     pool.Push(obj);
   }
 }
 
-internal class EntityProxy : BoltObject {
+internal class EntityProxy : BitSet {
   public class PriorityComparer : IComparer<EntityProxy> {
     public static readonly PriorityComparer Instance = new PriorityComparer();
 
@@ -65,7 +57,6 @@ internal class EntityProxy : BoltObject {
 
   public NetworkState State;
   public NetworkId NetworkId;
-  public BitSet Changed;
   public ProxyFlags Flags;
   public Priority[] PropertyPriority;
 

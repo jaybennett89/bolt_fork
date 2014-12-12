@@ -87,7 +87,6 @@
     <Compile Include="BoltConnectionsWindow.cs" />
     <Compile Include="BoltWindow.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileAssemblyInfo.cs" />
-    <Compile Include="Editors\BoltAssetEditorGUI.cs" />
     <Compile Include="Editors\BoltHitboxBodyEditor.cs" />
     <Compile Include="Editors\BoltPrefabDatabaseEditor.cs" />
     <Compile Include="Editors\BoltRuntimeSettingsEditor.cs" />

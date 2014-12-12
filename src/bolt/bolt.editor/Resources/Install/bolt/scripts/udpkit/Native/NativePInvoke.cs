@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -6,8 +7,13 @@ using System;
 using UdpKit;
 
 public static class NativePInvoke {
+#if UNITY_ANDROID
   public const string DLL_NAME = "udpkit_android";
-  //public const string DLL_NAME = "__Internal";
+#elif UNITY_IPHONE
+  public const string DLL_NAME = "__Internal";
+#else
+  public const string DLL_NAME = null;
+#endif
 
   public const int UDPKIT_SOCKET_OK = 0;
   public const int UDPKIT_SOCKET_ERROR = -1;
@@ -68,3 +74,4 @@ public static class NativePInvoke {
   [SuppressUnmanagedCodeSecurity]
   public static extern UInt32 GetBroadcastAddress();
 }
+#endif

@@ -25,26 +25,26 @@ public class BoltSettingsWindow : EditorWindow {
   void Replication() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltAssetEditorGUI.Label("FixedUpdate Rate", () => {
+    BoltEditorGUI.WithLabel("FixedUpdate Rate", () => {
       settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
     });
 
-    BoltAssetEditorGUI.Label("Network Tick Rate", () => {
+    BoltEditorGUI.WithLabel("Network Tick Rate", () => {
       settings._config.serverSendRate = BoltEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
     });
 
-    BoltAssetEditorGUI.Label("Max Priorities", () => {
+    BoltEditorGUI.WithLabel("Max Priorities", () => {
       settings._config.maxEntityPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxEntityPriority, "Entity"), 1, 1 << 16);
       settings._config.maxPropertyPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxPropertyPriority, "Proprerty"), 1, 1 << 11);
     });
 
-    BoltAssetEditorGUI.Label("Disable Dejitter Buffer", () => {
+    BoltEditorGUI.WithLabel("Disable Dejitter Buffer", () => {
       settings._config.disableDejitterBuffer = EditorGUILayout.Toggle(settings._config.disableDejitterBuffer);
     });
 
     EditorGUI.BeginDisabledGroup(settings._config.disableDejitterBuffer);
 
-    BoltAssetEditorGUI.Label("Dejitter Delay", () => {
+    BoltEditorGUI.WithLabel("Dejitter Delay", () => {
       settings._config.serverDejitterDelayMin = Mathf.Max(0, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMin, "Min"));
       settings._config.serverDejitterDelay = Mathf.Max(1, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelay, "Frames"));
       settings._config.serverDejitterDelayMax = Mathf.Max(settings._config.serverDejitterDelay + 1, BoltEditorGUI.IntFieldOverlay(settings._config.serverDejitterDelayMax, "Max"));
@@ -52,7 +52,7 @@ public class BoltSettingsWindow : EditorWindow {
 
     EditorGUI.EndDisabledGroup();
 
-    BoltAssetEditorGUI.Label("Scoping Mode", () => {
+    BoltEditorGUI.WithLabel("Scoping Mode", () => {
       Bolt.ScopeMode previous = settings._config.scopeMode;
       settings._config.scopeMode = (Bolt.ScopeMode)EditorGUILayout.EnumPopup(settings._config.scopeMode);
 
@@ -62,7 +62,7 @@ public class BoltSettingsWindow : EditorWindow {
       }
     });
 
-    BoltAssetEditorGUI.Label("Instantiate Mode", () => {
+    BoltEditorGUI.WithLabel("Instantiate Mode", () => {
       settings.clientCanInstantiateAll = BoltEditorGUI.ToggleDropdown("Client Can Instantiate Everything", "Individual On Each Prefab", settings.clientCanInstantiateAll);
     });
 
@@ -84,39 +84,39 @@ public class BoltSettingsWindow : EditorWindow {
   void Connection() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltAssetEditorGUI.Label("Limit", () => {
+    BoltEditorGUI.WithLabel("Limit", () => {
       settings._config.serverConnectionLimit = BoltEditorGUI.IntFieldOverlay(settings._config.serverConnectionLimit, "");
     });
 
-    BoltAssetEditorGUI.Label("Timeout", () => {
+    BoltEditorGUI.WithLabel("Timeout", () => {
       settings._config.connectionTimeout = BoltEditorGUI.IntFieldOverlay(settings._config.connectionTimeout, "ms");
     });
 
-    BoltAssetEditorGUI.Label("Connect Timeout", () => {
+    BoltEditorGUI.WithLabel("Connect Timeout", () => {
       settings._config.connectionRequestTimeout = BoltEditorGUI.IntFieldOverlay(settings._config.connectionRequestTimeout, "ms");
     });
 
-    BoltAssetEditorGUI.Label("Connect Attempts", () => {
+    BoltEditorGUI.WithLabel("Connect Attempts", () => {
       settings._config.connectionRequestAttempts = BoltEditorGUI.IntFieldOverlay(settings._config.connectionRequestAttempts, "");
     });
 
-    BoltAssetEditorGUI.Label("Accept Mode", () => {
+    BoltEditorGUI.WithLabel("Accept Mode", () => {
       settings._config.serverConnectionAcceptMode = (BoltConnectionAcceptMode)EditorGUILayout.EnumPopup(settings._config.serverConnectionAcceptMode);
     });
 
     EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
 
-    BoltAssetEditorGUI.Label("Accept Token Size", () => {
+    BoltEditorGUI.WithLabel("Accept Token Size", () => {
       settings._config.connectionTokenSize = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, UdpKit.UdpSocket.MaxTokenSize);
     });
 
     EditorGUI.EndDisabledGroup();
 
-    BoltAssetEditorGUI.Label("Packet Size", () => {
+    BoltEditorGUI.WithLabel("Packet Size", () => {
       settings._config.packetSize = BoltEditorGUI.IntFieldOverlay(settings._config.packetSize, "Bytes");
     });
 
-    BoltAssetEditorGUI.Label("UPnP", () => {
+    BoltEditorGUI.WithLabel("UPnP", () => {
       EditorGUILayout.BeginVertical();
       EditorGUILayout.BeginHorizontal();
 
@@ -191,14 +191,14 @@ public class BoltSettingsWindow : EditorWindow {
 
     EditorGUI.BeginDisabledGroup(BoltCore.isDebugMode == false);
 
-    BoltAssetEditorGUI.Label("Enabled", () => {
+    BoltEditorGUI.WithLabel("Enabled", () => {
       settings._config.useNetworkSimulation = EditorGUILayout.Toggle(settings._config.useNetworkSimulation);
     });
 
     EditorGUI.EndDisabledGroup();
     EditorGUI.BeginDisabledGroup(settings._config.useNetworkSimulation == false || BoltCore.isDebugMode == false);
 
-    BoltAssetEditorGUI.Label("Packet Loss", () => {
+    BoltEditorGUI.WithLabel("Packet Loss", () => {
       int loss;
 
       loss = Mathf.Clamp(Mathf.RoundToInt(settings._config.simulatedLoss * 100), 0, 100);
@@ -207,12 +207,12 @@ public class BoltSettingsWindow : EditorWindow {
       settings._config.simulatedLoss = Mathf.Clamp01(loss / 100f);
     });
 
-    BoltAssetEditorGUI.Label("Ping", () => {
+    BoltEditorGUI.WithLabel("Ping", () => {
       settings._config.simulatedPingMean = BoltEditorGUI.IntFieldOverlay(settings._config.simulatedPingMean, "Mean");
       settings._config.simulatedPingJitter = BoltEditorGUI.IntFieldOverlay(settings._config.simulatedPingJitter, "Jitter");
     });
 
-    BoltAssetEditorGUI.Label("Noise Function", () => {
+    BoltEditorGUI.WithLabel("Noise Function", () => {
       settings._config.simulatedRandomFunction = (BoltRandomFunction)EditorGUILayout.EnumPopup(settings._config.simulatedRandomFunction);
     });
 
@@ -223,15 +223,15 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltAssetEditorGUI.Label("Log Targets", () => {
+    BoltEditorGUI.WithLabel("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
 
-    BoltAssetEditorGUI.Label("Show Debug Info", () => {
+    BoltEditorGUI.WithLabel("Show Debug Info", () => {
       settings.showDebugInfo = EditorGUILayout.Toggle(settings.showDebugInfo);
     });
 
-    BoltAssetEditorGUI.Label("Log Unity To Console", () => {
+    BoltEditorGUI.WithLabel("Log Unity To Console", () => {
       settings.logUncaughtExceptions = EditorGUILayout.Toggle(settings.logUncaughtExceptions);
     });
 
@@ -240,11 +240,11 @@ public class BoltSettingsWindow : EditorWindow {
 
     EditorGUILayout.BeginVertical();
 
-    BoltAssetEditorGUI.Label("Toggle Key", () => {
+    BoltEditorGUI.WithLabel("Toggle Key", () => {
       settings.consoleToggleKey = (KeyCode)EditorGUILayout.EnumPopup(settings.consoleToggleKey);
     });
 
-    BoltAssetEditorGUI.Label("Visible By Default", () => {
+    BoltEditorGUI.WithLabel("Visible By Default", () => {
       settings.consoleVisibleByDefault = EditorGUILayout.Toggle(settings.consoleVisibleByDefault);
     });
 
@@ -255,12 +255,12 @@ public class BoltSettingsWindow : EditorWindow {
   void Compiler() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltAssetEditorGUI.Label("Warning Level", () => {
+    BoltEditorGUI.WithLabel("Warning Level", () => {
       settings.compilationWarnLevel = EditorGUILayout.IntField(settings.compilationWarnLevel);
       settings.compilationWarnLevel = Mathf.Clamp(settings.compilationWarnLevel, 0, 4);
     });
 
-    BoltAssetEditorGUI.Label("Prefab Mode", () => {
+    BoltEditorGUI.WithLabel("Prefab Mode", () => {
       PrefabDatabase.Instance.ManualMode = BoltEditorGUI.ToggleDropdown("Manual", "Automatic", PrefabDatabase.Instance.ManualMode);
     });
   }

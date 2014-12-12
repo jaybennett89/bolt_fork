@@ -57,7 +57,7 @@
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
     <Compile Include="Documentation.cs" />
-    <Compile Include="GlobalEventListenerBase.cs" />
+    <Compile Include="GlobalEventListener.cs" />
     <Compile Include="BoltLog.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -87,7 +87,6 @@
     <Compile Include="state\NetworkArray_Values.cs" />
     <Compile Include="state\Arrays\Vector.cs" />
     <Compile Include="state\Enums.cs" />
-    <Compile Include="state\BitSet.cs" />
     <Compile Include="state\DoubleBuffer.cs" />
     <Compile Include="state\Filter.cs" />
     <Compile Include="state\Indices.cs" />
@@ -127,10 +126,15 @@
     <Compile Include="state\Settings\Compression\Vector.cs" />
     <Compile Include="state\NetworkState_Meta.cs" />
     <Compile Include="state\Settings\String.cs" />
-    <Compile Include="t4\GlobalEventListenerBase.cs">
+    <Compile Include="t4\BitSet.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GlobalEventListenerBase.tt</DependentUpon>
+      <DependentUpon>BitSet.tt</DependentUpon>
+    </Compile>
+    <Compile Include="t4\GlobalEventListener.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GlobalEventListener.tt</DependentUpon>
     </Compile>
     <Compile Include="BoltConfig.cs" />
     <Compile Include="t4\Flags.cs">
@@ -196,9 +200,13 @@
     <Compile Include="event\EventDispatcher.Queue.cs" />
     <Compile Include="state\NetworkState.IEntitySerializer.cs" />
     <Compile Include="state\NetworkState.IState.cs" />
-    <None Include="t4\GlobalEventListenerBase.tt">
+    <None Include="t4\BitSet.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GlobalEventListenerBase.cs</LastGenOutput>
+      <LastGenOutput>BitSet.cs</LastGenOutput>
+    </None>
+    <None Include="t4\GlobalEventListener.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GlobalEventListener.cs</LastGenOutput>
     </None>
     <None Include="t4\Flags.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

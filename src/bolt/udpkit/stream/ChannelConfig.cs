@@ -10,15 +10,9 @@ namespace UdpKit {
     Reliable = 1
   }
 
-  [StructLayout(LayoutKind.Explicit)]
-  internal struct UdpChannelConfig {
-    [FieldOffset(0)]
+  internal class UdpChannelConfig {
     public int Priority;
-
-    [FieldOffset(4)]
     public UdpChannelMode Mode;
-
-    [FieldOffset(8)]
     public UdpChannelName ChannelName;
   }
 }

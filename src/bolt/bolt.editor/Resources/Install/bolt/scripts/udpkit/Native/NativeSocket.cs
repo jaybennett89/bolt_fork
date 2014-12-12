@@ -1,4 +1,5 @@
-﻿using System;
+﻿﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -122,3 +123,4 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
     throw new Exception(string.Format("Unknown return code: {0}", result));
   }
 }
+#endif
