@@ -538,6 +538,11 @@ namespace Bolt {
       eo.PrefabId = prefabId;
       eo.Flags = flags;
 
+      if (prefabId.Value == 0) {
+        eo.Flags |= EntityFlags.SCENE_OBJECT;
+        eo.SceneId = eo.UnityObject.sceneGuid;
+      }
+
       if (eo.UnityObject._persistThroughSceneLoads) { eo.Flags |= EntityFlags.PERSIST_ON_LOAD; }
       if (eo.UnityObject._clientPredicted) { eo.Flags |= EntityFlags.CONTROLLER_LOCAL_PREDICTION; }
 
