@@ -387,7 +387,7 @@ partial class EntityChannel : BoltChannel {
         packet.UdpPacket.WriteQuaternion(proxy.Entity.UnityObject.transform.rotation);
 
         if (packet.UdpPacket.WriteBool(proxy.Entity.IsSceneObject)) {
-          Assert.False(proxy.Entity.SceneId.IsNone);
+          Assert.False(proxy.Entity.SceneId.IsNone, string.Format("'{0}' is marked a scene object but has no scene id ", proxy.Entity.UnityObject.gameObject));
           packet.UdpPacket.WriteUniqueId(proxy.Entity.SceneId);
         }
       }
@@ -494,29 +494,29 @@ partial class EntityChannel : BoltChannel {
       EntityProxy proxy = null;
 
       if (createRequested && (_incomming.ContainsKey(networkId) == false)) {
-        // prefab checks (if applicable)
-        {
-          GameObject go = BoltCore.PrefabPool.LoadPrefab(prefabId);
-
-          if (go) {
-            if (BoltCore.isServer && !go.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
-              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.remoteEndPoint);
-            }
-          }
-        }
-
         // create entity
 
         if (isSceneObject) {
           GameObject go = BoltCore.FindSceneObject(sceneId);
 
           if (!go) {
+            BoltLog.Warn("Could not find scene object with {0}", sceneId);
             go = BoltCore.PrefabPool.Instantiate(prefabId, spawnPosition, spawnRotation);
           }
 
           entity = Entity.CreateFor(go, prefabId, serializerId, EntityFlags.SCENE_OBJECT);
         }
         else {
+          GameObject go = BoltCore.PrefabPool.LoadPrefab(prefabId);
+
+          // prefab checks (if applicable)
+          if (go) {
+            if (BoltCore.isServer && !go.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
+              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.remoteEndPoint);
+            }
+          }
+
+          BoltLog.Warn("Creating instance of {0}", prefabId);
           entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);
         }
 

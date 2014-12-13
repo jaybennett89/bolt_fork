@@ -47,6 +47,21 @@ public class BoltEntitySettingsModifier : IDisposable {
     set { _entity.VerifyNotAttached(); _entity._persistThroughSceneLoads = value; }
   }
 
+  public bool sceneObjectDestroyOnDetach {
+    get { return _entity._sceneObjectDestroyOnDetach; }
+    set { _entity.VerifyNotAttached(); _entity._sceneObjectDestroyOnDetach = value; }
+  }
+
+  public bool sceneObjectAutoAttach {
+    get { return _entity._sceneObjectAutoAttach; }
+    set { _entity.VerifyNotAttached(); _entity._sceneObjectAutoAttach = value; }
+  }
+
+  public bool alwaysProxy {
+    get { return _entity._alwaysProxy; }
+    set { _entity.VerifyNotAttached(); _entity._alwaysProxy = value; }
+  }
+
   void IDisposable.Dispose() {
 
   }
@@ -78,6 +93,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   [UE.SerializeField]
   internal bool _persistThroughSceneLoads = false;
+
+  [UE.SerializeField]
+  internal bool _sceneObjectDestroyOnDetach = false;
+
+  [UE.SerializeField]
+  internal bool _sceneObjectAutoAttach = false;
 
   [UE.SerializeField]
   internal bool _alwaysProxy = false;
@@ -133,6 +154,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// </summary>
   public bool isAttached {
     get { return (_entity != null) && _entity.IsAttached; }
+  }
+
+  public bool isFrozen {
+    get { return isAttached && BoltCore._entitiesFrozen.Contains(Entity); }
   }
 
   /// <summary>
@@ -281,6 +306,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// <param name="idle">If this should be idle or not</param>
   public void Idle(BoltConnection connection, bool idle) {
     Entity.SetIdle(connection, idle);
+  }
+
+  public void Freeze(bool pause) {
+    Entity.Freeze(pause);
   }
 
   /// <summary>

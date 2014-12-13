@@ -4,6 +4,16 @@ using System.Text;
 
 namespace UdpKit {
   partial class UdpSocket {
+
+    [System.Obsolete("ClassName.OldMethod is obsolete, use ClassName.NewMethod instead")]
+    public void OldMethod(string a, string b) {
+      NewMethod(a, b);
+    }
+
+    public void NewMethod(string a, string b) {
+
+    }
+
     bool PeekInternal(out UdpEvent ev) {
       lock (eventQueueIn) {
         if (eventQueueIn.Count > 0) {

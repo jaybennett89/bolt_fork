@@ -33,6 +33,7 @@ public static class BoltNetworkInternal {
     BoltCore.Initialize(mode, endpoint, config, platform);
   }
 
+
   public static void __Shutdown() {
     BoltCore.Shutdown();
   }
@@ -46,6 +47,10 @@ public static class BoltNetworkInternal {
 public static class BoltNetwork {
   public static void SetCanReceiveEntities(bool canReceiveEntities) {
     BoltCore._canReceiveEntities = canReceiveEntities;
+  }
+
+  public static IEnumerable<BoltEntity> SceneObjects {
+    get { return BoltCore._sceneObjects.Values; }
   }
 
   /// <summary>
@@ -160,6 +165,10 @@ public static class BoltNetwork {
 
   public static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
     return BoltCore.CreateStreamChannel(name, mode, priority);
+  }
+
+  public static void UpdateSceneObjectsLookup() {
+    BoltCore.UpdateSceneObjectsLookup();
   }
 
   //public static UdpStreamData CreateStreamData(byte[] data) {

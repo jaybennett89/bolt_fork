@@ -20,11 +20,11 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
   public T last {
     get {
       VerifyNotEmpty();
-      return (T) _first.prev;
+      return (T)_first.prev;
     }
   }
 
-  public BoltIterator<T> GetIterator () {
+  public BoltIterator<T> GetIterator() {
     return new BoltIterator<T>(_first, _count);
   }
 
@@ -44,7 +44,11 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     }
   }
 
-  public bool IsFirst (T node) {
+  public bool Contains(T node) {
+    return (ReferenceEquals(node, null) == false) && (ReferenceEquals(this, node.list) == true);
+  }
+
+  public bool IsFirst(T node) {
     VerifyInList(node);
 
     if (_count == 0)
@@ -53,58 +57,60 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     return ReferenceEquals(node, _first);
   }
 
-  public void AddLast (T node) {
+  public void AddLast(T node) {
     VerifyCanInsert(node);
 
     if (_count == 0) {
       InsertEmpty(node);
-    } else {
+    }
+    else {
       InsertBefore(node, _first);
     }
   }
 
-  public void AddFirst (T node) {
+  public void AddFirst(T node) {
     VerifyCanInsert(node);
 
     if (_count == 0) {
       InsertEmpty(node);
-    } else {
+    }
+    else {
       InsertBefore(node, _first);
       _first = node;
     }
   }
 
-  public T Remove (T node) {
+  public T Remove(T node) {
     VerifyInList(node);
     VerifyNotEmpty();
     RemoveNode(node);
     return node;
   }
 
-  public T RemoveFirst () {
+  public T RemoveFirst() {
     return Remove(_first);
   }
 
-  public T RemoveLast () {
-    return Remove((T) _first.prev);
+  public T RemoveLast() {
+    return Remove((T)_first.prev);
   }
 
-  public void Clear () {
+  public void Clear() {
     _first = null;
     _count = 0;
   }
 
-  public T Prev (T node) {
+  public T Prev(T node) {
     VerifyInList(node);
-    return (T) node.prev;
+    return (T)node.prev;
   }
 
-  public T Next (T node) {
+  public T Next(T node) {
     VerifyInList(node);
-    return (T) node.next;
+    return (T)node.next;
   }
 
-  public void Replace (T node, T newNode) {
+  public void Replace(T node, T newNode) {
     VerifyInList(node);
     VerifyCanInsert(newNode);
 
@@ -113,8 +119,8 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     newNode.next = node.next;
     newNode.prev = node.prev;
 
-    T next = (T) newNode.next;
-    T prev = (T) newNode.prev;
+    T next = (T)newNode.next;
+    T prev = (T)newNode.prev;
 
     next.prev = newNode;
     prev.next = newNode;
@@ -130,24 +136,24 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     node.next = null;
   }
 
-  void VerifyCanInsert (T node) {
+  void VerifyCanInsert(T node) {
     if (ReferenceEquals(node.list, null) == false) {
       throw new InvalidOperationException("Node is already in a list");
     }
   }
 
-  void VerifyInList (T node) {
+  void VerifyInList(T node) {
     if (ReferenceEquals(node.list, this) == false) {
       throw new InvalidOperationException("Node is not in this list");
     }
   }
 
-  void InsertBefore (T node, T before) {
+  void InsertBefore(T node, T before) {
     node.next = before;
     node.prev = before.prev;
 
-    T prev = (T) before.prev;
-    prev.next = (T) node;
+    T prev = (T)before.prev;
+    prev.next = (T)node;
 
     before.prev = node;
 
@@ -155,7 +161,7 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     ++_count;
   }
 
-  void InsertEmpty (T node) {
+  void InsertEmpty(T node) {
     _first = node;
     _first.next = node;
     _first.prev = node;
@@ -164,18 +170,19 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     ++_count;
   }
 
-  void RemoveNode (T node) {
+  void RemoveNode(T node) {
     if (_count == 1) {
       _first = null;
-    } else {
-      T next = (T) node.next;
-      T prev = (T) node.prev;
+    }
+    else {
+      T next = (T)node.next;
+      T prev = (T)node.prev;
 
       next.prev = node.prev;
       prev.next = node.next;
 
       if (ReferenceEquals(_first, node)) {
-        _first = (T) node.next;
+        _first = (T)node.next;
       }
     }
 
@@ -183,27 +190,27 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     --_count;
   }
 
-  void VerifyNotEmpty () {
+  void VerifyNotEmpty() {
     if (_count == 0)
       throw new InvalidOperationException("List is empty");
   }
 
-  public IEnumerator<T> GetEnumerator () {
+  public IEnumerator<T> GetEnumerator() {
     T n = _first;
     int c = count;
 
     while (c > 0) {
       yield return n;
-      n = (T) n.next;
+      n = (T)n.next;
       c = c - 1;
     }
   }
 
-  IEnumerator IEnumerable.GetEnumerator () {
+  IEnumerator IEnumerable.GetEnumerator() {
     return GetEnumerator();
   }
 
-  public static implicit operator bool (BoltDoubleList<T> list) {
+  public static implicit operator bool(BoltDoubleList<T> list) {
     return list != null;
   }
 }
