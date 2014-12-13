@@ -95,6 +95,10 @@ namespace Bolt {
     internal bool CanQueueCommands {
       get { return _canQueueCommands; }
     }
+    
+    public bool IsFrozen {
+      get { return BoltCore._entitiesFrozen.Contains(this); }
+    }
 
     object IBoltListNode.prev { get; set; }
     object IBoltListNode.next { get; set; }
@@ -149,6 +153,23 @@ namespace Bolt {
 
     internal void SetScope(BoltConnection connection, bool inScope) {
       connection._entityChannel.SetScope(this, inScope);
+    }
+
+    internal void Freeze(bool freeze) {
+      if (freeze) {
+        if (BoltCore._entities.Contains(this)) {
+          BoltCore._entities.Remove(this);
+          BoltCore._entitiesFrozen.AddLast(this);
+          BoltLog.Debug("FROZEN: {0}", this);
+        }
+      }
+      else {
+        if (BoltCore._entitiesFrozen.Contains(this)) {
+          BoltCore._entitiesFrozen.Remove(this);
+          BoltCore._entities.AddLast(this);
+          BoltLog.Debug("THAWED: {0}", this);
+        }
+      }
     }
 
     internal EntityProxy CreateProxy() {
@@ -292,7 +313,12 @@ namespace Bolt {
       Flags &= ~EntityFlags.ATTACHED;
 
       // remove from entities list
-      BoltCore._entities.Remove(this);
+      if (IsFrozen) {
+        BoltCore._entitiesFrozen.Remove(this);
+      }
+      else {
+        BoltCore._entities.Remove(this);
+      }
 
       // clear from unity object
       UnityObject._entity = null;

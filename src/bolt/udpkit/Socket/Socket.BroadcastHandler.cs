@@ -65,7 +65,6 @@ namespace UdpKit {
           catch (Exception exn) {
             UdpLog.Error(exn.ToString());
           }
-          finally 
 #endif
         }
       }

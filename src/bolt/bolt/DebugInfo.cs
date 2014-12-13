@@ -141,8 +141,6 @@ namespace Bolt {
       return Color.Lerp(BoltGUI.Green, BoltGUI.Error, t);
     }
 
-
-
     void DrawEntity(BoltEntity entity) {
       if (entity && entity.isAttached) {
         Camera c = Camera.main;
@@ -165,7 +163,7 @@ namespace Bolt {
       BoltNetworkInternal.DebugDrawer.IsEditor(false);
 
       {
-        Rect r = new Rect(10, Screen.height - 30, 300, 20);
+        Rect r = new Rect(10, Screen.height - 30, Screen.width - 420, 20);
 
         DrawBackground(r);
 
@@ -182,11 +180,13 @@ namespace Bolt {
 
         GUILayout.Label(string.Format("Poll {0} ms", pollTime), LabelStyleColor(GetColor(PollTime, 16)));
         GUILayout.Label(string.Format("Send {0} ms", sendTime), LabelStyleColor(GetColor(SendTime, 16)));
-        GUILayout.Label(string.Format("Total Entities {0}", BoltCore._entities.count), LabelStyle);
+        GUILayout.Label(string.Format("Active Entities {0}", BoltCore._entities.count), LabelStyle);
+        GUILayout.Label(string.Format("Frozen Entities {0}", BoltCore._entitiesFrozen.count), LabelStyle);
 
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
       }
+#if DEBUG
       {
         Camera c = Camera.main;
 
@@ -201,10 +201,10 @@ namespace Bolt {
         Entity entity = BoltCore._entities
           .Where(x => ignoreList.Contains(x.NetworkId) == false)
           .Where(x => {
-              Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
-              return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
+            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+            return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
           })
-          .OrderBy(x => { 
+          .OrderBy(x => {
             Vector3 vc = new Vector3(0.5f, 0.5f, 0f);
             Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
             vp.z = 0;
@@ -239,6 +239,7 @@ namespace Bolt {
           LabelBold("Entity Info");
           LabelField("Name", entity.UnityObject.gameObject.name);
           LabelField("Network Id", entity.NetworkId);
+          LabelField("Is Frozen", entity.IsFrozen);
 
           LabelField("World Position", entity.UnityObject.transform.position);
 
@@ -262,6 +263,7 @@ namespace Bolt {
           debugInfoScroll.y = Mathf.Min(debugInfoScroll.y + 10, 2000);
         }
       }
+#endif
     }
   }
 }

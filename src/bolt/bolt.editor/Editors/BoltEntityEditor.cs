@@ -45,20 +45,6 @@ public class BoltEntityEditor : Editor {
     GUILayout.Label("Settings", EditorStyles.boldLabel);
     EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
 
-    if (prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance) {
-      EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
-
-      if (entity.sceneGuid == Bolt.UniqueId.None) {
-        // create new scene id
-        entity.sceneGuid = Bolt.UniqueId.New();
-
-        // save shit (force)
-        EditorUtility.SetDirty(this);
-
-        // log it
-        Debug.Log(string.Format("Generated scene {0} for {1}", entity.sceneGuid, entity.gameObject.name));
-      }
-    }
 
     EditorGUI.BeginDisabledGroup(!canBeEdited);
 
@@ -81,6 +67,20 @@ public class BoltEntityEditor : Editor {
         break;
 
       case PrefabType.None:
+        if (entity._prefabId != 0) {
+          // force 0 prefab id
+          entity._prefabId = 0;
+
+          // set dirty
+          EditorUtility.SetDirty(this);
+        }
+
+        BoltEditorGUI.Disabled(() => {
+          EditorGUILayout.IntField("Prefab Id", entity._prefabId);
+        });
+
+        break;
+
       case PrefabType.DisconnectedPrefabInstance:
         entity._prefabId = EditorGUILayout.IntField("Prefab Id", entity._prefabId);
 
@@ -123,6 +123,26 @@ public class BoltEntityEditor : Editor {
     else {
       if (prefabType == PrefabType.Prefab || prefabType == PrefabType.None) {
         Save();
+      }
+    }
+
+    GUILayout.Label("Scene Entity Settings", EditorStyles.boldLabel);
+
+    if (prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance || prefabType == PrefabType.None) {
+      EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
+
+      entity._sceneObjectAutoAttach = EditorGUILayout.Toggle("Attach On Load", entity._sceneObjectAutoAttach);
+      entity._sceneObjectDestroyOnDetach = EditorGUILayout.Toggle("Destroy On Detach", entity._sceneObjectDestroyOnDetach);
+
+      if (entity.sceneGuid == Bolt.UniqueId.None) {
+        // create new scene id
+        entity.sceneGuid = Bolt.UniqueId.New();
+
+        // save shit (force)
+        EditorUtility.SetDirty(this);
+
+        // log it
+        Debug.Log(string.Format("Generated scene {0} for {1}", entity.sceneGuid, entity.gameObject.name));
       }
     }
   }

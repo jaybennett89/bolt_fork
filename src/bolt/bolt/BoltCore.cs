@@ -34,9 +34,11 @@ internal static class BoltCore {
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
+  static internal BoltDoubleList<Entity> _entitiesFrozen = new BoltDoubleList<Entity>();
+
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
-  static internal List<BoltEntity> _sceneObjects = new List<BoltEntity>();
+  static internal Dictionary<UniqueId, BoltEntity> _sceneObjects = new Dictionary<UniqueId, BoltEntity>(UniqueId.EqualityComparer.Instance);
 
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
@@ -797,13 +799,12 @@ internal static class BoltCore {
 
     PrefabDatabase.BuildCache();
 
-#if DEBUG
-    DebugInfo.ignoreList = new HashSet<NetworkId>();
-
     if (BoltRuntimeSettings.instance.showDebugInfo) {
+      DebugInfo.ignoreList = new HashSet<NetworkId>();
       DebugInfo.Show();
     }
 
+#if DEBUG
     if (BoltRuntimeSettings.instance.logUncaughtExceptions) {
       UE.Application.RegisterLogCallbackThreaded(UnityLogCallback);
     }
@@ -954,7 +955,7 @@ internal static class BoltCore {
     }
 
     // clear out scene entities
-    _sceneObjects = new List<BoltEntity>();
+    _sceneObjects = new Dictionary<UniqueId, BoltEntity>();
 
     // update behaviours
     UpdateActiveGlobalBehaviours(scene.Index);
@@ -971,38 +972,39 @@ internal static class BoltCore {
     // switch local state
     _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
 
-    // grab all scene entities
-    _sceneObjects =
-      UE.GameObject.FindObjectsOfType<BoltEntity>()
-        .Where(x => !x.isAttached && x.sceneGuid != UniqueId.None)
-        .ToList();
-
-    // update settings
-    foreach (var se in _sceneObjects) {
-      using (var mod = se.ModifySettings()) {
-        mod.clientPredicted = false;
-        mod.persistThroughSceneLoads = false;
-        mod.allowInstantiateOnClient = false;
-      }
-
-      // attach on server
-      if (isServer) {
-        BoltEntity entity;
-        entity = Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>();
-        entity.Entity.SceneId = se.sceneGuid;
-      }
-    }
-
-    BoltLog.Debug("Found {0} Scene Objects", _sceneObjects.Count);
+    // 
+    UpdateSceneObjectsLookup();
 
     // call out to user code
     BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
   }
 
-  internal static GameObject FindSceneObject(UniqueId uniqueId) {
-    BoltEntity entity = _sceneObjects.FirstOrDefault(x => x.sceneGuid == uniqueId);
+  internal static void UpdateSceneObjectsLookup() {
+    // grab all scene entities
+    _sceneObjects =
+      UE.GameObject.FindObjectsOfType<BoltEntity>()
+        .Where(x => x.sceneGuid != UniqueId.None)
+        .ToDictionary(x => x.sceneGuid);
 
-    if (entity) {
+    // how many?
+    BoltLog.Debug("Found {0} Scene Objects", _sceneObjects.Count);
+
+    // update settings
+    foreach (var se in _sceneObjects.Values) {
+      // attach on server
+      if (isServer && (se.isAttached == false) && se._sceneObjectAutoAttach) {
+        BoltEntity entity;
+
+        entity = Attach(se.gameObject, EntityFlags.SCENE_OBJECT).GetComponent<BoltEntity>();
+        entity.Entity.SceneId = se.sceneGuid;
+      }
+    }
+  }
+
+  internal static GameObject FindSceneObject(UniqueId uniqueId) {
+    BoltEntity entity;
+
+    if (_sceneObjects.TryGetValue(uniqueId, out entity)) {
       return entity.gameObject;
     }
 
