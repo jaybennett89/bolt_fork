@@ -102,7 +102,7 @@ namespace Bolt {
     }
 
     void InvokeCallbacks() {
-      while (Frames.first.IsZero == false) {
+      while (!Frames.first.IsZero) {
         // merge into default mask
         PropertyDefaultMask.Combine(Frames.first);
 
@@ -116,37 +116,54 @@ namespace Bolt {
         }
 
         // invoke callbacks
-        var bitsIterator = Frames.first.GetIterator();
-        var propertyIndex = -1;
+        for (var n = 0; n < BitSet.BITSET_LONGS; ++n) {
+          var v = Frames.first[n];
 
-        while (bitsIterator.Next(out propertyIndex)) {
-          // clear this propertys changed flag
-          Frames.first.Clear(propertyIndex);
+          if (v == 0UL) {
+            continue;
+          }
 
-          // invoke callback for it
-          InvokeCallbacksForProperty(propertyIndex);
+          // clear all bits
+          Frames.first[n] = 0UL;
+
+          for (var b = 0; b < 64; ++b) {
+            if ((v & (1UL << b)) == 0UL) {
+              continue;
+            }
+
+            // clear bit
+            v &= ~(1UL << b);
+
+            // invoke callbacks
+            InvokeCallbacksForProperty((n * 64) + b);
+          }
         }
       }
     }
 
     void InvokeCallbacksForProperty(int propertyIndex) {
-      NetworkPropertyInfo pi = Meta.Properties[propertyIndex];
+      try {
+        NetworkPropertyInfo pi = Meta.Properties[propertyIndex];
 
-      List<PropertyCallback> callbacks;
-      List<PropertyCallbackSimple> callbacksSimple;
+        List<PropertyCallback> callbacks;
+        List<PropertyCallbackSimple> callbacksSimple;
 
-      for (int i = 0; i < pi.Paths.Length; ++i) {
-        if (Callbacks.TryGetValue(pi.Paths[i], out callbacks)) {
-          for (int c = 0; c < callbacks.Count; ++c) {
-            callbacks[c](this, pi.Paths[pi.Paths.Length - 1], new ArrayIndices(pi.Indices));
+        for (int i = 0; i < pi.Paths.Length; ++i) {
+          if (Callbacks.TryGetValue(pi.Paths[i], out callbacks)) {
+            for (int c = 0; c < callbacks.Count; ++c) {
+              callbacks[c](this, pi.Paths[pi.Paths.Length - 1], new ArrayIndices(pi.Indices));
+            }
+          }
+
+          if (CallbacksSimple.TryGetValue(pi.Paths[i], out callbacksSimple)) {
+            for (int c = 0; c < callbacksSimple.Count; ++c) {
+              callbacksSimple[c]();
+            }
           }
         }
-
-        if (CallbacksSimple.TryGetValue(pi.Paths[i], out callbacksSimple)) {
-          for (int c = 0; c < callbacksSimple.Count; ++c) {
-            callbacksSimple[c]();
-          }
-        }
+      }
+      catch (Exception exn) {
+        BoltLog.Exception(exn);
       }
     }
 

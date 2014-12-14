@@ -30,6 +30,7 @@ namespace Bolt {
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
+    internal bool CanFreeze = true;
     internal ushort CommandSequence = 0;
     internal Command CommandLastExecuted = null;
 
@@ -157,10 +158,12 @@ namespace Bolt {
 
     internal void Freeze(bool freeze) {
       if (freeze) {
-        if (BoltCore._entities.Contains(this)) {
-          BoltCore._entities.Remove(this);
-          BoltCore._entitiesFrozen.AddLast(this);
-          BoltLog.Debug("FROZEN: {0}", this);
+        if (CanFreeze) {
+          if (BoltCore._entities.Contains(this)) {
+            BoltCore._entities.Remove(this);
+            BoltCore._entitiesFrozen.AddLast(this);
+            BoltLog.Debug("FROZEN: {0}", this);
+          }
         }
       }
       else {

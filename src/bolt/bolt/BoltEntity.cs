@@ -142,6 +142,11 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.NetworkId; }
   }
 
+  public bool canFreeze {
+    get { return Entity.CanFreeze; }
+    set { Entity.CanFreeze = value; }
+  }
+
   /// <summary>
   /// If this entity is controlled by a remote connection it contains that connection, otherwise null
   /// </summary>

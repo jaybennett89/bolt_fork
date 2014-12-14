@@ -278,98 +278,54 @@ namespace Bolt {
 		  }
 		}
 		
-		public Iterator GetIterator() {
-		  return new Iterator(this);
-		}
-
-		  public struct Iterator {
-			int number;
-			int numberBit;
-
-			BitSet set;
-
-			public Iterator(BitSet set) {
-			  this.number = 0;
-			  this.numberBit = 0;
-			  this.set = set;
-			}
-
-			public bool Next(out int bit) {
-			  ulong bits;
-
-			  while (true) {
-
-				switch (number) {
-
-									case 0: bits = set.Bits0; break;
-									case 1: bits = set.Bits1; break;
-									case 2: bits = set.Bits2; break;
-									case 3: bits = set.Bits3; break;
-									case 4: bits = set.Bits4; break;
-									case 5: bits = set.Bits5; break;
-									case 6: bits = set.Bits6; break;
-									case 7: bits = set.Bits7; break;
-									case 8: bits = set.Bits8; break;
-									case 9: bits = set.Bits9; break;
-									case 10: bits = set.Bits10; break;
-									case 11: bits = set.Bits11; break;
-									case 12: bits = set.Bits12; break;
-									case 13: bits = set.Bits13; break;
-									case 14: bits = set.Bits14; break;
-									case 15: bits = set.Bits15; break;
-				
-				  case 16:
-					bit = -1;
-					return false;
-
-				  default:
-					throw new InvalidOperationException();
-				}
-
-				if (bits == 0) {
-				  number = number + 1;
-				  numberBit = 0;
-				}
-				else {
-				  for (; numberBit < 64; ++numberBit) {
-					if ((bits & (1UL << numberBit)) != 0UL) {
-					  switch (number) {
-													case 0: set.Bits0 &= ~(1UL << numberBit); break;
-													case 1: set.Bits1 &= ~(1UL << numberBit); break;
-													case 2: set.Bits2 &= ~(1UL << numberBit); break;
-													case 3: set.Bits3 &= ~(1UL << numberBit); break;
-													case 4: set.Bits4 &= ~(1UL << numberBit); break;
-													case 5: set.Bits5 &= ~(1UL << numberBit); break;
-													case 6: set.Bits6 &= ~(1UL << numberBit); break;
-													case 7: set.Bits7 &= ~(1UL << numberBit); break;
-													case 8: set.Bits8 &= ~(1UL << numberBit); break;
-													case 9: set.Bits9 &= ~(1UL << numberBit); break;
-													case 10: set.Bits10 &= ~(1UL << numberBit); break;
-													case 11: set.Bits11 &= ~(1UL << numberBit); break;
-													case 12: set.Bits12 &= ~(1UL << numberBit); break;
-													case 13: set.Bits13 &= ~(1UL << numberBit); break;
-													case 14: set.Bits14 &= ~(1UL << numberBit); break;
-													case 15: set.Bits15 &= ~(1UL << numberBit); break;
-												
-						default:
-						throw new InvalidOperationException();
-					  }
-
-					  // set bit we found
-					  bit = (number * 64) + numberBit;
-
-					  // done!
-					  return true;
-					}
-				  }
-
-				  throw new InvalidOperationException();
-				}
-			  }
-			}
+		
+		public ulong this[int index] {
+		  get { 
+		  switch(index) {
+						case 0: return this.Bits0;
+						case 1: return this.Bits1;
+						case 2: return this.Bits2;
+						case 3: return this.Bits3;
+						case 4: return this.Bits4;
+						case 5: return this.Bits5;
+						case 6: return this.Bits6;
+						case 7: return this.Bits7;
+						case 8: return this.Bits8;
+						case 9: return this.Bits9;
+						case 10: return this.Bits10;
+						case 11: return this.Bits11;
+						case 12: return this.Bits12;
+						case 13: return this.Bits13;
+						case 14: return this.Bits14;
+						case 15: return this.Bits15;
+						
+			default:
+			  throw new IndexOutOfRangeException();
 		  }
-
+		  }
+		  set {
+		  switch(index) {
+						case 0: this.Bits0 = value; break;
+						case 1: this.Bits1 = value; break;
+						case 2: this.Bits2 = value; break;
+						case 3: this.Bits3 = value; break;
+						case 4: this.Bits4 = value; break;
+						case 5: this.Bits5 = value; break;
+						case 6: this.Bits6 = value; break;
+						case 7: this.Bits7 = value; break;
+						case 8: this.Bits8 = value; break;
+						case 9: this.Bits9 = value; break;
+						case 10: this.Bits10 = value; break;
+						case 11: this.Bits11 = value; break;
+						case 12: this.Bits12 = value; break;
+						case 13: this.Bits13 = value; break;
+						case 14: this.Bits14 = value; break;
+						case 15: this.Bits15 = value; break;
+						
+			default:
+			  throw new IndexOutOfRangeException();
+		  }
+		  }
+		}
 	}
-
-	
 }
