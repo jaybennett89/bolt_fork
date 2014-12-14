@@ -94,6 +94,8 @@ namespace UdpKit {
           // grab connection id from token with prefix
           ConnectionId = BitConverter.ToUInt32(AcceptTokenWithPrefix, 0);
 
+          UdpLog.Debug("Assigned Connection Id {0} from server", ConnectionId);
+
           // gotta be larger than 1
           UdpAssert.Assert(ConnectionId > 1u);
 
