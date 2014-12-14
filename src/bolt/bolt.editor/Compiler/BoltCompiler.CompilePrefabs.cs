@@ -22,6 +22,7 @@ partial class BoltCompiler {
 
       if (entity) {
         entity._prefabId = id;
+        entity._sceneGuid = null;
 
         if (settings.clientCanInstantiateAll) {
           entity._allowInstantiateOnClient = true;

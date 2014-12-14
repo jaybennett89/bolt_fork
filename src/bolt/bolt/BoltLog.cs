@@ -184,7 +184,7 @@ public static class BoltLog {
       _writers.Add(instance);
     }
   }
-  
+
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
@@ -202,35 +202,35 @@ public static class BoltLog {
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Info(object message) {
-    Info(message.ToString());
+    Info(Format(message));
   }
-  
+
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Info(string message, object arg0) {
-    Info(string.Format(message, arg0));
+    Info(Format(message, arg0));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Info(string message, object arg0, object arg1) {
-    Info(string.Format(message, arg0, arg1));
+    Info(Format(message, arg0, arg1));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Info(string message, object arg0, object arg1, object arg2) {
-    Info(string.Format(message, arg0, arg1, arg2));
+    Info(Format(message, arg0, arg1, arg2));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Info(string message, params object[] args) {
-    Info(string.Format(message, args));
+    Info(Format(message, args));
   }
 
 #if !DEBUG && !LOG
@@ -250,35 +250,35 @@ public static class BoltLog {
   [Conditional("_DISABLE_LOG_")]
 #endif
   internal static void Debug(object message) {
-    Debug(message.ToString());
+    Debug(Format(message));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   internal static void Debug(string message, object arg0) {
-    Debug(string.Format(message, arg0));
+    Debug(Format(message, arg0));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   internal static void Debug(string message, object arg0, object arg1) {
-    Debug(string.Format(message, arg0, arg1));
+    Debug(Format(message, arg0, arg1));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   internal static void Debug(string message, object arg0, object arg1, object arg2) {
-    Debug(string.Format(message, arg0, arg1, arg2));
+    Debug(Format(message, arg0, arg1, arg2));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   internal static void Debug(string message, params object[] args) {
-    Debug(string.Format(message, args));
+    Debug(Format(message, args));
   }
 
   static void VerifyOneWriter() {
@@ -304,35 +304,49 @@ public static class BoltLog {
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Warn(object message) {
-    Warn(message.ToString());
+    Warn(Format(message));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Warn(string message, object arg0) {
-    Warn(string.Format(message, arg0));
+    Warn(Format(message, arg0));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Warn(string message, object arg0, object arg1) {
-    Warn(string.Format(message, arg0, arg1));
+    Warn(Format(message, arg0, arg1));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Warn(string message, object arg0, object arg1, object arg2) {
-    Warn(string.Format(message, arg0, arg1, arg2));
+    Warn(Format(message, arg0, arg1, arg2));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Warn(string message, params object[] args) {
-    Warn(string.Format(message, args));
+    Warn(Format(message, FixNulls(args)));
+  }
+
+  static object[] FixNulls(object[] args) {
+    if (args == null) {
+      args = new object[0];
+    }
+
+    for (int i = 0; i < args.Length; ++i) {
+      if (ReferenceEquals(args[i], null)) {
+        args[i] = "NULL";
+      }
+    }
+
+    return args;
   }
 
 #if !DEBUG && !LOG
@@ -352,35 +366,35 @@ public static class BoltLog {
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Error(object message) {
-    Error(message.ToString());
+    Error(Format(message));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Error(string message, object arg0) {
-    Error(string.Format(message, arg0));
+    Error(Format(message, arg0));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Error(string message, object arg0, object arg1) {
-    Error(string.Format(message, arg0, arg1));
+    Error(Format(message, arg0, arg1));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Error(string message, object arg0, object arg1, object arg2) {
-    Error(string.Format(message, arg0, arg1, arg2));
+    Error(Format(message, arg0, arg1, arg2));
   }
 
 #if !DEBUG && !LOG
   [Conditional("_DISABLE_LOG_")]
 #endif
   public static void Error(string message, params object[] args) {
-    Error(string.Format(message, args));
+    Error(Format(message, args));
   }
 
 #if !DEBUG && !LOG
@@ -393,5 +407,34 @@ public static class BoltLog {
         _writers[i].Error(exception.StackTrace);
       }
     }
+  }
+
+
+  static string Format(object message) {
+    return message == null ? "NULL" : message.ToString();
+  }
+
+  static string Format(string message, object arg0) {
+    return string.Format(Format(message), Format(arg0));
+  }
+
+  static string Format(string message, object arg0, object arg1) {
+    return string.Format(Format(message), Format(arg0), Format(arg1));
+  }
+
+  static string Format(string message, object arg0, object arg1, object arg2) {
+    return string.Format(Format(message), Format(arg0), Format(arg1), Format(arg2));
+  }
+
+  static string Format(string message, object[] args) {
+    if (args == null) {
+      return Format(message);
+    }
+
+    for (int i = 0; i < args.Length; ++i) {
+      args[i] = Format(args[i]);
+    }
+
+    return string.Format(Format(message), args);
   }
 }

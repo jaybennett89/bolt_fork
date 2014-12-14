@@ -17,10 +17,14 @@ namespace Bolt {
     }
 
     public static void Assigned(uint connectionId) {
-      Assert.True(BoltCore.isClient);
-      Assert.True(connectionId > 0u);
-      Assert.True(connectionId != uint.MaxValue);
-      Assert.True(ConnectionId == uint.MaxValue);
+      BoltLog.Debug("Assigned id {0} from server", connectionId);
+
+      Assert.True(BoltCore.isClient, "BoltCore.isClient");
+      Assert.True(connectionId > 0u, "connectionId > 0u");
+      Assert.True(connectionId != uint.MaxValue, "connectionId != uint.MaxValue");
+
+      // verify connection id
+      Assert.True(ConnectionId == uint.MaxValue, "ConnectionId == uint.MaxValue");
 
       BoltLog.Debug("Assigned id {0} from server", connectionId);
 
