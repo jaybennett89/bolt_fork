@@ -129,14 +129,14 @@ public class BoltEntityEditor : Editor {
     bool isSceneObject = prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance || prefabType == PrefabType.None;
 
     GUILayout.Label("Scene Entity Settings", EditorStyles.boldLabel);
-    EditorGUI.BeginDisabledGroup(isSceneObject == false);
+    EditorGUI.BeginDisabledGroup(!isSceneObject || !canBeEdited);
 
     EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
 
     entity._sceneObjectAutoAttach = EditorGUILayout.Toggle("Attach On Load", entity._sceneObjectAutoAttach);
     entity._sceneObjectDestroyOnDetach = EditorGUILayout.Toggle("Destroy On Detach", entity._sceneObjectDestroyOnDetach);
 
-    if (isSceneObject && (Application.isPlaying == false) && (entity.sceneGuid == Bolt.UniqueId.None)) {
+    if (isSceneObject && !Application.isPlaying && (entity.sceneGuid == Bolt.UniqueId.None)) {
       // create new scene id
       entity.sceneGuid = Bolt.UniqueId.New();
 
