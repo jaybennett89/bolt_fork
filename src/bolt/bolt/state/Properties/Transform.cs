@@ -146,69 +146,77 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(NetworkObj obj) {
-      if (obj.RootState.Entity.IsDummy) {
-        var nt = obj.Storage.Values[obj[this]].Transform;
-        if (nt != null && nt.Simulate) {
-          var snapped = false;
-          if (Extrapolation.Enabled) {
-            UE.Vector3 pos;
-            UE.Quaternion rot;
+      var root = (NetworkState)obj.Root;
 
-            pos = Math.ExtrapolateVector(
-              /* currentPosition */   nt.Simulate.localPosition,
-              /* receivedPosition */  obj.Storage.Values[obj[this] + POSITION].Vector3,
-              /* receivedVelocity */  obj.Storage.Values[obj[this] + VELOCITY].Vector3,
-              /* receivedFrame */     obj.RootState.Frames.first.Frame,
-              /* entityFrame */       obj.RootState.Entity.Frame,
-              /* extrapolation */     Extrapolation,
-              /* snapping */          ref snapped
-            );
+      if (root.Entity.IsOwner) {
+        return;
+      }
 
-            rot = Math.ExtrapolateQuaternion(
-              /* currentRotation */   nt.Simulate.localRotation,
-              /* receivedRotation */  obj.Storage.Values[obj[this] + ROTATION].Quaternion,
-              /* receivedFrame */     obj.RootState.Frames.first.Frame,
-              /* entityFrame */       obj.RootState.Entity.Frame,
-              /* extrapolation */     Extrapolation
-            );
+      if (root.Entity.HasControl && !ToController) {
+        return;
+      }
 
-            nt.Simulate.localPosition = nt.Clamper(obj.RootState.Entity.UnityObject, pos);
-            nt.Simulate.localRotation = rot;
-          }
-          else if (Interpolation.Enabled) {
-            // position
-            nt.Simulate.localPosition = Math.InterpolateVector(
-              obj.RootState.Frames,
-              obj[this] + POSITION,
-              obj.RootState.Entity.Frame,
-              Interpolation.SnapMagnitude,
-              ref snapped
-            );
+      var nt = obj.Storage.Values[obj[this]].Transform;
+      if (nt != null && nt.Simulate) {
+        var snapped = false;
+        if (Extrapolation.Enabled) {
+          UE.Vector3 pos;
+          UE.Quaternion rot;
 
-            // rotation
-            nt.Simulate.localRotation = Math.InterpolateQuaternion(
-              obj.RootState.Frames,
-              obj[this] + ROTATION,
-              obj.RootState.Entity.Frame
-            );
-          }
-          else {
-            // always snapped on this
-            snapped = true;
+          pos = Math.ExtrapolateVector(
+            /* currentPosition */   nt.Simulate.localPosition,
+            /* receivedPosition */  obj.Storage.Values[obj[this] + POSITION].Vector3,
+            /* receivedVelocity */  obj.Storage.Values[obj[this] + VELOCITY].Vector3,
+            /* receivedFrame */     obj.RootState.Frames.first.Frame,
+            /* entityFrame */       obj.RootState.Entity.Frame,
+            /* extrapolation */     Extrapolation,
+            /* snapping */          ref snapped
+          );
 
-            // position
-            nt.Simulate.localPosition = obj.Storage.Values[obj[this] + POSITION].Vector3;
+          rot = Math.ExtrapolateQuaternion(
+            /* currentRotation */   nt.Simulate.localRotation,
+            /* receivedRotation */  obj.Storage.Values[obj[this] + ROTATION].Quaternion,
+            /* receivedFrame */     obj.RootState.Frames.first.Frame,
+            /* entityFrame */       obj.RootState.Entity.Frame,
+            /* extrapolation */     Extrapolation
+          );
 
-            // rotation
-            nt.Simulate.localRotation = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
-          }
+          nt.Simulate.localPosition = nt.Clamper(obj.RootState.Entity.UnityObject, pos);
+          nt.Simulate.localRotation = rot;
+        }
+        else if (Interpolation.Enabled) {
+          // position
+          nt.Simulate.localPosition = Math.InterpolateVector(
+            obj.RootState.Frames,
+            obj[this] + POSITION,
+            obj.RootState.Entity.Frame,
+            Interpolation.SnapMagnitude,
+            ref snapped
+          );
 
-          if (snapped) {
-            nt.RenderDoubleBufferPosition =
-              nt.RenderDoubleBufferPosition
-                .Shift(nt.Simulate.position)
-                .Shift(nt.Simulate.position);
-          }
+          // rotation
+          nt.Simulate.localRotation = Math.InterpolateQuaternion(
+            obj.RootState.Frames,
+            obj[this] + ROTATION,
+            obj.RootState.Entity.Frame
+          );
+        }
+        else {
+          // always snapped on this
+          snapped = true;
+
+          // position
+          nt.Simulate.localPosition = obj.Storage.Values[obj[this] + POSITION].Vector3;
+
+          // rotation
+          nt.Simulate.localRotation = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+        }
+
+        if (snapped) {
+          nt.RenderDoubleBufferPosition =
+            nt.RenderDoubleBufferPosition
+              .Shift(nt.Simulate.position)
+              .Shift(nt.Simulate.position);
         }
       }
     }

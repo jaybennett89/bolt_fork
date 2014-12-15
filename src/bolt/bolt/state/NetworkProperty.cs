@@ -12,6 +12,9 @@ namespace Bolt {
     public Int32 PropertyPriority;
     public NetworkObj_Meta PropertyMeta;
 
+    public bool ToProxies;
+    public bool ToController;
+
     public PropertyInterpolationSettings Interpolation;
 
     public virtual bool AllowCallbacks { get { return true; } }
@@ -25,6 +28,9 @@ namespace Bolt {
       PropertyName = name;
       PropertyFilters = filters;
       PropertyPriority = UE.Mathf.Clamp(priority, 1, 100);
+
+      ToProxies = (filters & (1 << 30)) == (1 << 30);
+      ToController = (filters & (1 << 31)) == (1 << 31);
     }
 
     public void Settings_Offsets(Int32 properties, Int32 storage) {

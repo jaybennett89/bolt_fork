@@ -42,6 +42,17 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
         BoltNetwork.Instantiate(BoltPrefabs.SceneCube, new Vector3(Random.value * 512, Random.value * 512, Random.value * 512), Quaternion.identity);
       }
     }
+
+    if (entity.hasControl) {
+      for (int k = 0; k < ints.Length; ++k) {
+        if (ints[k] != 3) {
+          //BoltLog.Warn("MISSING {0}", k);
+          return;
+        }
+      }
+
+      //BoltLog.Error("ALL RECEIVED");
+    }
   }
 
   void PollKeys(bool mouse) {
@@ -69,8 +80,35 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     }
   }
 
+  static int[] ints = new int[128];
+
   public override void Attached(Bolt.IProtocolToken token) {
     BoltLog.Info("Attached-Token: {0}", token);
+
+    if (entity.isOwner) {
+      state.TEST = 10;
+
+      for (int i = 0; i < state.NewProperty.Length; ++i) {
+        state.NewProperty[i] = i + 1;
+      }
+    }
+    else {
+      BoltLog.Error("TEST VALUE = {0}", state.TEST);
+    }
+
+    //state.AddCallback("NewProperty[]", (s, p, i) => {
+    //  int n = i[0];
+    //  ints[n] += 1;
+
+    //  if (state.NewProperty[n] != n + 1) {
+    //    BoltLog.Error("IS WRONG VALUE {0} - {1}", state.NewProperty[n], n + 1);
+    //  }
+
+    //  //BoltLog.Error("NewProperty[{0}] = {1} ({2})", n, state.NewProperty[n], ints[n]);
+
+    //});
+
+    //state.AddCallback("TEST", () => { BoltLog.Error("TEST IS {0}", state.TEST); });
 
     state.transform.SetTransforms(transform);
     state.SetAnimator(GetComponentInChildren<Animator>());

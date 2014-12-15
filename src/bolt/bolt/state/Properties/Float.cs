@@ -9,6 +9,16 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(NetworkObj obj) {
+      var root = (NetworkState)obj.Root;
+
+      if (root.Entity.IsOwner) {
+        return;
+      }
+
+      if (root.Entity.HasControl && !ToController) {
+        return;
+      }
+
       if (Interpolation.Enabled) {
         obj.Storage.Values[obj[this]].Float0 = Math.InterpolateFloat(obj.RootState.Frames, obj[this], obj.RootState.Entity.Frame);
       }
