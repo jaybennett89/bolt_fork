@@ -183,6 +183,7 @@
     <Compile Include="BoltEntity.cs" />
     <Compile Include="entity\EntityChannel.cs" />
     <Compile Include="entity\EntityProxy.cs" />
+    <Compile Include="UnityCache.cs" />
     <Compile Include="UPnP.cs" />
     <Compile Include="utils\Assert.cs" />
     <Compile Include="BoltUtils.cs" />

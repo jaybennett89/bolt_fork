@@ -46,6 +46,8 @@ MonoBehaviour:
   _clientPredicted: 1
   _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0
+  _sceneObjectDestroyOnDetach: 0
+  _sceneObjectAutoAttach: 0
   _alwaysProxy: 0
 --- !u!1001 &100100000
 Prefab:
