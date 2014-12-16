@@ -577,7 +577,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var player = BoltNetwork.Instantiate(playerPrefab);
   ///   player.transform.position = spawnPoint.transform.position;
   ///   
@@ -602,7 +602,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   var player = BoltNetwork.Instantiate(playerPrefab, initData);
   ///   player.AssignControl(connection);
@@ -623,7 +623,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var player = BoltNetwork.Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
   ///   
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
@@ -649,7 +649,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   var player = BoltNetwork.Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
   ///   
@@ -681,7 +681,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player, initData);
   ///   player.AssignControl(connection);
@@ -702,7 +702,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player, initData);
   ///   player.AssignControl(connection);
@@ -724,7 +724,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player, spawnPoint.position, spawnPoint.rotation);
   ///   
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
@@ -749,7 +749,7 @@ public static class BoltNetwork {
   /// <returns>A reference to the new bolt entity</returns>
   /// <example>
   /// ```
-  /// public override void SceneLoadRemoteDone(BoltConnection connect) {
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player, spawnPoint.position, spawnPoint.rotation);
   ///   
