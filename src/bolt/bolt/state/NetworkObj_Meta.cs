@@ -35,6 +35,8 @@ namespace Bolt {
 
     internal NetworkObj_Meta() {
       Filters = new BitSet[32];
+      Filters[31] = new BitSet();
+      Filters[30] = new BitSet();
     }
 
     void AddPropertyToArray(int offsetProperties, int offsetObjects, NetworkProperty property) {
