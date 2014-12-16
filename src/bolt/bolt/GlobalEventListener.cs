@@ -28,6 +28,14 @@ namespace BoltInternal {
     /// Override this method and return true if you want the event listener to keep being attached to Bolt even when Bolt shuts down and starts again.
     /// </summary>
     /// <returns>True/False</returns>
+    /// <example>
+    /// ```
+    /// public override bool PersistBetweenStartupAndShutdown() {
+    ///   return true;
+    /// }
+    /// ```
+    /// **Ex.** Configuring the persistence behaviour to keep this listener alive between startup and shutdown.
+    /// </example>
     public virtual bool PersistBetweenStartupAndShutdown() {
       return false;
     }
