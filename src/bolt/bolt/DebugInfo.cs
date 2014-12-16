@@ -150,7 +150,7 @@ namespace Bolt {
 
           if (vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1) {
             Vector3 sp = c.WorldToScreenPoint(entity.transform.position);
-            Rect r = new Rect(sp.x - 16, (Screen.height - sp.y) - 16, 32, 32);
+            Rect r = new Rect(sp.x - 8, (Screen.height - sp.y) - 8, 16, 16);
             DebugInfo.DrawBackground(r);
 
             GUI.DrawTexture(r, DebugInfo.BoltIconTexture);
