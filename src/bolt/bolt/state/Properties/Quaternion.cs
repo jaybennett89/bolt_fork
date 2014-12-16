@@ -6,7 +6,9 @@ namespace Bolt {
     PropertyQuaternionCompression Compression;
 
     public override bool WantsOnSimulateBefore {
-      get { return Interpolation.Enabled; }
+      get {
+        return Interpolation.Enabled;
+      }
     }
 
     public void Settings_Quaternion(PropertyFloatCompressionSettings compression) {
@@ -59,8 +61,23 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(NetworkObj obj) {
+      var root = (NetworkState)obj.Root;
+
+      if (root.Entity.IsOwner) {
+        return;
+      }
+
+      if (root.Entity.HasControl && !ToController) {
+        return;
+      }
+
       if (Interpolation.Enabled) {
-        obj.Storage.Values[obj[this]].Quaternion = Math.InterpolateQuaternion(obj.RootState.Frames, obj[this] + 1, obj.RootState.Entity.Frame);
+        var it = root.Frames.GetIterator();
+        var value = Math.InterpolateQuaternion(obj.RootState.Frames, obj[this] + 1, obj.RootState.Entity.Frame);
+
+        while (it.Next()) {
+          it.val.Values[obj[this]].Quaternion = value;
+        }
       }
     }
   }

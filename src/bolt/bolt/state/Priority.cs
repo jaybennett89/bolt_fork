@@ -10,7 +10,7 @@ namespace Bolt {
       }
 
       int IComparer<Priority>.Compare(Priority x, Priority y) {
-        return y.PropertyPriority - x.PropertyPriority;
+        return y.PropertyPriority.CompareTo(x.PropertyPriority);
       }
     }
 

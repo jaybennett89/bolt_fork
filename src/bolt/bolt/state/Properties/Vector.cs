@@ -74,8 +74,23 @@ namespace Bolt {
     }
 
     public override void OnSimulateBefore(NetworkObj obj) {
+      var root = (NetworkState)obj.Root;
+
+      if (root.Entity.IsOwner) {
+        return;
+      }
+
+      if (root.Entity.HasControl && !ToController) {
+        return;
+      }
+
       if (Interpolation.Enabled) {
-        obj.Storage.Values[obj[this]].Vector3 = Math.InterpolateVector(obj.RootState.Frames, obj[this] + 1, obj.RootState.Entity.Frame, Interpolation.SnapMagnitude);
+        var it = root.Frames.GetIterator();
+        var value = Math.InterpolateVector(obj.RootState.Frames, obj[this] + 1, obj.RootState.Entity.Frame, Interpolation.SnapMagnitude);
+
+        while (it.Next()) {
+          it.val.Values[obj[this]].Vector3 = value;
+        }
       }
     }
   }

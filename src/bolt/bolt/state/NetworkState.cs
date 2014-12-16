@@ -27,6 +27,8 @@ namespace Bolt {
     internal NetworkState(NetworkState_Meta meta)
       : base(meta) {
       Meta = meta;
+      Meta.PropertyIdBits = 32;
+      Meta.PacketMaxPropertiesBits = 8;
     }
 
     public void SetAnimator(UE.Animator animator) {
