@@ -9,6 +9,18 @@ public struct PacketStats {
   public int CommandBits;
 }
 
+/// <summary>
+/// The connection to a remote endpoint
+/// </summary>
+/// <example>
+/// *Example:* Accepting an incoming connection.
+/// 
+/// ```csharp
+/// public override void ConnectRequest(UdpEndPoint endpoint) {
+///   BoltNetwork.Accept(endPoint);
+/// }
+/// ```
+/// </example>
 [DocumentationAttribute]
 public class BoltConnection : BoltObject {
 
@@ -42,8 +54,19 @@ public class BoltConnection : BoltObject {
   internal SceneLoadState _remoteSceneLoading;
 
   /// <summary>
-  /// Returns true if the remote computer on the other end of this connection is loading a map currently
+  /// Returns true if the remote computer on the other end of this connection is loading a map currently, otherwise false
   /// </summary>
+  /// <example>
+  /// *Example:* Removing a preloaded player entity from the game if they disconnect while loading.
+  /// 
+  /// ```csharp
+  /// public override void Disconnected(BoltConnection connection) {
+  ///   if(connection.isLoadingMap) {
+  ///     PlayerEntityList.instance.RemoveFor(connection);
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public bool isLoadingMap {
     get {
       return
@@ -52,15 +75,72 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  /// <summary>
+  /// The estimated frame of the simulation running at the other end of this connection
+  /// </summary>
+  /// <example>
+  /// *Example:* Calculating the average frame difference of the client and server for all clients.
+  /// 
+  /// ```csharp
+  /// float EstimateFrameDiff() {
+  ///   int count
+  ///   float avg;
+  ///   
+  ///   foreach(BoltConnection client in BoltNetwork.clients) {
+  ///     count++;
+  ///     avg += BoltNetwork.serverFrame - client.remoteFrame;
+  ///   }
+  ///   avg = avg / count;
+  ///   return avg;
+  /// }
+  /// ```
+  /// </example>
   public int remoteFrame {
     get { return _remoteFrameEstimated; }
   }
 
+  /// <summary>
+  /// A data token that was passed by the client when initiating a connection
+  /// </summary>
+  /// <example>
+  /// *Example:* Using the ```UserInfo``` token to get a fingerprint that identifies the client's local computer.
+  /// 
+  /// ```csharp
+  /// void StorePlayerScore(BoltConnection connection, ScoreData score) {
+  ///   Guid fingerprint;  
+  /// 
+  ///   UserInfo userInfo = (UserInfo)ConnectToken;
+  ///   if(userInfo.fingerprint != null) {
+  ///     fingerprint = userInfo.fingerprint;  
+  ///   }
+  ///   else {
+  ///     fingerprint = Guid.NewGuid();
+  ///     userInfo.fingerprint = fingerprint;
+  ///   }
+  ///   
+  ///   database.PersistScore(userInfo.name, fingerprint, score);
+  /// }
+  /// ```
+  /// </example>
   public IProtocolToken ConnectToken {
     get;
     internal set;
   }
 
+  /// <summary>
+  /// A data token that was passed by the server when accepting the connection
+  /// </summary>
+  /// <example>
+  /// *Example:* Using the ```AcceptToken``` to store connection settings.
+  /// 
+  /// ```csharp
+  /// public override void Disconnected(BoltConnection connection, IProtocolToken token) {
+  ///   ConnectionSettings connSettings = (ConnectionSettings)token;
+  ///   
+  ///   StartCoroutine(RemoveIfTimeout(connection, connSettings.maxTimeout));
+  /// }
+  /// ```
+  /// </example>
   public IProtocolToken AcceptToken {
     get;
     internal set;
@@ -71,14 +151,59 @@ public class BoltConnection : BoltObject {
     get { return _udp.NetworkPing; }
   }
 
+  /// <summary>
+  /// The round-trip time on the network
+  /// </summary>
+  /// <example>
+  /// *Example:* Displaying the network ping when in debug mode.
+  /// 
+  /// ```csharp
+  /// void OnGUI() {
+  ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public float pingNetwork {
     get { return _udp.NetworkPing; }
   }
 
+  /// <summary>
+  /// The dejitter delay in number of frames
+  /// </summary>
+  /// <example>
+  /// *Example:* Showing the dejitter delay frames and ping.
+  /// 
+  /// ```csharp
+  /// void OnGUI() {
+  ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///     GUILayout.Label("Dejitter Delay:" + BoltNetwork.server.dejitterFrames;
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public int dejitterFrames {
     get { return _remoteFrameActual - _remoteFrameEstimated; }
   }
 
+
+  /// <summary>
+  /// The round-trip time across the network, including processing delays and acks
+  /// </summary>
+  /// <example>
+  /// *Example:* Showing the difference between ping and aliased ping. Aliased ping will always be larger.
+  /// 
+  /// ```csharp
+  /// void OnGUI() {
+  ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///     GUILayout.Label("Ping (Aliased):" + BoltNetwork.server.pingAliased;
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public float pingAliased {
     get { return _udp.AliasedPing; }
   }
@@ -98,6 +223,19 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// How many bits per second we are receiving in
   /// </summary>
+  /// <example>
+  /// *Example:* Showing the ping and data flow in and out.
+  /// 
+  /// ```csharp
+  /// void OnGUI() {
+  ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///     GUILayout.Label("Bandwidth Out:" + BoltNetwork.server.bitsPerSecondIn);
+  ///     GUILayout.Label("Bandwidth In:" + BoltNetwork.server.bitsPerSecondOut);
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public int bitsPerSecondIn {
     get { return _bitsSecondIn; }
   }
@@ -105,10 +243,26 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// How many bits per second we are sending out
   /// </summary>
+  /// <example>
+  /// *Example:* Showing the ping and data flow in and out.
+  /// 
+  /// ```csharp
+  /// void OnGUI() {
+  ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///     GUILayout.Label("Bandwidth Out:" + BoltNetwork.server.bitsPerSecondIn);
+  ///     GUILayout.Label("Bandwidth In:" + BoltNetwork.server.bitsPerSecondOut);
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public int bitsPerSecondOut {
     get { return _bitsSecondOut; }
   }
 
+  /// <summary>
+  /// The internal id of this connection
+  /// </summary>
   public uint ConnectionId {
     get { return udpConnection.ConnectionId; }
   }
@@ -116,6 +270,15 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// Remote end point of this connection
   /// </summary>
+  /// <example>
+  /// *Example:* Logging the address of new connections
+  /// 
+  /// ```csharp
+  /// public override void Connected(BoltConnection connection) {
+  ///   ServerLog.Write(string.Format("[{0}:{1}] New Connection", connection.remoteEndPoint.Address, connection.remoteEndPoint.Port);
+  /// }
+  /// ```
+  /// </example>
   public UdpEndPoint remoteEndPoint {
     get { return udpConnection.RemoteEndPoint; }
   }
@@ -123,6 +286,15 @@ public class BoltConnection : BoltObject {
   /// <summary>
   /// User assignable token which lets you pair arbitrary data with the connection
   /// </summary>
+  /// <example>
+  /// *Example:* Using a reference to the player entity in the userToken.
+  /// 
+  /// ```csharp
+  /// public override void Disconnected(BoltConnection connection) {
+  ///   BoltNetwork.Destroy((BoltEntity)connection.userToken);
+  /// }
+  /// ```
+  /// </example>
   public object userToken {
     get;
     set;
@@ -183,13 +355,41 @@ public class BoltConnection : BoltObject {
     _canReceiveEntities = canReceive;
   }
 
+  /// <summary>
+  /// Disconnect this connection
+  /// </summary>
+  /// <example>
+  /// *Example:* Terminating all connections.
+  /// 
+  /// ```csharp
+  /// void DisconnectAll() {
+  ///   foreach(var connection in BoltNetwork.connections) {
+  ///     connection.Disconnect();
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public void Disconnect() {
     Disconnect(null);
   }
 
   /// <summary>
-  /// Disconnect this connection
+  /// Disconnect this connection with custom data
   /// </summary>
+  /// <param name="token">A data token</param>
+  /// <example>
+  /// *Example:* Terminating all connections with a custom error message.
+  /// 
+  /// ```csharp
+  /// void DisconnectAll(int errorCode, string errorMessage) {
+  ///   ServerMessage msg = new ServerMessage(errorCode, errorMessage);
+  ///   
+  ///   foreach(var connection in BoltNetwork.connections) {
+  ///     connection.Disconnect(errorMessage);
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public void Disconnect(IProtocolToken token) {
     _udp.Disconnect(token.ToByteArray());
   }
@@ -198,6 +398,15 @@ public class BoltConnection : BoltObject {
     return _entityChannel.GetSkippedUpdates(en.Entity);
   }
 
+  /// <summary>
+  /// Reference comparison between two connections
+  /// </summary>
+  /// <param name="obj">The object to compare</param>
+  /// <example>
+  /// bool Compare(BoltConnection A, BoltConnection B) {
+  ///   return A.Equals(B);
+  /// }
+  /// </example>
   public override bool Equals(object obj) {
     return ReferenceEquals(this, obj);
   }
@@ -206,10 +415,25 @@ public class BoltConnection : BoltObject {
     return _entityChannel.MightExistOnRemote(entity.Entity);
   }
 
+  /// <summary>
+  /// A hash code for this connection
+  /// </summary>
   public override int GetHashCode() {
     return _udp.GetHashCode();
   }
-
+  
+  /// <summary>
+  /// The string representation of this connection
+  /// </summary>
+  /// <example>
+  /// *Example:* Logging the address of new connections using the string representation.
+  /// 
+  /// ```csharp
+  /// public override void Connected(BoltConnection connection) {
+  ///   ServerLog.instance.Write("New Connection:" + connection.ToString());
+  /// }
+  /// ```
+  /// </example>
   public override string ToString() {
     return string.Format("[Connection {0}]", _udp.RemoteEndPoint);
   }

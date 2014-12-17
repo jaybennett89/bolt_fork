@@ -170,7 +170,7 @@ public static class BoltNetwork {
   /// 
   /// ```csharp
   /// void PostGameCleanup() {
-  ///   foreach(var entity in BoltNetwork.entnties) {
+  ///   foreach(var entity in BoltNetwork.entities) {
   ///     if(entity.isOwner && entity.StateIs&ltMinionState&gt) {
   ///       BoltNetwork.Destroy(entity);
   ///     }
@@ -1014,8 +1014,8 @@ public static class BoltNetwork {
   /// *Example:* Accepting an incoming connection.
   /// 
   /// ```csharp
-  /// public override void ConnectRequest(BoltConnection connection) {
-  ///   BoltNetwork.Accept(connection.remoteEndPoint);
+  /// public override void ConnectRequest(UdpEndPoint endpoint) {
+  ///   BoltNetwork.Accept(endPoint);
   /// }
   /// ```
   /// </example>

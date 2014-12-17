@@ -6,6 +6,15 @@ namespace BoltInternal {
   /// <summary>
   /// Base class for all BoltCallbacks objects
   /// </summary>
+  /// <example>
+  /// *Example:* Accepting an incoming remote connection.
+  /// 
+  /// ```csharp
+  /// public override void ConnectRequest(BoltConnection connection) {
+  ///   BoltNetwork.Accept(connection.remoteEndPoint);
+  /// }
+  /// ```
+  /// </example> 
   [DocumentationAttribute(Alias = "Bolt.GlobalEventListener")]
   public abstract partial class GlobalEventListenerBase : MonoBehaviour, IBoltListNode {
     static readonly BoltDoubleList<GlobalEventListenerBase> callbacks = new BoltDoubleList<GlobalEventListenerBase>();

@@ -306,8 +306,8 @@ partial class GlobalEventListenerBase {
   /// Accepting an incoming connection.
   /// 
   /// ```csharp
-  /// public override void ConnectRequest(BoltConnection connection) {
-  ///   BoltNetwork.Accept(connection.remoteEndPoint);
+  /// public override void ConnectRequest(UdpEndPoint endpoint) {
+  ///   BoltNetwork.Accept(remoteEndPoint);
   /// }
   /// ```
   /// </example> 
@@ -333,7 +333,7 @@ partial class GlobalEventListenerBase {
   /// *Example:* Accepting an incoming connection with user credentials in the data token.
   /// 
   /// ```csharp
-  /// public override void ConnectRequest(BoltConnection connection, Bolt.IProtocolToken token) {
+  /// public override void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {
   ///   UserCredentials creds = (UserCredentials)token);
   ///   if(Authenticate(creds.username, creds.password)) {
   ///     BoltNetwork.Accept(connection.remoteEndPoint);
