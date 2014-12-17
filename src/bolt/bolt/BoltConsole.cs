@@ -4,6 +4,18 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
+/// <summary>
+/// The in-game console window
+/// </summary>
+/// <example>
+/// *Example:* Writing a custom message to the console.
+/// 
+/// ```csharp
+/// void Start() {
+///   BoltConsole.Write("[Start:" + this.gameObject.name + "]);
+/// }
+/// ```
+/// </example>
 public class BoltConsole : MonoBehaviour {
   internal struct Line {
     public Color color;
@@ -28,6 +40,15 @@ public class BoltConsole : MonoBehaviour {
   /// </summary>
   /// <param name="line">Text to write</param>
   /// <param name="color">Color of the text</param>
+  /// <example>
+  /// *Example:* Writing a custom message to the console in color.
+  /// 
+  /// ```csharp
+  /// void OnDeath() {
+  ///   BoltConsole.Write("[Death:" + this.gameObject.name + "], Color.Red);
+  /// }
+  /// ```
+  /// </example>
   public static void Write(string line, Color color) {
     lock (_mutex) {
       if (line.Contains("\r") || line.Contains("\n")) {
@@ -50,6 +71,15 @@ public class BoltConsole : MonoBehaviour {
   /// Write one line to the console
   /// </summary>
   /// <param name="line">Text to write</param>
+  /// <example>
+  /// *Example:* Writing a custom message to the console.
+  /// 
+  /// ```csharp
+  /// void OnSpawn() {
+  ///   BoltConsole.Write("[Spawn:" + this.gameObject.name + "]);
+  /// }
+  /// ```
+  /// </example>
   public static void Write(string line) {
     Write(line, Color.white);
   }
