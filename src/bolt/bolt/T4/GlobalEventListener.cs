@@ -11,13 +11,13 @@ partial class GlobalEventListenerBase {
   /// Callback triggered when the bolt simulation is shutting down.
   /// </summary>
   /// <example>
-  /// Override the ```BoltShutdown()``` method to get a callback for when the bolt simulation is shutting down
-  /// ```
+  /// *Example:* Showing a message to clients when the server has shut down unexpectedly.
+  /// 
+  /// ```csharp
   /// public override void BoltShutdown() {
   ///   Message.Show("Error", "Server Shut Down!");
   /// }
   /// ```
-  /// **Ex.** Show a message to clients when the server has shut down unexpectedly.
   /// </example>
   public virtual void BoltShutdown() {  }
 
@@ -36,14 +36,13 @@ partial class GlobalEventListenerBase {
   /// Callback triggered when the bolt simulation is starting.
   /// </summary>
   /// <example>
-  /// Override the ```BoltStarted()``` method to get a callback for when the bolt simulation is startinng up.
-  /// ```
+  /// *Example:* Showing a meessage when the bolt simulation is starting and initializing some NPC data.
+  /// ```csharp
   /// public override void BoltStarted() {
   ///   PrecalcNpcPaths();
   ///   Message.Show("Starting Game...");
   /// }
   /// ```
-  /// **Ex.** Show a meessage when the bolt simulation is starting and initializing some NPC data.
   /// </example>
   public virtual void BoltStarted() {  }
 
@@ -109,14 +108,15 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="map">Name of scene being loaded</param>
   /// <example>
-  /// ```
+  /// *Example:* Showing a splash screen when clients are loading the game scene.
+  /// 
+  /// ```csharp
   /// public override void SceneLoadLocalBegin(string map) {
   ///   if(BoltNetwork.isClient && map.Equals("GameScene") {
   ///     SplashScreen.Show(SplashScreens.GameLoad);
   ///   }
   /// }
   /// ```
-  /// **Ex.** Using the ```SceneLoadLocalBegin()``` override to show a splash screen when clients are loading the game scene.
   /// </example>
   public virtual void SceneLoadLocalBegin(string map) {  }
 
@@ -136,14 +136,15 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="map">Name of scene that has loaded</param>
   /// <example>
-  /// ```
+  /// *Example:* Hiding a splash screen that was shown during loading.
+  /// 
+  /// ```csharp
   /// public override void SceneLoadLocalBegin(string map) {
   ///   if(BoltNetwork.isClient && map.Equals("GameScene") {
   ///     SplashScreen.Hide();
   ///   }
   /// }
   /// ```
-  /// **Ex.** Using the ```SceneLoadLocalDone()``` override to hide a splash screen that was shown during loading.
   /// </example>
   public virtual void SceneLoadLocalDone(string map) {  }
 
@@ -163,7 +164,9 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="connection">The remote connection</param>
   /// <example>
-  /// ```
+  /// *Example:* Instantiating and configuring a player entity on the server and then assigning control to the client.
+  /// 
+  /// ```csharp
   /// public override void SceneLoadRemoteDone(BoltConnection connection) {
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
   ///   player.transform.position = spawnPoint.transform.position;
@@ -174,8 +177,6 @@ partial class GlobalEventListenerBase {
   ///   player.AssignControl(connection);
   /// }
   /// ```
-  /// **Ex.** How to instantiate and configure a player entity inside a ```Bolt.GlobalEventListener``` on the server and then assign
-  /// control to the client.
   /// </example>
   public virtual void SceneLoadRemoteDone(BoltConnection connection) {  }
 
@@ -195,7 +196,9 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="connection">The connected client endpoint</param>
   /// <example>
-  /// ```
+  /// *Example:* Instantiating and configuring a player entity when a client connects to the server.
+  /// 
+  /// ```csharp
   /// public override void Connected(BoltConnection connection) {
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
   ///   player.transform.position = spawnPoint.transform.position;
@@ -206,7 +209,6 @@ partial class GlobalEventListenerBase {
   ///   player.AssignControl(connection);
   /// }
   /// ```
-  /// **Ex.** How to instantiate and configure a player entity when the client connects to the server.
   /// </example>
   public virtual void Connected(BoltConnection connection) {  }
 
@@ -227,7 +229,9 @@ partial class GlobalEventListenerBase {
   /// <param name="connection">The connected client endpoint</param>
   /// <param name="acceptToken">A data token sent in the accept method</param>
   /// <example>
-  /// ```
+  /// *Example:* Using a protocol token with the Connected callback to pass a spawnpoint position to to new player entity.
+  /// 
+  /// ```csharp
   /// public override void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
   ///   
@@ -240,7 +244,6 @@ partial class GlobalEventListenerBase {
   ///   player.AssignControl(connection);
   /// }
   /// ```
-  /// **Ex.** How to use a protocol token with the Connected callback to pass a spawnpoint position to to new player entity.
   /// </example>
   public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {  }
 
@@ -274,12 +277,13 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="endpoint">The remote address</param>
   /// <example>
-  /// ```
+  /// *Example:* Showing an error message when the remote connection has failed.
+  /// 
+  /// ```csharp
   /// public override void ConnectFailed(UdpEndPoint endpoint) {
   ///   Message.Show("Error", string.Format("Connection To ({0}:{1}) has failed", endpoint.Address.ToString(), endpoint.ToString());
   /// }
   /// ```
-  /// **Ex.** Showing an error message when the remote connection has failed.
   /// </example>
   public virtual void ConnectFailed(UdpEndPoint endpoint) {  }
 
@@ -299,12 +303,13 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="endpoint">The incoming client endpoint</param>
   /// <example>
-  /// ```
+  /// Accepting an incoming connection.
+  /// 
+  /// ```csharp
   /// public override void ConnectRequest(BoltConnection connection) {
   ///   BoltNetwork.Accept(connection.remoteEndPoint);
   /// }
   /// ```
-  /// **Ex.** Accepting an incoming connection.
   /// </example> 
   public virtual void ConnectRequest(UdpEndPoint endpoint) {  }
 
@@ -325,7 +330,9 @@ partial class GlobalEventListenerBase {
   /// <param name="endpoint">The incoming client endpoint</param>
   /// <param name="token">A data token sent from the incoming client</param>
   /// <example>
-  /// ```
+  /// *Example:* Accepting an incoming connection with user credentials in the data token.
+  /// 
+  /// ```csharp
   /// public override void ConnectRequest(BoltConnection connection, Bolt.IProtocolToken token) {
   ///   UserCredentials creds = (UserCredentials)token);
   ///   if(Authenticate(creds.username, creds.password)) {
@@ -333,7 +340,6 @@ partial class GlobalEventListenerBase {
   ///   }
   /// }
   /// ```
-  /// **Ex.** Accepting an incoming connection with user credentials in the data token.
   /// </example> 
   public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
@@ -353,12 +359,13 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="endpoint">The remote server endpoint</param>
   /// <example>
-  /// ```
+  /// *Example:* Showing an error message when the remote connection has been refused.
+  /// 
+  /// ```csharp
   /// public override void ConnectRefused(UdpEndPoint endpoint) {
-  ///   Message.Show("Error", string.Format("Connection To ({0}:{1}) has been refused", endpoint.Address.ToString(), endpoint.ToString());
+  ///   Message.Show("Error", string.Format("Connection To ({0}:{1}) has been refused", endpoint.Address.ToString(), endpoint.Port.ToString());
   /// }
   /// ```
-  /// **Ex.** Showing an error message when the remote connection has been refused.
   /// </example>
   public virtual void ConnectRefused(UdpEndPoint endpoint) {  }
 
@@ -379,14 +386,15 @@ partial class GlobalEventListenerBase {
   /// <param name="endpoint">The remote server endpoint</param>
   /// <param name="token">Data token sent by refusing server</param>
   /// <example>
-  /// ```
+  /// *Example:* Showing an error message when the remote connection has been refused using an error message token from the server.
+  /// 
+  /// ```csharp
   /// public override void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) {
   ///   ServerMessage.message = (ServerMessage)token;
   ///   Message.Show(serverMessage.error, string.Format("Connection To ({0}:{1}) has been refused. Reason was {3}", 
   ///     endpoint.Address.ToString(), endpoint.ToString(), serverMessage.errorDescription);
   /// }
   /// ```
-  /// **Ex.** Showing an error message when the remote connection has been refused using an error message token from the server.
   /// </example> 
   public virtual void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
@@ -402,17 +410,17 @@ partial class GlobalEventListenerBase {
   }
 
   /// <summary>
-  /// Callback triggered when a client attempts to connect to this instance
+  /// Callback triggered when trying to connect to a remote endpoint
   /// </summary>
-  /// <param name="endpoint">The connecting client address</param>
+  /// <param name="endpoint">The remote server address</param>
   /// <example>
-  /// Override the ```ConnectAttempt()``` method in a server callback script in order to handle incoming connections
-  /// ```
-  /// public override void ConnectAttempt(BoltConnection connection) {
-  ///   BoltNetwork.Accept(connection.remoteEndPoint);
+  /// *Example:* Displaying a message to clients when initializing a connection to server.
+  /// 
+  /// ```csharp
+  /// public override void ConnectAttempt((UdpEndPoint endpoint) {
+  ///   Message.Show("Connecting ...", string.Format("To Remote Server At ({0}:{1}), endpoint.Address, endpoint.Port);
   /// }
   /// ```
-  /// **Ex.** Accepting an incoming connection.
   /// </example>
   public virtual void ConnectAttempt(UdpEndPoint endpoint) {  }
 
@@ -432,13 +440,14 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="connection">The remote server endpoint</param>
   /// <example>
-  /// ```
+  /// *Example:* Displaying a disconnect message to the client and returning to the main menu scene.
+  /// 
+  /// ```csharp
   /// public override void Disconnected(BoltConnection connection) {
   ///   Message.Show("Disconnected", "Returning to main menu...");
   ///   Application.LoadLevel("MainMenu");
   /// }
   /// ```
-  /// **Ex.** Displaying a disconnection message to the client and returning to the main menu scene.
   /// </example>
   public virtual void Disconnected(BoltConnection connection) {  }
 
@@ -459,14 +468,15 @@ partial class GlobalEventListenerBase {
   /// <param name="connection">The remote server endpoint</param>
   /// <param name="token">Data token sent by disconnecting server</param>
   /// <example>
-  /// ```
+  /// *Example:* Displaying a custom disconnect message to the client.
+  /// 
+  /// ```csharp
   /// public override void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {
   ///   ServerMessage msg = (ServerMessage)token;  /// 
   ///   Message.Show(msg.error, msg.description);
   ///   Application.LoadLevel("MainMenu");
   /// }
   /// ```
-  /// **Ex.** Displaying a disconnection message to the client with a custom disconnect message.
   /// </example>
   public virtual void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {  }
 
@@ -486,13 +496,14 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="entity">The controlled entity</param>
   /// <example>
-  /// ```
+  /// *Example:* Setting up game components to no longer control an entity.
+  /// 
+  /// ```csharp
   /// public override void ControlOfEntityLost(BoltEntity entity) {
   ///   GameInput.instance.RemoveControlledEntity(entity);
   ///   MiniMap.instance.RemoveControlledEntity(entity);
   /// }
   /// ```
-  /// **Ex.** Setting up the game minimap and other components to remove a specific entity as the player's controlled entity.
   /// </example>
   public virtual void ControlOfEntityLost(BoltEntity entity) {  }
 
@@ -513,7 +524,10 @@ partial class GlobalEventListenerBase {
   /// <param name="entity">The controlled entity</param>
   /// <param name="token">Data token sent by the owner</param>
   /// <example>
-  /// ```
+  /// *Example:* Removing the player entity from being controlled by game components and showing a message explaining 
+  /// the reason for losing control.
+  /// 
+  /// ```csharp
   /// public override void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) {
   ///   GameInput.instance.RemoveControlledEntity(entity);
   ///   MiniMap.instance.RemoveControlledEntity(entity);
@@ -522,8 +536,6 @@ partial class GlobalEventListenerBase {
   ///   Message.Show(msg.error, msg.description);
   /// }
   /// ```
-  /// **Ex.** Removing the player from receiving input events and being displayed as controlled on the minimap, and shows a
-  /// message explaining the reason for losing control.
   /// </example>
   public virtual void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) { }
 
@@ -544,13 +556,14 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="entity">The controlled entity</param>
   /// <example>
-  /// ```
+  /// *Example:* Setting up the game minimap and other components to use a specific entity as the player's controlled entity.
+  /// 
+  /// ```csharp
   /// public override void ControlOfEntityGained(BoltEntity entity) {
   ///   GameInput.instance.SetControlledEntity(entity);
   ///   MiniMap.instance.SetControlledEntity(entity);
   /// }
   /// ```
-  /// **Ex.** Setting up the game minimap and other components to use a specific entity as the player's controlled entity.
   /// </example>
   public virtual void ControlOfEntityGained(BoltEntity entity) {  }
 
@@ -571,7 +584,10 @@ partial class GlobalEventListenerBase {
   /// <param name="entity">The controlled entity</param>
   /// <param name="token">Data token sent by the owner</param>
   /// <example>
-  /// ```
+  /// *Example:* Setting up the game minimap and other components to use a specific entity as the player's controlled entity and using a data token to 
+  /// transmit the correct team color.
+  /// 
+  /// ```csharp
   /// public override void ControlOfEntityGained(BoltEntity entity, IProtocolToken token) {
   ///   GameInput.instance.SetControlledEntity(entity);
   ///   
@@ -579,8 +595,6 @@ partial class GlobalEventListenerBase {
   ///   MiniMap.instance.SetControlledEntity(entity, info.teamColor);
   /// }
   /// ```
-  /// **Ex.** Setting up the game minimap and other components to use a specific entity as the player's controlled entity and using a data token to 
-  /// transmit the correct team color.
   /// </example>
   public virtual void ControlOfEntityGained(BoltEntity entity, Bolt.IProtocolToken token) { }
 
@@ -601,13 +615,14 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="entity">The attached entity</param>
   /// <example>
-  /// ```
+  /// *Example:* Setting up the game minimap to show a newly attached entity.
+  /// 
+  /// ```csharp
   /// public override void EntityAttached(BoltEntity entity) {
   ///   MiniMap.instance.SetKnownEntity(entity);
   /// }
   /// ```
-  /// **Ex.** Setting up the game minimap to show the newly attached entity.
-  /// </example>
+  /// </example> 
   public virtual void EntityAttached(BoltEntity entity) {  }
 
   internal static void EntityAttachedInvoke(BoltEntity entity) { 
@@ -627,7 +642,9 @@ partial class GlobalEventListenerBase {
   /// <param name="entity">The attached entity</param>
   /// <param name="token">Data token sent by the owner</param>
   /// <example>
-  /// ```
+  /// *Example:* Initializing a newly attached entity with loadout data for weapon, armor, and abilities.
+  /// 
+  /// ```csharp
   /// public override void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) {
   ///   MiniMap.instance.SetKnownEntity(entity);
   ///   
@@ -635,7 +652,6 @@ partial class GlobalEventListenerBase {
   ///   ConfigureEntity(entity, loadout.weaponId, loadout.armorId, loadout.abilities);
   /// }
   /// ```
-  /// **Ex.** Initializing a newly attached entity with loadout data for weapon, armor, and abilities.
   /// </example>
   public virtual void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) { }
 
@@ -656,12 +672,13 @@ partial class GlobalEventListenerBase {
   /// </summary>
   /// <param name="entity">The detached entity</param>
   /// <example>
-  /// ```
+  /// *Example:* Removing the newly detached entity from the game minimap.
+  /// 
+  /// ```csharp
   /// public override void EntityDetached(BoltEntity entity) {
   ///   MiniMap.instance.RemoveKnownEntity(entity);
   /// }
   /// ```
-  /// **Ex.** Removing the newly detached entity from the game minimap.
   /// </example>
   public virtual void EntityDetached(BoltEntity entity) {  }
 
@@ -682,9 +699,8 @@ partial class GlobalEventListenerBase {
   /// <param name="entity">The detached entity</param>
   /// <param name="token">Data token sent by the owner</param>
   /// <example>
-  /// public override void 
-  /// <example>
-  /// ```
+  /// *Example:* Cleaning up a newly detached entity and writing a detailed description of its death to a game console.
+  /// ```csharp
   /// public override void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {
   ///   MiniMap.instance.RemoveKnownEntity(entity);
   ///   
@@ -692,7 +708,6 @@ partial class GlobalEventListenerBase {
   ///   GameConsole.Log(recap.killer, recap.damageEvents);
   /// }
   /// ```
-  /// **Ex.** Cleaning up the newly detached entity and writing a detailed description of its death to a game console.
   /// </example>
   public virtual void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {  }
 

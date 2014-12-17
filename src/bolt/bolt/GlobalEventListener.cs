@@ -29,12 +29,13 @@ namespace BoltInternal {
     /// </summary>
     /// <returns>True/False</returns>
     /// <example>
-    /// ```
+    /// *Example:* Configuring the persistence behaviour to keep this listener alive between startup and shutdown.
+    /// 
+    /// ```csharp
     /// public override bool PersistBetweenStartupAndShutdown() {
     ///   return true;
     /// }
     /// ```
-    /// **Ex.** Configuring the persistence behaviour to keep this listener alive between startup and shutdown.
     /// </example>
     public virtual bool PersistBetweenStartupAndShutdown() {
       return false;
