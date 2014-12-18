@@ -8,6 +8,20 @@ using UnityEngine;
 /// <summary>
 /// Defines one hitbox on a BoltHitboxBody
 /// </summary>
+/// <example>
+/// *Example:* Resizing a sphere hitbox
+/// 
+/// ```csharp
+/// void ResizeSphereHitbox(BoltHitbox hitbox, float newRadius) {
+///   if(hitbox.hitboxShape != BoltHitboxShape.Sphere) {
+///     Debug.Log("Attemping to resize a non-sphere hitbox");
+///     return;
+///   }
+///   
+///   hitbox.hitboxSphereRadius = newRadius;
+/// }
+/// ```
+/// </example>
 [Documentation]
 public class BoltHitbox : MonoBehaviour {
 
@@ -29,6 +43,20 @@ public class BoltHitbox : MonoBehaviour {
   /// <summary>
   /// Shape of the hitbox (box or sphere)
   /// </summary>
+  /// <example>
+  /// *Example:* Sorting the hitboxes in a body based on shape.
+  /// 
+  /// ```csharp
+  /// void ConfigureHitboxes(BoltHitboxBody body) {
+  ///   foreach(BoltHitbox hitbox in body.hitboxes) {
+  ///     switch(hitbox.hitboxShape) {
+  ///       case BoltHitboxShape.Sphere: ConfigureSphere(hitbox); break;
+  ///       case BoltHitboxShape.Box: ConfigureBox(hitbox); break;
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public BoltHitboxShape hitboxShape {
     get { return _shape; }
     set { _shape = value; }
@@ -37,6 +65,25 @@ public class BoltHitbox : MonoBehaviour {
   /// <summary>
   /// Type of the hitbox
   /// </summary>
+  /// <example>
+  /// *Example:* Modifying a base damage value depending on the area of the hit.
+  /// 
+  /// ```csharp
+  /// float CalculateDamage(BoltHitbox hit, float baseDamage) {
+  ///   switch(hit.hitboxType) {
+  ///     case BoltHitboxType.Head: return 2.5f * baseDamage;
+  ///     
+  ///     case BoltHitboxType.Leg:
+  ///     case BoltHitboxType.Foot:
+  ///     case BoltHitboxType.Forearm:
+  ///     case BoltHitboxType.UpperArm:
+  ///     case BoltHitboxType.Hand: return 0.7f * baseDamage;
+  ///     6
+  ///     default: return baseDamage;
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public BoltHitboxType hitboxType {
     get { return _type; }
     set { _type = value; }
@@ -45,6 +92,24 @@ public class BoltHitbox : MonoBehaviour {
   /// <summary>
   /// Center of the hitbox in local coordinates
   /// </summary>
+  /// <example>
+  /// *Example:* Getting a vector that points from the player's weapon to the head of a target entity.
+  /// 
+  /// ```csharp
+  /// Vector3 GetHeadshotVector(BoltEntity target, IWeapon currentWeapon) {
+  ///   BoltHitboxBody body = target.GetComponent&ltBoltHitboxBody%gt();
+  ///   BoltHitbox head = body.hitboxes[0];
+  ///   
+  ///   foreach(BoltHitbox hitbox in body.hitboxes) {
+  ///     if(hitbox.hitboxType == BoltHitboxType.Head) {
+  ///       head = hitbox;
+  ///     }
+  ///   }
+  ///   
+  ///   return head.hitboxCenter - currentWeapon.fireOrigin;
+  /// }
+  /// ```
+  /// </example>
   public Vector3 hitboxCenter {
     get { return _center; }
     set { _center = value; }
@@ -53,14 +118,43 @@ public class BoltHitbox : MonoBehaviour {
   /// <summary>
   /// Size of the hitbox if this shape is a box
   /// </summary>
+  /// <summary>
+  /// Type of the hitbox
+  /// </summary>
+  /// <example>
+  /// *Example:* A method to double the size of a player's head hitbox if it is a box.
+  /// 
+  /// ```csharp
+  /// void DoubleHeadSize(BoltHitboxBody body) {
+  ///   foreach(BoltHitbox hitbox in body.hitboxes) {
+  ///     if(hitbox.hitboxType == BoltHitboxType.Head) {
+  ///       hitbox.hitboxBoxSize = hitbox.hitboxBoxSize * 2f;
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public Vector3 hitboxBoxSize {
     get { return _boxSize; }
     set { _boxSize = value; }
   }
 
   /// <summary>
-  /// Radius of the hitbox if this shape is a sphere
+  /// Type of the hitbox
   /// </summary>
+  /// <example>
+  /// *Example:* A method to double the size of a player's head hitbox if it is a sphere.
+  /// 
+  /// ```csharp
+  /// void DoubleHeadSize(BoltHitboxBody body) {
+  ///   foreach(BoltHitbox hitbox in body.hitboxes) {
+  ///     if(hitbox.hitboxType == BoltHitboxType.Head) {
+  ///       hitbox.hitboxSphereRadius = hitbox.hitboxSphereRadius * 2f;
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public float hitboxSphereRadius {
     get { return _sphereRadius; }
     set { _sphereRadius = value; }
