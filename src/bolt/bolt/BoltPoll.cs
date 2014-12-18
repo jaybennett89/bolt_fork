@@ -1,5 +1,20 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Bolt behaviour to poll the network and step entities in the simulation
+/// </summary>
+/// <example>
+/// *Example:* if bolt is missing the ```BoltPoll`` behaviour then the simulation is broken and we should shut down.
+/// 
+/// ```csharp
+/// void CheckBoltHealth() {
+///   if(BoltNetwork.globalObject.GetComponent&ltBoltPoll&gt() == null) {
+///     Debug.Log("BoltPoll is missing!);
+///     GameApplication.Shutdown(ErrorCode.Bolt);
+///   }
+/// }
+/// ```
+/// </example>
 [BoltExecutionOrder(-10000)]
 public class BoltPoll : MonoBehaviour {
   protected void Awake() {

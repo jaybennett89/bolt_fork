@@ -60,8 +60,21 @@ partial class GlobalEventListenerBase {
   /// <summary>
   /// Callback triggered when binary stream data is received 
   /// </summary>
-  /// <param name="connection"></param>
-  /// <param name="data"></param>
+  /// <param name="connection">The sender connection</param>
+  /// <param name="data">The binary stream data</param>
+  /// <example>
+  /// *Example:* Receiving a custom player icon.
+  /// 
+  /// ```csharp
+  /// public override void StreamDataReceived(BoltConnection connnection, UdpStreamData data) { 
+  ///   Texture2D icon = new Texture2D(4, 4);
+  ///   icon.LoadImage(data.Data);
+  ///   
+  ///   PlayerData playerData = (PlayerData)connection.userToken;
+  ///   playerData.SetIcon(icon);
+  /// }
+  /// ```
+  /// </example>
   public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
 
   internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
@@ -75,7 +88,22 @@ partial class GlobalEventListenerBase {
     }
   }
 
-  
+  /// <summary>
+  /// Registering binary stream channels may only be done in this callback
+  /// </summary>
+  /// <example>
+  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
+  /// 
+  /// ```csharp
+  /// public static UdpKit.UdpChannelName Voice;
+  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
+  /// 
+  /// public override void RegisterStreamChannels() {
+  ///   Voice = BoltNetwork.CreateStreamChannel("Voice", UdpKit.UdpChannelMode.Unreliable, 1});
+  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel("CustomPlayerIcon", UdpKit.UdpChannelMode.Reliable, 4});
+  /// }
+  /// ```
+  /// </example>
   public virtual void RegisterStreamChannels() {  }
 
   internal static void RegisterStreamChannelsInvoke() { 

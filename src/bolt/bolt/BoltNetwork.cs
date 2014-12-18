@@ -387,6 +387,26 @@ public static class BoltNetwork {
     get { return isServer || (isClient && BoltCore._connections.count > 0); }
   }
 
+  /// <summary>
+  /// Creating a new binary streaming channel
+  /// </summary>
+  /// <param name="name">Channel name</param>
+  /// <param name="mode">Reliability mode</param>
+  /// <param name="priority">Bandwidth priority</param>
+  /// <returns>Channel name struct</returns>
+  /// <example>
+  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
+  /// 
+  /// ```csharp
+  /// public static UdpKit.UdpChannelName Voice;
+  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
+  /// 
+  /// public override void RegisterStreamChannels() {
+  ///   Voice = BoltNetwork.CreateStreamChannel("Voice", UdpKit.UdpChannelMode.Unreliable, 1});
+  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel("CustomPlayerIcon", UdpKit.UdpChannelMode.Reliable, 4});
+  /// }
+  /// ```
+  /// </example>
   public static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
     return BoltCore.CreateStreamChannel(name, mode, priority);
   }
@@ -983,20 +1003,57 @@ public static class BoltNetwork {
   /// <param name="origin">The origin of the sphere</param>
   /// <param name="radius">The radius of the sphere</param>
   /// <returns>The hitboxes that overlapped with the sphere</returns>
+  /// <example>
+  /// *Example:* Calculating the blast radius of a grenade.
+  /// 
+  /// ```csharp
+  /// void GrenadeOwner(PlayerCommand cmd, BoltEntity entity, IThrownWeapon grenade) {
+  ///   if(entity.isOwner) {
+  ///     using(var hits = BoltNetwork.OverlapSphereAll(cmd.targetPos, grenade.explosionRadius)) {
+  ///       for(int i = 0; i < hits.count; i++) {
+  ///         var hit = hits.GetHit(i);
+  ///         var targetEntity = hit.body.GetComponent&ltBoltEntity&gt();
+  ///         
+  ///         if(targetEntity != entity && targetEntity.StateIs&ltILivingEntity&gt()) {
+  ///             targetEntity.GetState&ltILivingEntity&gt().Modify().HP -= grenade.damage;   
+  ///         } 
+  ///       }
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// </example>
   public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius) {
     return BoltPhysics.OverlapSphere(origin, radius);
   }
 
   /// <summary>
-  /// 
+  /// Perform a sphere overlap against Bolt hiboxes
   /// </summary>
+  /// <param name="origin">The origin of the sphere</param>
+  /// <param name="radius">The radius of the sphere</param>
+  /// <param name="frame">The frame to rollback to for calculation</param>
+  /// <returns>The hitboxes that overlapped with the sphere</returns>
   /// <example>
+  /// *Example:* Calculating the blast radius of a grenade.
   /// 
+  /// ```csharp
+  /// void GrenadeOwner(PlayerCommand cmd, BoltEntity entity, IThrownWeapon grenade) {
+  ///   if(entity.isOwner) {
+  ///     using(var hits = BoltNetwork.OverlapSphereAll(cmd.targetPos, grenade.explosionRadius, cmd.ServerFrame)) {
+  ///       for(int i = 0; i < hits.count; i++) {
+  ///         var hit = hits.GetHit(i);
+  ///         var targetEntity = hit.body.GetComponent&ltBoltEntity&gt();
+  ///         
+  ///         if(targetEntity != entity && targetEntity.StateIs&ltILivingEntity&gt()) {
+  ///             targetEntity.GetState&ltILivingEntity&gt().Modify().HP -= grenade.damage;   
+  ///         } 
+  ///       }
+  ///     }
+  ///   }
+  /// }
+  /// ```
   /// </example>
-  /// <param name="origin"></param>
-  /// <param name="radius"></param>
-  /// <param name="frame"></param>
-  /// <returns></returns>
   public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius, int frame) {
     return BoltPhysics.OverlapSphere(origin, radius, frame);
   }

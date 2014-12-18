@@ -343,10 +343,40 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  /// <summary>
+  /// Send a binary stream of data to this connection
+  /// </summary>
+  /// <param name="channel">The channel to send on</param>
+  /// <param name="data">The binary data</param>
+  /// <example>
+  /// *Example:* Sending the binary data of a custom icon texture to the server using a static reference 
+  /// to the "PlayerIcon" channel that was created inside a ```Channels``` class.
+  /// 
+  /// ```csharp
+  /// void SendCustomIcon(Texture2D myCustomIcon) {
+  ///   byte[] data = myCustomIcon.EncodeToPNG();
+  ///   
+  ///   BoltNetwork.server.StreamBytes(Channels.PlayerIcon, data);
+  /// }
+  /// ```
+  /// </example>
   public void StreamBytes(UdpChannelName channel, byte[] data) {
     _udp.StreamBytes(channel, data);
   }
 
+  /// <summary>
+  /// Set the max amount of data allowed per second
+  /// </summary>
+  /// <param name="bytesPerSecond">The rate in bytes / sec</param>
+  /// <example>
+  /// *Example:* Configuring the initial stream bandwidth of new connections to 20 kb/s.
+  /// 
+  /// ```csharp
+  /// public override void Connected(BoltConnection connection) {
+  ///   connection.SetStreamBandwidth(1024 * 20);
+  /// }
+  /// ```
+  /// </example>
   public void SetStreamBandwidth(int bytesPerSecond) {
     _udp.StreamSetBandwidth(bytesPerSecond);
   }
