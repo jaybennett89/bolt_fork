@@ -23,6 +23,7 @@ namespace Bolt {
     public virtual bool WantsOnSimulateAfter { get { return false; } }
     public virtual bool WantsOnSimulateBefore { get { return false; } }
     public virtual bool WantsOnControlGainedLost { get { return false; } }
+    public virtual bool WantsOnFrameCloned { get { return false; } }
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
@@ -56,6 +57,7 @@ namespace Bolt {
     public virtual void OnSimulateBefore(NetworkObj obj) { }
     public virtual void OnSimulateAfter(NetworkObj obj) { }
     public virtual void OnParentChanged(NetworkObj obj, Entity newParent, Entity oldParent) { }
+    public virtual void OnFrameCloned(NetworkObj obj, NetworkStorage storage) { }
 
     public virtual void OnControlGained(NetworkObj obj) { }
     public virtual void OnControlLost(NetworkObj obj) { }

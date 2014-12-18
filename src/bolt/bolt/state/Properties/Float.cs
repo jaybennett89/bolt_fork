@@ -31,6 +31,11 @@ namespace Bolt {
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {
+      if (MecanimDirection == Bolt.MecanimDirection.UsingAnimatorMethods) {
+        BoltLog.Error("Can't call SetDynamic on a float in 'UsingAnimatorMethods' mode");
+        return;
+      }
+
       var v = (float)value;
 
       if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Float0, v)) {

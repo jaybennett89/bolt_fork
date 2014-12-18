@@ -24,6 +24,10 @@ namespace Bolt.Compiler {
       get { return Decorator.PropertyClassName; }
     }
 
+    public virtual bool AllowSetter {
+      get { return true; }
+    }
+
     public virtual void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
 
     }
@@ -38,31 +42,40 @@ namespace Bolt.Compiler {
 
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
-      var property =
-        type.DeclareProperty(Decorator.ClrType, name, get => {
-          get.Add(
-            new CodeMethodReturnStatement(
-              new CodeFieldReferenceExpression(index, StorageField)
-            )
-          );
-        }, set => {
-          if (changed) {
-            set.Add("{0} oldValue".Expr(Decorator.ClrType));
-            set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
-          }
 
-          set.Add(new CodeAssignStatement(
-            new CodeFieldReferenceExpression(index, StorageField),
-            new CodeVariableReferenceExpression("value")
-          ));
+      // getter method
+      Action<CodeStatementCollection> getter = get => {
+        get.Add(
+          new CodeMethodReturnStatement(
+            new CodeFieldReferenceExpression(index, StorageField)
+          )
+        );
+      };
 
-          if (changed) {
-            set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
-              EmitPropertyChanged(body, storage);
-            });
-          }
-        });
+      // setter method
+      Action<CodeStatementCollection> setter = set => {
+        if (changed) {
+          set.Add("{0} oldValue".Expr(Decorator.ClrType));
+          set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
+        }
 
+        set.Add(new CodeAssignStatement(
+          new CodeFieldReferenceExpression(index, StorageField),
+          new CodeVariableReferenceExpression("value")
+        ));
+
+        if (changed) {
+          set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
+            EmitPropertyChanged(body, storage);
+          });
+        }
+      };
+
+      if (!AllowSetter) {
+        setter = null;
+      }
+
+      var property = type.DeclareProperty(Decorator.ClrType, name, getter, setter);
       property.PrivateImplementationType = interfaceType;
       property.Attributes = Decorator.Attributes;
     }

@@ -13,12 +13,17 @@ namespace Bolt.Compiler {
     public override void EmitObjectMembers(CodeTypeDeclaration type) {
       EmitSimplePropertyMembers(type, new CodeSnippetExpression("Storage"), null, false, Decorator.TriggerListener);
 
-      type.DeclareMethod(typeof(void).FullName, Decorator.TriggerMethod, method => {
-        method.Statements.Expr("Storage.Values[this.OffsetStorage + {0}].TriggerLocal.Update(BoltCore.frame, true)", Decorator.OffsetStorage);
+      var s = Decorator.Definition.StateAssetSettings;
 
-        // flag this property as changed
-        EmitPropertyChanged(method.Statements, new CodeSnippetExpression("Storage"));
-      });
+      // don't emit this method if we we are pulling data from mecanim
+      if (s.MecanimMode == MecanimMode.Disabled || s.MecanimDirection == MecanimDirection.UsingBoltProperties) {
+        type.DeclareMethod(typeof(void).FullName, Decorator.TriggerMethod, method => {
+          method.Statements.Expr("Storage.Values[this.OffsetStorage + {0}].TriggerLocal.Update(BoltCore.frame, true)", Decorator.OffsetStorage);
+
+          // flag this property as changed
+          EmitPropertyChanged(method.Statements, new CodeSnippetExpression("Storage"));
+        });
+      }
     }
   }
 }

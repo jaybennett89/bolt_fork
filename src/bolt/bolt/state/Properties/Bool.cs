@@ -7,6 +7,11 @@ namespace Bolt {
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {
+      if (MecanimDirection == Bolt.MecanimDirection.UsingAnimatorMethods) {
+        BoltLog.Error("Can't call SetDynamic on a bool in 'UsingAnimatorMethods' mode");
+        return;
+      }
+
       var v = (bool)value;
 
       if (NetworkValue.Diff(obj.Storage.Values[obj[this]].Bool, v)) {

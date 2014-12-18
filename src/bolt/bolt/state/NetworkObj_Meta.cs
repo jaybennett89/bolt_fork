@@ -28,6 +28,7 @@ namespace Bolt {
     internal List<NetworkPropertyInfo> OnSimulateAfter = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnSimulateBefore = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnControlGainedLost = new List<NetworkPropertyInfo>();
+    internal List<NetworkPropertyInfo> OnFrameCloned = new List<NetworkPropertyInfo>();
 
     internal int CountObjects;
     internal int CountStorage;
@@ -132,6 +133,10 @@ namespace Bolt {
 
         if (Properties[i].Property.WantsOnControlGainedLost) {
           OnControlGainedLost.Add(Properties[i]);
+        }
+
+        if (Properties[i].Property.WantsOnFrameCloned) {
+          OnFrameCloned.Add(Properties[i]);
         }
       }
 

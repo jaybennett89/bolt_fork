@@ -50,7 +50,26 @@ namespace Bolt {
     }
 
     protected bool ShouldPullDataFromMecanim(NetworkState state) {
-      return MecanimDirection == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl);
+#if DEBUG
+      if (
+#else
+        return
+#endif
+        MecanimDirection == MecanimDirection.UsingAnimatorMethods && (state.Entity.IsOwner || state.Entity.HasPredictedControl)
+        
+#if DEBUG
+        ) {
+        if (state.Animators.Count > 1) {
+          BoltLog.Warn("Property '{0}' set to 'UsingAnimatorMethods' but several animators have been specified, only the first one added will be used.");
+        }
+
+        return true;
+      }
+
+      return false;
+#else
+        ;
+#endif
     }
 
     protected virtual void PullMecanimValue(NetworkState state) { }
