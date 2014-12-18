@@ -71,14 +71,11 @@ public class BoltHitbox : MonoBehaviour {
   /// ```csharp
   /// float CalculateDamage(BoltHitbox hit, float baseDamage) {
   ///   switch(hit.hitboxType) {
-  ///     case BoltHitboxType.Head: return 2.5f * baseDamage;
+  ///     case BoltHitboxType.Head: return 2.0f * baseDamage;
   ///     
   ///     case BoltHitboxType.Leg:
-  ///     case BoltHitboxType.Foot:
-  ///     case BoltHitboxType.Forearm:
-  ///     case BoltHitboxType.UpperArm:
-  ///     case BoltHitboxType.Hand: return 0.7f * baseDamage;
-  ///     6
+  ///     case BoltHitboxType.UpperArm: return 0.7f * baseDamage;
+  ///     
   ///     default: return baseDamage;
   ///   }
   /// }

@@ -9,6 +9,9 @@ using UE = UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 using System.Text.RegularExpressions;
 
+/// <summary>
+/// The network mode of this bolt simulation (i.e. client or server)
+/// </summary>
 public enum BoltNetworkModes {
   None = 0,
   Server = 1,
