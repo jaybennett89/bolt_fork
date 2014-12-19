@@ -8,13 +8,21 @@
       get { return false; }
     }
 
+    public override bool WantsOnFrameCloned {
+      get { return true; }
+    }
+
     public override int BitCount(NetworkObj obj) {
-      return 32;
+      return obj.RootState.Entity.SendRate;
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {
+      if (MecanimDirection == Bolt.MecanimDirection.UsingAnimatorMethods) {
+        BoltLog.Error("Can't call SetDynamic on a trigger in 'UsingAnimatorMethods' mode");
+        return;
+      }
+
       obj.Storage.Values[obj[this]].TriggerLocal.Update(BoltCore.frame, true);
-      obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
     }
 
     public override bool Write(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
@@ -23,6 +31,8 @@
 
       // write history
       packet.WriteInt(storage.Values[obj[this]].TriggerSend.History, obj.RootState.Entity.SendRate);
+
+      // this always succeeds!
       return true;
     }
 
@@ -32,74 +42,83 @@
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
-      var it = obj.RootState.Frames.GetIterator();
-
-      while (it.Next()) {
-        if (InvokeForFrame(obj, it.val) == false) {
-          break;
-        }
-      }
-    }
-
-    bool InvokeForFrame(NetworkObj obj, NetworkStorage storage) {
       if (MecanimMode == MecanimMode.Disabled) {
-        return MecanimPushOrNone(obj, storage, false);
+        MecanimPush(obj, false);
       }
       else {
         if (ShouldPullDataFromMecanim(obj.RootState)) {
-          return MecanimPull(obj, storage);
+          MecanimPull(obj, obj.Storage);
         }
         else {
-          return MecanimPushOrNone(obj, storage, true);
+          MecanimPush(obj, true);
         }
       }
     }
 
-    bool MecanimPull(NetworkObj obj, NetworkStorage storage) {
-      if (obj.RootState.Animator.GetBool(PropertyName) && (obj.RootState.Animator.IsInTransition(MecanimLayer) == false)) {
-        SetDynamic(obj, null);
+    public override void OnFrameCloned(NetworkObj obj, NetworkStorage storage) {
+      storage.Values[obj[this]].TriggerLocal.Frame = 0;
+      storage.Values[obj[this]].TriggerLocal.History = 0;
+    }
 
+    void MecanimPull(NetworkObj obj, NetworkStorage storage) {
+      if (obj.RootState.Animator.GetBool(PropertyName) && (obj.RootState.Animator.IsInTransition(MecanimLayer) == false)) {
+        // update send trigger
+        storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
+
+        // notify bolt this property changed
+        storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
+
+        // invoke callback
         var cb = obj.Storage.Values[obj[this]].Action;
         if (cb != null) {
           cb();
         }
       }
-
-      return false;
     }
 
-    bool MecanimPushOrNone(NetworkObj obj, NetworkStorage storage, bool push) {
-      var t_frame = storage.Values[obj[this]].TriggerLocal.Frame;
-      var t_history = storage.Values[obj[this]].TriggerLocal.History;
-      var t_callback = storage.Values[obj[this]].Action;
+    void MecanimPush(NetworkObj obj, bool push) {
+      var root = obj.RootState;
+      var frames = root.Frames.GetIterator();
 
-      for (int i = (obj.RootState.Entity.SendRate - 1); (i >= 0) && (t_history != 0); --i) {
-        if (t_frame - i > obj.RootState.Entity.Frame) {
-          return false;
-        }
+      while (frames.Next()) {
+        var s = frames.val;
+        var i = obj[this];
 
-        int b = 1 << i;
+        var t_frame = s.Values[i].TriggerLocal.Frame;
+        var t_history = s.Values[i].TriggerLocal.History;
+        var t_callback = s.Values[i].Action;
 
-        if ((t_history & b) == b) {
-          // clear history for this bit
-          storage.Values[obj[this]].TriggerLocal.History = t_history = (t_history & ~b);
-
-          // update send trigger
-          storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
-
-          if (push) {
-            for (int a = 0; a < obj.RootState.Animators.Count; ++a) {
-              obj.RootState.Animators[a].SetTrigger(PropertyName);
-            }
+        for (int k = (obj.RootState.Entity.SendRate - 1); (k >= 0) && (t_history != 0); --k) {
+          if (t_frame - k > obj.RootState.Entity.Frame) {
+            continue;
           }
 
-          if (t_callback != null) {
-            t_callback();
+          int b = 1 << k;
+
+          if ((t_history & b) == b) {
+            t_history &= ~b;
+
+            // clear history for this bit
+            s.Values[i].TriggerLocal.History = t_history;
+
+            // update send trigger
+            root.Storage.Values[i].TriggerSend.Update(BoltCore.frame, true);
+
+            // meep
+            root.Storage.PropertyChanged(obj.OffsetProperties + obj.OffsetStorage);
+
+            if (push) {
+              for (int a = 0; a < obj.RootState.Animators.Count; ++a) {
+                obj.RootState.Animators[a].SetTrigger(PropertyName);
+              }
+            }
+
+            if (t_callback != null) {
+              t_callback();
+            }
           }
         }
       }
-
-      return true;
     }
   }
 }

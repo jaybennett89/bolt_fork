@@ -42,6 +42,10 @@ internal static class BitUtils {
     return sb.ToString();
   }
 
+  public static string IntToString(int value) {
+    return UIntToString((uint)value);
+  }
+
   public static string UIntToString (uint value) {
     StringBuilder sb = new StringBuilder(35);
 

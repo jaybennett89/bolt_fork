@@ -15,18 +15,6 @@ namespace Bolt.Compiler {
     public PropertyDefinition Definition;
     public MemberAttributes Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
-    public virtual bool OnRenderCallback {
-      get { return false; }
-    }
-
-    public virtual bool OnSimulateBeforeCallback {
-      get { return false; }
-    }
-
-    public virtual bool OnSimulateAfterCallback {
-      get { return false; }
-    }
-
     public abstract string ClrType {
       get;
     }

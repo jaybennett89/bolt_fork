@@ -277,6 +277,15 @@ namespace Bolt {
           storage.Frame = frame;
           storage.ClearAll();
 
+          // tell the properties that need to know about this
+          for (int i = 0; i < Meta.OnFrameCloned.Count; ++i) {
+            // grab property info
+            var pi = Meta.OnFrameCloned[i];
+
+            // invoke callback
+            pi.Property.OnFrameCloned(Objects[pi.OffsetObjects], storage);
+          }
+
           Frames.AddLast(storage);
         }
       }

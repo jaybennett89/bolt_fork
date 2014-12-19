@@ -55,6 +55,7 @@ namespace Bolt {
       Meta.InitObject(this, parent, offsets);
     }
 
+
     internal NetworkStorage AllocateStorage() {
       return new NetworkStorage(Meta.CountStorage);
     }

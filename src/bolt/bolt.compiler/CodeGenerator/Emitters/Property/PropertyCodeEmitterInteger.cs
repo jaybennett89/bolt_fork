@@ -10,6 +10,17 @@ namespace Bolt.Compiler {
       get { return "Int0"; }
     }
 
+    public override bool AllowSetter {
+      get {
+        var s = Decorator.Definition.StateAssetSettings;
+        if (s != null) {
+          return s.MecanimMode == MecanimMode.Disabled || s.MecanimDirection == MecanimDirection.UsingBoltProperties;
+        }
+
+        return true;
+      }
+    }
+
     public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
       if (Decorator.PropertyType.CompressionEnabled) {
         statements.Call(expr, "Settings_Integer",

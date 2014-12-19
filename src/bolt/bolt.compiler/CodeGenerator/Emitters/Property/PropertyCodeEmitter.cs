@@ -24,6 +24,14 @@ namespace Bolt.Compiler {
       get { return Decorator.PropertyClassName; }
     }
 
+    public virtual bool AllowSetter {
+      get { return true; }
+    }
+
+    public virtual bool VerifyModify {
+      get { return true; }
+    }
+
     public virtual void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
 
     }
@@ -38,33 +46,72 @@ namespace Bolt.Compiler {
 
     public void EmitSimplePropertyMembers(CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
       var index = new CodeIndexerExpression(storage.Field("Values"), "this.OffsetStorage + {0}".Expr(Decorator.OffsetStorage));
-      var property =
-        type.DeclareProperty(Decorator.ClrType, name, get => {
-          get.Add(
-            new CodeMethodReturnStatement(
-              new CodeFieldReferenceExpression(index, StorageField)
-            )
-          );
-        }, set => {
-          if (changed) {
-            set.Add("{0} oldValue".Expr(Decorator.ClrType));
-            set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
-          }
 
-          set.Add(new CodeAssignStatement(
-            new CodeFieldReferenceExpression(index, StorageField),
-            new CodeVariableReferenceExpression("value")
-          ));
+      // getter method
+      Action<CodeStatementCollection> getter = get => {
+        get.Add(
+          new CodeMethodReturnStatement(
+            new CodeFieldReferenceExpression(index, StorageField)
+          )
+        );
+      };
 
-          if (changed) {
-            set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
-              EmitPropertyChanged(body, storage);
-            });
-          }
-        });
+      // setter method
+      Action<CodeStatementCollection> setter = set => {
+        var s = Decorator.Definition.StateAssetSettings;
+        if (s != null && VerifyModify) {
+          EmitAllowedCheck(set);
+        }
 
+        if (changed) {
+          set.Add("{0} oldValue".Expr(Decorator.ClrType));
+          set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
+        }
+
+        set.Add(new CodeAssignStatement(
+          new CodeFieldReferenceExpression(index, StorageField),
+          new CodeVariableReferenceExpression("value")
+        ));
+
+        if (changed) {
+          set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
+            EmitPropertyChanged(body, storage);
+          });
+        }
+      };
+
+      if (!AllowSetter) {
+        setter = null;
+      }
+
+      var property = type.DeclareProperty(Decorator.ClrType, name, getter, setter);
       property.PrivateImplementationType = interfaceType;
       property.Attributes = Decorator.Attributes;
+    }
+
+    protected void EmitAllowedCheck(CodeStatementCollection stmts) {
+#if DEBUG
+      string error = null;
+
+      switch (Decorator.Definition.ReplicationMode) {
+        case ReplicationMode.EveryoneExceptController:
+          error = @"var en = this.RootState.Entity; if(!en.IsOwner && !en.HasControl) {{ BoltLog.Error(""Only the owner and controller can modify: '{0}'""); return; }}";
+          break;
+
+        case ReplicationMode.Everyone:
+          error = @"var en = this.RootState.Entity; if(!en.IsOwner) {{ BoltLog.Error(""Only the owner can modify: '{0}'""); return; }}";
+          break;
+
+        case ReplicationMode.OnlyOwnerAndController:
+          error = @"var en = this.RootState.Entity; if(en.HasControl) {{ BoltLog.Error(""Controller is not allowed to modify '{0}'""); return; }}";
+          break;
+      }
+
+
+      if (error != null) {
+        stmts.Expr(error, Decorator.Definition.Name);
+      }
+#endif
     }
 
     public void EmitPropertyChanged(CodeStatementCollection stmt, CodeExpression storage) {
