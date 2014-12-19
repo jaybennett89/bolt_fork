@@ -13,7 +13,7 @@
     }
 
     public override int BitCount(NetworkObj obj) {
-      return 32;
+      return obj.RootState.Entity.SendRate;
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {
@@ -25,17 +25,12 @@
       obj.Storage.Values[obj[this]].TriggerLocal.Update(BoltCore.frame, true);
     }
 
-    int c = 0;
-
     public override bool Write(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
       // adjust trigger
       storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, false);
 
       // write history
       packet.WriteInt(storage.Values[obj[this]].TriggerSend.History, obj.RootState.Entity.SendRate);
-
-      // meep
-      BoltLog.Info("WRITE: {0}:{1}", BoltCore.frame, BitUtils.IntToString(storage.Values[obj[this]].TriggerSend.History));
 
       // this always succeeds!
       return true;
@@ -44,7 +39,6 @@
     public override void Read(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpKit.UdpPacket packet) {
       storage.Values[obj[this]].TriggerLocal.Frame = storage.Frame;
       storage.Values[obj[this]].TriggerLocal.History = packet.ReadInt(obj.RootState.Entity.SendRate);
-      BoltLog.Info("READ: {0}:{1}", storage.Frame, BitUtils.IntToString(storage.Values[obj[this]].TriggerLocal.History));
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
@@ -72,7 +66,7 @@
         storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);
 
         // notify bolt this property changed
-        storage.PropertyChanged(obj.OffsetProperties + obj.OffsetStorage);
+        storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
 
         // invoke callback
         var cb = obj.Storage.Values[obj[this]].Action;
@@ -102,8 +96,6 @@
           int b = 1 << k;
 
           if ((t_history & b) == b) {
-            BoltLog.Info("{2} TRIGGER: {0}:{1}:{3}", t_frame - k, BitUtils.IntToString(t_history), BoltCore.frame, BitUtils.IntToString(t_history & ~b));
-
             t_history &= ~b;
 
             // clear history for this bit

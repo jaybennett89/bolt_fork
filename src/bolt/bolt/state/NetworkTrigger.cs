@@ -10,10 +10,7 @@ namespace Bolt {
     public int History;
 
     public void Update(int frame, bool set) {
-      if (frame != this.Frame) {
-        // must be larger than old frame
-        Assert.True(frame > this.Frame);
-
+      if (frame > this.Frame) {
         // get diff
         int diff = frame - this.Frame;
 
@@ -25,6 +22,11 @@ namespace Bolt {
         }
 
         this.Frame = frame;
+      }
+      else if (frame == this.Frame) {
+        if (set) {
+          this.History |= 1;
+        }
       }
     }
 
