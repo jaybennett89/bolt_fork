@@ -19,6 +19,7 @@ namespace Bolt.Compiler {
   [ProtoInclude(1200, typeof(PropertyTypeQuaternion))]
   [ProtoInclude(1400, typeof(PropertyTypePrefabId))]
   [ProtoInclude(1500, typeof(PropertyTypeNetworkId))]
+  [ProtoInclude(1600, typeof(PropertyTypeProcotolToken))]
   public abstract class PropertyType {
     [ProtoIgnore]
     public Project Context;

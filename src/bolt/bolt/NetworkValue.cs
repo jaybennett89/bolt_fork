@@ -60,6 +60,11 @@ namespace Bolt {
       set { Object = value; }
     }
 
+    public Bolt.IProtocolToken ProtocolToken {
+      get { return (Bolt.IProtocolToken)Object; }
+      set { Object = value; }
+    }
+
     public Bolt.NetworkTransform Transform {
       get { return (Bolt.NetworkTransform)Object; }
       set { Object = value; }
@@ -114,6 +119,11 @@ namespace Bolt {
     public static bool Diff(UnityEngine.Vector3 a, UnityEngine.Vector3 b) { return a != b; }
     public static bool Diff(UnityEngine.Quaternion a, UnityEngine.Quaternion b) { return a != b; }
     public static bool Diff(UnityEngine.Color a, UnityEngine.Color b) { return a != b; }
+
+
+    public static bool Diff(Bolt.IProtocolToken a, Bolt.IProtocolToken b) {
+      return ReferenceEquals(a, b) == false;
+    }
 
     public static bool Diff_Strict(UnityEngine.Vector2 a, UnityEngine.Vector2 b) {
       return a.x != b.x || a.y != b.y;

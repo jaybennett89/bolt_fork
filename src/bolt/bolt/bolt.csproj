@@ -110,6 +110,7 @@
     <Compile Include="state\Properties\Bool.cs" />
     <Compile Include="state\Properties\NetworkId.cs" />
     <Compile Include="state\Properties\PrefabId.cs" />
+    <Compile Include="state\Properties\ProtocolToken.cs" />
     <Compile Include="state\Properties\Quaternion.cs" />
     <Compile Include="state\Properties\String.cs" />
     <Compile Include="state\Properties\Transform.cs" />
