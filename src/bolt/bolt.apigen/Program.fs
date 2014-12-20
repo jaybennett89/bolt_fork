@@ -20,6 +20,27 @@ let replace (regex:string) (value:string) (text:string) =
 let grab regex text =
   Regex.Match(text, regex).Groups.[1].Value
   
+let typeLink (url:string) (text:string) =
+  sprintf "[%s](%s)" text url
+
+let typeString (s:string) =
+  let s = s.Trim()
+
+  if s.StartsWith("UnityEngine.") then
+    typeLink (sprintf "http://docs.unity3d.com/ScriptReference/%s.html" (remove "UnityEngine." s)) s
+
+  else
+    match s with
+    | "System.Single" -> typeLink "http://msdn.microsoft.com/en-us/library/b1e65aza.aspx" "float"
+    | "System.Boolean" -> typeLink "http://msdn.microsoft.com/en-us/library/c8f5xwh7.aspx" "bool"
+    | "System.Void" -> typeLink "http://msdn.microsoft.com/en-us/library/yah0tteb.aspx" "void"
+    | "System.Object" -> typeLink "http://msdn.microsoft.com/en-us/library/9kkx3h3c.aspx" "object"
+    | "System.Int32" -> typeLink "http://msdn.microsoft.com/en-us/library/5kzh1b5w.aspx" "int"
+    | "System.UInt32" -> typeLink "http://msdn.microsoft.com/en-us/library/x0sksh43.aspx" "uint"
+    | "System.String" -> typeLink "http://msdn.microsoft.com/en-us/library/362314fe.aspx" "string"
+    | _ -> 
+      System.Web.HttpUtility.HtmlEncode(s)
+
 type DocParam = {
   Xml : XML.Param
   TypeName : string
@@ -27,6 +48,7 @@ type DocParam = {
   member x.Name = x.Xml.Name
   member x.Type = x.TypeName
   
+(*
 type DocTypeParam = {
   Xml : XML.Typeparam
 } with
@@ -36,15 +58,20 @@ type DocTypeParam = {
     match parms with
     | None -> ""
     | Some parms -> "<" + System.String.Join(", ", parms |> Seq.map (fun x -> x.Name) |> Seq.toArray) + ">"
+*)
 
 type DocMethod = {
   Xml : XML.Member
   Cecil : Mono.Cecil.MethodDefinition option
   Type : DocType option
   Parameters : DocParam list
-  TypeParams : DocTypeParam list
+  TypeParams : string list 
 } with
   member x.Name = x.Cecil.Value.Name
+  member x.Signature = 
+    x.Parameters 
+      |> List.map (fun p -> (typeString p.TypeName) + " " + p.Name) 
+      |> (fun s -> String.Join(", ", s))
 
 and DocProperty = {
   Xml : XML.Member
@@ -58,7 +85,7 @@ and DocType = {
   Cecil : Mono.Cecil.TypeDefinition
   Methods : DocMethod list
   Properties : DocProperty list
-  TypeParams : DocTypeParam list
+  TypeParams : string list
 } with
   member x.Name = x.Xml.Name.Substring(2)
 
@@ -71,6 +98,16 @@ let main argv =
   let h3 h = (!sb).AppendLine("### " + h) |> ignore
   let h4 h = (!sb).AppendLine("#### " + h) |> ignore
   let h5 h = (!sb).AppendLine("##### " + h) |> ignore
+
+
+  let typeName (c:Mono.Cecil.TypeReference) =
+
+    if c.Name.StartsWith("IEnumerable`1") then
+      let gparams = String.Join(", ", c.GenericParameters |> Seq.map (fun p -> p.FullName))
+      sprintf "IEnumerable&lt;%s&gt;" gparams
+
+    else
+      typeString c.FullName
   
   let startsWith c (m:XML.Member) =
     m.Name.StartsWith(c)
@@ -105,7 +142,7 @@ let main argv =
   let methods =
     xml.Members
     |> Seq.filter (startsWith "M:")
-    |> Seq.map (fun x -> {DocMethod.Xml=x; Type=None; Cecil=None; Parameters=[]; TypeParams=[]})
+    |> Seq.map (fun x -> {DocMethod.Xml=x; Type=None; Cecil=None; Parameters=[]; TypeParams=[]}) 
     |> Seq.map (fun x ->
 
       let paramTypes =
@@ -118,12 +155,12 @@ let main argv =
         |> Seq.map (fun (t, p) -> {DocParam.Xml = p; TypeName=t})
         |> Seq.toList
 
-      let typeParams = 
-        match x.Xml.Typeparam with
-        | None -> []
-        | Some t -> [{DocTypeParam.Xml = t}]
+//      let typeParams = 
+//        match x.Xml.Typeparam with
+//        | None -> []
+//        | Some t -> [{DocTypeParam.Xml = t}]
 
-      {x with Parameters=parameters; TypeParams=typeParams}
+      {x with Parameters=parameters; TypeParams=[]}
     )
     |> Seq.groupBy (fun x -> Regex.Match(x.Xml.Name, @"(?<=M:)(Bolt\.|BoltInternal\.|)[^.]+").Value)
     |> Seq.map (fun (c, m) -> (c, m |> Seq.toList))
@@ -151,12 +188,12 @@ let main argv =
       | Some c -> Some {x with Cecil=c}
     )
 
-    // find type params
-    |> Seq.map (fun x ->
-      match x.Xml.Typeparam with
-      | None -> x
-      | Some tp -> {x with TypeParams = [{DocTypeParam.Xml = tp}]}
-    )
+//    // find type params
+//    |> Seq.map (fun x ->
+//      match x.Xml.Typeparam with
+//      | None -> x
+//      | Some tp -> {x with TypeParams = [{DocTypeParam.Xml = tp}]}
+//    )
 
     // find methods
     |> Seq.map (fun x ->
@@ -229,7 +266,21 @@ let main argv =
           then "set; "
           else ""
 
-      h5 (sprintf "public %s %s { get; %s}" m.Cecil.Value.PropertyType.Name m.Name set)
+      h5 (sprintf "public %s %s { get; %s}" (typeName m.Cecil.Value.PropertyType) m.Name set)
+      
+      match m.Xml.Summary with
+      | Some s -> p s
+      | None -> ()
+
+      match m.Xml.Example with
+      | Some s -> pre s
+      | None -> ()
+      
+    if t.Methods.Length > 0 then 
+      h4 "Methods"
+
+    for m in t.Methods do
+      h5 (sprintf "public %s %s(%s)" (typeName m.Cecil.Value.ReturnType) m.Name m.Signature)
       
       match m.Xml.Summary with
       | Some s -> p s

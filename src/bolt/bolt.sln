@@ -136,14 +136,10 @@ Global
 		{CE0570DD-F462-476B-B78A-0B363092852A}.Release|Win32.ActiveCfg = Release|Win32
 		{CE0570DD-F462-476B-B78A-0B363092852A}.Release|Win32.Build.0 = Release|Win32
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{931FFE38-AC82-4A60-A268-E760DAE59633}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{931FFE38-AC82-4A60-A268-E760DAE59633}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{931FFE38-AC82-4A60-A268-E760DAE59633}.Release|Any CPU.Build.0 = Release|Any CPU
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{931FFE38-AC82-4A60-A268-E760DAE59633}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{931FFE38-AC82-4A60-A268-E760DAE59633}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
