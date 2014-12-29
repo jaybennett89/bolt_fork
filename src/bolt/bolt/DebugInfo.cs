@@ -199,71 +199,78 @@ namespace Bolt {
         mp = c.ScreenToViewportPoint(Input.mousePosition);
         mp.z = 0;
 
-        if (mp.ViewPointIsOnScreen()) {
-          foreach (Entity en in BoltCore._entities) {
-            DrawEntity(en.UnityObject);
+        foreach (Entity en in BoltCore._entities) {
+          DrawEntity(en.UnityObject);
+        }
+
+        Entity entity = BoltCore._entities
+          .Where(x => ignoreList.Contains(x.NetworkId) == false)
+          .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
+          .Where(x => {
+            Vector3 m = Input.mousePosition;
+            m.z = 0;
+
+            Vector3 p = c.WorldToScreenPoint(x.UnityObject.transform.position);
+            p.z = 0;
+
+            return (m - p).sqrMagnitude < (32 * 32);
+          })
+          .OrderBy(x => {
+            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+            vp.z = 0;
+
+            return (mp - vp).sqrMagnitude;
+          })
+          .FirstOrDefault();
+
+        if (entity && mp.ViewPointIsOnScreen()) {
+
+          Rect r = new Rect(Screen.width - 410, 10, 400, Screen.height - 20);
+
+          DrawBackground(r);
+
+          r.xMin += 10;
+          r.xMax -= 10;
+
+          r.yMin += 10;
+          r.yMax -= 10;
+
+          GUILayout.BeginArea(r);
+
+          debugInfoScroll = GUILayout.BeginScrollView(debugInfoScroll, false, false, GUIStyle.none, GUIStyle.none);
+          GUILayout.BeginVertical();
+
+          var state = (NetworkState)entity.Serializer;
+
+          if (Input.GetKeyDown(KeyCode.L)) {
+            BoltNetworkInternal.DebugDrawer.SelectGameObject(entity.UnityObject.gameObject);
           }
 
-          Entity entity = BoltCore._entities
-            .Where(x => ignoreList.Contains(x.NetworkId) == false)
-            .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
-            .OrderBy(x => {
-              Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
-              vp.z = 0;
+          LabelBold("Entity Info");
+          LabelField("Name", entity.UnityObject.gameObject.name);
+          LabelField("Network Id", entity.NetworkId);
+          LabelField("Is Frozen", entity.IsFrozen);
 
-              return (mp - vp).sqrMagnitude;
-            })
-            .FirstOrDefault();
+          LabelField("World Position", entity.UnityObject.transform.position);
 
-          if (entity) {
+          LabelField("ServerFrame Count", state.Frames.count);
+          LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
+          LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
+          LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
-            Rect r = new Rect(Screen.width - 410, 10, 400, Screen.height - 20);
+          entity.Serializer.DebugInfo();
 
-            DrawBackground(r);
+          GUILayout.EndVertical();
+          GUILayout.EndScrollView();
+          GUILayout.EndArea();
+        }
 
-            r.xMin += 10;
-            r.xMax -= 10;
+        if (Input.GetKey(KeyCode.PageUp)) {
+          debugInfoScroll.y = Mathf.Max(debugInfoScroll.y - 10, 0);
+        }
 
-            r.yMin += 10;
-            r.yMax -= 10;
-
-            GUILayout.BeginArea(r);
-
-            debugInfoScroll = GUILayout.BeginScrollView(debugInfoScroll, false, false, GUIStyle.none, GUIStyle.none);
-            GUILayout.BeginVertical();
-
-            var state = (NetworkState)entity.Serializer;
-
-            if (Input.GetKeyDown(KeyCode.L)) {
-              BoltNetworkInternal.DebugDrawer.SelectGameObject(entity.UnityObject.gameObject);
-            }
-
-            LabelBold("Entity Info");
-            LabelField("Name", entity.UnityObject.gameObject.name);
-            LabelField("Network Id", entity.NetworkId);
-            LabelField("Is Frozen", entity.IsFrozen);
-
-            LabelField("World Position", entity.UnityObject.transform.position);
-
-            LabelField("ServerFrame Count", state.Frames.count);
-            LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
-            LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
-            LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
-
-            entity.Serializer.DebugInfo();
-
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-            GUILayout.EndArea();
-          }
-
-          if (Input.GetKey(KeyCode.PageUp)) {
-            debugInfoScroll.y = Mathf.Max(debugInfoScroll.y - 10, 0);
-          }
-
-          if (Input.GetKey(KeyCode.PageDown)) {
-            debugInfoScroll.y = Mathf.Min(debugInfoScroll.y + 10, 2000);
-          }
+        if (Input.GetKey(KeyCode.PageDown)) {
+          debugInfoScroll.y = Mathf.Min(debugInfoScroll.y + 10, 2000);
         }
       }
 #endif
