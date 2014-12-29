@@ -205,7 +205,7 @@ namespace Bolt {
             return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
           })
           .OrderBy(x => {
-            Vector3 vc = new Vector3(0.5f, 0.5f, 0f);
+            Vector3 vc = c.ScreenToViewportPoint(Input.mousePosition);
             Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
             vp.z = 0;
 
