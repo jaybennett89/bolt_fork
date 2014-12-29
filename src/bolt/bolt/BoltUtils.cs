@@ -14,6 +14,10 @@ static class BoltUtils {
     return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
   }
 
+  public static bool ViewPointIsOnScreen(this Vector3 vp) {
+    return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
+  }
+
   public static T[] CloneArray<T>(this T[] array) {
     T[] clone = new T[array.Length];
     Array.Copy(array, 0, clone, 0, array.Length);
