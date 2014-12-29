@@ -479,7 +479,6 @@ public static class BoltNetwork {
   /// <summary>
   /// The scoping mode active
   /// </summary>
-  [System.Obsolete("This property will be removed in a future update")]
   public static ScopeMode scopeMode {
     get { return BoltCore._config.scopeMode; }
   }
