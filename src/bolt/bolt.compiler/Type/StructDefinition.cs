@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class StructDefinition : AssetDefinition {
+  public class ObjectDefinition : AssetDefinition {
     [ProtoMember(50)]
     public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
 

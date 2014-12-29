@@ -40,7 +40,7 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypeFloat);
       yield return typeof(PropertyTypeInteger);
       yield return typeof(PropertyTypeArray);
-      yield return typeof(PropertyTypeStruct);
+      yield return typeof(PropertyTypeObject);
       yield return typeof(PropertyTypeString);
       yield return typeof(PropertyTypeTrigger);
       yield return typeof(PropertyTypeTransform);

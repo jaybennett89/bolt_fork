@@ -109,7 +109,7 @@ namespace Bolt.Compiler {
         States.Add(decorator);
       }
 
-      foreach (StructDefinition def in Project.Structs) {
+      foreach (ObjectDefinition def in Project.Structs) {
         ObjectDecorator decorator;
 
         decorator = new ObjectDecorator(def);
@@ -138,9 +138,9 @@ namespace Bolt.Compiler {
     }
 
     ObjectDecorator CreateCommandObjectDefintion(AssetDecorator asset, string suffix) {
-      StructDefinition def;
+      ObjectDefinition def;
 
-      def = new StructDefinition();
+      def = new ObjectDefinition();
       def.Deleted = false;
       def.Enabled = true;
       def.Guid = Guid.NewGuid();
@@ -163,7 +163,7 @@ namespace Bolt.Compiler {
       def.Replicated = true;
       def.Enabled = true;
       def.Deleted = false;
-      def.PropertyType = new PropertyTypeStruct() {
+      def.PropertyType = new PropertyTypeObject() {
         Context = Project,
         StructGuid = propertyType.Guid
       };

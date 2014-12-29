@@ -16,7 +16,7 @@ namespace Bolt.Compiler {
     public IEnumerable<Type> AllowedElementTypes {
       get {
         yield return typeof(PropertyTypeFloat);
-        yield return typeof(PropertyTypeStruct);
+        yield return typeof(PropertyTypeObject);
         yield return typeof(PropertyTypeEntity);
         yield return typeof(PropertyTypeInteger);
         yield return typeof(PropertyTypeString);
@@ -33,8 +33,8 @@ namespace Bolt.Compiler {
           return false;
         }
 
-        if (ElementType is PropertyTypeStruct) {
-          return ((PropertyTypeStruct)ElementType).StructGuid != Guid.Empty;
+        if (ElementType is PropertyTypeObject) {
+          return ((PropertyTypeObject)ElementType).StructGuid != Guid.Empty;
         }
 
         return true;
@@ -42,7 +42,7 @@ namespace Bolt.Compiler {
     }
 
     public override bool HasPriority {
-      get { return ElementType != null && ElementType.GetType() != typeof(PropertyTypeStruct); }
+      get { return ElementType != null && ElementType.GetType() != typeof(PropertyTypeObject); }
     }
 
     public override bool IsValue {

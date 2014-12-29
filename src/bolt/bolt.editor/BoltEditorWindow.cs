@@ -53,8 +53,8 @@ public class BoltEditorWindow : BoltWindow {
         EditState((StateDefinition)Selected);
       }
 
-      if (Selected is StructDefinition) {
-        EditStruct((StructDefinition)Selected);
+      if (Selected is ObjectDefinition) {
+        EditStruct((ObjectDefinition)Selected);
       }
 
       if (Selected is EventDefinition) {
@@ -194,7 +194,7 @@ public class BoltEditorWindow : BoltWindow {
     }
   }
 
-  void EditStruct(StructDefinition def) {
+  void EditStruct(ObjectDefinition def) {
     // add button
     EditPropertyList(def, def.Properties);
   }
@@ -251,7 +251,7 @@ public class BoltEditorWindow : BoltWindow {
 
   void EditHeader(AssetDefinition def) {
     var stateDef = def as StateDefinition;
-    var structDef = def as StructDefinition;
+    var structDef = def as ObjectDefinition;
     var cmdDef = def as CommandDefinition;
     var eventDef = def as EventDefinition;
 
@@ -259,7 +259,7 @@ public class BoltEditorWindow : BoltWindow {
     GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
 
     if (def is StateDefinition) { BoltEditorGUI.IconButton("mc_state"); }
-    if (def is StructDefinition) { BoltEditorGUI.IconButton("mc_struct"); }
+    if (def is ObjectDefinition) { BoltEditorGUI.IconButton("mc_struct"); }
     if (def is EventDefinition) { BoltEditorGUI.IconButton("mc_event"); }
     if (def is CommandDefinition) { BoltEditorGUI.IconButton("mc_command"); }
 
@@ -387,7 +387,7 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
-    if (def is StateDefinition || def is StructDefinition) {
+    if (def is StateDefinition || def is ObjectDefinition) {
       p.Name = BoltEditorGUI.TextFieldOverlay(p.Name, p.Priority.ToString(), GUILayout.Width(181));
 
       switch (p.ReplicationMode) {
@@ -445,7 +445,7 @@ public class BoltEditorWindow : BoltWindow {
       //  p.Comment = EditorGUILayout.TextField(p.Comment);
       //});
 
-      if (def is StateDefinition || def is StructDefinition) {
+      if (def is StateDefinition || def is ObjectDefinition) {
         BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
           p.ReplicationMode = (ReplicationMode)EditorGUILayout.EnumPopup(p.ReplicationMode);

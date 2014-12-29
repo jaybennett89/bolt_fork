@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bolt.Compiler {
-  public class PropertyDecoratorStruct : PropertyDecorator<PropertyTypeStruct> {
+  public class PropertyDecoratorStruct : PropertyDecorator<PropertyTypeObject> {
     public ObjectDecorator Object {
       get { return Generator.FindStruct(PropertyType.StructGuid); }
     }
