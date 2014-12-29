@@ -53,6 +53,7 @@ namespace UdpKit {
     public const int PIPE_COMMAND = 1;
     public const int PIPE_PACKET = 3;
     public const int PIPE_STREAM = 4;
+    public const int PIPE_STREAM_UNRELIABLE = 5;
     public const int PIPE_MASTERSERVER = 2;
 
     struct SendInfo {

@@ -588,9 +588,21 @@ namespace UdpKit {
           RecvStream(ep, buffer, bytes);
           break;
 
+        case UdpPipe.PIPE_STREAM_UNRELIABLE:
+          RecvStreamUnreliable(ep, buffer, bytes);
+          break;
+
         case Protocol.Message.MESSAGE_HEADER:
           RecvProtocol(ep, buffer, bytes);
           break;
+      }
+    }
+
+    void RecvStreamUnreliable(UdpEndPoint ep, byte[] buffer, int bytes) {
+      UdpConnection cn;
+
+      if (connectionLookup.TryGetValue(ep, out cn)) {
+        cn.OnStreamReceived_Unreliable(buffer, bytes);
       }
     }
 

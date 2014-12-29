@@ -95,7 +95,6 @@ namespace UdpKit {
                 // if this is an unreliable channel we just remove the item right away
                 if (Channel.Config.Mode == UdpChannelMode.Unreliable) {
                   OutgoingData.Remove(d.Key);
-
                 }
 
                 // if not, track pending delivery
