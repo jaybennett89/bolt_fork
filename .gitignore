@@ -5,6 +5,7 @@
 *.dll
 *.opensdf
 *.sdf
+*.booproj
 
 build
 upload

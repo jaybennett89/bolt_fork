@@ -194,26 +194,36 @@ namespace Bolt {
           return;
         }
 
+        Vector3 mp;
+
+        mp = c.ScreenToViewportPoint(Input.mousePosition);
+        mp.z = 0;
+
         foreach (Entity en in BoltCore._entities) {
           DrawEntity(en.UnityObject);
         }
 
         Entity entity = BoltCore._entities
           .Where(x => ignoreList.Contains(x.NetworkId) == false)
+          .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
           .Where(x => {
-            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
-            return vp.z >= 0 && vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1;
+            Vector3 m = Input.mousePosition;
+            m.z = 0;
+
+            Vector3 p = c.WorldToScreenPoint(x.UnityObject.transform.position);
+            p.z = 0;
+
+            return (m - p).sqrMagnitude < (32 * 32);
           })
           .OrderBy(x => {
-            Vector3 vc = new Vector3(0.5f, 0.5f, 0f);
             Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
             vp.z = 0;
 
-            return (vc - vp).sqrMagnitude;
+            return (mp - vp).sqrMagnitude;
           })
           .FirstOrDefault();
 
-        if (entity) {
+        if (entity && mp.ViewPointIsOnScreen()) {
 
           Rect r = new Rect(Screen.width - 410, 10, 400, Screen.height - 20);
 

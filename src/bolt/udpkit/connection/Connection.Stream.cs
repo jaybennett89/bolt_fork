@@ -45,9 +45,37 @@ namespace UdpKit {
           UdpLog.Error("Can't queue unreliable data streams larger than {0}", maxUnreliableSize);
           return;
         }
-      }
 
-      s.Queue(op.Data);
+        var o = 0;
+        var buffer = Socket.GetRecvBuffer();
+
+        Blit.PackByte(buffer, ref o, UdpPipe.PIPE_STREAM_UNRELIABLE);
+        Blit.PackI32(buffer, ref o, c.Name.Id);
+        Blit.PackBytesPrefix(buffer, ref o, op.Data);
+
+        Socket.Send(RemoteEndPoint, buffer, o);
+      }
+      else {
+        s.Queue(op.Data);
+      }
+    }
+
+    internal void OnStreamReceived_Unreliable(byte[] buffer, int size) {
+      var o = 1;
+      var channelId = Blit.ReadI32(buffer, ref o);
+      var data = Blit.ReadBytesPrefix(buffer, ref o);
+
+      UdpEvent ev;
+      UdpStreamChannel channel;
+
+      if (Socket.FindChannel(channelId, out channel)) {
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_STREAM_DATARECEIVED;
+        ev.Connection = this;
+        ev.StreamData = new UdpStreamData { Channel = channel.Name, Data = data };
+
+        Socket.Raise(ev);
+      }
     }
 
     internal void OnStreamReceived(byte[] buffer, int bytes) {

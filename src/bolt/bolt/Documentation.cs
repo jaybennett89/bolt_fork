@@ -7,5 +7,10 @@ namespace Bolt {
       get;
       set;
     }
+
+    public bool Ignore {
+      get;
+      set;
+    }
   }
 }

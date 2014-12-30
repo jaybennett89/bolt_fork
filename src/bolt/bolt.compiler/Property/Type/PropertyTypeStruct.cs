@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   [ProtoContract]
-  public class PropertyTypeStruct : PropertyType {
+  public class PropertyTypeObject : PropertyType {
     [ProtoMember(50)]
     public Guid StructGuid;
 

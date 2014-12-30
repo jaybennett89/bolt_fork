@@ -115,9 +115,6 @@ public class BoltHitbox : MonoBehaviour {
   /// <summary>
   /// Size of the hitbox if this shape is a box
   /// </summary>
-  /// <summary>
-  /// Type of the hitbox
-  /// </summary>
   /// <example>
   /// *Example:* A method to double the size of a player's head hitbox if it is a box.
   /// 

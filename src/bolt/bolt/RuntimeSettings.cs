@@ -78,13 +78,13 @@ public class BoltRuntimeSettings : ScriptableObject {
   /// Whether to show debug info or not
   /// </summary>
   [SerializeField]
-  public bool showDebugInfo = false;
+  public bool showDebugInfo = true;
 
   /// <summary>
   /// Whether to log uncaught exceptions
   /// </summary>
   [SerializeField]
-  public bool logUncaughtExceptions = true;
+  public bool logUncaughtExceptions = false;
 
   /// <summary>
   /// Whehther the client has instantiate priviledges or not

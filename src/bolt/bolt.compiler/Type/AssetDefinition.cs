@@ -15,7 +15,7 @@ namespace Bolt.Compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(StateDefinition))]
   [ProtoInclude(200, typeof(EventDefinition))]
-  [ProtoInclude(300, typeof(StructDefinition))]
+  [ProtoInclude(300, typeof(ObjectDefinition))]
   [ProtoInclude(400, typeof(CommandDefinition))]
   public abstract class AssetDefinition {
     [ProtoIgnore]

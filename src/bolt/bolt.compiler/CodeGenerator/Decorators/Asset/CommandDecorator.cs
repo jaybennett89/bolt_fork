@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public class CommandObjectDecorator : ObjectDecorator {
-    public CommandObjectDecorator(StructDefinition def)
+    public CommandObjectDecorator(ObjectDefinition def)
       : base(def) {
     }
 

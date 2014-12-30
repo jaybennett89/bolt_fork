@@ -27,6 +27,7 @@ namespace Bolt {
 /// }
 /// ```
 /// </example>
+///
 public enum BoltRandomFunction {
   PerlinNoise,
   SystemRandom

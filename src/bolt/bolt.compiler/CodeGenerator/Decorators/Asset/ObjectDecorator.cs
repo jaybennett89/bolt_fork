@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Bolt.Compiler {
-  public class ObjectDecorator : AssetDecorator<StructDefinition> {
+  public class ObjectDecorator : AssetDecorator<ObjectDefinition> {
     public override string FactoryInterface {
       get { return "Bolt.IFactory"; }
     }
@@ -18,7 +18,7 @@ namespace Bolt.Compiler {
     public IEnumerable<ObjectDecorator> Dependencies {
       get {
         foreach (PropertyDecorator pd in Properties) {
-          var typeStruct = pd.Definition.PropertyType as PropertyTypeStruct;
+          var typeStruct = pd.Definition.PropertyType as PropertyTypeObject;
           if (typeStruct != null) {
             yield return Generator.FindStruct(typeStruct.StructGuid);
 
@@ -29,7 +29,7 @@ namespace Bolt.Compiler {
 
           var typeArray = pd.Definition.PropertyType as PropertyTypeArray;
           if (typeArray != null) {
-            var typeArrayStruct = typeArray.ElementType as PropertyTypeStruct;
+            var typeArrayStruct = typeArray.ElementType as PropertyTypeObject;
             if (typeArrayStruct != null) {
               yield return Generator.FindStruct(typeArrayStruct.StructGuid);
 
@@ -42,7 +42,7 @@ namespace Bolt.Compiler {
       }
     }
 
-    public ObjectDecorator(StructDefinition def) {
+    public ObjectDecorator(ObjectDefinition def) {
       Definition = def;
     }
   }

@@ -30,8 +30,8 @@ namespace Bolt.Compiler {
       get { return RootFolder.Assets.Where(x => x is StateDefinition).Cast<StateDefinition>(); }
     }
 
-    public IEnumerable<StructDefinition> Structs {
-      get { return RootFolder.Assets.Where(x => x is StructDefinition).Cast<StructDefinition>(); }
+    public IEnumerable<ObjectDefinition> Structs {
+      get { return RootFolder.Assets.Where(x => x is ObjectDefinition).Cast<ObjectDefinition>(); }
     }
 
     public IEnumerable<EventDefinition> Events {

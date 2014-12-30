@@ -6,7 +6,7 @@ using System.Text;
 namespace Bolt.Compiler {
   [ProtoContract]
   [ProtoInclude(100, typeof(PropertyTypeFloat))]
-  [ProtoInclude(200, typeof(PropertyTypeStruct))]
+  [ProtoInclude(200, typeof(PropertyTypeObject))]
   [ProtoInclude(300, typeof(PropertyTypeArray))]
   [ProtoInclude(400, typeof(PropertyTypeVector))]
   [ProtoInclude(500, typeof(PropertyTypeString))]

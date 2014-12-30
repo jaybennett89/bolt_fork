@@ -103,7 +103,7 @@ namespace Bolt.Compiler {
           break;
 
         case ReplicationMode.OnlyOwnerAndController:
-          error = @"var en = this.RootState.Entity; if(en.HasControl) {{ BoltLog.Error(""Controller is not allowed to modify '{0}'""); return; }}";
+          error = @"var en = this.RootState.Entity; if(!en.IsOwner && en.HasControl) {{ BoltLog.Error(""Controller is not allowed to modify '{0}'""); return; }}";
           break;
       }
 
