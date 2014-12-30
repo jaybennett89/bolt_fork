@@ -1272,6 +1272,7 @@ public static class BoltNetwork {
   ///   
   ///   BoltNetwork.SetHostInfo(serverName, sessionData);
   /// }
+  /// ```
   /// </example>
   public static void SetHostInfo(string serverName, IProtocolToken token) {
     BoltCore.SetHostInfo(serverName, token);
