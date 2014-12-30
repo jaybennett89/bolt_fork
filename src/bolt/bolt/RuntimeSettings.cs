@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-public enum BoltEditorStartMode {
+internal enum BoltEditorStartMode {
   None = 0,
   Server = 1,
   Client = 2
@@ -19,7 +19,7 @@ public enum BoltEditorStartMode {
 /// }
 /// </example>
 public class BoltRuntimeSettings : ScriptableObject {
-  static BoltRuntimeSettings _instance;
+  static BoltRuntimeSettings _instance; 
 
   /// <summary>
   /// A singleton static instance of the runtime settings
@@ -93,7 +93,7 @@ public class BoltRuntimeSettings : ScriptableObject {
   public bool clientCanInstantiateAll = true;
 
   [SerializeField]
-  public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
+  internal BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   /// <summary>
   /// The keycode that will toggle visibility of the bolt console

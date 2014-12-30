@@ -84,7 +84,7 @@ public class BoltConsole : MonoBehaviour {
     Write(line, Color.white);
   }
 
-  public static void WriteReal(string line, Color color) {
+  internal static void WriteReal(string line, Color color) {
     // free one slot up
     if (_lines.full) { _lines.Dequeue(); }
 

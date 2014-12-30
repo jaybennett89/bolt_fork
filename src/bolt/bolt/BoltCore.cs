@@ -18,7 +18,6 @@ public enum BoltNetworkModes {
   Client = 2,
 }
 
-
 internal static class BoltCore {
   internal static UdpSocket _udpSocket;
   internal static UdpPlatform _udpPlatform;

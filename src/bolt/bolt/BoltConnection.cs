@@ -260,10 +260,7 @@ public class BoltConnection : BoltObject {
     get { return _bitsSecondOut; }
   }
 
-  /// <summary>
-  /// The internal id of this connection
-  /// </summary>
-  public uint ConnectionId {
+  internal uint ConnectionId {
     get { return udpConnection.ConnectionId; }
   }
 
@@ -379,10 +376,6 @@ public class BoltConnection : BoltObject {
   /// </example>
   public void SetStreamBandwidth(int bytesPerSecond) {
     _udp.StreamSetBandwidth(bytesPerSecond);
-  }
-
-  public void SetCanReceiveEntities(bool canReceive) {
-    _canReceiveEntities = canReceive;
   }
 
   /// <summary>
