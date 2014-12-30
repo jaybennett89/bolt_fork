@@ -135,7 +135,6 @@
     <Compile Include="Exception.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Math.cs" />
-    <Compile Include="Platform.cs" />
     <Compile Include="RingBuffer.cs" />
     <Compile Include="Set.cs" />
     <Compile Include="Socket\Socket.cs" />

@@ -50,6 +50,24 @@ public class DotNetPlatform : UdpPlatform {
     return FindInterfaces();
   }
 
+#if UNITY_WEBPLAYER
+  public override UdpIPv4Address[] ResolveHostAddress(string host) {
+    throw new System.NotSupportedException("ResolveHostAddress is not supported in WebPlayer");
+  }
+#else
+  public override UdpIPv4Address[] ResolveHostAddress(string host) {
+    if (host == null) {
+      throw new System.ArgumentNullException("host", "argument was null");
+    }
+
+    if (host.Length == 0) {
+      throw new System.ArgumentException("host name was empty", "host");
+    }
+
+    return Dns.GetHostAddresses(host).Select(x => ConvertAddress(x)).ToArray();
+  }
+#endif
+
   List<UdpPlatformInterface> FindInterfaces() {
     List<UdpPlatformInterface> result = new List<UdpPlatformInterface>();
 
@@ -195,6 +213,5 @@ public class DotNetPlatform : UdpPlatform {
     return IPAddress.Any;
   }
 #endif
-
 }
 #endif

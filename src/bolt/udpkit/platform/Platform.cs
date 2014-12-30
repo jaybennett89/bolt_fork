@@ -96,6 +96,7 @@ namespace UdpKit {
     public abstract uint GetPrecisionTime();
 
     public abstract UdpIPv4Address GetBroadcastAddress();
+    public abstract UdpIPv4Address[] ResolveHostAddress(string host);
     public abstract UdpPlatformSocket CreateSocket();
     public abstract List<UdpPlatformInterface> GetNetworkInterfaces();
 
