@@ -187,16 +187,13 @@
     <Compile Include="entity\EntityProxy.cs" />
     <Compile Include="UnityCache.cs" />
     <Compile Include="UPnP.cs" />
-    <Compile Include="utils\Assert.cs" />
-    <Compile Include="BoltUtils.cs" />
+    <Compile Include="Assert.cs" />
     <Compile Include="collections\BoltDoubleList.cs" />
-    <Compile Include="BoltExtensions.cs" />
+    <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltSingleList.cs" />
     <Compile Include="BoltMath.cs" />
     <Compile Include="collections\BoltRingBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
-    <Compile Include="utils\BitUtils.cs" />
-    <Compile Include="utils\UdpStreamExt.cs" />
     <Compile Include="NetworkId.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +226,7 @@
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
