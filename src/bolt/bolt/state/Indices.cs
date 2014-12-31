@@ -21,6 +21,7 @@ namespace Bolt {
       get { return (indices == null) ? 0 : indices.Length; }
     }
 
+    [Documentation(Ignore = true)]
     public int this[int index] {
       get {
         if (index < 0 || index >= Length) {

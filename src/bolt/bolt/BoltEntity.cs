@@ -4,6 +4,31 @@ using System.Collections;
 using BoltInternal;
 using UE = UnityEngine;
 
+
+/// <summary>
+/// Modifier for bolt entity settings before it's attached
+/// </summary>
+/// <example>
+/// *Example:* Attaching an entity with custom settings
+/// 
+/// ```csharp
+/// if (BoltNetwork.isServer) {
+///   BoltEntity entity = gameObject.AddComponent&ltBoltEntity&gt();
+///   
+///   using (var mod = entity.ModifySettings()) {
+///     mod.persistThroughSceneLoads = true;
+///     mod.allowInstantiateOnClient = false;
+///     mod.clientPredicted = false;
+///     mod.prefabId = prefabId;
+///     mod.updateRate = 1;
+///     mod.sceneId = Bolt.UniqueId.None;
+///     mod.serializerId = state;
+///   }
+///   
+///   BoltNetwork.Attach(entity.gameObject);
+/// }
+/// ```
+/// </example>
 [Documentation]
 public class BoltEntitySettingsModifier : IDisposable {
   BoltEntity _entity;
@@ -12,51 +37,81 @@ public class BoltEntitySettingsModifier : IDisposable {
     _entity = entity;
   }
 
+  /// <summary>
+  /// The prefab identifier
+  /// </summary>
   public PrefabId prefabId {
     get { return _entity.prefabId; }
     set { _entity.VerifyNotAttached(); _entity._prefabId = value.Value; }
   }
 
+  /// <summary>
+  /// A unique identifier present on scene entities
+  /// </summary>
   public UniqueId sceneId {
     get { return _entity.sceneGuid; }
     set { _entity.VerifyNotAttached(); _entity.sceneGuid = value; }
   }
 
+  /// <summary>
+  /// A unique identifier of this entity state serializer
+  /// </summary>
   public UniqueId serializerId {
     get { return _entity.serializerGuid; }
     set { _entity.VerifyNotAttached(); _entity.serializerGuid = value; }
   }
 
+  /// <summary>
+  /// The network update rate for this entity
+  /// </summary>
   public int updateRate {
     get { return _entity._updateRate; }
     set { _entity.VerifyNotAttached(); _entity._updateRate = value; }
   }
 
+  /// <summary>
+  /// Enable or disable client prediction on the entity
+  /// </summary>
   public bool clientPredicted {
     get { return _entity._clientPredicted; }
     set { _entity.VerifyNotAttached(); _entity._clientPredicted = value; }
   }
 
+  /// <summary>
+  /// Enable or disable instantiation of the entity by clients
+  /// </summary>
   public bool allowInstantiateOnClient {
     get { return _entity._allowInstantiateOnClient; }
     set { _entity.VerifyNotAttached(); _entity._allowInstantiateOnClient = value; }
   }
 
+  /// <summary>
+  /// Whether the entity is persistence between scenes
+  /// </summary>
   public bool persistThroughSceneLoads {
     get { return _entity._persistThroughSceneLoads; }
     set { _entity.VerifyNotAttached(); _entity._persistThroughSceneLoads = value; }
   }
 
+  /// <summary>
+  /// True if the entity should be destroyed when detached
+  /// </summary>
   public bool sceneObjectDestroyOnDetach {
     get { return _entity._sceneObjectDestroyOnDetach; }
     set { _entity.VerifyNotAttached(); _entity._sceneObjectDestroyOnDetach = value; }
   }
 
+  /// <summary>
+  /// True if bolt should automatically attach the entity during instantiation
+  /// </summary>
   public bool sceneObjectAutoAttach {
     get { return _entity._sceneObjectAutoAttach; }
     set { _entity.VerifyNotAttached(); _entity._sceneObjectAutoAttach = value; }
   }
 
+  /// <summary>
+  /// True if this entity is always owned by the server
+  /// </summary>
   public bool alwaysProxy {
     get { return _entity._alwaysProxy; }
     set { _entity.VerifyNotAttached(); _entity._alwaysProxy = value; }

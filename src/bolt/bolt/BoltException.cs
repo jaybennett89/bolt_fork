@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Base class for all bolt specific exceptions
+/// </summary>
 public class BoltException : Exception {
   public BoltException(string message)
     : base(message) {

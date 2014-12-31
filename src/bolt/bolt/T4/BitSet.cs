@@ -4,6 +4,7 @@ using System;
 
 namespace Bolt {
 
+  [Documentation(Ignore = true)]
 	public class BitSet : BoltObject {
 		public const int BITSET_LONGS = 16;
 		internal static readonly BitSet Full;

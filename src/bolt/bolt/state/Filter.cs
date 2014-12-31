@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 
 namespace Bolt {
+
+  [Documentation(Ignore = true)]
   public struct Filter {
+
+    [Documentation(Ignore = true)]
     public class EqualityComparer : IEqualityComparer<Filter> {
       public static readonly EqualityComparer Instance = new EqualityComparer();
 

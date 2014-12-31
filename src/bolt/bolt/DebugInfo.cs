@@ -5,7 +5,8 @@ using System.Text;
 using UnityEngine;
 
 namespace Bolt {
-  
+
+  [Documentation(Ignore = true)]
   public class DebugInfo : MonoBehaviour {
     static GUIStyle labelStyle;
     static GUIStyle labelStyleBold;

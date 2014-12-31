@@ -1,4 +1,7 @@
-﻿public struct BoltIterator<T> where T : class, IBoltListNode {
+﻿using Bolt;
+
+[Documentation(Ignore = true)]
+public struct BoltIterator<T> where T : class, IBoltListNode {
   T _node;
   int _count;
   int _number;

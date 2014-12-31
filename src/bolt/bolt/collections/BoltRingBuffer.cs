@@ -1,5 +1,7 @@
 ﻿using System;
+using Bolt;
 
+[Documentation(Ignore = true)]
 public class BoltRingBuffer<T> : System.Collections.Generic.IEnumerable<T> {
   int _head;
   int _tail;

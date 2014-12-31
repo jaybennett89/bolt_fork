@@ -31,6 +31,9 @@ namespace Bolt {
     void Destroy(UE.GameObject gameObject);
   }
 
+  /// <summary>
+  /// Deault implementation of Bolt.IPrefabPool which uses GameObject.Instantiate and GameObject.Destroy
+  /// </summary>
   public class DefaultPrefabPool : IPrefabPool {
     UE.GameObject IPrefabPool.Instantiate(PrefabId prefabId, UE.Vector3 position, UE.Quaternion rotation) {
       UE.GameObject go;

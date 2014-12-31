@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 
+/// <summary>
+/// Thrown if a debug assert fails somewhere in the code
+/// </summary>
 public class BoltAssertFailedException : Exception {
   internal BoltAssertFailedException() {
     BoltLog.Error("ASSERT FAILED");

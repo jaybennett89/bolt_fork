@@ -17,6 +17,7 @@ namespace BoltInternal {
   }
 }
 
+[Documentation(Ignore = true)]
 public static class BoltNetworkInternal {
   public static bool UsingUnityPro;
 
