@@ -7,7 +7,35 @@ using IO = System.IO;
 using SYS = System;
 using UE = UnityEngine;
 
+/// <summary>
+/// Provides logging capabilities to a variety of outputs
+/// </summary>
+/// <example>
+/// *Example:* Logging with different status levels.
+/// 
+/// ```csharp
+/// void OwnerOnAttack(BoltEntity player, BoltEntity target) {
+///   if(!target.isAttached) {
+///     BoltLog.Error("Attempting to target an entity that is not attached: {0}", target.networkId);
+///   }
+///   else {
+///     BoltLog.Info("{0} attack on {1}", player.networkId, target.networkId);
+///     
+///     var playerState = player.GetState&ltPlayerState&gt();
+///     var targetState = target.GetState&ltPlayerState&gt();
+///     
+///     using (var mod = targetState.Modify()) {
+///       mod.HP -= playerState.BaseDamage * playerState.DamageModMultiplier;       
+///     }
+///   }
+/// }
+/// ```
+/// </example>
 public static class BoltLog {
+
+  /// <summary>
+  /// The interface providing log writing capabilities to an output
+  /// </summary>
   public interface IWriter : IDisposable {
     void Info(string message);
     void Debug(string message);
@@ -15,6 +43,9 @@ public static class BoltLog {
     void Error(string message);
   }
 
+  /// <summary>
+  /// IWriter implementation that outputs to a file
+  /// </summary>
   public class File : IWriter {
     volatile bool running = true;
 
@@ -100,6 +131,9 @@ public static class BoltLog {
     }
   }
 
+  /// <summary>
+  /// IWriter implementation that outputs to the Bolt console
+  /// </summary>
   public class Console : IWriter {
     void IWriter.Info(string message) {
       BoltConsole.Write(message, BoltGUI.Sky);
@@ -122,6 +156,9 @@ public static class BoltLog {
     }
   }
 
+  /// <summary>
+  /// IWriter implementation that outputs to the system console out
+  /// </summary>
   public class SystemOut : IWriter {
     void IWriter.Info(string message) {
       SYS.Console.Out.WriteLine(message);
@@ -144,6 +181,9 @@ public static class BoltLog {
     }
   }
 
+  /// <summary>
+  /// IWriter implementation that outputs to Unity console
+  /// </summary>
   public class Unity : IWriter {
     void IWriter.Info(string message) {
       UE.Debug.Log(message);

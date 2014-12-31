@@ -28,6 +28,9 @@ public class BoltHitboxBody : MonoBehaviour, IBoltListNode {
   object IBoltListNode.next { get; set; }
   object IBoltListNode.list { get; set; }
 
+  /// <summary>
+  /// A hitbox which should contain all other hitboxes on this entity
+  /// </summary>
   public BoltHitbox proximity {
     get { return _proximity; }
     set { _proximity = value; }

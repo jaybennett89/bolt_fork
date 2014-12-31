@@ -5,6 +5,9 @@ using System.Text;
 using UdpKit;
 
 namespace Bolt {
+  /// <summary>
+  /// Interface for unity behaviours that want to access Bolt methods
+  /// </summary>
   public interface IEntityBehaviour {
     BoltEntity entity { get; set; }
     void Initialized();
@@ -53,6 +56,10 @@ namespace Bolt {
     bool Always { get; }
   }
 
+  /// <summary>
+  /// Interface for unity behaviours that want to access Bolt methods
+  /// </summary>
+  /// <typeparam name="TState">Bolt state of the entity</typeparam>
   public interface IEntityBehaviour<TState> : IEntityBehaviour where TState : IState {
     TState state { get; }
   }

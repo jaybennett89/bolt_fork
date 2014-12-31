@@ -2,6 +2,9 @@
 using UE = UnityEngine;
 
 namespace Bolt {
+  /// <summary>
+  /// Interface exposing a token of network protocol data of max 512 bytes
+  /// </summary>
   public interface INetworkCommandData {
     IProtocolToken Token {
       get;
@@ -161,6 +164,7 @@ namespace Bolt {
 
     }
 
+    [Documentation(Ignore = true)]
     public static implicit operator bool(Command cmd) {
       return cmd != null;
     }
