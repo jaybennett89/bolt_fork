@@ -4,7 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UEDI = UnityEditorInternal;
+
+#if UNITY5
+using AC = UnityEditor.Animations.AnimatorController;
+using ACP = UnityEngine.AnimatorControllerParameter;
+using ACPT = UnityEngine.AnimatorControllerParameterType;
+#else
+using AC = UnityEditorInternal.AnimatorController;
+using ACP = UnityEditorInternal.AnimatorControllerParameter;
+using ACPT = UnityEditorInternal.AnimatorControllerParameterType;
+#endif
 
 public class BoltEditorWindow : BoltWindow {
   [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
@@ -78,15 +87,15 @@ public class BoltEditorWindow : BoltWindow {
 
   RuntimeAnimatorController mecanimController;
 
-  void ImportMecanimParameter(StateDefinition def, UEDI.AnimatorControllerParameter p) {
+  void ImportMecanimParameter(StateDefinition def, ACP p) {
     PropertyType type = null;
 
-    switch (p.type) {
-      case UEDI.AnimatorControllerParameterType.Trigger: type = new PropertyTypeTrigger(); break;
-      case UEDI.AnimatorControllerParameterType.Bool: type = new PropertyTypeBool(); break;
-      case UEDI.AnimatorControllerParameterType.Int: type = new PropertyTypeInteger(); break;
-      case UEDI.AnimatorControllerParameterType.Float: type = new PropertyTypeFloat(); break;
-    }
+	switch (p.type) {
+	case ACPT.Trigger: type = new PropertyTypeTrigger(); break;
+	case ACPT.Bool: type = new PropertyTypeBool(); break;
+	case ACPT.Int: type = new PropertyTypeInteger(); break;
+	case ACPT.Float: type = new PropertyTypeFloat(); break;
+	}
 
     PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == p.name);
 
@@ -126,11 +135,17 @@ public class BoltEditorWindow : BoltWindow {
       if (mecanimController) {
         if (GUILayout.Button("Import", EditorStyles.miniButton)) {
           try {
-            UEDI.AnimatorController ac = (UEDI.AnimatorController)mecanimController;
+			AC ac = (AC)mecanimController;
 
+#if UNITY5
+            for (int i = 0; i < ac.parameters.Length; ++i) {
+              ImportMecanimParameter(def, ac.parameters[i]);
+            }
+#else
             for (int i = 0; i < ac.parameterCount; ++i) {
               ImportMecanimParameter(def, ac.GetParameter(i));
             }
+#endif
 
             Save();
           }
