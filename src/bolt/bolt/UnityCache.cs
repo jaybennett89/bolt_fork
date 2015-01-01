@@ -1,14 +1,25 @@
 ﻿using UnityEngine;
 
 namespace Bolt {
+
+  /// <summary>
+  /// Utility struct for caching a unity component globally as a field on a class
+  /// </summary>
+  /// <typeparam name="T">The component type</typeparam>
   public struct CachedObject<T> where T : Component {
     T component;
     float lastCheck;
 
+    /// <summary>
+    /// Returns false if the component is currently null
+    /// </summary>
     public bool Exists {
       get { return Component; }
     }
 
+    /// <summary>
+    /// Returns the cached component
+    /// </summary>
     public T Component {
       get {
         if (component) {
@@ -35,6 +46,10 @@ namespace Bolt {
     }
   }
 
+  /// <summary>
+  /// Utility struct for caching a unity component on the same object (or children) field on a class
+  /// </summary>
+  /// <typeparam name="T">The component type</typeparam>
   public struct CachedComponent<T> where T : Component {
     T component;
 
@@ -47,10 +62,16 @@ namespace Bolt {
       component = default(T);
     }
 
+    /// <summary>
+    /// Returns false if the component is currently null
+    /// </summary>
     public bool Exists {
       get { return Component; }
     }
 
+    /// <summary>
+    /// Returns the cached component
+    /// </summary>
     public T Component {
       get {
         if (go) {

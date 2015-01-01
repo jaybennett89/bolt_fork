@@ -1,5 +1,9 @@
 ﻿using System;
 namespace Bolt {
+
+  /// <summary>
+  /// The reliability mode of an event
+  /// </summary>
   [Documentation]
   public enum ReliabilityModes : byte {
     Unreliable = 0,
@@ -7,6 +11,9 @@ namespace Bolt {
     ReliableOrdered = 2,
   }
 
+  /// <summary>
+  /// The target of an entity event
+  /// </summary>
   [Documentation]
   public enum EntityTargets : byte {
     Everyone = Event.ENTITY_EVERYONE,
@@ -17,6 +24,9 @@ namespace Bolt {
     OnlySelf = Event.ENTITY_ONLY_SELF,
   }
 
+  /// <summary>
+  /// The target of a global event
+  /// </summary>
   [Documentation]
   public enum GlobalTargets : byte {
     Everyone = Event.GLOBAL_EVERYONE,

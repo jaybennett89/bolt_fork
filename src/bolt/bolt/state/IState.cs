@@ -10,10 +10,17 @@ namespace Bolt {
   /// </summary>
   [Documentation]
   public interface IState : IDisposable {
+
+    /// <summary>
+    /// The Animator component associated with this entity state
+    /// </summary>
     UE.Animator Animator {
       get;
     }
 
+    /// <summary>
+    /// A collection of all Animator components associated with this entity state
+    /// </summary>
     IEnumerable<UE.Animator> AllAnimators {
       get;
     }
@@ -56,14 +63,14 @@ namespace Bolt {
     /// <summary>
     /// Set a property dynamically by string name
     /// </summary>
-    /// <param name="property"></param>
-    /// <param name="value"></param>
+    /// <param name="property">The property name to set</param>
+    /// <param name="value">The property value to set</param>
     void SetDynamic(string property, object value);
 
     /// <summary>
-    /// 
+    /// Gets a property dynamically by string name
     /// </summary>
-    /// <param name="property"></param>
+    /// <param name="property">The property name to get</param>
     /// <returns></returns>
     object GetDynamic(string property);
   }

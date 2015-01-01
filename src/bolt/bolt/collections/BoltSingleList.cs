@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
+[Documentation(Ignore = true)]
 public class BoltSingleList<T> : IEnumerable<T> where T : class, IBoltListNode {
 
   T _head;

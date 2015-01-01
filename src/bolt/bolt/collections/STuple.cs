@@ -1,4 +1,7 @@
-﻿public struct STuple<T0, T1> {
+﻿using Bolt;
+
+[Documentation(Ignore = true)]
+public struct STuple<T0, T1> {
   public readonly T0 item0;
   public readonly T1 item1;
 

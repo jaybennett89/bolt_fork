@@ -20,18 +20,27 @@ namespace BoltInternal {
 
 namespace Bolt {
 
+  /// <summary>
+  /// Whether a NAT port mapping is open or closed
+  /// </summary>
   public enum NatPortMappingStatus {
     Closed = -1, 
     Unknown = 0, 
     Open = 1
   }
 
+  /// <summary>
+  /// Exposes information about a port mapping done using UPnP
+  /// </summary>
   public interface IPortMapping {
     ushort External { get; }
     ushort Internal { get; }
     NatPortMappingStatus Status { get; }
   }
 
+  /// <summary>
+  /// Exposes information about available NAT devices found through UPnP
+  /// </summary>
   public interface INatDevice {
     string DeviceType { get; }
     IEnumerable<IPortMapping> Ports { get; }

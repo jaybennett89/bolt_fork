@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Bolt;
 
+[Documentation(Ignore = true)]
 class BoltObjectPool<T> where T : BoltObject, new() {
   readonly Stack<T> _pool = new Stack<T>();
 

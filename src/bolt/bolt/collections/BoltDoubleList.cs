@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Bolt;
 
+[Documentation(Ignore = true)]
 public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
   T _first;
   int _count;

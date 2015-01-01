@@ -3,6 +3,7 @@ using System;
 using UdpKit;
 using UnityEngine;
 
+[Documentation(Ignore = true)]
 public struct PacketStats {
   public int StateBits;
   public int EventBits;
