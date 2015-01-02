@@ -288,14 +288,14 @@ let main argv =
           then "set; "
           else ""
 
-      h5 (sprintf "public %s %s { get; %s} <a name=\"%s\"></a>" (typeName m.Cecil.Value.PropertyType) m.Name set m.NameLink)
+      h5 (sprintf "<a name=\"%s\"></a> public %s %s { get; %s}" m.NameLink (typeName m.Cecil.Value.PropertyType) m.Name set)
       printSummary m.Xml
       
     if t.Methods.Length > 0 then 
       h4 "Methods"
 
     for m in t.Methods do
-      h5 (sprintf "public %s %s(%s) <a name=\"%s\"></a>" (typeName m.Cecil.Value.ReturnType) m.Name m.Signature m.NameLink)
+      h5 (sprintf "<a name=\"%s\"></a> public %s %s(%s)" m.NameLink (typeName m.Cecil.Value.ReturnType) m.Name m.Signature)
       printSummary m.Xml
 
   File.WriteAllText("..\\..\\..\\..\\..\\build\\bolt.md", (!sb).ToString());
