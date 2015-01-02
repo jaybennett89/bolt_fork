@@ -140,9 +140,10 @@ let main argv =
   let types = new List<DocType>()
 
   let printSummary (t:XML.Member) =
-    match t.Summary with
-    | Some s -> p s
-    | None -> ()
+    p t.Summary
+    //match t.Summary with
+    //| Some s -> p s
+    //| None -> ()
 
     match t.Example with
     | Some s -> pre s
