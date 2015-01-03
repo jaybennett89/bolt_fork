@@ -167,7 +167,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   internal bool _sceneObjectDestroyOnDetach = false;
 
   [UE.SerializeField]
-  internal bool _sceneObjectAutoAttach = false;
+  internal bool _sceneObjectAutoAttach = true;
 
   [UE.SerializeField]
   internal bool _alwaysProxy = false;

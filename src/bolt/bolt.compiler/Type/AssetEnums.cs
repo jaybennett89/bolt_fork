@@ -15,6 +15,7 @@ namespace Bolt.Compiler {
     Everyone = 0,
     OnlyOwner = 1,
     OnlyController = 2,
+    None = 3,
   }
 
   [ProtoContract]
@@ -38,7 +39,8 @@ namespace Bolt.Compiler {
   public enum GlobalEventSenders {
     Everyone = 0,
     OnlyServer = 1,
-    OnlyClients = 2
+    OnlyClients = 2,
+    None = 3,
   }
 
   [ProtoContract]

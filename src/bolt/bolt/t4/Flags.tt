@@ -13,7 +13,7 @@ Dictionary<string, string[]> flagList = new Dictionary<string, string[]>();
 flagList.Add("EntityFlags", new string[]{ "Has_Control", "Persist_On_Load", "Attached", "Controller_Local_Prediction", "Scene_Object" });
 flagList.Add("InstantiateFlags", new string[]{ "Take_Control", "Assign_Control" });
 flagList.Add("ProxyFlags", new string[]{ "Create_Requested", "Create_Done", "Destroy_Requested", "Destroy_Pending", "Destroy_Ignore", "Idle", "Force_Sync" });
-flagList.Add("CommandFlags", new string[] { "Has_Executed", "Send_State", "Send_State_Performed", "Correction_Received", "Dispose" } );
+flagList.Add("CommandFlags", new string[] { "Has_Executed", "Send_State", "Send_State_Performed", "Correction_Received", "Dispose", "Missing" } );
 
 foreach(var kvp in flagList) {
 	var name = kvp.Key;

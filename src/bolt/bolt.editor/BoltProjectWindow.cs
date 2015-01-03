@@ -234,13 +234,15 @@ public class BoltProjectWindow : BoltWindow {
 
       if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(20))) {
         if (deleteMode) {
-          a.Deleted = true;
+          if (EditorUtility.DisplayDialog("Delete Asset", "Are you sure?", "Yes", "No")) {
+            a.Deleted = true;
 
-          if (IsSelected(a)) {
-            Select(null, false);
+            if (IsSelected(a)) {
+              Select(null, false);
+            }
+
+            Save();
           }
-
-          Save();
         }
         else {
           OpenFilterMenu(a);

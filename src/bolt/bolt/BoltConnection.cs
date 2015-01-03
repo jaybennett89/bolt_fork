@@ -282,20 +282,26 @@ public class BoltConnection : BoltObject {
   }
 
   /// <summary>
-  /// User assignable token which lets you pair arbitrary data with the connection
+  /// User assignable object which lets you pair arbitrary data with the connection
   /// </summary>
   /// <example>
-  /// *Example:* Using a reference to the player entity in the userToken.
+  /// *Example:* Using a reference to the player entity in the UserData property.
   /// 
   /// ```csharp
   /// public override void Disconnected(BoltConnection connection) {
-  ///   BoltNetwork.Destroy((BoltEntity)connection.userToken);
+  ///   BoltNetwork.Destroy((BoltEntity)connection.UserData);
   /// }
   /// ```
   /// </example>
-  public object userToken {
+  public object UserData {
     get;
     set;
+  }
+
+  [Obsolete("Use the 'UserData' property instead")]
+  public object userToken {
+    get { return UserData; }
+    set { UserData = value; }
   }
 
   internal int SendRateMultiplier {
@@ -314,7 +320,7 @@ public class BoltConnection : BoltObject {
   }
 
   internal BoltConnection(UdpConnection udp) {
-    userToken = udp.UserToken;
+    UserData = udp.UserToken;
 
     _udp = udp;
     _udp.UserToken = this;
@@ -467,12 +473,12 @@ public class BoltConnection : BoltObject {
       _channels[i].Disconnected();
     }
 
-    if (userToken != null) {
-      if (userToken is IDisposable) {
-        (userToken as IDisposable).Dispose();
+    if (UserData != null) {
+      if (UserData is IDisposable) {
+        (UserData as IDisposable).Dispose();
       }
 
-      userToken = null;
+      UserData = null;
     }
   }
 

@@ -51,11 +51,11 @@ public class DotNetPlatform : UdpPlatform {
   }
 
 #if UNITY_WEBPLAYER
-  public override UdpIPv4Address[] ResolveHostAddress(string host) {
+  public override UdpIPv4Address[] ResolveHostAddresses(string host) {
     throw new System.NotSupportedException("ResolveHostAddress is not supported in WebPlayer");
   }
 #else
-  public override UdpIPv4Address[] ResolveHostAddress(string host) {
+  public override UdpIPv4Address[] ResolveHostAddresses(string host) {
     if (host == null) {
       throw new System.ArgumentNullException("host", "argument was null");
     }

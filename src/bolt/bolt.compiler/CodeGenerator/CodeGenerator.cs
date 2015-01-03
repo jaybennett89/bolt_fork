@@ -293,13 +293,21 @@ namespace Bolt.Compiler {
       entityListenerGeneric.BaseTypes.Add("BoltInternal.EntityEventListenerBase<TState>");
 
       foreach (EventDecorator d in Events) {
-        EmitEventMethodOverride(globalListener, d);
-        EmitEventMethodOverride(entityListener, d);
-        EmitEventMethodOverride(entityListenerGeneric, d);
+        EmitEventMethodOverride(true, globalListener, d);
+        EmitEventMethodOverride(false, entityListener, d);
+        EmitEventMethodOverride(false, entityListenerGeneric, d);
       }
     }
 
-    void EmitEventMethodOverride(CodeTypeDeclaration type, EventDecorator d) {
+    void EmitEventMethodOverride(bool global, CodeTypeDeclaration type, EventDecorator d) {
+      if (global && d.Definition.GlobalSenders == GlobalEventSenders.None) {
+        return;
+      }
+
+      if (!global && d.Definition.EntitySenders == EntityEventSenders.None) {
+        return;
+      }
+
       type.BaseTypes.Add(d.ListenerInterface);
 
       type.DeclareMethod(typeof(void).FullName, "OnEvent", method => {

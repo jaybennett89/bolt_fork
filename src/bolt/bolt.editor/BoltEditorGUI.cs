@@ -38,7 +38,7 @@ public static class BoltEditorGUI {
     GUIStyle s = new GUIStyle("flow node " + n);
     s.padding = new RectOffset(4, 4, 4, 4);
     return s;
-  } 
+  }
 
   public static AxisSelections EditAxisSelection(AxisSelections value) {
     var values = Enum.GetValues(typeof(AxisSelections)).Cast<AxisSelections>().ToArray();
@@ -134,6 +134,15 @@ public static class BoltEditorGUI {
       s.padding = new RectOffset();
       s.margin = new RectOffset(4, 4, 4, 0);
       s.normal.textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
+      return s;
+    }
+  }
+
+  public static GUIStyle HelpButtonStyle {
+    get {
+      GUIStyle s = new GUIStyle(EditorStyles.miniButton);
+      s.normal.textColor = EditorGUIUtility.isProSkin ? ColorInt(128, 255, 0) : ColorInt(0, 128, 192);
+      s.fontStyle = FontStyle.Bold;
       return s;
     }
   }
@@ -234,6 +243,22 @@ public static class BoltEditorGUI {
     GUILayout.EndHorizontal();
   }
 
+  public static void Help(string url) {
+    if (BoltRuntimeSettings.instance.showHelpButtons) {
+      if (GUILayout.Button("Help", HelpButtonStyle, GUILayout.ExpandWidth(false))) {
+        Application.OpenURL(url);
+      }
+    }
+  }
+
+  public static void Help(string text, string url) {
+    if (BoltRuntimeSettings.instance.showHelpButtons) {
+      if (GUILayout.Button("Help: " + text, HelpButtonStyle)) {
+        Application.OpenURL(url);
+      }
+    }
+  }
+
   public static void PropertyTypePopup(AssetDefinition asset, PropertyDefinition definition, params GUILayoutOption[] options) {
     if (!asset.AllowedPropertyTypes.Contains(definition.PropertyType.GetType())) {
       definition.PropertyType = new PropertyTypeFloat();
@@ -296,7 +321,7 @@ public static class BoltEditorGUI {
     style.contentOffset = new Vector2(0, 0);
 
     Color c;
-    
+
     c = HighlightColor;
     c.a = alpha;
 

@@ -146,30 +146,30 @@ namespace Bolt {
 
     internal bool QueueInput(Command cmd) {
       if (_canQueueCommands) {
-        // owner
-        if (IsOwner) {
-          cmd.ServerFrame = BoltCore.serverFrame;
-          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
-        }
 
-        // controller
-        else if (CommandQueue.count < BoltCore._config.commandQueueSize) {
-          cmd.ServerFrame = BoltCore.serverFrame;
-          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
+        if (HasControl) {
+          if (CommandQueue.count < BoltCore._config.commandQueueSize) {
+            cmd.ServerFrame = BoltCore.serverFrame;
+            cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
+          }
+          else {
+            BoltLog.Error("Input queue for {0} is full", this);
+            return false;
+          }
         }
-
-        // not allowed
         else {
-          BoltLog.Error("RootCommand queue for {0} is full", this);
-          return false;
+          Assert.True(IsOwner);
+
+          cmd.ServerFrame = BoltCore.serverFrame;
+          cmd.Sequence = CommandSequence;
+          cmd.Flags |= CommandFlags.MISSING;
         }
 
-        // queue!
         CommandQueue.AddLast(cmd);
         return true;
       }
       else {
-        BoltLog.Error("You can not queue commands to {0}", this);
+        BoltLog.Error("You can only queue commands to in the 'SimulateController' and 'MissingCommand' callbacks");
         return false;
       }
     }

@@ -312,21 +312,13 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
-    def.SortOrder = (SortOrder)EditorGUILayout.EnumPopup(def.SortOrder, GUILayout.Width(75));
-
     GUILayout.EndHorizontal();
     GUILayout.EndArea();
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
-    List<PropertyDefinition> sortedList = list;
-
-    switch (def.SortOrder) {
-      case SortOrder.Priority: sortedList = list.OrderByDescending(x => x.Priority).ToList(); break;
-    }
-
-    for (int i = 0; i < sortedList.Count; ++i) {
-      EditProperty(def, sortedList[i], i == 0, i == (sortedList.Count - 1));
+    for (int i = 0; i < list.Count; ++i) {
+      EditProperty(def, list[i], i == 0, i == (list.Count - 1));
     }
 
     // move nudged property
@@ -393,7 +385,9 @@ public class BoltEditorWindow : BoltWindow {
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.IconButton("mc_minus")) {
-        p.Deleted = true;
+        if (EditorUtility.DisplayDialog("Delete Property", "Are you sure?", "Yes", "No")) {
+          p.Deleted = true;
+        }
       }
     }
     else {
@@ -464,6 +458,7 @@ public class BoltEditorWindow : BoltWindow {
         BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
           p.ReplicationMode = (ReplicationMode)EditorGUILayout.EnumPopup(p.ReplicationMode);
+          BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/31");
         });
       }
 
