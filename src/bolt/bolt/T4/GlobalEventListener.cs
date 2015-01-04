@@ -4,60 +4,61 @@ using UdpKit;
 using UnityEngine;
 
 namespace BoltInternal {
-
 partial class GlobalEventListenerBase {
-  
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when the bolt simulation is shutting down.
   /// </summary>
   /// <example>
-  /// *Example:* Showing a message to clients when the server has shut down unexpectedly.
+  /// *Example:* Logging a message in the bolt console when the server has shut down unexpectedly.
   /// 
   /// ```csharp
   /// public override void BoltShutdown() {
-  ///   Message.Show("Error", "Server Shut Down!");
+  ///   BoltConsole.Write("Warning: Server Shutting Down...");
   /// }
   /// ```
   /// </example>
-  public virtual void BoltShutdown() {  }
+public virtual void BoltShutdown() {  }
 
-  internal static void BoltShutdownInvoke() { 
-    BoltLog.Debug("Invoking callback BoltShutdown");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void BoltShutdownInvoke() { 
+	BoltLog.Debug("Invoking callback BoltShutdown");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltShutdown();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when the bolt simulation is starting.
   /// </summary>
   /// <example>
-  /// *Example:* Showing a meessage when the bolt simulation is starting and initializing some NPC data.
+  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
   /// ```csharp
   /// public override void BoltStarted() {
   ///   PrecalcNpcPaths();
-  ///   Message.Show("Starting Game...");
+  ///   BoltConsole.Write("Starting Game...");
   /// }
   /// ```
   /// </example>
-  public virtual void BoltStarted() {  }
+public virtual void BoltStarted() {  }
 
-  internal static void BoltStartedInvoke() { 
-    BoltLog.Debug("Invoking callback BoltStarted");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void BoltStartedInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStarted");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStarted();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when binary stream data is received 
   /// </summary>
   /// <param name="connection">The sender connection</param>
@@ -75,20 +76,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
+public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
 
-  internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
-    BoltLog.Debug("Invoking callback StreamDataReceived");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
+	BoltLog.Debug("Invoking callback StreamDataReceived");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.StreamDataReceived(connection, data);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Registering binary stream channels may only be done in this callback
   /// </summary>
   /// <example>
@@ -104,34 +106,40 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void RegisterStreamChannels() {  }
+public virtual void RegisterStreamChannels() {  }
 
-  internal static void RegisterStreamChannelsInvoke() { 
-    BoltLog.Debug("Invoking callback RegisterStreamChannels");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void RegisterStreamChannelsInvoke() { 
+	BoltLog.Debug("Invoking callback RegisterStreamChannels");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.RegisterStreamChannels();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  
-  public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) {  }
 
-  internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
-    BoltLog.Debug("Invoking callback PortMappingChanged");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+/// <summary>
+  /// Callback when network router port mapping has been changed
+  /// </summary>
+  /// <param name="device">The current network routing device</param>
+  /// <param name="portMapping">The new port mapping</param>
+public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) {  }
+
+internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
+	BoltLog.Debug("Invoking callback PortMappingChanged");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.PortMappingChanged(device, portMapping);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered before the new local scene is loaded
   /// </summary>
   /// <param name="map">Name of scene being loaded</param>
@@ -146,20 +154,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void SceneLoadLocalBegin(string map) {  }
+public virtual void SceneLoadLocalBegin(string map) {  }
 
-  internal static void SceneLoadLocalBeginInvoke(string map) { 
-    BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void SceneLoadLocalBeginInvoke(string map) { 
+	BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalBegin(map);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered before the new local scene has been completely loaded
   /// </summary>
   /// <param name="map">Name of scene that has loaded</param>
@@ -167,27 +176,28 @@ partial class GlobalEventListenerBase {
   /// *Example:* Hiding a splash screen that was shown during loading.
   /// 
   /// ```csharp
-  /// public override void SceneLoadLocalBegin(string map) {
+  /// public override void sceneLoadLocalDone(string map) {
   ///   if(BoltNetwork.isClient && map.Equals("GameScene") {
   ///     SplashScreen.Hide();
   ///   }
   /// }
   /// ```
   /// </example>
-  public virtual void SceneLoadLocalDone(string map) {  }
+public virtual void SceneLoadLocalDone(string map) {  }
 
-  internal static void SceneLoadLocalDoneInvoke(string map) { 
-    BoltLog.Debug("Invoking callback SceneLoadLocalDone");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void SceneLoadLocalDoneInvoke(string map) { 
+	BoltLog.Debug("Invoking callback SceneLoadLocalDone");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalDone(map);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a remote connection has completely loaded the current scene
   /// </summary>
   /// <param name="connection">The remote connection</param>
@@ -206,23 +216,24 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void SceneLoadRemoteDone(BoltConnection connection) {  }
+public virtual void SceneLoadRemoteDone(BoltConnection connection) {  }
 
-  internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) { 
-    BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) { 
+	BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadRemoteDone(connection);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a client has become connected to this instance
   /// </summary>
-  /// <param name="connection">The connected client endpoint</param>
+  /// <param name="connection">Endpoint of the connected client</param>
   /// <example>
   /// *Example:* Instantiating and configuring a player entity when a client connects to the server.
   /// 
@@ -238,33 +249,34 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void Connected(BoltConnection connection) {  }
+public virtual void Connected(BoltConnection connection) {  }
 
-  internal static void ConnectedInvoke(BoltConnection connection) { 
-    BoltLog.Debug("Invoking callback Connected");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectedInvoke(BoltConnection connection) { 
+	BoltLog.Debug("Invoking callback Connected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Connected(connection);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a client has become connected to this instance
   /// </summary>
-  /// <param name="connection">The connected client endpoint</param>
-  /// <param name="acceptToken">A data token sent in the accept method</param>
+  /// <param name="connection">Endpoint of the connected client</param>
+  /// <param name="acceptToken">The data token the server sent to the accept call</param>
   /// <example>
-  /// *Example:* Using a protocol token with the Connected callback to pass a spawnpoint position to to new player entity.
+  /// *Example:* Using a protocol token with the Connected callback to pass a spawnpoint position to to new player.
   /// 
   /// ```csharp
   /// public override void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {
   ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
   ///   
-  ///   var spawnPoint = (SpawnPoint)acceptToken;
-  ///   player.transform.position = spawnPoint.position;
+  ///   var spawnpoint = (SpawnPoint)acceptToken;
+  ///   player.transform.position = spawnpoint.position;
   ///   
   ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
   ///   Configure(player, initData);
@@ -273,60 +285,87 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {  }
+public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {  }
 
-  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken) { 
-    BoltLog.Debug("Invoking callback Connected");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken) { 
+	BoltLog.Debug("Invoking callback Connected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Connected(connection, acceptToken);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  
-  public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {  }
 
-  internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) { 
-    BoltLog.Debug("Invoking callback Connected");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+/// <summary>
+  /// Callback triggered when a client has become connected to this instance
+  /// </summary>
+  /// <param name="connection">Endpoint of the connected client</param>
+  /// <param name="acceptToken">The data token the server sent to the accept call</param>
+  /// <param name="connectToken">The data token the client sent to it's connect call</param>
+  /// <example>
+  /// *Example:* A connection method using both server and client token data to spawn and configure a player.
+  /// 
+  /// ```csharp
+  /// public override void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {
+  ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
+  ///   
+  ///   var spawnpoint = (SpawnPoint)acceptToken;
+  ///   player.transform.position = spawnpoint.Position;
+  ///   
+  ///   var userInfo = (UserInfo)connectToken;
+  ///    
+  ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
+  ///   Configure(player, userInfo.Name, initData);
+  ///   
+  ///   player.AssignControl(connection);
+  /// }
+  /// ```
+  /// </example>
+public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {  }
+
+internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) { 
+	BoltLog.Debug("Invoking callback Connected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Connected(connection, acceptToken, connectToken);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a connection to remote server has failed
   /// </summary>
   /// <param name="endpoint">The remote address</param>
   /// <example>
-  /// *Example:* Showing an error message when the remote connection has failed.
+  /// *Example:* Logging an error message when the remote connection has failed.
   /// 
   /// ```csharp
   /// public override void ConnectFailed(UdpEndPoint endpoint) {
-  ///   Message.Show("Error", string.Format("Connection To ({0}:{1}) has failed", endpoint.Address.ToString(), endpoint.ToString());
+  ///   BoltConsole.Write(string.Format("Connection To ({0}:{1}) has failed", endpoint.Address.ToString(), endpoint.ToString()));
   /// }
   /// ```
   /// </example>
-  public virtual void ConnectFailed(UdpEndPoint endpoint) {  }
+public virtual void ConnectFailed(UdpEndPoint endpoint) {  }
 
-  internal static void ConnectFailedInvoke(UdpEndPoint endpoint) { 
-    BoltLog.Debug("Invoking callback ConnectFailed");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectFailedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ConnectFailed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectFailed(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance receives an incoming client connection
   /// </summary>
   /// <param name="endpoint">The incoming client endpoint</param>
@@ -338,21 +377,22 @@ partial class GlobalEventListenerBase {
   ///   BoltNetwork.Accept(remoteEndPoint);
   /// }
   /// ```
-  /// </example> 
-  public virtual void ConnectRequest(UdpEndPoint endpoint) {  }
+  /// </example>
+public virtual void ConnectRequest(UdpEndPoint endpoint) {  }
 
-  internal static void ConnectRequestInvoke(UdpEndPoint endpoint) { 
-    BoltLog.Debug("Invoking callback ConnectRequest");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectRequestInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ConnectRequest");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRequest(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance receives an incoming client connection
   /// </summary>
   /// <param name="endpoint">The incoming client endpoint</param>
@@ -368,158 +408,164 @@ partial class GlobalEventListenerBase {
   ///   }
   /// }
   /// ```
-  /// </example> 
-  public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
+  /// </example>
+public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
-  internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
-    BoltLog.Debug("Invoking callback ConnectRequest");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback ConnectRequest");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRequest(endpoint, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when the connection to a remote server has been refused.
   /// </summary>
   /// <param name="endpoint">The remote server endpoint</param>
   /// <example>
-  /// *Example:* Showing an error message when the remote connection has been refused.
+  /// *Example:* Logging an error message when the remote connection has been refused.
   /// 
   /// ```csharp
   /// public override void ConnectRefused(UdpEndPoint endpoint) {
-  ///   Message.Show("Error", string.Format("Connection To ({0}:{1}) has been refused", endpoint.Address.ToString(), endpoint.Port.ToString());
+  ///   BoltConsole.Write(string.Format("Connection To ({0}:{1}) has been refused", endpoint.Address.ToString(), endpoint.Port.ToString()));
   /// }
   /// ```
   /// </example>
-  public virtual void ConnectRefused(UdpEndPoint endpoint) {  }
+public virtual void ConnectRefused(UdpEndPoint  endpoint) {  }
 
-  internal static void ConnectRefusedInvoke(UdpEndPoint endpoint) { 
-    BoltLog.Debug("Invoking callback ConnectRefused");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint) { 
+	BoltLog.Debug("Invoking callback ConnectRefused");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRefused(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when the connection to a remote server has been refused.
   /// </summary>
   /// <param name="endpoint">The remote server endpoint</param>
   /// <param name="token">Data token sent by refusing server</param>
   /// <example>
-  /// *Example:* Showing an error message when the remote connection has been refused using an error message token from the server.
+  /// *Example:* Logging an error message when the remote connection has been refused using an error message token from the server.
   /// 
   /// ```csharp
   /// public override void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) {
   ///   ServerMessage.message = (ServerMessage)token;
-  ///   Message.Show(serverMessage.error, string.Format("Connection To ({0}:{1}) has been refused. Reason was {3}", 
-  ///     endpoint.Address.ToString(), endpoint.ToString(), serverMessage.errorDescription);
+  ///   BoltConsole.Write(string.Format("Connection To ({0}:{1}) has been refused. Reason was {3}", 
+  ///     endpoint.Address.ToString(), endpoint.ToString(), serverMessage.errorDescription));
   /// }
   /// ```
-  /// </example> 
-  public virtual void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
+  /// </example>
+public virtual void ConnectRefused(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) {  }
 
-  internal static void ConnectRefusedInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
-    BoltLog.Debug("Invoking callback ConnectRefused");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) { 
+	BoltLog.Debug("Invoking callback ConnectRefused");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRefused(endpoint, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when trying to connect to a remote endpoint
   /// </summary>
   /// <param name="endpoint">The remote server address</param>
   /// <example>
-  /// *Example:* Displaying a message to clients when initializing a connection to server.
+  /// *Example:* Logging a message when initializing a connection to server.
   /// 
   /// ```csharp
   /// public override void ConnectAttempt((UdpEndPoint endpoint) {
-  ///   Message.Show("Connecting ...", string.Format("To Remote Server At ({0}:{1}), endpoint.Address, endpoint.Port);
+  ///   BoltConsole.Write(string.Format("To Remote Server At ({0}:{1})", endpoint.Address, endpoint.Port);
   /// }
   /// ```
   /// </example>
-  public virtual void ConnectAttempt(UdpEndPoint endpoint) {  }
+public virtual void ConnectAttempt(UdpEndPoint endpoint) {  }
 
-  internal static void ConnectAttemptInvoke(UdpEndPoint endpoint) { 
-    BoltLog.Debug("Invoking callback ConnectAttempt");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ConnectAttemptInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ConnectAttempt");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectAttempt(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when disconnected from remote server
   /// </summary>
   /// <param name="connection">The remote server endpoint</param>
   /// <example>
-  /// *Example:* Displaying a disconnect message to the client and returning to the main menu scene.
+  /// *Example:* Logging a disconnect message and returning to the main menu scene.
   /// 
   /// ```csharp
   /// public override void Disconnected(BoltConnection connection) {
-  ///   Message.Show("Disconnected", "Returning to main menu...");
+  ///   BoltConsole.Write("Returning to main menu...");
   ///   Application.LoadLevel("MainMenu");
   /// }
   /// ```
   /// </example>
-  public virtual void Disconnected(BoltConnection connection) {  }
+public virtual void Disconnected(BoltConnection connection) {  }
 
-  internal static void DisconnectedInvoke(BoltConnection connection) { 
-    BoltLog.Debug("Invoking callback Disconnected");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void DisconnectedInvoke(BoltConnection connection) { 
+	BoltLog.Debug("Invoking callback Disconnected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Disconnected(connection);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when disconnected from remote server
   /// </summary>
   /// <param name="connection">The remote server endpoint</param>
   /// <param name="token">Data token sent by disconnecting server</param>
   /// <example>
-  /// *Example:* Displaying a custom disconnect message to the client.
+  /// *Example:* Logging a disconnect message from the server and returning to the log in menu
   /// 
   /// ```csharp
   /// public override void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {
   ///   ServerMessage msg = (ServerMessage)token;  /// 
-  ///   Message.Show(msg.error, msg.description);
-  ///   Application.LoadLevel("MainMenu");
+  ///   BoltConsole.Write(msg.description);
+  ///   Application.LoadLevel("Login");
   /// }
   /// ```
   /// </example>
-  public virtual void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {  }
+public virtual void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {  }
 
-  internal static void DisconnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
-    BoltLog.Debug("Invoking callback Disconnected");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void DisconnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback Disconnected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Disconnected(connection, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance of bolt loses control of a bolt entity
   /// </summary>
   /// <param name="entity">The controlled entity</param>
@@ -533,53 +579,49 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void ControlOfEntityLost(BoltEntity entity) {  }
+public virtual void ControlOfEntityLost(BoltEntity entity) {  }
 
-  internal static void ControlOfEntityLostInvoke(BoltEntity entity) { 
-    BoltLog.Debug("Invoking callback ControlOfEntityLost");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ControlOfEntityLostInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback ControlOfEntityLost");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ControlOfEntityLost(entity);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance of bolt loses control of a bolt entity
   /// </summary>
   /// <param name="entity">The controlled entity</param>
-  /// <param name="token">Data token sent by the owner</param>
   /// <example>
-  /// *Example:* Removing the player entity from being controlled by game components and showing a message explaining 
-  /// the reason for losing control.
+  /// *Example:* Setting up game components to no longer control an entity.
   /// 
   /// ```csharp
-  /// public override void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) {
+  /// public override void ControlOfEntityLost(BoltEntity entity) {
   ///   GameInput.instance.RemoveControlledEntity(entity);
   ///   MiniMap.instance.RemoveControlledEntity(entity);
-  ///   
-  ///   ServerMessage msg = (ServerMessage)token;
-  ///   Message.Show(msg.error, msg.description);
   /// }
   /// ```
   /// </example>
-  public virtual void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) { }
+public virtual void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
-  internal static void ControlOfEntityLostInvoke(BoltEntity entity, Bolt.IProtocolToken token) {
-    BoltLog.Debug("Invoking callback ControlOfEntityLost");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-      try {
-        cb.ControlOfEntityLost(entity, token);
-      }
-      catch (System.Exception exn) {
-        BoltLog.Exception(exn);
-      }
-    }
-  }
+internal static void ControlOfEntityLostInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback ControlOfEntityLost");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.ControlOfEntityLost(entity, token);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance of bolt receieves control of a bolt entity
   /// </summary>
   /// <param name="entity">The controlled entity</param>
@@ -593,20 +635,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void ControlOfEntityGained(BoltEntity entity) {  }
+public virtual void ControlOfEntityGained(BoltEntity entity) {  }
 
-  internal static void ControlOfEntityGainedInvoke(BoltEntity entity) { 
-    BoltLog.Debug("Invoking callback ControlOfEntityGained");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void ControlOfEntityGainedInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback ControlOfEntityGained");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ControlOfEntityGained(entity);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when this instance of bolt receieves control of a bolt entity
   /// </summary>
   /// <param name="entity">The controlled entity</param>
@@ -624,21 +667,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void ControlOfEntityGained(BoltEntity entity, Bolt.IProtocolToken token) { }
+public virtual void ControlOfEntityGained(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
-  internal static void ControlOfEntityGainedInvoke(BoltEntity entity, Bolt.IProtocolToken token) {
-    BoltLog.Debug("Invoking callback ControlOfEntityGained");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-      try {
-        cb.ControlOfEntityGained(entity, token);
-      }
-      catch (System.Exception exn) {
-        BoltLog.Exception(exn);
-      }
-    }
-  }
+internal static void ControlOfEntityGainedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback ControlOfEntityGained");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.ControlOfEntityGained(entity, token);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a new entity is attached to the bolt simulation
   /// </summary>
   /// <param name="entity">The attached entity</param>
@@ -650,21 +693,22 @@ partial class GlobalEventListenerBase {
   ///   MiniMap.instance.SetKnownEntity(entity);
   /// }
   /// ```
-  /// </example> 
-  public virtual void EntityAttached(BoltEntity entity) {  }
+  /// </example>
+public virtual void EntityAttached(BoltEntity entity) {  }
 
-  internal static void EntityAttachedInvoke(BoltEntity entity) { 
-    BoltLog.Debug("Invoking callback EntityAttached");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void EntityAttachedInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback EntityAttached");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityAttached(entity);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a new entity is attached to the bolt simulation
   /// </summary>
   /// <param name="entity">The attached entity</param>
@@ -681,21 +725,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) { }
+public virtual void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
-  internal static void EntityAttachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) {
-    BoltLog.Debug("Invoking callback EntityAttached");
-    foreach (GlobalEventListenerBase cb in callbacks) {
-      try {
-        cb.EntityAttached(entity, token);
-      }
-      catch (System.Exception exn) {
-        BoltLog.Exception(exn);
-      }
-    }
-  }
+internal static void EntityAttachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback EntityAttached");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.EntityAttached(entity, token);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a new entity is detached from the bolt simulation
   /// </summary>
   /// <param name="entity">The detached entity</param>
@@ -708,20 +752,21 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
-  public virtual void EntityDetached(BoltEntity entity) {  }
+public virtual void EntityDetached(BoltEntity entity) {  }
 
-  internal static void EntityDetachedInvoke(BoltEntity entity) { 
-    BoltLog.Debug("Invoking callback EntityDetached");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void EntityDetachedInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback EntityDetached");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityDetached(entity);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  /// <summary>
+
+/// <summary>
   /// Callback triggered when a new entity is detached from the bolt simulation
   /// </summary>
   /// <param name="entity">The detached entity</param>
@@ -733,36 +778,51 @@ partial class GlobalEventListenerBase {
   ///   MiniMap.instance.RemoveKnownEntity(entity);
   ///   
   ///   DeathRecap recap = (DeathRecap)token;
-  ///   GameConsole.Log(recap.killer, recap.damageEvents);
+  ///   BoltConsole.Write(string.Format("Killed By {0} - {1} Damage", recap.KillerName, recap.Damage);
   /// }
   /// ```
   /// </example>
-  public virtual void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {  }
+public virtual void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
-  internal static void EntityDetachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
-    BoltLog.Debug("Invoking callback EntityDetached");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+internal static void EntityDetachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback EntityDetached");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityDetached(entity, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
+	}
+}
 
-  
-  public virtual void EntityReceived(BoltEntity entity) {  }
 
-  internal static void EntityReceivedInvoke(BoltEntity entity) { 
-    BoltLog.Debug("Invoking callback EntityReceived");
-    foreach (GlobalEventListenerBase cb in callbacks) {
+/// <summary>
+  /// Callback triggered when a bolt entity is recieved from the network
+  /// </summary>
+  /// <param name="entity">The recieved bolt entity</param>
+  /// <example>
+  /// *Example:* Loggging connections from remote players in the client bolt console
+  /// 
+  /// ```csharp
+  /// public override void EntityReceived(BoltEntity entity) {
+  ///   string name = entity.GetState&ltPlayerState&gt().Name; 
+  ///   BoltConsole.Write(string.Format("{0} Has Connected", name));
+  /// }
+  /// ```
+  /// </example>
+public virtual void EntityReceived(BoltEntity entity) {  }
+
+internal static void EntityReceivedInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback EntityReceived");
+	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityReceived(entity);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
-    }
-  }
-
-  }
+	}
 }
+
+}
+}
+
