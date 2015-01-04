@@ -97,9 +97,12 @@ and DocType = {
   TypeParams : string list
 } with
   member x.Name = 
-    if x.Cecil.Namespace = "Bolt"  
-      then "Bolt." + (typeName x.Cecil)
-      else typeName x.Cecil
+    if x.Cecil.Name = "GlobalEventListenerBase" then
+      "Bolt.GlobalEventListener"
+    elif x.Cecil.Namespace = "Bolt" then 
+      "Bolt." + (typeName x.Cecil)
+    else 
+      typeName x.Cecil
 
   member x.NameLink = typeHref x.Cecil
 
@@ -221,7 +224,7 @@ let main argv =
 
     // find methods
     |> Seq.map (fun x ->
-      match methods.TryFind x.Name with
+      match methods.TryFind (x.Xml.Name.Substring(2)) with
       | None -> x
       | Some m -> 
         let m = 
@@ -237,7 +240,7 @@ let main argv =
 
     // find properties
     |> Seq.map (fun x ->
-      match properties.TryFind x.Name with
+      match properties.TryFind (x.Xml.Name.Substring(2)) with
       | None -> x
       | Some p -> 
         let p = 
