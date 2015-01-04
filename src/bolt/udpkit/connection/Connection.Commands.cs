@@ -15,27 +15,27 @@ namespace UdpKit {
 
       switch (buffer[1]) {
         case COMMAND_CONNECT:
-          OnCommandConnect(buffer); 
+          OnCommandConnect(buffer);
           break;
 
         case COMMAND_ACCEPTED:
-          OnCommandAccepted(buffer, size); 
+          OnCommandAccepted(buffer, size);
           break;
 
         case COMMAND_REFUSED:
-          OnCommandRefused(buffer, size); 
+          OnCommandRefused(buffer, size);
           break;
 
         case COMMAND_DISCONNECTED:
-          OnCommandDisconnected(buffer, size); 
+          OnCommandDisconnected(buffer, size);
           break;
 
         case COMMAND_PING:
-          OnCommandPing(buffer); 
+          OnCommandPing(buffer);
           break;
 
         default:
-          ConnectionError(UdpConnectionError.IncorrectCommand); 
+          ConnectionError(UdpConnectionError.IncorrectCommand);
           break;
       }
     }
@@ -82,6 +82,8 @@ namespace UdpKit {
 
     void OnCommandAccepted(byte[] buffer, int size) {
       if (IsClient) {
+        UdpLog.Info("Connect to {0} accepted", RemoteEndPoint);
+
         if (CheckState(UdpConnectionState.Connecting)) {
           if (size > 6) {
             AcceptToken = new byte[size - 6];
@@ -94,7 +96,12 @@ namespace UdpKit {
           // grab connection id from token with prefix
           ConnectionId = BitConverter.ToUInt32(AcceptTokenWithPrefix, 0);
 
-          UdpLog.Debug("Assigned Connection Id {0} from server", ConnectionId);
+          if (ConnectionId < 2) {
+            UdpLog.Error("Incorrect connection id #{0} received from server", ConnectionId);
+          }
+          else {
+            UdpLog.Info("Correct connection id #{0} received from server", ConnectionId);
+          }
 
           // gotta be larger than 1
           UdpAssert.Assert(ConnectionId > 1u);
@@ -127,16 +134,12 @@ namespace UdpKit {
     }
 
     void OnCommandDisconnected(byte[] buffer, int size) {
-      EnsureClientIsConnected();
-
       if (CheckState(UdpConnectionState.Connected)) {
         ChangeState(UdpConnectionState.Disconnected, UdpUtils.ReadToken(buffer, size, 2));
       }
     }
 
     void OnCommandPing(byte[] buffer) {
-      EnsureClientIsConnected();
     }
-
   }
 }
