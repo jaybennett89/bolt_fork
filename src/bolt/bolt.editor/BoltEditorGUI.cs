@@ -141,7 +141,7 @@ public static class BoltEditorGUI {
   public static GUIStyle HelpButtonStyle {
     get {
       GUIStyle s = new GUIStyle(EditorStyles.miniButton);
-      s.normal.textColor = EditorGUIUtility.isProSkin ? ColorInt(128, 255, 0) : ColorInt(0, 128, 192);
+      s.normal.textColor = EditorGUIUtility.isProSkin ? ColorInt(177, 255, 3) : ColorInt(0, 128, 192);
       s.fontStyle = FontStyle.Bold;
       return s;
     }
