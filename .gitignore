@@ -7,6 +7,7 @@
 *.sdf
 *.booproj
 *.~vsdx
+*.apk
 
 build
 upload
