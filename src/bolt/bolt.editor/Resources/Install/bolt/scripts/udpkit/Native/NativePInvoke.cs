@@ -68,7 +68,7 @@ public static class NativePInvoke {
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  public static extern UInt32 GetHighPrecisionTime();
+  public static extern UInt32 GetPrecisionTime();
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
