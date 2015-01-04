@@ -2,7 +2,8 @@
 using System.Linq;
 using UnityEngine;
 
-internal enum BoltEditorStartMode {
+[Bolt.Documentation(Ignore = true)]
+public enum BoltEditorStartMode {
   None = 0,
   Server = 1,
   Client = 2
@@ -93,7 +94,7 @@ public class BoltRuntimeSettings : ScriptableObject {
   public bool clientCanInstantiateAll = true;
 
   [SerializeField]
-  internal BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
+  public BoltEditorStartMode debugEditorMode = BoltEditorStartMode.Server;
 
   /// <summary>
   /// The keycode that will toggle visibility of the bolt console
@@ -115,6 +116,9 @@ public class BoltRuntimeSettings : ScriptableObject {
 
   [SerializeField]
   public bool scopeModeHideWarningInGui = false;
+
+  [SerializeField]
+  public bool showHelpButtons = true;
 
   /// <summary>
   /// Get a memberwise copy of the current bolt config

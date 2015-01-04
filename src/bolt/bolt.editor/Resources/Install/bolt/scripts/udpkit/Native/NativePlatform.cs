@@ -1,4 +1,5 @@
 ﻿﻿#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
+using UdpKit;
 using UnityEngine;
 using System.Collections;
 
@@ -19,13 +20,17 @@ public class NativePlatform : UdpKit.UdpPlatform {
 #endif
   }
 
+  public override UdpIPv4Address[] ResolveHostAddresses(string host) {
+    throw new System.NotSupportedException("ResolveHostAddress is not supported in iOS and Android");
+  }
+
   public override System.Collections.Generic.List<UdpKit.UdpPlatformInterface> GetNetworkInterfaces() {
     throw new System.NotImplementedException();
   }
 
   public override uint GetPrecisionTime() {
     lock (timeLock) {
-      return NativePInvoke.GetHighPrecisionTime();
+      return NativePInvoke.GetPrecisionTime();
     }
   }
 

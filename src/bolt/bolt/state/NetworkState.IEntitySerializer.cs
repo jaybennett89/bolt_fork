@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using UdpKit;
 using UE = UnityEngine;
 
@@ -115,7 +116,8 @@ namespace Bolt {
 
         for (int i = 0; i < Meta.Properties.Length; ++i) {
           var pi = Meta.Properties[i];
-          string label = pi.Property.PropertyName;
+
+          string label = pi.Paths.NullOrEmpty() ? pi.Property.PropertyName : FixArrayIndices(pi.Paths[pi.Paths.Length - 1], pi.Indices);
           object value = pi.Property.DebugValue(Objects[pi.OffsetObjects], Storage);
 
           if (!Entity.IsOwner) {
@@ -135,6 +137,16 @@ namespace Bolt {
         }
       }
 #endif
+    }
+
+    string FixArrayIndices(string path, int[] indices) {
+      Regex r = new Regex(@"\[\]");
+
+      for (int i = 0; i < indices.Length; ++i) {
+        path = r.Replace(path, "[" + indices[i] + "]", 1);
+      }
+
+      return path;
     }
 
     void IEntitySerializer.InitProxy(EntityProxy p) {

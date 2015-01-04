@@ -29,24 +29,27 @@ public class BoltEntityEditor : Editor {
   }
 
   public override void OnInspectorGUI() {
+    GUILayout.Space(4);
+
+    BoltEditorGUI.Help("Entity Settings", "http://wiki.boltengine.com/wiki/38");
+
+    GUILayout.Space(4);
+
+    GUILayout.BeginHorizontal();
+    GUILayout.Space(2);
+    GUI.DrawTexture(GUILayoutUtility.GetRect(128, 128, 64, 64, GUILayout.ExpandHeight(false), GUILayout.ExpandWidth(false)), Resources.Load("BoltLogo") as Texture2D);
+    GUILayout.EndHorizontal();
+
+    GUILayout.Space(2);
+
+    EditorGUI.BeginDisabledGroup(Application.isPlaying);
+
     BoltEntity entity = (BoltEntity)target;
     PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
 
-    bool canBeEdited =
-      (Application.isPlaying == false) &&
-      (
-        prefabType == PrefabType.Prefab ||
-        prefabType == PrefabType.DisconnectedPrefabInstance ||
-        prefabType == PrefabType.None
-      );
-
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    GUILayout.Label("Settings", EditorStyles.boldLabel);
     EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
-
-
-    EditorGUI.BeginDisabledGroup(!canBeEdited);
 
     // Prefab Id
     switch (prefabType) {
@@ -63,7 +66,6 @@ public class BoltEntityEditor : Editor {
             EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Bolt Engine/Compile Assembly' menu option to correct", MessageType.Error);
           }
         }
-
         break;
 
       case PrefabType.None:
@@ -90,11 +92,30 @@ public class BoltEntityEditor : Editor {
         break;
     }
 
+    EditSerializer(entity);
+    EditProperties(entity);
+    EditSceneProperties(entity, prefabType);
 
-    // Serializer
+    EditorGUI.EndDisabledGroup();
+
+    if (prefabType == PrefabType.Prefab) {
+      SaveEntity(entity);
+    }
+    else {
+      if (Application.isPlaying) {
+        RuntimeInfoGUI(entity);
+      }
+      else {
+        SaveEntity(entity);
+      }
+    }
+  }
+
+  void EditSerializer(BoltEntity entity) {
     int selectedIndex;
+
     selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.serializerGuid) + 1);
-    selectedIndex = EditorGUILayout.Popup("Serializer", selectedIndex, serializerNames);
+    selectedIndex = EditorGUILayout.Popup("State", selectedIndex, serializerNames);
 
     if (selectedIndex == 0) {
       entity.serializerGuid = Bolt.UniqueId.None;
@@ -103,56 +124,52 @@ public class BoltEntityEditor : Editor {
     else {
       entity.serializerGuid = serializerIds[selectedIndex - 1];
     }
+  }
+
+
+  void EditProperties(BoltEntity entity) {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
     // Update Rate
     entity._updateRate = EditorGUILayout.IntField("Update Rate", entity._updateRate);
 
     // Bool Settings
     entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);
-    entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Client Can Instantiate", entity._allowInstantiateOnClient);
-    entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Dont Destroy On Load", entity._persistThroughSceneLoads);
-    entity._alwaysProxy = EditorGUILayout.Toggle("Always Proxy (Ignore Loading)", entity._alwaysProxy);
+    entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Persist Through Load", entity._persistThroughSceneLoads);
+    entity._alwaysProxy = EditorGUILayout.Toggle("Always Proxy", entity._alwaysProxy);
 
-    EditorGUI.EndDisabledGroup();
-
-    if (Application.isPlaying) {
-      if (prefabType != PrefabType.Prefab) {
-        RuntimeInfoGUI(entity);
-      }
+    if (settings.clientCanInstantiateAll == false) {
+      entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Client Can Instantiate", entity._allowInstantiateOnClient);
     }
-    else {
-      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.None) {
-        Save();
-      }
-    }
+  }
 
+  void EditSceneProperties(BoltEntity entity, PrefabType prefabType) {
     bool isSceneObject = prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.DisconnectedPrefabInstance || prefabType == PrefabType.None;
 
-    GUILayout.Label("Scene Entity Settings", EditorStyles.boldLabel);
-    EditorGUI.BeginDisabledGroup(!isSceneObject || !canBeEdited);
-
-    EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
+    GUILayout.Label("Scene Object Settings", EditorStyles.boldLabel);
 
     entity._sceneObjectAutoAttach = EditorGUILayout.Toggle("Attach On Load", entity._sceneObjectAutoAttach);
     entity._sceneObjectDestroyOnDetach = EditorGUILayout.Toggle("Destroy On Detach", entity._sceneObjectDestroyOnDetach);
 
-    if (isSceneObject && !Application.isPlaying && (entity.sceneGuid == Bolt.UniqueId.None)) {
-      // create new scene id
-      entity.sceneGuid = Bolt.UniqueId.New();
+    if (isSceneObject) {
+      if (!Application.isPlaying && (entity.sceneGuid == Bolt.UniqueId.None)) {
+        // create new scene id
+        entity.sceneGuid = Bolt.UniqueId.New();
 
-      // save shit (force)
-      EditorUtility.SetDirty(this);
+        // save shit (force)
+        EditorUtility.SetDirty(this);
 
-      // log it
-      Debug.Log(string.Format("Generated scene {0} for {1}", entity.sceneGuid, entity.gameObject.name));
+        // log it
+        Debug.Log(string.Format("Generated scene {0} for {1}", entity.sceneGuid, entity.gameObject.name));
+      }
+
+      EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
     }
-
-    EditorGUI.EndDisabledGroup();
   }
 
-  void Save() {
-    if (!Application.isPlaying && GUI.changed) {
-      EditorUtility.SetDirty(target);
+  void SaveEntity(BoltEntity entity) {
+    if (GUI.changed) {
+      EditorUtility.SetDirty(entity);
     }
   }
 

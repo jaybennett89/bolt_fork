@@ -20,8 +20,9 @@ namespace UdpKit {
       lock (sync) {
         Writer callback = writer;
 
-        if (callback != null)
+        if (callback != null) {
           callback(level, message);
+        }
       }
     }
 

@@ -3,7 +3,7 @@
 namespace Bolt {
 
 
-[Documentation(Ignore = true)]
+[Documentation]
 public struct EntityFlags {
     public static readonly EntityFlags ZERO = new EntityFlags(0);
     public static readonly EntityFlags HAS_CONTROL = new EntityFlags(1);
@@ -98,7 +98,7 @@ public struct EntityFlags {
   }
 
 
-[Documentation(Ignore = true)]
+[Documentation]
 public struct InstantiateFlags {
     public static readonly InstantiateFlags ZERO = new InstantiateFlags(0);
     public static readonly InstantiateFlags TAKE_CONTROL = new InstantiateFlags(1);
@@ -284,7 +284,7 @@ public struct ProxyFlags {
   }
 
 
-[Documentation(Ignore = true)]
+[Documentation]
 public struct CommandFlags {
     public static readonly CommandFlags ZERO = new CommandFlags(0);
     public static readonly CommandFlags HAS_EXECUTED = new CommandFlags(1);
@@ -292,6 +292,7 @@ public struct CommandFlags {
     public static readonly CommandFlags SEND_STATE_PERFORMED = new CommandFlags(4);
     public static readonly CommandFlags CORRECTION_RECEIVED = new CommandFlags(8);
     public static readonly CommandFlags DISPOSE = new CommandFlags(16);
+    public static readonly CommandFlags MISSING = new CommandFlags(32);
     
     readonly int bits;
 
@@ -335,6 +336,9 @@ public struct CommandFlags {
 		}
 			if((bits & 16) == 16) {
 			sb.Append(" DISPOSE");
+		}
+			if((bits & 32) == 32) {
+			sb.Append(" MISSING");
 		}
 	
 	  sb.Append("]");

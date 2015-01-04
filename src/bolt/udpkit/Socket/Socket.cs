@@ -506,6 +506,10 @@ namespace UdpKit {
       cn.AcceptToken = acceptToken;
       cn.ConnectionId = ++connectionIdCounter;
 
+      if (cn.ConnectionId < 2) {
+        UdpLog.Error("Incorrect connection id '{0}' assigned to {1}", cn.ConnectionId, ep);
+      }
+
       if (cn.AcceptToken == null) {
         cn.AcceptTokenWithPrefix = BitConverter.GetBytes(cn.ConnectionId);
       }

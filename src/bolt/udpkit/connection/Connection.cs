@@ -46,7 +46,7 @@ namespace UdpKit {
     internal uint SendTime { get; private set; }
     internal uint RecvTime { get; private set; }
 
-    internal uint ConnectionId;
+    internal volatile uint ConnectionId;
 
     internal byte[] ConnectToken;
     internal byte[] AcceptToken;
@@ -259,6 +259,7 @@ namespace UdpKit {
         UdpLog.Info("{0} connected", EndPoint);
 
         if (IsServer) {
+          UdpLog.Info("SENDING ACCEPT COMMAND");
           SendCommand(COMMAND_ACCEPTED, AcceptTokenWithPrefix);
         }
 
@@ -277,12 +278,6 @@ namespace UdpKit {
         ev.Connection = this;
         ev.DisconnectToken = token;
         Socket.Raise(ev);
-      }
-    }
-
-    void EnsureClientIsConnected() {
-      if (IsClient && State == UdpConnectionState.Connecting && Socket.Config.AllowImplicitAccept) {
-        ChangeState(UdpConnectionState.Connected);
       }
     }
   }

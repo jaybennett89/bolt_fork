@@ -180,6 +180,10 @@ EXPORT_API S32 RecvPoll(udpSocket* socket, S32 timeoutMs) {
 
   S32 result = select(socket->nativeSocket + 1, &set, NULL, NULL, &tv);
   if (result == SOCKET_ERROR) {
+    if (errno == EINTR) {
+      return UDPKIT_SOCKET_NODATA;
+    }
+
     return UDPKIT_SOCKET_ERROR;
   }
 

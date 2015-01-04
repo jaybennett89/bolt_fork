@@ -223,6 +223,10 @@ public class BoltSettingsWindow : EditorWindow {
   void Miscellaneous() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
+    BoltEditorGUI.WithLabel("Show Help Buttons", () => {
+      settings.showHelpButtons = EditorGUILayout.Toggle(settings.showHelpButtons);
+    });
+
     BoltEditorGUI.WithLabel("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });

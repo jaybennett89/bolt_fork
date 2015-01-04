@@ -87,11 +87,17 @@ namespace Bolt {
     }
 
     /// <summary>
-    /// User assignable token that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
+    /// User assignable object that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
     /// </summary>
-    public object UserToken {
+    public object UserData {
       get;
       set;
+    }
+
+    [System.Obsolete("Use the 'UserData' property instead")]
+    public object UserToken {
+      get { return UserData; }
+      set { UserData = value; }
     }
 
     object IBoltListNode.prev { get; set; }

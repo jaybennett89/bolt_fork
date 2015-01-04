@@ -68,12 +68,17 @@ public class BoltConnection : BoltObject {
   /// }
   /// ```
   /// </example>
-  public bool isLoadingMap {
+  public bool IsLoadingMap {
     get {
       return
         (_remoteSceneLoading.Scene != BoltCore._localSceneLoading.Scene) ||
         (_remoteSceneLoading.State != SceneLoadState.STATE_CALLBACK_INVOKED);
     }
+  }
+
+  [Obsolete("Use BoltConnection.IsLoadingMap instead")]
+  public bool isLoadingMap {
+    get { return IsLoadingMap; }
   }
 
   /// <summary>
@@ -96,8 +101,13 @@ public class BoltConnection : BoltObject {
   /// }
   /// ```
   /// </example>
-  public int remoteFrame {
+  public int RemoteFrame {
     get { return _remoteFrameEstimated; }
+  }
+
+  [Obsolete("Use BoltConnection.PingNetwork instead")]
+  public int remoteFrame {
+    get { return RemoteFrame; }
   }
 
   /// <summary>
@@ -147,7 +157,7 @@ public class BoltConnection : BoltObject {
     internal set;
   }
 
-  [Obsolete("Use BoltConnection.pingNetwork instead")]
+  [Obsolete("Use BoltConnection.PingNetwork instead")]
   public float ping {
     get { return _udp.NetworkPing; }
   }
@@ -161,11 +171,16 @@ public class BoltConnection : BoltObject {
   /// ```csharp
   /// void OnGUI() {
   ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
-  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.PingNetwork;
   ///   }
   /// }
   /// ```
   /// </example>
+  public float PingNetwork {
+    get { return _udp.NetworkPing; }
+  }
+
+  [Obsolete("Use BoltConnection.PingNetwork instead")]
   public float pingNetwork {
     get { return _udp.NetworkPing; }
   }
@@ -180,15 +195,19 @@ public class BoltConnection : BoltObject {
   /// void OnGUI() {
   ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
   ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
-  ///     GUILayout.Label("Dejitter Delay:" + BoltNetwork.server.dejitterFrames;
+  ///     GUILayout.Label("Dejitter Delay:" + BoltNetwork.server.DejitterFrames;
   ///   }
   /// }
   /// ```
   /// </example>
-  public int dejitterFrames {
+  public int DejitterFrames {
     get { return _remoteFrameActual - _remoteFrameEstimated; }
   }
 
+  [Obsolete("Use BoltConnection.DejitterFrames instead")]
+  public int dejitterFrames {
+    get { return DejitterFrames; }
+  }
 
   /// <summary>
   /// The round-trip time across the network, including processing delays and acks
@@ -199,12 +218,17 @@ public class BoltConnection : BoltObject {
   /// ```csharp
   /// void OnGUI() {
   ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
-  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
-  ///     GUILayout.Label("Ping (Aliased):" + BoltNetwork.server.pingAliased;
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.PingNetwork;
+  ///     GUILayout.Label("Ping (Aliased):" + BoltNetwork.server.PingAliased;
   ///   }
   /// }
   /// ```
   /// </example>
+  public float PingAliased {
+    get { return _udp.NetworkPing; }
+  }
+
+  [Obsolete("Use BoltConnection.PingAliased instead")]
   public float pingAliased {
     get { return _udp.AliasedPing; }
   }
@@ -230,15 +254,20 @@ public class BoltConnection : BoltObject {
   /// ```csharp
   /// void OnGUI() {
   ///   if(BoltNetwork.isConnected && BoltNetwork.isClient) {
-  ///     GUILayout.Label("Ping:" + BoltNetwork.server.pingNetwork;
-  ///     GUILayout.Label("Bandwidth Out:" + BoltNetwork.server.bitsPerSecondIn);
-  ///     GUILayout.Label("Bandwidth In:" + BoltNetwork.server.bitsPerSecondOut);
+  ///     GUILayout.Label("Ping:" + BoltNetwork.server.PingNetwork;
+  ///     GUILayout.Label("Bandwidth Out:" + BoltNetwork.server.BitsPerSecondOut);
+  ///     GUILayout.Label("Bandwidth In:" + BoltNetwork.server.BitsPerSecondIn);
   ///   }
   /// }
   /// ```
   /// </example>
-  public int bitsPerSecondIn {
+  public int BitsPerSecondIn {
     get { return _bitsSecondIn; }
+  }
+
+  [Obsolete("Use BoltConnection.BitsPerSecondIn instead")]
+  public int bitsPerSecondIn {
+    get { return BitsPerSecondIn; }
   }
 
   /// <summary>
@@ -257,11 +286,16 @@ public class BoltConnection : BoltObject {
   /// }
   /// ```
   /// </example>
-  public int bitsPerSecondOut {
+  public int BitsPerSecondOut {
     get { return _bitsSecondOut; }
   }
 
-  internal uint ConnectionId {
+  [Obsolete("Use BoltConnection.BitsPerSecondOut instead")]
+  public int bitsPerSecondOut {
+    get { return BitsPerSecondOut; }
+  }
+
+  public uint ConnectionId {
     get { return udpConnection.ConnectionId; }
   }
 
@@ -277,25 +311,36 @@ public class BoltConnection : BoltObject {
   /// }
   /// ```
   /// </example>
-  public UdpEndPoint remoteEndPoint {
+  public UdpEndPoint RemoteEndPoint {
     get { return udpConnection.RemoteEndPoint; }
   }
 
+  [Obsolete("Use BoltConnection.RemoteEndPoint instead")]
+  public UdpEndPoint remoteEndPoint {
+    get { return RemoteEndPoint; }
+  }
+
   /// <summary>
-  /// User assignable token which lets you pair arbitrary data with the connection
+  /// User assignable object which lets you pair arbitrary data with the connection
   /// </summary>
   /// <example>
-  /// *Example:* Using a reference to the player entity in the userToken.
+  /// *Example:* Using a reference to the player entity in the UserData property.
   /// 
   /// ```csharp
   /// public override void Disconnected(BoltConnection connection) {
-  ///   BoltNetwork.Destroy((BoltEntity)connection.userToken);
+  ///   BoltNetwork.Destroy((BoltEntity)connection.UserData);
   /// }
   /// ```
   /// </example>
-  public object userToken {
+  public object UserData {
     get;
     set;
+  }
+
+  [Obsolete("Use the 'UserData' property instead")]
+  public object userToken {
+    get { return UserData; }
+    set { UserData = value; }
   }
 
   internal int SendRateMultiplier {
@@ -314,7 +359,7 @@ public class BoltConnection : BoltObject {
   }
 
   internal BoltConnection(UdpConnection udp) {
-    userToken = udp.UserToken;
+    UserData = udp.UserToken;
 
     _udp = udp;
     _udp.UserToken = this;
@@ -467,12 +512,12 @@ public class BoltConnection : BoltObject {
       _channels[i].Disconnected();
     }
 
-    if (userToken != null) {
-      if (userToken is IDisposable) {
-        (userToken as IDisposable).Dispose();
+    if (UserData != null) {
+      if (UserData is IDisposable) {
+        (UserData as IDisposable).Dispose();
       }
 
-      userToken = null;
+      UserData = null;
     }
   }
 

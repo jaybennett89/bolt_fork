@@ -29,8 +29,6 @@ namespace UdpKit {
     internal void OnPacketReceived(byte[] buffer, int bytes) {
       RecvTime = Socket.GetCurrentTime();
 
-      EnsureClientIsConnected();
-
       if (CheckState(UdpConnectionState.Connected) == false) {
         return;
       }

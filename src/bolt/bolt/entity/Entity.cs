@@ -96,7 +96,7 @@ namespace Bolt {
     internal bool CanQueueCommands {
       get { return _canQueueCommands; }
     }
-    
+
     public bool IsFrozen {
       get { return BoltCore._entitiesFrozen.Contains(this); }
     }
@@ -325,7 +325,7 @@ namespace Bolt {
 
       // clear from unity object
       UnityObject._entity = null;
-       
+
       // log
       BoltLog.Debug("Detached {0}", this);
     }
@@ -452,7 +452,13 @@ namespace Bolt {
               MissingCommand(null);
             }
 
-            ExecuteCommandsFromRemote();
+            // execute commands comands from 'MissingCommand' callback
+            commands = ExecuteCommandsFromRemote();
+
+            // remove all commands queued by the Owner
+            while ((CommandQueue.count > 0) && (CommandQueue.last.Flags & CommandFlags.MISSING)) {
+              CommandQueue.RemoveLast();
+            }
           }
         }
       }
