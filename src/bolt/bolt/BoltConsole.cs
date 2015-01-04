@@ -159,6 +159,7 @@ public class BoltConsole : MonoBehaviour {
     if (visible == false) {
       return;
     }
+
     LinesRefresh();
 
     // how many lines to render at most
@@ -173,7 +174,10 @@ public class BoltConsole : MonoBehaviour {
 
       if (i < _linesRender.count) {
         Line l = _linesRender[_linesRender.count - m + i];
-        GUI.Label(GetRect(i), l.text, Bolt.DebugInfo.LabelStyleColor(l.color));
+        GUIStyle s = Bolt.DebugInfo.LabelStyleColor(l.color);
+        s.fontSize = fontSize;
+
+        GUI.Label(GetRect(i), l.text, s);
       }
     }
   }
