@@ -8,6 +8,10 @@ using UnityEngine;
 
 [Documentation(Ignore = true)]
 public static class BoltUtils {
+  public static bool NullOrEmpty(this Array array) {
+    return array == null || array.Length == 0;
+  }
+
   public static bool Has<T> (this T[] array, int index) where T : class {
     return index < array.Length && array[index] != null;
   }
