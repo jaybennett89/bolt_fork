@@ -261,7 +261,7 @@ public class BoltConnection : BoltObject {
     get { return _bitsSecondOut; }
   }
 
-  internal uint ConnectionId {
+  public uint ConnectionId {
     get { return udpConnection.ConnectionId; }
   }
 
