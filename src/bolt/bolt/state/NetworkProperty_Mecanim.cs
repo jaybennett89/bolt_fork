@@ -44,7 +44,12 @@ namespace Bolt {
           }
         }
         else {
-          BoltLog.Warn("You have not assigned a mecanim animator to the state on {0}, but you have properties set to use mecanim", state.Entity.UnityObject.gameObject.name);
+#if DEBUG
+          if (state.MecanimWarningTimeout < UnityEngine.Time.time) {
+            BoltLog.Warn("You have not assigned a mecanim animator to the state on {0}, but you have properties set to use mecanim", state.Entity.UnityObject.gameObject.name);
+            state.MecanimWarningTimeout = UnityEngine.Time.time + 1;
+          }
+#endif
         }
       }
     }
