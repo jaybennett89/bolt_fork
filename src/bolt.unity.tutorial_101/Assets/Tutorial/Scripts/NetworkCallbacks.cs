@@ -9,7 +9,7 @@ public class NetworkCallbacks : Bolt.GlobalEventListener {
     var pos = new Vector3(Random.Range(-16, 16), 0, Random.Range(0, 16));
 
     // instantiate cube
-    BoltNetwork.Instantiate(BoltPrefabs.Cube, pos, Quaternion.identity);
+    BoltNetwork.Instantiate(BoltPrefabs.Robot, pos, Quaternion.identity);
   }
 
   List<string> logMessages = new List<string>();
