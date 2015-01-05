@@ -182,7 +182,7 @@ public class BoltConnection : BoltObject {
 
   [Obsolete("Use BoltConnection.PingNetwork instead")]
   public float pingNetwork {
-    get { return _udp.NetworkPing; }
+    get { return PingNetwork; }
   }
 
   /// <summary>

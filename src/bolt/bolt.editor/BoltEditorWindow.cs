@@ -507,6 +507,8 @@ public class BoltEditorWindow : BoltWindow {
             EditorGUI.EndDisabledGroup();
           }
 
+          BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/41");
+
           EditorGUILayout.EndHorizontal();
         });
       }
