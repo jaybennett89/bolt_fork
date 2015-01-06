@@ -56,15 +56,15 @@ public static class NativePInvoke {
   [SuppressUnmanagedCodeSecurity]
   public static extern Int32 Close(IntPtr socket);
 
-  [DllImport(DLL_NAME, EntryPoint = "PlatformName")]
+  [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  static extern IntPtr PlatformName_Extern();
-  public static string PlatformName() { return Marshal.PtrToStringAnsi(PlatformName_Extern()); }
+  static extern IntPtr PlatformName();
+  public static string PlatformName_Wrapper() { return Marshal.PtrToStringAnsi(PlatformName()); }
 
-  [DllImport(DLL_NAME, EntryPoint = "Error")]
+  [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  static extern IntPtr Error_Extern();
-  public static string Error() { return Marshal.PtrToStringAnsi(Error_Extern()); }
+  static extern IntPtr Error();
+  public static string Error_Wrapper() { return Marshal.PtrToStringAnsi(Error()); }
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]

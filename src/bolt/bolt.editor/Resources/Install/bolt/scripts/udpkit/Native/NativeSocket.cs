@@ -40,7 +40,7 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
   }
 
   public override string Error {
-    get { return NativePInvoke.Error(); }
+    get { return NativePInvoke.Error_Wrapper(); }
   }
 
   public override bool IsBound {
