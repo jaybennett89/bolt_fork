@@ -12,7 +12,8 @@ public class NativePlatform : UdpKit.UdpPlatform {
 
   public override UdpKit.UdpIPv4Address GetBroadcastAddress() {
 #if UNITY_IPHONE
-    return NativePInvoke.GetBroadcastAddress();
+    var addr = NativePInvoke.GetBroadcastAddress();
+    return new UdpKit.UdpIPv4Address((byte) (addr >> 0), (byte) (addr >> 8), (byte) (addr >> 16), (byte) (addr >> 24));
 #elif UNITY_ANDROID
     return Android.GetBroadcastAddress();
 #else
