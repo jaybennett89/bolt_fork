@@ -412,7 +412,7 @@ public class BoltEditorWindow : BoltWindow {
           BoltEditorGUI.Toggle("mc_controller_only", true);
           break;
 
-        case ReplicationMode.OnlyOwner:
+        case ReplicationMode.Local:
           BoltEditorGUI.Toggle("mc_owner_only", true);
           break;
       }

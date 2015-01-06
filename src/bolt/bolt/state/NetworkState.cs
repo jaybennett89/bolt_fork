@@ -7,6 +7,10 @@ using UE = UnityEngine;
 
 namespace Bolt {
   internal abstract partial class NetworkState : NetworkObj_Root {
+#if DEBUG
+    internal float MecanimWarningTimeout = 0;
+#endif
+
     internal Entity Entity;
     internal List<UE.Animator> Animators = new List<UE.Animator>();
     internal new NetworkState_Meta Meta;
