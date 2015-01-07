@@ -38,7 +38,7 @@ namespace Bolt {
       return Wrap(ev, 0);
     }
 
-    public static EventReliable Wrap(Bolt.Event ev, uint sequence) {
+    public static EventReliable Wrap(Event ev, uint sequence) {
       EventReliable r;
 
       r.NetworkEvent = ev;
