@@ -60,6 +60,8 @@ public class BoltSettingsWindow : EditorWindow {
         settings.scopeModeHideWarningInGui = false;
         Save();
       }
+
+      BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/42");
     });
 
     BoltEditorGUI.WithLabel("Instantiate Mode", () => {
