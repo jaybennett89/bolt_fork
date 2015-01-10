@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Bolt {
-  public abstract class NetworkArray_Values<T> : NetworkObj {
+  public abstract class NetworkArray_Values<T> : NetworkObj, IEnumerator<T> {
     int _length;
     int _stride;
 
@@ -41,5 +42,15 @@ namespace Bolt {
 
     protected abstract T GetValue(int index);
     protected abstract void SetValue(int index, T value);
+
+    public IEnumerator<T> GetEnumerator() {
+      for (int i = 0; i < _length; ++i) {
+        yield return this[i];
+      }
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+      return GetEnumerator();
+    }
   }
 }
