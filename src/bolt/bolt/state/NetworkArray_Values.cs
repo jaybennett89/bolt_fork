@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Bolt {
-  public abstract class NetworkArray_Values<T> : NetworkObj, IEnumerator<T> {
+  public abstract class NetworkArray_Values<T> : NetworkObj, IEnumerable<T> {
     int _length;
     int _stride;
 
