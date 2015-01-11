@@ -163,6 +163,10 @@ public static class BoltNetwork {
     }
   }
 
+  public static UdpSocket UdpSocket {
+    get { return BoltCore._udpSocket; }
+  }
+
   /// <summary>
   /// The current server simulation frame number
   /// </summary>
