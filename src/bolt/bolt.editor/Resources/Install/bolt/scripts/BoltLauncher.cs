@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using UdpKit;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System;
 using System.Reflection;
+using UdpKit;
+using UnityEngine;
 
 public static class BoltLauncher {
+  static UdpPlatform UserAssignedPlatform;
+
   public static void StartServer() {
     StartServer(UdpEndPoint.Any);
   }
@@ -92,7 +93,15 @@ public static class BoltLauncher {
     return result;
   }
 
+  public static void SetUdpPlatform(UdpPlatform platform) {
+    UserAssignedPlatform = platform;
+  }
+
   public static UdpPlatform CreateUdpPlatform() {
+    if (UserAssignedPlatform != null) {
+      return UserAssignedPlatform;
+    }
+
 #if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
     return new NativePlatform();
 #elif (UNITY_PS4 || UNITY_PSM) && !UNITY_EDITOR
@@ -101,5 +110,4 @@ public static class BoltLauncher {
     return new DotNetPlatform();
 #endif
   }
-
 }
