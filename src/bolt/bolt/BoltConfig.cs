@@ -204,8 +204,6 @@ public sealed class BoltConfig {
   /// </summary>
   public int connectionRequestAttempts = 20;
 
-  public int connectionTokenSize = 128;
-
   public BoltConfig() {
     // sendrates of server/client
     serverSendRate = 3;
