@@ -4,7 +4,6 @@ using System;
 
 namespace Bolt {
 
-  [Documentation(Ignore = true)]
 	public class BitSet : BoltObject {
 		public const int BITSET_LONGS = 16;
 		internal static readonly BitSet Full;
@@ -12,22 +11,22 @@ namespace Bolt {
 		static BitSet() {
 		  Full = new BitSet();
 		  
-						Full.Bits0 |= uint.MaxValue; 
-						Full.Bits1 |= uint.MaxValue; 
-						Full.Bits2 |= uint.MaxValue; 
-						Full.Bits3 |= uint.MaxValue; 
-						Full.Bits4 |= uint.MaxValue; 
-						Full.Bits5 |= uint.MaxValue; 
-						Full.Bits6 |= uint.MaxValue; 
-						Full.Bits7 |= uint.MaxValue; 
-						Full.Bits8 |= uint.MaxValue; 
-						Full.Bits9 |= uint.MaxValue; 
-						Full.Bits10 |= uint.MaxValue; 
-						Full.Bits11 |= uint.MaxValue; 
-						Full.Bits12 |= uint.MaxValue; 
-						Full.Bits13 |= uint.MaxValue; 
-						Full.Bits14 |= uint.MaxValue; 
-						Full.Bits15 |= uint.MaxValue; 
+						Full.Bits0 |= ulong.MaxValue; 
+						Full.Bits1 |= ulong.MaxValue; 
+						Full.Bits2 |= ulong.MaxValue; 
+						Full.Bits3 |= ulong.MaxValue; 
+						Full.Bits4 |= ulong.MaxValue; 
+						Full.Bits5 |= ulong.MaxValue; 
+						Full.Bits6 |= ulong.MaxValue; 
+						Full.Bits7 |= ulong.MaxValue; 
+						Full.Bits8 |= ulong.MaxValue; 
+						Full.Bits9 |= ulong.MaxValue; 
+						Full.Bits10 |= ulong.MaxValue; 
+						Full.Bits11 |= ulong.MaxValue; 
+						Full.Bits12 |= ulong.MaxValue; 
+						Full.Bits13 |= ulong.MaxValue; 
+						Full.Bits14 |= ulong.MaxValue; 
+						Full.Bits15 |= ulong.MaxValue; 
 					}
 
 

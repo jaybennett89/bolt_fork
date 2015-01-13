@@ -7,7 +7,6 @@
 
 <#
 const int SIZE = 16;
-
 #>
 
 using System;
@@ -22,7 +21,7 @@ namespace Bolt {
 		  Full = new BitSet();
 		  
 			<# for(int i = 0; i < SIZE; ++i) { #>
-			Full.Bits<#=i#> |= uint.MaxValue; 
+			Full.Bits<#=i#> |= ulong.MaxValue; 
 			<# } #>
 		}
 
