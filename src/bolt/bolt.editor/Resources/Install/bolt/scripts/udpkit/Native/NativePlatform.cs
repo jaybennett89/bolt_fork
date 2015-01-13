@@ -39,6 +39,10 @@ public class NativePlatform : UdpKit.UdpPlatform {
     get { return true; }
   }
 
+  public override bool SupportsMasterServer {
+    get { return true; }
+  }
+
 #if UNITY_ANDROID
   static class Android {
     static AndroidJavaObject androidMulticastLock;

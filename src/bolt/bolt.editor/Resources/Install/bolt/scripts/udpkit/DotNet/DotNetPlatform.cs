@@ -28,6 +28,10 @@ public class DotNetPlatform : UdpPlatform {
     get { return true; }
   }
 
+  public override bool SupportsMasterServer {
+    get { return true; }
+  }
+
   public override uint GetPrecisionTime() {
     return PrecisionTimer.GetCurrentTime();
   }
