@@ -86,6 +86,18 @@ namespace UdpKit {
       return string.Format("{0}.{1}.{2}.{3}", Byte3, Byte2, Byte1, Byte0);
     }
 
+    public bool IsAny {
+      get { return Byte0 == 0 && Byte1 == 0 && Byte2 == 0 && Byte3 == 0; }
+    }
+
+    public bool IsLocalHost {
+      get { return Byte3 == 127 && Byte2 == 0 && Byte1 == 0 && Byte0 == 1; }
+    }
+
+    public bool IsBroadcast {
+      get { return Byte3 == 255 && Byte2 == 255 && Byte1 == 255 && Byte0 == 255; }
+    }
+
     public bool IsPrivate {
       get {
         return
@@ -98,12 +110,20 @@ namespace UdpKit {
       }
     }
 
+    public bool IsWan {
+      get { return !IsAny && !IsLocalHost && !IsBroadcast && !IsPrivate; }
+    }
+
     public static bool operator ==(UdpIPv4Address x, UdpIPv4Address y) {
       return Compare(x, y) == 0;
     }
 
     public static bool operator !=(UdpIPv4Address x, UdpIPv4Address y) {
       return Compare(x, y) != 0;
+    }
+
+    public static UdpIPv4Address operator &(UdpIPv4Address a, UdpIPv4Address b) {
+      return new UdpIPv4Address(a.Packed & b.Packed);
     }
 
     static int Compare(UdpIPv4Address x, UdpIPv4Address y) {
