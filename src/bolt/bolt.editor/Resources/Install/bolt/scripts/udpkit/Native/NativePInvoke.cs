@@ -26,7 +26,7 @@ public static class NativePInvoke {
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  public static extern Int32 Bind(IntPtr socket, UdpEndPoint addr);
+  public static extern Int32 Bind(IntPtr socket, UdpEndPoint.Native addr);
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
@@ -38,11 +38,11 @@ public static class NativePInvoke {
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  public static extern Int32 SendTo(IntPtr socket, [Out] byte[] buffer, int size, UdpEndPoint addr);
+  public static extern Int32 SendTo(IntPtr socket, [Out] byte[] buffer, int size, UdpEndPoint.Native addr);
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  public static extern Int32 RecvFrom(IntPtr socket, [Out] byte[] buffer, int size, [Out] out UdpEndPoint addr);
+  public static extern Int32 RecvFrom(IntPtr socket, [Out] byte[] buffer, int size, [Out] out UdpEndPoint.Native addr);
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
@@ -50,7 +50,7 @@ public static class NativePInvoke {
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
-  public static extern Int32 GetEndPoint(IntPtr socket, [Out] out UdpEndPoint addr);
+  public static extern Int32 GetEndPoint(IntPtr socket, [Out] out UdpEndPoint.Native addr);
 
   [DllImport(DLL_NAME)]
   [SuppressUnmanagedCodeSecurity]
