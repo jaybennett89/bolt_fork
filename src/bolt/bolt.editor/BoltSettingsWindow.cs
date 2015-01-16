@@ -25,17 +25,31 @@ public class BoltSettingsWindow : EditorWindow {
   void Replication() {
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-    BoltEditorGUI.WithLabel("FixedUpdate Rate", () => {
-      settings._config.framesPerSecond = BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "Per Second");
+    BoltEditorGUI.WithLabel("Simulation Rate", () => {
+      settings._config.framesPerSecond = Mathf.Max(10, BoltEditorGUI.IntFieldOverlay(settings._config.framesPerSecond, "FixedUpdate Calls / Second"));
     });
 
-    BoltEditorGUI.WithLabel("Network Tick Rate", () => {
-      settings._config.serverSendRate = BoltEditorGUI.IntFieldOverlay(settings._config.serverSendRate, "Frames");
+    BoltEditorGUI.WithLabel("Network Rate", () => {
+      settings._config.serverSendRate = Mathf.Clamp(settings._config.serverSendRate, 1, settings._config.framesPerSecond);
+
+      var ssr = settings._config.serverSendRate;
+      var fps = settings._config.framesPerSecond;
+
+      string legend = "";
+
+      if (fps == ((fps / ssr) * ssr)) {
+        legend = (fps / ssr).ToString();
+      }
+      else {
+        legend = System.Math.Round((float)fps / (float)ssr, 2).ToString();
+      }
+
+      settings._config.serverSendRate = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.serverSendRate, string.Format("{0} Packets / Second", legend)), 1, fps);
     });
 
     BoltEditorGUI.WithLabel("Max Priorities", () => {
       settings._config.maxEntityPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxEntityPriority, "Entity"), 1, 1 << 16);
-      settings._config.maxPropertyPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxPropertyPriority, "Proprerty"), 1, 1 << 11);
+      settings._config.maxPropertyPriority = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.maxPropertyPriority, "Property"), 1, 1 << 11);
     });
 
     BoltEditorGUI.WithLabel("Disable Dejitter Buffer", () => {

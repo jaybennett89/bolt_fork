@@ -22,15 +22,20 @@ public class BoltPoll : MonoBehaviour {
   }
 
   protected void Update() {
-    if (Time.timeScale != 1f) {
-      // log this error
-      BoltLog.Error("Time.timeScale value is incorrect: {0}f", Time.timeScale);
+    try {
+      if (Time.timeScale != 1f) {
+        // log this error
+        BoltLog.Error("Time.timeScale value is incorrect: {0}f", Time.timeScale);
 
-      // force this
-      Time.timeScale = 1f;
+        // force this
+        Time.timeScale = 1f;
 
-      // log that we forced timescale to 1
-      BoltLog.Error("Time.timeScale has been set to 1.0f by Bolt");
+        // log that we forced timescale to 1
+        BoltLog.Error("Time.timeScale has been set to 1.0f by Bolt");
+      }
+    }
+    finally {
+      BoltCore.Update();
     }
   }
 

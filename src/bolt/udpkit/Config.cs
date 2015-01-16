@@ -1,10 +1,9 @@
 ﻿using System;
 namespace UdpKit {
-  public delegate float UdpNoise ();
-
+  [Serializable]
   public class UdpConfig {
     public int PacketWindow = 256;
-    public int PacketDatagramSize = 1400;
+    public int PacketDatagramSize = 1200;
 
     public int StreamWindow = 1024;
     public int StreamDatagramSize = 4096;
@@ -23,12 +22,6 @@ namespace UdpKit {
     /// If we allow serialization to overflow MTU of the connection, default: false
     /// </summary>
     public bool AllowPacketOverflow = false;
-
-    /// <summary>
-    /// If we should flip the AutoResetEvent which signals to the
-    /// user thread if we have available events on a socket, default: true
-    /// </summary>
-    public bool UseAvailableEventEvent = true;
 
     /// <summary>
     /// The timeout until we should make a new connect request, default: 1000 (milliseconds)
@@ -71,7 +64,6 @@ namespace UdpKit {
     /// </summary>
     public int SimulatedPingMax = 0;
 
-
     /// <summary>
     /// How many connections we allow, default: 64
     /// </summary>
@@ -95,14 +87,9 @@ namespace UdpKit {
     public bool AllowImplicitAccept = true;
 
     /// <summary>
-    /// How large the event queues should by default, default: 4096
-    /// </summary>
-    public int InitialEventQueueSize = 4096;
-
-    /// <summary>
     /// Custom noise function for use in packet loss simulation, default: null
     /// </summary>
-    public UdpNoise NoiseFunction = null;
+    public Func<float> NoiseFunction = null;
 
     internal UdpConfig Duplicate () {
       return (UdpConfig) MemberwiseClone();

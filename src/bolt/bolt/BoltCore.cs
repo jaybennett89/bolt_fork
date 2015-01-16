@@ -8,6 +8,7 @@ using UnityEngine;
 using UE = UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 /// <summary>
 /// The network mode of this bolt simulation (i.e. client or server)
@@ -294,7 +295,7 @@ internal static class BoltCore {
     BoltSceneLoader.Enqueue(_localSceneLoading.Scene);
   }
 
-  public static void Shutdown() {
+  public static ManualResetEvent Shutdown() {
     if (_udpSocket != null && _mode != BoltNetworkModes.None) {
       // log that we are shutting down
       BoltLog.Info("Shutdown");
@@ -302,16 +303,13 @@ internal static class BoltCore {
       // notify user code
       BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
 
+      // 
       UPnP.Disable(false);
 
       // 
       _mode = BoltNetworkModes.None;
 
-      // disconnect from everywhere
-      foreach (BoltConnection connection in _connections) {
-        connection.Disconnect();
-      }
-
+      // destroy all entities
       foreach (Bolt.Entity entity in _entities.ToArray()) {
         DestroyForce(entity);
       }
@@ -327,13 +325,24 @@ internal static class BoltCore {
 
       BoltNetworkInternal.EnvironmentReset();
 
-      _udpSocket.Close();
+      // set a specificl writer for this
+      UdpLog.SetWriter((i, m) => UnityEngine.Debug.Log(m));
+
+      // begin closing socket
+      var resetEvent = _udpSocket.Close();
+
+      // clear socket
       _udpSocket = null;
 
       Factory.UnregisterAll();
       BoltLog.RemoveAll();
       BoltConsole.Clear();
+      DebugInfo.Hide();
+
+      return resetEvent;
     }
+
+    return new ManualResetEvent(true);
   }
 
   public static UdpSession[] GetSessions() {
@@ -891,11 +900,11 @@ internal static class BoltCore {
     _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
-    _udpConfig.UseAvailableEventEvent = false;
 
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
+    // create udp socket
     _udpSocket = new UdpSocket(udpPlatform, _udpConfig);
 
     // init all global behaviours
@@ -912,13 +921,13 @@ internal static class BoltCore {
   }
 
 #if DEBUG
-  static UdpNoise CreatePerlinNoise() {
+  static Func<float> CreatePerlinNoise() {
     var x = UnityEngine.Random.value;
     var s = Stopwatch.StartNew();
     return () => Mathf.PerlinNoise(x, (float)s.Elapsed.TotalSeconds);
   }
 
-  static UdpNoise CreateRandomNoise() {
+  static Func<float> CreateRandomNoise() {
     var r = new System.Random();
     return () => (float)r.NextDouble();
   }
@@ -1032,4 +1041,12 @@ internal static class BoltCore {
   //internal static UdpStreamData FindStreamData(UdpDataKey data) {
   //  return _udpSocket.StreamDataFind(data);
   //}
+
+  internal static void Update() {
+    var it = _entities.GetIterator();
+
+    while (it.Next()) {
+      it.val.Render();
+    }
+  }
 }

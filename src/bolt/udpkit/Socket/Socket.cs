@@ -98,6 +98,10 @@ namespace UdpKit {
       set;
     }
 
+    public UdpPlatformSocket PlatformSocket {
+      get { return platformSocket; }
+    }
+
     public UdpSocket(UdpPlatform platform)
       : this(platform, new UdpConfig()) {
     }

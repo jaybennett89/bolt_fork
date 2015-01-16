@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BoltInternal;
 using UdpKit;
 using UnityEngine;
+using System.Threading;
 
 namespace BoltInternal {
   public interface IDebugDrawer {
@@ -35,8 +36,8 @@ public static class BoltNetworkInternal {
   }
 
 
-  public static void __Shutdown() {
-    BoltCore.Shutdown();
+  public static ManualResetEvent __Shutdown() {
+    return BoltCore.Shutdown();
   }
 }
 
@@ -161,6 +162,10 @@ public static class BoltNetwork {
 
       return 0;
     }
+  }
+
+  public static UdpSocket UdpSocket {
+    get { return BoltCore._udpSocket; }
   }
 
   /// <summary>

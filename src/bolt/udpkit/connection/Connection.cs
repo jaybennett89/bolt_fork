@@ -259,7 +259,6 @@ namespace UdpKit {
         UdpLog.Info("{0} connected", EndPoint);
 
         if (IsServer) {
-          UdpLog.Info("SENDING ACCEPT COMMAND");
           SendCommand(COMMAND_ACCEPTED, AcceptTokenWithPrefix);
         }
 
