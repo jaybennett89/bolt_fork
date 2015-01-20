@@ -21,7 +21,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("thundercloud")]
 #endif
 
-
 [assembly: AssemblyDescription(".Net/Mono/Unity networking library for games")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Bolt Engine AB")]

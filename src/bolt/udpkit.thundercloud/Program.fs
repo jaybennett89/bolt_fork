@@ -88,7 +88,9 @@ let main argv =
       {
         PeerFind = peerLookup.Find 
         PeerRemove = peerLookup.Remove
-        Protocol = new UdpKit.Protocol.Context(System.Guid.NewGuid())
+
+        HostTimeout = cfg.Timeouts.Host
+        ClientTimeout = cfg.Timeouts.Client
 
         Probe0 = new IPEndPoint(IPAddress.Any, 0)
         Probe1 = new IPEndPoint(IPAddress.Any, 0)
@@ -96,6 +98,7 @@ let main argv =
         Master = new IPEndPoint(IPAddress.Any, 0)
 
         Socket = Unchecked.defaultof<AsyncUdpSocket>
+        Protocol = new UdpKit.Protocol.Context(System.Guid.NewGuid())
       }
 
     let allMasters = 

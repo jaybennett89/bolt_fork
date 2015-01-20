@@ -938,6 +938,10 @@ internal static class BoltCore {
     // 
     _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));
 
+    if (BoltRuntimeSettings.instance.masterServerAutoConnect) {
+      _udpSocket.MasterServerConnect(UdpEndPoint.Parse(BoltRuntimeSettings.instance.masterServerEndPoint));
+    }
+
     // tell user that we started
     BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
