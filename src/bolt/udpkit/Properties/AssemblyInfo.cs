@@ -6,8 +6,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("udpkit")]
 #elif UDPKIT_COMMON
 [assembly: AssemblyTitle("udpkit.common")]
-#elif UDPKIT_MASTER
-[assembly: AssemblyTitle("udpkit.master")]
 #endif
 
 [assembly: AssemblyProduct("udpkit")]
