@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace UdpKit {
   partial class UdpSocket {
-
-    [System.Obsolete("ClassName.OldMethod is obsolete, use ClassName.NewMethod instead")]
-    public void OldMethod(string a, string b) {
-      NewMethod(a, b);
-    }
-
-    public void NewMethod(string a, string b) {
-
-    }
-
     bool PeekInternal(out UdpEvent ev) {
       lock (eventQueueIn) {
         if (eventQueueIn.Count > 0) {
@@ -69,18 +60,17 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconnect(ev); break;
           case UdpEvent.INTERNAL_CLOSE: OnEventClose(ev); return;
-          case UdpEvent.INTERNAL_SEND:
-            OnEventSend(ev); 
-            break;
+          case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
 
           case UdpEvent.INTERNAL_LANBROADCAST_ENABLE: OnEvent_LanBroadcast_Enable(ev); break;
           case UdpEvent.INTERNAL_LANBROADCAST_DISABLE: OnEvent_LanBroadcast_Disable(ev); break;
-          case UdpEvent.INTERNAL_LANBROADCAST_FORGETSESSIONS: OnEvent_LanBroadcast_ForgetSessions(ev); break;
+          case UdpEvent.INTERNAL_FORGETSESSIONS: OnEvent_ForgetSessions(ev); break;
 
           case UdpEvent.INTERNAL_SESSION_HOST_SETINFO: OnEvent_Session_Host_SetInfo(ev); break;
           case UdpEvent.INTERNAL_SESSION_CONNECT: OnEvent_Session_Connect(ev); break;
 
-          case UdpEvent.INTERNAL_MASTERSERVER_SET: OnEvent_MasterServer_Set(ev); break;
+          case UdpEvent.INTERNAL_MASTERSERVER_CONNECT: OnEvent_MasterServer_Connect(ev); break;
+          case UdpEvent.INTERNAL_MASTERSERVER_DISCONNECT: OnEvent_MasterServer_Disconnect(ev); break;
           case UdpEvent.INTERNAL_MASTERSERVER_SESSION_LISTREQUEST: OnEvent_MasterServer_Session_ListRequest(ev); break;
 
           case UdpEvent.INTERNAL_STREAM_QUEUE: OnEvent_Stream_Queue(ev); break;
@@ -98,17 +88,16 @@ namespace UdpKit {
       }
     }
 
+    void OnEvent_MasterServer_Disconnect(UdpEvent ev) {
+      if (masterClient != null) {
+        masterClient.Disconnect();
+      }
+    }
 
     void OnEventStart(UdpEvent ev) {
       if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
         // set mode
         mode = ev.SocketMode;
-
-        // start UPnP
-        NAT_UPnP_Start();
-
-        // give socket to socketpeer
-        platformSocketPeer.Socket = platformSocket; 
 
         // tell user
         Raise(UdpEvent.PUBLIC_START_DONE, platformSocket.EndPoint);
@@ -182,13 +171,18 @@ namespace UdpKit {
     }
 
     void OnEventClose(UdpEvent ev) {
-      if (ChangeState(UdpSocketState.Running, UdpSocketState.Shutdown)) {
-        for (int i = 0; i < connectionList.Count; ++i) {
-          UdpConnection cn = connectionList[i];
-          cn.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
-          cn.ChangeState(UdpConnectionState.Disconnected);
+      if (CheckState(UdpSocketState.Running)) {
+        foreach (var c in connectionLookup.Values) {
+          c.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
+          c.ChangeState(UdpConnectionState.Disconnected);
         }
+      }
 
+      if (ChangeState(UdpSocketState.Running, UdpSocketState.Shutdown)) {
+        // wait 3 seconds for connection stuff to go out
+        Thread.Sleep(3000);
+
+        // then close platform socket
         platformSocket.Close();
 
         if (platformSocket.Error != null) {
@@ -199,6 +193,9 @@ namespace UdpKit {
         connectionLookup.Clear();
         eventQueueIn.Clear();
         pendingConnections.Clear();
+
+        // signal to user thread that this is done
+        ev.ResetEvent.Set();
       }
     }
 
@@ -210,13 +207,13 @@ namespace UdpKit {
      * Master Server
      * */
 
-    void OnEvent_MasterServer_Set(UdpEvent ev) {
-      MasterServer_Set(ev.EndPoint);
+    void OnEvent_MasterServer_Connect(UdpEvent ev) {
+      masterClient = new MasterClient(this, new Protocol.ProtocolClient(platformSocket, GameId, PeerId));
+      masterClient.Connect(ev.EndPoint);
     }
 
-
     void OnEvent_MasterServer_Session_ListRequest(UdpEvent ev) {
-      MasterServer_Session_ListRequest();
+      masterClient.RequestSessionList();
     }
 
     /*
@@ -224,11 +221,27 @@ namespace UdpKit {
      * */
 
     void OnEvent_Session_Host_SetInfo(UdpEvent ev) {
-      Session_Host_SetInfo(ev.HostName, ev.HostData);
+      sessionManager.SetHostInfo(ev.HostName, ev.HostData);
     }
 
     void OnEvent_Session_Connect(UdpEvent ev) {
-      Session_Connect(ev.Session, ev.ConnectToken);
+      switch (ev.Session.Source) {
+        case UdpSessionSource.MasterServer:
+          if (masterClient != null) {
+            masterClient.ConnectToSession(ev.Session);
+          }
+          else {
+            UdpLog.Error("No connection to master server found");
+          }
+          break;
+
+        case UdpSessionSource.Lan:
+          break;
+
+        case UdpSessionSource.Steam:
+          UdpLog.Error("Steam session support not implemented");
+          break;
+      }
     }
 
     /*
@@ -236,14 +249,15 @@ namespace UdpKit {
      * */
 
     void OnEvent_LanBroadcast_Enable(UdpEvent ev) {
-      broadcastHandler.Enable(ev.EndPoint);
+      broadcastManager.Enable(ev.BroadcastArgs);
     }
 
     void OnEvent_LanBroadcast_Disable(UdpEvent ev) {
-      broadcastHandler.Disable();
+      broadcastManager.Disable();
     }
 
-    void OnEvent_LanBroadcast_ForgetSessions(UdpEvent ev) {
+    void OnEvent_ForgetSessions(UdpEvent ev) {
+      sessionManager.ForgetSessions(ev.SessionSource);
     }
 
     /*

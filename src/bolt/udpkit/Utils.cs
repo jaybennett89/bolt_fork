@@ -2,6 +2,21 @@
 
 namespace UdpKit {
   internal static class UdpUtils {
+    public static bool HasValue(this string value) {
+      if (value == null) {
+        return false;
+      }
+
+      if (value.Length == 0) {
+        return false;
+      }
+
+      if (value.Trim().Length == 0) {
+        return false;
+      }
+
+      return true;
+    }
     public static byte[] ReadToken(byte[] buffer, int size, int tokenStart) {
       byte[] token = null;
 

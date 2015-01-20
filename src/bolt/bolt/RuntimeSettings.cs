@@ -120,6 +120,15 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public bool showHelpButtons = true;
 
+  [SerializeField]
+  public string masterServerGameId = "";
+
+  [SerializeField]
+  public string masterServerEndPoint = "79.99.6.136:24000";
+
+  [SerializeField]
+  public bool masterServerAutoConnect = true;
+
   /// <summary>
   /// Get a memberwise copy of the current bolt config
   /// </summary>

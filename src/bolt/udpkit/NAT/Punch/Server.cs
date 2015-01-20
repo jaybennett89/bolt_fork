@@ -82,8 +82,8 @@ namespace UdpKit.NAT.Punch {
 
     protected override void OnInit() {
       ProtocolPeer = new Protocol.Peer(Platform.CreateSocket(Config.Punch));
-      ProtocolPeer.Message_AddHandler<Protocol.NatPunch_PeerRegister>(Peer_Register);
-      ProtocolPeer.Ack_AddHandler<Protocol.Socket_Ping>(Socket_Ping);
+      ProtocolPeer.SetHandler<Protocol.NatPunch_PeerRegister>(Peer_Register);
+      ProtocolPeer.SetCallback<Protocol.Socket_Ping>(Socket_Ping);
 
       if (ProtocolPeer.Socket.IsBound == false) {
         Shutdown("failed to bind socket to {0}", Config.Punch);
@@ -94,10 +94,10 @@ namespace UdpKit.NAT.Punch {
       uint now = Platform.GetPrecisionTime();
 
       // receive new data
-      ProtocolPeer.Message_Recv(1);
+      ProtocolPeer.Recv(1);
 
       // update queries
-      ProtocolPeer.Query_Update(now);
+      ProtocolPeer.Update(now);
 
       // update sessions
       Peer_Update(now);
@@ -136,17 +136,17 @@ namespace UdpKit.NAT.Punch {
       intro.Info[intro[msg.PeerId]].Lan = msg.Lan;
       intro.Info[intro[msg.PeerId]].Wan = msg.Sender;
 
-      ProtocolPeer.Message_Ack(msg);
+      ProtocolPeer.Ack(msg);
 
       if (intro.Info[intro[msg.PeerId]].State == PeerState.New) {
         Protocol.Socket_Ping ping;
 
-        ping = ProtocolPeer.Message_Create<Protocol.Socket_Ping>();
+        ping = ProtocolPeer.Create<Protocol.Socket_Ping>();
         ping.Local = msg.PeerId;
         ping.Remote = msg.Remote;
 
         // send ping packet
-        ProtocolPeer.Message_Send(ping, msg.Sender);
+        ProtocolPeer.Send(ping, msg.Sender);
 
         // we don't wanna do this 
         intro.Info[intro[msg.PeerId]].State = PeerState.Pinging;
@@ -180,11 +180,11 @@ namespace UdpKit.NAT.Punch {
 
       Protocol.NatPunch_PunchInfo msg;
 
-      msg = ProtocolPeer.Message_Create<Protocol.NatPunch_PunchInfo>();
+      msg = ProtocolPeer.Create<Protocol.NatPunch_PunchInfo>();
       msg.PunchTo = intro.Info[remote].Wan;
       msg.Ping = intro.Info[peer].Ping;
 
-      ProtocolPeer.Message_Send(msg, intro.Info[peer].Wan);
+      ProtocolPeer.Send(msg, intro.Info[peer].Wan);
     }
   }
 }

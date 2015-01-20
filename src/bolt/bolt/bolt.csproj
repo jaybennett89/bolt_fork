@@ -54,6 +54,14 @@
     <Compile Include="event\EventFilter.cs" />
     <Compile Include="event\EventListener.cs" />
     <Compile Include="event\Event_Meta.cs" />
+    <Compile Include="hitbox2\Hitbox.cs" />
+    <Compile Include="hitbox2\HitboxBodySnapshot.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HitboxBodySnapshot.tt</DependentUpon>
+    </Compile>
+    <Compile Include="hitbox2\HitboxBodySnapshot_Raycast.cs" />
+    <Compile Include="hitbox2\RaycastHitsCollection.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
@@ -200,6 +208,10 @@
     <Compile Include="event\EventDispatcher.Queue.cs" />
     <Compile Include="state\NetworkState.IEntitySerializer.cs" />
     <Compile Include="state\NetworkState.IState.cs" />
+    <None Include="hitbox2\HitboxBodySnapshot.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>HitboxBodySnapshot.cs</LastGenOutput>
+    </None>
     <None Include="t4\BitSet.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BitSet.cs</LastGenOutput>
@@ -221,12 +233,15 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\udpkit.common\udpkit.common.csproj">
+      <Project>{bece3789-7e78-437c-9423-594705f5fa49}</Project>
+      <Name>udpkit.common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\udpkit\udpkit.csproj">
       <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
       <Name>udpkit</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -823,6 +823,96 @@ internal static void EntityReceivedInvoke(BoltEntity entity) {
 	}
 }
 
+
+
+public virtual void MasterServerConnectFailed(UdpEndPoint endpoint) {  }
+
+internal static void MasterServerConnectFailedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback MasterServerConnectFailed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.MasterServerConnectFailed(endpoint);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void MasterServerConnected(UdpEndPoint endpoint) {  }
+
+internal static void MasterServerConnectedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback MasterServerConnected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.MasterServerConnected(endpoint);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void MasterServerDisconnected(UdpEndPoint endpoint) {  }
+
+internal static void MasterServerDisconnectedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback MasterServerDisconnected");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.MasterServerDisconnected(endpoint);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void MasterServerNatProbeResult(UdpKit.NatFeatures features) {  }
+
+internal static void MasterServerNatProbeResultInvoke(UdpKit.NatFeatures features) { 
+	BoltLog.Debug("Invoking callback MasterServerNatProbeResult");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.MasterServerNatProbeResult(features);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void SessionListUpdated(Map<System.Guid, UdpSession> sessionList) {  }
+
+internal static void SessionListUpdatedInvoke(Map<System.Guid, UdpSession> sessionList) { 
+	BoltLog.Debug("Invoking callback SessionListUpdated");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.SessionListUpdated(sessionList);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void SessionConnectFailed(UdpSession session) {  }
+
+internal static void SessionConnectFailedInvoke(UdpSession session) { 
+	BoltLog.Debug("Invoking callback SessionConnectFailed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.SessionConnectFailed(session);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
 }
 }
 

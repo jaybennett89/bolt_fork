@@ -15,15 +15,7 @@ namespace UdpKit.Protocol {
     }
 
     protected override void OnSerialize() {
-      base.OnSerialize();
-
-      Create(ref Host);
-
-      Serialize(ref Host.HostName);
-      Serialize(ref Host.HostData);
-      Serialize(ref Host.LanEndPoint);
-      Serialize(ref Host.UPnP_Result);
-      Serialize(ref Host.NatProbe_Result);
+      Serialize(ref Host);
     }
   }
 }

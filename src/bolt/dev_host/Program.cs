@@ -10,7 +10,7 @@ namespace UdpKit {
 
       UdpSocket socket = new UdpSocket(new DotNetPlatform());
       socket.Start(new UdpEndPoint(UdpIPv4Address.Parse("192.168.2.173"), 0), UdpSocketMode.Host);
-      socket.MasterServerSet(new UdpEndPoint(UdpIPv4Address.Parse("94.247.169.158"), 25000));
+      socket.MasterServerConnect(new UdpEndPoint(UdpIPv4Address.Parse("94.247.169.158"), 25000));
       socket.MasterServerRequestSessionList();
       socket.SetHostInfo("Test", new byte[0]);
 

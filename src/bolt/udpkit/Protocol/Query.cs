@@ -7,6 +7,14 @@ namespace UdpKit.Protocol {
   abstract class Query : Message {
     public Result Result;
 
+    public bool HasResult {
+      get { return Result != null; }
+    }
+
+    public bool Failed {
+      get { return Result == null; }
+    }
+
     public virtual bool IsUnique {
       get { return false; }
     }

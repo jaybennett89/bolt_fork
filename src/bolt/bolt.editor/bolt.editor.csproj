@@ -128,6 +128,10 @@
       <Project>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</Project>
       <Name>bolt</Name>
     </ProjectReference>
+    <ProjectReference Include="..\udpkit.common\udpkit.common.csproj">
+      <Project>{bece3789-7e78-437c-9423-594705f5fa49}</Project>
+      <Name>udpkit.common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\udpkit\udpkit.csproj">
       <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
       <Name>udpkit</Name>
@@ -225,6 +229,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller_plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_masterserver.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

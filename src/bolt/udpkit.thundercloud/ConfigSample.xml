@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ThunderCloud>
+  <Timeouts Host="120" Client="60" />
+  <GameId>2098810B-9537-448A-961D-8F803D988EF2</GameId>
+  <GameId>15E11B91-B5AB-4419-A611-6292BE917333</GameId>
+  <GameId>7FBFDCBB-8F4D-4750-BCC9-FD4FD36B5E5F</GameId>
+  <Master Ip="127.0.0.1" Count="4">
+    <NatProbe Ip0="127.0.0.3" Ip1="127.0.0.4" Ip2="127.0.0.5" />
+  </Master>
+  <Master Ip="127.0.0.1">
+    <NatProbe Ip0="127.0.0.2" Ip1="127.0.0.3" />
+  </Master>
+</ThunderCloud>

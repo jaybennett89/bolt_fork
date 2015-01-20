@@ -8,10 +8,11 @@ namespace UdpKit {
     public const uint NATPROBE_TIMEOUT_SHORT = 500;
 
     class NatProbeInfo {
-      public Protocol.Peer Peer;
       public Protocol.Peer Hairpin;
 
       public uint Timeout;
+      public uint LastSend;
+
       public NAT.Probe.Result Result;
 
       public UdpEndPoint[] Probes;
@@ -19,6 +20,13 @@ namespace UdpKit {
     }
 
     NatProbeInfo NatProbe;
+
+    void NatProbe_SetupProtocol() {
+      protocol.SetHandler<Protocol.NatProbe_TestUnsolicited>(NatProbe_UnsolicitedTest);
+      protocol.SetHandler<Protocol.NatProbe_TestHairpin>(NatProbe_HairpinTest);
+
+      protocol.SetCallback<Protocol.NatProbe_TestEndPoint>(NatProbe_Query);
+    }
 
     void NatProbe_Start(UdpEndPoint probe0, UdpEndPoint probe1, UdpEndPoint probe2) {
       NatProbe_Reset();
@@ -29,14 +37,8 @@ namespace UdpKit {
       NatProbe.Probes = new UdpEndPoint[] { probe0, probe1, probe2 };
       NatProbe.Hairpin = new Protocol.Peer(platform.CreateSocket(UdpEndPoint.Any));
 
-      NatProbe.Peer = new Protocol.Peer(platformSocket);
-      NatProbe.Peer.Message_AddHandler<Protocol.NatProbe_TestUnsolicited>(NatProbe_UnsolicitedTest);
-      NatProbe.Peer.Message_AddHandler<Protocol.NatProbe_TestHairpin>(NatProbe_HairpinTest);
-
-      NatProbe.Peer.Ack_AddHandler<Protocol.NatProbe_TestEndPoint>(NatProbe_Query);
-
-      NatProbe.Peer.Message_Send<Protocol.NatProbe_TestEndPoint>(NatProbe.Probes[0]);
-      NatProbe.Peer.Message_Send<Protocol.NatProbe_TestEndPoint>(NatProbe.Probes[1]);
+      protocol.Send<Protocol.NatProbe_TestEndPoint>(NatProbe.Probes[0]);
+      protocol.Send<Protocol.NatProbe_TestEndPoint>(NatProbe.Probes[1]);
     }
 
     bool NatProbe_IsRunning() {
@@ -52,25 +54,23 @@ namespace UdpKit {
     }
 
     void NatProbe_Stop() {
-      if (NatProbe != null) {
-        Session.Local.NatProbe_Result = NatProbe.Result;
+      //if (NatProbe != null) {
+      //  Session.Local.NatProbe_Result = NatProbe.Result;
 
-        NatProbe.Peer = null;
+      //  NatProbe.Hairpin.Socket.Close();
+      //  NatProbe.Hairpin = null;
 
-        NatProbe.Hairpin.Socket.Close();
-        NatProbe.Hairpin = null;
+      //  NatProbe = null;
 
-        NatProbe = null;
-
-        UdpLog.Debug("NatProbe Result: {0}", Session.Local.NatProbe_Result);
-      }
+      //  UdpLog.Debug("NatProbe Result: {0}", Session.Local.NatProbe_Result);
+      //}
     }
 
     void NatProbe_Reset() {
       NatProbe_Stop();
 
       // reset to in-progress
-      Session.Local.NatProbe_Result = NAT.Probe.Result.Unknown;
+      //ession.Local.NatProbe_Result = NAT.Probe.Result.Unknown;
     }
 
     void NatProbe_HairpinTest(Protocol.NatProbe_TestHairpin msg) {
@@ -90,7 +90,7 @@ namespace UdpKit {
       }
       else {
         // send hairpin test
-        NatProbe.Hairpin.Message_Send<Protocol.NatProbe_TestHairpin>(query.Result.ClientWanEndPoint);
+        NatProbe.Hairpin.Send<Protocol.NatProbe_TestHairpin>(query.Result.ClientWanEndPoint);
 
         // store probes test
         NatProbe.WanEndPoints[query.Result.Probe] = query.Result.ClientWanEndPoint;

@@ -17,16 +17,16 @@ namespace UdpKit.Protocol {
     public UdpSession Client;
 
     protected override void OnSerialize() {
-      base.OnSerialize();
+      //base.OnSerialize();
 
-      Create(ref Host);
-      Serialize(ref Host.Id);
+      //Create(ref Host);
+      //Serialize(ref Host.Id);
 
-      Create(ref Client);
-      Serialize(ref Client.Id);
-      Serialize(ref Client.LanEndPoint);
-      Serialize(ref Client.UPnP_Result);
-      Serialize(ref Client.NatProbe_Result);
+      //Create(ref Client);
+      //Serialize(ref Client.Id);
+      //Serialize(ref Client.LanEndPoint);
+      //Serialize(ref Client.UPnP_Result);
+      //Serialize(ref Client.NatProbe_Result);
     }
   }
 

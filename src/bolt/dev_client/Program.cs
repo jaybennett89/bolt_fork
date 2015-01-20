@@ -12,7 +12,7 @@ namespace UdpKit {
       UdpSocket socket;
       socket = new UdpSocket(new DotNetPlatform());
       socket.Start(new UdpEndPoint(UdpIPv4Address.Parse("192.168.1.100"), 0), UdpSocketMode.Client);
-      socket.MasterServerSet(new UdpEndPoint(UdpIPv4Address.Parse("94.247.169.158"), 25000));
+      socket.MasterServerConnect(new UdpEndPoint(UdpIPv4Address.Parse("94.247.169.158"), 25000));
 
       bool connecting = false;
       DateTime nextRequest = DateTime.MinValue;
@@ -25,7 +25,7 @@ namespace UdpKit {
             case UdpEventType.SessionListUpdated:
               if (!connecting) {
                 connecting = true;
-                socket.Connect(ev.SessionList.First().Value);
+                socket.Connect(ev.SessionList.First().Value, null);
               }
               break;
           }

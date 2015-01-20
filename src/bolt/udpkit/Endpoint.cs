@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace UdpKit {
-  public struct UdpSteamID {
-    public readonly ulong Id;
-
-    public UdpSteamID(ulong id) {
-      Id = id;
-    }
-  }
-
   [StructLayout(LayoutKind.Explicit, Pack = 1)]
   public struct UdpEndPoint : IEquatable<UdpEndPoint>, IComparable<UdpEndPoint> {
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Native {
+      public UdpIPv4Address Address;
+      public ushort Port;
+
+      public UdpEndPoint AsManaged {
+        get { return new UdpEndPoint(Address, Port); }
+      }
+    }
+
     public class Comparer : IEqualityComparer<UdpEndPoint> {
       bool IEqualityComparer<UdpEndPoint>.Equals(UdpEndPoint x, UdpEndPoint y) {
         return UdpEndPoint.Compare(x, y) == 0;
@@ -40,6 +43,10 @@ namespace UdpKit {
 
     public bool IsLan {
       get { return Address.IsPrivate && Port > 0; }
+    }
+
+    public Native AsNative {
+      get { return new Native() { Address = this.Address, Port = this.Port }; }
     }
 
     public UdpEndPoint(UdpIPv4Address address, ushort port) {
@@ -110,6 +117,5 @@ namespace UdpKit {
 
       return cmp;
     }
-
   }
 }

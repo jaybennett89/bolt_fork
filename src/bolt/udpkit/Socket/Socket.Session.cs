@@ -19,20 +19,20 @@ namespace UdpKit {
 
     void Session_Host_SetInfo(string hostName, byte[] hostData) {
       Session.Local = new UdpSession();
-      Session.Local.HostName = hostName;
-      Session.Local.HostData = hostData;
+      Session.Local._hostName = hostName;
+      Session.Local._hostData = hostData;
 
       MasterServer_HostRegister();
     }
 
     void Session_Connect(UdpSession session, byte[] connectToken) {
       // lan session
-      if (session.IsLan) {
+      if (session.HasLan) {
         ConnectToEndPoint(session.LanEndPoint, connectToken);
       }
 
       // wan session
-      else if (session.IsWan) {
+      else if (session.HasWan) {
         MasterServer_Connect(session, connectToken);
       }
 
@@ -44,7 +44,6 @@ namespace UdpKit {
 
     void Session_Update(uint now) {
       if ((Session.LastUpdate + SESSION_UPDATE_RATE) < now) {
-
         if ((Session.ListUpdated_EventTime > 0) && (Session.ListUpdated_EventTime < now)) {
           Session_ListUpdated_Event_Raise();
         }

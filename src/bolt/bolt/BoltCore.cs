@@ -372,21 +372,11 @@ internal static class BoltCore {
       return;
     }
 
-    if (token == null) {
-      BoltLog.Error("You must specify a protocol token for session info");
-      return;
-    }
-
     _udpSocket.SetHostInfo(serverName, token.ToByteArray());
   }
 
-  public static void EnableLanBroadcast(UdpEndPoint endpoint) {
-    if (endpoint.Address == UdpIPv4Address.Any || endpoint.Port == 0) {
-      BoltLog.Error("Incorrect broadcast endpoint: {0}", endpoint);
-    }
-    else {
-      _udpSocket.LanBroadcastEnable(endpoint);
-    }
+  public static void EnableLanBroadcast(UdpIPv4Address local, UdpIPv4Address broadcast, ushort port) {
+    _udpSocket.LanBroadcastEnable(local, broadcast, port);
   }
 
   public static void DisableLanBroadcast() {
@@ -470,6 +460,38 @@ internal static class BoltCore {
             ev.Connection.GetBoltConnection(),
             ev.StreamData
           );
+          break;
+
+        // SESSION
+
+        case UdpEventType.SessionListUpdated:
+          // store session list
+          BoltNetwork._sessionList = ev.SessionList;
+
+          // notify user
+          BoltInternal.GlobalEventListenerBase.SessionListUpdatedInvoke(BoltNetwork._sessionList);
+          break;
+
+        case UdpEventType.SessionConnectFailed:
+          BoltInternal.GlobalEventListenerBase.SessionConnectFailedInvoke(ev.Session);
+          break;
+
+        // MASTER SERVER
+
+        case UdpEventType.MasterServerConnected:
+          BoltInternal.GlobalEventListenerBase.MasterServerConnectedInvoke(ev.EndPoint);
+          break;
+
+        case UdpEventType.MasterServerDisconnected:
+          BoltInternal.GlobalEventListenerBase.MasterServerDisconnectedInvoke(ev.EndPoint);
+          break;
+
+        case UdpEventType.MasterServerConnectFailed:
+          BoltInternal.GlobalEventListenerBase.MasterServerConnectFailedInvoke(ev.EndPoint);
+          break;
+
+        case UdpEventType.MasterServerNatProbeResult:
+          BoltInternal.GlobalEventListenerBase.MasterServerNatProbeResultInvoke(ev.NatFeatures);
           break;
       }
     }
@@ -905,7 +927,7 @@ internal static class BoltCore {
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
     // create udp socket
-    _udpSocket = new UdpSocket(udpPlatform, _udpConfig);
+    _udpSocket = new UdpSocket(new Guid(BoltRuntimeSettings.instance.masterServerGameId), udpPlatform, _udpConfig);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);

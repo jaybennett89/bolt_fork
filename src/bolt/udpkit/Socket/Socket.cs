@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace UdpKit {
+
   public enum UdpSocketState : int {
     Created = 0,
     Running = 1,
@@ -16,13 +17,12 @@ namespace UdpKit {
   }
 
   public partial class UdpSocket {
-    public static int MaxTokenSize {
-      get { return 768; }
-    }
-
     readonly internal UdpConfig Config;
     readonly internal UdpPipeConfig PacketPipeConfig;
     readonly internal UdpPipeConfig StreamPipeConfig;
+
+    readonly internal Guid PeerId;
+    readonly internal Guid GameId;
 
     volatile int frame;
     volatile int channelIdCounter;
@@ -33,29 +33,37 @@ namespace UdpKit {
     readonly byte[] sendBuffer;
     readonly byte[] recvBuffer;
 
+
     readonly Thread thread;
     readonly UdpPlatform platform;
-    readonly Protocol.Peer platformSocketPeer;
     readonly UdpPlatformSocket platformSocket;
-
     readonly UdpPacketPool packetPool;
-    readonly AutoResetEvent availableEvent;
+
+    MasterClient masterClient;
+
+    readonly SessionManager sessionManager;
+    readonly BroadcastManager broadcastManager;
+
     readonly Queue<UdpEvent> eventQueueIn;
     readonly Queue<UdpEvent> eventQueueOut;
-    readonly SessionHandler sessionHandler;
-    readonly BroadcastHandler broadcastHandler;
+
     readonly List<UdpConnection> connectionList = new List<UdpConnection>();
     readonly UdpSet<UdpEndPoint> pendingConnections = new UdpSet<UdpEndPoint>(new UdpEndPoint.Comparer());
     readonly Dictionary<UdpEndPoint, UdpConnection> connectionLookup = new Dictionary<UdpEndPoint, UdpConnection>(new UdpEndPoint.Comparer());
     readonly Dictionary<UdpChannelName, UdpStreamChannel> streamChannels = new Dictionary<UdpChannelName, UdpStreamChannel>(UdpChannelName.EqualityComparer.Instance);
 
     /// <summary>
-    /// Local endpoint of this socket
+    /// LAN endpoint of this socket
     /// </summary>
-    public UdpEndPoint LocalEndPoint {
-      get {
-        return platformSocket.EndPoint;
-      }
+    public UdpEndPoint LocalLanEndPoint {
+      get { return platformSocket.EndPoint; }
+    }
+
+    /// <summary>
+    /// WAN endpoint of this socket
+    /// </summary>
+    public UdpEndPoint LocalWanEndPoint {
+      get { return masterClient == null ? UdpEndPoint.Any : masterClient.LocalWanEndPoint; }
     }
 
     /// <summary>
@@ -79,15 +87,11 @@ namespace UdpKit {
       get { return GetCurrentTime(); }
     }
 
+    /// <summary>
+    /// Current packet pool for this socket
+    /// </summary>
     public UdpPacketPool PacketPool {
       get { return packetPool; }
-    }
-
-    /// <summary>
-    /// A thread can wait on this event before calling Poll to make sure at least one event is available
-    /// </summary>
-    public AutoResetEvent EventsAvailable {
-      get { return availableEvent; }
     }
 
     /// <summary>
@@ -102,21 +106,25 @@ namespace UdpKit {
       get { return platformSocket; }
     }
 
-    public UdpSocket(UdpPlatform platform)
-      : this(platform, new UdpConfig()) {
+    public UdpSocket(Guid gameId, UdpPlatform platform)
+      : this(gameId, platform, new UdpConfig()) {
     }
 
-    public UdpSocket(UdpPlatform platform, UdpConfig config) {
-      this.Config = config.Duplicate();
+    public UdpSocket(Guid gameId, UdpPlatform p, UdpConfig cfg) {
+      GameId = gameId;
+      PeerId = Guid.NewGuid();
 
-      this.platform = platform;
-      this.platformSocket = platform.CreateSocket();
-
-      state = UdpSocketState.Created;
-      availableEvent = new AutoResetEvent(false);
-      sessionHandler = new SessionHandler();
-      broadcastHandler = new BroadcastHandler(this);
+      // set default values
+      frame = 0;
+      channelIdCounter = 0;
       connectionIdCounter = 1;
+
+      // duplicate config object
+      Config = cfg.Duplicate();
+
+      // assign platform and create socket
+      platform = p;
+      platformSocket = platform.CreateSocket();
 
 #if DEBUG
       if (this.Config.NoiseFunction == null) {
@@ -125,25 +133,14 @@ namespace UdpKit {
       }
 #endif
 
-      platformSocketPeer = new Protocol.Peer();
-      platformSocketPeer.Ack_AddHandler<Protocol.NatPunch_PeerRegister>(Socket_NatPunch_PeerRegister_Ack);
-      platformSocketPeer.Ack_AddHandler<Protocol.Socket_Punch>(Socket_Punch_Ack);
+      // allocate buffers
+      sendBuffer = new byte[Math.Max(cfg.StreamDatagramSize, cfg.PacketDatagramSize) * 2];
+      recvBuffer = new byte[Math.Max(cfg.StreamDatagramSize, cfg.PacketDatagramSize) * 2];
 
-      platformSocketPeer.Message_AddHandler<Protocol.Socket_Ping>(Socket_Ping);
-      platformSocketPeer.Message_AddHandler<Protocol.Socket_Punch>(Socket_Punch);
-      platformSocketPeer.Message_AddHandler<Protocol.NatPunch_PunchInfo>(NatPunch_PunchInfo);
-
-      sendBuffer = new byte[Math.Max(config.StreamDatagramSize, config.PacketDatagramSize) * 2];
-      recvBuffer = new byte[Math.Max(config.StreamDatagramSize, config.PacketDatagramSize) * 2];
-
+      // pools & queues
       packetPool = new UdpPacketPool(this);
-      eventQueueIn = new Queue<UdpEvent>(config.InitialEventQueueSize);
-      eventQueueOut = new Queue<UdpEvent>(config.InitialEventQueueSize);
-
-      thread = new Thread(NetworkLoop);
-      thread.Name = "UdpKit Background Thread";
-      thread.IsBackground = true;
-      thread.Start();
+      eventQueueIn = new Queue<UdpEvent>(4096);
+      eventQueueOut = new Queue<UdpEvent>(4096);
 
       // setup packet pipe configuration
       PacketPipeConfig = new UdpPipeConfig {
@@ -164,10 +161,21 @@ namespace UdpKit {
         SequenceBytes = 3,
         UpdatePing = false,
         WindowSize = Config.StreamWindow,
-        DatagramSize = config.StreamDatagramSize
+        DatagramSize = Config.StreamDatagramSize
       };
-    }
 
+      sessionManager = new SessionManager(this);
+      broadcastManager = new BroadcastManager(this);
+
+      // socket is created
+      state = UdpSocketState.Created;
+
+      // last thing we do is start the thread
+      thread = new Thread(NetworkLoop);
+      thread.Name = "UdpKit Thread";
+      thread.IsBackground = true;
+      thread.Start();
+    }
 
     /// <summary>
     /// Start this socket
@@ -185,20 +193,14 @@ namespace UdpKit {
     /// <summary>
     /// Close this socket
     /// </summary>
-    public void Close() {
-      Raise(UdpEvent.INTERNAL_CLOSE);
-    }
+    public ManualResetEvent Close() {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_CLOSE;
+      ev.ResetEvent = new ManualResetEvent(false);
 
-    /// <summary>
-    /// Connect to remote endpoint
-    /// </summary>
-    /// <param name="endpoint">The endpoint to connect to</param>
-    public void Connect(UdpEndPoint endpoint) {
-      Connect(endpoint, null);
-    }
+      Raise(ev);
 
-    public void Connect(UdpSession session) {
-      Connect(session, null);
+      return ev.ResetEvent;
     }
 
     public void Connect(UdpSession session, byte[] connectToken) {
@@ -261,7 +263,7 @@ namespace UdpKit {
     /// A list of all currently available sessions
     /// </summary>
     public UdpSession[] GetSessions() {
-      return sessionHandler.Sessions.ToArray();
+      return new UdpSession[0];
     }
 
     /// <summary>
@@ -281,9 +283,15 @@ namespace UdpKit {
       return false;
     }
 
-    public void MasterServerSet(UdpEndPoint endpoint) {
+    public void MasterServerDisconnect() {
       UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_MASTERSERVER_SET;
+      ev.Type = UdpEvent.INTERNAL_MASTERSERVER_DISCONNECT;
+      Raise(ev);
+    }
+
+    public void MasterServerConnect(UdpEndPoint endpoint) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_MASTERSERVER_CONNECT;
       ev.EndPoint = endpoint;
       Raise(ev);
     }
@@ -292,10 +300,10 @@ namespace UdpKit {
       Raise(UdpEvent.INTERNAL_MASTERSERVER_SESSION_LISTREQUEST);
     }
 
-    public void LanBroadcastEnable(UdpEndPoint endpoint) {
+    public void LanBroadcastEnable(UdpIPv4Address localAddresss, UdpIPv4Address broadcastAddress, ushort port) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_LANBROADCAST_ENABLE;
-      ev.EndPoint = endpoint;
+      ev.BroadcastArgs = new UdpEventBroadcastArgs { LocalAddress = localAddresss, BroadcastAddress = broadcastAddress, Port = port };
       Raise(ev);
     }
 
@@ -303,8 +311,17 @@ namespace UdpKit {
       Raise(UdpEvent.INTERNAL_LANBROADCAST_DISABLE);
     }
 
-    public void ForgetLanSessions() {
-      Raise(UdpEvent.INTERNAL_LANBROADCAST_FORGETSESSIONS);
+    public void ForgetSessions(UdpSessionSource source) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_FORGETSESSIONS;
+      ev.SessionSource = source;
+      Raise(ev);
+    }
+
+    public void ForgetSessions() {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_FORGETSESSIONS_ALL;
+      Raise(ev);
     }
 
     public void SetHostInfo(string serverName, byte[] userData) {
@@ -379,10 +396,6 @@ namespace UdpKit {
       else {
         lock (eventQueueOut) {
           eventQueueOut.Enqueue(ev);
-        }
-
-        if (Config.UseAvailableEventEvent) {
-          availableEvent.Set();
         }
       }
     }
@@ -461,14 +474,15 @@ namespace UdpKit {
             RecvDelayedPackets();
             RecvNetworkData();
             ProcessTimeouts();
-            ProcessLanBroadcastDiscovery();
             ProcessInternalEvents();
 
-            MasterServer_Update(now);
-            NatProbe_Update(now);
-            Session_Update(now);
-            Socket_Update(now);
+            broadcastManager.Update(now);
+            sessionManager.Update(now);
 
+            // this does not always exist
+            if (masterClient != null) {
+              masterClient.Update(now);
+            }
 
             frame += 1;
           }
@@ -615,26 +629,8 @@ namespace UdpKit {
     }
 
     void RecvProtocol(UdpEndPoint endpoint, byte[] buffer, int bytes) {
-      var off = 0;
-      var msg = platform.ParseMessage(buffer, ref off);
-
-      if (msg != null) {
-        msg.Sender = endpoint;
-
-        if ((MasterServer != null) && MasterServer.Peer.HasHandler(msg)) {
-          MasterServer.Peer.Message_Recv(msg);
-          return;
-        }
-
-        if ((NatProbe != null) && NatProbe.Peer.HasHandler(msg)) {
-          NatProbe.Peer.Message_Recv(msg);
-          return;
-        }
-
-        if ((platformSocketPeer != null) && platformSocketPeer.HasHandler(msg)) {
-          platformSocketPeer.Message_Recv(msg);
-          return;
-        }
+      if (masterClient != null) {
+        masterClient.Client.Recv(endpoint, buffer, 0);
       }
     }
 
