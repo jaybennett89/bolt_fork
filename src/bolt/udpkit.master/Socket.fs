@@ -77,7 +77,6 @@ type AsyncUdpSocket (onRecv:SocketAsyncEventArgs -> unit) =
     let success, args = sendQueue.TryDequeue()
 
     if success then
-      UdpLog.Info (sprintf "Sending To %A" args.RemoteEndPoint)
       args.UserToken <- sendAsyncComplete
 
       if not <| socket.SendToAsync(args) then
@@ -92,8 +91,6 @@ type AsyncUdpSocket (onRecv:SocketAsyncEventArgs -> unit) =
 
   // recv completed callback
   let rec recvAsyncComplete (args:SocketAsyncEventArgs) = 
-    UdpLog.Info (sprintf "Received From %A" args.RemoteEndPoint)
-
     // set reply function
     args.UserToken <- send
 

@@ -41,6 +41,9 @@ type MasterContext = {
   PeerFind : Protocol.Message -> (Game -> Guid -> PeerMailbox) -> PeerMailbox option
   PeerRemove : Game -> Guid -> unit
 
+  ClientTimeout : int
+  HostTimeout : int
+
   Probe0 : IPEndPoint
   Probe1 : IPEndPoint
   Probe2 : IPEndPoint

@@ -15,7 +15,7 @@ module Master =
       let rec loop (peer:Peer) =
         async {
           try 
-            let! msg = inbox.Receive(30000)
+            let! msg = inbox.Receive(if peer.IsHost then context.HostTimeout else context.ClientTimeout)
 
             match msg with
             | PeerMessage.Shutdown -> 
@@ -23,7 +23,6 @@ module Master =
               return ()
 
             | PeerMessage.MessageReceived(msg, args) ->
-              UdpLog.Info "MessageReceived"
               return! loop <| peer.HandleMessage msg args
 
             | PeerMessage.BeginNatPunch(otherId, otherInbox, otherNat) as nat ->
@@ -31,28 +30,31 @@ module Master =
 
             | PeerMessage.Error(text) ->
               UdpLog.Error(text)
+              return! loop peer
 
             | PeerMessage.PerformPunchOnce(remoteId, remoteEndPoint, selfEndPoint) ->
               let msg = context.Protocol.CreateMessage<Protocol.PunchOnce>()
               msg.RemotePeerId <- remoteId
               msg.RemoteEndPoint <- remoteEndPoint
               context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+              return! loop peer
               
             | PeerMessage.PerformDirectConnection(remoteId, remoteEndPoint, selfEndPoint) ->
               let msg = context.Protocol.CreateMessage<Protocol.DirectConnection>()
               msg.RemotePeerId <- remoteId
               msg.RemoteEndPoint <- remoteEndPoint
               context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+              return! loop peer
 
           with
             | ex ->  
               context.PeerRemove game peerId
-              UdpLog.Error(ex.Message)
-              return ()
-          
-          return! loop peer
+              UdpLog.Error(ex.ToString())
+              
+          return ()
         }
 
+      UdpLog.Info (sprintf "Peer %A Connected" peerId)
       loop {Context=context; Game=game; PeerId=peerId; NatFeatures=None; IsHost=false; Mailbox=inbox}
     )
 
@@ -80,12 +82,8 @@ module Master =
 
               // grab peer
               match (!context).PeerFind msg createPeer with
-              | None -> 
-                UdpLog.Info "PeerNotFound"
-
-              | Some peer -> 
-                UdpLog.Info "PeerFoundForMsg"
-                peer.Post(MessageReceived(msg, args))
+              | None -> ()
+              | Some peer -> peer.Post(MessageReceived(msg, args))
 
             | MasterMessage.Context(c) ->
               context := (c :?> MasterContext)
@@ -118,13 +116,17 @@ module Master =
 
 type PeerLookup (allowedGameIds:Set<Guid>) =
 
+  let createGame id =
+    {GameId=id; Peers=new PeerDictionary(); Hosts=new HostDictionary()}
+
   let lookup = 
     allowedGameIds
-    |> Seq.map (fun id -> (id, {GameId=id; Peers=new PeerDictionary(); Hosts=new HostDictionary()}))
+    |> Seq.map (fun id -> id, createGame id)
     |> Map.ofSeq
+    |> ref
 
   member x.Remove (game:Game) (peerId:Guid) =
-    match lookup |> Map.tryFind game.GameId with
+    match !lookup |> Map.tryFind game.GameId with
     | None -> ()
     | Some game ->
       let success, removed = game.Peers.TryRemove peerId
@@ -138,8 +140,15 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
           UdpLog.Info (sprintf "Removed Host %A" peerId)
 
   member x.Find (msg:Protocol.Message) (new':Game -> Guid -> PeerMailbox) = 
-    match lookup |> Map.tryFind msg.GameId with
-    | None -> None
+    if allowedGameIds.Count = 0 then
+      UdpLog.Warn (sprintf "Created Game %A" msg.GameId)
+      lookup := !lookup  |> Map.add msg.GameId (createGame msg.GameId)
+
+    match !lookup |> Map.tryFind msg.GameId with
+    | None -> 
+      UdpLog.Info (sprintf "Invalid Game Id %A" msg.GameId)
+      None
+
     | Some game ->
       let success, peer = game.Peers.TryGetValue(msg.PeerId)
 

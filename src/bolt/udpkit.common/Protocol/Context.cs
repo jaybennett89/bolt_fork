@@ -95,7 +95,6 @@ namespace UdpKit.Protocol {
 
     public int WriteMessage(Message msg, byte[] buffer) {
       UdpLog.Info("Writing: {0}", msg.GetType().Name);
-
       buffer[0] = Protocol.Message.MESSAGE_HEADER;
       return msg.Serialize(1, buffer, true);
     }
