@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace UdpKit {
   public enum UdpSendFailReason {
@@ -24,7 +25,14 @@ namespace UdpKit {
     PacketDelivered = UdpEvent.PUBLIC_PACKET_DELIVERED,
 
     StreamDataReceived = UdpEvent.PUBLIC_STREAM_DATARECEIVED,
+
     SessionListUpdated = UdpEvent.PUBLIC_SESSION_LISTUPDATED,
+    SessionConnectFailed = UdpEvent.PUBLIC_SESSION_CONNECTFAILED,
+
+    MasterServerConnectFailed = UdpEvent.PUBLIC_MASTERSERVER_CONNECTFAILED,
+    MasterServerConnected = UdpEvent.PUBLIC_MASTERSERVER_CONNECTED,
+    MasterServerDisconnected = UdpEvent.PUBLIC_MASTERSERVER_DISCONNECTED,
+    MasterServerNatProbeResult = UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT,
   }
 
   class UdpEventAcceptArgs {
@@ -33,51 +41,64 @@ namespace UdpKit {
     public byte[] ConnectToken;
   }
 
+  class UdpEventBroadcastArgs {
+    public UdpIPv4Address LocalAddress;
+    public UdpIPv4Address BroadcastAddress;
+    public ushort Port;
+  }
+
   [StructLayout(LayoutKind.Explicit)]
   public struct UdpEvent {
     internal const int INTERNAL_START = 1;
     internal const int INTERNAL_CONNECT = 3;
-    internal const int INTERNAL_CONNECT_CANCEL = 17;
-    internal const int INTERNAL_ACCEPT = 5;
-    internal const int INTERNAL_REFUSE = 7;
-    internal const int INTERNAL_DISCONNECT = 9;
-    internal const int INTERNAL_CLOSE = 11;
-    internal const int INTERNAL_SEND = 13;
+    internal const int INTERNAL_CONNECT_CANCEL = 5;
+    internal const int INTERNAL_ACCEPT = 7;
+    internal const int INTERNAL_REFUSE = 9;
+    internal const int INTERNAL_DISCONNECT = 11;
+    internal const int INTERNAL_CLOSE = 13;
+    internal const int INTERNAL_SEND = 15;
 
-    internal const int INTERNAL_LANBROADCAST_ENABLE = 23;
-    internal const int INTERNAL_LANBROADCAST_DISABLE = 29;
+    internal const int INTERNAL_LANBROADCAST_ENABLE = 17;
+    internal const int INTERNAL_LANBROADCAST_DISABLE = 19;
 
-    internal const int INTERNAL_LANBROADCAST_FORGETSESSIONS = 31;
+    internal const int INTERNAL_FORGETSESSIONS = 21;
+    internal const int INTERNAL_FORGETSESSIONS_ALL = 23;
 
-    internal const int INTERNAL_STREAM_CREATECHANNEL = 35;
-    internal const int INTERNAL_STREAM_QUEUE = 37;
-    internal const int INTERNAL_STREAM_SETBANDWIDTH = 39;
+    internal const int INTERNAL_STREAM_CREATECHANNEL = 25;
+    internal const int INTERNAL_STREAM_QUEUE = 27;
+    internal const int INTERNAL_STREAM_SETBANDWIDTH = 29;
 
+    internal const int INTERNAL_SESSION_CONNECT = 31;
+    internal const int INTERNAL_SESSION_HOST_SETINFO = 33;
 
-    internal const int INTERNAL_SESSION_CONNECT = 45;
-    internal const int INTERNAL_SESSION_HOST_SETINFO = 25;
-
-    internal const int INTERNAL_MASTERSERVER_SET = 41;
-    internal const int INTERNAL_MASTERSERVER_SESSION_LISTREQUEST = 43;
-
-    internal const int PUBLIC_SESSION_LISTUPDATED = 36;
+    internal const int INTERNAL_MASTERSERVER_CONNECT = 35;
+    internal const int INTERNAL_MASTERSERVER_DISCONNECT = 37;
+    internal const int INTERNAL_MASTERSERVER_SESSION_LISTREQUEST = 39;
 
     internal const int PUBLIC_CONNECT_REQUEST = 2;
     internal const int PUBLIC_CONNECT_FAILED = 4;
     internal const int PUBLIC_CONNECT_REFUSED = 6;
 
     internal const int PUBLIC_CONNECTED = 8;
-    internal const int PUBLIC_CONNECT_ATTEMPT = 32;
-    internal const int PUBLIC_DISCONNECTED = 10;
+    internal const int PUBLIC_CONNECT_ATTEMPT = 10;
+    internal const int PUBLIC_DISCONNECTED = 12;
 
-    internal const int PUBLIC_PACKET_LOST = 18;
-    internal const int PUBLIC_PACKET_RECEIVED = 20;
-    internal const int PUBLIC_PACKET_DELIVERED = 16;
+    internal const int PUBLIC_PACKET_LOST = 14;
+    internal const int PUBLIC_PACKET_RECEIVED = 16;
+    internal const int PUBLIC_PACKET_DELIVERED = 18;
 
-    internal const int PUBLIC_STREAM_DATARECEIVED = 34;
+    internal const int PUBLIC_STREAM_DATARECEIVED = 20;
 
-    internal const int PUBLIC_START_DONE = 24;
-    internal const int PUBLIC_START_FAILED = 26;
+    internal const int PUBLIC_START_DONE = 22;
+    internal const int PUBLIC_START_FAILED = 24;
+
+    internal const int PUBLIC_MASTERSERVER_CONNECTED = 26;
+    internal const int PUBLIC_MASTERSERVER_DISCONNECTED = 28;
+    internal const int PUBLIC_MASTERSERVER_NATPROBE_RESULT = 32;
+    internal const int PUBLIC_MASTERSERVER_CONNECTFAILED = 34;
+
+    internal const int PUBLIC_SESSION_LISTUPDATED = 30;
+    internal const int PUBLIC_SESSION_CONNECTFAILED = 36;
 
     [FieldOffset(0)]
     internal int Type;
@@ -116,6 +137,11 @@ namespace UdpKit {
         UdpAssert.Assert(Object0 == null);
         Object0 = value;
       }
+    }
+
+    internal UdpSessionSource SessionSource {
+      get { return (UdpSessionSource)integer0; }
+      set { integer0 = (int)value; }
     }
 
     internal UdpSocketMode SocketMode {
@@ -173,6 +199,21 @@ namespace UdpKit {
     /* 
      * OBJECT 0
      * */
+
+    internal NatFeatures NatFeatures {
+      get { return (NatFeatures)Object0; }
+      set { UdpAssert.Assert(Object0 == null); Object0 = value; }
+    }
+
+    internal UdpEventBroadcastArgs BroadcastArgs {
+      get { return (UdpEventBroadcastArgs)Object0; }
+      set { UdpAssert.Assert(Object0 == null); Object0 = value; }
+    }
+
+    public ManualResetEvent ResetEvent {
+      get { return (ManualResetEvent)Object0; }
+      set { UdpAssert.Assert(Object0 == null); Object0 = value; }
+    }
 
     public UdpSession Session {
       get { return (UdpSession)Object0; }

@@ -21,13 +21,13 @@ namespace UdpKit.MasterServer {
     protected override void OnInit() {
       ProtocolPeer = new Protocol.Peer(Platform.CreateSocket(Config.Master));
 
-      ProtocolPeer.Message_AddHandler<Protocol.MasterServer_HostRegister>(Host_Register_Query);
-      ProtocolPeer.Message_AddHandler<Protocol.MasterServer_HostKeepAlive>(Host_KeepAlive);
-      ProtocolPeer.Message_AddHandler<Protocol.MasterServer_NatProbeInfo>(NatProbeInfo_Query);
-      ProtocolPeer.Message_AddHandler<Protocol.MasterServer_Session_ListRequest>(Session_ListRequest);
-      ProtocolPeer.Message_AddHandler<Protocol.MasterServer_Introduce>(Introduce_Query);
+      ProtocolPeer.SetHandler<Protocol.MasterServer_HostRegister>(Host_Register_Query);
+      ProtocolPeer.SetHandler<Protocol.MasterServer_HostKeepAlive>(Host_KeepAlive);
+      ProtocolPeer.SetHandler<Protocol.MasterServer_NatProbeInfo>(NatProbeInfo_Query);
+      ProtocolPeer.SetHandler<Protocol.MasterServer_Session_ListRequest>(Session_ListRequest);
+      ProtocolPeer.SetHandler<Protocol.MasterServer_Introduce>(Introduce_Query);
 
-      ProtocolPeer.Ack_AddHandler<Protocol.MasterServer_IntroduceInfo>(IntroduceInfo);
+      ProtocolPeer.SetCallback<Protocol.MasterServer_IntroduceInfo>(IntroduceInfo);
 
       Punch = new NAT.Punch.Server(Platform);
       Punch.Start(Config);
@@ -40,10 +40,10 @@ namespace UdpKit.MasterServer {
       uint now = Platform.GetPrecisionTime();
 
       // receive new messages
-      ProtocolPeer.Message_Recv(1);
+      ProtocolPeer.Recv(1);
 
       // update queries
-      ProtocolPeer.Query_Update(now);
+      ProtocolPeer.Update(now);
 
       // check timeouts
       Host_CheckTimeouts(now);
@@ -52,7 +52,7 @@ namespace UdpKit.MasterServer {
     void Host_CheckTimeouts(uint now) {
       for (int i = 0; i < HostList.Count; ++i) {
         // if this host has timed out
-        if (HostList[i].LastSeen + HOST_TIMEOUT < now) {
+        if (HostList[i]._lastSeen + HOST_TIMEOUT < now) {
           // remove from lookup
           HostLookup.Remove(HostList[i].Id);
 
@@ -73,7 +73,7 @@ namespace UdpKit.MasterServer {
       UdpSession host;
 
       if (HostLookup.TryGetValue(msg.PeerId, out host)) {
-        host.LastSeen = Platform.GetPrecisionTime();
+        host._lastSeen = Platform.GetPrecisionTime();
       }
     }
 
@@ -85,30 +85,30 @@ namespace UdpKit.MasterServer {
       UdpSession host;
 
       host = msg.Host;
-      host.Id = msg.PeerId;
-      host.WanEndPoint = msg.Sender;
-      host.LastSeen = Platform.GetPrecisionTime();
+      host._id = msg.PeerId;
+      host._wanEndPoint = msg.Sender;
+      host._lastSeen = Platform.GetPrecisionTime();
 
       HostLookup[host.Id] = host;
       HostList.Add(host);
 
       UdpLog.Info("Host Registered: {0}", host);
 
-      ProtocolPeer.Message_Ack(msg);
+      ProtocolPeer.Ack(msg);
     }
 
     void Session_ListRequest(Protocol.MasterServer_Session_ListRequest msg) {
       foreach (var host in HostList) {
-        if (host.ConnectivityStatus == UdpConnectivityStatus.Unknown) {
-          continue;
-        }
+        //if (host.ConnectivityStatus == UdpConnectivityStatus.Unknown) {
+        //  continue;
+        //}
 
         Protocol.MasterServer_Session_Info reply;
 
-        reply = ProtocolPeer.Message_Create<Protocol.MasterServer_Session_Info>();
+        reply = ProtocolPeer.Create<Protocol.MasterServer_Session_Info>();
         reply.Host = host;
 
-        ProtocolPeer.Message_Send(reply, msg.Sender);
+        ProtocolPeer.Send(reply, msg.Sender);
       }
     }
 
@@ -121,7 +121,7 @@ namespace UdpKit.MasterServer {
       result.Probe1 = Config.Probe1;
       result.Probe2 = Config.Probe2;
 
-      ProtocolPeer.Message_Send(result, query.Sender);
+      ProtocolPeer.Send(result, query.Sender);
     }
 
     void Introduce_Query(Protocol.MasterServer_Introduce query) {
@@ -129,45 +129,45 @@ namespace UdpKit.MasterServer {
 
       Protocol.MasterServer_Introduce_Result result;
 
-      result = ProtocolPeer.Message_Create<Protocol.MasterServer_Introduce_Result>();
+      result = ProtocolPeer.Create<Protocol.MasterServer_Introduce_Result>();
       result.Query = query.MessageId;
 
-      // make sure host still exists
-      if (HostLookup.TryGetValue(query.Host.Id, out host)) {
-        switch (host.ConnectivityStatus) {
-          case UdpConnectivityStatus.DirectConnection:
-            result.Status = Protocol.MasterServer_Introduce_Result_Status.DirectConnection;
-            ProtocolPeer.Message_Send(result, query.Sender);
-            break;
+      //// make sure host still exists
+      //if (HostLookup.TryGetValue(query.Host.Id, out host)) {
+      //  switch (host.ConnectivityStatus) {
+      //    case UdpConnectivityStatus.DirectConnection:
+      //      result.Status = Protocol.MasterServer_Introduce_Result_Status.DirectConnection;
+      //      ProtocolPeer.Send(result, query.Sender);
+      //      break;
 
-          case UdpConnectivityStatus.RequiresIntroduction:
-            result.Status = Protocol.MasterServer_Introduce_Result_Status.IntroductionRequired;
-            ProtocolPeer.Message_Send(result, query.Sender);
+      //    case UdpConnectivityStatus.RequiresIntroduction:
+      //      result.Status = Protocol.MasterServer_Introduce_Result_Status.IntroductionRequired;
+      //      ProtocolPeer.Send(result, query.Sender);
 
-            Send_IntroduceInfo_Query(query.Sender, host.Id);
-            Send_IntroduceInfo_Query(host.WanEndPoint, query.PeerId);
+      //      Send_IntroduceInfo_Query(query.Sender, host.Id);
+      //      Send_IntroduceInfo_Query(host.WanEndPoint, query.PeerId);
 
-            break;
+      //      break;
 
-          case UdpConnectivityStatus.ReverseDirectConnection:
-            break;
-        }
-      }
-      else {
-        result.Status = Protocol.MasterServer_Introduce_Result_Status.HostGone;
-        ProtocolPeer.Message_Send(result, query.Sender);
-      }
+      //    case UdpConnectivityStatus.ReverseDirectConnection:
+      //      break;
+      //  }
+      //}
+      //else {
+      //  result.Status = Protocol.MasterServer_Introduce_Result_Status.HostGone;
+      //  ProtocolPeer.Send(result, query.Sender);
+      //}
     }
 
     void Send_IntroduceInfo_Query(UdpEndPoint endpoint, Guid remote) {
 
       Protocol.MasterServer_IntroduceInfo msg;
 
-      msg = ProtocolPeer.Message_Create<Protocol.MasterServer_IntroduceInfo>();
+      msg = ProtocolPeer.Create<Protocol.MasterServer_IntroduceInfo>();
       msg.Remote = remote;
       msg.PunchServer = Config.Punch;
 
-      ProtocolPeer.Message_Send(msg, endpoint);
+      ProtocolPeer.Send(msg, endpoint);
     }
 
     void IntroduceInfo(Protocol.MasterServer_IntroduceInfo obj) {

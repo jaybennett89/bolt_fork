@@ -611,6 +611,30 @@ entityReceived.XmlDoc =
   /// </example>
 ";
 
+var masterServerConnectFailed = new Method("MasterServerConnectFailed");
+masterServerConnectFailed.AddArgument("UdpEndPoint", "endpoint");
+masterServerConnectFailed.XmlDoc = @"";
+
+var masterServerConnected = new Method("MasterServerConnected");
+masterServerConnected.AddArgument("UdpEndPoint", "endpoint");
+masterServerConnected.XmlDoc = @"";
+
+var masterServerDisconnected = new Method("MasterServerDisconnected");
+masterServerDisconnected.AddArgument("UdpEndPoint", "endpoint");
+masterServerDisconnected.XmlDoc = @"";
+
+var masterServerNatProbeResult = new Method("MasterServerNatProbeResult");
+masterServerNatProbeResult.AddArgument("UdpKit.NatFeatures", "features");
+masterServerNatProbeResult.XmlDoc = @"";
+
+var sessionListUpdated = new Method("SessionListUpdated");
+sessionListUpdated.AddArgument("Map<System.Guid, UdpSession>", "sessionList");
+sessionListUpdated.XmlDoc = @"";
+
+var sessionConnectFailed = new Method("SessionConnectFailed");
+sessionConnectFailed.AddArgument("UdpSession", "session");
+sessionConnectFailed.XmlDoc = @"";
+
 var methods = new List<Method>();
 methods.Add(shutdown);
 methods.Add(boltStarted);
@@ -640,6 +664,14 @@ methods.Add(entityAttached2);
 methods.Add(entityDetached);
 methods.Add(entityDetached2);
 methods.Add(entityReceived);
+
+methods.Add(masterServerConnectFailed);
+methods.Add(masterServerConnected);
+methods.Add(masterServerDisconnected);
+methods.Add(masterServerNatProbeResult);
+
+methods.Add(sessionListUpdated);
+methods.Add(sessionConnectFailed);
 
 #>
 

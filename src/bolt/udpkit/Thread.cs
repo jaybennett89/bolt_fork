@@ -22,7 +22,7 @@ namespace UdpKit {
       get { return stopped || (thread.IsAlive == false); }
     }
 
-    internal UdpThread(UdpPlatform platform) {
+    protected UdpThread(UdpPlatform platform) {
       Platform = platform;
       Buffer = new byte[1024];
     }

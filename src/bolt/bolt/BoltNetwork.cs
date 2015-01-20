@@ -1324,25 +1324,6 @@ public static class BoltNetwork {
   /// <summary>
   /// Enable LAN broadcasting
   /// </summary>
-  /// <param name="endpoint">The endpoint to use for LAN broadcast</param>
-  /// <example>
-  /// *Example:* Enabling LAN broadcast after starting a new server using a ```UdpEndPoint``` object.
-  /// 
-  /// ```csharp
-  /// void StartServer(UdpEndPoint serverAddr, string map) {
-  ///   BoltLauncher.StartServer(serverAddr);
-  ///   BoltNetwork.EnableLanBroadcast(serverAddr);
-  ///   BoltNetwork.LoadScene(map);
-  /// }
-  /// ```
-  /// </example>
-  public static void EnableLanBroadcast(UdpEndPoint endpoint) {
-    BoltCore.EnableLanBroadcast(endpoint);
-  }
-
-  /// <summary>
-  /// Enable LAN broadcasting
-  /// </summary>
   /// <param name="port">The port to use for LAN broadcast</param>
   /// <example>
   /// *Example:* Enabling LAN broadcast after starting a new server using a specified port.
@@ -1356,7 +1337,7 @@ public static class BoltNetwork {
   /// ```
   /// </example> 
   public static void EnableLanBroadcast(ushort port) {
-    EnableLanBroadcast(new UdpEndPoint(BoltCore._udpPlatform.GetBroadcastAddress(), port));
+    BoltCore._udpSocket.LanBroadcastEnable(UdpIPv4Address.Any, BoltCore._udpPlatform.GetBroadcastAddress(), port);
   }
 
   /// <summary>
@@ -1365,5 +1346,23 @@ public static class BoltNetwork {
   /// <returns>Array of sessions available</returns>
   public static UdpSession[] GetSessions() {
     return BoltCore.GetSessions();
+  }
+
+  internal static Map<Guid, UdpSession> _sessionList = new Map<Guid, UdpSession>();
+
+  public static Map<Guid, UdpSession> SessionList {
+    get { return _sessionList; }
+  }
+
+  public static void MasterServerRequestSessionList() {
+    UdpSocket.MasterServerRequestSessionList();
+  }
+
+  public static void MasterServerConnect(UdpEndPoint endpoint) {
+    UdpSocket.MasterServerConnect(endpoint);
+  }
+
+  public static void MasterServerDisconnect() {
+    UdpSocket.MasterServerDisconnect();
   }
 }

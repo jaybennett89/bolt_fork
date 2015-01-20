@@ -7,17 +7,7 @@ namespace UdpKit.Protocol {
     public UdpSession Host;
 
     protected override void OnSerialize() {
-      base.OnSerialize();
-
-      if (!Pack) {
-        Host = new UdpSession();
-      }
-
-      Serialize(ref Host.Id);
-      Serialize(ref Host.HostName);
-      Serialize(ref Host.HostData);
-      Serialize(ref Host.WanEndPoint);
-      Serialize(ref Host.LanEndPoint);
+      Serialize(ref Host);
     }
   }
 }

@@ -111,6 +111,7 @@ Target "InstallBolt" (fun _ ->
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
   CopyFile (unityDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
 )
@@ -137,6 +138,7 @@ Target "InstallBoltDebugFiles" (fun _ ->
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll.mdb")
   CopyFile (unityDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll.mdb")
   CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
+  CopyFile (unityDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll.mdb")
 )
 
 "Clean"

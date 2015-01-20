@@ -15,12 +15,21 @@ namespace UdpKit {
 
     Socket_Info SocketInfo = new Socket_Info();
 
+    void Socket_SetupProtocol() {
+      protocol.SetCallback<Protocol.NatPunch_PeerRegister>(Socket_NatPunch_PeerRegister_Ack);
+      protocol.SetCallback<Protocol.Socket_Punch>(Socket_Punch_Ack);
+
+      protocol.SetHandler<Protocol.Socket_Ping>(Socket_Ping);
+      protocol.SetHandler<Protocol.Socket_Punch>(Socket_Punch);
+      protocol.SetHandler<Protocol.NatPunch_PunchInfo>(NatPunch_PunchInfo);
+    }
+
     void Socket_Update(uint now) {
       if (SocketInfo.Punch) {
         if (SocketInfo.PunchPackets < 10) {
           if (SocketInfo.PunchTime < now) {
             // send packet
-            platformSocketPeer.Message_Send<Protocol.Socket_Punch>(SocketInfo.PunchTarget);
+            protocol.Send<Protocol.Socket_Punch>(SocketInfo.PunchTarget);
 
             // update punch time
             SocketInfo.PunchTime = (platform.GetPrecisionTime() + 1000) - SocketInfo.PunchPing;
@@ -36,11 +45,11 @@ namespace UdpKit {
     }
 
     void Socket_Ping(Protocol.Socket_Ping ping) {
-      platformSocketPeer.Message_Ack(ping);
+      protocol.Ack(ping);
     }
 
     void Socket_Punch(Protocol.Socket_Punch punch) {
-      platformSocketPeer.Message_Ack(punch);
+      protocol.Ack(punch);
     }
 
     void Socket_NatPunch_PeerRegister_Ack(Protocol.NatPunch_PeerRegister register) {
@@ -55,7 +64,7 @@ namespace UdpKit {
     }
 
     void NatPunch_PunchInfo(Protocol.NatPunch_PunchInfo msg) {
-      platformSocketPeer.Message_Ack(msg);
+      protocol.Ack(msg);
 
       SocketInfo = new Socket_Info();
 

@@ -86,7 +86,7 @@
 
         var t_frame = s.Values[i].TriggerLocal.Frame;
         var t_history = s.Values[i].TriggerLocal.History;
-        var t_callback = s.Values[i].Action;
+        var t_callback = s.Values[i].Action; 
 
         for (int k = (obj.RootState.Entity.SendRate - 1); (k >= 0) && (t_history != 0); --k) {
           if (t_frame - k > obj.RootState.Entity.Frame) {
@@ -105,7 +105,7 @@
             root.Storage.Values[i].TriggerSend.Update(BoltCore.frame, true);
 
             // meep
-            root.Storage.PropertyChanged(obj.OffsetProperties + obj.OffsetStorage);
+            root.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
 
             if (push) {
               for (int a = 0; a < obj.RootState.Animators.Count; ++a) {

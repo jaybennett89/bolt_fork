@@ -17,7 +17,7 @@ namespace UdpKit {
     }
 
     void NAT_UPnP_Start() {
-      NAT_UPnP_Client = new NAT.UPnP.Client(platform, LocalEndPoint.Port);
+      NAT_UPnP_Client = new NAT.UPnP.Client(platform, LocalLanEndPoint.Port);
       NAT_UPnP_Client.Start(null);
     }
 

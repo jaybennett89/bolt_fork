@@ -343,6 +343,10 @@ public class BoltConnection : BoltObject {
     set { UserData = value; }
   }
 
+  public void SetCanReceiveEntities(bool v) {
+    _canReceiveEntities = v;
+  }
+
   internal int SendRateMultiplier {
     get {
       float r = udpConnection.WindowFillRatio;

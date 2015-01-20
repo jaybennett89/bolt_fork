@@ -22,14 +22,14 @@ namespace UdpKit.NAT.Probe {
       BindSocket(out Peers[2], Config.Probe2);
 
       if (Running) {
-        Peers[0].Message_AddHandler<Protocol.NatProbe_TestEndPoint>(ClientQuery(Peers[0], 0));
-        Peers[1].Message_AddHandler<Protocol.NatProbe_TestEndPoint>(ClientQuery(Peers[1], 1));
+        Peers[0].SetHandler<Protocol.NatProbe_TestEndPoint>(ClientQuery(Peers[0], 0));
+        Peers[1].SetHandler<Protocol.NatProbe_TestEndPoint>(ClientQuery(Peers[1], 1));
       }
     }
 
     protected override void OnUpdate() {
-      Peers[0].Message_Recv(0);
-      Peers[1].Message_Recv(0);
+      Peers[0].Recv(0);
+      Peers[1].Recv(0);
     }
 
     void BindSocket(out Protocol.Peer peer, UdpEndPoint endpoint) {
@@ -48,20 +48,20 @@ namespace UdpKit.NAT.Probe {
     Action<Protocol.NatProbe_TestEndPoint> ClientQuery(Protocol.Peer peer, int probe) {
       return qry => {
         Protocol.NatProbe_TestEndPoint_Result result;
-        result = peer.Message_Create<Protocol.NatProbe_TestEndPoint_Result>();
+        result = peer.Create<Protocol.NatProbe_TestEndPoint_Result>();
         result.Probe = probe;
         result.Query = qry.MessageId;
         result.ClientWanEndPoint = qry.Sender;
 
-        peer.Message_Send(result, result.ClientWanEndPoint);
+        peer.Send(result, result.ClientWanEndPoint);
 
         if (probe == PROBE0) {
           Protocol.NatProbe_TestUnsolicited test;
-          test = peer.Message_Create<Protocol.NatProbe_TestUnsolicited>();
+          test = peer.Create<Protocol.NatProbe_TestUnsolicited>();
           test.ClientWanEndPoint = qry.Sender;
           test.Probe = probe;
 
-          Peers[PROBE2].Message_Send(test, test.ClientWanEndPoint);
+          Peers[PROBE2].Send(test, test.ClientWanEndPoint);
         }
       };
     }

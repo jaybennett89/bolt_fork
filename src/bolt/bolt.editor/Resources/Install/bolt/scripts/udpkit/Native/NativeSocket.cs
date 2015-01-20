@@ -29,10 +29,10 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
 
   public override UdpEndPoint EndPoint {
     get {
-      UdpEndPoint ep = default(UdpEndPoint);
+      UdpEndPoint.Native ep = default(UdpEndPoint.Native);
 
       if (NativePInvoke.GetEndPoint(socket, out ep) == NativePInvoke.UDPKIT_SOCKET_OK) {
-        return ep;
+        return ep.AsManaged;
       }
 
       return UdpEndPoint.Any;
@@ -58,7 +58,7 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
   }
 
   public override void Bind(UdpKit.UdpEndPoint ep) {
-    CheckResult(NativePInvoke.Bind(socket, ep));
+    CheckResult(NativePInvoke.Bind(socket, ep.AsNative));
   }
 
   public override void Close() {
@@ -67,11 +67,11 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
   }
 
   public override int RecvFrom(byte[] buffer, int bufferSize, ref UdpKit.UdpEndPoint endpoint) {
-    var sender = default(UdpEndPoint);
+    var sender = default(UdpEndPoint.Native);
     var bytesReceived = NativePInvoke.RecvFrom(socket, buffer, bufferSize, out sender);
 
     if (bytesReceived > 0) {
-      endpoint = sender;
+      endpoint = sender.AsManaged;
     }
 
     if (bytesReceived < 0) {
@@ -91,7 +91,7 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
   }
 
   public override int SendTo(byte[] buffer, int bytesToSend, UdpKit.UdpEndPoint endpoint) {
-    var bytesSent = NativePInvoke.SendTo(socket, buffer, bytesToSend, endpoint);
+    var bytesSent = NativePInvoke.SendTo(socket, buffer, bytesToSend, endpoint.AsNative);
 
     if (bytesSent >= 0) {
       return bytesSent;
@@ -108,6 +108,7 @@ public class NativeSocket : UdpKit.UdpPlatformSocket {
 
     if (result == NativePInvoke.UDPKIT_SOCKET_ERROR) {
       UdpLog.Error(Error);
+      UdpLog.Error(System.Environment.StackTrace);
       return false;
     }
 

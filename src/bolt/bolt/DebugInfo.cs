@@ -252,6 +252,7 @@ namespace Bolt {
           LabelField("Name", entity.UnityObject.gameObject.name);
           LabelField("Network Id", entity.NetworkId);
           LabelField("Is Frozen", entity.IsFrozen);
+          LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
 
           LabelField("World Position", entity.UnityObject.transform.position);
 

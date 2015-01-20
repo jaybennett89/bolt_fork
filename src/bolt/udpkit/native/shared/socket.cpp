@@ -168,7 +168,6 @@ EXPORT_API S32 RecvPoll(udpSocket* socket, S32 timeoutMs) {
   return UDPKIT_SOCKET_NODATA;
 
 #else
-
   fd_set set;
   timeval tv;
 
@@ -179,7 +178,7 @@ EXPORT_API S32 RecvPoll(udpSocket* socket, S32 timeoutMs) {
   tv.tv_usec = timeoutMs * 1000;
 
   S32 result = select(socket->nativeSocket + 1, &set, NULL, NULL, &tv);
-  if (result == SOCKET_ERROR) {
+  if (result < 0) {
     if (errno == EINTR) {
       return UDPKIT_SOCKET_NODATA;
     }

@@ -1,9 +1,6 @@
-﻿//#define COLOR_EDITOR
-
-using Bolt;
+﻿using Bolt;
 using System;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -121,10 +118,6 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     EditorGUI.BeginDisabledGroup(settings._config.serverConnectionAcceptMode != BoltConnectionAcceptMode.Manual);
-
-    BoltEditorGUI.WithLabel("Accept Token Size", () => {
-      settings._config.connectionTokenSize = Mathf.Clamp(BoltEditorGUI.IntFieldOverlay(settings._config.connectionTokenSize, "Bytes"), 0, UdpKit.UdpSocket.MaxTokenSize);
-    });
 
     EditorGUI.EndDisabledGroup();
 
@@ -285,12 +278,31 @@ public class BoltSettingsWindow : EditorWindow {
     });
   }
 
+  void MasterServer() {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    BoltEditorGUI.WithLabel("Game Id", () => {
+      if (settings.masterServerGameId == null || settings.masterServerGameId.Trim().Length == 0) {
+        settings.masterServerGameId = Guid.NewGuid().ToString().ToUpperInvariant();
+        Save();
+      }
+
+      settings.masterServerGameId = EditorGUILayout.TextField(settings.masterServerGameId);
+    });
+
+    BoltEditorGUI.WithLabel("Adress:Port", () => {
+      settings.masterServerEndPoint = EditorGUILayout.TextField(settings.masterServerEndPoint);
+    });
+
+    BoltEditorGUI.WithLabel("Connect", () => {
+      settings.masterServerAutoConnect = BoltEditorGUI.ToggleDropdown("Automatic", "Manual", settings.masterServerAutoConnect);
+    });
+  }
+
   Vector2 scrollPos = Vector2.zero;
 
   void Header(string text, string icon) {
-    //GUILayout.BeginHorizontal(BoltEditorGUI.HeaderBackgorund, GUILayout.Height(BoltEditorGUI.HEADER_HEIGHT));
     BoltEditorGUI.Header(text, icon);
-    //GUILayout.EndHorizontal();
   }
 
   void OnGUI() {
@@ -302,6 +314,9 @@ public class BoltSettingsWindow : EditorWindow {
     Header("Connection", "mc_connection");
     Connection();
 
+    Header("Master Server", "mc_masterserver");
+    MasterServer();
+
     Header("Latency Simulation", "mc_ping_sim");
     Simulation();
 
@@ -310,21 +325,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     Header("Compiler", "mc_compile");
     Compiler();
-
-
-#if COLOR_EDITOR
-    var v = BoltEditorSkin.Selected.Variation;
-
-    v.TintColor = EditorGUILayout.ColorField(v.TintColor);
-    v.IconColor = EditorGUILayout.ColorField(v.IconColor);
-
-    BoltEditorSkin s;
-    
-    s = BoltEditorSkin.Selected;
-    s.Variation = v;
-
-    BoltEditorSkin.Selected = s;
-#endif
 
     EditorGUILayout.EndScrollView();
 
