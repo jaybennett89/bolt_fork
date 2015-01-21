@@ -825,13 +825,13 @@ internal static void EntityReceivedInvoke(BoltEntity entity) {
 
 
 
-public virtual void MasterServerConnectFailed(UdpEndPoint endpoint) {  }
+public virtual void ZeusConnectFailed(UdpEndPoint endpoint) {  }
 
-internal static void MasterServerConnectFailedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback MasterServerConnectFailed");
+internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ZeusConnectFailed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.MasterServerConnectFailed(endpoint);
+			cb.ZeusConnectFailed(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -840,13 +840,13 @@ internal static void MasterServerConnectFailedInvoke(UdpEndPoint endpoint) {
 
 
 
-public virtual void MasterServerConnected(UdpEndPoint endpoint) {  }
+public virtual void ZeusConnected(UdpEndPoint endpoint) {  }
 
-internal static void MasterServerConnectedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback MasterServerConnected");
+internal static void ZeusConnectedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ZeusConnected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.MasterServerConnected(endpoint);
+			cb.ZeusConnected(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -855,13 +855,13 @@ internal static void MasterServerConnectedInvoke(UdpEndPoint endpoint) {
 
 
 
-public virtual void MasterServerDisconnected(UdpEndPoint endpoint) {  }
+public virtual void ZeusDisconnected(UdpEndPoint endpoint) {  }
 
-internal static void MasterServerDisconnectedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback MasterServerDisconnected");
+internal static void ZeusDisconnectedInvoke(UdpEndPoint endpoint) { 
+	BoltLog.Debug("Invoking callback ZeusDisconnected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.MasterServerDisconnected(endpoint);
+			cb.ZeusDisconnected(endpoint);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -870,13 +870,13 @@ internal static void MasterServerDisconnectedInvoke(UdpEndPoint endpoint) {
 
 
 
-public virtual void MasterServerNatProbeResult(UdpKit.NatFeatures features) {  }
+public virtual void ZeusNatProbeResult(UdpKit.NatFeatures features) {  }
 
-internal static void MasterServerNatProbeResultInvoke(UdpKit.NatFeatures features) { 
-	BoltLog.Debug("Invoking callback MasterServerNatProbeResult");
+internal static void ZeusNatProbeResultInvoke(UdpKit.NatFeatures features) { 
+	BoltLog.Debug("Invoking callback ZeusNatProbeResult");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.MasterServerNatProbeResult(features);
+			cb.ZeusNatProbeResult(features);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
