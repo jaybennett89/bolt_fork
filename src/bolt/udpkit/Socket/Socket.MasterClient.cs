@@ -159,6 +159,10 @@ namespace UdpKit {
 
       public void RequestSessionList() {
         if (IsConnected) {
+          // forget all sessions from zeus
+          socket.sessionManager.ForgetSessions(UdpSessionSource.Zeus);
+
+          // request list from zeus
           Send<Protocol.GetHostList>(endpoint);
         }
       }
@@ -309,6 +313,9 @@ namespace UdpKit {
         // Update ping
         UpdatePing(features);
 
+        // assign wan endpoint to local session
+        socket.sessionManager.SetWanEndPoint(features.NatFeatures.WanEndPoint);
+
         // if we're a host register us
         RegisterHost();
       }
@@ -353,7 +360,7 @@ namespace UdpKit {
       }
 
       void OnHostInfo(Protocol.HostInfo obj) {
-        socket.sessionManager.UpdateSession(obj.Host, UdpSessionSource.MasterServer);
+        socket.sessionManager.UpdateSession(obj.Host, UdpSessionSource.Zeus);
       }
 
       void OnPunchOnce(Protocol.PunchOnce once) {
