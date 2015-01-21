@@ -287,7 +287,22 @@ public class BoltSettingsWindow : EditorWindow {
         Save();
       }
 
+      GUILayout.BeginHorizontal();
+
       settings.masterServerGameId = EditorGUILayout.TextField(settings.masterServerGameId);
+
+      try {
+        if (new Guid(settings.masterServerGameId) == Guid.Empty) {
+          return;
+        }
+
+        EditorGUILayout.HelpBox("The game id must non-zero", MessageType.Error);
+      }
+      catch {
+        EditorGUILayout.HelpBox("The game id must be a valid GUID in this format: 00000000-0000-0000-0000-000000000000", MessageType.Error);
+      }
+
+      GUILayout.EndHorizontal();
     });
 
     BoltEditorGUI.WithLabel("Endpoint", () => {
@@ -296,10 +311,6 @@ public class BoltSettingsWindow : EditorWindow {
 
     BoltEditorGUI.WithLabel("Connect", () => {
       settings.masterServerAutoConnect = BoltEditorGUI.ToggleDropdown("Automatic", "Manual", settings.masterServerAutoConnect);
-    });
-
-    BoltEditorGUI.WithLabel("Session List", () => {
-      settings.masterServerAutoGetList = BoltEditorGUI.ToggleDropdown("Automatic", "Manual", settings.masterServerAutoGetList);
     });
   }
 
@@ -318,7 +329,7 @@ public class BoltSettingsWindow : EditorWindow {
     Header("Connection", "mc_connection");
     Connection();
 
-    Header("Master Server", "mc_masterserver");
+    Header("Zeus (Master Server)", "mc_masterserver");
     MasterServer();
 
     Header("Latency Simulation", "mc_ping_sim");
