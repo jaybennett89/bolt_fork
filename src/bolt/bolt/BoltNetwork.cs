@@ -1354,15 +1354,15 @@ public static class BoltNetwork {
     get { return _sessionList; }
   }
 
-  public static void MasterServerRequestSessionList() {
+  internal static void MasterServerRequestSessionList() {
     UdpSocket.MasterServerRequestSessionList();
   }
 
-  public static void MasterServerConnect(UdpEndPoint endpoint) {
+  internal static void MasterServerConnect(UdpEndPoint endpoint) {
     UdpSocket.MasterServerConnect(endpoint);
   }
 
-  public static void MasterServerDisconnect() {
+  internal static void MasterServerDisconnect() {
     UdpSocket.MasterServerDisconnect();
   }
 }
