@@ -125,12 +125,14 @@ namespace UdpKit {
               if (natProbeState.Hairpin != null) {
                 natProbeState.Hairpin.Socket.Close();
                 natProbeState.Hairpin = null;
-                natProbeState = null;
               }
             }
             catch (Exception exn) {
               UdpLog.Error(exn.ToString());
             }
+
+            // whops
+            natProbeState = null;
 
             // connected!
             state = State.Connected;
