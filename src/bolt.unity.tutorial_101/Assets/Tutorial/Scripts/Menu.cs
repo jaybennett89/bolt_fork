@@ -11,6 +11,10 @@ public class Menu : Bolt.GlobalEventListener {
 
   State state = State.SelectPeer;
 
+  public override void ZeusConnected(UdpEndPoint endpoint) {
+    Bolt.Zeus.RequestSessionList();
+  }
+
   void SelectPeer() {
     if (GUILayout.Button("Start Server", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true))) {
       BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("192.168.2.173:27000"));

@@ -287,22 +287,20 @@ public class BoltSettingsWindow : EditorWindow {
         Save();
       }
 
-      GUILayout.BeginHorizontal();
+      GUILayout.BeginVertical();
 
       settings.masterServerGameId = EditorGUILayout.TextField(settings.masterServerGameId);
 
       try {
         if (new Guid(settings.masterServerGameId) == Guid.Empty) {
-          return;
+          EditorGUILayout.HelpBox("The game id must non-zero", MessageType.Error);
         }
-
-        EditorGUILayout.HelpBox("The game id must non-zero", MessageType.Error);
       }
       catch {
         EditorGUILayout.HelpBox("The game id must be a valid GUID in this format: 00000000-0000-0000-0000-000000000000", MessageType.Error);
       }
 
-      GUILayout.EndHorizontal();
+      GUILayout.EndVertical();
     });
 
     BoltEditorGUI.WithLabel("Endpoint", () => {
