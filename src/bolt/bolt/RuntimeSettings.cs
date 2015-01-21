@@ -129,9 +129,6 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public bool masterServerAutoConnect = true;
 
-  [SerializeField]
-  public bool masterServerAutoGetList = true;
-
   /// <summary>
   /// Get a memberwise copy of the current bolt config
   /// </summary>
