@@ -1348,14 +1348,6 @@ public static class BoltNetwork {
     BoltCore._udpSocket.LanBroadcastEnable(UdpIPv4Address.Any, BoltCore._udpPlatform.GetBroadcastAddress(), port);
   }
 
-  /// <summary>
-  /// Sessions currently vailable from the LAN Broadcasting/Master Server listing
-  /// </summary>
-  /// <returns>Array of sessions available</returns>
-  public static UdpSession[] GetSessions() {
-    return BoltCore.GetSessions();
-  }
-
   internal static Map<Guid, UdpSession> _sessionList = new Map<Guid, UdpSession>();
 
   public static Map<Guid, UdpSession> SessionList {
