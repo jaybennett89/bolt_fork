@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Zeus>
+  <Timeouts Host="180000" Client="60000" />
+  <GameId>00000000-0000-0000-0000-000000000000</GameId>
+  <Master Ip="0.0.0.1">
+    <NatProbe Ip0="0.0.0.2" Ip1="0.0.0.3"  Ip2="0.0.0.4"/>
+  </Master>
+</Zeus>

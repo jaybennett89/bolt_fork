@@ -69,6 +69,7 @@
     <Content Include="ConfigDevRemote.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
