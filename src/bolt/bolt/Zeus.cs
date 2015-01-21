@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,20 +22,6 @@ namespace Bolt {
 
     public static void RequestSessionList() {
       BoltNetwork.MasterServerRequestSessionList();
-    }
-  }
-
-  public static class UdpSessionExtensions {
-    public static IProtocolToken GetProtocolToken(this UdpSession session) {
-      if (session._hostData == null || session._hostData.Length == 0) {
-        return null;
-      }
-
-      if (session._hostObject == null) {
-        session._hostObject = session._hostData.ToToken();
-      }
-
-      return (IProtocolToken)session._hostObject;
     }
   }
 }

@@ -8,6 +8,18 @@ using UnityEngine;
 
 [Documentation(Ignore = true)]
 public static class BoltUtils {
+  public static IProtocolToken GetProtocolToken(this UdpSession session) {
+    if (session._hostData == null || session._hostData.Length == 0) {
+      return null;
+    }
+
+    if (session._hostObject == null) {
+      session._hostObject = session._hostData.ToToken();
+    }
+
+    return (IProtocolToken)session._hostObject;
+  }
+
   public static bool NullOrEmpty(this Array array) {
     return array == null || array.Length == 0;
   }
