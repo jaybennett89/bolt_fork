@@ -37,7 +37,8 @@ namespace UdpKit {
       }
 
       uint ping;
-      uint update;
+      uint keepalive;
+
       State state;
       UdpEndPoint endpoint;
 
@@ -62,17 +63,15 @@ namespace UdpKit {
       }
 
       public void Update(uint now) {
-        if (update <= now) {
-          // update this client
-          Client.Update(now);
+        // update this client
+        Client.Update(now);
 
-          // update nat stuff
-          UpdateNatProbe(now);
-          UpdateNatPunch(now);
+        // update nat stuff
+        UpdateNatProbe(now);
+        UpdateNatPunch(now);
 
-          // update host stuff
-          UpdateRegisteredHost(now);
-        }
+        // update host stuff
+        UpdateRegisteredHost(now);
       }
 
       void UpdateNatPunch(uint now) {
@@ -80,17 +79,15 @@ namespace UdpKit {
 
         if ((natPunchRequest != null) && (natPunchRequest.Time < now)) {
           // if we have done less than 10 requests
-          if (++natPunchRequest.Count <= 10) {
+          if (++natPunchRequest.Count <= socket.Config.NatPunchRequestCount) {
             // perform once more, and then wait 2000 ms
-            natPunchRequest.Time = now + 2000;
+            natPunchRequest.Time = now + socket.Config.NatPunchRequestInterval;
 
             // send request
             Send<Protocol.PunchRequest>(endpoint, m => m.Host = natPunchRequest.Target.Id);
           }
           else {
             natPunchRequest = null;
-
-
           }
         }
 
@@ -102,7 +99,7 @@ namespace UdpKit {
           if (target.Time < now) {
             Send<Protocol.Punch>(target.EndPoint);
 
-            if (target.Count == 2) {
+            if (target.Count == socket.Config.NatPunchOnceCount) {
               // remove this
               natPunchTargets.RemoveAt(i);
 
@@ -111,7 +108,7 @@ namespace UdpKit {
             }
             else {
               target.Count += 1;
-              target.Time = now + 100;
+              target.Time = now + socket.Config.NatPunchOnceInterval;
             }
           }
         }
@@ -141,9 +138,6 @@ namespace UdpKit {
             // tell the master server about this
             Send<Protocol.ProbeFeatures>(endpoint, m => m.NatFeatures = natFeatures);
 
-            // tell user about this
-            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_CONNECTED);
-
             // give user info about nat results
             UdpEvent ev = new UdpEvent();
             ev.Type = UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT;
@@ -156,8 +150,9 @@ namespace UdpKit {
 
       void UpdateRegisteredHost(uint now) {
         if (IsConnected && (socket.Mode == UdpSocketMode.Host)) {
-          if ((SendTime + 10000) < now) {
+          if (keepalive < now) {
             Send<Protocol.HostKeepAlive>(endpoint);
+            keepalive = now + socket.Config.HostKeepAliveInterval;
           }
         }
       }
@@ -222,6 +217,9 @@ namespace UdpKit {
           Client.SetHandler<Protocol.Punch>(OnPunch);
           Client.SetHandler<Protocol.DirectConnection>(OnDirectConnection);
 
+          // setup
+          keepalive = socket.GetCurrentTime();
+
           // send peer connect
           Send<Protocol.PeerConnect>(endpoint);
         }
@@ -258,7 +256,7 @@ namespace UdpKit {
         natProbeState.Probe0 = connect.Result.Probe0;
         natProbeState.Probe1 = connect.Result.Probe1;
         natProbeState.Probe2 = connect.Result.Probe2;
-        natProbeState.Timeout = socket.GetCurrentTime() + 10000;
+        natProbeState.Timeout = socket.GetCurrentTime() + socket.Config.NatProbeEndPointTimeout;
 
         Send<Protocol.ProbeEndPoint>(natProbeState.Probe0);
         Send<Protocol.ProbeEndPoint>(natProbeState.Probe1);
@@ -289,7 +287,7 @@ namespace UdpKit {
               natProbeState.Hairpin.Send(natProbeState.Hairpin.CreateMessage<Protocol.ProbeHairpin>(), natFeatures.WanEndPoint);
 
               // increase timeout a little bit
-              natProbeState.Timeout = socket.GetCurrentTime() + 2000;
+              natProbeState.Timeout = socket.GetCurrentTime() + socket.Config.NatProbeHairpinTimeout;
             }
             else {
               UdpLog.Info("NAT Probe: SupportsEndPointPreservation:NO");
@@ -359,7 +357,7 @@ namespace UdpKit {
       }
 
       void OnPunchOnce(Protocol.PunchOnce once) {
-        uint time = (socket.GetCurrentTime() + 500) - ping;
+        uint time = (socket.GetCurrentTime() + socket.Config.NatPunchOnceDelay) - ping;
 
         foreach (var t in natPunchTargets) {
           if (t.EndPoint == once.RemoteEndPoint && t.Count > 0) {

@@ -2,20 +2,25 @@
 using System.Collections;
 using UdpKit;
 
-public class Menu : MonoBehaviour {
-  void OnGUI() {
-    GUILayout.BeginArea(new Rect(10, 10, Screen.width - 20, (Screen.height / 2) - 20));
+public class Menu : Bolt.GlobalEventListener {
 
+  enum State {
+    SelectPeer,
+    ServerBrowser
+  }
+
+  State state = State.SelectPeer;
+
+  void SelectPeer() {
     if (GUILayout.Button("Start Server", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true))) {
       BoltLauncher.StartServer(UdpKit.UdpEndPoint.Parse("192.168.2.173:27000"));
       BoltNetwork.SetHostInfo("TestServer", null);
-      BoltNetwork.EnableLanBroadcast();
       BoltNetwork.LoadScene("Tutorial1");
     }
 
     if (GUILayout.Button("Start Client", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true))) {
       BoltLauncher.StartClient();
-      BoltNetwork.EnableLanBroadcast();
+      state = State.ServerBrowser;
     }
 
     GUILayout.EndArea();
@@ -26,7 +31,36 @@ public class Menu : MonoBehaviour {
     foreach (var kvp in BoltNetwork.SessionList) {
       GUILayout.Label(kvp.Value.HostName);
     }
+  }
 
+  void ServerBrowser() {
+    GUILayout.Label("Server Browser");
+
+    GUILayout.BeginVertical(GUI.skin.box);
+
+    foreach (var session in BoltNetwork.SessionList) {
+      GUILayout.BeginHorizontal();
+
+      GUILayout.Label(session.Value.HostName);
+
+      if (GUILayout.Button("Join")) {
+        BoltNetwork.Connect(session.Value);
+      }
+
+      GUILayout.EndHorizontal();
+    }
+
+    GUILayout.EndVertical();
+  }
+
+  void OnGUI() {
+    GUILayout.BeginArea(new Rect(10, 10, Screen.width - 20, (Screen.height / 2) - 20));
+
+    switch (state) {
+      case State.SelectPeer: SelectPeer(); break;
+      case State.ServerBrowser: ServerBrowser(); break;
+    }
+ 
     GUILayout.EndArea();
   }
 }

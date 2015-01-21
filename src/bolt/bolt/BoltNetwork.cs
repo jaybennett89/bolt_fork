@@ -1240,7 +1240,15 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Connect(UdpEndPoint endpoint) {
-    BoltCore.Connect(endpoint);
+    BoltCore.Connect(endpoint, null);
+  }
+
+  public static void Connect(UdpSession session) {
+    BoltCore.Connect(session, null);
+  }
+
+  public static void Connect(UdpSession session, IProtocolToken token) {
+    BoltCore.Connect(session, token);
   }
 
   /// <summary>
@@ -1338,14 +1346,6 @@ public static class BoltNetwork {
   /// </example> 
   public static void EnableLanBroadcast(ushort port) {
     BoltCore._udpSocket.LanBroadcastEnable(UdpIPv4Address.Any, BoltCore._udpPlatform.GetBroadcastAddress(), port);
-  }
-
-  /// <summary>
-  /// Sessions currently vailable from the LAN Broadcasting/Master Server listing
-  /// </summary>
-  /// <returns>Array of sessions available</returns>
-  public static UdpSession[] GetSessions() {
-    return BoltCore.GetSessions();
   }
 
   internal static Map<Guid, UdpSession> _sessionList = new Map<Guid, UdpSession>();

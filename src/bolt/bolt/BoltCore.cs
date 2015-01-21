@@ -349,10 +349,6 @@ internal static class BoltCore {
     return _udpSocket.GetSessions();
   }
 
-  public static void Connect(UdpEndPoint endpoint) {
-    Connect(endpoint, null);
-  }
-
   public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
     if (server != null) {
       BoltLog.Error("You must disconnect from the current server first");
@@ -364,6 +360,19 @@ internal static class BoltCore {
 
     // connect
     _udpSocket.Connect(endpoint, token.ToByteArray());
+  }
+
+  public static void Connect(UdpSession session, IProtocolToken token) {
+    if (server != null) {
+      BoltLog.Error("You must disconnect from the current server first");
+      return;
+    }
+
+    // stop broadcasting
+    DisableLanBroadcast();
+
+    // connect
+    _udpSocket.Connect(session, token.ToByteArray());
   }
 
   public static void SetHostInfo(string serverName, IProtocolToken token) {
@@ -479,6 +488,10 @@ internal static class BoltCore {
         // MASTER SERVER
 
         case UdpEventType.MasterServerConnected:
+          if (BoltRuntimeSettings.instance.masterServerAutoGetList) {
+            BoltNetwork.MasterServerRequestSessionList();
+          }
+
           BoltInternal.GlobalEventListenerBase.MasterServerConnectedInvoke(ev.EndPoint);
           break;
 
@@ -1075,4 +1088,5 @@ internal static class BoltCore {
       it.val.Render();
     }
   }
+
 }

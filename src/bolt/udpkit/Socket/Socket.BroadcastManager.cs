@@ -27,11 +27,11 @@ namespace UdpKit {
         if (service.Client.Socket.RecvPoll(0)) {
           var endpoint = new UdpEndPoint();
           var bytes = service.Client.Socket.RecvFrom(service.Client.Buffer, ref endpoint);
-          service.Client.Recv(endpoint, service.Client.Buffer, bytes);
+          service.Client.Recv(endpoint, service.Client.Buffer, 0);
         }
 
         if (socket.Mode == UdpSocketMode.Client) {
-          if ((service.SendTime + 2000) < now) {
+          if ((service.SendTime + socket.Config.BroadcastInterval) < now) {
             service.Send<Protocol.BroadcastSearch>(broadcast);
           }
         }
@@ -53,20 +53,20 @@ namespace UdpKit {
         service.Client.Socket.Bind(new UdpEndPoint(args.LocalAddress, args.Port));
         service.Client.Socket.Broadcast = true;
 
-        if (socket.Mode == UdpSocketMode.Host) {
-          service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
-        }
-        else {
-          service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
-        }
+        service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
+        service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
       }
 
       void OnBroadcastSearch(Protocol.BroadcastSearch search) {
-        service.Send<Protocol.BroadcastSession>(search.Sender, m => m.Host = socket.sessionManager.GetLocalSession());
+        if (search.PeerId != socket.PeerId) {
+          service.Send<Protocol.BroadcastSession>(search.Sender, m => m.Host = socket.sessionManager.GetLocalSession());
+        }
       }
 
       void OnBroadcastSession(Protocol.BroadcastSession session) {
-        socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);
+        if (session.PeerId != socket.PeerId) {
+          socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);
+        }
       }
 
       public void Disable() {

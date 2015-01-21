@@ -8,6 +8,19 @@ namespace UdpKit {
     public int StreamWindow = 1024;
     public int StreamDatagramSize = 4096;
 
+    public uint NatPunchOnceDelay = 500;
+    public int NatPunchOnceCount = 3;
+    public uint NatPunchOnceInterval = 100;
+
+    public int NatPunchRequestCount = 10;
+    public uint NatPunchRequestInterval = 2000;
+
+    public uint NatProbeEndPointTimeout = 10000;
+    public uint NatProbeHairpinTimeout = 2000;
+
+    public uint HostKeepAliveInterval = 20000;
+    public uint BroadcastInterval = 2000;
+
     /// <summary>
     /// The default network ping for new connections, default: 0.1f (seconds)
     /// </summary>

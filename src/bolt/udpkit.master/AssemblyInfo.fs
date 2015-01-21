@@ -4,15 +4,14 @@ open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
-[<assembly: AssemblyProduct("udpkit")>]
-[<assembly: AssemblyDescription(".Net/Mono/Unity networking library for games")>]
+[<assembly: AssemblyProduct("thundercloud")>]
+[<assembly: AssemblyDescription("Master Server for the UdpKit socket library")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("Bolt Engine AB")>]
 [<assembly: AssemblyCopyright("Copyright © 2012-2015 Bolt Engine AB")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
 [<assembly: ComVisible(false)>]
-[<assembly: AssemblyVersion("0.3.2.0")>]
-[<assembly: AssemblyFileVersion("0.3.2.0")>]
-
+[<assembly: AssemblyVersion("0.1.1.0")>]
+[<assembly: AssemblyFileVersion("0.1.1.0")>]
 do()
