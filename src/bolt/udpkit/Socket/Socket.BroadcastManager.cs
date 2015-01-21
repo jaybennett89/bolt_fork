@@ -53,12 +53,8 @@ namespace UdpKit {
         service.Client.Socket.Bind(new UdpEndPoint(args.LocalAddress, args.Port));
         service.Client.Socket.Broadcast = true;
 
-        if (socket.Mode == UdpSocketMode.Host) {
-          service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
-        }
-        else {
-          service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
-        }
+        service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
+        service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
       }
 
       void OnBroadcastSearch(Protocol.BroadcastSearch search) {
@@ -66,7 +62,9 @@ namespace UdpKit {
       }
 
       void OnBroadcastSession(Protocol.BroadcastSession session) {
-        socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);
+        if (session.Host.Id != socket.PeerId) {
+          socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);
+        }
       }
 
       public void Disable() {
