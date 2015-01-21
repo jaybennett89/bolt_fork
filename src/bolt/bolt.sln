@@ -31,11 +31,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit.common", "udpkit.com
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "udpkit.master", "udpkit.master\udpkit.master.fsproj", "{98329380-F918-48DE-8C4A-046E6D153CD4}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "udpkit.thundercloud", "udpkit.thundercloud\udpkit.thundercloud.fsproj", "{A9DC1688-3C67-4DA8-8C5C-848EC8DBDDE2}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "udpkit.zeus", "udpkit.thundercloud\udpkit.zeus.fsproj", "{A9DC1688-3C67-4DA8-8C5C-848EC8DBDDE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit.thundercloud.client", "udpkit.thundercloud.client\udpkit.thundercloud.client.csproj", "{70FFF6C5-C296-444A-BE2A-8B7BAA51B449}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit.zeus.client", "udpkit.thundercloud.client\udpkit.zeus.client.csproj", "{70FFF6C5-C296-444A-BE2A-8B7BAA51B449}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit.thundercloud.host", "udpkit.thundercloud.host\udpkit.thundercloud.host.csproj", "{6658C058-501C-4C27-A6A2-391A03083E82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "udpkit.zeus.host", "udpkit.thundercloud.host\udpkit.zeus.host.csproj", "{6658C058-501C-4C27-A6A2-391A03083E82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

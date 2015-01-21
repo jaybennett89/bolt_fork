@@ -3,29 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace UdpKit {
-  public enum UdpConnectivityStatus {
-    Unknown,
-    DirectConnection,
-    RequiresIntroduction,
-    ReverseDirectConnection,
-  }
-
-  public enum UdpConnectMode {
-    NotPossible,
-    DirectConnection,
-    ReverseConnection,
-    IntroduceConnection
-  }
-
   public enum UdpSessionSource {
     Lan,
     Steam,
-    MasterServer,
-  }
-
-  public enum UdpSessionType {
-    DedicatedServer,
-    PlayerHost
+    Zeus,
   }
 
   public class UdpSession {
@@ -38,14 +19,16 @@ namespace UdpKit {
 
     internal string _hostName;
     internal byte[] _hostData;
+    internal object _hostObject;
 
     public Guid Id { get { return _id; } }
     public UdpSessionSource Source { get { return _source; } }
     public UdpEndPoint WanEndPoint { get { return _wanEndPoint; } }
     public UdpEndPoint LanEndPoint { get { return _lanEndPoint; } }
 
-    public string HostName { get { return _hostName; } }
-    public byte[] HostData { get { return _hostData; } }
+    public string HostName {
+      get { return _hostName; }
+    }
 
     public bool HasWan {
       get { return WanEndPoint.IsWan; }

@@ -29,7 +29,18 @@ module Master =
               return! loop <| peer.BeginNatPunch otherId otherInbox otherNat
 
             | PeerMessage.Error(text) ->
-              UdpLog.Error(text)
+              UdpLog.Error (sprintf "Peer %A: %s" peer.PeerId text)
+
+              match peer.NatFeatures with
+              | None -> ()
+              | Some nat ->
+                if nat.WanEndPoint.IsWan then
+                  let msg = context.Protocol.CreateMessage<Protocol.Error>()
+                  msg.Text <- text
+
+                  // send to remote
+                  context.Socket.Send(EndPoint.toDotNet nat.WanEndPoint, msg)
+
               return! loop peer
 
             | PeerMessage.PerformPunchOnce(remoteId, remoteEndPoint, selfEndPoint) ->

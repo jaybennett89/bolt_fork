@@ -64,28 +64,28 @@ public class BoltConnectionsWindow : BoltWindow {
       NatDeviceDetailsView();
     }
 
-    Header("mc_server", "LAN Servers");
-    LanServers();
+    //Header("mc_server", "LAN Servers");
+    //LanServers();
 
     GUILayout.EndArea();
     GUILayout.EndScrollView();
   }
 
-  void LanServers() {
-    GUIStyle s = new GUIStyle(GUIStyle.none);
-    s.padding = new RectOffset(5, 5, 2, 2);
-    GUILayout.BeginHorizontal(s);
+  //void LanServers() {
+  //  GUIStyle s = new GUIStyle(GUIStyle.none);
+  //  s.padding = new RectOffset(5, 5, 2, 2);
+  //  GUILayout.BeginHorizontal(s);
 
-    var sessions = BoltNetwork.isRunning ? BoltNetwork.GetSessions() : new UdpKit.UdpSession[0];
+  //  var sessions = BoltNetwork.isRunning ? BoltNetwork.GetSessions() : new UdpKit.UdpSession[0];
 
-    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "Name"), c => StatsLabel(c.HostName));
-    Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_ipaddress", "End Point"), c => StatsLabel(c.WanEndPoint));
+  //  Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_name", "Name"), c => StatsLabel(c.HostName));
+  //  Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_ipaddress", "End Point"), c => StatsLabel(c.WanEndPoint));
 
-    //Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_bubble", "User Data"), c => StatsLabel(c.Data ?? ""));
+  //  //Each<UdpKit.UdpSession>(sessions, MakeHeader("mc_bubble", "User Data"), c => StatsLabel(c.Data ?? ""));
 
-    GUILayout.EndHorizontal();
-    GUILayout.Space(4);
-  }
+  //  GUILayout.EndHorizontal();
+  //  GUILayout.Space(4);
+  //}
 
   void NatDeviceDetailsView() {
     GUIStyle s = new GUIStyle(GUIStyle.none);

@@ -8,11 +8,11 @@
     <ProjectGuid>a9dc1688-3c67-4da8-8c5c-848ec8dbdde2</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>udpkit.thundercloud</RootNamespace>
-    <AssemblyName>thundercloud</AssemblyName>
+    <AssemblyName>zeus</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
-    <Name>udpkit.thundercloud</Name>
+    <Name>udpkit.zeus</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,7 +32,8 @@
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Release\udpkit.thundercloud.XML</DocumentationFile>
@@ -68,6 +69,7 @@
     <Content Include="ConfigDevRemote.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Config.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">

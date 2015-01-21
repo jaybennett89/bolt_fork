@@ -611,19 +611,19 @@ entityReceived.XmlDoc =
   /// </example>
 ";
 
-var masterServerConnectFailed = new Method("MasterServerConnectFailed");
+var masterServerConnectFailed = new Method("ZeusConnectFailed");
 masterServerConnectFailed.AddArgument("UdpEndPoint", "endpoint");
 masterServerConnectFailed.XmlDoc = @"";
 
-var masterServerConnected = new Method("MasterServerConnected");
+var masterServerConnected = new Method("ZeusConnected");
 masterServerConnected.AddArgument("UdpEndPoint", "endpoint");
 masterServerConnected.XmlDoc = @"";
 
-var masterServerDisconnected = new Method("MasterServerDisconnected");
+var masterServerDisconnected = new Method("ZeusDisconnected");
 masterServerDisconnected.AddArgument("UdpEndPoint", "endpoint");
 masterServerDisconnected.XmlDoc = @"";
 
-var masterServerNatProbeResult = new Method("MasterServerNatProbeResult");
+var masterServerNatProbeResult = new Method("ZeusNatProbeResult");
 masterServerNatProbeResult.AddArgument("UdpKit.NatFeatures", "features");
 masterServerNatProbeResult.XmlDoc = @"";
 

@@ -226,7 +226,7 @@ namespace UdpKit {
 
     void OnEvent_Session_Connect(UdpEvent ev) {
       switch (ev.Session.Source) {
-        case UdpSessionSource.MasterServer:
+        case UdpSessionSource.Zeus:
           if (masterClient != null) {
             masterClient.ConnectToSession(ev.Session);
           }

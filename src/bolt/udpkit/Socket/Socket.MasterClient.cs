@@ -159,6 +159,10 @@ namespace UdpKit {
 
       public void RequestSessionList() {
         if (IsConnected) {
+          // forget all sessions from zeus
+          socket.sessionManager.ForgetSessions(UdpSessionSource.Zeus);
+
+          // request list from zeus
           Send<Protocol.GetHostList>(endpoint);
         }
       }
@@ -216,6 +220,7 @@ namespace UdpKit {
           Client.SetHandler<Protocol.PunchOnce>(OnPunchOnce);
           Client.SetHandler<Protocol.Punch>(OnPunch);
           Client.SetHandler<Protocol.DirectConnection>(OnDirectConnection);
+          Client.SetHandler<Protocol.Error>(OnError);
 
           // setup
           keepalive = socket.GetCurrentTime();
@@ -224,6 +229,7 @@ namespace UdpKit {
           Send<Protocol.PeerConnect>(endpoint);
         }
       }
+
 
       public void RegisterHost() {
         if (IsConnected && socket.sessionManager.IsHostWithName) {
@@ -309,6 +315,9 @@ namespace UdpKit {
         // Update ping
         UpdatePing(features);
 
+        // assign wan endpoint to local session
+        socket.sessionManager.SetWanEndPoint(features.NatFeatures.WanEndPoint);
+
         // if we're a host register us
         RegisterHost();
       }
@@ -353,7 +362,7 @@ namespace UdpKit {
       }
 
       void OnHostInfo(Protocol.HostInfo obj) {
-        socket.sessionManager.UpdateSession(obj.Host, UdpSessionSource.MasterServer);
+        socket.sessionManager.UpdateSession(obj.Host, UdpSessionSource.Zeus);
       }
 
       void OnPunchOnce(Protocol.PunchOnce once) {
@@ -391,6 +400,10 @@ namespace UdpKit {
           ev.EndPoint = obj.Sender;
           socket.OnEventConnect(ev);
         }
+      }
+
+      void OnError(Protocol.Error obj) {
+        UdpLog.Error("Received Error From Zeus: {0}", obj.Text);
       }
 
       void UpdatePing(Protocol.Query query) {

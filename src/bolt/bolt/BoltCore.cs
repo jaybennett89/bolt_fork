@@ -488,23 +488,19 @@ internal static class BoltCore {
         // MASTER SERVER
 
         case UdpEventType.MasterServerConnected:
-          if (BoltRuntimeSettings.instance.masterServerAutoGetList) {
-            BoltNetwork.MasterServerRequestSessionList();
-          }
-
-          BoltInternal.GlobalEventListenerBase.MasterServerConnectedInvoke(ev.EndPoint);
+          BoltInternal.GlobalEventListenerBase.ZeusConnectedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.MasterServerDisconnected:
-          BoltInternal.GlobalEventListenerBase.MasterServerDisconnectedInvoke(ev.EndPoint);
+          BoltInternal.GlobalEventListenerBase.ZeusDisconnectedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.MasterServerConnectFailed:
-          BoltInternal.GlobalEventListenerBase.MasterServerConnectFailedInvoke(ev.EndPoint);
+          BoltInternal.GlobalEventListenerBase.ZeusConnectFailedInvoke(ev.EndPoint);
           break;
 
         case UdpEventType.MasterServerNatProbeResult:
-          BoltInternal.GlobalEventListenerBase.MasterServerNatProbeResultInvoke(ev.NatFeatures);
+          BoltInternal.GlobalEventListenerBase.ZeusNatProbeResultInvoke(ev.NatFeatures);
           break;
       }
     }
@@ -939,8 +935,18 @@ internal static class BoltCore {
     // create and start socket
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
+    Guid gameGuid = new Guid();
+
+    try {
+      gameGuid = new Guid(BoltRuntimeSettings.instance.masterServerGameId);
+    }
+    catch {
+      gameGuid = new Guid();
+      BoltLog.Error("Could not parse game id, you will not be able to connect to the Zeus server");
+    }
+
     // create udp socket
-    _udpSocket = new UdpSocket(new Guid(BoltRuntimeSettings.instance.masterServerGameId), udpPlatform, _udpConfig);
+    _udpSocket = new UdpSocket(gameGuid, udpPlatform, _udpConfig);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);
@@ -951,8 +957,20 @@ internal static class BoltCore {
     // 
     _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));
 
-    if (BoltRuntimeSettings.instance.masterServerAutoConnect) {
-      _udpSocket.MasterServerConnect(UdpEndPoint.Parse(BoltRuntimeSettings.instance.masterServerEndPoint));
+    if (BoltRuntimeSettings.instance.masterServerAutoConnect && (gameGuid != Guid.Empty)) {
+      UdpEndPoint zeusEndPoint = new UdpEndPoint();
+
+      try {
+        zeusEndPoint = UdpEndPoint.Parse(BoltRuntimeSettings.instance.masterServerEndPoint);
+      }
+      catch {
+        zeusEndPoint = new UdpEndPoint();
+        BoltLog.Error("Could not parse Zeus server endpoint for automatic connection");
+      }
+
+      if (zeusEndPoint != UdpEndPoint.Any) {
+        Zeus.Connect(zeusEndPoint);
+      }
     }
 
     // tell user that we started

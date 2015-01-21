@@ -56,6 +56,13 @@ namespace UdpKit {
         }
       }
 
+      public void ForgetSessionsAll() {
+        sessions = new Map<Guid, UdpSession>();
+
+        // tell user
+        RaiseSessionUpdatedEvent();
+      }
+
       public void ForgetSessions(UdpSessionSource source) {
         var newSessions = sessions;
 
@@ -72,6 +79,10 @@ namespace UdpKit {
         RaiseSessionUpdatedEvent();
       }
 
+      public void SetWanEndPoint(UdpEndPoint endpoint) {
+        local._wanEndPoint = endpoint;
+      }
+
       void RaiseSessionUpdatedEvent() {
         try {
           UdpEvent ev = new UdpEvent();
@@ -85,6 +96,7 @@ namespace UdpKit {
           eventTime = 0;
         }
       }
+
     }
   }
 }

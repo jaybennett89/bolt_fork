@@ -4,7 +4,8 @@ open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
-[<assembly: AssemblyProduct("thundercloud")>]
+[<assembly: AssemblyTitle("zeus")>]
+[<assembly: AssemblyProduct("Zeus")>]
 [<assembly: AssemblyDescription("Master Server for the UdpKit socket library")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("Bolt Engine AB")>]
@@ -12,6 +13,6 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
 [<assembly: ComVisible(false)>]
-[<assembly: AssemblyVersion("0.1.1.0")>]
-[<assembly: AssemblyFileVersion("0.1.1.0")>]
+[<assembly: AssemblyVersion("0.1.2.0")>]
+[<assembly: AssemblyFileVersion("0.1.2.0")>]
 do()

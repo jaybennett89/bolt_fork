@@ -59,7 +59,13 @@ let startMaster (context:MasterContext) (m:Config.Master) =
 let main argv = 
   UdpKit.UdpLog.SetWriter(fun i m -> Console.WriteLine(m))
 
-  let configFile = ref "Config.xml"
+  let path = 
+    let asm = System.Reflection.Assembly.GetEntryAssembly()
+    let location = asm.Location
+    let fileInfo = new FileInfo(location)
+    Path.Combine(fileInfo.Directory.FullName, "Config.xml")
+
+  let configFile = ref path
   let logLevel = ref 4
   let showUsage = ref false
 
@@ -80,6 +86,7 @@ let main argv =
     ArgParser.Usage(specs)
 
   else
+    UdpKit.UdpLog.Info (sprintf "Reading Config File: %s" !configFile)
     let cfg = Config.Parse(System.IO.File.ReadAllText(!configFile))
     let gameIdSet = cfg.GameIds |> Set.ofArray
     let peerLookup = new PeerLookup(gameIdSet)
