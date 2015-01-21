@@ -19,6 +19,7 @@ namespace UdpKit {
     public uint NatProbeHairpinTimeout = 2000;
 
     public uint HostKeepAliveInterval = 20000;
+    public uint BroadcastInterval = 2000;
 
     /// <summary>
     /// The default network ping for new connections, default: 0.1f (seconds)
