@@ -1240,7 +1240,15 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Connect(UdpEndPoint endpoint) {
-    BoltCore.Connect(endpoint);
+    BoltCore.Connect(endpoint, null);
+  }
+
+  public static void Connect(UdpSession session) {
+    BoltCore.Connect(session, null);
+  }
+
+  public static void Connect(UdpSession session, IProtocolToken token) {
+    BoltCore.Connect(session, token);
   }
 
   /// <summary>
