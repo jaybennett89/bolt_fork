@@ -26,8 +26,9 @@ namespace UdpKit {
     public UdpEndPoint WanEndPoint { get { return _wanEndPoint; } }
     public UdpEndPoint LanEndPoint { get { return _lanEndPoint; } }
 
-    public string HostName { get { return _hostName; } }
-    public object HostObject { get { return _hostObject; } }
+    public string HostName {
+      get { return _hostName; }
+    }
 
     public bool HasWan {
       get { return WanEndPoint.IsWan; }
