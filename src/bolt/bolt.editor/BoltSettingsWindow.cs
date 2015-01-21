@@ -76,7 +76,7 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltEditorGUI.WithLabel("Instantiate Mode", () => {
-      settings.clientCanInstantiateAll = BoltEditorGUI.ToggleDropdown("Client Can Instantiate Everything", "Individual On Each Prefab", settings.clientCanInstantiateAll);
+      settings.clientCanInstantiateAll = BoltEditorGUI.ToggleDropdown("Client Can Instantiate Everything", "Individual Setting On Each Prefab", settings.clientCanInstantiateAll);
     });
 
     if ((settings._config.scopeMode == Bolt.ScopeMode.Manual) && (settings.scopeModeHideWarningInGui == false)) {
