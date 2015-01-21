@@ -290,7 +290,7 @@ public class BoltSettingsWindow : EditorWindow {
       settings.masterServerGameId = EditorGUILayout.TextField(settings.masterServerGameId);
     });
 
-    BoltEditorGUI.WithLabel("Adress:Port", () => {
+    BoltEditorGUI.WithLabel("Endpoint", () => {
       settings.masterServerEndPoint = EditorGUILayout.TextField(settings.masterServerEndPoint);
     });
 
