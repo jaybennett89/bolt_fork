@@ -125,6 +125,28 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
     |> Map.ofSeq
     |> ref
 
+  let rec find (msg:Protocol.Message) (new':Game -> Guid -> PeerMailbox) (allowCreate:bool) =
+    match !lookup |> Map.tryFind msg.GameId with
+    | None -> 
+      
+      if allowedGameIds.Count = 0 && allowCreate then
+        UdpLog.Warn (sprintf "Created Game %A" msg.GameId)
+        lookup := !lookup  |> Map.add msg.GameId (createGame msg.GameId)
+        find msg new' false
+
+      else
+        UdpLog.Info (sprintf "Invalid Game Id %A" msg.GameId)
+        None
+
+    | Some game ->
+      let success, peer = game.Peers.TryGetValue(msg.PeerId)
+
+      if success then 
+        Some peer
+
+      else
+        game.Peers.GetOrAdd(msg.PeerId, new' game) |> Some
+
   member x.Remove (game:Game) (peerId:Guid) =
     match !lookup |> Map.tryFind game.GameId with
     | None -> ()
@@ -140,20 +162,4 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
           UdpLog.Info (sprintf "Removed Host %A" peerId)
 
   member x.Find (msg:Protocol.Message) (new':Game -> Guid -> PeerMailbox) = 
-    if allowedGameIds.Count = 0 then
-      UdpLog.Warn (sprintf "Created Game %A" msg.GameId)
-      lookup := !lookup  |> Map.add msg.GameId (createGame msg.GameId)
-
-    match !lookup |> Map.tryFind msg.GameId with
-    | None -> 
-      UdpLog.Info (sprintf "Invalid Game Id %A" msg.GameId)
-      None
-
-    | Some game ->
-      let success, peer = game.Peers.TryGetValue(msg.PeerId)
-
-      if success then 
-        Some peer
-
-      else
-        game.Peers.GetOrAdd(msg.PeerId, new' game) |> Some
+    find msg new' true

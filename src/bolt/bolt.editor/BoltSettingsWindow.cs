@@ -297,6 +297,10 @@ public class BoltSettingsWindow : EditorWindow {
     BoltEditorGUI.WithLabel("Connect", () => {
       settings.masterServerAutoConnect = BoltEditorGUI.ToggleDropdown("Automatic", "Manual", settings.masterServerAutoConnect);
     });
+
+    BoltEditorGUI.WithLabel("Session List", () => {
+      settings.masterServerAutoGetList = BoltEditorGUI.ToggleDropdown("Automatic", "Manual", settings.masterServerAutoGetList);
+    });
   }
 
   Vector2 scrollPos = Vector2.zero;

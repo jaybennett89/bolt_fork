@@ -488,6 +488,10 @@ internal static class BoltCore {
         // MASTER SERVER
 
         case UdpEventType.MasterServerConnected:
+          if (BoltRuntimeSettings.instance.masterServerAutoGetList) {
+            BoltNetwork.MasterServerRequestSessionList();
+          }
+
           BoltInternal.GlobalEventListenerBase.MasterServerConnectedInvoke(ev.EndPoint);
           break;
 
