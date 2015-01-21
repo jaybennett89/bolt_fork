@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 #if UDPKIT_COMMON
 [assembly: InternalsVisibleTo("udpkit")]
 [assembly: InternalsVisibleTo("udpkit.master")]
-[assembly: InternalsVisibleTo("thundercloud")]
+[assembly: InternalsVisibleTo("zeus")]
 #endif
 
 [assembly: AssemblyDescription(".Net/Mono/Unity networking library for games")]

@@ -4,7 +4,8 @@ open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
-[<assembly: AssemblyProduct("thundercloud")>]
+[<assembly: AssemblyTitle("zeus")>]
+[<assembly: AssemblyProduct("Zeus")>]
 [<assembly: AssemblyDescription("Master Server for the UdpKit socket library")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("Bolt Engine AB")>]

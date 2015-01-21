@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ThunderCloud>
+<Zeus>
   <Timeouts Host="120000" Client="60000" />
   <GameId>2098810B-9537-448A-961D-8F803D988EF2</GameId>
   <GameId>15E11B91-B5AB-4419-A611-6292BE917333</GameId>
@@ -7,4 +7,4 @@
   <Master Ip="79.99.6.136">
     <NatProbe Ip0="109.74.1.131" Ip1="31.192.227.11" Ip2="46.21.108.50" />
   </Master>
-</ThunderCloud>
+</Zeus>
