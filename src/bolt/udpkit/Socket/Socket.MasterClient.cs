@@ -220,6 +220,7 @@ namespace UdpKit {
           Client.SetHandler<Protocol.PunchOnce>(OnPunchOnce);
           Client.SetHandler<Protocol.Punch>(OnPunch);
           Client.SetHandler<Protocol.DirectConnection>(OnDirectConnection);
+          Client.SetHandler<Protocol.Error>(OnError);
 
           // setup
           keepalive = socket.GetCurrentTime();
@@ -228,6 +229,7 @@ namespace UdpKit {
           Send<Protocol.PeerConnect>(endpoint);
         }
       }
+
 
       public void RegisterHost() {
         if (IsConnected && socket.sessionManager.IsHostWithName) {
@@ -398,6 +400,10 @@ namespace UdpKit {
           ev.EndPoint = obj.Sender;
           socket.OnEventConnect(ev);
         }
+      }
+
+      void OnError(Protocol.Error obj) {
+        UdpLog.Error("Received Error From Zeus: {0}", obj.Text);
       }
 
       void UpdatePing(Protocol.Query query) {
