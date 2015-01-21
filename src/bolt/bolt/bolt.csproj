@@ -195,6 +195,7 @@
     <Compile Include="collections\BoltRingBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="NetworkId.cs" />
+    <Compile Include="Zeus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="event\EventDispatcher.Queue.cs" />
