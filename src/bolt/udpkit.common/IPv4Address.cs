@@ -28,6 +28,7 @@ namespace UdpKit {
 
     public static readonly UdpIPv4Address Any = new UdpIPv4Address();
     public static readonly UdpIPv4Address Localhost = new UdpIPv4Address(127, 0, 0, 1);
+    public static readonly UdpIPv4Address Broadcast = new UdpIPv4Address(255, 255, 255, 255);
 
     [FieldOffset(0)]
     public readonly uint Packed;

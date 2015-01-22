@@ -50,8 +50,15 @@ module Master =
               context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
               return! loop peer
               
-            | PeerMessage.PerformDirectConnection(remoteId, remoteEndPoint, selfEndPoint) ->
-              let msg = context.Protocol.CreateMessage<Protocol.DirectConnection>()
+            | PeerMessage.PerformDirectConnectionWan(remoteId, remoteEndPoint, selfEndPoint) ->
+              let msg = context.Protocol.CreateMessage<Protocol.DirectConnectionWan>()
+              msg.RemotePeerId <- remoteId
+              msg.RemoteEndPoint <- remoteEndPoint
+              context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+              return! loop peer
+              
+            | PeerMessage.PerformDirectConnectionLan(remoteId, remoteEndPoint, selfEndPoint) ->
+              let msg = context.Protocol.CreateMessage<Protocol.DirectConnectionLan>()
               msg.RemotePeerId <- remoteId
               msg.RemoteEndPoint <- remoteEndPoint
               context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)

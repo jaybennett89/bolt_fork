@@ -83,6 +83,10 @@ namespace UdpKit {
         local._wanEndPoint = endpoint;
       }
 
+      public void SetLanEndPoint(UdpEndPoint endpoint) {
+        local._lanEndPoint = endpoint;
+      }
+
       void RaiseSessionUpdatedEvent() {
         try {
           UdpEvent ev = new UdpEvent();

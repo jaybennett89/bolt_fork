@@ -22,11 +22,11 @@ public class NativePlatform : UdpKit.UdpPlatform {
   }
 
   public override UdpIPv4Address[] ResolveHostAddresses(string host) {
-    throw new System.NotSupportedException("ResolveHostAddress is not supported in iOS and Android");
+    return new UdpIPv4Address[0];
   }
 
   public override System.Collections.Generic.List<UdpKit.UdpPlatformInterface> GetNetworkInterfaces() {
-    throw new System.NotImplementedException();
+    return new System.Collections.Generic.List<UdpKit.UdpPlatformInterface>();
   }
 
   public override uint GetPrecisionTime() {

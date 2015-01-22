@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace UdpKit {
   internal static class UdpUtils {
+    public static string Join<T>(this IEnumerable<T> items, string seperator) {
+      return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
+    }
+
     public static bool HasValue(this string value) {
       if (value == null) {
         return false;

@@ -106,6 +106,7 @@ namespace UdpKit.Protocol {
       Serialize(ref features.AllowsUnsolicitedTraffic);
       Serialize(ref features.SupportsHairpinTranslation);
       Serialize(ref features.SupportsEndPointPreservation);
+      Serialize(ref features.LanEndPoint);
     }
 
     protected void Serialize(ref byte value) {

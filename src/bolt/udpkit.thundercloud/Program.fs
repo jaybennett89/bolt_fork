@@ -106,6 +106,7 @@ let main argv =
 
         Socket = Unchecked.defaultof<AsyncUdpSocket>
         Protocol = new UdpKit.Protocol.Context(System.Guid.NewGuid())
+        LanNetmask = UdpKit.UdpIPv4Address.Parse(cfg.LanNetmask.Netmask)
       }
 
     let allMasters = 

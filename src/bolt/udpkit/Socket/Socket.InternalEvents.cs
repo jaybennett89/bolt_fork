@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -101,10 +102,60 @@ namespace UdpKit {
 
         // tell user
         Raise(UdpEvent.PUBLIC_START_DONE, platformSocket.EndPoint);
+
+        // try to find the lan interface ip address
+        FindLanInterfaceIP();
       }
       else {
         Raise(UdpEvent.PUBLIC_START_FAILED);
       }
+    }
+
+    void FindLanInterfaceIP() {
+      IEnumerable<UdpPlatformInterface> ifaces;
+
+      // ask the platform for all network interfaces
+      ifaces = platform.GetNetworkInterfaces();
+
+      foreach (var f in ifaces) {
+        UdpLog.Info("{0} {1}", f.UnicastAddresses.Join(", "), f.GatewayAddresses.Join(","));
+      }
+
+      // only interfaces which has a unitcast address
+      ifaces = ifaces.Where(x => x.UnicastAddresses.Length > 0);
+
+      // only interfaces that has gateways
+      ifaces = ifaces.Where(x => x.GatewayAddresses.Length > 0);
+
+      // only interfaces whith gateways addresses that are not 0.0.0.0, 127.0.0.1, 255.255.255.255 or any of our own unitcast addresses
+      ifaces = ifaces.Where(x => x.GatewayAddresses.Count(y => y != UdpIPv4Address.Localhost && y != UdpIPv4Address.Any && y != UdpIPv4Address.Broadcast && !x.UnicastAddresses.Contains(y)) > 0);
+
+      if (ifaces.Count() > 0) {
+        foreach (var f in ifaces) {
+          try {
+            UdpIPv4Address ip = f.UnicastAddresses.First(x => x.IsPrivate);
+            UdpEndPoint ep = new UdpEndPoint(ip, platformSocket.EndPoint.Port);
+
+            // Set this endpoint
+            LANEndPoint = ep;
+
+            // tell session manager
+            sessionManager.SetLanEndPoint(LANEndPoint);
+
+            // tell user
+            UdpLog.Info("LAN endpoint resolved as {0}", LANEndPoint);
+
+            // we're done
+            return;
+          }
+          catch {
+
+          }
+        }
+      }
+
+      sessionManager.SetLanEndPoint(UdpEndPoint.Any);
+      UdpLog.Info("Could not resolve a possible LAN address by inspecting local network interfaces");
     }
 
     void OnEventConnect(UdpEvent ev) {

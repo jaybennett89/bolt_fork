@@ -125,12 +125,14 @@ namespace UdpKit {
               if (natProbeState.Hairpin != null) {
                 natProbeState.Hairpin.Socket.Close();
                 natProbeState.Hairpin = null;
-                natProbeState = null;
               }
             }
             catch (Exception exn) {
               UdpLog.Error(exn.ToString());
             }
+
+            // whops
+            natProbeState = null;
 
             // connected!
             state = State.Connected;
@@ -180,6 +182,8 @@ namespace UdpKit {
       public void Disconnect() {
         try {
           if (IsConnected) {
+            ClearPunchRequest();
+
             // tell master server we are leaving
             Send<Protocol.PeerDisconnect>(endpoint);
 
@@ -219,8 +223,10 @@ namespace UdpKit {
           Client.SetHandler<Protocol.HostInfo>(OnHostInfo);
           Client.SetHandler<Protocol.PunchOnce>(OnPunchOnce);
           Client.SetHandler<Protocol.Punch>(OnPunch);
-          Client.SetHandler<Protocol.DirectConnection>(OnDirectConnection);
           Client.SetHandler<Protocol.Error>(OnError);
+
+          Client.SetHandler<Protocol.DirectConnectionWan>(OnDirectConnectionWan);
+          Client.SetHandler<Protocol.DirectConnectionLan>(OnDirectConnectionLan);
 
           // setup
           keepalive = socket.GetCurrentTime();
@@ -231,6 +237,7 @@ namespace UdpKit {
       }
 
 
+
       public void RegisterHost() {
         if (IsConnected && socket.sessionManager.IsHostWithName) {
           Send<Protocol.HostRegister>(endpoint, m => m.Host = socket.sessionManager.GetLocalSession());
@@ -238,6 +245,8 @@ namespace UdpKit {
       }
 
       public void ConnectToSession(UdpSession session) {
+        ClearPunchRequest();
+
         natPunchRequest = new NatPunchRequest {
           Count = 0,
           Time = 0,
@@ -258,6 +267,8 @@ namespace UdpKit {
         UpdatePing(connect);
 
         natFeatures = new NatFeatures();
+        natFeatures.LanEndPoint = socket.LANEndPoint;
+
         natProbeState = new NatProbeState();
         natProbeState.Probe0 = connect.Result.Probe0;
         natProbeState.Probe1 = connect.Result.Probe1;
@@ -287,6 +298,9 @@ namespace UdpKit {
               // we support end point preservation
               natFeatures.SupportsEndPointPreservation = NatFeatureStates.Yes;
               natFeatures.WanEndPoint = natProbeState.Probe0WanResponse;
+
+              // update wan endpoint for us
+              socket.WANEndPoint = natFeatures.WanEndPoint;
 
               // begin test for hairpin translation
               natProbeState.Hairpin = new Protocol.ProtocolClient(socket.platform.CreateSocket(UdpEndPoint.Any), socket.GameId, socket.PeerId);
@@ -382,7 +396,18 @@ namespace UdpKit {
         natPunchTargets.Add(new NatPunchTarget { Time = time, Count = 0, EndPoint = once.RemoteEndPoint });
       }
 
-      void OnDirectConnection(Protocol.DirectConnection direct) {
+      void OnDirectConnectionLan(Protocol.DirectConnectionLan direct) {
+        ClearPunchRequest();
+
+        UdpEvent ev = new UdpEvent();
+        ev.Type = UdpEvent.INTERNAL_CONNECT;
+        ev.EndPoint = direct.RemoteEndPoint;
+        socket.OnEventConnect(ev);
+      }
+
+      void OnDirectConnectionWan(Protocol.DirectConnectionWan direct) {
+        ClearPunchRequest();
+
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.INTERNAL_CONNECT;
         ev.EndPoint = direct.RemoteEndPoint;
@@ -392,14 +417,18 @@ namespace UdpKit {
       void OnPunch(Protocol.Punch obj) {
         // if we receive a punch message on the client, then we know that we are ready to connect
         if ((socket.Mode == UdpSocketMode.Client) && (natPunchTargets.Any(x => x.EndPoint == obj.Sender))) {
-          natPunchRequest = null;
-          natPunchTargets.Clear();
+          ClearPunchRequest();
 
           UdpEvent ev = new UdpEvent();
           ev.Type = UdpEvent.INTERNAL_CONNECT;
           ev.EndPoint = obj.Sender;
           socket.OnEventConnect(ev);
         }
+      }
+
+      void ClearPunchRequest() {
+        natPunchRequest = null;
+        natPunchTargets.Clear();
       }
 
       void OnError(Protocol.Error obj) {
