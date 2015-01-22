@@ -101,32 +101,44 @@ public class DotNetPlatform : UdpPlatform {
 
     IPInterfaceProperties p = n.GetIPProperties();
 
-    foreach (var gw in p.GatewayAddresses) {
-      if (gw.Address.AddressFamily == AddressFamily.InterNetwork) {
-        gateway.Add(ConvertAddress(gw.Address));
+    try {
+      foreach (var gw in p.GatewayAddresses) {
+        if (gw.Address.AddressFamily == AddressFamily.InterNetwork) {
+          gateway.Add(ConvertAddress(gw.Address));
+        }
       }
     }
+    catch { }
 
-    foreach (var addr in p.DnsAddresses) {
-      if (addr.AddressFamily == AddressFamily.InterNetwork) {
-        gateway.Add(ConvertAddress(addr));
+    try {
+      foreach (var addr in p.DnsAddresses) {
+        if (addr.AddressFamily == AddressFamily.InterNetwork) {
+          gateway.Add(ConvertAddress(addr));
+        }
       }
     }
+    catch { }
 
-    foreach (var uni in p.UnicastAddresses) {
-      if (uni.Address.AddressFamily == AddressFamily.InterNetwork) {
-        UdpIPv4Address ipv4 = ConvertAddress(uni.Address);
+    try {
+      foreach (var uni in p.UnicastAddresses) {
+        if (uni.Address.AddressFamily == AddressFamily.InterNetwork) {
+          UdpIPv4Address ipv4 = ConvertAddress(uni.Address);
 
-        unicast.Add(ipv4);
-        gateway.Add(new UdpIPv4Address(ipv4.Byte3, ipv4.Byte2, ipv4.Byte1, 1));
+          unicast.Add(ipv4);
+          gateway.Add(new UdpIPv4Address(ipv4.Byte3, ipv4.Byte2, ipv4.Byte1, 1));
+        }
       }
     }
+    catch { }
 
-    foreach (var multi in p.MulticastAddresses) {
-      if (multi.Address.AddressFamily == AddressFamily.InterNetwork) {
-        multicast.Add(ConvertAddress(multi.Address));
+    try {
+      foreach (var multi in p.MulticastAddresses) {
+        if (multi.Address.AddressFamily == AddressFamily.InterNetwork) {
+          multicast.Add(ConvertAddress(multi.Address));
+        }
       }
     }
+    catch { }
 
     if (unicast.Count == 0 || gateway.Count == 0) {
       return null;
