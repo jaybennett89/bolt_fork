@@ -52,20 +52,21 @@ Target "Build" (fun _ ->
 )
 
 Target "Install" (fun _ ->
-  mkdir (projectDir + "/Assets/bolt/assemblies")
-  mkdir (projectDir + "/Assets/bolt/assemblies/upnp")
-  mkdir (projectDir + "/Assets/bolt/assemblies/editor")
-  mkdir (projectDir + "/Assets/bolt/assemblies/udpkit")
+  if projectDir <> "" then
+    mkdir (projectDir + "/Assets/bolt/assemblies")
+    mkdir (projectDir + "/Assets/bolt/assemblies/upnp")
+    mkdir (projectDir + "/Assets/bolt/assemblies/editor")
+    mkdir (projectDir + "/Assets/bolt/assemblies/udpkit")
 
-  CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
 )
 
 Target "InstallDebug" (fun _ ->
