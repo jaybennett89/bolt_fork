@@ -12,7 +12,6 @@ type Ports = {
   Probe0 : int
   Probe1 : int
   Probe2 : int
-  Puncher : int
 } with
   member x.Next =
     {x with 
@@ -20,7 +19,6 @@ type Ports = {
       Probe0 = x.Probe0 + 1
       Probe1 = x.Probe1 + 1
       Probe2 = x.Probe2 + 1
-      Puncher = x.Puncher + 1
     }
 
 type MasterObjects = {
@@ -53,7 +51,7 @@ let startMaster (context:MasterContext) (m:Config.Master) =
       // start master
       {Master=master; Probe=probe} :: (startAll ports.Next (c-1))
 
-  startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000; Puncher=28000} count
+  startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000} count
 
 [<EntryPoint>]
 let main argv = 
