@@ -72,7 +72,7 @@ module Master =
           return ()
         }
 
-      UdpLog.Info (sprintf "Peer %A Connected" peerId)
+      UdpLog.Info (sprintf "Peer %A Connected (GameId: %A)" peerId game.GameId)
       loop {Context=context; Game=game; PeerId=peerId; NatFeatures=None; IsHost=false; Mailbox=inbox}
     )
 
