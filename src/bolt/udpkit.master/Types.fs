@@ -169,6 +169,8 @@ type Peer = {
 
     x.AckMessage getlist recvArgs
 
+    UdpLog.Info (sprintf "Found %i Hosts" x.Game.Hosts.Count)
+
     for host in x.Game.Hosts.Values do
       let msg = x.Context.Protocol.CreateMessage<Protocol.HostInfo>()
       msg.Host <- host.Session
