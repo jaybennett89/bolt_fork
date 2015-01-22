@@ -24,7 +24,6 @@ let rec findFiles pattern dirs =
 let ndkPath = environVar "ndkbuild"
 let buildMode = getBuildParamOrDefault "build" "Debug"
 
-
 let rootDir = currentDirectory
 let projectDir = getBuildParamOrDefault "project" ""
 let unityDir = getBuildParamOrDefault "unity" @"C:\Program Files (x86)\Unity"
@@ -71,7 +70,10 @@ Target "Install" (fun _ ->
 
 Target "InstallDebug" (fun _ ->
   if not isMacOS then
-    let pdb2mdbPath = unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
+    let pdb2mdbPath = 
+      if buildMode = "DebugU5" 
+        then unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.5\pdb2mdb.exe";
+        else unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
     (directoryInfo "./build")
     |> filesInDirMatching "*.pdb"
