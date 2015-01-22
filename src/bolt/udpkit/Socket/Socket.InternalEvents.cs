@@ -137,10 +137,13 @@ namespace UdpKit {
             UdpEndPoint ep = new UdpEndPoint(ip, platformSocket.EndPoint.Port);
 
             // Set this endpoint
-            sessionManager.SetLanEndPoint(ep);
+            LANEndPoint = ep;
+
+            // tell session manager
+            sessionManager.SetLanEndPoint(LANEndPoint);
 
             // tell user
-            UdpLog.Info("LAN endpoint resolved as {0}", ep);
+            UdpLog.Info("LAN endpoint resolved as {0}", LANEndPoint);
 
             // we're done
             return;

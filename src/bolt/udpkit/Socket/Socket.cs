@@ -21,6 +21,10 @@ namespace UdpKit {
     readonly internal UdpPipeConfig PacketPipeConfig;
     readonly internal UdpPipeConfig StreamPipeConfig;
 
+    internal UdpEndPoint LANEndPoint;
+    internal UdpEndPoint WANEndPoint;
+    internal UdpEndPoint SocketEndPoint;
+
     readonly internal Guid PeerId;
     readonly internal Guid GameId;
 
@@ -30,9 +34,9 @@ namespace UdpKit {
     volatile UdpSocketMode mode;
     volatile UdpSocketState state;
 
+
     readonly byte[] sendBuffer;
     readonly byte[] recvBuffer;
-
 
     readonly Thread thread;
     readonly UdpPlatform platform;
