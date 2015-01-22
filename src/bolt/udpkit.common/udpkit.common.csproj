@@ -49,7 +49,8 @@
     <Compile Include="Protocol\Message.cs" />
     <Compile Include="Protocol\Messages\BroadcastSearch.cs" />
     <Compile Include="Protocol\Messages\BroadcastSession.cs" />
-    <Compile Include="Protocol\Messages\DirectConnection.cs" />
+    <Compile Include="Protocol\Messages\DirectConnectionLan.cs" />
+    <Compile Include="Protocol\Messages\DirectConnectionWan.cs" />
     <Compile Include="Protocol\Messages\Error.cs" />
     <Compile Include="Protocol\Messages\GetHostList.cs" />
     <Compile Include="Protocol\Messages\HostInfo.cs" />

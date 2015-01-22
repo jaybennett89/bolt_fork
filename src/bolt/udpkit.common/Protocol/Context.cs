@@ -49,7 +49,8 @@ namespace UdpKit.Protocol {
       RegisterMessageType<Protocol.PunchOnce>();
       RegisterMessageType<Protocol.PunchRequest>();
 
-      RegisterMessageType<Protocol.DirectConnection>();
+      RegisterMessageType<Protocol.DirectConnectionLan>();
+      RegisterMessageType<Protocol.DirectConnectionWan>();
     }
 
     public T CreateMessage<T>() where T : Protocol.Message {

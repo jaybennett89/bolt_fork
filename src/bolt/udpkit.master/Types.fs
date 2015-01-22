@@ -11,7 +11,8 @@ type PeerMessage
   = Shutdown
   | MessageReceived of Protocol.Message * SocketAsyncEventArgs
   | BeginNatPunch of Guid * MailboxProcessor<PeerMessage> * NatFeatures
-  | PerformDirectConnection of Guid * UdpEndPoint * UdpEndPoint
+  | PerformDirectConnectionWan of Guid * UdpEndPoint * UdpEndPoint
+  | PerformDirectConnectionLan of Guid * UdpEndPoint * UdpEndPoint
   | PerformPunchOnce of Guid * UdpEndPoint * UdpEndPoint
   | Error of string
 
@@ -51,6 +52,7 @@ type MasterContext = {
 
   Socket : AsyncUdpSocket
   Protocol : Protocol.Context
+  LanNetmask : UdpIPv4Address
 }
 
 type Peer = {
@@ -79,28 +81,49 @@ type Peer = {
       otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not have a valid NAT state" x.PeerId))
 
     | Some nat -> 
-      match nat.WanEndPoint.IsWan, nat.AllowsUnsolicitedTraffic, nat.SupportsEndPointPreservation, otherNat.SupportsEndPointPreservation with
-      | false, _, _, _ ->
-        otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not have a valid WAN end-point" x.PeerId))
+      let bothHaveWan = nat.WanEndPoint.IsWan && otherNat.WanEndPoint.IsWan
+      let bothHaveLan = nat.LanEndPoint.IsLan && otherNat.LanEndPoint.IsLan
+      let bothHaveSameWan = UdpIPv4Address.op_Equality(nat.WanEndPoint.Address, otherNat.WanEndPoint.Address)
+      let bothHaveSameLanSubnet = 
+        UdpIPv4Address.op_Equality(
+          UdpIPv4Address.op_BitwiseAnd(nat.LanEndPoint.Address, x.Context.LanNetmask),
+          UdpIPv4Address.op_BitwiseAnd(otherNat.LanEndPoint.Address, x.Context.LanNetmask)
+        )
 
-      | true, NatFeatureStates.Yes, _, _ ->
-        otherInbox.Post(PerformDirectConnection(x.PeerId, nat.WanEndPoint, otherNat.WanEndPoint))
+      if bothHaveWan && bothHaveLan && bothHaveSameWan && bothHaveSameLanSubnet then
+        let bothHaveLanSameAddress = UdpIPv4Address.op_Equality(nat.LanEndPoint.Address, otherNat.LanEndPoint.Address)
 
-      | true, _, NatFeatureStates.Yes, NatFeatureStates.Yes ->
-        // tell ourselves to do this
-        x.Mailbox.Post(PerformPunchOnce(otherId, otherNat.WanEndPoint, nat.WanEndPoint))
+        // connecting to your own computer
+        if bothHaveLanSameAddress then
+          otherInbox.Post(PerformDirectConnectionLan(x.PeerId, new UdpEndPoint(UdpIPv4Address.Localhost, nat.LanEndPoint.Port), otherNat.WanEndPoint))
 
-        // tell other end to do this
-        otherInbox.Post(PerformPunchOnce(x.PeerId, nat.WanEndPoint, otherNat.WanEndPoint))
+        // connecting to another computer on your lan
+        else
+          otherInbox.Post(PerformDirectConnectionLan(x.PeerId, nat.LanEndPoint, otherNat.WanEndPoint))
 
-      | _, _, NatFeatureStates.No, NatFeatureStates.Yes ->
-        otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not support NAT-punchthrough" x.PeerId))
+      else
+        match nat.WanEndPoint.IsWan, nat.AllowsUnsolicitedTraffic, nat.SupportsEndPointPreservation, otherNat.SupportsEndPointPreservation with
+        | false, _, _, _ ->
+          otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not have a valid WAN end-point" x.PeerId))
 
-      | _, _, NatFeatureStates.Yes, NatFeatureStates.No ->
-        otherInbox.Post(Error(sprintf "Can't connect to host %A, your connection does not support NAT-punchthrough and the host does not allow direct connections" x.PeerId))
+        | true, NatFeatureStates.Yes, _, _ ->
+          otherInbox.Post(PerformDirectConnectionWan(x.PeerId, nat.WanEndPoint, otherNat.WanEndPoint))
 
-      | _ ->
-        otherInbox.Post(Error(sprintf "Can't connect to host %A," x.PeerId))
+        | true, _, NatFeatureStates.Yes, NatFeatureStates.Yes ->
+          // tell ourselves to do this
+          x.Mailbox.Post(PerformPunchOnce(otherId, otherNat.WanEndPoint, nat.WanEndPoint))
+
+          // tell other end to do this
+          otherInbox.Post(PerformPunchOnce(x.PeerId, nat.WanEndPoint, otherNat.WanEndPoint))
+
+        | _, _, NatFeatureStates.No, NatFeatureStates.Yes ->
+          otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not support NAT-punchthrough" x.PeerId))
+
+        | _, _, NatFeatureStates.Yes, NatFeatureStates.No ->
+          otherInbox.Post(Error(sprintf "Can't connect to host %A, your connection does not support NAT-punchthrough and the host does not allow direct connections" x.PeerId))
+
+        | _ ->
+          otherInbox.Post(Error(sprintf "Can't connect to host %A," x.PeerId))
     x
         
 

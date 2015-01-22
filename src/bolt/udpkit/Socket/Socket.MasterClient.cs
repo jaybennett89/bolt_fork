@@ -221,8 +221,10 @@ namespace UdpKit {
           Client.SetHandler<Protocol.HostInfo>(OnHostInfo);
           Client.SetHandler<Protocol.PunchOnce>(OnPunchOnce);
           Client.SetHandler<Protocol.Punch>(OnPunch);
-          Client.SetHandler<Protocol.DirectConnection>(OnDirectConnection);
           Client.SetHandler<Protocol.Error>(OnError);
+
+          Client.SetHandler<Protocol.DirectConnectionWan>(OnDirectConnectionWan);
+          Client.SetHandler<Protocol.DirectConnectionLan>(OnDirectConnectionLan);
 
           // setup
           keepalive = socket.GetCurrentTime();
@@ -231,6 +233,7 @@ namespace UdpKit {
           Send<Protocol.PeerConnect>(endpoint);
         }
       }
+
 
 
       public void RegisterHost() {
@@ -384,7 +387,14 @@ namespace UdpKit {
         natPunchTargets.Add(new NatPunchTarget { Time = time, Count = 0, EndPoint = once.RemoteEndPoint });
       }
 
-      void OnDirectConnection(Protocol.DirectConnection direct) {
+      void OnDirectConnectionLan(Protocol.DirectConnectionLan direct) {
+        UdpEvent ev = new UdpEvent();
+        ev.Type = UdpEvent.INTERNAL_CONNECT;
+        ev.EndPoint = direct.RemoteEndPoint;
+        socket.OnEventConnect(ev);
+      }
+
+      void OnDirectConnectionWan(Protocol.DirectConnectionWan direct) {
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.INTERNAL_CONNECT;
         ev.EndPoint = direct.RemoteEndPoint;

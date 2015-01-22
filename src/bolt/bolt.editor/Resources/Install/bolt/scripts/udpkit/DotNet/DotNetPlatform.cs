@@ -159,7 +159,6 @@ public class DotNetPlatform : UdpPlatform {
     return new DotNetInterface(n, gateway.ToArray(), unicast.ToArray(), multicast.ToArray());
   }
 
-
 #pragma warning disable 618
   public static UdpEndPoint ConvertEndPoint(EndPoint endpoint) {
     return ConvertEndPoint((IPEndPoint)endpoint);
