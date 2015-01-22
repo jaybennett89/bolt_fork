@@ -90,14 +90,31 @@ class BoltUserAssemblyCompiler {
         Environment.OSVersion.Platform == PlatformID.WinCE;
     }
   }
+  static bool isUnity5 {
+    get {
+      return Application.unityVersion.Trim()[0] == '5';
+    }
+  }
+
+  static string monoCompiler {
+    get {
+      if (isUnity5) {
+        return "4.5/mcs.exe";
+      }
+      else {
+        return "2.0/gmcs.exe";
+      }
+    }
+  }
 
   static string csharpCompilerPath {
     get {
+
       if (isOSX) {
-        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "Frameworks/MonoBleedingEdge/lib/mono/" + monoCompiler);
       }
       else {
-        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/lib/mono/2.0/gmcs.exe");
+        return BoltEditorUtilsInternal.MakePath(EditorApplication.applicationContentsPath, "MonoBleedingEdge/lib/mono/" + monoCompiler);
       }
     }
   }
@@ -176,6 +193,11 @@ class BoltUserAssemblyCompiler {
     if (BoltCore.isDebugMode) {
       args += "-define:DEBUG ";
     }
+
+    if (isUnity5) {
+      args += "-sdk:2 ";
+    }
+
 
     Process p = new Process();
     p.StartInfo.FileName = monoPath;

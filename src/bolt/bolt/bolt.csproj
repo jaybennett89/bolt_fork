@@ -36,14 +36,30 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DocumentationFile>bin\Release\bolt.XML</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU5|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugU5\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BOLT_DLL; UNITY5</DefineConstants>
+    <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine" Condition=" '$(OS)' != 'Unix' ">
+    <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' != 'DebugU5') ">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' == 'DebugU5') ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Unity 5.0.0b18\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
