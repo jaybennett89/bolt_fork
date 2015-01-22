@@ -245,10 +245,10 @@ namespace Bolt {
           return (nt.Simulate.localPosition - position) * BoltCore._config.framesPerSecond;
 
         case ExtrapolationVelocityModes.CopyFromRigidbody:
-          return nt.Simulate.rigidbody.velocity;
+          return nt.Simulate.GetComponent<UE.Rigidbody>().velocity;
 
         case ExtrapolationVelocityModes.CopyFromRigidbody2D:
-          return nt.Simulate.rigidbody2D.velocity;
+          return nt.Simulate.GetComponent<UE.Rigidbody2D>().velocity;
 
         case ExtrapolationVelocityModes.CopyFromCharacterController:
           return nt.Simulate.GetComponent<UE.CharacterController>().velocity;
