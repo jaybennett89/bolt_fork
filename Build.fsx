@@ -52,48 +52,47 @@ Target "Build" (fun _ ->
 )
 
 Target "Install" (fun _ ->
-  mkdir (projectDir + "/Assets/bolt/assemblies")
-  mkdir (projectDir + "/Assets/bolt/assemblies/upnp")
-  mkdir (projectDir + "/Assets/bolt/assemblies/editor")
-  mkdir (projectDir + "/Assets/bolt/assemblies/udpkit")
+  if projectDir <> "" then
+    mkdir (projectDir + "/Assets/bolt/assemblies")
+    mkdir (projectDir + "/Assets/bolt/assemblies/upnp")
+    mkdir (projectDir + "/Assets/bolt/assemblies/editor")
+    mkdir (projectDir + "/Assets/bolt/assemblies/udpkit")
 
-  CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/protobuf-net.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") ("./src/assemblies/protobuf-net.LICENSE.txt")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/Mono.Nat.bytes") ("./src/assemblies/Mono.Nat.dll")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/upnp/") ("./src/assemblies/Mono.Nat.LICENSE.txt")
 )
 
 Target "InstallDebug" (fun _ ->
-  if not isMacOS then
-    let pdb2mdbPath = 
-      if buildMode = "DebugU5" 
-        then unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.5\pdb2mdb.exe";
-        else unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
+  if buildMode = "Debug" then
+    if not isMacOS then
+      let pdb2mdbPath = unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
-    (directoryInfo "./build")
-    |> filesInDirMatching "*.pdb"
-    |> Seq.iter (fun file ->
-      {
-        ExecParams.Program = pdb2mdbPath
-        ExecParams.CommandLine = @" """ + file.Name.Replace(".pdb", ".dll") + @""""
-        ExecParams.Args = List.empty
-        ExecParams.WorkingDirectory = (directoryInfo "./build").FullName
-      }
-      |> shellExec
-      |> ignore
-    )
+      (directoryInfo "./build")
+      |> filesInDirMatching "*.pdb"
+      |> Seq.iter (fun file ->
+        {
+          ExecParams.Program = pdb2mdbPath
+          ExecParams.CommandLine = @" """ + file.Name.Replace(".pdb", ".dll") + @""""
+          ExecParams.Args = List.empty
+          ExecParams.WorkingDirectory = (directoryInfo "./build").FullName
+        }
+        |> shellExec
+        |> ignore
+      )
     
-  // copy files into unity folder
-  CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll.mdb")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll.mdb")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll.mdb")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
-  CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll.mdb")
+    // copy files into unity folder
+    CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll.mdb")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll.mdb")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll.mdb")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.dll.mdb")
+    CopyFile (projectDir + "/Assets/bolt/assemblies/udpkit/") (buildDir + "/udpkit.common.dll.mdb")
 )
 
 ("Clean")
