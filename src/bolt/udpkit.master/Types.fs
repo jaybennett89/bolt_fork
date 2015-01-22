@@ -90,13 +90,9 @@ type Peer = {
           UdpIPv4Address.op_BitwiseAnd(otherNat.LanEndPoint.Address, x.Context.LanNetmask)
         )
 
-      UdpLog.Info (sprintf "bothHaveWan:%b bothHaveLan:%b bothHaveSameWan:%b bothHaveSameLanSubnet:%b" bothHaveWan bothHaveLan bothHaveSameWan bothHaveSameLanSubnet)
-
       if bothHaveWan && bothHaveLan && bothHaveSameWan && bothHaveSameLanSubnet then
         let bothHaveLanSameAddress = UdpIPv4Address.op_Equality(nat.LanEndPoint.Address, otherNat.LanEndPoint.Address)
         
-        UdpLog.Info (sprintf "bothHaveLanSameAddress:%b" bothHaveLanSameAddress)
-
         // connecting to your own computer
         if bothHaveLanSameAddress then
           otherInbox.Post(PerformDirectConnectionLan(x.PeerId, new UdpEndPoint(UdpIPv4Address.Localhost, nat.LanEndPoint.Port), otherNat.WanEndPoint))
