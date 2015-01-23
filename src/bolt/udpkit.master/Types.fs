@@ -69,7 +69,7 @@ type Peer = {
     | :? Protocol.PeerDisconnect as disconnect -> x.OnPeerDisconnect disconnect args
     | :? Protocol.ProbeFeatures as features -> x.OnProbeFeatures features args
     | :? Protocol.HostRegister as register -> x.OnHostRegister register args
-    | :? Protocol.HostKeepAlive as keepalive -> x
+    | :? Protocol.HostKeepAlive as keepalive -> x.OnHostKeepAlive keepalive args
     | :? Protocol.GetHostList as getlist -> x.OnGetHostList getlist args
     | :? Protocol.PunchRequest as request -> x.OnPunchRequest request args
     | _ ->
@@ -144,19 +144,32 @@ type Peer = {
     failwith "Peer Disconnected"
 
   member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketAsyncEventArgs) =
+    UdpLog.Info (sprintf "NatProbeResult for peer %A is %A" x.PeerId features)
+
     // ack this message
     x.AckMessage features args
 
     // update this peer
     {x with NatFeatures = Some(features.NatFeatures)}
+    
+  member private x.OnHostKeepAlive (keepalive:Protocol.HostKeepAlive) (args:SocketAsyncEventArgs) =
+    if x.Game.Hosts.ContainsKey(x.PeerId) then
+      UdpLog.Info (sprintf "KeepAlive for host %A" x.PeerId)
+    else
+      UdpLog.Warn (sprintf "Received KeepAlive for host %A but could not find it in host lookup table" x.PeerId)
+
+    x
 
   member private x.OnHostRegister (register:Protocol.HostRegister) (args:SocketAsyncEventArgs) =
     // create host object
     let host = {PeerId=x.PeerId; Session=register.Host}
 
     // add to this games hosts list
-    x.Game.Hosts.AddOrUpdate(x.PeerId, host, fun _ _ -> host) |> ignore
+    let host = x.Game.Hosts.AddOrUpdate(x.PeerId, host, fun _ _ -> host)
     
+    // ad this logging
+    UdpLog.Info (sprintf "Registered peer %A as a host" x.PeerId)
+
     // ack message
     Args.Reply args (x.Context.Protocol.CreateMessage<Protocol.Ack>(register))
     
@@ -168,6 +181,8 @@ type Peer = {
     let remoteEndpoint = recvArgs.RemoteEndPoint
 
     x.AckMessage getlist recvArgs
+
+    UdpLog.Info (sprintf "Found %i Hosts" x.Game.Hosts.Count)
 
     for host in x.Game.Hosts.Values do
       let msg = x.Context.Protocol.CreateMessage<Protocol.HostInfo>()

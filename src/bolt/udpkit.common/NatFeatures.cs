@@ -15,5 +15,9 @@
     public NatFeatures Clone() {
       return (NatFeatures)MemberwiseClone();
     }
+
+    public override string ToString() {
+      return string.Format("[NatFeatures Lan={0} Wan={1} AllowsUnsolicitedTraffic={2}, HairpinTranslation={3}, EndPointPreservation={4}", LanEndPoint, WanEndPoint, AllowsUnsolicitedTraffic, SupportsHairpinTranslation, SupportsEndPointPreservation);
+    }
   }
 }

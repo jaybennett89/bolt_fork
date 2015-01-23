@@ -12,7 +12,6 @@ type Ports = {
   Probe0 : int
   Probe1 : int
   Probe2 : int
-  Puncher : int
 } with
   member x.Next =
     {x with 
@@ -20,7 +19,6 @@ type Ports = {
       Probe0 = x.Probe0 + 1
       Probe1 = x.Probe1 + 1
       Probe2 = x.Probe2 + 1
-      Puncher = x.Puncher + 1
     }
 
 type MasterObjects = {
@@ -53,7 +51,7 @@ let startMaster (context:MasterContext) (m:Config.Master) =
       // start master
       {Master=master; Probe=probe} :: (startAll ports.Next (c-1))
 
-  startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000; Puncher=28000} count
+  startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000} count
 
 [<EntryPoint>]
 let main argv = 
@@ -67,12 +65,14 @@ let main argv =
 
   let configFile = ref path
   let logLevel = ref 4
+  let dumpTimer = ref 0
   let showUsage = ref false
 
   let specs = 
     [
       "--config", ArgType.String(fun s -> configFile := s), "specifies the configuration file to use"
       "--log", ArgType.Int(fun i -> logLevel := i), "logging level, 1 = Errors only, 2 = +Warnings, 3 = +Info, 4 = +Debug"
+      "--dumpTimer", ArgType.Int(fun i -> dumpTimer := i), "host and peer console dumping, 0 <= Off (Default), > 0 = On"
     ] |> List.map (fun (sh, ty, desc) -> ArgInfo(sh, ty, desc))
 
   let compile text = 
@@ -115,5 +115,23 @@ let main argv =
       |> Seq.toList
 
     while true do 
-      System.Console.ReadKey(true) |> ignore
+      if !dumpTimer > 0 then
+        System.Threading.Thread.Sleep(!dumpTimer)
+
+        for g in peerLookup.Lookup do
+          let g = g.Value
+          UdpKit.UdpLog.Info (sprintf "Game: %A (Peers: %i, Hosts: %i)" g.GameId g.Peers.Count g.Hosts.Count) 
+
+          if g.Peers.Count > 0 then
+            UdpKit.UdpLog.Info "Peers"
+            for p in g.Peers do
+              UdpKit.UdpLog.Info (sprintf "Peer %A" p.Key)
+
+          if g.Hosts.Count > 0 then
+            UdpKit.UdpLog.Info "Hosts"
+            for p in g.Hosts do
+              UdpKit.UdpLog.Info (sprintf "Host %A" p.Key)
+
+      else
+        System.Threading.Thread.Sleep(1000)
   0

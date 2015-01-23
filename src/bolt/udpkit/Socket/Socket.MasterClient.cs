@@ -53,6 +53,10 @@ namespace UdpKit {
         get { return endpoint.IsWan && (state >= State.Connected); }
       }
 
+      public bool IsConnectedHost {
+        get { return IsConnected && socket.sessionManager.IsHostWithName; }
+      }
+
       public UdpEndPoint LocalWanEndPoint {
         get { return natFeatures == null ? UdpEndPoint.Any : natFeatures.WanEndPoint; }
       }
@@ -151,7 +155,7 @@ namespace UdpKit {
       }
 
       void UpdateRegisteredHost(uint now) {
-        if (IsConnected && (socket.Mode == UdpSocketMode.Host)) {
+        if (IsConnectedHost) {
           if (keepalive < now) {
             Send<Protocol.HostKeepAlive>(endpoint);
             keepalive = now + socket.Config.HostKeepAliveInterval;
@@ -236,10 +240,8 @@ namespace UdpKit {
         }
       }
 
-
-
       public void RegisterHost() {
-        if (IsConnected && socket.sessionManager.IsHostWithName) {
+        if (IsConnectedHost) {
           Send<Protocol.HostRegister>(endpoint, m => m.Host = socket.sessionManager.GetLocalSession());
         }
       }

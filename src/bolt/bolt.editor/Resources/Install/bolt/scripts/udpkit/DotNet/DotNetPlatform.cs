@@ -75,85 +75,104 @@ public class DotNetPlatform : UdpPlatform {
   List<UdpPlatformInterface> FindInterfaces() {
     List<UdpPlatformInterface> result = new List<UdpPlatformInterface>();
 
-    foreach (var n in NetworkInterface.GetAllNetworkInterfaces()) {
-      if (n.OperationalStatus != OperationalStatus.Up && n.OperationalStatus != OperationalStatus.Unknown) {
-        continue;
-      }
+    try {
+      if (NetworkInterface.GetIsNetworkAvailable()) {
+        foreach (var n in NetworkInterface.GetAllNetworkInterfaces()) {
+          try {
+            if (n.OperationalStatus != OperationalStatus.Up && n.OperationalStatus != OperationalStatus.Unknown) {
+              continue;
+            }
 
-      if (n.NetworkInterfaceType == NetworkInterfaceType.Loopback) {
-        continue;
-      }
+            if (n.NetworkInterfaceType == NetworkInterfaceType.Loopback) {
+              continue;
+            }
 
-      var iface = ParseInterface(n);
-      if (iface != null) {
-        result.Add(iface);
+            var iface = ParseInterface(n);
+            if (iface != null) {
+              result.Add(iface);
+            }
+          }
+          catch (System.Exception exn) {
+            UdpLog.Error(exn.Message);
+          }
+        }
       }
+    }
+    catch (System.Exception exn) {
+      UdpLog.Error(exn.Message);
     }
 
     return result;
   }
-
 
   DotNetInterface ParseInterface(NetworkInterface n) {
     HashSet<UdpIPv4Address> gateway = new HashSet<UdpIPv4Address>(UdpIPv4Address.Comparer.Instance);
     HashSet<UdpIPv4Address> unicast = new HashSet<UdpIPv4Address>(UdpIPv4Address.Comparer.Instance);
     HashSet<UdpIPv4Address> multicast = new HashSet<UdpIPv4Address>(UdpIPv4Address.Comparer.Instance);
 
-    IPInterfaceProperties p = n.GetIPProperties();
+    IPInterfaceProperties p = null;
 
     try {
-      foreach (var gw in p.GatewayAddresses) {
-        try {
-          if (gw.Address.AddressFamily == AddressFamily.InterNetwork) {
-            gateway.Add(ConvertAddress(gw.Address));
-          }
-        }
-        catch { }
-      }
+      p = n.GetIPProperties();
     }
-    catch { }
+    catch { return null; }
 
-    try {
-      foreach (var addr in p.DnsAddresses) {
-        try {
-          if (addr.AddressFamily == AddressFamily.InterNetwork) {
-            gateway.Add(ConvertAddress(addr));
+    if (p != null) {
+
+      try {
+        foreach (var gw in p.GatewayAddresses) {
+          try {
+            if (gw.Address.AddressFamily == AddressFamily.InterNetwork) {
+              gateway.Add(ConvertAddress(gw.Address));
+            }
           }
+          catch { }
         }
-        catch { }
       }
-    }
-    catch { }
+      catch { }
 
-    try {
-      foreach (var uni in p.UnicastAddresses) {
-        try {
-          if (uni.Address.AddressFamily == AddressFamily.InterNetwork) {
-            UdpIPv4Address ipv4 = ConvertAddress(uni.Address);
-
-            unicast.Add(ipv4);
-            gateway.Add(new UdpIPv4Address(ipv4.Byte3, ipv4.Byte2, ipv4.Byte1, 1));
+      try {
+        foreach (var addr in p.DnsAddresses) {
+          try {
+            if (addr.AddressFamily == AddressFamily.InterNetwork) {
+              gateway.Add(ConvertAddress(addr));
+            }
           }
+          catch { }
         }
-        catch { }
       }
-    }
-    catch { }
+      catch { }
 
-    try {
-      foreach (var multi in p.MulticastAddresses) {
-        try {
-          if (multi.Address.AddressFamily == AddressFamily.InterNetwork) {
-            multicast.Add(ConvertAddress(multi.Address));
+      try {
+        foreach (var uni in p.UnicastAddresses) {
+          try {
+            if (uni.Address.AddressFamily == AddressFamily.InterNetwork) {
+              UdpIPv4Address ipv4 = ConvertAddress(uni.Address);
+
+              unicast.Add(ipv4);
+              gateway.Add(new UdpIPv4Address(ipv4.Byte3, ipv4.Byte2, ipv4.Byte1, 1));
+            }
           }
+          catch { }
         }
-        catch { }
       }
-    }
-    catch { }
+      catch { }
 
-    if (unicast.Count == 0 || gateway.Count == 0) {
-      return null;
+      try {
+        foreach (var multi in p.MulticastAddresses) {
+          try {
+            if (multi.Address.AddressFamily == AddressFamily.InterNetwork) {
+              multicast.Add(ConvertAddress(multi.Address));
+            }
+          }
+          catch { }
+        }
+      }
+      catch { }
+
+      if (unicast.Count == 0 || gateway.Count == 0) {
+        return null;
+      }
     }
 
     return new DotNetInterface(n, gateway.ToArray(), unicast.ToArray(), multicast.ToArray());
