@@ -65,14 +65,14 @@ let main argv =
 
   let configFile = ref path
   let logLevel = ref 4
-  let dumpLevel = ref 0
+  let dumpTimer = ref 0
   let showUsage = ref false
 
   let specs = 
     [
       "--config", ArgType.String(fun s -> configFile := s), "specifies the configuration file to use"
       "--log", ArgType.Int(fun i -> logLevel := i), "logging level, 1 = Errors only, 2 = +Warnings, 3 = +Info, 4 = +Debug"
-      "--dump", ArgType.Int(fun i -> dumpLevel := i), "host and peer console dumping, 0 <= Off (Default), > 0 = On"
+      "--dumpTimer", ArgType.Int(fun i -> dumpTimer := i), "host and peer console dumping, 0 <= Off (Default), > 0 = On"
     ] |> List.map (fun (sh, ty, desc) -> ArgInfo(sh, ty, desc))
 
   let compile text = 
@@ -115,5 +115,23 @@ let main argv =
       |> Seq.toList
 
     while true do 
-      System.Console.ReadKey(true) |> ignore
+      if !dumpTimer > 0 then
+        System.Threading.Thread.Sleep(!dumpTimer)
+
+        for g in peerLookup.Lookup do
+          let g = g.Value
+          UdpKit.UdpLog.Info (sprintf "Game: %A (Peers: %i, Hosts: %i)" g.GameId g.Peers.Count g.Hosts.Count) 
+
+          if g.Peers.Count > 0 then
+            UdpKit.UdpLog.Info "Peers"
+            for p in g.Peers do
+              UdpKit.UdpLog.Info (sprintf "Peer %A" p.Key)
+
+          if g.Hosts.Count > 0 then
+            UdpKit.UdpLog.Info "Hosts"
+            for p in g.Hosts do
+              UdpKit.UdpLog.Info (sprintf "Host %A" p.Key)
+
+      else
+        System.Threading.Thread.Sleep(1000)
   0

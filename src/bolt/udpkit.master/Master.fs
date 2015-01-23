@@ -168,6 +168,9 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
       else
         game.Peers.GetOrAdd(msg.PeerId, new' game) |> Some
 
+  member x.Lookup = 
+    lookup
+
   member x.Remove (game:Game) (peerId:Guid) =
     match lookup.TryGetValue game.GameId with
     | false, _ -> ()
