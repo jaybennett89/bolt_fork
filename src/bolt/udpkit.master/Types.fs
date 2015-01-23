@@ -144,6 +144,8 @@ type Peer = {
     failwith "Peer Disconnected"
 
   member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketAsyncEventArgs) =
+    UdpLog.Info (sprintf "NatProbeREsult for peer %A is %A" x.PeerId features)
+
     // ack this message
     x.AckMessage features args
 
