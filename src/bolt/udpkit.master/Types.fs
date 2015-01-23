@@ -69,7 +69,7 @@ type Peer = {
     | :? Protocol.PeerDisconnect as disconnect -> x.OnPeerDisconnect disconnect args
     | :? Protocol.ProbeFeatures as features -> x.OnProbeFeatures features args
     | :? Protocol.HostRegister as register -> x.OnHostRegister register args
-    | :? Protocol.HostKeepAlive as keepalive -> x
+    | :? Protocol.HostKeepAlive as keepalive -> x.OnHostKeepAlive keepalive args
     | :? Protocol.GetHostList as getlist -> x.OnGetHostList getlist args
     | :? Protocol.PunchRequest as request -> x.OnPunchRequest request args
     | _ ->
@@ -144,13 +144,21 @@ type Peer = {
     failwith "Peer Disconnected"
 
   member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketAsyncEventArgs) =
-    UdpLog.Info (sprintf "NatProbeREsult for peer %A is %A" x.PeerId features)
+    UdpLog.Info (sprintf "NatProbeResult for peer %A is %A" x.PeerId features)
 
     // ack this message
     x.AckMessage features args
 
     // update this peer
     {x with NatFeatures = Some(features.NatFeatures)}
+    
+  member private x.OnHostKeepAlive (keepalive:Protocol.HostKeepAlive) (args:SocketAsyncEventArgs) =
+    if x.Game.Hosts.ContainsKey(x.PeerId) then
+      UdpLog.Info (sprintf "KeepAlive for host %A" x.PeerId)
+    else
+      UdpLog.Warn (sprintf "Received KeepAlive for host %A but could not find it in host lookup table" x.PeerId)
+
+    x
 
   member private x.OnHostRegister (register:Protocol.HostRegister) (args:SocketAsyncEventArgs) =
     // create host object
