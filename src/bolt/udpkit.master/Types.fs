@@ -165,8 +165,11 @@ type Peer = {
     let host = {PeerId=x.PeerId; Session=register.Host}
 
     // add to this games hosts list
-    x.Game.Hosts.AddOrUpdate(x.PeerId, host, fun _ _ -> host) |> ignore
+    let host = x.Game.Hosts.AddOrUpdate(x.PeerId, host, fun _ _ -> host)
     
+    // ad this logging
+    UdpLog.Info (sprintf "Registered peer %A as a host" x.PeerId)
+
     // ack message
     Args.Reply args (x.Context.Protocol.CreateMessage<Protocol.Ack>(register))
     
