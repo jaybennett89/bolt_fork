@@ -65,12 +65,14 @@ let main argv =
 
   let configFile = ref path
   let logLevel = ref 4
+  let dumpLevel = ref 0
   let showUsage = ref false
 
   let specs = 
     [
       "--config", ArgType.String(fun s -> configFile := s), "specifies the configuration file to use"
       "--log", ArgType.Int(fun i -> logLevel := i), "logging level, 1 = Errors only, 2 = +Warnings, 3 = +Info, 4 = +Debug"
+      "--dump", ArgType.Int(fun i -> dumpLevel := i), "host and peer console dumping, 0 <= Off (Default), > 0 = On"
     ] |> List.map (fun (sh, ty, desc) -> ArgInfo(sh, ty, desc))
 
   let compile text = 

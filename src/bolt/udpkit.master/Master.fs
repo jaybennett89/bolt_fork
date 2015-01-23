@@ -138,25 +138,28 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
     {GameId=id; Peers=new PeerDictionary(); Hosts=new HostDictionary()}
 
   let lookup = 
-    allowedGameIds
-    |> Seq.map (fun id -> id, createGame id)
-    |> Map.ofSeq
-    |> ref
+    let dict = new System.Collections.Concurrent.ConcurrentDictionary<Guid, Game>()
+
+    for id in allowedGameIds do
+      dict.TryAdd(id, createGame id) |> ignore
+
+    UdpLog.Info ("Created lookup table for %i games", dict.Count)
+    dict
 
   let rec find (msg:Protocol.Message) (new':Game -> Guid -> PeerMailbox) (allowCreate:bool) =
-    match !lookup |> Map.tryFind msg.GameId with
-    | None -> 
+    match lookup.TryGetValue msg.GameId with
+    | false, _ -> 
       
       if allowedGameIds.Count = 0 && allowCreate then
-        UdpLog.Warn (sprintf "Created Game %A" msg.GameId)
-        lookup := !lookup  |> Map.add msg.GameId (createGame msg.GameId)
+        let game = lookup.GetOrAdd(msg.GameId, createGame msg.GameId)
+        UdpLog.Warn (sprintf "Created Game %A" game.GameId)
         find msg new' false
 
       else
         UdpLog.Info (sprintf "Invalid Game Id %A" msg.GameId)
         None
 
-    | Some game ->
+    | true, game ->
       let success, peer = game.Peers.TryGetValue(msg.PeerId)
 
       if success then 
@@ -166,9 +169,9 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
         game.Peers.GetOrAdd(msg.PeerId, new' game) |> Some
 
   member x.Remove (game:Game) (peerId:Guid) =
-    match !lookup |> Map.tryFind game.GameId with
-    | None -> ()
-    | Some game ->
+    match lookup.TryGetValue game.GameId with
+    | false, _ -> ()
+    | true , game ->
       let success, removed = game.Peers.TryRemove peerId
       
       if success then
