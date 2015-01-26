@@ -55,7 +55,18 @@ let startMaster (context:MasterContext) (m:Config.Master) =
 
 [<EntryPoint>]
 let main argv = 
-  UdpKit.UdpLog.SetWriter(fun i m -> Console.WriteLine(m))
+  let logFile = 
+    let n = DateTime.Now
+    let fmt = "Zeus_Log_{0}Y{1}M{2}D_{3}H{4}M{5}S_{6}MS.txt";
+    String.Format(fmt, n.Year, n.Month, n.Day, n.Hour, n.Minute, n.Second, n.Millisecond);
+
+  let log = File.OpenWrite(logFile)
+  let writer = new StreamWriter(log)
+
+  UdpKit.UdpLog.SetWriter(fun i m ->
+    Console.WriteLine(m);
+    lock log (fun () -> writer.WriteLine(m))
+  )
 
   let path = 
     let asm = System.Reflection.Assembly.GetEntryAssembly()
@@ -71,7 +82,6 @@ let main argv =
   let specs = 
     [
       "--config", ArgType.String(fun s -> configFile := s), "specifies the configuration file to use"
-      "--log", ArgType.Int(fun i -> logLevel := i), "logging level, 1 = Errors only, 2 = +Warnings, 3 = +Info, 4 = +Debug"
       "--dumpTimer", ArgType.Int(fun i -> dumpTimer := i), "host and peer console dumping, 0 <= Off (Default), > 0 = On"
     ] |> List.map (fun (sh, ty, desc) -> ArgInfo(sh, ty, desc))
 
