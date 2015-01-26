@@ -246,7 +246,7 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     // add button
-    BoltEditorGUI.Header("Input", "mc_input");
+    BoltEditorGUI.Header("Input", "mc_command");
     GUILayout.Space(2);
     EditPropertyList(def, def.Input);
 
