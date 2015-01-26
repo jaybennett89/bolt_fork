@@ -89,7 +89,6 @@ namespace Bolt {
     }
 
     void IEntitySerializer.OnControlLost() {
-      Assert.True(Frames.count == 1);
       Frames.first.Frame = Entity.Frame;
     }
 
