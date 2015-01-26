@@ -1,7 +1,7 @@
-﻿﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PS4 || UNITY_PSM
+﻿﻿#if !UNITY_WEBPLAYER && (UNITY_EDITOR || UNITY_STANDALONE || UNITY_PS4 || UNITY_PSM)
 using System.Collections;
-using UdpKit;
 using System.Net.NetworkInformation;
+using UdpKit;
 
 public class DotNetInterface : UdpPlatformInterface {
   string name;
@@ -80,6 +80,5 @@ public class DotNetInterface : UdpPlatformInterface {
         return UdpLinkType.Unknown;
     }
   }
-
 }
 #endif
