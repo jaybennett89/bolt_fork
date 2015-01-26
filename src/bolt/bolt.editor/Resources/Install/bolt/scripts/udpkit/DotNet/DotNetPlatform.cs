@@ -5,7 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+
+#if !UNITY_WEBPLAYER
 using System.Net.NetworkInformation;
+#endif
+
 using System.Diagnostics;
 
 public class DotNetPlatform : UdpPlatform {
@@ -73,6 +77,9 @@ public class DotNetPlatform : UdpPlatform {
 #endif
 
   List<UdpPlatformInterface> FindInterfaces() {
+#if UNITY_WEBPLAYER
+    return new List<UdpPlatformInterface>();
+#else
     List<UdpPlatformInterface> result = new List<UdpPlatformInterface>();
 
     try {
@@ -103,8 +110,11 @@ public class DotNetPlatform : UdpPlatform {
     }
 
     return result;
+#endif
   }
 
+
+#if !UNITY_WEBPLAYER
   DotNetInterface ParseInterface(NetworkInterface n) {
     HashSet<UdpIPv4Address> gateway = new HashSet<UdpIPv4Address>(UdpIPv4Address.Comparer.Instance);
     HashSet<UdpIPv4Address> unicast = new HashSet<UdpIPv4Address>(UdpIPv4Address.Comparer.Instance);
@@ -177,6 +187,7 @@ public class DotNetPlatform : UdpPlatform {
 
     return new DotNetInterface(n, gateway.ToArray(), unicast.ToArray(), multicast.ToArray());
   }
+#endif
 
 #pragma warning disable 618
   public static UdpEndPoint ConvertEndPoint(EndPoint endpoint) {
