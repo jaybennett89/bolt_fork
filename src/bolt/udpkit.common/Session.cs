@@ -17,6 +17,9 @@ namespace UdpKit {
     internal UdpEndPoint _lanEndPoint;
     internal UdpSessionSource _source;
 
+    internal int _connectionsMax;
+    internal int _connectionsCurrent;
+
     internal string _hostName;
     internal byte[] _hostData;
     internal object _hostObject;
@@ -25,6 +28,14 @@ namespace UdpKit {
     public UdpSessionSource Source { get { return _source; } }
     public UdpEndPoint WanEndPoint { get { return _wanEndPoint; } }
     public UdpEndPoint LanEndPoint { get { return _lanEndPoint; } }
+
+    public int ConnectionsMax {
+      get { return _connectionsMax; }
+    }
+
+    public int ConnectionsCurrent {
+      get { return _connectionsCurrent; }
+    }
 
     public string HostName {
       get { return _hostName; }
