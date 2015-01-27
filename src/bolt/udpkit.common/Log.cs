@@ -21,7 +21,7 @@ namespace UdpKit {
         Writer callback = writer;
 
         if (callback != null) {
-          callback(level, message);
+          callback(level, DateTime.Now + ": " + message);
         }
       }
     }
