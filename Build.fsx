@@ -46,6 +46,8 @@ Target "Build" (fun _ ->
         [
           "Configuration", buildMode
           "OutputPath", buildDir
+          "UnityPathWin", unityDir
+          "UnityPathOSX", unityDir
         ]
     }
   ) "src\\bolt\\bolt.sln"

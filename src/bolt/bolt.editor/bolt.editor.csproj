@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <ProductVersion>12.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <UnityPathWin>C:\Program Files (x86)\Unity</UnityPathWin>
+    <UnityPathOSX>/Applications/Unity</UnityPathOSX>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -79,27 +81,19 @@
     <Reference Include="System" />
     <Reference Include="UnityEditor" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
+      <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' != 'DebugU5')  ">
+    <Reference Include="UnityEditor" Condition=" ('$(OS)' != 'Unix') ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' == 'DebugU5') ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Unity 5.0.0b18\Editor\Data\Managed\UnityEditor.dll</HintPath>
+      <HintPath>$(UnityPathWin)\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+      <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' != 'DebugU5') ">
+    <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') And ('$(Configuration)' == 'DebugU5') ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Unity 5.0.0b18\Editor\Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(UnityPathWin)\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
