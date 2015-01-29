@@ -7,6 +7,18 @@ using UnityEngine;
 public static class BoltLauncher {
   static UdpPlatform UserAssignedPlatform;
 
+  public static void StartSinglePlayer() {
+    StartSinglePlayer(BoltRuntimeSettings.instance.GetConfigCopy());
+  }
+
+  public static void StartSinglePlayer(BoltConfig config) {
+    // set null platform
+    SetUdpPlatform(new NullPlatform());
+
+    // init server
+    Initialize(BoltNetworkModes.Server, UdpEndPoint.Any, config);
+  }
+
   public static void StartServer() {
     StartServer(UdpEndPoint.Any);
   }

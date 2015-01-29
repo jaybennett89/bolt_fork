@@ -11,25 +11,25 @@ module Probe =
 
   type T (context:MasterContext) =
 
-    let onRecv (probe:int) (fwd:AsyncUdpSocket option ref) (args:SocketAsyncEventArgs) = 
+    let onRecv (probe:int) (fwd:AsyncUdpSocket option ref) (args:SocketData) = 
       try 
-        match context.Protocol.ParseMessage(args.Buffer) with
+        match context.Protocol.ParseMessage(args.Data) with
         | :? Protocol.ProbeEndPoint as query -> 
 
           match !fwd with
           | None -> ()
           | Some fwd ->
             let msg = context.Protocol.CreateMessage<Protocol.ProbeUnsolicited>()
-            msg.WanEndPoint <- args.RemoteEndPoint |> EndPoint.toUdpKit
-            fwd.Send(args.RemoteEndPoint, msg)
+            msg.WanEndPoint <- args.Remote |> EndPoint.toUdpKit
+            fwd.Send(args.Remote, msg)
           
           // setup message
           let msg = context.Protocol.CreateMessage<Protocol.ProbeEndPointResult>(query)
-          msg.WanEndPoint <- args.RemoteEndPoint |> EndPoint.toUdpKit
-          Args.Reply args msg
+          msg.WanEndPoint <- args.Remote |> EndPoint.toUdpKit
+          args.Reply (msg :> Protocol.Message)
 
         | _ ->
-          Args.Push args
+          ()
 
       with
         | ex -> 
