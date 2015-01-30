@@ -87,7 +87,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteBlit.cs" />
     <Compile Include="Collections\Map.cs" />
     <Compile Include="CRC32.cs" />
     <Compile Include="Platform\PlatformInterface.cs" />
