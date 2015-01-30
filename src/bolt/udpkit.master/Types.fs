@@ -9,7 +9,7 @@ open UdpKit
 
 type PeerMessage
   = Shutdown
-  | MessageReceived of Protocol.Message * SocketAsyncEventArgs
+  | MessageReceived of Protocol.Message * SocketData
   | BeginNatPunch of Guid * MailboxProcessor<PeerMessage> * NatFeatures
   | PerformDirectConnectionWan of Guid * UdpEndPoint * UdpEndPoint
   | PerformDirectConnectionLan of Guid * UdpEndPoint * UdpEndPoint
@@ -18,7 +18,7 @@ type PeerMessage
 
 type MasterMessage 
   = Shutdown
-  | Packet of SocketAsyncEventArgs
+  | Packet of SocketData
   | Context of obj
   
 type PeerMailbox = MailboxProcessor<PeerMessage>
@@ -63,7 +63,7 @@ type Peer = {
   Context : MasterContext
   NatFeatures : UdpKit.NatFeatures option
 } with
-  member x.HandleMessage (msg:Protocol.Message) (args:SocketAsyncEventArgs) =
+  member x.HandleMessage (msg:Protocol.Message) (args:SocketData) =
     match msg with
     | :? Protocol.PeerConnect as connect -> x.OnPeerConnect connect args
     | :? Protocol.PeerDisconnect as disconnect -> x.OnPeerDisconnect disconnect args
@@ -127,23 +127,23 @@ type Peer = {
     x
         
 
-  member private x.AckMessage (msg:Protocol.Query) (args:SocketAsyncEventArgs) =
-    Args.Reply args (x.Context.Protocol.CreateMessage<Protocol.Ack>(msg))
+  member private x.AckMessage (msg:Protocol.Query) (args:SocketData) =
+    args.Reply (x.Context.Protocol.CreateMessage<Protocol.Ack>(msg) :> Protocol.Message)
 
-  member private x.OnPeerConnect (connect:Protocol.PeerConnect) (args:SocketAsyncEventArgs) =
+  member private x.OnPeerConnect (connect:Protocol.PeerConnect) (args:SocketData) =
     let msg = x.Context.Protocol.CreateMessage<Protocol.PeerConnectResult>(connect)
     msg.Probe0 <- x.Context.Probe0 |> EndPoint.toUdpKit
     msg.Probe1 <- x.Context.Probe1 |> EndPoint.toUdpKit
     msg.Probe2 <- x.Context.Probe2 |> EndPoint.toUdpKit
 
-    Args.Reply args msg
+    args.Reply (msg :> Protocol.Message)
 
     x
     
-  member private x.OnPeerDisconnect (connect:Protocol.PeerDisconnect) (args:SocketAsyncEventArgs) =
+  member private x.OnPeerDisconnect (connect:Protocol.PeerDisconnect) (args:SocketData) =
     failwith "Peer Disconnected"
 
-  member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketAsyncEventArgs) =
+  member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketData) =
     UdpLog.Info (sprintf "NatProbeResult for peer %A is %A" x.PeerId features)
 
     // ack this message
@@ -152,7 +152,7 @@ type Peer = {
     // update this peer
     {x with NatFeatures = Some(features.NatFeatures)}
     
-  member private x.OnHostKeepAlive (keepalive:Protocol.HostKeepAlive) (args:SocketAsyncEventArgs) =
+  member private x.OnHostKeepAlive (keepalive:Protocol.HostKeepAlive) (args:SocketData) =
     if x.Game.Hosts.ContainsKey(x.PeerId) then
       UdpLog.Info (sprintf "KeepAlive for host %A" x.PeerId)
     else
@@ -160,7 +160,7 @@ type Peer = {
 
     x
 
-  member private x.OnHostRegister (register:Protocol.HostRegister) (args:SocketAsyncEventArgs) =
+  member private x.OnHostRegister (register:Protocol.HostRegister) (args:SocketData) =
     // create host object
     let host = {PeerId=x.PeerId; Session=register.Host}
 
@@ -171,34 +171,26 @@ type Peer = {
     UdpLog.Info (sprintf "Registered peer %A as a host" x.PeerId)
 
     // ack message
-    Args.Reply args (x.Context.Protocol.CreateMessage<Protocol.Ack>(register))
+    args.Reply (x.Context.Protocol.CreateMessage<Protocol.Ack>(register) :> Protocol.Message)
     
     // mark this peer as being a host
     {x with IsHost=true}
     
-  member private x.OnGetHostList (getlist:Protocol.GetHostList) (recvArgs:SocketAsyncEventArgs) =
-    let send = recvArgs.UserToken :?> (SocketAsyncEventArgs -> unit)
-    let remoteEndpoint = recvArgs.RemoteEndPoint
-
+  member private x.OnGetHostList (getlist:Protocol.GetHostList) (recvArgs:SocketData) =
     x.AckMessage getlist recvArgs
-
     UdpLog.Info (sprintf "Found %i Hosts" x.Game.Hosts.Count)
 
     for host in x.Game.Hosts.Values do
+      // create hostinfo
       let msg = x.Context.Protocol.CreateMessage<Protocol.HostInfo>()
       msg.Host <- host.Session
-
-      let args = Args.Pop()
-      let size = x.Context.Protocol.WriteMessage(msg, args.Buffer)
-
-      args.SetBuffer(0, size)
-      args.RemoteEndPoint <- remoteEndpoint
-
-      send args
+      
+      // reply with this
+      recvArgs.Reply (msg :> Protocol.Message)
 
     x
     
-  member private x.OnPunchRequest (request:Protocol.PunchRequest) (args:SocketAsyncEventArgs) =
+  member private x.OnPunchRequest (request:Protocol.PunchRequest) (args:SocketData) =
     match x.NatFeatures with
     | None ->
       x.Mailbox.Post(Error(sprintf "Can't connect to %A. Your connection does not have a valid NAT state" request.Host))
@@ -217,7 +209,7 @@ type Peer = {
 and PunchMessage 
   = Shutdown
   | Begin of Guid * Peer * Peer
-  | Packet of SocketAsyncEventArgs
+  | Packet of SocketData
 
 and PunchMailbox = 
   MailboxProcessor<PunchMessage>

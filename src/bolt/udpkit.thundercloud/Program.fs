@@ -55,6 +55,18 @@ let startMaster (context:MasterContext) (m:Config.Master) =
 
 [<EntryPoint>]
 let main argv = 
+
+  printf "\n"
+  printf "\n"
+  printf "    _____________________ ____ ___   _________  \n"
+  printf "    \____    /\_   _____/|    |   \ /   _____/  \n"
+  printf "      /     /  |    __)_ |    |   / \_____  \   \n"
+  printf "     /     /_  |        \|    |  /  /        \  \n"
+  printf "    /_______ \/_______  /|______/  /_______  /  \n"
+  printf "            \/        \/                   \/   v. %A\n" (System.Reflection.Assembly.GetExecutingAssembly().GetName().Version)
+  printf "\n"
+  printf "\n"
+
   let logFile = 
     let n = DateTime.Now
     let fmt = "Zeus_Log_{0}Y{1}M{2}D_{3}H{4}M{5}S_{6}MS.txt";
@@ -123,7 +135,7 @@ let main argv =
       cfg.Masters 
       |> Seq.map (startMaster context) 
       |> Seq.toList
-
+       
     while true do 
       if !dumpTimer > 0 then
         System.Threading.Thread.Sleep(!dumpTimer)

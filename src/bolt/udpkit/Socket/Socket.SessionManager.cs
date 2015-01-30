@@ -87,6 +87,11 @@ namespace UdpKit {
         local._lanEndPoint = endpoint;
       }
 
+      public void SetConnections(int current, int max) {
+        local._connectionsMax = max;
+        local._connectionsCurrent = current;
+      }
+
       void RaiseSessionUpdatedEvent() {
         try {
           UdpEvent ev = new UdpEvent();
@@ -100,6 +105,7 @@ namespace UdpKit {
           eventTime = 0;
         }
       }
+
 
     }
   }

@@ -15,118 +15,95 @@ module EndPoint =
   let toDotNet (ep:UdpEndPoint) = 
     new IPEndPoint(new IPAddress([| ep.Address.Byte3; ep.Address.Byte2; ep.Address.Byte1; ep.Address.Byte0 |]), int32 ep.Port);
 
-module Args = 
-  
-  let private Pool = 
-    System.Collections.Concurrent.ConcurrentQueue<SocketAsyncEventArgs>()
+type SocketData = {
+  Data : byte array
+  Size : int
+  Remote : EndPoint
+  Reply : Protocol.Message -> unit
+} with
+  static member New () =
+    {Data=Array.zeroCreate 1024; Size=0; Remote=null; Reply=Unchecked.defaultof<Protocol.Message -> unit>}
 
-  let private Completed (sender:obj) (args:SocketAsyncEventArgs) =
-    if args.BytesTransferred > 0 && args.SocketError = SocketError.Success then
-      (args.UserToken :?> (SocketAsyncEventArgs -> unit)) args
+type AsyncUdpSocket (onRecv:SocketData -> unit) =
 
-  let Pop () = 
-    let success, args = Pool.TryDequeue()
-
-    if success then 
-      args.SetBuffer(args.Buffer, 0, args.Buffer.Length)
-      args
-
-    else 
-      let args = new SocketAsyncEventArgs()
-      args.Completed.AddHandler(new EventHandler<SocketAsyncEventArgs>(Completed))
-      args.SetBuffer(Array.zeroCreate 1024, 0, 1024)
-      args
-
-  let Push (args:SocketAsyncEventArgs) =
-    args.UserToken <- null
-    args.RemoteEndPoint <- null
-    Pool.Enqueue(args)
-
-  let Reply (recvArgs:SocketAsyncEventArgs) (msg:Protocol.Message) =
-    // setup send args
-    let sendArgs = Pop()
-    sendArgs.RemoteEndPoint <- recvArgs.RemoteEndPoint
-    sendArgs.SetBuffer(0, msg.Context.WriteMessage(msg, sendArgs.Buffer))
-
-    // reply to this message
-    (recvArgs.UserToken :?> (SocketAsyncEventArgs -> unit)) sendArgs
-
-    // return recv args to pool
-    Push recvArgs
-
-type AsyncUdpSocket (onRecv:SocketAsyncEventArgs -> unit) =
-
-  // this is the socket we will be using
   let socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
+  let sendQueue = new System.Collections.Concurrent.ConcurrentQueue<SocketData>()
 
-  // send queue
-  let sendQueue = new System.Collections.Concurrent.ConcurrentQueue<SocketAsyncEventArgs>()
+  let queueMsg (remote:EndPoint) (msg:Protocol.Message) =
+    let data = SocketData.New()
+    let size = msg.Context.WriteMessage(msg, data.Data)
+    sendQueue.Enqueue({data with Size=size; Remote=remote})
+  
+  let rec loop () =
+    let rec send () =
+      try 
+        if sendQueue.Count > 0 then
+          let ok, data = sendQueue.TryDequeue() 
 
-  // send counter
-  let mutable sendCount = 0;
+          if ok then
+            UdpLog.Info (sprintf "%A: Send To:%A" socket.LocalEndPoint data.Remote)
+            socket.SendTo(data.Data, data.Size, SocketFlags.None, data.Remote) |> ignore
+            send()
 
-  // send completed callback
-  let rec sendAsyncComplete (args:SocketAsyncEventArgs) =
-    Args.Push(args)
+          else
+            ()
 
-    if Interlocked.Decrement(&sendCount) > 0 then
-      sendAsync()
+        else
+          ()
+      with
+      | ex -> 
+        UdpLog.Error(ex.Message);
+        UdpLog.Error(ex.StackTrace);
+        send()
 
-  // main send function
-  and sendAsync () =
-    let success, args = sendQueue.TryDequeue()
+    let rec recv wait =
+      try 
+        if socket.Poll(wait, SelectMode.SelectRead) then
+           let data = SocketData.New()
+           let mutable remote = new IPEndPoint(IPAddress.Any, 0) :> EndPoint
+           let bytes = socket.ReceiveFrom(data.Data, &remote)
 
-    if success then
-      args.UserToken <- sendAsyncComplete
+           UdpLog.Info (sprintf "%A: Recv From:%A" socket.LocalEndPoint remote)
 
-      if not <| socket.SendToAsync(args) then
-        sendAsyncComplete args
-        
-  // send queue function
-  let send (args:SocketAsyncEventArgs) =
-    sendQueue.Enqueue(args)
+           onRecv {data with Size = bytes; Remote = remote; Reply = queueMsg remote}
 
-    if Interlocked.Increment(&sendCount) = 1 then
-      sendAsync()
+           // once more
+           recv 0
 
-  // recv completed callback
-  let rec recvAsyncComplete (args:SocketAsyncEventArgs) = 
-    // set reply function
-    args.UserToken <- send
+        else
 
-    // callback
-    onRecv args
+          ()
 
-    // start next receive op
-    recvAsync()
+      with
+      | ex -> 
+        UdpLog.Error(ex.Message);
+        UdpLog.Error(ex.StackTrace);
+        recv 0
 
-  // main recv function
-  and recvAsync () = 
-    // pop args object
-    let args = Args.Pop()
-    args.RemoteEndPoint <- new IPEndPoint(IPAddress.Any, 0)
-    args.UserToken <- recvAsyncComplete
+    // send data
+    send ()
+      
+    // recv data
+    recv 1
 
-    if not <| socket.ReceiveFromAsync(args) then
-      recvAsyncComplete args
+    // loop
+    loop ()
+      
+
+  let thread = new Thread(loop)
       
   let bind (endpoint:IPEndPoint) =
     // bind socket
     socket.Bind(endpoint)
     socket.Blocking <- false
+    
+    thread.IsBackground <- true
+    thread.Start()
 
     // log that this happened
     UdpLog.Info (sprintf "UdpAsyncSocket bound to %A" socket.LocalEndPoint)
 
-    // start recv loop
-    recvAsync()
-
   member x.EndPoint = socket.LocalEndPoint :?> IPEndPoint
   member x.Bind (endpoint:IPEndPoint) = bind endpoint
-  member x.Send (args:SocketAsyncEventArgs) = send args
-  member x.Send (endpoint:EndPoint, msg:Protocol.Message) =
-    let args = Args.Pop()
-    args.RemoteEndPoint <- endpoint
-    args.SetBuffer(0, msg.Context.WriteMessage(msg, args.Buffer))
-    
-    x.Send(args)
+  member x.Send (data:SocketData) = sendQueue.Enqueue(data)
+  member x.Send (endpoint:EndPoint, msg:Protocol.Message) = queueMsg endpoint msg

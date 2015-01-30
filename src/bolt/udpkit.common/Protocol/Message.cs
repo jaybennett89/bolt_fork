@@ -97,6 +97,8 @@ namespace UdpKit.Protocol {
       Serialize(ref session._hostData);
       Serialize(ref session._lanEndPoint);
       Serialize(ref session._wanEndPoint);
+      Serialize(ref session._connectionsMax);
+      Serialize(ref session._connectionsCurrent);
     }
 
     protected void Serialize(ref NatFeatures features) {

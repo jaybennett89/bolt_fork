@@ -96,7 +96,7 @@ module Master =
 
             | MasterMessage.Packet (args) ->
               // parse into a message
-              let msg = (!context).Protocol.ParseMessage(args.Buffer)
+              let msg = (!context).Protocol.ParseMessage(args.Data)
 
               // grab peer
               match (!context).PeerFind msg createPeer with
@@ -143,8 +143,8 @@ type PeerLookup (allowedGameIds:Set<Guid>) =
     for id in allowedGameIds do
       dict.TryAdd(id, createGame id) |> ignore
 
-    UdpLog.Info ("Created lookup table for %i games", dict.Count)
-    dict
+    UdpLog.Info (sprintf "Created lookup table for %i games" dict.Count)
+    dict 
 
   let rec find (msg:Protocol.Message) (new':Game -> Guid -> PeerMailbox) (allowCreate:bool) =
     match lookup.TryGetValue msg.GameId with

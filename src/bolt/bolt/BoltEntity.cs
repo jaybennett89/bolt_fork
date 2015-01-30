@@ -943,7 +943,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
         BoltLog.Warn("{0} is being destroyed/disabled without being detached, forcing detach", Entity);
       }
       else {
-        BoltLog.Error("{0} is being destroyed/disabled without being detached by the owner, this will cause this peer to disconnect the next time it receives an update for this entity");
+        BoltLog.Error("{0} is being destroyed/disabled without being detached by the owner, this will cause this peer to disconnect the next time it receives an update for this entity", Entity);
       }
 
       // force detach

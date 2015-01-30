@@ -169,6 +169,8 @@ namespace UdpKit {
       };
 
       sessionManager = new SessionManager(this);
+      sessionManager.SetConnections(0, Config.ConnectionLimit);
+
       broadcastManager = new BroadcastManager(this);
 
       // socket is created
@@ -331,8 +333,7 @@ namespace UdpKit {
     public void SetHostInfo(string serverName, byte[] userData) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_SESSION_HOST_SETINFO;
-      ev.HostName = serverName;
-      ev.HostData = userData;
+      ev.HostInfo = new UdpHostInfoArgs() { Name = serverName, Data = userData };
       Raise(ev);
     }
 
@@ -546,6 +547,12 @@ namespace UdpKit {
       }
 
       cn.ChangeState(UdpConnectionState.Connected);
+
+      // update
+      sessionManager.SetConnections(connectionLookup.Count, Config.ConnectionLimit);
+
+      // register host with new info
+      masterClient.RegisterHost();
     }
 
     void ProcessTimeouts() {

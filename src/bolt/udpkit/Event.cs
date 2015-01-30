@@ -47,6 +47,11 @@ namespace UdpKit {
     public ushort Port;
   }
 
+  class UdpHostInfoArgs {
+    public string Name;
+    public byte[] Data;
+  }
+
   [StructLayout(LayoutKind.Explicit)]
   public struct UdpEvent {
     internal const int INTERNAL_START = 1;
@@ -181,11 +186,6 @@ namespace UdpKit {
       set { UdpAssert.Assert(Object1 == null); Object1 = value; }
     }
 
-    public byte[] HostData {
-      get { return (byte[])Object1; }
-      set { UdpAssert.Assert(Object1 == null); Object1 = value; }
-    }
-
     public byte[] ConnectToken {
       get { return (byte[])Object1; }
       set { UdpAssert.Assert(Object1 == null); Object1 = value; }
@@ -240,8 +240,8 @@ namespace UdpKit {
       set { UdpAssert.Assert(Object0 == null); Object0 = value; }
     }
 
-    public string HostName {
-      get { return (string)Object0; }
+    internal UdpHostInfoArgs HostInfo {
+      get { return (UdpHostInfoArgs)Object0; }
       set { UdpAssert.Assert(Object0 == null); Object0 = value; }
     }
 
