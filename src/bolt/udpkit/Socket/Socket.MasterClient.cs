@@ -304,19 +304,28 @@ namespace UdpKit {
               // update wan endpoint for us
               socket.WANEndPoint = natFeatures.WanEndPoint;
 
-              // begin test for hairpin translation
-              natProbeState.Hairpin = new Protocol.ProtocolClient(socket.platform.CreateSocket(UdpEndPoint.Any), socket.GameId, socket.PeerId);
-              natProbeState.Hairpin.Send(natProbeState.Hairpin.CreateMessage<Protocol.ProbeHairpin>(), natFeatures.WanEndPoint);
-
-              // increase timeout a little bit
-              natProbeState.Timeout = socket.GetCurrentTime() + socket.Config.NatProbeHairpinTimeout;
+              // begin hairpin test
+              StartHairpinTest();
             }
             else {
-              UdpLog.Info("NAT Probe: SupportsEndPointPreservation:NO");
+              UdpLog.Info("NAT Probe: SupportsEndPointPreservation:NO PROBE:0{0} PROBE:1{1}", natProbeState.Probe0WanResponse, natProbeState.Probe1WanResponse);
+
               natFeatures.SupportsEndPointPreservation = NatFeatureStates.No;
+              natFeatures.WanEndPoint = UdpEndPoint.Any;
+              socket.WANEndPoint = UdpEndPoint.Any;
+
+              // begin hairpin test
+              StartHairpinTest();
             }
           }
         }
+      }
+
+      void StartHairpinTest() {
+        natProbeState.Hairpin = new Protocol.ProtocolClient(socket.platform.CreateSocket(UdpEndPoint.Any), socket.GameId, socket.PeerId);
+        natProbeState.Hairpin.Send(natProbeState.Hairpin.CreateMessage<Protocol.ProbeHairpin>(), natFeatures.WanEndPoint);
+
+        natProbeState.Timeout = socket.GetCurrentTime() + socket.Config.NatProbeHairpinTimeout;
       }
 
       void AckProbeFeatures(Protocol.ProbeFeatures features) {
