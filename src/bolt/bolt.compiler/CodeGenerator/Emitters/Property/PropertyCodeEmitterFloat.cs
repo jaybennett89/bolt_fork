@@ -22,6 +22,10 @@ namespace Bolt.Compiler {
     }
 
     public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
+      if (Decorator.DefiningAsset is StateDecorator) {
+        statements.Call(expr, "Settings_Float", "new Bolt.PropertyFloatSettings {{ IsAngle = {0} }}".Expr(Decorator.PropertyType.IsAngle.ToString().ToLowerInvariant()));
+      }
+
       EmitFloatSettings(expr, statements, Decorator.PropertyType.Compression);
       EmitInterpolationSettings(expr, statements);
     }

@@ -135,6 +135,7 @@
     <Compile Include="state\Settings\Compression\Float.cs" />
     <Compile Include="state\Settings\Compression\Int.cs" />
     <Compile Include="state\Settings\Extrapolation.cs" />
+    <Compile Include="state\Settings\Float.cs" />
     <Compile Include="state\Settings\Mecanim.cs" />
     <Compile Include="state\Settings\Compression\Quaternion.cs" />
     <Compile Include="state\Settings\Interpolation.cs" />

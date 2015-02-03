@@ -4,7 +4,7 @@ using UE = UnityEngine;
 namespace Bolt {
   [Documentation]
   public static class Math {
-    internal static float InterpolateFloat(BoltDoubleList<NetworkStorage> frames, int offset, int frame) {
+    internal static float InterpolateFloat(BoltDoubleList<NetworkStorage> frames, int offset, int frame, bool angle) {
       var f0 = frames.first;
       var p0 = f0.Values[offset].Float1;
 
@@ -26,7 +26,7 @@ namespace Bolt {
         float t = f1.Frame - f0Frame;
         float d = frame - f0Frame;
 
-        return UE.Mathf.Lerp(p0, p1, d / t);
+        return angle ? UE.Mathf.LerpAngle(p0, p1, d / t) : UE.Mathf.Lerp(p0, p1, d / t);
       }
     }
 
