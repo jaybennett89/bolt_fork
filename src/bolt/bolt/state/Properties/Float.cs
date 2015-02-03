@@ -2,6 +2,7 @@
 
 namespace Bolt {
   internal class NetworkProperty_Float : NetworkProperty_Mecanim {
+    PropertyFloatSettings Settings;
     PropertyFloatCompressionSettings Compression;
 
     public override bool WantsOnSimulateBefore {
@@ -22,7 +23,7 @@ namespace Bolt {
 
         var it = root.Frames.GetIterator();
         var idx = obj[this];
-        var value = Math.InterpolateFloat(obj.RootState.Frames, idx + 1, obj.RootState.Entity.Frame);
+        var value = Math.InterpolateFloat(obj.RootState.Frames, idx + 1, obj.RootState.Entity.Frame, Settings.IsAngle);
 
         while (it.Next()) {
           it.val.Values[idx].Float0 = value;
@@ -50,6 +51,10 @@ namespace Bolt {
 
     public void Settings_Float(PropertyFloatCompressionSettings compression) {
       Compression = compression;
+    }
+
+    public void Settings_Float(PropertyFloatSettings settings) {
+      Settings = settings;
     }
 
     public override int BitCount(NetworkObj obj) {

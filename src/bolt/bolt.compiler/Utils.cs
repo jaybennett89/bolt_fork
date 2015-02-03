@@ -5,6 +5,22 @@ using System.Text;
 
 namespace Bolt.Compiler {
   public static class Utils {
+    public static string ToStringSigned(this float f) {
+      if (f < 0) {
+        return f.ToString();
+      }
+
+      return "+" + f.ToString();
+    }
+
+    public static string ToStringSigned(this int i) {
+      if (i < 0) {
+        return i.ToString();
+      }
+
+      return "+" + i.ToString();
+    }
+
     public static string Join<T>(this IEnumerable<T> items, string seperator) {
       return String.Join(seperator, items.Select(x => x.ToString()).ToArray());
     }
