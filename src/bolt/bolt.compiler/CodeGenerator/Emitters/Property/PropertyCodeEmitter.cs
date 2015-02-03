@@ -220,15 +220,19 @@ namespace Bolt.Compiler {
     }
 
     public void EmitVectorSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, AxisSelections selection) {
-      statements.Call(expr, "Settings_Vector", CreateAxisCompressionExpression(axes, selection).ToArray());
+      if (selection != AxisSelections.Disabled) {
+        statements.Call(expr, "Settings_Vector", CreateAxisCompressionExpression(axes, selection).ToArray());
+      }
     }
 
     public void EmitQuaternionSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
-      if (axes == null || quaternion == null || selection == AxisSelections.XYZ) {
-        statements.Call(expr, "Settings_Quaternion", CreateFloatCompressionExpression(quaternion, true));
-      }
-      else {
-        statements.Call(expr, "Settings_QuaternionEuler", CreateAxisCompressionExpression(axes, selection).ToArray());
+      if (selection != AxisSelections.Disabled) {
+        if (axes == null || quaternion == null || selection == AxisSelections.XYZ) {
+          statements.Call(expr, "Settings_Quaternion", CreateFloatCompressionExpression(quaternion, true));
+        }
+        else {
+          statements.Call(expr, "Settings_QuaternionEuler", CreateAxisCompressionExpression(axes, selection).ToArray());
+        }
       }
     }
 
