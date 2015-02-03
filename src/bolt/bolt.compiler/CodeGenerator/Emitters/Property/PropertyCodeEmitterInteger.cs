@@ -32,5 +32,19 @@ namespace Bolt.Compiler {
       }
 
     }
+
+    protected override void EmitSetPropertyValidator(CodeStatementCollection stmts, CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
+      var p = Decorator.PropertyType;
+
+      if (p.CompressionEnabled && p.BitsRequired < 32) {
+#if DEBUG
+        stmts.If("value < {0} || value > {1}".Expr(p.MinValue, p.MaxValue), ifBody => {
+          ifBody.Expr("BoltLog.Warn(\"Property '{0}' is being set to a value larger than the compression settings, it will be clamped to [{1}, {2}]\")", Decorator.Definition.Name, p.MinValue.ToStringSigned(), p.MaxValue.ToStringSigned());
+        });
+#endif
+
+        stmts.Expr("value = UnityEngine.Mathf.Clamp(value, {0}, {1})", p.MinValue, p.MaxValue);
+      }
+    }
   }
 }

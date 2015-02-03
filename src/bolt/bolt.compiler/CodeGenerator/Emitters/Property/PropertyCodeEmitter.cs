@@ -63,6 +63,9 @@ namespace Bolt.Compiler {
           EmitAllowedCheck(set);
         }
 
+        // allows emission of a validator snippet
+        EmitSetPropertyValidator(set, type, storage, interfaceType, changed, name);
+
         if (changed) {
           set.Add("{0} oldValue".Expr(Decorator.ClrType));
           set.Add("oldValue".Expr().Assign(new CodeFieldReferenceExpression(index, StorageField)));
@@ -87,6 +90,10 @@ namespace Bolt.Compiler {
       var property = type.DeclareProperty(Decorator.ClrType, name, getter, setter);
       property.PrivateImplementationType = interfaceType;
       property.Attributes = Decorator.Attributes;
+    }
+
+    protected virtual void EmitSetPropertyValidator(CodeStatementCollection stmts, CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
+
     }
 
     protected void EmitAllowedCheck(CodeStatementCollection stmts) {

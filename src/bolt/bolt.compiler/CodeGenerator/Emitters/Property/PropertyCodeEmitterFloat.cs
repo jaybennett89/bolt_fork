@@ -25,5 +25,19 @@ namespace Bolt.Compiler {
       EmitFloatSettings(expr, statements, Decorator.PropertyType.Compression);
       EmitInterpolationSettings(expr, statements);
     }
+
+    protected override void EmitSetPropertyValidator(CodeStatementCollection stmts, CodeTypeDeclaration type, CodeSnippetExpression storage, CodeTypeReference interfaceType, bool changed, string name) {
+      var c = Decorator.PropertyType.Compression;
+
+      if (c.Enabled && c.BitsRequired < 32) {
+#if DEBUG
+        stmts.If("value < {0}f || value > {1}f".Expr(c.MinValue, c.MaxValue), ifBody => {
+          ifBody.Expr("BoltLog.Warn(\"Property '{0}' is being set to a value larger than the compression settings, it will be clamped to [{1}f, {2}f]\")", Decorator.Definition.Name, c.MinValue.ToStringSigned(), c.MaxValue.ToStringSigned());
+        });
+#endif
+
+        stmts.Expr("value = UnityEngine.Mathf.Clamp(value, {0}f, {1}f)", c.MinValue, c.MaxValue);
+      }
+    }
   }
 }
