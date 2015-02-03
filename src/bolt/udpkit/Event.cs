@@ -200,7 +200,7 @@ namespace UdpKit {
      * OBJECT 0
      * */
 
-    internal NatFeatures NatFeatures {
+    public NatFeatures NatFeatures {
       get { return (NatFeatures)Object0; }
       set { UdpAssert.Assert(Object0 == null); Object0 = value; }
     }

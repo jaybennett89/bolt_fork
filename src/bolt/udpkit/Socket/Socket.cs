@@ -23,7 +23,6 @@ namespace UdpKit {
 
     internal UdpEndPoint LANEndPoint;
     internal UdpEndPoint WANEndPoint;
-    internal UdpEndPoint SocketEndPoint;
 
     readonly internal Guid PeerId;
     readonly internal Guid GameId;
@@ -56,18 +55,22 @@ namespace UdpKit {
     readonly Dictionary<UdpEndPoint, UdpConnection> connectionLookup = new Dictionary<UdpEndPoint, UdpConnection>(new UdpEndPoint.Comparer());
     readonly Dictionary<UdpChannelName, UdpStreamChannel> streamChannels = new Dictionary<UdpChannelName, UdpStreamChannel>(UdpChannelName.EqualityComparer.Instance);
 
+    public UdpEndPoint SocketEndPoint {
+      get { return platformSocket.EndPoint; }
+    }
+
     /// <summary>
     /// LAN endpoint of this socket
     /// </summary>
-    public UdpEndPoint LocalLanEndPoint {
-      get { return platformSocket.EndPoint; }
+    public UdpEndPoint LanEndPoint {
+      get { return LANEndPoint; }
     }
 
     /// <summary>
     /// WAN endpoint of this socket
     /// </summary>
-    public UdpEndPoint LocalWanEndPoint {
-      get { return masterClient == null ? UdpEndPoint.Any : masterClient.LocalWanEndPoint; }
+    public UdpEndPoint WanEndPoint {
+      get { return WANEndPoint; }
     }
 
     /// <summary>
@@ -549,10 +552,14 @@ namespace UdpKit {
       cn.ChangeState(UdpConnectionState.Connected);
 
       // update
-      sessionManager.SetConnections(connectionLookup.Count, Config.ConnectionLimit);
+      if (sessionManager != null) {
+        sessionManager.SetConnections(connectionLookup.Count, Config.ConnectionLimit);
+      }
 
-      // register host with new info
-      masterClient.RegisterHost();
+      if (masterClient != null) {
+        // register host with new info
+        masterClient.RegisterHost();
+      }
     }
 
     void ProcessTimeouts() {

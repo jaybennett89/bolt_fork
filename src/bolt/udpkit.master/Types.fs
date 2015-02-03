@@ -61,6 +61,7 @@ type Peer = {
   PeerId : Guid
   Mailbox : PeerMailbox
   Context : MasterContext
+  EndPoint : EndPoint
   NatFeatures : UdpKit.NatFeatures option
 } with
   member x.HandleMessage (msg:Protocol.Message) (args:SocketData) =
@@ -144,7 +145,7 @@ type Peer = {
     failwith "Peer Disconnected"
 
   member private x.OnProbeFeatures (features:Protocol.ProbeFeatures) (args:SocketData) =
-    UdpLog.Info (sprintf "NatProbeResult for peer %A is %A" x.PeerId features)
+    UdpLog.Info (sprintf "NatProbeResult for peer %A is %A" x.PeerId (features.NatFeatures))
 
     // ack this message
     x.AckMessage features args

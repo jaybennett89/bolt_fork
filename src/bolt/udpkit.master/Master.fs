@@ -10,7 +10,7 @@ open UdpKit
 module Master =
 
   // starts a new peer mailbox
-  let private StartPeer (context:MasterContext) (game:Game) (peerId:Guid) =
+  let private StartPeer (context:MasterContext) (game:Game) (peerId:Guid) (endpoint:EndPoint) =
     PeerMailbox.Start(fun inbox ->
       let rec loop (peer:Peer) =
         async {
@@ -44,24 +44,33 @@ module Master =
               return! loop peer
 
             | PeerMessage.PerformPunchOnce(remoteId, remoteEndPoint, selfEndPoint) ->
-              let msg = context.Protocol.CreateMessage<Protocol.PunchOnce>()
-              msg.RemotePeerId <- remoteId
-              msg.RemoteEndPoint <- remoteEndPoint
-              context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+
+              if selfEndPoint <> UdpEndPoint.Any then
+                let msg = context.Protocol.CreateMessage<Protocol.PunchOnce>()
+                msg.RemotePeerId <- remoteId
+                msg.RemoteEndPoint <- remoteEndPoint
+                context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+
               return! loop peer
               
             | PeerMessage.PerformDirectConnectionWan(remoteId, remoteEndPoint, selfEndPoint) ->
               let msg = context.Protocol.CreateMessage<Protocol.DirectConnectionWan>()
               msg.RemotePeerId <- remoteId
-              msg.RemoteEndPoint <- remoteEndPoint
-              context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+              msg.RemoteEndPoint <- remoteEndPoint 
+
+              let ep = if selfEndPoint = UdpEndPoint.Any then peer.EndPoint else ((EndPoint.toDotNet selfEndPoint) :> EndPoint)
+
+              context.Socket.Send(ep, msg)
               return! loop peer
               
             | PeerMessage.PerformDirectConnectionLan(remoteId, remoteEndPoint, selfEndPoint) ->
               let msg = context.Protocol.CreateMessage<Protocol.DirectConnectionLan>()
               msg.RemotePeerId <- remoteId
               msg.RemoteEndPoint <- remoteEndPoint
-              context.Socket.Send(EndPoint.toDotNet selfEndPoint, msg)
+
+              let ep = if selfEndPoint = UdpEndPoint.Any then peer.EndPoint else ((EndPoint.toDotNet selfEndPoint) :> EndPoint)
+
+              context.Socket.Send(ep, msg)
               return! loop peer
 
           with
@@ -73,7 +82,7 @@ module Master =
         }
 
       UdpLog.Info (sprintf "Peer %A Connected (GameId: %A)" peerId game.GameId)
-      loop {Context=context; Game=game; PeerId=peerId; NatFeatures=None; IsHost=false; Mailbox=inbox}
+      loop {Context=context; Game=game; PeerId=peerId; NatFeatures=None; IsHost=false; Mailbox=inbox; EndPoint = endpoint}
     )
 
   // starts a new master mailbox
@@ -82,7 +91,7 @@ module Master =
     // start master mailbox
     let mailbox = MasterMailbox.Start(fun inbox ->
       let context = ref Unchecked.defaultof<MasterContext>
-      let createPeer (g:Game) (peerId:Guid) = StartPeer !context g peerId
+      let createPeer endpoint (g:Game) (peerId:Guid) = StartPeer !context g peerId endpoint
 
       let rec loop () =
         async {
@@ -99,7 +108,7 @@ module Master =
               let msg = (!context).Protocol.ParseMessage(args.Data)
 
               // grab peer
-              match (!context).PeerFind msg createPeer with
+              match (!context).PeerFind msg (createPeer args.Remote) with
               | None -> ()
               | Some peer -> peer.Post(MessageReceived(msg, args))
 
