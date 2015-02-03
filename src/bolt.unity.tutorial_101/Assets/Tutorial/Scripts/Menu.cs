@@ -24,6 +24,7 @@ public class Menu : Bolt.GlobalEventListener {
 
     if (GUILayout.Button("Start Client", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true))) {
       BoltLauncher.StartClient();
+      BoltNetwork.Connect(UdpEndPoint.Parse("127.0.0.1:27000"));
       state = State.ServerBrowser;
     }
 
