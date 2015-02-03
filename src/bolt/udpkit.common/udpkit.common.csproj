@@ -64,12 +64,13 @@
     <Compile Include="Protocol\Messages\GetHostList.cs" />
     <Compile Include="Protocol\Messages\HostInfo.cs" />
     <Compile Include="Protocol\Messages\PeerConnect.cs" />
-    <Compile Include="Protocol\Messages\HostKeepAlive.cs" />
+    <Compile Include="Protocol\Messages\PeerKeepAlive.cs" />
     <Compile Include="Protocol\Messages\HostRegister.cs" />
     <Compile Include="Protocol\Messages\PeerDisconnect.cs" />
     <Compile Include="Protocol\Messages\ProbeEndPoint.cs" />
     <Compile Include="Protocol\Messages\ProbeFeatures.cs" />
     <Compile Include="Protocol\Messages\ProbeHairpin.cs" />
+    <Compile Include="Protocol\Messages\PeerReconnect.cs" />
     <Compile Include="Protocol\Messages\ProbeUnsolicited.cs" />
     <Compile Include="Protocol\Messages\Punch.cs" />
     <Compile Include="Protocol\Messages\PunchOnce.cs" />

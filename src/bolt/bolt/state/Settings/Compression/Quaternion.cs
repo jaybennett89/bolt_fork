@@ -4,8 +4,9 @@ using UE = UnityEngine;
 namespace Bolt {
   struct PropertyQuaternionCompression {
     bool QuaternionMode;
-    PropertyVectorCompressionSettings Euler;
-    PropertyFloatCompressionSettings Quaternion;
+
+    public PropertyVectorCompressionSettings Euler;
+    public PropertyFloatCompressionSettings Quaternion;
 
     public int BitsRequired {
       get {

@@ -44,8 +44,8 @@ namespace UdpKit {
 
     MasterClient masterClient;
 
-    readonly SessionManager sessionManager;
-    readonly BroadcastManager broadcastManager;
+    SessionManager sessionManager;
+    BroadcastManager broadcastManager;
 
     readonly Queue<UdpEvent> eventQueueIn;
     readonly Queue<UdpEvent> eventQueueOut;
@@ -333,10 +333,10 @@ namespace UdpKit {
       Raise(ev);
     }
 
-    public void SetHostInfo(string serverName, byte[] userData) {
+    public void SetHostInfo(string serverName, bool dedicated, byte[] userData) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_SESSION_HOST_SETINFO;
-      ev.HostInfo = new UdpHostInfoArgs() { Name = serverName, Data = userData };
+      ev.HostInfo = new UdpHostInfoArgs() { Name = serverName, Data = userData, Dedicated = dedicated };
       Raise(ev);
     }
 

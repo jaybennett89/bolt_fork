@@ -23,6 +23,7 @@ namespace UdpKit {
     internal string _hostName;
     internal byte[] _hostData;
     internal object _hostObject;
+    internal bool _hostIsDedicated;
 
     public Guid Id { get { return _id; } }
     public UdpSessionSource Source { get { return _source; } }
@@ -39,6 +40,10 @@ namespace UdpKit {
 
     public string HostName {
       get { return _hostName; }
+    }
+
+    public bool IsDedicatedServer {
+      get { return _hostIsDedicated; }
     }
 
     public bool HasWan {

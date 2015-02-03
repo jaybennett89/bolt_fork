@@ -6,8 +6,19 @@ public class RobotBehaviour : Bolt.EntityBehaviour<IRobotState> {
   public override void Attached() {
     state.Transform.SetTransforms(transform);
     state.SetAnimator(GetComponent<Animator>());
-
     state.Animator.applyRootMotion = entity.isOwner;
+  }
+
+  public void FixedUpdate() {
+    if (!entity.isOwner) {
+      if (Input.GetKeyUp(KeyCode.U)) {
+        transform.localPosition = transform.localPosition + Vector3.up;
+      }
+
+      if (Input.GetKeyUp(KeyCode.J)) {
+        transform.localPosition = transform.localPosition + Vector3.down;
+      }
+    }
   }
 
   public override void SimulateOwner() {

@@ -50,6 +50,7 @@ namespace UdpKit {
   class UdpHostInfoArgs {
     public string Name;
     public byte[] Data;
+    public bool Dedicated;
   }
 
   [StructLayout(LayoutKind.Explicit)]

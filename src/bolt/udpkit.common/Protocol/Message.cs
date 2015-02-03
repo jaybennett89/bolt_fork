@@ -99,6 +99,7 @@ namespace UdpKit.Protocol {
       Serialize(ref session._wanEndPoint);
       Serialize(ref session._connectionsMax);
       Serialize(ref session._connectionsCurrent);
+      Serialize(ref session._hostIsDedicated);
     }
 
     protected void Serialize(ref NatFeatures features) {
@@ -109,6 +110,17 @@ namespace UdpKit.Protocol {
       Serialize(ref features.SupportsHairpinTranslation);
       Serialize(ref features.SupportsEndPointPreservation);
       Serialize(ref features.LanEndPoint);
+    }
+
+    protected void Serialize(ref bool value) {
+      if (_pack) {
+        if (HasSpace(1)) {
+          Blit.PackBool(_buffer, ref _ptr, value);
+        }
+      }
+      else {
+        value = Blit.ReadBool(_buffer, ref _ptr);
+      }
     }
 
     protected void Serialize(ref byte value) {
