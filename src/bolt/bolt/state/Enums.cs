@@ -38,7 +38,7 @@ namespace Bolt {
     EveryoneExceptController = 0,
     Everyone = 1,
     OnlyOwnerAndController = 2,
-    Local = 3
+    LocalForEachPlayer = 3
   }
 
 #if BOLT_COMPILER_DLL
