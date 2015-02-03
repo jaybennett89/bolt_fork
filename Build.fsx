@@ -100,5 +100,6 @@ Target "InstallDebug" (fun _ ->
 ("Clean")
   ==> ("Build")
   ==> ("Install")
+  ==> ("InstallDebug")
 
-Run "Install"
+Run "InstallDebug"

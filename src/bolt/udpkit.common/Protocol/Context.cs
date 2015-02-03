@@ -7,7 +7,7 @@ namespace UdpKit.Protocol {
   class Context {
     readonly Guid peerId;
     readonly Guid gameId;
-    readonly Type[] messageTypes = new Type[256];
+    readonly Type[] messageTypes = new Type[128];
 
     public Guid PeerId {
       get { return peerId; }
@@ -33,10 +33,12 @@ namespace UdpKit.Protocol {
 
       RegisterMessageType<Protocol.PeerConnect>();
       RegisterMessageType<Protocol.PeerConnectResult>();
+      RegisterMessageType<Protocol.PeerDisconnect>();
+      RegisterMessageType<Protocol.PeerReconnect>();
+      RegisterMessageType<Protocol.PeerKeepAlive>();
 
       RegisterMessageType<Protocol.HostInfo>();
       RegisterMessageType<Protocol.HostRegister>();
-      RegisterMessageType<Protocol.HostKeepAlive>();
       RegisterMessageType<Protocol.GetHostList>();
 
       RegisterMessageType<Protocol.ProbeEndPoint>();

@@ -54,6 +54,7 @@ namespace UdpKit {
       UdpEvent ev;
 
       while (PollInternal(out ev)) {
+
         switch (ev.Type) {
           case UdpEvent.INTERNAL_CONNECT: OnEventConnect(ev); break;
           case UdpEvent.INTERNAL_CONNECT_CANCEL: OnEventConnectCancel(ev); break;
@@ -89,11 +90,6 @@ namespace UdpKit {
       }
     }
 
-    void OnEvent_MasterServer_Disconnect(UdpEvent ev) {
-      if (masterClient != null) {
-        masterClient.Disconnect();
-      }
-    }
 
     void OnEventStart(UdpEvent ev) {
       if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
@@ -265,8 +261,18 @@ namespace UdpKit {
      * */
 
     void OnEvent_MasterServer_Connect(UdpEvent ev) {
+      if (masterClient != null) {
+        masterClient.Disconnect();
+      }
+
       masterClient = new MasterClient(this, new Protocol.ProtocolClient(platformSocket, GameId, PeerId));
       masterClient.Connect(ev.EndPoint);
+    }
+
+    void OnEvent_MasterServer_Disconnect(UdpEvent ev) {
+      if (masterClient != null) {
+        masterClient.Disconnect();
+      }
     }
 
     void OnEvent_MasterServer_Session_ListRequest(UdpEvent ev) {
@@ -278,7 +284,7 @@ namespace UdpKit {
      * */
 
     void OnEvent_Session_Host_SetInfo(UdpEvent ev) {
-      sessionManager.SetHostInfo(ev.HostInfo.Name, ev.HostInfo.Data);
+      sessionManager.SetHostInfo(ev.HostInfo);
     }
 
     void OnEvent_Session_Connect(UdpEvent ev) {

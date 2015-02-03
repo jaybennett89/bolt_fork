@@ -24,7 +24,7 @@ public class Menu : Bolt.GlobalEventListener {
 
     if (GUILayout.Button("Start Client", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true))) {
       BoltLauncher.StartClient();
-      BoltNetwork.Connect(UdpEndPoint.Parse("127.0.0.1:27000"));
+      //BoltNetwork.Connect(UdpEndPoint.Parse("127.0.0.1:27000"));
       state = State.ServerBrowser;
     }
 
@@ -40,6 +40,10 @@ public class Menu : Bolt.GlobalEventListener {
 
   void ServerBrowser() {
     GUILayout.Label("Server Browser");
+
+    if (GUILayout.Button("Disconnect From Zeus")) {
+      Bolt.Zeus.Disconnect();
+    }
 
     GUILayout.BeginVertical(GUI.skin.box);
 

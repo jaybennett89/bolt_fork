@@ -44,7 +44,6 @@ module Master =
               return! loop peer
 
             | PeerMessage.PerformPunchOnce(remoteId, remoteEndPoint, selfEndPoint) ->
-
               if selfEndPoint <> UdpEndPoint.Any then
                 let msg = context.Protocol.CreateMessage<Protocol.PunchOnce>()
                 msg.RemotePeerId <- remoteId

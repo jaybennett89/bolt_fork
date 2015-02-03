@@ -375,13 +375,13 @@ internal static class BoltCore {
     _udpSocket.Connect(session, token.ToByteArray());
   }
 
-  public static void SetHostInfo(string serverName, IProtocolToken token) {
+  public static void SetHostInfo(string serverName, bool dedicated, IProtocolToken token) {
     if (BoltCore.isServer == false) {
       BoltLog.Error("Only the server can call SetSessionData");
       return;
     }
 
-    _udpSocket.SetHostInfo(serverName, token.ToByteArray());
+    _udpSocket.SetHostInfo(serverName, dedicated, token.ToByteArray());
   }
 
   public static void EnableLanBroadcast(UdpIPv4Address local, UdpIPv4Address broadcast, ushort port) {

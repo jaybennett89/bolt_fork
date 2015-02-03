@@ -75,7 +75,7 @@ namespace UdpKit {
         UpdateNatPunch(now);
 
         // update host stuff
-        UpdateRegisteredHost(now);
+        KeepAlive(now);
       }
 
       void UpdateNatPunch(uint now) {
@@ -154,12 +154,10 @@ namespace UdpKit {
         }
       }
 
-      void UpdateRegisteredHost(uint now) {
-        if (IsConnectedHost) {
-          if (keepalive < now) {
-            Send<Protocol.HostKeepAlive>(endpoint);
-            keepalive = now + socket.Config.HostKeepAliveInterval;
-          }
+      void KeepAlive(uint now) {
+        if (IsConnected && (keepalive < now)) {
+          Send<Protocol.PeerKeepAlive>(endpoint);
+          keepalive = now + socket.Config.HostKeepAliveInterval;
         }
       }
 
@@ -186,18 +184,22 @@ namespace UdpKit {
       public void Disconnect() {
         try {
           if (IsConnected) {
-            ClearPunchRequest();
+            // tell user we are leaving
+            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_DISCONNECTED, endpoint);
 
             // tell master server we are leaving
             Send<Protocol.PeerDisconnect>(endpoint);
 
-            // tell user we are leaving
-            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_DISCONNECTED, endpoint);
+            //
+            ClearPunchRequest();
+          }
+          else {
+            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_CONNECTFAILED, endpoint);
           }
         }
         finally {
-          endpoint = UdpEndPoint.Any;
-          state = State.Disconnected;
+          socket.masterClient = null;
+          socket.sessionManager = new SessionManager(socket);
         }
       }
 
@@ -208,9 +210,6 @@ namespace UdpKit {
         }
 
         if (endpoint != ep) {
-          // disconnect from old master server
-          Disconnect();
-
           // connect to new one
           endpoint = ep;
 
@@ -228,6 +227,7 @@ namespace UdpKit {
           Client.SetHandler<Protocol.PunchOnce>(OnPunchOnce);
           Client.SetHandler<Protocol.Punch>(OnPunch);
           Client.SetHandler<Protocol.Error>(OnError);
+          Client.SetHandler<Protocol.PeerReconnect>(OnPeerReconnect);
 
           Client.SetHandler<Protocol.DirectConnectionWan>(OnDirectConnectionWan);
           Client.SetHandler<Protocol.DirectConnectionLan>(OnDirectConnectionLan);
@@ -238,6 +238,17 @@ namespace UdpKit {
           // send peer connect
           Send<Protocol.PeerConnect>(endpoint);
         }
+      }
+
+      void OnPeerReconnect(Protocol.PeerReconnect perform) {
+        if (socket.masterClient != null) {
+          socket.masterClient.Disconnect();
+        }
+
+        socket.sessionManager = new SessionManager(socket);
+
+        socket.masterClient = new MasterClient(socket, new Protocol.ProtocolClient(socket.PlatformSocket, socket.GameId, socket.PeerId));
+        socket.masterClient.Connect(endpoint);
       }
 
       public void RegisterHost() {

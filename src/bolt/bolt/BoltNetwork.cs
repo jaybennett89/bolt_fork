@@ -1289,7 +1289,11 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void SetHostInfo(string serverName, IProtocolToken token) {
-    BoltCore.SetHostInfo(serverName, token);
+    BoltCore.SetHostInfo(serverName, false, token);
+  }
+
+  public static void SetDedicatedServerInfo(string serverName, IProtocolToken token) {
+    BoltCore.SetHostInfo(serverName, true, token);
   }
 
   /// <summary>
