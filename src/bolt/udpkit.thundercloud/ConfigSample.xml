@@ -4,7 +4,7 @@
   <Timeouts Host="180000" Client="60000" />
   <GameId>00000000-0000-0000-0000-000000000000</GameId>
   <GameId>7FBFDCBB-8F4D-4750-BCC9-FD4FD36B5E5F</GameId>
-  <Master Ip="127.0.0.1" Count="1">
+  <Master Ip="127.0.0.1" Count="1" Port="24000">
     <NatProbe Ip0="127.0.0.2" Ip1="127.0.0.3" Ip2="127.0.0.4" />
   </Master>
   <Master Ip="127.0.0.1">

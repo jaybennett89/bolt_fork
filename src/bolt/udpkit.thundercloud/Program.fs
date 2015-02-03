@@ -51,7 +51,9 @@ let startMaster (context:MasterContext) (m:Config.Master) =
       // start master
       {Master=master; Probe=probe} :: (startAll ports.Next (c-1))
 
-  startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000} count
+  match m.Port with
+  | None -> startAll {Master=24000; Probe0=25000; Probe1=26000; Probe2=27000} count
+  | Some p -> startAll {Master=p; Probe0=(p+1000); Probe1=(p+2000); Probe2=(p+3000)} count
 
 [<EntryPoint>]
 let main argv = 
