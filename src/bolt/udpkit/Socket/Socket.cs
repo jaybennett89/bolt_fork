@@ -715,6 +715,10 @@ namespace UdpKit {
 
           cn.Destroy();
 
+          if (mode == UdpSocketMode.Host && sessionManager != null) {
+            sessionManager.SetConnections(connectionList.Count, Config.ConnectionLimit);
+          }
+
           return true;
         }
       }
