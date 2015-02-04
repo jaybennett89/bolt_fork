@@ -89,15 +89,12 @@ type AsyncUdpSocket (onRecv:SocketData -> unit) =
       // recv data
       recv 1
 
-      // loop
-      loop ()
-
     with
     | ex ->
       UdpLog.Error(ex.Message)
       UdpLog.Error(ex.StackTrace)
-
-      loop ()
+    
+    loop ()
 
   let thread = new Thread(loop)
       
