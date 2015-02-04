@@ -292,7 +292,7 @@ internal static class BoltCore {
     _localSceneLoading = loading;
 
     // begin loading
-    BoltSceneLoader.Enqueue(_localSceneLoading.Scene);
+    BoltSceneLoader.Enqueue(_localSceneLoading);
   }
 
   public static ManualResetEvent Shutdown() {
@@ -657,6 +657,10 @@ internal static class BoltCore {
         if (sameScene && loadingDone) {
           try {
             BoltInternal.GlobalEventListenerBase.SceneLoadRemoteDoneInvoke(it.val);
+
+            if (_localSceneLoading.Token != null) {
+              BoltInternal.GlobalEventListenerBase.SceneLoadRemoteDoneInvoke(it.val, _localSceneLoading.Token);
+            }
           }
           finally {
             it.val._remoteSceneLoading.State = Bolt.SceneLoadState.STATE_CALLBACK_INVOKED;
@@ -1013,7 +1017,7 @@ internal static class BoltCore {
 #endif
   }
 
-  internal static void SceneLoadBegin(Scene scene) {
+  internal static void SceneLoadBegin(SceneLoadState state) {
     var it = _entities.GetIterator();
 
     while (it.Next()) {
@@ -1026,25 +1030,31 @@ internal static class BoltCore {
     _sceneObjects = new Dictionary<UniqueId, BoltEntity>();
 
     // update behaviours
-    UpdateActiveGlobalBehaviours(scene.Index);
+    UpdateActiveGlobalBehaviours(state.Scene.Index);
 
     // call out to user code
-    BoltInternal.GlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltInternal.GlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(state.Scene.Index));
+
+    if (state.Token != null) {
+      BoltInternal.GlobalEventListenerBase.SceneLoadLocalBeginInvoke(BoltNetworkInternal.GetSceneName(state.Scene.Index), state.Token);
+    }
   }
 
-  internal static void SceneLoadDone(Scene scene) {
-    // verify state
-    Assert.True(_localSceneLoading.Scene == scene);
-    Assert.True(_localSceneLoading.State == SceneLoadState.STATE_LOADING);
-
+  internal static void SceneLoadDone(SceneLoadState state) {
     // switch local state
-    _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
+    if (state.Scene == _localSceneLoading.Scene) {
+      _localSceneLoading.State = SceneLoadState.STATE_LOADING_DONE;
+    }
 
     // 
     UpdateSceneObjectsLookup();
 
     // call out to user code
-    BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(scene.Index));
+    BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(state.Scene.Index));
+
+    if (state.Token != null) {
+      BoltInternal.GlobalEventListenerBase.SceneLoadLocalDoneInvoke(BoltNetworkInternal.GetSceneName(state.Scene.Index), state.Token);
+    }
   }
 
   internal static void UpdateSceneObjectsLookup() {

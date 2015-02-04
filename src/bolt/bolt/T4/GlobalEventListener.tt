@@ -119,6 +119,11 @@ sceneLoadLocalBegin.XmlDoc =
   /// </example>
 ";
 
+var sceneLoadLocalBegin2 = new Method("SceneLoadLocalBegin");
+sceneLoadLocalBegin2.AddArgument("string", "scene");
+sceneLoadLocalBegin2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadLocalBegin2.XmlDoc = "";
+
 var sceneLoadLocalDone = new Method("SceneLoadLocalDone");
 sceneLoadLocalDone.AddArgument("string", "map");
 sceneLoadLocalDone.XmlDoc =
@@ -139,6 +144,11 @@ sceneLoadLocalDone.XmlDoc =
   /// ```
   /// </example>
 ";
+
+var sceneLoadLocalDone2 = new Method("SceneLoadLocalDone");
+sceneLoadLocalDone2.AddArgument("string", "scene");
+sceneLoadLocalDone2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadLocalDone2.XmlDoc = "";
 
 var sceneLoadRemoteDone = new Method("SceneLoadRemoteDone");
 sceneLoadRemoteDone.AddArgument("BoltConnection", "connection");
@@ -164,6 +174,11 @@ sceneLoadRemoteDone.XmlDoc =
   /// ```
   /// </example>
 ";
+
+var sceneLoadRemoteDone2 = new Method("SceneLoadRemoteDone");
+sceneLoadRemoteDone2.AddArgument("BoltConnection", "connection");
+sceneLoadRemoteDone2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadRemoteDone2.XmlDoc = "";
 
 var connected = new Method("Connected");
 connected.AddArgument("BoltConnection", "connection");
@@ -642,8 +657,11 @@ methods.Add(streamDataReceived);
 methods.Add(registerStreamChannels);
 methods.Add(portMappingChanged);
 methods.Add(sceneLoadLocalBegin);
+methods.Add(sceneLoadLocalBegin2);
 methods.Add(sceneLoadLocalDone);
+methods.Add(sceneLoadLocalDone2);
 methods.Add(sceneLoadRemoteDone);
+methods.Add(sceneLoadRemoteDone2);
 methods.Add(connected);
 methods.Add(connected2);
 methods.Add(connected3);

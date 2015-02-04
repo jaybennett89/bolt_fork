@@ -3,12 +3,12 @@ using UnityEngine;
 
 class BoltSceneLoader : MonoBehaviour {
   class LoadOp : BoltObject {
-    public Bolt.Scene scene;
+    public Bolt.SceneLoadState scene;
     public AsyncOperation async;
   }
 
   static int _delay;
-  static Bolt.Scene _loaded;
+  static Bolt.SceneLoadState _loaded;
 
   static readonly BoltSingleList<LoadOp> _loadOps = new BoltSingleList<LoadOp>();
   static internal bool IsLoading { get { return _loadOps.count > 0; } }
@@ -38,7 +38,7 @@ class BoltSceneLoader : MonoBehaviour {
     BoltCore.SceneLoadBegin(_loadOps.first.scene);
 
     // load level
-    Application.LoadLevel(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Index));
+    Application.LoadLevel(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Scene.Index));
 
     // we are done!
     Done();
@@ -50,7 +50,7 @@ class BoltSceneLoader : MonoBehaviour {
       BoltCore.SceneLoadBegin(_loadOps.first.scene);
 
       // begin new async load
-      _loadOps.first.async = Application.LoadLevelAsync(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Index));
+      _loadOps.first.async = Application.LoadLevelAsync(BoltNetworkInternal.GetSceneName(_loadOps.first.scene.Scene.Index));
 
     }
     else {
@@ -73,8 +73,8 @@ class BoltSceneLoader : MonoBehaviour {
     }
   }
 
-  internal static void Enqueue(Bolt.Scene scene) {
-    BoltLog.Debug("Loading {0} ({1})", scene, BoltNetworkInternal.GetSceneName(scene.Index));
+  internal static void Enqueue(Bolt.SceneLoadState scene) {
+    BoltLog.Debug("Loading {0} ({1})", scene, BoltNetworkInternal.GetSceneName(scene.Scene.Index));
 
     _delay = 0;
     _loadOps.AddLast(new LoadOp { scene = scene });
