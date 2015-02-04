@@ -94,10 +94,10 @@ module Master =
 
       let rec loop () =
         async {
-          // wait for args to receive
-          let! args = inbox.Receive()
-
           try 
+            // wait for args to receive
+            let! args = inbox.Receive()
+
             match args with
             | MasterMessage.Shutdown -> 
               return ()
