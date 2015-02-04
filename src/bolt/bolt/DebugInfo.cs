@@ -254,6 +254,16 @@ namespace Bolt {
           LabelField("Is Frozen", entity.IsFrozen);
           LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
 
+          if(state.Animator != null) {
+            for(int i = 0; i < state.Animator.layerCount; ++i) {
+              LabelField("Animator Layer", state.Animator.GetLayerName(i));
+
+              foreach (var clip in state.Animator.GetCurrentAnimationClipState(i)) {
+                LabelField("Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
+              }
+            }
+          }
+
           LabelField("World Position", entity.UnityObject.transform.position);
 
           LabelField("ServerFrame Count", state.Frames.count);
