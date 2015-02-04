@@ -72,7 +72,7 @@ namespace Bolt {
 
     public override void Read(BoltConnection connection, NetworkObj obj, NetworkStorage storage, UdpPacket packet) {
       if (Interpolation.Enabled) {
-        storage.Values[obj[this]].Float1 = Compression.Read(packet);
+        storage.Values[obj[this] + 1].Float1 = Compression.Read(packet);
       }
       else {
         storage.Values[obj[this]].Float0 = Compression.Read(packet);

@@ -78,8 +78,12 @@ let main argv =
   let writer = new StreamWriter(log)
 
   UdpKit.UdpLog.SetWriter(fun i m ->
-    Console.WriteLine(m);
-    lock log (fun () -> writer.WriteLine(m))
+    Console.WriteLine(m)
+
+    lock log (fun () -> 
+      writer.WriteLine(m)
+      writer.Flush()
+    )
   )
 
   let path = 
@@ -132,30 +136,35 @@ let main argv =
         Protocol = new UdpKit.Protocol.Context(System.Guid.NewGuid())
         LanNetmask = UdpKit.UdpIPv4Address.Parse(cfg.LanNetmask.Netmask)
       }
-
-    let allMasters = 
-      cfg.Masters 
-      |> Seq.map (startMaster context) 
-      |> Seq.toList
+      
+    try 
+      let allMasters = 
+        cfg.Masters 
+        |> Seq.map (startMaster context) 
+        |> Seq.toList
        
-    while true do 
-      if !dumpTimer > 0 then
-        System.Threading.Thread.Sleep(!dumpTimer)
+      while true do 
+        if !dumpTimer > 0 then
+          System.Threading.Thread.Sleep(!dumpTimer)
 
-        for g in peerLookup.Lookup do
-          let g = g.Value
-          UdpKit.UdpLog.Info (sprintf "Game: %A (Peers: %i, Hosts: %i)" g.GameId g.Peers.Count g.Hosts.Count) 
+          for g in peerLookup.Lookup do
+            let g = g.Value
+            UdpKit.UdpLog.Info (sprintf "Game: %A (Peers: %i, Hosts: %i)" g.GameId g.Peers.Count g.Hosts.Count) 
 
-          if g.Peers.Count > 0 then
-            UdpKit.UdpLog.Info "Peers"
-            for p in g.Peers do
-              UdpKit.UdpLog.Info (sprintf "Peer %A" p.Key)
+            if g.Peers.Count > 0 then
+              UdpKit.UdpLog.Info "Peers"
+              for p in g.Peers do
+                UdpKit.UdpLog.Info (sprintf "Peer %A" p.Key)
 
-          if g.Hosts.Count > 0 then
-            UdpKit.UdpLog.Info "Hosts"
-            for p in g.Hosts do
-              UdpKit.UdpLog.Info (sprintf "Host %A" p.Key)
+            if g.Hosts.Count > 0 then
+              UdpKit.UdpLog.Info "Hosts"
+              for p in g.Hosts do
+                UdpKit.UdpLog.Info (sprintf "Host %A" p.Key)
 
-      else
-        System.Threading.Thread.Sleep(1000)
+        else
+          System.Threading.Thread.Sleep(1000)
+    with
+    | ex ->
+      UdpKit.UdpLog.Error(ex.Message)
+      UdpKit.UdpLog.Error(ex.StackTrace)
   0

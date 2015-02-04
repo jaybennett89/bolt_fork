@@ -35,60 +35,69 @@ type AsyncUdpSocket (onRecv:SocketData -> unit) =
     sendQueue.Enqueue({data with Size=size; Remote=remote})
   
   let rec loop () =
-    let rec send () =
-      try 
-        if sendQueue.Count > 0 then
-          let ok, data = sendQueue.TryDequeue() 
 
-          if ok then
-            UdpLog.Info (sprintf "%A: Send To:%A" socket.LocalEndPoint data.Remote)
-            socket.SendTo(data.Data, data.Size, SocketFlags.None, data.Remote) |> ignore
-            send()
+    try 
+      
+      let rec send () =
+        try 
+          if sendQueue.Count > 0 then
+            let ok, data = sendQueue.TryDequeue() 
+
+            if ok then
+              UdpLog.Info (sprintf "%A: Send To:%A" socket.LocalEndPoint data.Remote)
+              socket.SendTo(data.Data, data.Size, SocketFlags.None, data.Remote) |> ignore
+              send()
+
+            else
+              ()
 
           else
             ()
+        with
+        | ex -> 
+          UdpLog.Error(ex.Message);
+          UdpLog.Error(ex.StackTrace);
+          send()
 
-        else
-          ()
-      with
-      | ex -> 
-        UdpLog.Error(ex.Message);
-        UdpLog.Error(ex.StackTrace);
-        send()
+      let rec recv wait =
+        try 
+          if socket.Poll(wait, SelectMode.SelectRead) then
+             let data = SocketData.New()
+             let mutable remote = new IPEndPoint(IPAddress.Any, 0) :> EndPoint
+             let bytes = socket.ReceiveFrom(data.Data, &remote)
 
-    let rec recv wait =
-      try 
-        if socket.Poll(wait, SelectMode.SelectRead) then
-           let data = SocketData.New()
-           let mutable remote = new IPEndPoint(IPAddress.Any, 0) :> EndPoint
-           let bytes = socket.ReceiveFrom(data.Data, &remote)
+             UdpLog.Info (sprintf "%A: Recv From:%A" socket.LocalEndPoint remote)
 
-           UdpLog.Info (sprintf "%A: Recv From:%A" socket.LocalEndPoint remote)
+             onRecv {data with Size = bytes; Remote = remote; Reply = queueMsg remote}
 
-           onRecv {data with Size = bytes; Remote = remote; Reply = queueMsg remote}
+             // once more
+             recv 0
 
-           // once more
-           recv 0
+          else
 
-        else
+            ()
 
-          ()
+        with
+        | ex -> 
+          UdpLog.Error(ex.Message);
+          UdpLog.Error(ex.StackTrace);
+          recv 0
 
-      with
-      | ex -> 
-        UdpLog.Error(ex.Message);
-        UdpLog.Error(ex.StackTrace);
-        recv 0
-
-    // send data
-    send ()
+      // send data
+      send ()
       
-    // recv data
-    recv 1
+      // recv data
+      recv 1
 
-    // loop
-    loop ()
-      
+      // loop
+      loop ()
+
+    with
+    | ex ->
+      UdpLog.Error(ex.Message)
+      UdpLog.Error(ex.StackTrace)
+
+      loop ()
 
   let thread = new Thread(loop)
       
