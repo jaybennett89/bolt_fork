@@ -256,10 +256,10 @@ namespace Bolt {
 
           if(state.Animator != null) {
             for(int i = 0; i < state.Animator.layerCount; ++i) {
-              LabelField("Animator Layer", state.Animator.GetLayerName(i));
+              LabelField("  Layer", state.Animator.GetLayerName(i));
 
               foreach (var clip in state.Animator.GetCurrentAnimationClipState(i)) {
-                LabelField("Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
+                LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
             }
           }
