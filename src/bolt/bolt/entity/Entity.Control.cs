@@ -110,7 +110,7 @@ namespace Bolt {
         Controller._entityChannel.CreateOnRemote(this, out proxy);
         Controller._entityChannel.ForceSync(this);
 
-        // set token
+        // set token 
         proxy.ControlTokenLost = null;
         proxy.ControlTokenGained = token;
       }
@@ -146,11 +146,10 @@ namespace Bolt {
 
     internal bool QueueInput(Command cmd) {
       if (_canQueueCommands) {
-
         if (HasControl) {
           if (CommandQueue.count < BoltCore._config.commandQueueSize) {
+            cmd.Sequence = ++CommandSequence;
             cmd.ServerFrame = BoltCore.serverFrame;
-            cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
           }
           else {
             BoltLog.Error("Input queue for {0} is full", this);
@@ -173,7 +172,5 @@ namespace Bolt {
         return false;
       }
     }
-
-
   }
 }

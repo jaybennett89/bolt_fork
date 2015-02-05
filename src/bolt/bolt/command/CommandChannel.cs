@@ -41,7 +41,7 @@ partial class EntityChannel {
     }
 
 
-    bool EntityHasUnsentState(Entity entity) {
+    bool EntityHasUnsentResults(Entity entity) {
       var it = entity.CommandQueue.GetIterator();
 
       while (it.Next()) {
@@ -61,9 +61,9 @@ partial class EntityChannel {
         // 1) Entity must exist locally (not null)
         // 2) The connection must be the controller
         // 3) The entity must exist remotely
-        // 4) The entity has to have unsent states
+        // 4) The entity has to have unsent results
 
-        if ((entity != null) && ReferenceEquals(entity.Controller, connection) && connection._entityChannel.ExistsOnRemote(entity) && EntityHasUnsentState(entity)) {
+        if ((entity != null) && ReferenceEquals(entity.Controller, connection) && connection._entityChannel.ExistsOnRemote(entity) && EntityHasUnsentResults(entity)) {
           Assert.True(entity.IsOwner);
 
           int proxyPos = packet.UdpPacket.Position;
@@ -81,7 +81,7 @@ partial class EntityChannel {
 
                 packet.UdpPacket.WriteBool(true);
                 packet.UdpPacket.WriteTypeId(it.val.ResultObject.Meta.TypeId);
-                packet.UdpPacket.WriteUShort(it.val.Sequence, Command.SEQ_BITS);
+                packet.UdpPacket.WriteIntVB(it.val.Sequence);
                 packet.UdpPacket.WriteToken(it.val.ResultObject.Token);
 
                 it.val.PackResult(connection, packet.UdpPacket);
@@ -122,19 +122,21 @@ partial class EntityChannel {
     }
 
     void ReadResult(Packet packet) {
-      while (packet.UdpPacket.CanRead()) {
-        if (packet.UdpPacket.ReadBool() == false) { break; }
+      var p = packet.UdpPacket;
 
-        NetworkId netId = packet.UdpPacket.ReadNetworkId();
+      while (p.CanRead()) {
+        if (p.ReadBool() == false) { break; }
+
+        NetworkId netId = p.ReadNetworkId();
         EntityProxy proxy = incommingProxiesByNetworkId[netId];
         Entity entity = proxy.Entity;
 
-        while (packet.UdpPacket.CanRead()) {
-          if (packet.UdpPacket.ReadBool() == false) { break; }
+        while (p.CanRead()) {
+          if (p.ReadBool() == false) { break; }
 
-          TypeId typeId = packet.UdpPacket.ReadTypeId();
-          ushort sequence = packet.UdpPacket.ReadUShort(Command.SEQ_BITS);
-          IProtocolToken resultToken = packet.UdpPacket.ReadToken();
+          var typeId = p.ReadTypeId();
+          var sequence = p.ReadIntVB();
+          var token = p.ReadToken();
 
           Command cmd = null;
 
@@ -142,10 +144,18 @@ partial class EntityChannel {
             var it = entity.CommandQueue.GetIterator();
 
             while (it.Next()) {
-              int dist = UdpMath.SeqDistance(it.val.Sequence, sequence, Command.SEQ_SHIFT);
-              if (dist > 0) { break; }
-              if (dist < 0) { it.val.Flags |= CommandFlags.DISPOSE; }
-              if (dist == 0) {
+              // this is later than we received, skip
+              if (it.val.Sequence > sequence) {
+                break;
+              }
+
+              // this is 
+              else if (it.val.Sequence < sequence) {
+                it.val.Flags |= CommandFlags.DISPOSE;
+              }
+
+              // we found what we need
+              else {
                 cmd = it.val;
                 break;
               }
@@ -153,18 +163,18 @@ partial class EntityChannel {
           }
 
           if (cmd) {
-            cmd.ResultObject.Token = resultToken;
             cmd.Flags |= CommandFlags.CORRECTION_RECEIVED;
+            cmd.ResultObject.Token = token;
 
             if (cmd.Meta.SmoothFrames > 0) {
               cmd.BeginSmoothing();
             }
 
-            cmd.ReadResult(connection, packet.UdpPacket);
+            cmd.ReadResult(connection, p);
           }
           else {
             cmd = Factory.NewCommand(typeId);
-            cmd.ReadResult(connection, packet.UdpPacket);
+            cmd.ReadResult(connection, p);
             cmd.Free();
           }
         }
@@ -179,13 +189,15 @@ partial class EntityChannel {
     }
 
     void PackInput(Packet packet) {
+      var p = packet.UdpPacket;
+
       foreach (EntityProxy proxy in incommingProxiesByNetworkId.Values) {
         Entity entity = proxy.Entity;
 
         if (entity && entity.HasControl && (entity.CommandQueue.count > 0)) {
-          int proxyPos = packet.UdpPacket.Position;
-          packet.UdpPacket.WriteContinueMarker();
-          packet.UdpPacket.WriteNetworkId(proxy.NetworkId);
+          int proxyPos = p.Position;
+          p.WriteContinueMarker();
+          p.WriteNetworkId(proxy.NetworkId);
 
           Command cmd = entity.CommandQueue.last;
 
@@ -199,42 +211,42 @@ partial class EntityChannel {
 
           // write all commands into the packet
           for (int i = 0; i < redundancy; ++i) {
-            ////BoltLog.Debug("PACK | cmd._frame: {0}, Network._frame: {1}", cmd._frame, BoltNetworkCore._frame);
+            int cmdPos = p.Position;
 
-            int cmdPos = packet.UdpPacket.Position;
+            p.WriteContinueMarker();
+            p.WriteTypeId(cmd.Meta.TypeId);
+            p.WriteIntVB(cmd.Sequence);
+            p.WriteIntVB(cmd.ServerFrame);
+            p.WriteToken(cmd.InputObject.Token);
 
-            packet.UdpPacket.WriteContinueMarker();
-            packet.UdpPacket.WriteTypeId(cmd.Meta.TypeId);
-            packet.UdpPacket.WriteUShort(cmd.Sequence, Command.SEQ_BITS);
-            packet.UdpPacket.WriteIntVB(cmd.ServerFrame);
-            packet.UdpPacket.WriteToken(cmd.InputObject.Token);
-
-            cmd.PackInput(connection, packet.UdpPacket);
+            cmd.PackInput(connection, p);
             cmd = entity.CommandQueue.Next(cmd);
 
-            if (packet.UdpPacket.Overflowing) {
-              packet.UdpPacket.Position = cmdPos;
+            if (p.Overflowing) {
+              p.Position = cmdPos;
               break;
             }
           }
 
           // overflowing, reset before this proxy and break
-          if (packet.UdpPacket.Overflowing) {
-            packet.UdpPacket.Position = proxyPos;
+          if (p.Overflowing) {
+            p.Position = proxyPos;
             break;
           }
           else {
             // stop marker for commands
-            packet.UdpPacket.WriteStopMarker();
+            p.WriteStopMarker();
           }
         }
       }
 
       // stop marker for proxies
-      packet.UdpPacket.WriteStopMarker();
+      p.WriteStopMarker();
     }
 
     void ReadInput(Packet packet) {
+      var p = packet.UdpPacket;
+
       int maxFrame = BoltCore._frame;
       int minFrame = maxFrame - (BoltCore._config.commandDelayAllowed + pingFrames);
 
@@ -246,12 +258,12 @@ partial class EntityChannel {
           proxy = outgoingProxiesByNetworkId[netId];
         }
 
-        while (packet.UdpPacket.ReadStopMarker()) {
-          Bolt.Command cmd = Factory.NewCommand(packet.UdpPacket.ReadTypeId());
-          cmd.Sequence = packet.UdpPacket.ReadUShort(Command.SEQ_BITS);
-          cmd.ServerFrame = packet.UdpPacket.ReadIntVB();
-          cmd.InputObject.Token = packet.UdpPacket.ReadToken();
-          cmd.ReadInput(connection, packet.UdpPacket);
+        while (p.ReadStopMarker()) {
+          Bolt.Command cmd = Factory.NewCommand(p.ReadTypeId());
+          cmd.Sequence = p.ReadIntVB();
+          cmd.ServerFrame = p.ReadIntVB();
+          cmd.InputObject.Token = p.ReadToken();
+          cmd.ReadInput(connection, p);
 
           // no proxy or entity
           if (!proxy || !proxy.Entity) { continue; }
@@ -262,7 +274,7 @@ partial class EntityChannel {
           if (ReferenceEquals(entity.Controller, connection) == false) { continue; }
 
           // sequence is old
-          if (UdpMath.SeqDistance(cmd.Sequence, entity.CommandSequence, Command.SEQ_SHIFT) <= 0) { continue; }
+          if (cmd.Sequence < entity.CommandSequence) { continue; }
 
           // put on command queue
           entity.CommandQueue.AddLast(cmd);

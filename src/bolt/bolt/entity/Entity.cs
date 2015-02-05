@@ -30,8 +30,8 @@ namespace Bolt {
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
+    internal int CommandSequence = 0;
     internal bool CanFreeze = true;
-    internal ushort CommandSequence = 0;
     internal Command CommandLastExecuted = null;
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();

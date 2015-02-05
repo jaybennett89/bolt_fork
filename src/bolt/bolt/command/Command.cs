@@ -68,7 +68,7 @@ namespace Bolt {
     internal NetworkStorage SmoothStorageFrom;
     internal NetworkStorage SmoothStorageTo;
 
-    internal ushort Sequence;
+    internal int Sequence;
     internal CommandFlags Flags;
 
     /// <summary>
@@ -77,6 +77,10 @@ namespace Bolt {
     public int ServerFrame {
       get;
       internal set;
+    }
+
+    public int Number {
+      get { return Sequence; }
     }
 
     /// <summary>
