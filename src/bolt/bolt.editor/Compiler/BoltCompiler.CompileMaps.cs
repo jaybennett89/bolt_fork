@@ -46,12 +46,17 @@ partial class BoltCompiler {
         file.EmitLine("static internal readonly Dictionary<string, int> nameLookup = new Dictionary<string, int>();");
         file.EmitLine("static internal readonly Dictionary<int, string> indexLookup = new Dictionary<int, string>();");
 
+        file.EmitScope("public static void AddScene(short prefix, short id, string name)", () => {
+          file.EmitLine("int index = (prefix << 16) | (int)id;");
+          file.EmitLine("nameLookup.Add(name, index);");
+          file.EmitLine("indexLookup.Add(index, name);");
+        });
+
         file.EmitLine("static public IEnumerable<string> AllScenes { get { return nameLookup.Keys; } }");
 
         file.EmitScope("static BoltScenes()", () => {
           for (int n = 0; n < scenes.Count; ++n) {
-            file.EmitLine("nameLookup.Add(\"{0}\", {1});", scenes[n].Name, n);
-            file.EmitLine("indexLookup.Add({1}, \"{0}\");", scenes[n].Name, n);
+            file.EmitLine("AddScene(0, {1}, \"{0}\");", scenes[n].Name, n);
           }
         });
 
