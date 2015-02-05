@@ -88,6 +88,14 @@ public class BoltSettingsWindow : EditorWindow {
       }
     }
 
+    BoltEditorGUI.WithLabel("Override Time Scale", () => {
+      settings.overrideTimeScale = EditorGUILayout.Toggle(settings.overrideTimeScale);
+
+      if (!settings.overrideTimeScale) {
+        EditorGUILayout.HelpBox("Without override time scale enabled Bolt will not detect any changes to the time scale and set it back to 1.0, you need to handle this manually.", MessageType.Warning);
+      }
+    });
+
     settings._config.clientSendRate = settings._config.serverSendRate;
     settings._config.clientDejitterDelay = settings._config.serverDejitterDelay;
     settings._config.clientDejitterDelayMin = settings._config.serverDejitterDelayMin;
