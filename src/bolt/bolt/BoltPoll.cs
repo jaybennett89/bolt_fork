@@ -23,7 +23,7 @@ public class BoltPoll : MonoBehaviour {
 
   protected void Update() {
     try {
-      if (Time.timeScale != 1f) {
+      if ((Time.timeScale != 1f) && BoltRuntimeSettings.instance.overrideTimeScale) {
         // log this error
         BoltLog.Error("Time.timeScale value is incorrect: {0}f", Time.timeScale);
 
