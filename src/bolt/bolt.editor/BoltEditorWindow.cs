@@ -385,7 +385,7 @@ public class BoltEditorWindow : BoltWindow {
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.IconButton("mc_minus")) {
-        if (EditorUtility.DisplayDialog("Delete Property", "Are you sure?", "Yes", "No")) {
+        if (EditorUtility.DisplayDialog("Delete Property",string.Format( "Do you want to delete '{0}' (Property)?", p.Name), "Yes", "No")) {
           p.Deleted = true;
         }
       }
