@@ -86,12 +86,12 @@ public class BoltEditorWindow : BoltWindow {
   void ImportMecanimParameter(StateDefinition def, ACP p) {
     PropertyType type = null;
 
-	switch (p.type) {
-	case ACPT.Trigger: type = new PropertyTypeTrigger(); break;
-	case ACPT.Bool: type = new PropertyTypeBool(); break;
-	case ACPT.Int: type = new PropertyTypeInteger(); break;
-	case ACPT.Float: type = new PropertyTypeFloat(); break;
-	}
+    switch (p.type) {
+      case ACPT.Trigger: type = new PropertyTypeTrigger(); break;
+      case ACPT.Bool: type = new PropertyTypeBool(); break;
+      case ACPT.Int: type = new PropertyTypeInteger(); break;
+      case ACPT.Float: type = new PropertyTypeFloat(); break;
+    }
 
     PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == p.name);
 
@@ -131,7 +131,7 @@ public class BoltEditorWindow : BoltWindow {
       if (mecanimController) {
         if (GUILayout.Button("Import", EditorStyles.miniButton)) {
           try {
-			AC ac = (AC)mecanimController;
+            AC ac = (AC)mecanimController;
 
 #if UNITY5
             for (int i = 0; i < ac.parameters.Length; ++i) {
@@ -386,7 +386,7 @@ public class BoltEditorWindow : BoltWindow {
 
     if ((Event.current.modifiers & EventModifiers.Control) == EventModifiers.Control) {
       if (BoltEditorGUI.IconButton("mc_minus")) {
-        if (EditorUtility.DisplayDialog("Delete Property",string.Format( "Do you want to delete '{0}' (Property)?", p.Name), "Yes", "No")) {
+        if (EditorUtility.DisplayDialog("Delete Property", string.Format("Do you want to delete '{0}' (Property)?", p.Name), "Yes", "No")) {
           p.Deleted = true;
         }
       }
