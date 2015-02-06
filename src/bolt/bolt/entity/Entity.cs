@@ -454,7 +454,7 @@ namespace Bolt {
         }
 
         // if this is a local entity we are controlling
-        // we should dispose all commands except one
+        // we should dispose all commands (there is no need to store them)
         if (IsOwner) {
           while (CommandQueue.count > 0) {
             CommandQueue.RemoveFirst().Free();

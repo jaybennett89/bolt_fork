@@ -55,6 +55,18 @@ public static class BoltLauncher {
     return BoltNetworkInternal.__Shutdown();
   }
 
+  public static void Shutdown(Action callback) {
+    if (callback == null) {
+      Shutdown();
+    }
+    else {
+      GameObject go = new GameObject("BoltShutdownCallback");
+      BoltShutdownPoll poll = go.AddComponent<BoltShutdownPoll>();
+      poll.ShutdownEvent = Shutdown();
+      poll.Callback = callback;
+    }
+  }
+
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
     BoltNetworkInternal.DebugDrawer = new BoltInternal.UnityDebugDrawer();
 
