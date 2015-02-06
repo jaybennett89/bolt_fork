@@ -1,11 +1,9 @@
 ﻿using Bolt;
 using System.Collections.Generic;
-using System.Linq;
-using UdpKit;
 using UnityEngine;
 
 partial class EntityChannel {
-  public class CommandChannel : BoltChannel {
+  internal class CommandChannel : BoltChannel {
 
     int pingFrames {
       get { return Mathf.CeilToInt((connection.udpConnection.AliasedPing * BoltCore._config.commandPingMultiplier) / BoltCore.frameDeltaTime); }
@@ -20,6 +18,7 @@ partial class EntityChannel {
     }
 
     public CommandChannel() {
+
     }
 
     public override void Pack(Packet packet) {
@@ -40,7 +39,6 @@ partial class EntityChannel {
       packet.Stats.CommandBits = packet.UdpPacket.Position - startPtr;
     }
 
-
     bool EntityHasUnsentResults(Entity entity) {
       var it = entity.CommandQueue.GetIterator();
 
@@ -54,6 +52,8 @@ partial class EntityChannel {
     }
 
     void PackResult(Packet packet) {
+      var p = packet.UdpPacket;
+
       foreach (EntityProxy proxy in outgoingProxiesByNetworkId.Values) {
         Entity entity = proxy.Entity;
 
@@ -66,28 +66,28 @@ partial class EntityChannel {
         if ((entity != null) && ReferenceEquals(entity.Controller, connection) && connection._entityChannel.ExistsOnRemote(entity) && EntityHasUnsentResults(entity)) {
           Assert.True(entity.IsOwner);
 
-          int proxyPos = packet.UdpPacket.Position;
+          int proxyPos = p.Position;
           int cmdWriteCount = 0;
 
-          packet.UdpPacket.WriteBool(true);
-          packet.UdpPacket.WriteNetworkId(proxy.NetworkId);
+          p.WriteBool(true);
+          p.WriteNetworkId(proxy.NetworkId);
 
           var it = entity.CommandQueue.GetIterator();
 
           while (it.Next()) {
             if (it.val.Flags & CommandFlags.HAS_EXECUTED) {
               if (it.val.Flags & CommandFlags.SEND_STATE) {
-                int cmdPos = packet.UdpPacket.Position;
+                int cmdPos = p.Position;
 
-                packet.UdpPacket.WriteBool(true);
-                packet.UdpPacket.WriteTypeId(it.val.ResultObject.Meta.TypeId);
-                packet.UdpPacket.WriteIntVB(it.val.Sequence);
-                packet.UdpPacket.WriteToken(it.val.ResultObject.Token);
+                p.WriteBool(true);
+                p.WriteTypeId(it.val.ResultObject.Meta.TypeId);
+                p.WriteIntVB(it.val.Sequence);
+                p.WriteToken(it.val.ResultObject.Token);
 
-                it.val.PackResult(connection, packet.UdpPacket);
+                it.val.PackResult(connection, p);
 
-                if (packet.UdpPacket.Overflowing) {
-                  packet.UdpPacket.Position = cmdPos;
+                if (p.Overflowing) {
+                  p.Position = cmdPos;
                   break;
                 }
                 else {
@@ -101,13 +101,13 @@ partial class EntityChannel {
           }
 
           // we wrote too much or nothing at all
-          if (packet.UdpPacket.Overflowing || (cmdWriteCount == 0)) {
-            packet.UdpPacket.Position = proxyPos;
+          if (p.Overflowing || (cmdWriteCount == 0)) {
+            p.Position = proxyPos;
             break;
           }
           else {
             // stop marker for states
-            packet.UdpPacket.WriteStopMarker();
+            p.WriteStopMarker();
           }
 
           // dipose commands we dont need anymore
@@ -118,7 +118,7 @@ partial class EntityChannel {
       }
 
       // stop marker for proxies
-      packet.UdpPacket.WriteStopMarker();
+      p.WriteStopMarker();
     }
 
     void ReadResult(Packet packet) {
@@ -127,9 +127,9 @@ partial class EntityChannel {
       while (p.CanRead()) {
         if (p.ReadBool() == false) { break; }
 
-        NetworkId netId = p.ReadNetworkId();
-        EntityProxy proxy = incommingProxiesByNetworkId[netId];
-        Entity entity = proxy.Entity;
+        var netId = p.ReadNetworkId();
+        var proxy = incommingProxiesByNetworkId[netId];
+        var entity = proxy.Entity;
 
         while (p.CanRead()) {
           if (p.ReadBool() == false) { break; }
@@ -250,8 +250,8 @@ partial class EntityChannel {
       int maxFrame = BoltCore._frame;
       int minFrame = maxFrame - (BoltCore._config.commandDelayAllowed + pingFrames);
 
-      while (packet.UdpPacket.ReadStopMarker()) {
-        NetworkId netId = packet.UdpPacket.ReadNetworkId();
+      while (p.ReadStopMarker()) {
+        NetworkId netId = p.ReadNetworkId();
         EntityProxy proxy = null;
 
         if (outgoingProxiesByNetworkId.ContainsKey(netId)) {
@@ -259,7 +259,7 @@ partial class EntityChannel {
         }
 
         while (p.ReadStopMarker()) {
-          Bolt.Command cmd = Factory.NewCommand(p.ReadTypeId());
+          Command cmd = Factory.NewCommand(p.ReadTypeId());
           cmd.Sequence = p.ReadIntVB();
           cmd.ServerFrame = p.ReadIntVB();
           cmd.InputObject.Token = p.ReadToken();

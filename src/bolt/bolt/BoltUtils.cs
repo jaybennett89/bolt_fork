@@ -24,15 +24,15 @@ public static class BoltUtils {
     return array == null || array.Length == 0;
   }
 
-  public static bool Has<T> (this T[] array, int index) where T : class {
+  public static bool Has<T>(this T[] array, int index) where T : class {
     return index < array.Length && array[index] != null;
   }
 
-  public static bool Has<T> (this T[] array, uint index) where T : class {
+  public static bool Has<T>(this T[] array, uint index) where T : class {
     return index < array.Length && array[index] != null;
   }
 
-  public static bool TryGetIndex<T> (this T[] array, int index, out T value) where T : class {
+  public static bool TryGetIndex<T>(this T[] array, int index, out T value) where T : class {
     if (index < array.Length)
       return (value = array[index]) != null;
 
@@ -40,7 +40,7 @@ public static class BoltUtils {
     return false;
   }
 
-  public static bool TryGetIndex<T> (this T[] array, uint index, out T value) where T : class {
+  public static bool TryGetIndex<T>(this T[] array, uint index, out T value) where T : class {
     if (index < array.Length)
       return (value = array[index]) != null;
 
@@ -48,15 +48,15 @@ public static class BoltUtils {
     return false;
   }
 
-  public static T FindComponent<T> (this Component component) where T : Component {
+  public static T FindComponent<T>(this Component component) where T : Component {
     return FindComponent<T>(component.transform);
   }
 
-  public static T FindComponent<T> (this GameObject gameObject) where T : Component {
+  public static T FindComponent<T>(this GameObject gameObject) where T : Component {
     return FindComponent<T>(gameObject.transform);
   }
 
-  public static T FindComponent<T> (this Transform transform) where T : Component {
+  public static T FindComponent<T>(this Transform transform) where T : Component {
     T component = null;
 
     while (transform && !component) {
@@ -402,6 +402,45 @@ public static class BoltUtils {
 
     do {
       b = packet.ReadByte();
+      v = v | ((b & 127U) << s);
+      s = s + 7;
+
+    } while (b > 127U);
+
+    return v;
+  }
+
+  public static void WriteLongVB(this UdpPacket p, long v) {
+    p.WriteULongVB((ulong)v);
+  }
+
+  public static long ReadLongVB(this UdpPacket p) {
+    return (long)p.ReadULongVB();
+  }
+
+  public static void WriteULongVB(this UdpPacket p, ulong v) {
+    ulong b = 0U;
+
+    do {
+      b = v & 127U;
+      v = v >> 7;
+
+      if (v > 0) {
+        b |= 128U;
+      }
+
+      p.WriteByte((byte)b);
+    } while (v != 0);
+  }
+
+  public static ulong ReadULongVB(this UdpPacket p) {
+    ulong v = 0U;
+    ulong b = 0U;
+
+    int s = 0;
+
+    do {
+      b = p.ReadByte();
       v = v | ((b & 127U) << s);
       s = s + 7;
 

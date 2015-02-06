@@ -35,6 +35,7 @@ namespace Bolt {
 
   internal abstract class Command_Meta : NetworkObj_Meta {
     internal int SmoothFrames;
+    internal bool Compression;
   }
 
   /// <summary>
@@ -127,26 +128,66 @@ namespace Bolt {
     }
 
     internal void PackInput(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-        InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
+      if (Meta.Compression) {
+        var v = Storage.Values;
+
+        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+          if (packet.WriteBool(v[this[InputObject.Meta.Properties[i].Property]].HasNonDefaultValue)) {
+            InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+          InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
+        }
       }
     }
 
     internal void ReadInput(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-        InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
+      if (Meta.Compression) {
+        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+          if (packet.ReadBool()) {
+            InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+          InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
+        }
       }
     }
 
     internal void PackResult(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-        ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
+      if (Meta.Compression) {
+        var v = Storage.Values;
+
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          if (packet.WriteBool(v[this[ResultObject.Meta.Properties[i].Property]].HasNonDefaultValue)) {
+            ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
+        }
       }
     }
 
     internal void ReadResult(BoltConnection connection, UdpPacket packet) {
-      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-        ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, SmoothStorageTo ?? Storage, packet);
+      if (Meta.Compression) {
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          if (packet.ReadBool()) {
+            ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, Storage, packet);
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+          ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, Storage, packet);
+        }
       }
     }
 

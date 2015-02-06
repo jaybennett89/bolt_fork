@@ -19,10 +19,30 @@ public class BoltDoubleList<T> : IEnumerable<T> where T : class, IBoltListNode {
     }
   }
 
+  public T firstOrDefault {
+    get {
+      if (_count > 0) {
+        return first;
+      }
+
+      return default(T);
+    }
+  }
+
   public T last {
     get {
       VerifyNotEmpty();
       return (T)_first.prev;
+    }
+  }
+
+  public T lastOrDefault {
+    get {
+      if (_count > 0) {
+        return last;
+      }
+
+      return default(T);
     }
   }
 

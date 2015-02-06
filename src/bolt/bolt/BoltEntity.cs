@@ -903,6 +903,14 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     StartCoroutine(DestroyDelayedInternal(time));
   }
 
+  public void InvokeOnce(Command cmd, int delay, CommandCallback callback) {
+    Entity.InvokeOnce(cmd, callback, delay);
+  }
+
+  public void InvokeMany(Command cmd, int duration, CommandCallback callback) {
+    Entity.InvokeRepeating(cmd, callback, duration);
+  }
+
   internal void VerifyNotAttached() {
     if (isAttached) {
       throw new InvalidOperationException("You can't modify a BoltEntity behaviour which is attached to Bolt");

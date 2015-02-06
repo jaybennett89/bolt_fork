@@ -370,8 +370,8 @@ public class BoltConnection : BoltObject {
 
     _channels = new BoltChannel[] {
       _sceneLoadChannel = new SceneLoadChannel(),
-      _eventChannel = new EventChannel(),
       _commandChannel = new EntityChannel.CommandChannel(),
+      _eventChannel = new EventChannel(),
       _entityChannel = new EntityChannel(),
     };
 
