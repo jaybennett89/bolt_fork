@@ -323,7 +323,18 @@ public class BoltSettingsWindow : EditorWindow {
   Vector2 scrollPos = Vector2.zero;
 
   void Header(string text, string icon) {
-    BoltEditorGUI.Header(text, icon);
+    GUIStyle style = new GUIStyle(BoltEditorGUI.HeaderBackgorund);
+    style.padding = new RectOffset(5, 0, 4, 4);
+
+    EditorGUILayout.BeginHorizontal(style);
+
+    BoltEditorGUI.Icon(icon);
+
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 0;
+    GUILayout.Label(text, s);
+
+    EditorGUILayout.EndHorizontal();
   }
 
   void OnGUI() {
