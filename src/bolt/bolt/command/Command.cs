@@ -35,7 +35,7 @@ namespace Bolt {
 
   internal abstract class Command_Meta : NetworkObj_Meta {
     internal int SmoothFrames;
-    internal bool Compression;
+    internal bool CompressZeroValues;
   }
 
   /// <summary>
@@ -128,7 +128,7 @@ namespace Bolt {
     }
 
     internal void PackInput(BoltConnection connection, UdpPacket packet) {
-      if (Meta.Compression) {
+      if (Meta.CompressZeroValues) {
         var v = Storage.Values;
 
         for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
@@ -145,7 +145,7 @@ namespace Bolt {
     }
 
     internal void ReadInput(BoltConnection connection, UdpPacket packet) {
-      if (Meta.Compression) {
+      if (Meta.CompressZeroValues) {
         for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
           if (packet.ReadBool()) {
             InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
@@ -160,7 +160,7 @@ namespace Bolt {
     }
 
     internal void PackResult(BoltConnection connection, UdpPacket packet) {
-      if (Meta.Compression) {
+      if (Meta.CompressZeroValues) {
         var v = Storage.Values;
 
         for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
@@ -177,7 +177,7 @@ namespace Bolt {
     }
 
     internal void ReadResult(BoltConnection connection, UdpPacket packet) {
-      if (Meta.Compression) {
+      if (Meta.CompressZeroValues) {
         for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
           if (packet.ReadBool()) {
             ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, Storage, packet);

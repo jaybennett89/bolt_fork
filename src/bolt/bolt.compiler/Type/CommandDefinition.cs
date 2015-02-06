@@ -15,6 +15,9 @@ namespace Bolt.Compiler {
     [ProtoMember(52)]
     public int SmoothFrames;
 
+    [ProtoMember(60)]
+    public bool CompressZeroValues;
+
     [ProtoIgnore]
     public List<PropertyDefinition> Properties = new List<PropertyDefinition>();
 

@@ -13,6 +13,7 @@ namespace Bolt.Compiler {
 
     protected override void EmitMetaInit(CodeMemberMethod method) {
       method.Statements.Expr("this.SmoothFrames = {0}", Decorator.Definition.SmoothFrames);
+      method.Statements.Expr("this.CompressZeroValues = {0}", Decorator.Definition.CompressZeroValues.ToString().ToLowerInvariant()); 
 
       base.EmitMetaInit(method);
     }

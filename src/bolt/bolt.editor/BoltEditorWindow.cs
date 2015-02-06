@@ -54,10 +54,6 @@ public class BoltEditorWindow : BoltWindow {
 
       GUILayout.Space(5);
 
-      //BoltEditorGUI.WithLabel("Comment", () => {
-      //  Selected.Comment = EditorGUILayout.TextField(Selected.Comment);
-      //});
-
       if (Selected is StateDefinition) {
         EditState((StateDefinition)Selected);
       }
@@ -233,7 +229,8 @@ public class BoltEditorWindow : BoltWindow {
     PropertyDefinition def = new PropertyDefinition {
       Name = "NewProperty",
       PropertyType = new PropertyTypeFloat { Compression = FloatCompression.Default() },
-      AssetSettings = settings
+      AssetSettings = settings,
+      ReplicationMode = ReplicationMode.Everyone,
     };
 
     def.Oncreated();
@@ -243,6 +240,10 @@ public class BoltEditorWindow : BoltWindow {
   void EditCommand(CommandDefinition def) {
     BoltEditorGUI.WithLabel("Correction Interpolation", () => {
       def.SmoothFrames = BoltEditorGUI.IntFieldOverlay(def.SmoothFrames, "Frames");
+    });
+
+    BoltEditorGUI.WithLabel("Compress Zero Values", () => {
+      def.CompressZeroValues = EditorGUILayout.Toggle(def.CompressZeroValues);
     });
 
     // add button
