@@ -35,9 +35,6 @@ public class PlayerMotor : MonoBehaviour {
   float maxVelocity = 32f;
 
   [SerializeField]
-  float radiusMultiplier = 1f;
-
-  [SerializeField]
   Vector3 drag = new Vector3(1f, 0f, 1f);
 
   [SerializeField]
@@ -89,39 +86,12 @@ public class PlayerMotor : MonoBehaviour {
     transform.localPosition = _state.position;
   }
 
-  ControllerColliderHit moveHit;
-
   void Move(Vector3 velocity) {
     bool isGrounded = false;
 
-    moveHit = null;
-
-    var moveResult = _cc.Move(velocity * BoltNetwork.frameDeltaTime);
-    if (moveResult == CollisionFlags.Below) {
-      if (moveHit != null) {
-        var n0 = moveHit.normal;
-        var n1 = new Vector3(n0.x, -n0.y, n0.z);
-        var an = Vector3.Angle(Vector3.up, n0);
-
-        if (an > 40) {
-          Vector3 g = new Vector3(0, gravityForce, 0);
-          Vector3 n = n1 * Mathf.Abs(gravityForce);
-
-          _state.velocity += Vector3.Lerp(g, n, 0.5f) * BoltNetwork.frameDeltaTime;
-        }
-      }
-      else {
-        BoltLog.Error("CharacterController.Move returned CollisionFlags.Below but no collider was hit?");
-      }
-    }
-
-    bool a = moveResult == CollisionFlags.Below;
-    bool b = _cc.isGrounded;
-    bool c = Physics.CheckSphere(sphere, _cc.radius * radiusMultiplier, layerMask);
-
-    isGrounded = isGrounded || a;
-    isGrounded = isGrounded || b;
-    isGrounded = isGrounded || c;
+    isGrounded = isGrounded || _cc.Move(velocity * BoltNetwork.frameDeltaTime) == CollisionFlags.Below;
+    isGrounded = isGrounded || _cc.isGrounded;
+    isGrounded = isGrounded || Physics.CheckSphere(sphere, _cc.radius, layerMask);
 
     if (isGrounded && !_state.isGrounded) {
       _state.velocity = new Vector3();
@@ -129,10 +99,6 @@ public class PlayerMotor : MonoBehaviour {
 
     _state.isGrounded = isGrounded;
     _state.position = transform.localPosition;
-  }
-
-  void OnControllerColliderHit(ControllerColliderHit hit) {
-    moveHit = hit;
   }
 
   public State Move(bool forward, bool backward, bool left, bool right, bool jump, float yaw) {
@@ -230,7 +196,7 @@ public class PlayerMotor : MonoBehaviour {
   void OnDrawGizmos() {
     if (Application.isPlaying) {
       Gizmos.color = _state.isGrounded ? Color.green : Color.red;
-      Gizmos.DrawWireSphere(sphere, _cc.radius * radiusMultiplier);
+      Gizmos.DrawWireSphere(sphere, _cc.radius);
 
       Gizmos.color = Color.magenta;
       Gizmos.DrawLine(waist, waist + new Vector3(0, -(_cc.height / 2f), 0));
