@@ -10,6 +10,9 @@ namespace Bolt.Compiler {
     [ProtoMember(16)]
     public AxisSelections Selection = AxisSelections.XYZ;
 
+    [ProtoMember(19)]
+    public bool StrictEquality;
+
     [ProtoMember(18, OverwriteList = true)]
     public FloatCompression[] EulerCompression = new FloatCompression[3] {
       new FloatCompression { MinValue = 0, MaxValue = +360, Accuracy = 1f },
@@ -19,6 +22,10 @@ namespace Bolt.Compiler {
 
     [ProtoMember(17)]
     public FloatCompression QuaternionCompression = new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };
+
+    public override bool StrictCompare {
+      get { return StrictEquality; }
+    }
 
     public override bool InterpolateAllowed {
       get { return true; }

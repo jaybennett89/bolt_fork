@@ -27,8 +27,8 @@ namespace Bolt {
       }
     }
 
-    public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
-      Compression = PropertyVectorCompressionSettings.Create(x, y, z);
+    public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z, bool strict) {
+      Compression = PropertyVectorCompressionSettings.Create(x, y, z, strict);
     }
 
     public override object DebugValue(NetworkObj obj, NetworkStorage storage) {

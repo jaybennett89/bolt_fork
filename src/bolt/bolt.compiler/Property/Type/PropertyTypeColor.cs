@@ -7,6 +7,9 @@ using System.Text;
 namespace Bolt.Compiler {
   [ProtoContract]
   public class PropertyTypeColor : PropertyType {
+    [ProtoMember(10)]
+    public bool StrictEquality;
+
     public override bool InterpolateAllowed {
       get { return true; }
     }

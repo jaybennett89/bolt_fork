@@ -10,8 +10,8 @@ namespace Bolt.Compiler {
     public override void AddSettings(CodeExpression expr, CodeStatementCollection stmts) {
       var pt = Decorator.PropertyType;
 
-      EmitVectorSettings(expr, stmts, pt.PositionCompression, pt.PositionSelection);
-      EmitQuaternionSettings(expr, stmts, pt.RotationCompression, pt.RotationCompressionQuaternion, pt.RotationSelection);
+      EmitVectorSettings(expr, stmts, pt.PositionCompression, pt.PositionSelection, pt.PositionStrictCompare);
+      EmitQuaternionSettings(expr, stmts, pt.RotationCompression, pt.RotationCompressionQuaternion, pt.RotationSelection, pt.RotationStrictCompare);
 
       switch (Decorator.Definition.StateAssetSettings.SmoothingAlgorithm) {
         case SmoothingAlgorithms.Interpolation:

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Bolt {
   [StructLayout(LayoutKind.Explicit)]
@@ -55,9 +52,6 @@ namespace Bolt {
     [FieldOffset(0)]
     public UnityEngine.Color Color;
 
-    //[FieldOffset(0)]
-    //public UdpKit.UdpDataKey DataKey;
-
     [FieldOffset(16)]
     public System.Object Object;
 
@@ -99,24 +93,6 @@ namespace Bolt {
       }
     }
 
-    //public UdpKit.UdpStreamData StreamData {
-    //  get {
-    //    return BoltCore.FindStreamData(DataKey);
-    //  }
-    //  set {
-    //    if (value != null) {
-    //      if (value.Key.IsZero) {
-    //        throw new BoltException("Can't assign data with zero key");
-    //      }
-
-    //      DataKey = value.Key;
-    //    }
-    //    else {
-    //      DataKey = default(UdpKit.UdpDataKey);
-    //    }
-    //  }
-    //}
-
     public static bool Diff(Boolean a, Boolean b) { return a != b; }
     public static bool Diff(Int32 a, Int32 b) { return a != b; }
     public static bool Diff(Single a, Single b) { return a != b; }
@@ -130,11 +106,6 @@ namespace Bolt {
     public static bool Diff(UnityEngine.Quaternion a, UnityEngine.Quaternion b) { return a != b; }
     public static bool Diff(UnityEngine.Color a, UnityEngine.Color b) { return a != b; }
 
-
-    public static bool Diff(Bolt.IProtocolToken a, Bolt.IProtocolToken b) {
-      return ReferenceEquals(a, b) == false;
-    }
-
     public static bool Diff_Strict(UnityEngine.Vector2 a, UnityEngine.Vector2 b) {
       return a.x != b.x || a.y != b.y;
     }
@@ -145,10 +116,6 @@ namespace Bolt {
 
     public static bool Diff_Strict(UnityEngine.Quaternion a, UnityEngine.Quaternion b) {
       return a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;
-    }
-
-    public static bool Diff_Strict(UnityEngine.Color a, UnityEngine.Color b) {
-      return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
     }
   }
 }

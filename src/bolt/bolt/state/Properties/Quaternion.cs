@@ -11,12 +11,12 @@ namespace Bolt {
       }
     }
 
-    public void Settings_Quaternion(PropertyFloatCompressionSettings compression) {
-      Compression = PropertyQuaternionCompression.Create(compression);
+    public void Settings_Quaternion(PropertyFloatCompressionSettings compression, bool strict) {
+      Compression = PropertyQuaternionCompression.Create(compression, strict);
     }
 
-    public void Settings_QuaternionEuler(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
-      Compression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z));
+    public void Settings_QuaternionEuler(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z, bool strict) {
+      Compression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z, strict));
     }
 
     public override void SetDynamic(NetworkObj obj, object value) {

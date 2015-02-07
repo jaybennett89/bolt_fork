@@ -13,6 +13,12 @@ class PropertyEditorQuaternion : PropertyEditor<PropertyTypeQuaternion> {
       PropertyType.Selection = BoltEditorGUI.EditAxisSelection(PropertyType.Selection);
     });
 
+    if (Asset is StateDefinition) {
+      BoltEditorGUI.WithLabel("Strict Comparison", () => {
+        PropertyType.StrictEquality = EditorGUILayout.Toggle(PropertyType.StrictEquality);
+      });
+    }
+
     if (PropertyType.Selection != AxisSelections.Disabled) {
       var quaternion = PropertyType.Selection == AxisSelections.XYZ;
 

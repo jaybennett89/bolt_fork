@@ -51,6 +51,9 @@ namespace Bolt.Compiler {
     [ProtoIgnore]
     public virtual bool CanSmoothCorrections { get { return false; } }
 
+    [ProtoIgnore]
+    public virtual bool StrictCompare { get { return false; } }
+
     public virtual void OnCreated() {
 
     }
