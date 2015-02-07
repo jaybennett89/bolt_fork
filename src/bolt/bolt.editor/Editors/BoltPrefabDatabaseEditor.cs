@@ -22,6 +22,16 @@ public class BoltPrefabDatabaseEditor : Editor {
   }
 
   public override void OnInspectorGUI() {
+
+    GUILayout.Space(4);
+
+    GUILayout.BeginHorizontal();
+    GUILayout.Space(2);
+    GUI.DrawTexture(GUILayoutUtility.GetRect(128, 128, 64, 64, GUILayout.ExpandHeight(false), GUILayout.ExpandWidth(false)), Resources.Load("BoltLogo") as Texture2D);
+    GUILayout.EndHorizontal();
+
+    GUILayout.Space(8);
+
     Bolt.PrefabDatabase db = (Bolt.PrefabDatabase)target;
 
     if (db.DatabaseMode == Bolt.PrefabDatabaseMode.Manual) {
@@ -49,6 +59,8 @@ public class BoltPrefabDatabaseEditor : Editor {
 
         EditorGUILayout.EndHorizontal();
       }
+
+      GUILayout.Space(8);
 
       if (GUILayout.Button("Add Prefab Slot", EditorStyles.miniButton)) {
         System.Array.Resize(ref db.Prefabs, db.Prefabs.Length + 1);
