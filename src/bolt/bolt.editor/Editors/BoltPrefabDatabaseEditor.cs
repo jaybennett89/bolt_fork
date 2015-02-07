@@ -60,7 +60,7 @@ public class BoltPrefabDatabaseEditor : Editor {
         EditorGUILayout.EndHorizontal();
       }
 
-      GUILayout.Space(8);
+      GUILayout.Space(6);
 
       if (GUILayout.Button("Add Prefab Slot", EditorStyles.miniButton)) {
         System.Array.Resize(ref db.Prefabs, db.Prefabs.Length + 1);
