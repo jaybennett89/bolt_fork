@@ -4,7 +4,7 @@ using UdpKit;
 using UnityEngine;
 
 [Documentation(Ignore = true)]
-public struct PacketStats {
+internal struct PacketStats {
   public int StateBits;
   public int EventBits;
   public int CommandBits;
