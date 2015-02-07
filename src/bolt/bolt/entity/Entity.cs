@@ -47,9 +47,9 @@ namespace Bolt {
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
-    internal int CommandSequence = 0;
     internal bool CanFreeze = true;
     internal Command CommandLastExecuted = null;
+    internal ushort CommandSequence = 0;
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
@@ -472,19 +472,19 @@ namespace Bolt {
             CommandQueue.RemoveFirst();
           }
 
-          RemoveOldCommandCallbacks(CommandSequence);
+          //RemoveOldCommandCallbacks(CommandSequence);
         }
         else {
-          if (CommandQueue.count > 0) {
-            RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
-          }
+          //if (CommandQueue.count > 0) {
+          //  RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
+          //}
         }
       }
       else {
         if (Controller != null) {
-          if (CommandQueue.count > 0) {
-            RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
-          }
+          //if (CommandQueue.count > 0) {
+          //  RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
+          //}
 
           if (ExecuteCommandsFromRemote() == 0) {
             Command cmd = CommandQueue.lastOrDefault;
@@ -526,35 +526,35 @@ namespace Bolt {
       return commandsExecuted;
     }
 
-    void ExecuteCommandCallback(CommandCallbackItem cb, Command cmd) {
-      try {
-        cb.Callback(cb.Command, cmd);
-      }
-      catch (Exception exn) {
-        BoltLog.Exception(exn);
-      }
-    }
+    //void ExecuteCommandCallback(CommandCallbackItem cb, Command cmd) {
+    //  try {
+    //    cb.Callback(cb.Command, cmd);
+    //  }
+    //  catch (Exception exn) {
+    //    BoltLog.Exception(exn);
+    //  }
+    //}
 
     void ExecuteCommand(Command cmd, bool resetState) {
       try {
         // execute all command callbacks
-        for (int i = 0; i < CommandCallbacks.Count; ++i) {
-          var cb = CommandCallbacks[i];
+        //for (int i = 0; i < CommandCallbacks.Count; ++i) {
+        //  var cb = CommandCallbacks[i];
 
-          switch (cb.Mode) {
-            case CommandCallbackModes.InvokeOnce:
-              if (cmd.Sequence == cb.End) {
-                ExecuteCommandCallback(cb, cmd);
-              }
-              break;
+        //  switch (cb.Mode) {
+        //    case CommandCallbackModes.InvokeOnce:
+        //      if (cmd.Sequence == cb.End) {
+        //        ExecuteCommandCallback(cb, cmd);
+        //      }
+        //      break;
 
-            case CommandCallbackModes.InvokeRepeating:
-              if (cmd.Sequence >= cb.Start && cmd.Sequence <= cb.End) {
-                ExecuteCommandCallback(cb, cmd);
-              }
-              break;
-          }
-        }
+        //    case CommandCallbackModes.InvokeRepeating:
+        //      if (cmd.Sequence >= cb.Start && cmd.Sequence <= cb.End) {
+        //        ExecuteCommandCallback(cb, cmd);
+        //      }
+        //      break;
+        //  }
+        //}
 
         _canQueueCallbacks = cmd.IsFirstExecution;
 
@@ -592,7 +592,7 @@ namespace Bolt {
         return;
       }
 
-      CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = -1, End = command.Number + delay, Mode = CommandCallbackModes.InvokeOnce });
+      //CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = -1, End = command.Number + delay, Mode = CommandCallbackModes.InvokeOnce });
     }
 
     internal void InvokeRepeating(Command command, CommandCallback callback, int period) {
@@ -603,7 +603,7 @@ namespace Bolt {
         return;
       }
 
-      CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = command.Number + 1, End = command.Number + period, Mode = CommandCallbackModes.InvokeRepeating });
+      //CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = command.Number + 1, End = command.Number + period, Mode = CommandCallbackModes.InvokeRepeating });
     }
 
     internal static Entity CreateFor(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {

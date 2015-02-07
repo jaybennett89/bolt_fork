@@ -149,8 +149,8 @@ namespace Bolt {
         Assert.True(HasControl);
 
         if (CommandQueue.count < BoltCore._config.commandQueueSize) {
-          cmd.Sequence = ++CommandSequence;
           cmd.ServerFrame = BoltCore.serverFrame;
+          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
         }
         else {
           BoltLog.Error("Input queue for {0} is full", this);

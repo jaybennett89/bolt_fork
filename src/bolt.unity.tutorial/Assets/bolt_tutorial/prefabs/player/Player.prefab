@@ -1936,7 +1936,6 @@ MonoBehaviour:
   jumpTotalFrames: 30
   movingSpeed: 4
   maxVelocity: 32
-  radiusMultiplier: 1
   drag: {x: 1, y: 0, z: 1}
   layerMask:
     serializedVersion: 2

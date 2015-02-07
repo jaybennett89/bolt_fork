@@ -2,9 +2,6 @@
 using UE = UnityEngine;
 
 namespace Bolt {
-  /// <summary>
-  /// Interface exposing a token of network protocol data of max 512 bytes
-  /// </summary>
   public interface INetworkCommandData {
     IProtocolToken Token {
       get;
@@ -69,7 +66,7 @@ namespace Bolt {
     internal NetworkStorage SmoothStorageFrom;
     internal NetworkStorage SmoothStorageTo;
 
-    internal int Sequence;
+    internal ushort Sequence;
     internal CommandFlags Flags;
 
     /// <summary>
@@ -80,10 +77,6 @@ namespace Bolt {
       internal set;
     }
 
-    public int Number {
-      get { return Sequence; }
-    }
-
     /// <summary>
     /// Returns true if it's the first time this command executed
     /// </summary>
@@ -92,17 +85,11 @@ namespace Bolt {
     }
 
     /// <summary>
-    /// User assignable object that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
+    /// User assignable token that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
     /// </summary>
-    public object UserData {
+    public object UserToken {
       get;
       set;
-    }
-
-    [System.Obsolete("Use the 'UserData' property instead")]
-    public object UserToken {
-      get { return UserData; }
-      set { UserData = value; }
     }
 
     object IBoltListNode.prev { get; set; }
@@ -128,66 +115,26 @@ namespace Bolt {
     }
 
     internal void PackInput(BoltConnection connection, UdpPacket packet) {
-      if (Meta.CompressZeroValues) {
-        var v = Storage.Values;
-
-        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-          if (packet.WriteBool(v[this[InputObject.Meta.Properties[i].Property]].HasNonDefaultValue)) {
-            InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-          InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
-        }
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Write(connection, InputObject, Storage, packet);
       }
     }
 
     internal void ReadInput(BoltConnection connection, UdpPacket packet) {
-      if (Meta.CompressZeroValues) {
-        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-          if (packet.ReadBool()) {
-            InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
-          InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
-        }
+      for (int i = 0; i < InputObject.Meta.Properties.Length; ++i) {
+        InputObject.Meta.Properties[i].Property.Read(connection, InputObject, Storage, packet);
       }
     }
 
     internal void PackResult(BoltConnection connection, UdpPacket packet) {
-      if (Meta.CompressZeroValues) {
-        var v = Storage.Values;
-
-        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-          if (packet.WriteBool(v[this[ResultObject.Meta.Properties[i].Property]].HasNonDefaultValue)) {
-            ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-          ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
-        }
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Write(connection, ResultObject, Storage, packet);
       }
     }
 
     internal void ReadResult(BoltConnection connection, UdpPacket packet) {
-      if (Meta.CompressZeroValues) {
-        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-          if (packet.ReadBool()) {
-            ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, Storage, packet);
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
-          ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, Storage, packet);
-        }
+      for (int i = 0; i < ResultObject.Meta.Properties.Length; ++i) {
+        ResultObject.Meta.Properties[i].Property.Read(connection, ResultObject, SmoothStorageTo ?? Storage, packet);
       }
     }
 
@@ -211,7 +158,10 @@ namespace Bolt {
       }
     }
 
-    [Documentation(Ignore = true)]
+    internal void Free() {
+
+    }
+
     public static implicit operator bool(Command cmd) {
       return cmd != null;
     }
