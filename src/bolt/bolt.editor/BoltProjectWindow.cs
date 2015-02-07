@@ -165,7 +165,7 @@ public class BoltProjectWindow : BoltWindow {
 
     Bolt.PrefabDatabase db = Bolt.PrefabDatabase.Instance;
 
-    if (db.ManualMode) {
+    if (db.DatabaseMode == Bolt.PrefabDatabaseMode.ManualScan) {
       if (BoltEditorGUI.IconButton("mc_refresh")) {
         BoltCompiler.UpdatePrefabsDatabase();
         Debug.Log("Upading prefab database...");

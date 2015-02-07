@@ -4,27 +4,84 @@ using UnityEngine;
 
 [CustomEditor(typeof(Bolt.PrefabDatabase))]
 public class BoltPrefabDatabaseEditor : Editor {
+  void OverlayIcon(string icon, int xOffset) {
+    Rect r = GUILayoutUtility.GetLastRect();
+    r.xMin = (r.xMax - 19) + xOffset;
+    r.xMax = (r.xMax - 3) + xOffset;
+    r.yMin = r.yMin;
+    r.yMax = r.yMax + 1;
+
+    GUI.color = BoltEditorGUI.HighlightColor;
+    GUI.DrawTexture(r, BoltEditorGUI.LoadIcon(icon));
+    GUI.color = Color.white;
+  }
+
+  void Save() {
+    EditorUtility.SetDirty(target);
+    AssetDatabase.SaveAssets();
+  }
+
   public override void OnInspectorGUI() {
     Bolt.PrefabDatabase db = (Bolt.PrefabDatabase)target;
 
-    EditorGUILayout.BeginVertical();
+    if (db.DatabaseMode == Bolt.PrefabDatabaseMode.Manual) {
+      EditorGUILayout.BeginVertical();
 
-    for (int i = 1; i < db.Prefabs.Length; ++i) {
-      if (db.Prefabs[i]) {
-        GUIStyle style;
+      for (int i = 1; i < db.Prefabs.Length; ++i) {
+        EditorGUILayout.BeginHorizontal();
 
-        style = new GUIStyle(EditorStyles.miniButton);
-        style.alignment = TextAnchor.MiddleLeft;
+        if (GUILayout.Button(" ", EditorStyles.miniButton, GUILayout.Width(20))) {
+          // remove prefab
+          ArrayUtility.RemoveAt(ref db.Prefabs, i);
 
-        string id = db.Prefabs[i].GetComponent<BoltEntity>().prefabId.ToString();
-        string path = Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(db.Prefabs[i]));
+          // save
+          Save();
 
-        if (GUILayout.Button(id + " " + path, style)) {
-          Selection.activeGameObject = db.Prefabs[i];
+          // decrement index
+          --i;
+
+          continue;
+        }
+
+        OverlayIcon("mc_minus_small", +1);
+
+        db.Prefabs[i] = (GameObject)EditorGUILayout.ObjectField(db.Prefabs[i], typeof(GameObject), false);
+
+        EditorGUILayout.EndHorizontal();
+      }
+
+      if (GUILayout.Button("Add Prefab Slot", EditorStyles.miniButton)) {
+        System.Array.Resize(ref db.Prefabs, db.Prefabs.Length + 1);
+        Save();
+      }
+
+      if (GUI.changed) {
+        Save();
+      }
+
+      EditorGUILayout.EndVertical();
+    }
+    else {
+      EditorGUILayout.BeginVertical();
+
+      for (int i = 1; i < db.Prefabs.Length; ++i) {
+        if (db.Prefabs[i]) {
+          GUIStyle style;
+
+          style = new GUIStyle(EditorStyles.miniButton);
+          style.alignment = TextAnchor.MiddleLeft;
+
+          string id = db.Prefabs[i].GetComponent<BoltEntity>().prefabId.ToString();
+          string path = Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(db.Prefabs[i]));
+
+          if (GUILayout.Button(id + " " + path, style)) {
+            Selection.activeGameObject = db.Prefabs[i];
+          }
         }
       }
+
+      EditorGUILayout.EndVertical();
     }
 
-    EditorGUILayout.EndVertical();
   }
 }
