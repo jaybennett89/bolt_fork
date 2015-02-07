@@ -424,6 +424,15 @@ internal static class BoltCore {
 
     while (hasSocket && _udpSocket.Poll(out ev)) {
       switch (ev.EventType) {
+        case UdpEventType.SocketStartupFailed:
+          BoltInternal.GlobalEventListenerBase.BoltStartFailedInvoke();
+          Shutdown();
+          break;
+
+        case UdpEventType.SocketStartupDone:
+          BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
+          break;
+
         case UdpEventType.Connected:
           HandleConnected(ev.Connection);
           break;
@@ -976,9 +985,6 @@ internal static class BoltCore {
         Zeus.Connect(zeusEndPoint);
       }
     }
-
-    // tell user that we started
-    BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
   }
 
 #if DEBUG

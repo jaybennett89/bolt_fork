@@ -40,6 +40,9 @@ boltStarted.XmlDoc =
   /// </example>
 ";
 
+var boltStartFailed = new Method("BoltStartFailed");
+boltStartFailed.XmlDoc = "";
+
 var streamDataReceived = new Method("StreamDataReceived");
 streamDataReceived.AddArgument("BoltConnection", "connection");
 streamDataReceived.AddArgument("UdpStreamData", "data");
@@ -653,6 +656,7 @@ sessionConnectFailed.XmlDoc = @"";
 var methods = new List<Method>();
 methods.Add(shutdown);
 methods.Add(boltStarted);
+methods.Add(boltStartFailed);
 methods.Add(streamDataReceived);
 methods.Add(registerStreamChannels);
 methods.Add(portMappingChanged);

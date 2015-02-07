@@ -58,6 +58,21 @@ internal static void BoltStartedInvoke() {
 }
 
 
+
+public virtual void BoltStartFailed() {  }
+
+internal static void BoltStartFailedInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartFailed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.BoltStartFailed();
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
 /// <summary>
   /// Callback triggered when binary stream data is received 
   /// </summary>

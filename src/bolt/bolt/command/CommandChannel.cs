@@ -5,7 +5,7 @@ using UdpKit;
 using UnityEngine;
 
 partial class EntityChannel {
-  public class CommandChannel : BoltChannel {
+  internal class CommandChannel : BoltChannel {
 
     int pingFrames {
       get { return Mathf.CeilToInt((connection.udpConnection.AliasedPing * BoltCore._config.commandPingMultiplier) / BoltCore.frameDeltaTime); }
