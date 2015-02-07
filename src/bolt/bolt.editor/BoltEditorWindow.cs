@@ -242,9 +242,9 @@ public class BoltEditorWindow : BoltWindow {
       def.SmoothFrames = BoltEditorGUI.IntFieldOverlay(def.SmoothFrames, "Frames");
     });
 
-    BoltEditorGUI.WithLabel("Compress Zero Values", () => {
-      def.CompressZeroValues = EditorGUILayout.Toggle(def.CompressZeroValues);
-    });
+    //BoltEditorGUI.WithLabel("Compress Zero Values", () => {
+    //  def.CompressZeroValues = EditorGUILayout.Toggle(def.CompressZeroValues);
+    //});
 
     // add button
     BoltEditorGUI.Header("Input", "mc_command");
