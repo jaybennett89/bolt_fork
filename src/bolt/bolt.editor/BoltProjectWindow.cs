@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class BoltProjectWindow : BoltWindow {
-  [MenuItem("Window/Bolt Engine/Assets", priority = -100)]
+  [MenuItem("Window/Bolt/Assets", priority = -100)]
   public static void Open() {
     BoltProjectWindow w;
 
@@ -234,7 +234,7 @@ public class BoltProjectWindow : BoltWindow {
 
       if (GUILayout.Button(" ", EditorStyles.miniButtonRight, GUILayout.Width(20))) {
         if (deleteMode) {
-          if (EditorUtility.DisplayDialog("Delete Asset", "Are you sure?", "Yes", "No")) {
+          if (EditorUtility.DisplayDialog("Delete Asset", string.Format("Do you want to delete {0} ({1})?", a.Name, a.GetType().Name.Replace("Definition", "")), "Yes", "No")) {
             a.Deleted = true;
 
             if (IsSelected(a)) {

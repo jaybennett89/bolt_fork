@@ -58,6 +58,21 @@ internal static void BoltStartedInvoke() {
 }
 
 
+
+public virtual void BoltStartFailed() {  }
+
+internal static void BoltStartFailedInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartFailed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.BoltStartFailed();
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
 /// <summary>
   /// Callback triggered when binary stream data is received 
   /// </summary>
@@ -168,6 +183,21 @@ internal static void SceneLoadLocalBeginInvoke(string map) {
 }
 
 
+
+public virtual void SceneLoadLocalBegin(string scene, Bolt.IProtocolToken token) {  }
+
+internal static void SceneLoadLocalBeginInvoke(string scene, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.SceneLoadLocalBegin(scene, token);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
 /// <summary>
   /// Callback triggered before the new local scene has been completely loaded
   /// </summary>
@@ -190,6 +220,21 @@ internal static void SceneLoadLocalDoneInvoke(string map) {
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalDone(map);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void SceneLoadLocalDone(string scene, Bolt.IProtocolToken token) {  }
+
+internal static void SceneLoadLocalDoneInvoke(string scene, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback SceneLoadLocalDone");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.SceneLoadLocalDone(scene, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -223,6 +268,21 @@ internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) {
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadRemoteDone(connection);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+public virtual void SceneLoadRemoteDone(BoltConnection connection, Bolt.IProtocolToken token) {  }
+
+internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
+	BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.SceneLoadRemoteDone(connection, token);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}

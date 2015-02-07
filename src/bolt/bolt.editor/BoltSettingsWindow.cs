@@ -88,6 +88,14 @@ public class BoltSettingsWindow : EditorWindow {
       }
     }
 
+    BoltEditorGUI.WithLabel("Override Time Scale", () => {
+      settings.overrideTimeScale = EditorGUILayout.Toggle(settings.overrideTimeScale);
+
+      if (!settings.overrideTimeScale) {
+        EditorGUILayout.HelpBox("Without override time scale enabled Bolt will not detect any changes to the time scale and set it back to 1.0, you need to handle this manually.", MessageType.Warning);
+      }
+    });
+
     settings._config.clientSendRate = settings._config.serverSendRate;
     settings._config.clientDejitterDelay = settings._config.serverDejitterDelay;
     settings._config.clientDejitterDelayMin = settings._config.serverDejitterDelayMin;
@@ -315,7 +323,18 @@ public class BoltSettingsWindow : EditorWindow {
   Vector2 scrollPos = Vector2.zero;
 
   void Header(string text, string icon) {
-    BoltEditorGUI.Header(text, icon);
+    GUIStyle style = new GUIStyle(BoltEditorGUI.HeaderBackgorund);
+    style.padding = new RectOffset(5, 0, 4, 4);
+
+    EditorGUILayout.BeginHorizontal(style);
+
+    BoltEditorGUI.Icon(icon);
+
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.margin.top = 0;
+    GUILayout.Label(text, s);
+
+    EditorGUILayout.EndHorizontal();
   }
 
   void OnGUI() {

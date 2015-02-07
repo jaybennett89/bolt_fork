@@ -4,7 +4,7 @@ using UdpKit;
 using UnityEngine;
 
 [Documentation(Ignore = true)]
-public struct PacketStats {
+internal struct PacketStats {
   public int StateBits;
   public int EventBits;
   public int CommandBits;
@@ -370,8 +370,8 @@ public class BoltConnection : BoltObject {
 
     _channels = new BoltChannel[] {
       _sceneLoadChannel = new SceneLoadChannel(),
-      _eventChannel = new EventChannel(),
       _commandChannel = new EntityChannel.CommandChannel(),
+      _eventChannel = new EventChannel(),
       _entityChannel = new EntityChannel(),
     };
 

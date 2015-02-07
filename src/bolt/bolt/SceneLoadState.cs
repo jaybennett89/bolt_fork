@@ -9,7 +9,7 @@
     public IProtocolToken Token;
 
     public SceneLoadState BeginLoad(int index, IProtocolToken token) {
-      return new SceneLoadState { Scene = new Scene(index, (this.Scene.Token + 1) & 255), State = SceneLoadState.STATE_LOADING, Token = token };
+      return new SceneLoadState { Scene = new Scene(index, (this.Scene.Sequence + 1) & 255), State = SceneLoadState.STATE_LOADING, Token = token };
     }
 
     public static SceneLoadState DefaultRemote() {
@@ -23,18 +23,18 @@
 
   struct Scene {
     public readonly int Index;
-    public readonly int Token;
+    public readonly int Sequence;
 
-    public Scene(int index, int token) {
+    public Scene(int index, int sequence) {
       Assert.True(index == (index & 255));
-      Assert.True(token == (token & 255));
+      Assert.True(sequence == (sequence & 255));
 
       this.Index = index & 255;
-      this.Token = token & 255;
+      this.Sequence = sequence & 255;
     }
 
     public override int GetHashCode() {
-      return Token ^ Index;
+      return Sequence ^ Index;
     }
 
     public override bool Equals(object obj) {
@@ -42,15 +42,15 @@
     }
 
     public override string ToString() {
-      return string.Format("[Scene Index={0} Token={1}]", Index, Token);
+      return string.Format("[Scene Index={0} Sequence={1}]", Index, Sequence);
     }
 
     public static bool operator ==(Scene a, Scene b) {
-      return a.Index == b.Index && a.Token == b.Token;
+      return (a.Index == b.Index) && (a.Sequence == b.Sequence);
     }
 
     public static bool operator !=(Scene a, Scene b) {
-      return a.Index != b.Index || a.Token != b.Token;
+      return (a.Index != b.Index) || (a.Sequence != b.Sequence);
     }
   }
 }

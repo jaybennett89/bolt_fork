@@ -46,7 +46,7 @@ public static class BoltLog {
   /// <summary>
   /// IWriter implementation that outputs to a file
   /// </summary>
-  public class File : IWriter {
+  internal class File : IWriter {
     volatile bool running = true;
 
     bool isServer;
@@ -134,7 +134,7 @@ public static class BoltLog {
   /// <summary>
   /// IWriter implementation that outputs to the Bolt console
   /// </summary>
-  public class Console : IWriter {
+  internal class Console : IWriter {
     void IWriter.Info(string message) {
       BoltConsole.Write(message, BoltGUI.Sky);
     }
@@ -159,7 +159,7 @@ public static class BoltLog {
   /// <summary>
   /// IWriter implementation that outputs to the system console out
   /// </summary>
-  public class SystemOut : IWriter {
+  internal class SystemOut : IWriter {
     void IWriter.Info(string message) {
       SYS.Console.Out.WriteLine(message);
     }
@@ -184,7 +184,7 @@ public static class BoltLog {
   /// <summary>
   /// IWriter implementation that outputs to Unity console
   /// </summary>
-  public class Unity : IWriter {
+  internal class Unity : IWriter {
     void IWriter.Info(string message) {
       UE.Debug.Log(message);
     }

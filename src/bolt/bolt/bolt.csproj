@@ -206,7 +206,7 @@
     <Compile Include="collections\BoltDoubleList.cs" />
     <Compile Include="BoltUtils.cs" />
     <Compile Include="collections\BoltSingleList.cs" />
-    <Compile Include="BoltMath.cs" />
+    <Compile Include="Math.cs" />
     <Compile Include="collections\BoltRingBuffer.cs" />
     <Compile Include="BoltSequenceGenerator.cs" />
     <Compile Include="NetworkId.cs" />

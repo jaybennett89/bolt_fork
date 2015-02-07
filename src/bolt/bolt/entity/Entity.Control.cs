@@ -110,7 +110,7 @@ namespace Bolt {
         Controller._entityChannel.CreateOnRemote(this, out proxy);
         Controller._entityChannel.ForceSync(this);
 
-        // set token
+        // set token 
         proxy.ControlTokenLost = null;
         proxy.ControlTokenGained = token;
       }
@@ -146,34 +146,24 @@ namespace Bolt {
 
     internal bool QueueInput(Command cmd) {
       if (_canQueueCommands) {
+        Assert.True(HasControl);
 
-        if (HasControl) {
-          if (CommandQueue.count < BoltCore._config.commandQueueSize) {
-            cmd.ServerFrame = BoltCore.serverFrame;
-            cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
-          }
-          else {
-            BoltLog.Error("Input queue for {0} is full", this);
-            return false;
-          }
+        if (CommandQueue.count < BoltCore._config.commandQueueSize) {
+          cmd.ServerFrame = BoltCore.serverFrame;
+          cmd.Sequence = CommandSequence = UdpMath.SeqNext(CommandSequence, Command.SEQ_MASK);
         }
         else {
-          Assert.True(IsOwner);
-
-          cmd.ServerFrame = BoltCore.serverFrame;
-          cmd.Sequence = CommandSequence;
-          cmd.Flags |= CommandFlags.MISSING;
+          BoltLog.Error("Input queue for {0} is full", this);
+          return false;
         }
 
         CommandQueue.AddLast(cmd);
         return true;
       }
       else {
-        BoltLog.Error("You can only queue commands to in the 'SimulateController' and 'MissingCommand' callbacks");
+        BoltLog.Error("You can only queue commands to in the 'SimulateController' callback");
         return false;
       }
     }
-
-
   }
 }

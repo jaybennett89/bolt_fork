@@ -2,9 +2,6 @@
 using UE = UnityEngine;
 
 namespace Bolt {
-  /// <summary>
-  /// Interface exposing a token of network protocol data of max 512 bytes
-  /// </summary>
   public interface INetworkCommandData {
     IProtocolToken Token {
       get;
@@ -35,6 +32,7 @@ namespace Bolt {
 
   internal abstract class Command_Meta : NetworkObj_Meta {
     internal int SmoothFrames;
+    internal bool CompressZeroValues;
   }
 
   /// <summary>
@@ -87,17 +85,11 @@ namespace Bolt {
     }
 
     /// <summary>
-    /// User assignable object that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
+    /// User assignable token that lets you pair arbitrary data with the command, this is not replicated over the network to any remote computers.
     /// </summary>
-    public object UserData {
+    public object UserToken {
       get;
       set;
-    }
-
-    [System.Obsolete("Use the 'UserData' property instead")]
-    public object UserToken {
-      get { return UserData; }
-      set { UserData = value; }
     }
 
     object IBoltListNode.prev { get; set; }
@@ -170,7 +162,6 @@ namespace Bolt {
 
     }
 
-    [Documentation(Ignore = true)]
     public static implicit operator bool(Command cmd) {
       return cmd != null;
     }

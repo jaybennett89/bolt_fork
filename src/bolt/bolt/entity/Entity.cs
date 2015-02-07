@@ -6,8 +6,25 @@ using UdpKit;
 using UE = UnityEngine;
 
 namespace Bolt {
+
+  public delegate void CommandCallback(Command created, Command current);
+
+  enum CommandCallbackModes {
+    InvokeOnce,
+    InvokeRepeating
+  }
+
+  struct CommandCallbackItem {
+    public int End;
+    public int Start;
+    public Command Command;
+    public CommandCallback Callback;
+    public CommandCallbackModes Mode;
+  }
+
   partial class Entity : IBoltListNode, IPriorityCalculator {
     bool _canQueueCommands = false;
+    bool _canQueueCallbacks = false;
 
     internal UniqueId SceneId;
     internal NetworkId NetworkId;
@@ -31,11 +48,12 @@ namespace Bolt {
 
     internal int UpdateRate;
     internal bool CanFreeze = true;
-    internal ushort CommandSequence = 0;
     internal Command CommandLastExecuted = null;
+    internal ushort CommandSequence = 0;
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
+    internal List<CommandCallbackItem> CommandCallbacks = new List<CommandCallbackItem>();
     internal BoltDoubleList<EntityProxy> Proxies = new BoltDoubleList<EntityProxy>();
 
     internal int Frame {
@@ -349,8 +367,10 @@ namespace Bolt {
     internal void Initialize() {
       IsOwner = ReferenceEquals(Source, null);
 
-      // grab all behaviours
+      // make this a bit faster
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
+
+      // try to find a priority calculator
       PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;
 
       // use the default priority calculator if none is available
@@ -380,6 +400,18 @@ namespace Bolt {
       }
 
       connection._entityChannel.SetIdle(this, idle);
+    }
+
+    void RemoveOldCommandCallbacks(int number) {
+      for (int i = 0; i < CommandCallbacks.Count; ++i) {
+        if (CommandCallbacks[i].End < number) {
+          // remove this index
+          CommandCallbacks.RemoveAt(i);
+
+          // 
+          --i;
+        }
+      }
     }
 
     internal void Simulate() {
@@ -434,30 +466,31 @@ namespace Bolt {
         }
 
         // if this is a local entity we are controlling
-        // we should dispose all commands except one
+        // we should dispose all commands (there is no need to store them)
         if (IsOwner) {
           while (CommandQueue.count > 0) {
-            CommandQueue.RemoveFirst().Free();
+            CommandQueue.RemoveFirst();
           }
+
+          //RemoveOldCommandCallbacks(CommandSequence);
+        }
+        else {
+          //if (CommandQueue.count > 0) {
+          //  RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
+          //}
         }
       }
       else {
         if (Controller != null) {
-          int commands = ExecuteCommandsFromRemote();
-          if (commands == 0) {
-            if (CommandQueue.count > 0) {
-              MissingCommand(CommandQueue.last);
-            }
-            else {
-              MissingCommand(null);
-            }
+          //if (CommandQueue.count > 0) {
+          //  RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
+          //}
 
-            // execute commands comands from 'MissingCommand' callback
-            commands = ExecuteCommandsFromRemote();
+          if (ExecuteCommandsFromRemote() == 0) {
+            Command cmd = CommandQueue.lastOrDefault;
 
-            // remove all commands queued by the Owner
-            while ((CommandQueue.count > 0) && (CommandQueue.last.Flags & CommandFlags.MISSING)) {
-              CommandQueue.RemoveLast();
+            for (int i = 0; i < Behaviours.Length; ++i) {
+              Behaviours[i].MissingCommand(cmd);
             }
           }
         }
@@ -466,21 +499,8 @@ namespace Bolt {
       Serializer.OnSimulateAfter();
     }
 
-    void MissingCommand(Command previous) {
-      try {
-        _canQueueCommands = true;
-
-        for (int i = 0; i < Behaviours.Length; ++i) {
-          Behaviours[i].MissingCommand(previous);
-        }
-      }
-      finally {
-        _canQueueCommands = false;
-      }
-    }
-
     int ExecuteCommandsFromRemote() {
-      int commandExecuted = 0;
+      int commandsExecuted = 0;
 
       Assert.True(IsOwner);
 
@@ -494,7 +514,7 @@ namespace Bolt {
 
           try {
             ExecuteCommand(it.val, false);
-            commandExecuted += 1;
+            commandsExecuted += 1;
             break;
           }
           finally {
@@ -503,16 +523,50 @@ namespace Bolt {
         }
       } while (UnexecutedCommandCount() > BoltCore._config.commandDejitterDelay);
 
-      return commandExecuted;
+      return commandsExecuted;
     }
+
+    //void ExecuteCommandCallback(CommandCallbackItem cb, Command cmd) {
+    //  try {
+    //    cb.Callback(cb.Command, cmd);
+    //  }
+    //  catch (Exception exn) {
+    //    BoltLog.Exception(exn);
+    //  }
+    //}
 
     void ExecuteCommand(Command cmd, bool resetState) {
       try {
+        // execute all command callbacks
+        //for (int i = 0; i < CommandCallbacks.Count; ++i) {
+        //  var cb = CommandCallbacks[i];
+
+        //  switch (cb.Mode) {
+        //    case CommandCallbackModes.InvokeOnce:
+        //      if (cmd.Sequence == cb.End) {
+        //        ExecuteCommandCallback(cb, cmd);
+        //      }
+        //      break;
+
+        //    case CommandCallbackModes.InvokeRepeating:
+        //      if (cmd.Sequence >= cb.Start && cmd.Sequence <= cb.End) {
+        //        ExecuteCommandCallback(cb, cmd);
+        //      }
+        //      break;
+        //  }
+        //}
+
+        _canQueueCallbacks = cmd.IsFirstExecution;
+
         foreach (IEntityBehaviour eb in Behaviours) {
           eb.ExecuteCommand(cmd, resetState);
         }
       }
       finally {
+        // flag this so it can't queue more callbacks
+        _canQueueCallbacks = false;
+
+        // flag this as executed
         cmd.Flags |= CommandFlags.HAS_EXECUTED;
       }
     }
@@ -528,6 +582,28 @@ namespace Bolt {
       }
 
       return count;
+    }
+
+    internal void InvokeOnce(Command command, CommandCallback callback, int delay) {
+      Assert.True(delay > 0);
+
+      if (!_canQueueCallbacks) {
+        BoltLog.Error("Can only queue callbacks when commands with 'IsFirstExecution' set to true are executing");
+        return;
+      }
+
+      //CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = -1, End = command.Number + delay, Mode = CommandCallbackModes.InvokeOnce });
+    }
+
+    internal void InvokeRepeating(Command command, CommandCallback callback, int period) {
+      Assert.True(period > 0);
+
+      if (!_canQueueCallbacks) {
+        BoltLog.Error("Can only queue callbacks when commands with 'IsFirstExecution' set to true are executing");
+        return;
+      }
+
+      //CommandCallbacks.Add(new CommandCallbackItem { Command = command, Callback = callback, Start = command.Number + 1, End = command.Number + period, Mode = CommandCallbackModes.InvokeRepeating });
     }
 
     internal static Entity CreateFor(PrefabId prefabId, TypeId serializerId, UE.Vector3 position, UE.Quaternion rotation) {

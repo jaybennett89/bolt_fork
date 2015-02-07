@@ -8,6 +8,12 @@ namespace Bolt {
   [StructLayout(LayoutKind.Explicit)]
   internal struct NetworkValue {
     [FieldOffset(0)]
+    public System.UInt64 Packed0;
+
+    [FieldOffset(8)]
+    public System.UInt64 Packed1;
+
+    [FieldOffset(0)]
     public System.Boolean Bool;
 
     [FieldOffset(0)]
@@ -54,6 +60,10 @@ namespace Bolt {
 
     [FieldOffset(16)]
     public System.Object Object;
+
+    public bool HasNonDefaultValue {
+      get { return (Packed0 != 0) || (Packed1 != 0) || (Object != null); }
+    }
 
     public System.String String {
       get { return (System.String)Object; }

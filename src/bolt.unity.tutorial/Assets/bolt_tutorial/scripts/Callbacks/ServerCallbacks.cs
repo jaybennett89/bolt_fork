@@ -29,9 +29,9 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
   }
 
   public override void Connected(BoltConnection c, Bolt.IProtocolToken token) {
-    c.userToken = new Player();
+    c.UserData = new Player();
     c.GetPlayer().connection = c;
-    c.GetPlayer().name = "CLIENT:" + c.remoteEndPoint.Port;
+    c.GetPlayer().name = "CLIENT:" + c.RemoteEndPoint.Port;
 
     c.SetStreamBandwidth(1024 * 1024);
   }

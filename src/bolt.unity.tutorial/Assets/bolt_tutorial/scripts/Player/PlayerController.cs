@@ -77,7 +77,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     }
 
     state.AddCallback("tokenTest", () => {
-      BoltLog.Error("RECEIVED TOKEN {0}", state.tokenTest);
+      BoltLog.Info("Received token in .tokenTest property {0}", state.tokenTest);
     });
 
     state.transform.SetTransforms(transform);

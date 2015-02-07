@@ -1936,7 +1936,6 @@ MonoBehaviour:
   jumpTotalFrames: 30
   movingSpeed: 4
   maxVelocity: 32
-  radiusMultiplier: 1
   drag: {x: 1, y: 0, z: 1}
   layerMask:
     serializedVersion: 2
@@ -1983,88 +1982,8 @@ MonoBehaviour:
   m_Script: {fileID: 1510134700, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HitboxCount: 0
-  HitboxArray:
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
-  - Bone: {fileID: 0}
-    Shape: 0
-    Center: {x: 0, y: 0, z: 0}
-    Size: {x: .25, y: .25, z: .25}
-    Radius: .25
+  _proximity: {fileID: 0}
+  _hitboxes: []
 --- !u!114 &11400012
 MonoBehaviour:
   m_ObjectHideFlags: 1
