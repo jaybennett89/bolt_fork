@@ -368,7 +368,7 @@ namespace Bolt {
       IsOwner = ReferenceEquals(Source, null);
 
       // make this a bit faster
-      Behaviours = (IEntityBehaviour[])UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour));
+      Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
 
       // try to find a priority calculator
       PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;

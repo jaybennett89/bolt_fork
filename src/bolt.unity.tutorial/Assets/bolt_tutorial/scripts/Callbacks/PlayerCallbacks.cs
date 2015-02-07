@@ -12,6 +12,18 @@ public class PlayerCallbacks : Bolt.GlobalEventListener {
     PlayerCamera.Instantiate();
   }
 
+  public override void SceneLoadLocalBegin(string scene, Bolt.IProtocolToken token) {
+    BoltLog.Info("SceneLoadLocalBegin-Token: {0}", token);
+  }
+
+  public override void SceneLoadLocalDone(string scene, Bolt.IProtocolToken token) {
+    BoltLog.Info("SceneLoadLocalDone-Token: {0}", token);
+  }
+
+  public override void SceneLoadRemoteDone(BoltConnection scene, Bolt.IProtocolToken token) {
+    BoltLog.Info("SceneLoadRemoteDone-Token: {0}", token);
+  }
+
   public override void ControlOfEntityGained(BoltEntity arg, Bolt.IProtocolToken token) {
     BoltLog.Info("ControlGained-Token: {0}", token);
 

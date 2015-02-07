@@ -1209,7 +1209,7 @@ public static class BoltNetwork {
   /// }
   /// ```
   /// </example>
-  static void LoadScene(string scene, IProtocolToken token) {
+  public static void LoadScene(string scene, IProtocolToken token) {
     int sceneIndex = -1;
 
     try {

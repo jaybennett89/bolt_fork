@@ -16,7 +16,7 @@ using ACPT = UnityEditorInternal.AnimatorControllerParameterType;
 #endif
 
 public class BoltEditorWindow : BoltWindow {
-  [MenuItem("Window/Bolt Engine/Editor", priority = -99)]
+  [MenuItem("Window/Bolt/Editor", priority = -99)]
   public static void Open() {
     BoltEditorWindow w;
 

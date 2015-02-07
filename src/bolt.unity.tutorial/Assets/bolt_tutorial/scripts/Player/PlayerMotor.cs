@@ -103,9 +103,6 @@ public class PlayerMotor : MonoBehaviour {
         var n1 = new Vector3(n0.x, -n0.y, n0.z);
         var an = Vector3.Angle(Vector3.up, n0);
 
-        Debug.DrawRay(moveHit.point, n0, Color.red);
-        Debug.DrawRay(moveHit.point, n1, Color.blue);
-
         if (an > 40) {
           Vector3 g = new Vector3(0, gravityForce, 0);
           Vector3 n = n1 * Mathf.Abs(gravityForce);
@@ -126,8 +123,6 @@ public class PlayerMotor : MonoBehaviour {
     isGrounded = isGrounded || b;
     isGrounded = isGrounded || c;
 
-    Debug.Log(string.Format("a={0},b={1},c={2}", a, b, c));
-
     if (isGrounded && !_state.isGrounded) {
       _state.velocity = new Vector3();
     }
@@ -138,9 +133,6 @@ public class PlayerMotor : MonoBehaviour {
 
   void OnControllerColliderHit(ControllerColliderHit hit) {
     moveHit = hit;
-
-    //Debug.DrawRay(hit.point, hit.normal);
-    //Debug.Log("hit: " + BoltNetwork.frame);
   }
 
   public State Move(bool forward, bool backward, bool left, bool right, bool jump, float yaw) {
