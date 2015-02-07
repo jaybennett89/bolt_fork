@@ -112,7 +112,7 @@ partial class EntityChannel {
 
           // dipose commands we dont need anymore
           while ((entity.CommandQueue.count > 1) && (entity.CommandQueue.first.Flags & CommandFlags.SEND_STATE_PERFORMED)) {
-            entity.CommandQueue.RemoveFirst().Free();
+            entity.CommandQueue.RemoveFirst();
           }
         }
       }
@@ -175,14 +175,13 @@ partial class EntityChannel {
           else {
             cmd = Factory.NewCommand(typeId);
             cmd.ReadResult(connection, p);
-            cmd.Free();
           }
         }
 
         // remove all disposable commands
         if (entity != null) {
           while ((entity.CommandQueue.count > 1) && (entity.CommandQueue.first.Flags & CommandFlags.DISPOSE)) {
-            entity.CommandQueue.RemoveFirst().Free();
+            entity.CommandQueue.RemoveFirst();
           }
         }
       }

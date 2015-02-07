@@ -402,6 +402,18 @@ namespace Bolt {
       connection._entityChannel.SetIdle(this, idle);
     }
 
+    void RemoveOldCommandCallbacks(int number) {
+      for (int i = 0; i < CommandCallbacks.Count; ++i) {
+        if (CommandCallbacks[i].End < number) {
+          // remove this index
+          CommandCallbacks.RemoveAt(i);
+
+          // 
+          --i;
+        }
+      }
+    }
+
     internal void Simulate() {
       Serializer.OnSimulateBefore();
 
@@ -457,12 +469,23 @@ namespace Bolt {
         // we should dispose all commands (there is no need to store them)
         if (IsOwner) {
           while (CommandQueue.count > 0) {
-            CommandQueue.RemoveFirst().Free();
+            CommandQueue.RemoveFirst();
+          }
+
+          RemoveOldCommandCallbacks(CommandSequence);
+        }
+        else {
+          if (CommandQueue.count > 0) {
+            RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
           }
         }
       }
       else {
         if (Controller != null) {
+          if (CommandQueue.count > 0) {
+            RemoveOldCommandCallbacks(CommandQueue.first.Sequence);
+          }
+
           if (ExecuteCommandsFromRemote() == 0) {
             Command cmd = CommandQueue.lastOrDefault;
 
@@ -503,18 +526,35 @@ namespace Bolt {
       return commandsExecuted;
     }
 
-    void ExecuteCommandCallbacks(Command cmd, bool resetState) {
-      if (IsOwner) {
-
+    void ExecuteCommandCallback(CommandCallbackItem cb, Command cmd) {
+      try {
+        cb.Callback(cb.Command, cmd);
       }
-      else {
-
+      catch (Exception exn) {
+        BoltLog.Exception(exn);
       }
     }
 
     void ExecuteCommand(Command cmd, bool resetState) {
       try {
-        ExecuteCommandCallbacks(cmd, resetState);
+        // execute all command callbacks
+        for (int i = 0; i < CommandCallbacks.Count; ++i) {
+          var cb = CommandCallbacks[i];
+
+          switch (cb.Mode) {
+            case CommandCallbackModes.InvokeOnce:
+              if (cmd.Sequence == cb.End) {
+                ExecuteCommandCallback(cb, cmd);
+              }
+              break;
+
+            case CommandCallbackModes.InvokeRepeating:
+              if (cmd.Sequence >= cb.Start && cmd.Sequence <= cb.End) {
+                ExecuteCommandCallback(cb, cmd);
+              }
+              break;
+          }
+        }
 
         _canQueueCallbacks = cmd.IsFirstExecution;
 

@@ -211,10 +211,6 @@ namespace Bolt {
       }
     }
 
-    internal void Free() {
-
-    }
-
     [Documentation(Ignore = true)]
     public static implicit operator bool(Command cmd) {
       return cmd != null;

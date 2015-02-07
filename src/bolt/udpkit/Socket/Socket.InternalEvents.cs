@@ -212,18 +212,12 @@ namespace UdpKit {
 
     void OnEventDisconnect(UdpEvent ev) {
       if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-        UdpLog.Debug("UdpSocket.OnEventDisconnect()");
-        UdpLog.Debug(Environment.StackTrace);
-
         ev.Connection.SendCommand(UdpConnection.COMMAND_DISCONNECTED, ev.DisconnectToken);
         ev.Connection.ChangeState(UdpConnectionState.Disconnected);
       }
     }
 
     void OnEventClose(UdpEvent ev) {
-      UdpLog.Debug("UdpSocket.OnEventClose()");
-      UdpLog.Debug(Environment.StackTrace);
-
       if (CheckState(UdpSocketState.Running)) {
         foreach (var c in connectionLookup.Values) {
           c.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
