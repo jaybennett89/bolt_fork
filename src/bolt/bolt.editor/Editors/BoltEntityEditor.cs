@@ -132,6 +132,7 @@ public class BoltEntityEditor : Editor {
 
     // Update Rate
     entity._updateRate = EditorGUILayout.IntField("Update Rate", entity._updateRate);
+    entity._autoFreezeProxyFrames = EditorGUILayout.IntField("Auto Freeze Frames", entity._autoFreezeProxyFrames);
 
     // Bool Settings
     entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);

@@ -70,6 +70,15 @@ public class BoltEntitySettingsModifier : IDisposable {
   }
 
   /// <summary>
+  /// The network update rate for this entity
+  /// </summary>
+  public int autoFreezeProxyFrames {
+    get { return _entity._autoFreezeProxyFrames; }
+    set { _entity.VerifyNotAttached(); _entity._autoFreezeProxyFrames = value; }
+  }
+
+
+  /// <summary>
   /// Enable or disable client prediction on the entity
   /// </summary>
   public bool clientPredicted {
@@ -153,6 +162,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
 
   [UE.SerializeField]
   internal int _updateRate = 1;
+
+  [UE.SerializeField]
+  internal int _autoFreezeProxyFrames = 0;
 
   [UE.SerializeField]
   internal bool _clientPredicted = true;
