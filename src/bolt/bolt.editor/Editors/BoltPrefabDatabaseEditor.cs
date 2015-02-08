@@ -5,6 +5,12 @@ using UnityEngine;
 
 [CustomEditor(typeof(Bolt.PrefabDatabase))]
 public class BoltPrefabDatabaseEditor : Editor {
+
+  [MenuItem("Window/Bolt/Prefabs", priority = 23)]
+  static void OpenPrefabDatabaseEditor() {
+    Selection.activeObject = Bolt.PrefabDatabase.Instance;
+  }
+
   void OverlayIcon(string icon, int xOffset) {
     Rect r = GUILayoutUtility.GetLastRect();
     r.xMin = (r.xMax - 19) + xOffset;
