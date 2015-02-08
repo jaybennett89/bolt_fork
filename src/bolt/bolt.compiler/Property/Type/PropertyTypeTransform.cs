@@ -30,6 +30,12 @@ namespace Bolt.Compiler {
       new FloatCompression { MinValue = 0, MaxValue = +360, Accuracy = 0.01f },
     };
 
+    [ProtoMember(21)]
+    public bool PositionStrictCompare;
+
+    [ProtoMember(22)]
+    public bool RotationStrictCompare;
+
     [ProtoMember(4)]
     public FloatCompression RotationCompressionQuaternion = 
       new FloatCompression { MinValue = -1, MaxValue = +1, Accuracy = 0.01f };

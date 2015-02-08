@@ -7,7 +7,7 @@ using System.Text;
 namespace Bolt.Compiler {
   class PropertyCodeEmitterQuaternion : PropertyCodeEmitter<PropertyDecoratorQuaternion> {
     public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
-      EmitQuaternionSettings(expr, statements, Decorator.PropertyType.EulerCompression, Decorator.PropertyType.QuaternionCompression, Decorator.PropertyType.Selection);
+      EmitQuaternionSettings(expr, statements, Decorator.PropertyType.EulerCompression, Decorator.PropertyType.QuaternionCompression, Decorator.PropertyType.Selection, Decorator.PropertyType.StrictCompare);
       EmitInterpolationSettings(expr, statements);
     }
   }

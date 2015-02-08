@@ -7,6 +7,7 @@ using UE = UnityEngine;
 
 namespace Bolt {
   struct PropertyVectorCompressionSettings {
+    public bool StrictComparison;
     public PropertyFloatCompressionSettings X;
     public PropertyFloatCompressionSettings Y;
     public PropertyFloatCompressionSettings Z;
@@ -19,11 +20,20 @@ namespace Bolt {
       PropertyFloatCompressionSettings x,
       PropertyFloatCompressionSettings y,
       PropertyFloatCompressionSettings z) {
+      return Create(x, y, z, false);
+    }
+
+    public static PropertyVectorCompressionSettings Create(
+      PropertyFloatCompressionSettings x,
+      PropertyFloatCompressionSettings y,
+      PropertyFloatCompressionSettings z,
+      bool strict) {
 
       return new PropertyVectorCompressionSettings {
         X = x,
         Y = y,
-        Z = z
+        Z = z,
+        StrictComparison = strict
       };
     }
 

@@ -70,7 +70,7 @@ partial class BoltCompiler {
   }
 
   static void CompilePrefabs(BoltCompilerOperation op) {
-    if (PrefabDatabase.Instance.ManualMode == false) {
+    if (PrefabDatabase.Instance.DatabaseMode == PrefabDatabaseMode.AutomaticScan) {
       UpdatePrefabsDatabase();
     }
 

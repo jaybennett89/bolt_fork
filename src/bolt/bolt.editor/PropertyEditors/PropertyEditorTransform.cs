@@ -17,9 +17,15 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     });
 
     if (PropertyType.PositionSelection != AxisSelections.Disabled) {
-      BoltEditorGUI.WithLabel("Teleport Threshold", () => {
-        Definition.StateAssetSettings.SnapMagnitude = EditorGUILayout.FloatField(Definition.StateAssetSettings.SnapMagnitude);
-      });
+      if (Asset is StateDefinition) {
+        BoltEditorGUI.WithLabel("Strict Comparison", () => {
+          PropertyType.PositionStrictCompare = EditorGUILayout.Toggle(PropertyType.PositionStrictCompare);
+        });
+
+        BoltEditorGUI.WithLabel("Teleport Threshold", () => {
+          Definition.StateAssetSettings.SnapMagnitude = EditorGUILayout.FloatField(Definition.StateAssetSettings.SnapMagnitude);
+        });
+      }
 
       BoltEditorGUI.WithLabel("Compression", () => {
         BoltEditorGUI.EditAxes(PropertyType.PositionCompression, PropertyType.PositionSelection);
@@ -34,6 +40,12 @@ public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
     });
 
     if (PropertyType.RotationSelection != AxisSelections.Disabled) {
+      if (Asset is StateDefinition) {
+        BoltEditorGUI.WithLabel("Strict Comparison", () => {
+          PropertyType.RotationStrictCompare = EditorGUILayout.Toggle(PropertyType.RotationStrictCompare);
+        });
+      }
+
       var quaternion = PropertyType.RotationSelection == AxisSelections.XYZ;
 
       BoltEditorGUI.WithLabel(quaternion ? "Compression (Quaternion)" : "Compression (Euler)", () => {

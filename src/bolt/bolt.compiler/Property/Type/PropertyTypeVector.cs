@@ -16,12 +16,19 @@ namespace Bolt.Compiler {
     [ProtoMember(16)]
     public AxisSelections Selection = AxisSelections.XYZ;
 
+    [ProtoMember(19)]
+    public bool StrictEquality;
+
     [ProtoMember(18, OverwriteList = true)]
     public FloatCompression[] Compression = new FloatCompression[3] {
       new FloatCompression { MinValue = -1024, MaxValue = +1024, Accuracy = 0.01f },
       new FloatCompression { MinValue = -1024, MaxValue = +1024, Accuracy = 0.01f },
       new FloatCompression { MinValue = -1024, MaxValue = +1024, Accuracy = 0.01f },
     };
+
+    public override bool StrictCompare {
+      get { return StrictEquality; }
+    }
 
     public override bool InterpolateAllowed {
       get { return true; }

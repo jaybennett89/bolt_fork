@@ -4,6 +4,7 @@ using UE = UnityEngine;
 namespace Bolt {
   struct PropertyQuaternionCompression {
     bool QuaternionMode;
+    bool QuaternionStrictComparison;
 
     public PropertyVectorCompressionSettings Euler;
     public PropertyFloatCompressionSettings Quaternion;
@@ -18,6 +19,16 @@ namespace Bolt {
       }
     }
 
+    public bool StrictComparison {
+      get {
+        if (QuaternionMode) {
+          return QuaternionStrictComparison;
+        }
+
+        return Euler.StrictComparison;
+      }
+    }
+
     public static PropertyQuaternionCompression Create(PropertyVectorCompressionSettings euler) {
       return new PropertyQuaternionCompression {
         Euler = euler,
@@ -26,9 +37,14 @@ namespace Bolt {
     }
 
     public static PropertyQuaternionCompression Create(PropertyFloatCompressionSettings quaternion) {
+      return Create(quaternion, false);
+    }
+
+    public static PropertyQuaternionCompression Create(PropertyFloatCompressionSettings quaternion, bool strict) {
       return new PropertyQuaternionCompression {
         Quaternion = quaternion,
-        QuaternionMode = true
+        QuaternionMode = true,
+        QuaternionStrictComparison = strict
       };
     }
 

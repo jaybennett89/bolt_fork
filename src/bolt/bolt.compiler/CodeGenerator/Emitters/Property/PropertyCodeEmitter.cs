@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.CodeDom;
 using System.Collections.Generic;
 
@@ -77,7 +78,8 @@ namespace Bolt.Compiler {
         ));
 
         if (changed) {
-          set.If("Bolt.NetworkValue.Diff(oldValue, value)".Expr(), body => {
+          var diff = Decorator.Definition.PropertyType.StrictCompare ? "Diff_Strict" : "Diff";
+          set.If("Bolt.NetworkValue.{0}(oldValue, value)".Expr(diff), body => {
             EmitPropertyChanged(body, storage);
           });
         }
@@ -219,19 +221,25 @@ namespace Bolt.Compiler {
       statements.Call(expr, "Settings_Float", CreateFloatCompressionExpression(c, true));
     }
 
-    public void EmitVectorSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, AxisSelections selection) {
+    public void EmitVectorSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, AxisSelections selection, bool strictCompare) {
       if (selection != AxisSelections.Disabled) {
-        statements.Call(expr, "Settings_Vector", CreateAxisCompressionExpression(axes, selection).ToArray());
+        var exprs = CreateAxisCompressionExpression(axes, selection);
+        exprs.Add(strictCompare.Literal());
+
+        statements.Call(expr, "Settings_Vector", exprs.ToArray());
       }
     }
 
-    public void EmitQuaternionSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection) {
+    public void EmitQuaternionSettings(CodeExpression expr, CodeStatementCollection statements, FloatCompression[] axes, FloatCompression quaternion, AxisSelections selection, bool strictCompare) {
       if (selection != AxisSelections.Disabled) {
         if (axes == null || quaternion == null || selection == AxisSelections.XYZ) {
-          statements.Call(expr, "Settings_Quaternion", CreateFloatCompressionExpression(quaternion, true));
+          statements.Call(expr, "Settings_Quaternion", CreateFloatCompressionExpression(quaternion, true), strictCompare.Literal());
         }
         else {
-          statements.Call(expr, "Settings_QuaternionEuler", CreateAxisCompressionExpression(axes, selection).ToArray());
+          var exprs = CreateAxisCompressionExpression(axes, selection);
+          exprs.Add(strictCompare.Literal());
+
+          statements.Call(expr, "Settings_QuaternionEuler", exprs.ToArray());
         }
       }
     }

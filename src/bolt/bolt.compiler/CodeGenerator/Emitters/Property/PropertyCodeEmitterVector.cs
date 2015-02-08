@@ -11,7 +11,7 @@ namespace Bolt.Compiler {
     }
 
     public override void AddSettings(CodeExpression expr, CodeStatementCollection statements) {
-      EmitVectorSettings(expr, statements, Decorator.PropertyType.Compression, Decorator.PropertyType.Selection);
+      EmitVectorSettings(expr, statements, Decorator.PropertyType.Compression, Decorator.PropertyType.Selection, Decorator.PropertyType.StrictCompare);
       EmitInterpolationSettings(expr, statements);
     }
 

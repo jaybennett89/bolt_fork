@@ -273,6 +273,14 @@ internal static class BoltCore {
       }
     }
 
+    it = _entitiesFrozen.GetIterator();
+
+    while (it.Next()) {
+      if (it.val.NetworkId == id) {
+        return it.val;
+      }
+    }
+
     return null;
   }
 
@@ -651,7 +659,25 @@ internal static class BoltCore {
         }
       }
 
+      // freeze all proxies
+      FreezeProxies();
+
       Bolt.EventDispatcher.DispatchAllEvents();
+    }
+  }
+
+  internal static void FreezeProxies() {
+    var it = _entities.GetIterator();
+    var freezeList = new List<Entity>();
+
+    while (it.Next()) {
+      if (!it.val.IsOwner && !it.val.HasControl && (it.val.AutoFreezeProxyFrames > 0) && (it.val.LastFrameReceived + it.val.AutoFreezeProxyFrames < BoltNetwork.frame)) {
+        freezeList.Add(it.val);
+      }
+    }
+
+    for (int i = 0; i < freezeList.Count; ++i) {
+      freezeList[i].Freeze(true);
     }
   }
 

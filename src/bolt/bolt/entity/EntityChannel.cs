@@ -556,6 +556,10 @@ partial class EntityChannel : BoltChannel {
         // log debug info
         BoltLog.Debug("Received {0} from {1}", entity, connection);
 
+        // update last received frame
+        proxy.Entity.LastFrameReceived = BoltNetwork.frame;
+        proxy.Entity.Freeze(false);
+
         // notify user
         BoltInternal.GlobalEventListenerBase.EntityReceivedInvoke(proxy.Entity.UnityObject);
       }
@@ -579,8 +583,9 @@ partial class EntityChannel : BoltChannel {
 
         // read update
         proxy.Entity.Serializer.Read(connection, packet.UdpPacket, packet.Frame);
+        proxy.Entity.LastFrameReceived = BoltNetwork.frame;
+        proxy.Entity.Freeze(false);
       }
-
     }
 
     return true;

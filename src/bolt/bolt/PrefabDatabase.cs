@@ -2,6 +2,12 @@
 using UE = UnityEngine;
 
 namespace Bolt {
+  public enum PrefabDatabaseMode {
+    AutomaticScan = 0,
+    ManualScan = 1,
+    Manual = 2
+  }
+
   public class PrefabDatabase : UE.ScriptableObject {
     static PrefabDatabase _instance;
     static Dictionary<Bolt.PrefabId, UE.GameObject> _lookup;
@@ -21,7 +27,7 @@ namespace Bolt {
     }
 
     [UE.SerializeField]
-    internal bool ManualMode = false;
+    internal PrefabDatabaseMode DatabaseMode = PrefabDatabaseMode.AutomaticScan;
 
     [UE.SerializeField]
     internal UE.GameObject[] Prefabs = new UE.GameObject[0];

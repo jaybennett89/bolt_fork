@@ -18,23 +18,23 @@ namespace Bolt {
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
 
-    public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
+    public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z, bool strict) {
       PositionEnabled = true;
-      PositionCompression = PropertyVectorCompressionSettings.Create(x, y, z);
+      PositionCompression = PropertyVectorCompressionSettings.Create(x, y, z, strict);
 
       if (PositionCompression.X.BitsRequired > 0) { PositionMask |= 1; }
       if (PositionCompression.Y.BitsRequired > 0) { PositionMask |= 2; }
       if (PositionCompression.Z.BitsRequired > 0) { PositionMask |= 4; }
     }
 
-    public void Settings_Quaternion(PropertyFloatCompressionSettings compression) {
+    public void Settings_Quaternion(PropertyFloatCompressionSettings compression, bool strict) {
       RotationEnabled = true;
-      RotationCompression = PropertyQuaternionCompression.Create(compression);
+      RotationCompression = PropertyQuaternionCompression.Create(compression, strict);
     }
 
-    public void Settings_QuaternionEuler(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z) {
+    public void Settings_QuaternionEuler(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z, bool strict) {
       RotationEnabled = true;
-      RotationCompression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z));
+      RotationCompression = PropertyQuaternionCompression.Create(PropertyVectorCompressionSettings.Create(x, y, z, strict));
 
       if (RotationCompression.Euler.X.BitsRequired > 0) { RotationMask |= 1; }
       if (RotationCompression.Euler.Y.BitsRequired > 0) { RotationMask |= 2; }
@@ -241,9 +241,25 @@ namespace Bolt {
           obj.Storage.Values[obj[this] + VELOCITY].Vector3 = CalculateVelocity(nt, oldPosition);
           obj.Storage.Values[obj[this] + ROTATION].Quaternion = GetLocalRotation(nt.Simulate);
 
-          var positionChanged = oldPosition != obj.Storage.Values[obj[this] + POSITION].Vector3;
-          var velocityChanged = oldVelocity != obj.Storage.Values[obj[this] + VELOCITY].Vector3;
-          var rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+          var positionChanged = false;
+          var velocityChanged = false;
+          var rotationChanged = false;
+
+          if (PositionCompression.StrictComparison) {
+            positionChanged = NetworkValue.Diff_Strict(oldPosition, obj.Storage.Values[obj[this] + POSITION].Vector3);
+            velocityChanged = NetworkValue.Diff_Strict(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
+          }
+          else {
+            positionChanged = oldPosition != obj.Storage.Values[obj[this] + POSITION].Vector3;
+            velocityChanged = oldVelocity != obj.Storage.Values[obj[this] + VELOCITY].Vector3;
+          }
+
+          if (RotationCompression.StrictComparison) {
+            rotationChanged = NetworkValue.Diff_Strict(oldRotation, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
+          }
+          else {
+            rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+          }
 
           if (positionChanged || velocityChanged || rotationChanged) {
             obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);

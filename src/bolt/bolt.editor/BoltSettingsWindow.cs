@@ -282,7 +282,7 @@ public class BoltSettingsWindow : EditorWindow {
     });
 
     BoltEditorGUI.WithLabel("Prefab Mode", () => {
-      PrefabDatabase.Instance.ManualMode = BoltEditorGUI.ToggleDropdown("Manual", "Automatic", PrefabDatabase.Instance.ManualMode);
+      PrefabDatabase.Instance.DatabaseMode = (PrefabDatabaseMode)EditorGUILayout.EnumPopup(PrefabDatabase.Instance.DatabaseMode);
     });
   }
 
@@ -367,6 +367,7 @@ public class BoltSettingsWindow : EditorWindow {
 
   void Save() {
     EditorUtility.SetDirty(BoltRuntimeSettings.instance);
+    EditorUtility.SetDirty(PrefabDatabase.Instance);
     AssetDatabase.SaveAssets();
   }
 }

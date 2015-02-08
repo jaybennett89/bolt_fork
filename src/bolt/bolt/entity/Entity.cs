@@ -47,9 +47,12 @@ namespace Bolt {
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
     internal int UpdateRate;
+    internal int LastFrameReceived;
+    internal int AutoFreezeProxyFrames;
     internal bool CanFreeze = true;
     internal Command CommandLastExecuted = null;
     internal ushort CommandSequence = 0;
+
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
@@ -620,6 +623,7 @@ namespace Bolt {
       eo = new Entity();
       eo.UnityObject = instance.GetComponent<BoltEntity>();
       eo.UpdateRate = eo.UnityObject._updateRate;
+      eo.AutoFreezeProxyFrames = eo.UnityObject._autoFreezeProxyFrames;
       eo.PrefabId = prefabId;
       eo.Flags = flags;
 

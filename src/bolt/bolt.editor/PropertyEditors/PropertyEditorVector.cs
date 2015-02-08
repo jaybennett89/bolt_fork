@@ -16,19 +16,26 @@ class PropertyEditorVector : PropertyEditor<PropertyTypeVector> {
     var cmdSettings = Definition.CommandAssetSettings;
     var stateSettings = Definition.StateAssetSettings;
 
-    BoltEditorGUI.WithLabel("Teleport Threshold", () => {
-      if (cmdSettings != null) {
-        cmdSettings.SnapMagnitude = EditorGUILayout.FloatField(cmdSettings.SnapMagnitude);
-      }
+    if (Asset is StateDefinition) {
+      BoltEditorGUI.WithLabel("Strict Comparison", () => {
+        PropertyType.StrictEquality = EditorGUILayout.Toggle(PropertyType.StrictEquality);
+      });
 
-      if (stateSettings != null) {
-        stateSettings.SnapMagnitude = EditorGUILayout.FloatField(stateSettings.SnapMagnitude);
-      }
-    });
+      BoltEditorGUI.WithLabel("Teleport Threshold", () => {
+        if (cmdSettings != null) {
+          cmdSettings.SnapMagnitude = EditorGUILayout.FloatField(cmdSettings.SnapMagnitude);
+        }
+
+        if (stateSettings != null) {
+          stateSettings.SnapMagnitude = EditorGUILayout.FloatField(stateSettings.SnapMagnitude);
+        }
+      });
+    }
 
     BoltEditorGUI.WithLabel("Axis Compression", () => {
       BoltEditorGUI.EditAxes(PropertyType.Compression, PropertyType.Selection);
     });
+
 
   }
 }
