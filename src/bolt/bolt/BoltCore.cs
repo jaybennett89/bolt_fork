@@ -273,6 +273,14 @@ internal static class BoltCore {
       }
     }
 
+    it = _entitiesFrozen.GetIterator();
+
+    while (it.Next()) {
+      if (it.val.NetworkId == id) {
+        return it.val;
+      }
+    }
+
     return null;
   }
 
