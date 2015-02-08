@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -65,6 +66,26 @@ public class BoltPrefabDatabaseEditor : Editor {
       if (GUILayout.Button("Add Prefab Slot", EditorStyles.miniButton)) {
         System.Array.Resize(ref db.Prefabs, db.Prefabs.Length + 1);
         Save();
+      }
+
+      HashSet<int> set = new HashSet<int>();
+
+      for (int i = 1; i < db.Prefabs.Length; ++i) {
+        if (db.Prefabs[i]) {
+          if (set.Contains(db.Prefabs[i].GetInstanceID())) {
+            // tell the user we did this
+            Debug.LogError(string.Format("Removed Duplicate Prefab: {0}", db.Prefabs[i].name));
+
+            // clear it out
+            db.Prefabs[i] = null;
+
+            // save
+            Save();
+          }
+          else {
+            set.Add(db.Prefabs[i].GetInstanceID());
+          }
+        }
       }
 
       if (GUI.changed) {
