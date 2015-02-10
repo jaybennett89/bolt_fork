@@ -254,8 +254,8 @@ namespace Bolt {
           LabelField("Is Frozen", entity.IsFrozen);
           LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
 
-          if(state.Animator != null) {
-            for(int i = 0; i < state.Animator.layerCount; ++i) {
+          if (state.Animator != null) {
+            for (int i = 0; i < state.Animator.layerCount; ++i) {
               LabelField("  Layer", state.Animator.GetLayerName(i));
 
               foreach (var clip in state.Animator.GetCurrentAnimationClipState(i)) {
@@ -269,6 +269,8 @@ namespace Bolt {
           LabelField("ServerFrame Count", state.Frames.count);
           LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
           LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
+          LabelField("ServerFrame Diff", BoltNetwork.serverFrame - state.Frames.last.Frame);
+
           LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
           entity.Serializer.DebugInfo();
