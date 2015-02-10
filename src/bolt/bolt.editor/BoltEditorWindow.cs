@@ -101,6 +101,9 @@ public class BoltEditorWindow : BoltWindow {
       pdef.Name = p.name;
       pdef.StateAssetSettings.MecanimMode = MecanimMode.Parameter;
       pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+
+      Debug.Log(string.Format("Imported Mecanim Parameter: {0}", pdef.Name));
+
       def.Properties.Add(pdef);
     }
     else {
