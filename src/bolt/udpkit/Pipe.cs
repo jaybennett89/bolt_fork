@@ -55,6 +55,7 @@ namespace UdpKit {
     public const int PIPE_STREAM = 4;
     public const int PIPE_STREAM_UNRELIABLE = 5;
     public const int PIPE_MASTERSERVER = 2;
+    public const int PIPE_UNCONNECTED = 0;
 
     struct SendInfo {
       public uint Sequence;
