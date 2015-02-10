@@ -100,11 +100,8 @@ public class BoltEditorWindow : BoltWindow {
 
       def.Properties.Add(pdef);
     }
-    else {
-      pdef.Name = name;
-      pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
-      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
-
+    else if (!(pdef.PropertyType is PropertyTypeFloat)) {
+      pdef.PropertyType = new PropertyTypeFloat() { Compression = new FloatCompression { Accuracy = 0.01f, MinValue = 0, MaxValue = 1, Enabled = true } };
       Debug.Log(string.Format("Updated Mecanim Layer: {0}", pdef.Name));
     }
   }
@@ -131,10 +128,8 @@ public class BoltEditorWindow : BoltWindow {
       Debug.Log(string.Format("Imported Mecanim Parameter: {0}", pdef.Name));
 
       def.Properties.Add(pdef);
-    }
-    else {
+    } else if (pdef.PropertyType.GetType() != type.GetType()) {
       pdef.PropertyType = type;
-
       Debug.Log(string.Format("Updated Mecanim Parameter: {0}", pdef.Name));
     }
   }
