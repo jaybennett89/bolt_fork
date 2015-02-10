@@ -313,8 +313,46 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
+    if (stateDef != null) { ExpandAllOrCollapseAll(stateDef.Properties); }
+    if (structDef != null) { ExpandAllOrCollapseAll(structDef.Properties); }
+    if (eventDef != null) { ExpandAllOrCollapseAll(eventDef.Properties); }
+    if (cmdDef != null) { ExpandAllOrCollapseAll(cmdDef.Input, cmdDef.Result); }
+
+    if (stateDef != null) { Duplicate(stateDef); }
+    if (structDef != null) { Duplicate(structDef); }
+    if (eventDef != null) { Duplicate(eventDef); }
+    if (cmdDef != null) { Duplicate(cmdDef); }
+
     GUILayout.EndHorizontal();
     GUILayout.EndArea();
+  }
+
+  void Duplicate<T>(T obj) where T : AssetDefinition {
+    if (GUILayout.Button("Duplicate", EditorStyles.miniButton, GUILayout.Width(80))) {
+      obj = SerializerUtils.DeepClone(obj);
+      obj.Guid = Guid.NewGuid();
+
+      Project.RootFolder.Assets = Project.RootFolder.Assets.Add(obj);
+
+      Save();
+    }
+  }
+
+  void ExpandAllOrCollapseAll(params IEnumerable<PropertyDefinition>[] defs) {
+    if (defs.SelectMany(x => x).Count(x => x.Expanded) > 0) {
+      if (GUILayout.Button("Collapse All", EditorStyles.miniButton, GUILayout.Width(80))) {
+        foreach (var d in defs.SelectMany(x => x)) {
+          d.Expanded = false;
+        }
+      }
+    }
+    else {
+      if (GUILayout.Button("Expand All", EditorStyles.miniButton, GUILayout.Width(80))) {
+        foreach (var d in defs.SelectMany(x => x)) {
+          d.Expanded = true;
+        }
+      }
+    }
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {
