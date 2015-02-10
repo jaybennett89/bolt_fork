@@ -83,6 +83,24 @@ public class BoltEditorWindow : BoltWindow {
 
   RuntimeAnimatorController mecanimController;
 
+  void ImportMecanimLayer(StateDefinition def, AC ac, int layer) {
+    string name = "MecanimLayer" + layer;
+
+    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == name);
+
+    if (pdef == null) {
+      pdef = CreateProperty(new PropertyStateSettings());
+      pdef.PropertyType = new PropertyTypeFloat();
+      pdef.Name = name;
+      pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
+      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+
+      Debug.Log(string.Format("Imported Mecanim Layer: {0}", pdef.Name));
+
+      def.Properties.Add(pdef);
+    }
+  }
+
   void ImportMecanimParameter(StateDefinition def, ACP p) {
     PropertyType type = null;
 
@@ -143,6 +161,10 @@ public class BoltEditorWindow : BoltWindow {
 #else
             for (int i = 0; i < ac.parameterCount; ++i) {
               ImportMecanimParameter(def, ac.GetParameter(i));
+            }
+
+            for (int i = 0; i < ac.layerCount; ++i) {
+              ImportMecanimLayer(def, ac, i);
             }
 #endif
 
@@ -207,6 +229,7 @@ public class BoltEditorWindow : BoltWindow {
       guid = parent.ParentGuid;
     }
   }
+
 
   void EditStruct(ObjectDefinition def) {
     // add button
