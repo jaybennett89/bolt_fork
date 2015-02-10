@@ -264,6 +264,14 @@ namespace Bolt {
             }
           }
 
+          LabelBold("Connection Priorities");
+
+          if (entity.IsOwner) {
+            foreach (BoltConnection cn in BoltNetwork.connections) {
+              LabelField(cn.RemoteEndPoint.ToString(), cn._entityChannel.GetPriority(entity).ToString());
+            }
+          }
+
           LabelField("World Position", entity.UnityObject.transform.position);
 
           LabelField("ServerFrame Count", state.Frames.count);
