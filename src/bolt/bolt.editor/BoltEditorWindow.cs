@@ -84,20 +84,28 @@ public class BoltEditorWindow : BoltWindow {
   RuntimeAnimatorController mecanimController;
 
   void ImportMecanimLayer(StateDefinition def, AC ac, int layer) {
-    string name = "MecanimLayer" + layer;
+    string name = "MecanimLayer_" + layer;
 
-    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.Name == name);
+    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.StateAssetSettings.MecanimLayer == layer && x.StateAssetSettings.MecanimMode == MecanimMode.LayerWeight);
 
     if (pdef == null) {
       pdef = CreateProperty(new PropertyStateSettings());
       pdef.PropertyType = new PropertyTypeFloat();
       pdef.Name = name;
+      pdef.StateAssetSettings.MecanimLayer = layer;
       pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
       pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
 
       Debug.Log(string.Format("Imported Mecanim Layer: {0}", pdef.Name));
 
       def.Properties.Add(pdef);
+    }
+    else {
+      pdef.Name = name;
+      pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
+      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+
+      Debug.Log(string.Format("Updated Mecanim Layer: {0}", pdef.Name));
     }
   }
 
@@ -126,6 +134,8 @@ public class BoltEditorWindow : BoltWindow {
     }
     else {
       pdef.PropertyType = type;
+
+      Debug.Log(string.Format("Updated Mecanim Parameter: {0}", pdef.Name));
     }
   }
 
