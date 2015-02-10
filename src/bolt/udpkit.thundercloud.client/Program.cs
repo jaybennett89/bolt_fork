@@ -27,7 +27,7 @@ namespace UdpKit {
 
       UdpSocket socket = new UdpSocket(new Guid("2098810B-9537-448A-961D-8F803D988EF2"), new DotNetPlatform());
       socket.Start(UdpEndPoint.Any, UdpSocketMode.Client);
-      socket.MasterServerConnect(new UdpEndPoint(UdpIPv4Address.Parse("79.99.6.136"), 34000));
+      socket.MasterServerConnect(new UdpEndPoint(UdpIPv4Address.Parse("79.99.6.136"), 24000));
 
       UdpSession session = null;
 
