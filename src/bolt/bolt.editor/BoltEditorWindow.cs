@@ -90,7 +90,7 @@ public class BoltEditorWindow : BoltWindow {
 
     if (pdef == null) {
       pdef = CreateProperty(new PropertyStateSettings());
-      pdef.PropertyType = new PropertyTypeFloat();
+      pdef.PropertyType = new PropertyTypeFloat() { Compression = new FloatCompression { Accuracy = 0.01f, MinValue = 0, MaxValue = 1, Enabled = true } };
       pdef.Name = name;
       pdef.StateAssetSettings.MecanimLayer = layer;
       pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
