@@ -107,10 +107,12 @@ namespace Bolt {
     void IEntitySerializer.DebugInfo() {
 #if DEBUG
       if (BoltNetworkInternal.DebugDrawer != null) {
+        BoltNetworkInternal.DebugDrawer.LabelBold("");
         BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
         BoltNetworkInternal.DebugDrawer.LabelField("Type", Factory.GetFactory(Meta.TypeId).TypeObject);
-        BoltNetworkInternal.DebugDrawer.LabelField("Frame Buffer Size", Frames.count);
+        BoltNetworkInternal.DebugDrawer.LabelField("Type Id", Meta.TypeId);
 
+        BoltNetworkInternal.DebugDrawer.LabelBold("");
         BoltNetworkInternal.DebugDrawer.LabelBold("State Properties");
 
         for (int i = 0; i < Meta.Properties.Length; ++i) {

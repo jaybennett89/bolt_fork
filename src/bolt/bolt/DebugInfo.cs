@@ -264,21 +264,26 @@ namespace Bolt {
             }
           }
 
-          LabelBold("Connection Priorities");
-
           if (entity.IsOwner) {
+            LabelBold("");
+            LabelBold("Connection Priorities");
+
             foreach (BoltConnection cn in BoltNetwork.connections) {
-              LabelField(cn.RemoteEndPoint.ToString(), cn._entityChannel.GetPriority(entity).ToString());
+              LabelField("Connection#" + cn.udpConnection.ConnectionId, cn._entityChannel.GetPriority(entity).ToString());
             }
           }
 
-          LabelField("World Position", entity.UnityObject.transform.position);
+          if (!entity.IsOwner) {
+            LabelBold("");
+            LabelBold("Frame Info");
+            LabelField("Buffer Count", state.Frames.count);
+            LabelField("Latest Received Number", state.Frames.last.Frame);
+            LabelField("Diff (Should be < 0)", BoltNetwork.serverFrame - state.Frames.last.Frame);
+          }
 
-          LabelField("ServerFrame Count", state.Frames.count);
-          LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
-          LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
-          LabelField("ServerFrame Diff", BoltNetwork.serverFrame - state.Frames.last.Frame);
-
+          LabelBold("");
+          LabelBold("World Info");
+          LabelField("Position", entity.UnityObject.transform.position);
           LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
           entity.Serializer.DebugInfo();
