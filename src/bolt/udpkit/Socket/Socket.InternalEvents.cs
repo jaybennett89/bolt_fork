@@ -312,6 +312,7 @@ namespace UdpKit {
           break;
 
         case UdpSessionSource.Lan:
+          ConnectToEndPoint(ev.Session.LanEndPoint, ev.ConnectToken);
           break;
 
         case UdpSessionSource.Steam:
