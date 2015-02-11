@@ -8,6 +8,9 @@ using UnityEngine;
 
 [Documentation(Ignore = true)]
 public static class BoltUtils {
+  public static string ToStringDetailed(this Quaternion q) {
+    return string.Format("({0}, {1}, {2}, {3})", q.x, q.y, q.z, q.w);
+  }
   public static IProtocolToken GetProtocolToken(this UdpSession session) {
     if (session._hostData == null || session._hostData.Length == 0) {
       return null;
