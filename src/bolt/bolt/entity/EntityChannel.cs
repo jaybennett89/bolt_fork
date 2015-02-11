@@ -230,7 +230,7 @@ partial class EntityChannel : BoltChannel {
         int failCount = 0;
 
         for (int i = 0; i < _prioritized.Count; ++i) {
-          if (failCount >= 2) {
+          if ((_prioritized[i].Priority <= 0) || (failCount >= 2)) {
             _prioritized[i].Skipped += 1;
           }
           else {
