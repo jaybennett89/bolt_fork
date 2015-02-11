@@ -148,9 +148,6 @@ namespace Bolt {
       }
 
       return UE.Quaternion.AngleAxis((r_angle * t) % 360f, r_axis) * cquat;
-
-      //UnityEngine.Debug.Log(string.Format("cquat:{0}, rquat:{1}, r:{2}, d:{3}, t:{4}, r_angle:{5}, r_axis:{6}, result:{7}", cquat.ToStringDetailed(), rquat.ToStringDetailed(), r.ToStringDetailed(), d, t, r_angle, r_axis, result.ToStringDetailed()));
-      //return result;
     }
 
     internal static int SequenceDistance(uint from, uint to, int shift) {
