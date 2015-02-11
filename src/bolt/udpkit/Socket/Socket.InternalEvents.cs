@@ -304,7 +304,7 @@ namespace UdpKit {
       switch (ev.Session.Source) {
         case UdpSessionSource.Zeus:
           if (masterClient != null) {
-            masterClient.ConnectToSession(ev.Session);
+            masterClient.ConnectToSession(ev.Session, ev.ConnectToken);
           }
           else {
             UdpLog.Error("No connection to master server found");
