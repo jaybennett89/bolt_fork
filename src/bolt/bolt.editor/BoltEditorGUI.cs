@@ -190,7 +190,12 @@ public static class BoltEditorGUI {
   }
 
   public static bool IsRightClick {
-    get { return Event.current.type == EventType.MouseDown && Event.current.button == 1; }
+    get { 
+      bool rightClick = Event.current.type == EventType.MouseDown && Event.current.button == 1;
+      bool cmdLeftClick = Event.current.type == EventType.MouseDown && Event.current.modifiers == EventModifiers.Command;
+      bool ctrlLeftClick = Event.current.type == EventType.MouseDown && Event.current.modifiers == EventModifiers.Control;
+      return rightClick || cmdLeftClick || ctrlLeftClick;
+    }
   }
 
   public static bool WasKeyPressed(KeyCode key) {
