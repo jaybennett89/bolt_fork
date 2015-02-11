@@ -258,7 +258,12 @@ namespace Bolt {
             for (int i = 0; i < state.Animator.layerCount; ++i) {
               LabelField("  Layer", state.Animator.GetLayerName(i));
 
-              foreach (var clip in state.Animator.GetCurrentAnimationClipState(i)) {
+#if UNITY5
+              var clips = state.Animator.GetCurrentAnimatorClipInfo(i);
+#else
+              var clips = state.Animator.GetCurrentAnimationClipState(i);
+#endif
+              foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
             }
