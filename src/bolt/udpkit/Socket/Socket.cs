@@ -109,6 +109,11 @@ namespace UdpKit {
       set;
     }
 
+    public Func<int, byte[]> UnconnectedBufferProvider {
+      get;
+      set;
+    }
+
     public UdpPlatformSocket PlatformSocket {
       get { return platformSocket; }
     }
@@ -210,6 +215,19 @@ namespace UdpKit {
       Raise(ev);
 
       return ev.ResetEvent;
+    }
+
+    public void SendUnconnected(UdpEndPoint endpoint, byte[] data) {
+      SendUnconnected(endpoint, data, data.Length);
+    }
+
+    public void SendUnconnected(UdpEndPoint endpoint, byte[] data, int size) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_SEND_UNCONNECTED;
+      ev.EndPoint = endpoint;
+      ev.ByteArray = data;
+
+      Raise(ev);
     }
 
     public void Connect(UdpSession session, byte[] connectToken) {
@@ -635,7 +653,27 @@ namespace UdpKit {
         case Protocol.Message.MESSAGE_HEADER:
           RecvProtocol(ep, buffer, bytes);
           break;
+
+        case UdpPipe.PIPE_UNCONNECTED:
+          RecvUnconnected(ep, buffer, bytes);
+          break;
       }
+    }
+
+    void RecvUnconnected(UdpEndPoint ep, byte[] recvbuffer, int bytes) {
+      byte[] data = (UnconnectedBufferProvider == null) ? (new byte[bytes - 1]) : UnconnectedBufferProvider(bytes - 1);
+
+      // copy recv buffer into data array (skip first byte)
+      Buffer.BlockCopy(recvbuffer, 1, data, 0, bytes - 1);
+
+      // raise event to main thread
+      UdpEvent ev = new UdpEvent();
+      ev.EndPoint = ep;
+      ev.ByteArray = data;
+      ev.ByteArraySize = bytes - 1;
+      ev.Type = UdpEvent.PUBLIC_UNCONNECTED_RECV;
+
+      Raise(ev);
     }
 
     void RecvStreamUnreliable(UdpEndPoint ep, byte[] buffer, int bytes) {

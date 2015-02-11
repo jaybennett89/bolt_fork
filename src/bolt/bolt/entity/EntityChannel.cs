@@ -134,6 +134,16 @@ partial class EntityChannel : BoltChannel {
     BoltLog.Debug("Created {0} on {1}", entity, connection);
   }
 
+  public float GetPriority(Entity entity) {
+    EntityProxy proxy;
+
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
+      return proxy.Priority;
+    }
+
+    return float.NegativeInfinity;
+  }
+
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incomming.Values) {
       // skip ones we are in control of and that are client predicted
@@ -220,7 +230,7 @@ partial class EntityChannel : BoltChannel {
         int failCount = 0;
 
         for (int i = 0; i < _prioritized.Count; ++i) {
-          if (failCount >= 2) {
+          if ((_prioritized[i].Priority <= 0) || (failCount >= 2)) {
             _prioritized[i].Skipped += 1;
           }
           else {
@@ -229,6 +239,9 @@ partial class EntityChannel : BoltChannel {
               _prioritized[i].Priority = 0;
             }
             else {
+              _prioritized[i].Skipped += 1;
+
+              // we failed once
               failCount += 1;
             }
           }

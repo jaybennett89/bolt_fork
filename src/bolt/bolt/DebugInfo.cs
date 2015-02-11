@@ -254,21 +254,41 @@ namespace Bolt {
           LabelField("Is Frozen", entity.IsFrozen);
           LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
 
-          if(state.Animator != null) {
-            for(int i = 0; i < state.Animator.layerCount; ++i) {
+          if (state.Animator != null) {
+            for (int i = 0; i < state.Animator.layerCount; ++i) {
               LabelField("  Layer", state.Animator.GetLayerName(i));
 
-              foreach (var clip in state.Animator.GetCurrentAnimationClipState(i)) {
+#if UNITY5
+              var clips = state.Animator.GetCurrentAnimatorClipInfo(i);
+#else
+              var clips = state.Animator.GetCurrentAnimationClipState(i);
+#endif
+              foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
             }
           }
 
-          LabelField("World Position", entity.UnityObject.transform.position);
+          if (entity.IsOwner) {
+            LabelBold("");
+            LabelBold("Connection Priorities");
 
-          LabelField("ServerFrame Count", state.Frames.count);
-          LabelField("ServerFrame Latest Number", state.Frames.last.Frame);
-          LabelField("ServerFrame Server Number", BoltNetwork.serverFrame);
+            foreach (BoltConnection cn in BoltNetwork.connections) {
+              LabelField("Connection#" + cn.udpConnection.ConnectionId, cn._entityChannel.GetPriority(entity).ToString());
+            }
+          }
+
+          if (!entity.IsOwner) {
+            LabelBold("");
+            LabelBold("Frame Info");
+            LabelField("Buffer Count", state.Frames.count);
+            LabelField("Latest Received Number", state.Frames.last.Frame);
+            LabelField("Diff (Should be < 0)", BoltNetwork.serverFrame - state.Frames.last.Frame);
+          }
+
+          LabelBold("");
+          LabelBold("World Info");
+          LabelField("Position", entity.UnityObject.transform.position);
           LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
 
           entity.Serializer.DebugInfo();

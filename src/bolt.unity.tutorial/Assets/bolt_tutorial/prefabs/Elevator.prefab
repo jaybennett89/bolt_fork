@@ -86,6 +86,7 @@ MonoBehaviour:
   _serializerGuid: 2f3355b6-af0d-41a1-98e8-a125b330bc8b
   _prefabId: 2
   _updateRate: 1
+  _autoFreezeProxyFrames: 0
   _clientPredicted: 0
   _allowInstantiateOnClient: 1
   _persistThroughSceneLoads: 0

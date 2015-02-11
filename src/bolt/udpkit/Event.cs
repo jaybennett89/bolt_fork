@@ -33,6 +33,9 @@ namespace UdpKit {
     MasterServerConnected = UdpEvent.PUBLIC_MASTERSERVER_CONNECTED,
     MasterServerDisconnected = UdpEvent.PUBLIC_MASTERSERVER_DISCONNECTED,
     MasterServerNatProbeResult = UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT,
+
+    UnconnectedSent = UdpEvent.PUBLIC_UNCONNECTED_SENT,
+    UnconnectedReceived = UdpEvent.PUBLIC_UNCONNECTED_RECV,
   }
 
   class UdpEventAcceptArgs {
@@ -63,6 +66,7 @@ namespace UdpKit {
     internal const int INTERNAL_DISCONNECT = 11;
     internal const int INTERNAL_CLOSE = 13;
     internal const int INTERNAL_SEND = 15;
+    internal const int INTERNAL_SEND_UNCONNECTED = 41;
 
     internal const int INTERNAL_LANBROADCAST_ENABLE = 17;
     internal const int INTERNAL_LANBROADCAST_DISABLE = 19;
@@ -105,6 +109,9 @@ namespace UdpKit {
 
     internal const int PUBLIC_SESSION_LISTUPDATED = 30;
     internal const int PUBLIC_SESSION_CONNECTFAILED = 36;
+
+    internal const int PUBLIC_UNCONNECTED_SENT = 38;
+    internal const int PUBLIC_UNCONNECTED_RECV = 40;
 
     [FieldOffset(0)]
     internal int Type;
@@ -178,6 +185,12 @@ namespace UdpKit {
       internal set { integer0 = (int)value; }
     }
 
+    public int ByteArraySize {
+      get { return integer2; }
+      set { integer2 = value; }
+    }
+
+
     /*
      * OBJECT 1
      * */
@@ -203,6 +216,11 @@ namespace UdpKit {
 
     public NatFeatures NatFeatures {
       get { return (NatFeatures)Object0; }
+      set { UdpAssert.Assert(Object0 == null); Object0 = value; }
+    }
+
+    public byte[] ByteArray {
+      get { return (byte[])Object0; }
       set { UdpAssert.Assert(Object0 == null); Object0 = value; }
     }
 
@@ -264,7 +282,5 @@ namespace UdpKit {
     internal bool IsInternal {
       get { return (Type & 1) == 1; }
     }
-
-
   }
 }

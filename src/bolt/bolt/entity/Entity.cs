@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UdpKit;
+using UnityEngine;
 using UE = UnityEngine;
 
 namespace Bolt {
@@ -661,7 +662,7 @@ namespace Bolt {
     }
 
     float IPriorityCalculator.CalculateStatePriority(BoltConnection connection, int skipped) {
-      return skipped;
+      return Mathf.Max(1, skipped);
     }
 
     float IPriorityCalculator.CalculateEventPriority(BoltConnection connection, Event evnt) {

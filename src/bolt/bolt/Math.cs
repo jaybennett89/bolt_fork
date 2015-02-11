@@ -71,6 +71,7 @@ namespace Bolt {
     internal static UE.Quaternion InterpolateQuaternion(BoltDoubleList<NetworkStorage> frames, int offset, int frame) {
       var f0 = frames.first;
       var p0 = f0.Values[offset].Quaternion;
+
       if (p0 == default(UE.Quaternion)) {
         p0 = UE.Quaternion.identity;
       }
@@ -81,6 +82,7 @@ namespace Bolt {
       else {
         var f1 = frames.Next(f0);
         var p1 = f1.Values[offset].Quaternion;
+
         if (p1 == default(UE.Quaternion)) {
           p1 = UE.Quaternion.identity;
         }
@@ -135,8 +137,14 @@ namespace Bolt {
 
       r.ToAngleAxis(out r_angle, out r_axis);
 
-      if (r_angle > 180) {
-        r_angle -= 360;
+      if (float.IsInfinity(r_axis.x) || float.IsNaN(r_axis.x)) {
+        r_angle = 0;
+        r_axis = UE.Vector3.right;
+      }
+      else {
+        if (r_angle > 180) {
+          r_angle -= 360;
+        }
       }
 
       return UE.Quaternion.AngleAxis((r_angle * t) % 360f, r_axis) * cquat;

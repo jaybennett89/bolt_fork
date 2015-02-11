@@ -33,6 +33,7 @@ namespace UdpKit {
       class NatPunchRequest {
         public uint Time;
         public uint Count;
+        public byte[] Token;
         public UdpSession Target;
       }
 
@@ -257,13 +258,14 @@ namespace UdpKit {
         }
       }
 
-      public void ConnectToSession(UdpSession session) {
+      public void ConnectToSession(UdpSession session, byte[] token) {
         ClearPunchRequest();
 
         natPunchRequest = new NatPunchRequest {
           Count = 0,
           Time = 0,
-          Target = session
+          Target = session,
+          Token = token
         };
       }
 
@@ -419,11 +421,13 @@ namespace UdpKit {
       }
 
       void OnDirectConnectionLan(Protocol.DirectConnectionLan direct) {
-        ClearPunchRequest();
-
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.INTERNAL_CONNECT;
         ev.EndPoint = direct.RemoteEndPoint;
+        ev.ConnectToken = natPunchRequest.Token;
+
+        ClearPunchRequest();
+
         socket.OnEventConnect(ev);
       }
 
@@ -433,17 +437,23 @@ namespace UdpKit {
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.INTERNAL_CONNECT;
         ev.EndPoint = direct.RemoteEndPoint;
+        ev.ConnectToken = natPunchRequest.Token;
+
+        ClearPunchRequest();
+
         socket.OnEventConnect(ev);
       }
 
       void OnPunch(Protocol.Punch obj) {
         // if we receive a punch message on the client, then we know that we are ready to connect
         if ((socket.Mode == UdpSocketMode.Client) && (natPunchTargets.Any(x => x.EndPoint == obj.Sender))) {
-          ClearPunchRequest();
-
           UdpEvent ev = new UdpEvent();
           ev.Type = UdpEvent.INTERNAL_CONNECT;
           ev.EndPoint = obj.Sender;
+          ev.ConnectToken = natPunchRequest.Token;
+
+          ClearPunchRequest();
+
           socket.OnEventConnect(ev);
         }
       }

@@ -230,7 +230,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     if (activeWeapon.fireFrame + activeWeapon.refireRate <= BoltNetwork.serverFrame) {
       activeWeapon.fireFrame = BoltNetwork.serverFrame;
 
-      state.Animator.SetTrigger("Fire");//.Fire();
+      state.Fire();
 
       // if we are the owner and the active weapon is a hitscan weapon, do logic
       if (entity.isOwner) {

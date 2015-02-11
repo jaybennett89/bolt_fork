@@ -83,6 +83,29 @@ public class BoltEditorWindow : BoltWindow {
 
   RuntimeAnimatorController mecanimController;
 
+  void ImportMecanimLayer(StateDefinition def, AC ac, int layer) {
+    string name = "MecanimLayer_" + layer;
+
+    PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.StateAssetSettings.MecanimLayer == layer && x.StateAssetSettings.MecanimMode == MecanimMode.LayerWeight);
+
+    if (pdef == null) {
+      pdef = CreateProperty(new PropertyStateSettings());
+      pdef.PropertyType = new PropertyTypeFloat() { Compression = new FloatCompression { Accuracy = 0.01f, MinValue = 0, MaxValue = 1, Enabled = true } };
+      pdef.Name = name;
+      pdef.StateAssetSettings.MecanimLayer = layer;
+      pdef.StateAssetSettings.MecanimMode = MecanimMode.LayerWeight;
+      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+
+      Debug.Log(string.Format("Imported Mecanim Layer: {0}", pdef.Name));
+
+      def.Properties.Add(pdef);
+    }
+    else if (!(pdef.PropertyType is PropertyTypeFloat)) {
+      pdef.PropertyType = new PropertyTypeFloat() { Compression = new FloatCompression { Accuracy = 0.01f, MinValue = 0, MaxValue = 1, Enabled = true } };
+      Debug.Log(string.Format("Updated Mecanim Layer: {0}", pdef.Name));
+    }
+  }
+
   void ImportMecanimParameter(StateDefinition def, ACP p) {
     PropertyType type = null;
 
@@ -101,10 +124,13 @@ public class BoltEditorWindow : BoltWindow {
       pdef.Name = p.name;
       pdef.StateAssetSettings.MecanimMode = MecanimMode.Parameter;
       pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+
+      Debug.Log(string.Format("Imported Mecanim Parameter: {0}", pdef.Name));
+
       def.Properties.Add(pdef);
-    }
-    else {
+    } else if (pdef.PropertyType.GetType() != type.GetType()) {
       pdef.PropertyType = type;
+      Debug.Log(string.Format("Updated Mecanim Parameter: {0}", pdef.Name));
     }
   }
 
@@ -140,6 +166,10 @@ public class BoltEditorWindow : BoltWindow {
 #else
             for (int i = 0; i < ac.parameterCount; ++i) {
               ImportMecanimParameter(def, ac.GetParameter(i));
+            }
+
+            for (int i = 0; i < ac.layerCount; ++i) {
+              ImportMecanimLayer(def, ac, i);
             }
 #endif
 
@@ -204,6 +234,7 @@ public class BoltEditorWindow : BoltWindow {
       guid = parent.ParentGuid;
     }
   }
+
 
   void EditStruct(ObjectDefinition def) {
     // add button
@@ -313,8 +344,46 @@ public class BoltEditorWindow : BoltWindow {
       }
     }
 
+    if (stateDef != null) { ExpandAllOrCollapseAll(stateDef.Properties); }
+    if (structDef != null) { ExpandAllOrCollapseAll(structDef.Properties); }
+    if (eventDef != null) { ExpandAllOrCollapseAll(eventDef.Properties); }
+    if (cmdDef != null) { ExpandAllOrCollapseAll(cmdDef.Input, cmdDef.Result); }
+
+    if (stateDef != null) { Duplicate(stateDef); }
+    if (structDef != null) { Duplicate(structDef); }
+    if (eventDef != null) { Duplicate(eventDef); }
+    if (cmdDef != null) { Duplicate(cmdDef); }
+
     GUILayout.EndHorizontal();
     GUILayout.EndArea();
+  }
+
+  void Duplicate<T>(T obj) where T : AssetDefinition {
+    if (GUILayout.Button("Duplicate", EditorStyles.miniButton, GUILayout.Width(80))) {
+      obj = SerializerUtils.DeepClone(obj);
+      obj.Guid = Guid.NewGuid();
+
+      Project.RootFolder.Assets = Project.RootFolder.Assets.Add(obj);
+
+      Save();
+    }
+  }
+
+  void ExpandAllOrCollapseAll(params IEnumerable<PropertyDefinition>[] defs) {
+    if (defs.SelectMany(x => x).Count(x => x.Expanded) > 0) {
+      if (GUILayout.Button("Collapse All", EditorStyles.miniButton, GUILayout.Width(80))) {
+        foreach (var d in defs.SelectMany(x => x)) {
+          d.Expanded = false;
+        }
+      }
+    }
+    else {
+      if (GUILayout.Button("Expand All", EditorStyles.miniButton, GUILayout.Width(80))) {
+        foreach (var d in defs.SelectMany(x => x)) {
+          d.Expanded = true;
+        }
+      }
+    }
   }
 
   void EditPropertyList(AssetDefinition def, List<PropertyDefinition> list) {

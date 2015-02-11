@@ -65,6 +65,10 @@ namespace UdpKit {
 
       void OnBroadcastSession(Protocol.BroadcastSession session) {
         if (session.PeerId != socket.PeerId) {
+          // set lan end point of session we received
+          session.Host._lanEndPoint = session.Sender;
+
+          // update session
           socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);
         }
       }

@@ -62,7 +62,9 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconnect(ev); break;
           case UdpEvent.INTERNAL_CLOSE: OnEventClose(ev); return;
+
           case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
+          case UdpEvent.INTERNAL_SEND_UNCONNECTED: OnEventSend_Unconnected(ev); break;
 
           case UdpEvent.INTERNAL_LANBROADCAST_ENABLE: OnEvent_LanBroadcast_Enable(ev); break;
           case UdpEvent.INTERNAL_LANBROADCAST_DISABLE: OnEvent_LanBroadcast_Disable(ev); break;
@@ -250,6 +252,23 @@ namespace UdpKit {
       ev.Connection.OnPacketSend(ev.Packet);
     }
 
+    void OnEventSend_Unconnected(UdpEvent ev) {
+      // grab send buffer
+      byte[] sendbuffer = GetSendBuffer();
+
+      // copy into send buffer
+      Buffer.BlockCopy(ev.ByteArray, 0, sendbuffer, 1, ev.ByteArraySize);
+
+      // send this 
+      Send(ev.EndPoint, sendbuffer, ev.ByteArraySize + 1);
+
+      // change event type and send it back to the main thread
+      ev.Type = UdpEvent.PUBLIC_UNCONNECTED_SENT;
+
+      // done!
+      Raise(ev);
+    }
+
     /*
      * Master Server
      * */
@@ -285,7 +304,7 @@ namespace UdpKit {
       switch (ev.Session.Source) {
         case UdpSessionSource.Zeus:
           if (masterClient != null) {
-            masterClient.ConnectToSession(ev.Session);
+            masterClient.ConnectToSession(ev.Session, ev.ConnectToken);
           }
           else {
             UdpLog.Error("No connection to master server found");
@@ -293,6 +312,7 @@ namespace UdpKit {
           break;
 
         case UdpSessionSource.Lan:
+          ConnectToEndPoint(ev.Session.LanEndPoint, ev.ConnectToken);
           break;
 
         case UdpSessionSource.Steam:
