@@ -74,6 +74,21 @@ partial class BoltCompiler {
       UpdatePrefabsDatabase();
     }
 
+    for (int i = 1; i < PrefabDatabase.Instance.Prefabs.Length; ++i) {
+      if (PrefabDatabase.Instance.Prefabs[i]) {
+        var go = PrefabDatabase.Instance.Prefabs[i];
+        var entity = go.GetComponent<BoltEntity>();
+
+        if (entity && entity.sceneGuid != Bolt.UniqueId.None) {
+          entity._sceneGuid = "";
+
+          EditorUtility.SetDirty(go);
+          EditorUtility.SetDirty(entity);
+          AssetDatabase.SaveAssets();
+        }
+      }
+    }
+
     using (BoltSourceFile file = new BoltSourceFile(op.prefabsFilePath)) {
       file.EmitScope("public static class BoltPrefabs", () => {
         for (int i = 1; i < PrefabDatabase.Instance.Prefabs.Length; ++i) {
