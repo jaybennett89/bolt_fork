@@ -1093,7 +1093,8 @@ internal static class BoltCore {
   internal static void UpdateSceneObjectsLookup() {
     // grab all scene entities
     _sceneObjects =
-      UE.GameObject.FindObjectsOfType<BoltEntity>()
+      UE.GameObject.FindObjectsOfType(typeof(BoltEntity))
+        .Cast<BoltEntity>()
         .Where(x => x.sceneGuid != UniqueId.None)
         .ToDictionary(x => x.sceneGuid);
 

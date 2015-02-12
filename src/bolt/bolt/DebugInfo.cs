@@ -109,7 +109,7 @@ namespace Bolt {
     }
 
     public static void Show() {
-      if (FindObjectOfType<DebugInfo>()) {
+      if (FindObjectOfType(typeof(DebugInfo))) {
         return;
       }
 
@@ -124,7 +124,7 @@ namespace Bolt {
     }
 
     public static void Hide() {
-      DebugInfo found = FindObjectOfType<DebugInfo>();
+      DebugInfo found = FindObjectOfType(typeof(DebugInfo)) as DebugInfo;
 
       if (found) {
         GameObject.Destroy(found.gameObject);
