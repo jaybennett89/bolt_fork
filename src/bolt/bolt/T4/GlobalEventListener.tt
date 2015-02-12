@@ -40,6 +40,23 @@ boltStarted.XmlDoc =
   /// </example>
 ";
 
+var boltStartInProgress = new Method("BoltStartInProgress");
+boltStartInProgress.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when the bolt simulation is starting.
+  /// </summary>
+  /// <example>
+  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+  /// ```csharp
+  /// public override void BoltStarted() {
+  ///   PrecalcNpcPaths();
+  ///   BoltConsole.Write(""Starting Game..."");
+  /// }
+  /// ```
+  /// </example>
+";
+
 var boltStartFailed = new Method("BoltStartFailed");
 boltStartFailed.XmlDoc = "";
 
@@ -69,6 +86,7 @@ streamDataReceived.XmlDoc =
 ";
 
 var registerStreamChannels = new Method("RegisterStreamChannels");
+registerStreamChannels.Obsolete = true;
 registerStreamChannels.XmlDoc =
 @"
   /// <summary>
@@ -657,6 +675,7 @@ var methods = new List<Method>();
 methods.Add(shutdown);
 methods.Add(boltStarted);
 methods.Add(boltStartFailed);
+methods.Add(boltStartInProgress);
 methods.Add(streamDataReceived);
 methods.Add(registerStreamChannels);
 methods.Add(portMappingChanged);
@@ -707,6 +726,7 @@ foreach(var m in methods) {
 #>
 
 <#= m.XmlDoc.Trim() #>
+<# if(m.Obsolete) { #>[System.Obsolete("This method is obsolete and will be removed in a future version of Bolt")]<# } #> 
 public virtual void <#= m.Name #>(<#= m.GetSignature() #>) {  }
 
 internal static void <#= m.Name #>Invoke(<#= m.GetSignature() #>) { 
@@ -741,6 +761,7 @@ class Argument {
 class Method {
 	public string Name;
 	public string XmlDoc;
+  public bool Obsolete;
 	public List<Argument> Arguments = new List<Argument>();
 
 	public Method(string name) {
