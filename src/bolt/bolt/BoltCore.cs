@@ -992,7 +992,7 @@ internal static class BoltCore {
 
     // have to register channels BEFORE the socket starts
     BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
-    BoltInternal.GlobalEventListenerBase.BoltStartInProgressInvoke();
+    BoltInternal.GlobalEventListenerBase.BoltStartPendingInvoke();
 
     // 
     _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));

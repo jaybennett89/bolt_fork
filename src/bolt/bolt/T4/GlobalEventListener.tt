@@ -40,7 +40,7 @@ boltStarted.XmlDoc =
   /// </example>
 ";
 
-var boltStartInProgress = new Method("BoltStartInProgress");
+var boltStartInProgress = new Method("BoltStartPending");
 boltStartInProgress.XmlDoc =
 @"
   /// <summary>

@@ -89,13 +89,13 @@ internal static void BoltStartFailedInvoke() {
   /// ```
   /// </example>
  
-public virtual void BoltStartInProgress() {  }
+public virtual void BoltStartPending() {  }
 
-internal static void BoltStartInProgressInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStartInProgress");
+internal static void BoltStartPendingInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartPending");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.BoltStartInProgress();
+			cb.BoltStartPending();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
