@@ -992,6 +992,7 @@ internal static class BoltCore {
 
     // have to register channels BEFORE the socket starts
     BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
+    BoltInternal.GlobalEventListenerBase.BoltStartPendingInvoke();
 
     // 
     _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));
@@ -1092,7 +1093,8 @@ internal static class BoltCore {
   internal static void UpdateSceneObjectsLookup() {
     // grab all scene entities
     _sceneObjects =
-      UE.GameObject.FindObjectsOfType<BoltEntity>()
+      UE.GameObject.FindObjectsOfType(typeof(BoltEntity))
+        .Cast<BoltEntity>()
         .Where(x => x.sceneGuid != UniqueId.None)
         .ToDictionary(x => x.sceneGuid);
 

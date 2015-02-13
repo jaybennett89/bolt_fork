@@ -18,6 +18,7 @@ partial class GlobalEventListenerBase {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void BoltShutdown() {  }
 
 internal static void BoltShutdownInvoke() { 
@@ -44,6 +45,7 @@ internal static void BoltShutdownInvoke() {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void BoltStarted() {  }
 
 internal static void BoltStartedInvoke() { 
@@ -59,6 +61,7 @@ internal static void BoltStartedInvoke() {
 
 
 
+ 
 public virtual void BoltStartFailed() {  }
 
 internal static void BoltStartFailedInvoke() { 
@@ -66,6 +69,33 @@ internal static void BoltStartFailedInvoke() {
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStartFailed();
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+/// <summary>
+  /// Callback triggered when the bolt simulation is starting.
+  /// </summary>
+  /// <example>
+  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+  /// ```csharp
+  /// public override void BoltStarted() {
+  ///   PrecalcNpcPaths();
+  ///   BoltConsole.Write("Starting Game...");
+  /// }
+  /// ```
+  /// </example>
+ 
+public virtual void BoltStartPending() {  }
+
+internal static void BoltStartPendingInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartPending");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.BoltStartPending();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -91,6 +121,7 @@ internal static void BoltStartFailedInvoke() {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
 
 internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
@@ -121,6 +152,7 @@ internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStre
   /// }
   /// ```
   /// </example>
+[System.Obsolete("This method is obsolete and will be removed in a future version of Bolt")] 
 public virtual void RegisterStreamChannels() {  }
 
 internal static void RegisterStreamChannelsInvoke() { 
@@ -140,6 +172,7 @@ internal static void RegisterStreamChannelsInvoke() {
   /// </summary>
   /// <param name="device">The current network routing device</param>
   /// <param name="portMapping">The new port mapping</param>
+ 
 public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) {  }
 
 internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
@@ -169,6 +202,7 @@ internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPort
   /// }
   /// ```
   /// </example>
+ 
 public virtual void SceneLoadLocalBegin(string map) {  }
 
 internal static void SceneLoadLocalBeginInvoke(string map) { 
@@ -184,6 +218,7 @@ internal static void SceneLoadLocalBeginInvoke(string map) {
 
 
 
+ 
 public virtual void SceneLoadLocalBegin(string scene, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadLocalBeginInvoke(string scene, Bolt.IProtocolToken token) { 
@@ -213,6 +248,7 @@ internal static void SceneLoadLocalBeginInvoke(string scene, Bolt.IProtocolToken
   /// }
   /// ```
   /// </example>
+ 
 public virtual void SceneLoadLocalDone(string map) {  }
 
 internal static void SceneLoadLocalDoneInvoke(string map) { 
@@ -228,6 +264,7 @@ internal static void SceneLoadLocalDoneInvoke(string map) {
 
 
 
+ 
 public virtual void SceneLoadLocalDone(string scene, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadLocalDoneInvoke(string scene, Bolt.IProtocolToken token) { 
@@ -261,6 +298,7 @@ internal static void SceneLoadLocalDoneInvoke(string scene, Bolt.IProtocolToken 
   /// }
   /// ```
   /// </example>
+ 
 public virtual void SceneLoadRemoteDone(BoltConnection connection) {  }
 
 internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) { 
@@ -276,6 +314,7 @@ internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) {
 
 
 
+ 
 public virtual void SceneLoadRemoteDone(BoltConnection connection, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
@@ -309,6 +348,7 @@ internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, Bolt.I
   /// }
   /// ```
   /// </example>
+ 
 public virtual void Connected(BoltConnection connection) {  }
 
 internal static void ConnectedInvoke(BoltConnection connection) { 
@@ -345,6 +385,7 @@ internal static void ConnectedInvoke(BoltConnection connection) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {  }
 
 internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken) { 
@@ -384,6 +425,7 @@ internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolTo
   /// }
   /// ```
   /// </example>
+ 
 public virtual void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {  }
 
 internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) { 
@@ -411,6 +453,7 @@ internal static void ConnectedInvoke(BoltConnection connection, Bolt.IProtocolTo
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectFailed(UdpEndPoint endpoint) {  }
 
 internal static void ConnectFailedInvoke(UdpEndPoint endpoint) { 
@@ -438,6 +481,7 @@ internal static void ConnectFailedInvoke(UdpEndPoint endpoint) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectRequest(UdpEndPoint endpoint) {  }
 
 internal static void ConnectRequestInvoke(UdpEndPoint endpoint) { 
@@ -469,6 +513,7 @@ internal static void ConnectRequestInvoke(UdpEndPoint endpoint) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
 internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
@@ -496,6 +541,7 @@ internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolTo
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectRefused(UdpEndPoint  endpoint) {  }
 
 internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint) { 
@@ -526,6 +572,7 @@ internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectRefused(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) {  }
 
 internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) { 
@@ -553,6 +600,7 @@ internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint, Bolt.IProtocolT
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ConnectAttempt(UdpEndPoint endpoint) {  }
 
 internal static void ConnectAttemptInvoke(UdpEndPoint endpoint) { 
@@ -581,6 +629,7 @@ internal static void ConnectAttemptInvoke(UdpEndPoint endpoint) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void Disconnected(BoltConnection connection) {  }
 
 internal static void DisconnectedInvoke(BoltConnection connection) { 
@@ -611,6 +660,7 @@ internal static void DisconnectedInvoke(BoltConnection connection) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {  }
 
 internal static void DisconnectedInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
@@ -639,6 +689,7 @@ internal static void DisconnectedInvoke(BoltConnection connection, Bolt.IProtoco
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ControlOfEntityLost(BoltEntity entity) {  }
 
 internal static void ControlOfEntityLostInvoke(BoltEntity entity) { 
@@ -667,6 +718,7 @@ internal static void ControlOfEntityLostInvoke(BoltEntity entity) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ControlOfEntityLost(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
 internal static void ControlOfEntityLostInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
@@ -695,6 +747,7 @@ internal static void ControlOfEntityLostInvoke(BoltEntity entity, Bolt.IProtocol
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ControlOfEntityGained(BoltEntity entity) {  }
 
 internal static void ControlOfEntityGainedInvoke(BoltEntity entity) { 
@@ -727,6 +780,7 @@ internal static void ControlOfEntityGainedInvoke(BoltEntity entity) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void ControlOfEntityGained(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
 internal static void ControlOfEntityGainedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
@@ -754,6 +808,7 @@ internal static void ControlOfEntityGainedInvoke(BoltEntity entity, Bolt.IProtoc
   /// }
   /// ```
   /// </example>
+ 
 public virtual void EntityAttached(BoltEntity entity) {  }
 
 internal static void EntityAttachedInvoke(BoltEntity entity) { 
@@ -785,6 +840,7 @@ internal static void EntityAttachedInvoke(BoltEntity entity) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
 internal static void EntityAttachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
@@ -812,6 +868,7 @@ internal static void EntityAttachedInvoke(BoltEntity entity, Bolt.IProtocolToken
   /// }
   /// ```
   /// </example>
+ 
 public virtual void EntityDetached(BoltEntity entity) {  }
 
 internal static void EntityDetachedInvoke(BoltEntity entity) { 
@@ -842,6 +899,7 @@ internal static void EntityDetachedInvoke(BoltEntity entity) {
   /// }
   /// ```
   /// </example>
+ 
 public virtual void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {  }
 
 internal static void EntityDetachedInvoke(BoltEntity entity, Bolt.IProtocolToken token) { 
@@ -870,6 +928,7 @@ internal static void EntityDetachedInvoke(BoltEntity entity, Bolt.IProtocolToken
   /// }
   /// ```
   /// </example>
+ 
 public virtual void EntityReceived(BoltEntity entity) {  }
 
 internal static void EntityReceivedInvoke(BoltEntity entity) { 
@@ -885,6 +944,7 @@ internal static void EntityReceivedInvoke(BoltEntity entity) {
 
 
 
+ 
 public virtual void ZeusConnectFailed(UdpEndPoint endpoint) {  }
 
 internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) { 
@@ -900,6 +960,7 @@ internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) {
 
 
 
+ 
 public virtual void ZeusConnected(UdpEndPoint endpoint) {  }
 
 internal static void ZeusConnectedInvoke(UdpEndPoint endpoint) { 
@@ -915,6 +976,7 @@ internal static void ZeusConnectedInvoke(UdpEndPoint endpoint) {
 
 
 
+ 
 public virtual void ZeusDisconnected(UdpEndPoint endpoint) {  }
 
 internal static void ZeusDisconnectedInvoke(UdpEndPoint endpoint) { 
@@ -930,6 +992,7 @@ internal static void ZeusDisconnectedInvoke(UdpEndPoint endpoint) {
 
 
 
+ 
 public virtual void ZeusNatProbeResult(UdpKit.NatFeatures features) {  }
 
 internal static void ZeusNatProbeResultInvoke(UdpKit.NatFeatures features) { 
@@ -945,6 +1008,7 @@ internal static void ZeusNatProbeResultInvoke(UdpKit.NatFeatures features) {
 
 
 
+ 
 public virtual void SessionListUpdated(Map<System.Guid, UdpSession> sessionList) {  }
 
 internal static void SessionListUpdatedInvoke(Map<System.Guid, UdpSession> sessionList) { 
@@ -960,6 +1024,7 @@ internal static void SessionListUpdatedInvoke(Map<System.Guid, UdpSession> sessi
 
 
 
+ 
 public virtual void SessionConnectFailed(UdpSession session) {  }
 
 internal static void SessionConnectFailedInvoke(UdpSession session) { 

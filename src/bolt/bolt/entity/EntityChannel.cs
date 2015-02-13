@@ -234,15 +234,20 @@ partial class EntityChannel : BoltChannel {
             _prioritized[i].Skipped += 1;
           }
           else {
-            var result = PackUpdate(packet, _prioritized[i]);
-            if (result) {
-              _prioritized[i].Priority = 0;
-            }
-            else {
-              _prioritized[i].Skipped += 1;
+            switch (PackUpdate(packet, _prioritized[i])) {
+              case -1:
+                failCount += 1;
+                _prioritized[i].Skipped += 1;
+                break;
 
-              // we failed once
-              failCount += 1;
+              case 0:
+                _prioritized[i].Skipped += 1;
+                break;
+
+              case +1:
+                _prioritized[i].Skipped = 0;
+                _prioritized[i].Priority = 0;
+                break;
             }
           }
         }
@@ -367,7 +372,7 @@ partial class EntityChannel : BoltChannel {
     }
   }
 
-  bool PackUpdate(Packet packet, EntityProxy proxy) {
+  int PackUpdate(Packet packet, EntityProxy proxy) {
     int pos = packet.UdpPacket.Position;
     int packCount = 0;
 
@@ -410,11 +415,11 @@ partial class EntityChannel : BoltChannel {
 
     if (packet.UdpPacket.Overflowing) {
       packet.UdpPacket.Position = pos;
-      return false;
+      return -1;
     }
     if (packCount == -1) {
       packet.UdpPacket.Position = pos;
-      return true;
+      return 0;
     }
     else {
       var isForce = proxy.Flags & ProxyFlags.FORCE_SYNC;
@@ -424,7 +429,7 @@ partial class EntityChannel : BoltChannel {
       // if we didn't pack anything and we are not creating or destroying this, just goto next
       if ((packCount == 0) && !isCreate && !isDestroy && !isForce) {
         packet.UdpPacket.Position = pos;
-        return true;
+        return 0;
       }
 
       // set in progress flags
@@ -447,7 +452,7 @@ partial class EntityChannel : BoltChannel {
       proxy.Envelopes.Enqueue(env);
 
       // keep going!
-      return true;
+      return 1;
     }
   }
 

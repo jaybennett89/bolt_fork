@@ -31,7 +31,7 @@ namespace Bolt {
             lastCheck = Time.realtimeSinceStartup;
 
             // grab component
-            component = GameObject.FindObjectOfType<T>();
+            component = (T)GameObject.FindObjectOfType(typeof(T));
 
             if (!component) {
               BoltLog.Error("Could not find object of type {0}", typeof(T).FullName);
