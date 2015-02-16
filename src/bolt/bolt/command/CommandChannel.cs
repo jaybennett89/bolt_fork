@@ -187,10 +187,14 @@ partial class EntityChannel {
           packet.UdpPacket.WriteContinueMarker();
           packet.UdpPacket.WriteNetworkId(proxy.NetworkId);
 
-          Command cmd = entity.CommandQueue.last;
+          var redundancy = Mathf.Min(entity.CommandQueue.count, BoltCore._config.commandRedundancy);
 
-          // how many commands we should send at most
-          int redundancy = Mathf.Min(entity.CommandQueue.count, BoltCore._config.commandRedundancy);
+          // if we are sending the entire command queue, then make sure we're not sending a command we already received a correction for
+          if ((entity.CommandQueue.count == redundancy) && (entity.CommandQueue.first.Flags & Bolt.CommandFlags.CORRECTION_RECEIVED)) {
+            redundancy -= 1;
+          }
+
+          var cmd = entity.CommandQueue.last;
 
           // go to first command
           for (int i = 0; i < (redundancy - 1); ++i) {
