@@ -320,7 +320,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// ```
   /// </example>
   public bool isFrozen {
-    get { return isAttached && BoltCore._entitiesFrozen.Contains(Entity); }
+    get { return isAttached && Entity.IsFrozen; }
   }
 
   /// <summary>

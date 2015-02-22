@@ -146,8 +146,8 @@ partial class EntityChannel : BoltChannel {
 
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incomming.Values) {
-      // skip ones we are in control of and that are client predicted
-      if (proxy.Entity.HasPredictedControl) {
+      // skip ones we are in control of and that are client predicted or that are frozen
+      if (proxy.Entity.HasPredictedControl || proxy.Entity.IsFrozen) {
         continue;
       }
 

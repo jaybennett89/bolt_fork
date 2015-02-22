@@ -182,8 +182,8 @@ namespace Bolt {
 
         GUILayout.Label(string.Format("Poll {0} ms", pollTime), LabelStyleColor(GetColor(PollTime, 16)));
         GUILayout.Label(string.Format("Send {0} ms", sendTime), LabelStyleColor(GetColor(SendTime, 16)));
-        GUILayout.Label(string.Format("Active Entities {0}", BoltCore._entities.count), LabelStyle);
-        GUILayout.Label(string.Format("Frozen Entities {0}", BoltCore._entitiesFrozen.count), LabelStyle);
+        GUILayout.Label(string.Format("Active Entities {0}", BoltCore._entities.Count(x => !x.IsFrozen)), LabelStyle);
+        GUILayout.Label(string.Format("Frozen Entities {0}", BoltCore._entities.Count(x => x.IsFrozen)), LabelStyle);
 
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
