@@ -45,11 +45,8 @@ namespace Bolt {
         // grab handle ptr
         var outHandlePtr = PInvoke.GetStdHandle(PInvoke.STD_OUTPUT_HANDLE);
 
-        // create handle to file
-        var fileHandle = new SafeFileHandle(outHandlePtr, true);
-
         // we can then create a filestream from this handle
-        var fileStream = new FileStream(fileHandle, FileAccess.Write);
+        var fileStream = new FileStream(outHandlePtr, FileAccess.Write);
 
         // and then create a new stream writer (using ASCII) 
         var stdOut = new StreamWriter(fileStream, Encoding.ASCII);
