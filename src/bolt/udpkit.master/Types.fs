@@ -88,7 +88,7 @@ type Peer = {
         otherInbox.Post(Error(sprintf "Can't connect to host %A, it does not have a valid NAT state" x.PeerId))
 
       | Some nat -> 
-        let bothHaveWan = nat.WanEndPoint.IsWan && otherNat.WanEndPoint.IsWan
+        let bothHaveWan = (nat.WanEndPoint.IsWan && otherNat.WanEndPoint.IsWan) || (nat.WanEndPoint.Address.Packed = UdpKit.UdpIPv4Address.Any.Packed && nat.WanEndPoint.Address.Packed = UdpKit.UdpIPv4Address.Any.Packed)
         let bothHaveLan = nat.LanEndPoint.IsLan && otherNat.LanEndPoint.IsLan
         let bothHaveSameWan = UdpIPv4Address.op_Equality(nat.WanEndPoint.Address, otherNat.WanEndPoint.Address)
         let bothHaveSameLanSubnet = 
