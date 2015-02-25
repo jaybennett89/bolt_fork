@@ -302,7 +302,10 @@ internal static class BoltCore {
       // notify user code
       BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
 
-      // 
+      // disconnect from zeus
+      Zeus.Disconnect();
+
+      // disable upnp
       UPnP.Disable(false);
 
       // 

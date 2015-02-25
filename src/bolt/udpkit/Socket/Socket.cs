@@ -109,6 +109,10 @@ namespace UdpKit {
       set;
     }
 
+    internal bool ConnectedToMaster {
+      get { return masterClient != null && masterClient.IsConnected; }
+    }
+
     public Func<int, byte[]> UnconnectedBufferProvider {
       get;
       set;

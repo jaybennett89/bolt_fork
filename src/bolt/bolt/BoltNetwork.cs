@@ -5,6 +5,7 @@ using BoltInternal;
 using UdpKit;
 using UnityEngine;
 using System.Threading;
+using System.Diagnostics;
 
 namespace BoltInternal {
   public interface IDebugDrawer {
@@ -37,6 +38,7 @@ public static class BoltNetworkInternal {
 
 
   public static ManualResetEvent __Shutdown() {
+    BoltNetwork.VerifyIsRunning();
     return BoltCore.Shutdown();
   }
 }
@@ -78,6 +80,13 @@ public static class BoltNetworkInternal {
 [Documentation]
 public static class BoltNetwork {
 
+  [Conditional("DEBUG")]
+  internal static void VerifyIsRunning() {
+    if (BoltNetwork.isRunning == false) {
+      throw new InvalidOperationException("You can't do this if Bolt is not running");
+    }
+  }
+
   /// <summary>
   /// Whether the local simulation can receive entities instantiated from other connections
   /// </summary>
@@ -92,7 +101,9 @@ public static class BoltNetwork {
   /// }
   /// ```
   /// </example>
+
   public static void SetCanReceiveEntities(bool canReceiveEntities) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore._canReceiveEntities = canReceiveEntities;
   }
 
@@ -165,7 +176,10 @@ public static class BoltNetwork {
   }
 
   public static UdpSocket UdpSocket {
-    get { return BoltCore._udpSocket; }
+    get {
+      BoltNetwork.VerifyIsRunning();
+      return BoltCore._udpSocket;
+    }
   }
 
   /// <summary>
@@ -414,10 +428,12 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
+    BoltNetwork.VerifyIsRunning();
     return BoltCore.CreateStreamChannel(name, mode, priority);
   }
 
   public static void UpdateSceneObjectsLookup() {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.UpdateSceneObjectsLookup();
   }
 
@@ -486,7 +502,10 @@ public static class BoltNetwork {
   /// The scoping mode active
   /// </summary>
   public static ScopeMode scopeMode {
-    get { return BoltCore._config.scopeMode; }
+    get {
+      BoltNetwork.VerifyIsRunning();
+      return BoltCore._config.scopeMode;
+    }
   }
 
   /// <summary>
@@ -504,7 +523,10 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static GameObject globalObject {
-    get { return BoltCore.globalObject; }
+    get {
+      BoltNetwork.VerifyIsRunning();
+      return BoltCore.globalObject;
+    }
   }
 
   /// <summary>
@@ -526,6 +548,8 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity FindEntity(NetworkId id) {
+    BoltNetwork.VerifyIsRunning();
+
     if (id.Packed == 0) {
       return null;
     }
@@ -557,6 +581,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void RegisterTokenClass<T>() where T : class, IProtocolToken, new() {
+    BoltNetwork.VerifyIsRunning();
     Factory.RegisterTokenClass(typeof(T));
   }
 
@@ -565,6 +590,7 @@ public static class BoltNetwork {
   /// Enables UPnP support on this instance
   /// </summary>
   public static void EnableUPnP() {
+    BoltNetwork.VerifyIsRunning();
     UPnP.Enable();
   }
 
@@ -572,6 +598,7 @@ public static class BoltNetwork {
   /// Disable UPnP
   /// </summary>
   public static void DisableUPnP() {
+    BoltNetwork.VerifyIsRunning();
     UPnP.Disable(true);
   }
 
@@ -580,6 +607,7 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="port">The port number</param>
   public static void OpenPortUPnP(int port) {
+    BoltNetwork.VerifyIsRunning();
     UPnP.OpenPort(port);
   }
 
@@ -588,6 +616,7 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="port">The port number</param>
   public static void ClosePortUPnP(int port) {
+    BoltNetwork.VerifyIsRunning();
     UPnP.ClosePort(port);
   }
 
@@ -680,6 +709,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(GameObject prefab) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefab, null, Vector3.zero, Quaternion.identity);
   }
 
@@ -703,6 +733,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(GameObject prefab, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefab, token, Vector3.zero, Quaternion.identity);
   }
 
@@ -731,6 +762,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(GameObject prefab, Vector3 position, Quaternion rotation) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefab, null, position, rotation);
   }
 
@@ -757,6 +789,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(GameObject prefab, IProtocolToken token, Vector3 position, Quaternion rotation) {
+    BoltNetwork.VerifyIsRunning();
     BoltEntity be = prefab.GetComponent<BoltEntity>();
 
     if (!be) {
@@ -790,6 +823,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(PrefabId prefabId) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefabId, null, Vector3.zero, Quaternion.identity);
   }
 
@@ -812,6 +846,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(PrefabId prefabId, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefabId, token, Vector3.zero, Quaternion.identity);
   }
 
@@ -837,6 +872,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(PrefabId prefabId, Vector3 position, Quaternion rotation) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(prefabId, null, position, rotation);
   }
 
@@ -862,6 +898,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltEntity Instantiate(PrefabId prefabId, IProtocolToken token, Vector3 position, Quaternion rotation) {
+    BoltNetwork.VerifyIsRunning();
     return Instantiate(BoltCore.PrefabPool.LoadPrefab(prefabId), token, position, rotation);
   }
 
@@ -888,6 +925,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Destroy(GameObject gameObject) {
+    BoltNetwork.VerifyIsRunning();
     Destroy(gameObject, null);
   }
 
@@ -910,6 +948,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Destroy(GameObject gameObject, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltEntity entity = gameObject.GetComponent<BoltEntity>();
 
     if (entity) {
@@ -926,10 +965,12 @@ public static class BoltNetwork {
    * */
 
   public static GameObject Attach(GameObject gameObject) {
+    BoltNetwork.VerifyIsRunning();
     return Attach(gameObject, null);
   }
 
   public static GameObject Attach(GameObject gameObject, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     return BoltCore.Attach(gameObject, EntityFlags.ZERO, token);
   }
 
@@ -939,10 +980,12 @@ public static class BoltNetwork {
    * */
 
   public static void Detach(GameObject gameObject) {
+    BoltNetwork.VerifyIsRunning();
     Detach(gameObject, null);
   }
 
   public static void Detach(GameObject gameObject, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.Detach(gameObject.GetComponent<BoltEntity>(), token);
   }
 
@@ -970,6 +1013,7 @@ public static class BoltNetwork {
   /// ```
   /// </example> 
   public static BoltPhysicsHits RaycastAll(Ray ray) {
+    BoltNetwork.VerifyIsRunning();
     return BoltPhysics.Raycast(ray);
   }
 
@@ -999,6 +1043,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltPhysicsHits RaycastAll(Ray ray, int frame) {
+    BoltNetwork.VerifyIsRunning();
     return BoltPhysics.Raycast(ray, frame);
   }
 
@@ -1029,6 +1074,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius) {
+    BoltNetwork.VerifyIsRunning();
     return BoltPhysics.OverlapSphere(origin, radius);
   }
 
@@ -1060,6 +1106,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static BoltPhysicsHits OverlapSphereAll(Vector3 origin, float radius, int frame) {
+    BoltNetwork.VerifyIsRunning();
     return BoltPhysics.OverlapSphere(origin, radius, frame);
   }
 
@@ -1082,6 +1129,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Accept(UdpEndPoint endpoint) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.AcceptConnection(endpoint, null, null, null);
   }
 
@@ -1103,18 +1151,22 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.AcceptConnection(endpoint, null, acceptToken, null);
   }
 
   public static void Accept(UdpEndPoint endpoint, object userToken) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.AcceptConnection(endpoint, userToken, null, null);
   }
 
   public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken, IProtocolToken connectToken) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.AcceptConnection(endpoint, null, acceptToken, connectToken);
   }
 
   public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.AcceptConnection(endpoint, userToken, acceptToken, connectToken);
   }
 
@@ -1137,6 +1189,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Refuse(UdpEndPoint endpoint) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.RefuseConnection(endpoint, null);
   }
 
@@ -1157,6 +1210,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Refuse(UdpEndPoint endpoint, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.RefuseConnection(endpoint, token);
   }
 
@@ -1165,6 +1219,7 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="mb">The monobehaviour to invoke events on</param>
   public static void AddGlobalEventListener(MonoBehaviour mb) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore._globalEventDispatcher.Add(mb);
   }
 
@@ -1173,6 +1228,7 @@ public static class BoltNetwork {
   /// </summary>
   /// <param name="mb">The monobehaviour to be removed</param>
   public static void RemoveGlobalEventListener(MonoBehaviour mb) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore._globalEventDispatcher.Remove(mb);
   }
 
@@ -1191,6 +1247,8 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void LoadScene(string scene) {
+    BoltNetwork.VerifyIsRunning();
+
     LoadScene(scene, null);
   }
 
@@ -1210,6 +1268,8 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void LoadScene(string scene, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
+
     int sceneIndex = -1;
 
     try {
@@ -1240,14 +1300,17 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Connect(UdpEndPoint endpoint) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.Connect(endpoint, null);
   }
 
   public static void Connect(UdpSession session) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.Connect(session, null);
   }
 
   public static void Connect(UdpSession session, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.Connect(session, token);
   }
 
@@ -1269,6 +1332,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Connect(UdpEndPoint endpoint, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.Connect(endpoint, token);
   }
 
@@ -1289,10 +1353,12 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void SetHostInfo(string serverName, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.SetHostInfo(serverName, false, token);
   }
 
   public static void SetDedicatedServerInfo(string serverName, IProtocolToken token) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.SetHostInfo(serverName, true, token);
   }
 
@@ -1312,6 +1378,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void DisableLanBroadcast() {
+    BoltNetwork.VerifyIsRunning();
     BoltCore.DisableLanBroadcast();
   }
 
@@ -1330,6 +1397,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void EnableLanBroadcast() {
+    BoltNetwork.VerifyIsRunning();
     EnableLanBroadcast(60000);
   }
 
@@ -1349,6 +1417,7 @@ public static class BoltNetwork {
   /// ```
   /// </example> 
   public static void EnableLanBroadcast(ushort port) {
+    BoltNetwork.VerifyIsRunning();
     BoltCore._udpSocket.LanBroadcastEnable(UdpIPv4Address.Any, BoltCore._udpPlatform.GetBroadcastAddress(), port);
   }
 
