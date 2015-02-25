@@ -158,6 +158,12 @@ namespace Bolt {
       storage = AllocateStorage();
     }
 
+    internal void FreeStorage() {
+      if (storage != null) {
+        Meta.FreeStorage(storage);
+      }
+    }
+
     internal void IncrementRefs() {
 
     }

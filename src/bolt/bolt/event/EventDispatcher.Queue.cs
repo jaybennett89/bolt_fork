@@ -77,11 +77,17 @@ namespace Bolt {
 
     static void Global_Only_Self(Event ev) {
       RaiseLocal(ev);
+
+      // we can free this (never used after this)
+      ev.FreeStorage();
     }
 
     static void Entity_Only_Self(Event ev) {
       if (ev.TargetEntity) {
         RaiseLocal(ev);
+
+        // we can free this (never used after this)
+        ev.FreeStorage();
       }
     }
 
@@ -89,6 +95,9 @@ namespace Bolt {
       if (ev.TargetEntity) {
         if (ev.TargetEntity.IsOwner) {
           RaiseLocal(ev);
+
+          // we can free this (never used after this)
+          ev.FreeStorage();
         }
         else {
           // forward to owner
@@ -101,6 +110,9 @@ namespace Bolt {
       if (ev.TargetEntity) {
         if (ev.TargetEntity.HasControl) {
           RaiseLocal(ev);
+
+          // we can free this (never used after this)
+          ev.FreeStorage();
         }
         else {
           if (ev.TargetEntity.IsOwner) {
@@ -241,7 +253,6 @@ namespace Bolt {
       RaiseLocal(ev);
     }
 
-
     static void RaiseLocal(Event ev) {
       try {
         BoltLog.Debug("Raising {0}", ev);
@@ -251,6 +262,10 @@ namespace Bolt {
         }
         else {
           BoltCore._globalEventDispatcher.Raise(ev);
+        }
+
+        if (BoltCore.isClient && ev.FromSelf == false) {
+          ev.FreeStorage();
         }
       }
       finally {

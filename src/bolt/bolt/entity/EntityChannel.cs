@@ -146,7 +146,6 @@ partial class EntityChannel : BoltChannel {
 
   public override void StepRemoteFrame() {
     foreach (EntityProxy proxy in _incomming.Values) {
-      // skip ones we are in control of and that are client predicted or that are frozen
       if (proxy.Entity.HasPredictedControl || proxy.Entity.IsFrozen) {
         continue;
       }
@@ -163,6 +162,10 @@ partial class EntityChannel : BoltChannel {
     _prioritized.Clear();
 
     foreach (EntityProxy proxy in _outgoing.Values) {
+      if (proxy.Entity.IsFrozen) {
+        continue;
+      }
+
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
           continue;
@@ -185,7 +188,7 @@ partial class EntityChannel : BoltChannel {
 
         // if this connection is loading a map dont send any creates or state updates
         if (proxy.Entity.UnityObject._alwaysProxy == false) {
-          if (connection.isLoadingMap || BoltSceneLoader.IsLoading || (connection._canReceiveEntities == false)) {
+          if (connection.IsLoadingMap || BoltSceneLoader.IsLoading || (connection._canReceiveEntities == false)) {
             continue;
           }
         }

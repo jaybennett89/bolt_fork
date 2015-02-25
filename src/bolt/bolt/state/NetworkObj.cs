@@ -57,7 +57,7 @@ namespace Bolt {
 
 
     internal NetworkStorage AllocateStorage() {
-      return new NetworkStorage(Meta.CountStorage);
+      return Meta.AllocateStorage();
     }
 
     internal NetworkStorage DuplicateStorage(NetworkStorage s) {
@@ -73,7 +73,7 @@ namespace Bolt {
     }
 
     internal void FreeStorage(NetworkStorage storage) {
-
+      Meta.FreeStorage(storage);
     }
 
     internal int this[NetworkProperty property] {

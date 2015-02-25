@@ -59,14 +59,21 @@ namespace UdpKit {
 
       void OnBroadcastSearch(Protocol.BroadcastSearch search) {
         if (search.PeerId != socket.PeerId) {
-          service.Send<Protocol.BroadcastSession>(search.Sender, m => m.Host = socket.sessionManager.GetLocalSession());
+          var session = service.Client.CreateMessage<Protocol.BroadcastSession>();
+          session.Host = socket.sessionManager.GetLocalSession();
+          session.Port = socket.platformSocket.EndPoint.Port;
+
+          service.Send(search.Sender, session);
         }
       }
 
       void OnBroadcastSession(Protocol.BroadcastSession session) {
         if (session.PeerId != socket.PeerId) {
+          var addr = session.Sender.Address;
+          var port = session.Port;
+
           // set lan end point of session we received
-          session.Host._lanEndPoint = session.Sender;
+          session.Host._lanEndPoint = new UdpEndPoint(addr, (ushort)port);
 
           // update session
           socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);

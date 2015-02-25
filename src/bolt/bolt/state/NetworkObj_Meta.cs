@@ -24,6 +24,7 @@ namespace Bolt {
     internal NetworkPropertyInfo[] Properties;
 
     internal HashSet<string> CallbackPaths = new HashSet<string>();
+    internal Stack<NetworkStorage> StoragePool = new Stack<NetworkStorage>();
     internal List<NetworkPropertyInfo> OnRender = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnSimulateAfter = new List<NetworkPropertyInfo>();
     internal List<NetworkPropertyInfo> OnSimulateBefore = new List<NetworkPropertyInfo>();
@@ -38,6 +39,25 @@ namespace Bolt {
       Filters = new BitSet[32];
       Filters[31] = new BitSet();
       Filters[30] = new BitSet();
+    }
+
+
+    internal NetworkStorage AllocateStorage() {
+      if (StoragePool.Count > 0) {
+        return StoragePool.Pop();
+      }
+
+      return new NetworkStorage(CountStorage);
+    }
+
+    internal void FreeStorage(NetworkStorage storage) {
+      storage.Frame = 0;
+      storage.Root = null;
+      storage.ClearAll();
+
+      System.Array.Clear(storage.Values, 0, storage.Values.Length);
+
+      StoragePool.Push(storage);
     }
 
     void AddPropertyToArray(int offsetProperties, int offsetObjects, NetworkProperty property) {
