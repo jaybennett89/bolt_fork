@@ -65,6 +65,7 @@
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="DebugInfo.cs" />
+    <Compile Include="entity\EntityLookup.cs" />
     <Compile Include="event\EventFilter.cs" />
     <Compile Include="event\EventListener.cs" />
     <Compile Include="event\Event_Meta.cs" />

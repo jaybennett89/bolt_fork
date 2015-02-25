@@ -1,7 +1,16 @@
 ﻿using Bolt;
 using System;
+using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
+
+namespace Bolt {
+  public enum ExistsResult {
+    No,
+    Maybe,
+    Yes,
+  }
+}
 
 [Documentation(Ignore = true)]
 internal struct PacketStats {
@@ -74,6 +83,14 @@ public class BoltConnection : BoltObject {
         (_remoteSceneLoading.Scene != BoltCore._localSceneLoading.Scene) ||
         (_remoteSceneLoading.State != SceneLoadState.STATE_CALLBACK_INVOKED);
     }
+  }
+
+  public EntityLookup ScopedTo {
+    get { return _entityChannel._outgoingLookup; }
+  }
+
+  public EntityLookup SourceOf {
+    get { return _entityChannel._incommingLookup; }
   }
 
   [Obsolete("Use BoltConnection.IsLoadingMap instead")]
@@ -390,6 +407,14 @@ public class BoltConnection : BoltObject {
     }
   }
 
+  public ExistsResult ExistsOnRemote(BoltEntity entity) {
+    return _entityChannel.ExistsOnRemote(entity.Entity, false);
+  }
+
+  public ExistsResult ExistsOnRemote(BoltEntity entity, bool allowMaybe) {
+    return _entityChannel.ExistsOnRemote(entity.Entity, allowMaybe);
+  }
+
   /// <summary>
   /// Send a binary stream of data to this connection
   /// </summary>
@@ -494,7 +519,7 @@ public class BoltConnection : BoltObject {
   public override int GetHashCode() {
     return _udp.GetHashCode();
   }
-  
+
   /// <summary>
   /// The string representation of this connection
   /// </summary>

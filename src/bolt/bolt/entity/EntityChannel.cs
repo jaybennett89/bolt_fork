@@ -4,13 +4,21 @@ using System.Linq;
 using UnityEngine;
 
 partial class EntityChannel : BoltChannel {
+  internal EntityLookup _outgoingLookup;
+  internal EntityLookup _incommingLookup;
+
   Dictionary<Bolt.NetworkId, EntityProxy> _outgoing;
   Dictionary<Bolt.NetworkId, EntityProxy> _incomming;
+
   List<EntityProxy> _prioritized;
 
   public EntityChannel() {
     _outgoing = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
     _incomming = new Dictionary<NetworkId, EntityProxy>(2048, Bolt.NetworkId.EqualityComparer.Instance);
+
+    _outgoingLookup = new EntityLookup(_outgoing);
+    _incommingLookup = new EntityLookup(_incomming);
+
     _prioritized = new List<EntityProxy>();
   }
 
@@ -93,6 +101,25 @@ partial class EntityChannel : BoltChannel {
     }
 
     return false;
+  }
+
+  public ExistsResult ExistsOnRemote(Entity entity, bool allowMaybe) {
+    if (entity == null) { return ExistsResult.No; }
+    if (_incomming.ContainsKey(entity.NetworkId)) { return ExistsResult.Yes; }
+
+    EntityProxy proxy;
+
+    if (_outgoing.TryGetValue(entity.NetworkId, out proxy)) {
+      if ((proxy.Flags & ProxyFlags.CREATE_DONE) && !(proxy.Flags & ProxyFlags.DESTROY_REQUESTED)) {
+        return ExistsResult.Yes;
+      }
+
+      if (allowMaybe) {
+        return ExistsResult.Maybe;
+      }
+    }
+
+    return ExistsResult.No;
   }
 
   public bool MightExistOnRemote(Bolt.Entity entity) {
