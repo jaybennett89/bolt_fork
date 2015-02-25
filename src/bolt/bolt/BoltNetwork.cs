@@ -1401,6 +1401,13 @@ public static class BoltNetwork {
     EnableLanBroadcast(60000);
   }
 
+  public static bool IsSinglePlayer {
+    get {
+      BoltNetwork.VerifyIsRunning();
+      return UdpSocket.PlatformSocket.Platform.IsNull;
+    }
+  }
+
   /// <summary>
   /// Enable LAN broadcasting
   /// </summary>
