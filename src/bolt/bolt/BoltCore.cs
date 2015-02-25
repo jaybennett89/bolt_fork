@@ -413,7 +413,7 @@ internal static class BoltCore {
         BoltIterator<BoltConnection> it = _connections.GetIterator();
 
         while (it.Next()) {
-          if (it.val.StepRemoteFrame()) {
+          if (it.val.StepRemoteEntities()) {
             retry = true;
           }
         }

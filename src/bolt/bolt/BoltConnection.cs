@@ -509,10 +509,6 @@ public class BoltConnection : BoltObject {
     return ReferenceEquals(this, obj);
   }
 
-  public bool IsScoped(BoltEntity entity) {
-    return _entityChannel.MightExistOnRemote(entity.Entity);
-  }
-
   /// <summary>
   /// A hash code for this connection
   /// </summary>
@@ -550,13 +546,17 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal bool StepRemoteFrame() {
+  internal bool StepRemoteEntities() {
     if (_framesToStep > 0) {
       _framesToStep -= 1;
       _remoteFrameEstimated += 1;
 
-      for (int i = 0; i < _channels.Length; ++i) {
-        _channels[i].StepRemoteFrame();
+      foreach (EntityProxy proxy in _entityChannel._incommingDict.Values) {
+        if (proxy.Entity.HasPredictedControl || proxy.Entity.IsFrozen) {
+          continue;
+        }
+
+        proxy.Entity.Simulate();
       }
     }
 

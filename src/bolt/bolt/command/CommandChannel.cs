@@ -12,11 +12,11 @@ partial class EntityChannel {
     }
 
     Dictionary<NetworkId, EntityProxy> incommingProxiesByNetworkId {
-      get { return connection._entityChannel._incomming; }
+      get { return connection._entityChannel._incommingDict; }
     }
 
     Dictionary<NetworkId, EntityProxy> outgoingProxiesByNetworkId {
-      get { return connection._entityChannel._outgoing; }
+      get { return connection._entityChannel._outgoingDict; }
     }
 
     public CommandChannel() {
