@@ -612,9 +612,9 @@ public class BoltConnection : BoltObject {
           _remoteFrameDiff = _remoteFrameActual - _remoteFrameEstimated;
 
           // call into channels to notify that the frame reset
-          for (int i = 0; i < _channels.Length; ++i) {
-            _channels[i].RemoteFrameReset(oldFrame, newFrame);
-          }
+          //for (int i = 0; i < _channels.Length; ++i) {
+          //  _channels[i].RemoteFrameReset(oldFrame, newFrame);
+          //}
         }
       }
     }
@@ -698,9 +698,9 @@ public class BoltConnection : BoltObject {
           _channels[i].Read(packet);
         }
 
-        for (int i = 0; i < _channels.Length; ++i) {
-          _channels[i].ReadDone();
-        }
+        //for (int i = 0; i < _channels.Length; ++i) {
+        //  _channels[i].ReadDone();
+        //}
 
         _packetStatsIn.Enqueue(packet.Stats);
 
