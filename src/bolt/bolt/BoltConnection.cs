@@ -56,6 +56,7 @@ public class BoltConnection : BoltObject {
   internal SceneLoadChannel _sceneLoadChannel;
   internal EntityChannel _entityChannel;
   internal EntityChannel.CommandChannel _commandChannel;
+  internal List<Entity> _controlling = new List<Entity>();
 
   internal BoltRingBuffer<PacketStats> _packetStatsIn;
   internal BoltRingBuffer<PacketStats> _packetStatsOut;
@@ -91,6 +92,10 @@ public class BoltConnection : BoltObject {
 
   public EntityLookup SourceOf {
     get { return _entityChannel._incommingLookup; }
+  }
+
+  public IEnumerable<Entity> ControlledEntities {
+    get { return _controlling; }
   }
 
   [Obsolete("Use BoltConnection.IsLoadingMap instead")]

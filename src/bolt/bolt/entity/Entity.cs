@@ -278,6 +278,10 @@ namespace Bolt {
       Assert.True(IsAttached);
       Assert.True(NetworkId.Packed != 0UL);
 
+      if (Controller) {
+        RevokeControl(null);
+      }
+
       // destroy on all connections
       var it = BoltCore._connections.GetIterator();
 
