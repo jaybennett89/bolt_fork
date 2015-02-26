@@ -432,8 +432,6 @@ namespace UdpKit {
       }
 
       void OnDirectConnectionWan(Protocol.DirectConnectionWan direct) {
-        ClearPunchRequest();
-
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.INTERNAL_CONNECT;
         ev.EndPoint = direct.RemoteEndPoint;

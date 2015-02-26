@@ -84,7 +84,7 @@ public class BoltEditorWindow : BoltWindow {
   RuntimeAnimatorController mecanimController;
 
   void ImportMecanimLayer(StateDefinition def, AC ac, int layer) {
-    string name = "MecanimLayer_" + layer;
+    string name = "MecanimLayer_" + layer + "_Weight";
 
     PropertyDefinition pdef = def.Properties.FirstOrDefault(x => x.StateAssetSettings.MecanimLayer == layer && x.StateAssetSettings.MecanimMode == MecanimMode.LayerWeight);
 

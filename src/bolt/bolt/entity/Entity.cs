@@ -98,6 +98,7 @@ namespace Bolt {
     }
 
     internal bool IsOwner;
+    internal bool IsFrozen;
 
     internal bool IsDummy {
       get { return !IsOwner && !HasPredictedControl; }
@@ -117,10 +118,6 @@ namespace Bolt {
 
     internal bool CanQueueCommands {
       get { return _canQueueCommands; }
-    }
-
-    public bool IsFrozen {
-      get { return BoltCore._entitiesFrozen.Contains(this); }
     }
 
     object IBoltListNode.prev { get; set; }
@@ -179,20 +176,18 @@ namespace Bolt {
     }
 
     internal void Freeze(bool freeze) {
-      if (freeze) {
-        if (CanFreeze) {
-          if (BoltCore._entities.Contains(this)) {
-            BoltCore._entities.Remove(this);
-            BoltCore._entitiesFrozen.AddLast(this);
-            BoltLog.Debug("FROZEN: {0}", this);
-          }
+      if (IsFrozen != freeze) {
+        if (IsFrozen) {
+          IsFrozen = false;
+          BoltCore._entities.Remove(this);
+          BoltCore._entities.AddFirst(this);
         }
-      }
-      else {
-        if (BoltCore._entitiesFrozen.Contains(this)) {
-          BoltCore._entitiesFrozen.Remove(this);
-          BoltCore._entities.AddLast(this);
-          BoltLog.Debug("THAWED: {0}", this);
+        else {
+          if (CanFreeze) {
+            IsFrozen = true;
+            BoltCore._entities.Remove(this);
+            BoltCore._entities.AddLast(this);
+          }
         }
       }
     }
@@ -283,6 +278,10 @@ namespace Bolt {
       Assert.True(IsAttached);
       Assert.True(NetworkId.Packed != 0UL);
 
+      if (Controller) {
+        RevokeControl(null);
+      }
+
       // destroy on all connections
       var it = BoltCore._connections.GetIterator();
 
@@ -338,12 +337,7 @@ namespace Bolt {
       Flags &= ~EntityFlags.ATTACHED;
 
       // remove from entities list
-      if (IsFrozen) {
-        BoltCore._entitiesFrozen.Remove(this);
-      }
-      else {
-        BoltCore._entities.Remove(this);
-      }
+      BoltCore._entities.Remove(this);
 
       // clear from unity object
       UnityObject._entity = null;

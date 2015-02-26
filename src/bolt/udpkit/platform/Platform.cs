@@ -6,6 +6,7 @@ namespace UdpKit {
   public abstract class UdpPlatform {
     public object Token { get; set; }
 
+    public virtual bool IsNull { get { return false; } }
     public abstract bool SupportsBroadcast { get; }
     public abstract bool SupportsMasterServer { get; }
     public abstract uint GetPrecisionTime();
@@ -20,6 +21,16 @@ namespace UdpKit {
 
       socket = CreateSocket();
       socket.Bind(endpoint);
+
+      return socket;
+    }
+
+    public virtual UdpPlatformSocket CreateBroadcastSocket(UdpEndPoint endpoint) {
+      UdpPlatformSocket socket;
+
+      socket = CreateSocket();
+      socket.Bind(endpoint);
+      socket.Broadcast = true;
 
       return socket;
     }

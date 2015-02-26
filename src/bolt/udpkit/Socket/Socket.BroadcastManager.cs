@@ -48,25 +48,32 @@ namespace UdpKit {
         }
 
         broadcast = new UdpEndPoint(args.BroadcastAddress, args.Port);
+        
+        // create broadcasting service
+        service = new Protocol.ProtocolService(new Protocol.ProtocolClient(socket.platform.CreateBroadcastSocket(new UdpEndPoint(args.LocalAddress, args.Port)), socket.GameId, socket.PeerId));
 
-        service = new Protocol.ProtocolService(new Protocol.ProtocolClient(socket.platform.CreateSocket(), socket.GameId, socket.PeerId));
-        service.Client.Socket.Bind(new UdpEndPoint(args.LocalAddress, args.Port));
-        service.Client.Socket.Broadcast = true;
-
+        // register messages
         service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
         service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
       }
 
       void OnBroadcastSearch(Protocol.BroadcastSearch search) {
         if (search.PeerId != socket.PeerId) {
-          service.Send<Protocol.BroadcastSession>(search.Sender, m => m.Host = socket.sessionManager.GetLocalSession());
+          var session = service.Client.CreateMessage<Protocol.BroadcastSession>();
+          session.Host = socket.sessionManager.GetLocalSession();
+          session.Port = socket.platformSocket.EndPoint.Port;
+
+          service.Send(search.Sender, session);
         }
       }
 
       void OnBroadcastSession(Protocol.BroadcastSession session) {
         if (session.PeerId != socket.PeerId) {
+          var addr = session.Sender.Address;
+          var port = session.Port;
+
           // set lan end point of session we received
-          session.Host._lanEndPoint = session.Sender;
+          session.Host._lanEndPoint = new UdpEndPoint(addr, (ushort)port);
 
           // update session
           socket.sessionManager.UpdateSession(session.Host, UdpSessionSource.Lan);

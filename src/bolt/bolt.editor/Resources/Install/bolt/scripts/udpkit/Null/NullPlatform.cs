@@ -63,4 +63,8 @@ public class NullPlatform : UdpPlatform {
   public override bool SupportsMasterServer {
     get { return false; }
   }
+
+  public override bool IsNull { 
+    get { return true; } 
+  }
 }

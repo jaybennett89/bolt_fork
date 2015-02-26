@@ -159,7 +159,7 @@ namespace Bolt {
     }
 
     internal void Free() {
-
+      FreeStorage(storage);
     }
 
     public static implicit operator bool(Command cmd) {

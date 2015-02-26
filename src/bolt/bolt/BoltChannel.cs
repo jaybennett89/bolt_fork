@@ -22,9 +22,6 @@ namespace Bolt {
     public virtual void Lost(Packet packet) { }
     public virtual void Delivered(Packet packet) { }
 
-    public virtual void ReadDone() { }
-    public virtual void StepRemoteFrame() { }
-    public virtual void RemoteFrameReset(int oldFrame, int newFrame) { }
     public virtual void Disconnected() { }
   }
 }

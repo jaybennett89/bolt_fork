@@ -6,14 +6,18 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("udpkit")]
 #elif UDPKIT_COMMON
 [assembly: AssemblyTitle("udpkit.common")]
+#elif UDPKIT_WP8
+[assembly: AssemblyTitle("udpkit.wp8")]
 #endif
 
 [assembly: AssemblyProduct("udpkit")]
 
+#if !UDPKIT_WP8
 [assembly: InternalsVisibleTo("bolt")]
 [assembly: InternalsVisibleTo("bolt.user")]
 [assembly: InternalsVisibleTo("bolt.editor")]
 [assembly: InternalsVisibleTo("bolt.compiler")]
+#endif
 
 #if UDPKIT_COMMON
 [assembly: InternalsVisibleTo("udpkit")]
@@ -28,5 +32,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.3.3.1")]
-[assembly: AssemblyFileVersion("0.3.3.1")]
+[assembly: AssemblyVersion("0.4.0.0")]
+[assembly: AssemblyFileVersion("0.4.0.0")]

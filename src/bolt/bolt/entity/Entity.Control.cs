@@ -107,6 +107,7 @@ namespace Bolt {
         CommandQueue.Clear();
 
         Controller = connection;
+        Controller._controlling.Add(this);
         Controller._entityChannel.CreateOnRemote(this, out proxy);
         Controller._entityChannel.ForceSync(this);
 
@@ -125,6 +126,7 @@ namespace Bolt {
           EntityProxy proxy;
 
           // force a replication of this
+          Controller._controlling.Remove(this);
           Controller._entityChannel.ForceSync(this, out proxy);
           Controller = null;
 

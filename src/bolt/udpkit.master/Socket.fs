@@ -96,7 +96,7 @@ type AsyncUdpSocket (onRecv:SocketData -> unit) =
         UdpLog.Error(ex.StackTrace)
     
       // yield thread
-      System.Threading.Thread.Yield() |> ignore
+      System.Threading.Thread.Sleep(1) |> ignore
 
   let thread = new Thread(loop)
       

@@ -225,7 +225,11 @@ namespace UdpKit {
     }
 
     public bool ReadHeader(byte[] buffer, int size) {
-      UdpAssert.Assert(size >= Config.HeaderSize);
+      if (size < Config.HeaderSize) {
+        return false;
+      }
+
+      // mnake sure this is correct tag
       UdpAssert.Assert(buffer[0] == Config.PipeId);
 
       int o = 1;

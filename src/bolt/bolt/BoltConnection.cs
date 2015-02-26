@@ -1,7 +1,16 @@
 ﻿using Bolt;
 using System;
+using System.Collections.Generic;
 using UdpKit;
 using UnityEngine;
+
+namespace Bolt {
+  public enum ExistsResult {
+    No,
+    Maybe,
+    Yes,
+  }
+}
 
 [Documentation(Ignore = true)]
 internal struct PacketStats {
@@ -47,6 +56,8 @@ public class BoltConnection : BoltObject {
   internal SceneLoadChannel _sceneLoadChannel;
   internal EntityChannel _entityChannel;
   internal EntityChannel.CommandChannel _commandChannel;
+  internal List<Entity> _controlling;
+  internal EntityList _controllingList;
 
   internal BoltRingBuffer<PacketStats> _packetStatsIn;
   internal BoltRingBuffer<PacketStats> _packetStatsOut;
@@ -74,6 +85,18 @@ public class BoltConnection : BoltObject {
         (_remoteSceneLoading.Scene != BoltCore._localSceneLoading.Scene) ||
         (_remoteSceneLoading.State != SceneLoadState.STATE_CALLBACK_INVOKED);
     }
+  }
+
+  public EntityLookup ScopedTo {
+    get { return _entityChannel._outgoingLookup; }
+  }
+
+  public EntityLookup SourceOf {
+    get { return _entityChannel._incommingLookup; }
+  }
+
+  public  EntityList HasControlOf {
+    get { return _controllingList; }
   }
 
   [Obsolete("Use BoltConnection.IsLoadingMap instead")]
@@ -365,6 +388,9 @@ public class BoltConnection : BoltObject {
   internal BoltConnection(UdpConnection udp) {
     UserData = udp.UserToken;
 
+    _controlling = new List<Entity>();
+    _controllingList = new EntityList(_controlling);
+
     _udp = udp;
     _udp.UserToken = this;
 
@@ -388,6 +414,14 @@ public class BoltConnection : BoltObject {
     for (int i = 0; i < _channels.Length; ++i) {
       _channels[i].connection = this;
     }
+  }
+
+  public ExistsResult ExistsOnRemote(BoltEntity entity) {
+    return _entityChannel.ExistsOnRemote(entity.Entity, false);
+  }
+
+  public ExistsResult ExistsOnRemote(BoltEntity entity, bool allowMaybe) {
+    return _entityChannel.ExistsOnRemote(entity.Entity, allowMaybe);
   }
 
   /// <summary>
@@ -484,17 +518,13 @@ public class BoltConnection : BoltObject {
     return ReferenceEquals(this, obj);
   }
 
-  public bool IsScoped(BoltEntity entity) {
-    return _entityChannel.MightExistOnRemote(entity.Entity);
-  }
-
   /// <summary>
   /// A hash code for this connection
   /// </summary>
   public override int GetHashCode() {
     return _udp.GetHashCode();
   }
-  
+
   /// <summary>
   /// The string representation of this connection
   /// </summary>
@@ -525,13 +555,17 @@ public class BoltConnection : BoltObject {
     }
   }
 
-  internal bool StepRemoteFrame() {
+  internal bool StepRemoteEntities() {
     if (_framesToStep > 0) {
       _framesToStep -= 1;
       _remoteFrameEstimated += 1;
 
-      for (int i = 0; i < _channels.Length; ++i) {
-        _channels[i].StepRemoteFrame();
+      foreach (EntityProxy proxy in _entityChannel._incommingDict.Values) {
+        if (proxy.Entity.HasPredictedControl || proxy.Entity.IsFrozen) {
+          continue;
+        }
+
+        proxy.Entity.Simulate();
       }
     }
 
@@ -587,9 +621,9 @@ public class BoltConnection : BoltObject {
           _remoteFrameDiff = _remoteFrameActual - _remoteFrameEstimated;
 
           // call into channels to notify that the frame reset
-          for (int i = 0; i < _channels.Length; ++i) {
-            _channels[i].RemoteFrameReset(oldFrame, newFrame);
-          }
+          //for (int i = 0; i < _channels.Length; ++i) {
+          //  _channels[i].RemoteFrameReset(oldFrame, newFrame);
+          //}
         }
       }
     }
@@ -673,9 +707,9 @@ public class BoltConnection : BoltObject {
           _channels[i].Read(packet);
         }
 
-        for (int i = 0; i < _channels.Length; ++i) {
-          _channels[i].ReadDone();
-        }
+        //for (int i = 0; i < _channels.Length; ++i) {
+        //  _channels[i].ReadDone();
+        //}
 
         _packetStatsIn.Enqueue(packet.Stats);
 

@@ -37,7 +37,6 @@ internal static class BoltCore {
   static internal UdpConfig _udpConfig = null;
 
   static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
-  static internal BoltDoubleList<Entity> _entitiesFrozen = new BoltDoubleList<Entity>();
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
@@ -273,14 +272,6 @@ internal static class BoltCore {
       }
     }
 
-    it = _entitiesFrozen.GetIterator();
-
-    while (it.Next()) {
-      if (it.val.NetworkId == id) {
-        return it.val;
-      }
-    }
-
     return null;
   }
 
@@ -311,7 +302,10 @@ internal static class BoltCore {
       // notify user code
       BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
 
-      // 
+      // disconnect from zeus
+      Zeus.Disconnect();
+
+      // disable upnp
       UPnP.Disable(false);
 
       // 
@@ -419,7 +413,7 @@ internal static class BoltCore {
         BoltIterator<BoltConnection> it = _connections.GetIterator();
 
         while (it.Next()) {
-          if (it.val.StepRemoteFrame()) {
+          if (it.val.StepRemoteEntities()) {
             retry = true;
           }
         }
@@ -654,7 +648,7 @@ internal static class BoltCore {
       var iter = _entities.GetIterator();
 
       while (iter.Next()) {
-        if (iter.val.IsOwner || iter.val.HasPredictedControl) {
+        if (!iter.val.IsFrozen && (iter.val.IsOwner || iter.val.HasPredictedControl)) {
           iter.val.Simulate();
         }
       }

@@ -8,12 +8,13 @@ namespace Bolt {
     public StringEncodings Encoding;
     public Encoding EncodingClass {
       get {
-        switch (Encoding) {
-          case StringEncodings.ASCII: return System.Text.Encoding.ASCII;
-          case StringEncodings.UTF8: return System.Text.Encoding.UTF8;
-        }
+        return System.Text.Encoding.UTF8;
 
-        throw new NotSupportedException();
+        //switch (Encoding) {
+        //  case StringEncodings.ASCII: return System.Text.ASCIIEncoding.ASCII;
+        //  case StringEncodings.UTF8: return System.Text.Encoding.UTF8;
+        //}
+        //throw new NotSupportedException();
       }
     }
   }

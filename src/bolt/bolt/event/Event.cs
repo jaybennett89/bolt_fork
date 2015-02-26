@@ -63,7 +63,7 @@ namespace Bolt {
     ///   ChatWindow.instance.ShowMessage(chatEvt.message, chatEvt.timestamp);
     /// }
     /// ```
-    /// </example>
+    /// </example> 
     public bool FromSelf {
       get { return ReferenceEquals(SourceConnection, null); }
     }
@@ -156,6 +156,12 @@ namespace Bolt {
       : base(meta) {
       Meta = meta;
       storage = AllocateStorage();
+    }
+
+    internal void FreeStorage() {
+      if (storage != null) {
+        Meta.FreeStorage(storage);
+      }
     }
 
     internal void IncrementRefs() {
