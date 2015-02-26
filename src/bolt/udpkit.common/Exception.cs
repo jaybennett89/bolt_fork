@@ -7,7 +7,6 @@ namespace UdpKit {
 
     internal UdpException(string msg) : base(msg) {
       UdpLog.Error(msg);
-      UdpLog.Error(Environment.StackTrace);
     }
   }
 }

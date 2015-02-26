@@ -48,11 +48,11 @@ namespace UdpKit {
         }
 
         broadcast = new UdpEndPoint(args.BroadcastAddress, args.Port);
+        
+        // create broadcasting service
+        service = new Protocol.ProtocolService(new Protocol.ProtocolClient(socket.platform.CreateBroadcastSocket(new UdpEndPoint(args.LocalAddress, args.Port)), socket.GameId, socket.PeerId));
 
-        service = new Protocol.ProtocolService(new Protocol.ProtocolClient(socket.platform.CreateSocket(), socket.GameId, socket.PeerId));
-        service.Client.Socket.Bind(new UdpEndPoint(args.LocalAddress, args.Port));
-        service.Client.Socket.Broadcast = true;
-
+        // register messages
         service.Client.SetHandler<Protocol.BroadcastSearch>(OnBroadcastSearch);
         service.Client.SetHandler<Protocol.BroadcastSession>(OnBroadcastSession);
       }

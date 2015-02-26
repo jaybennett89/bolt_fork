@@ -63,7 +63,7 @@ namespace Bolt {
     ///   ChatWindow.instance.ShowMessage(chatEvt.message, chatEvt.timestamp);
     /// }
     /// ```
-    /// </example>
+    /// </example> 
     public bool FromSelf {
       get { return ReferenceEquals(SourceConnection, null); }
     }

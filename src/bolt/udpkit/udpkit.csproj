@@ -124,7 +124,6 @@
     <Compile Include="Collections\Set.cs" />
     <Compile Include="Socket\Socket.cs" />
     <Compile Include="PacketPool.cs" />
-    <Compile Include="Thread.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

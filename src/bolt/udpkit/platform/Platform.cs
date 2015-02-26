@@ -24,5 +24,15 @@ namespace UdpKit {
 
       return socket;
     }
+
+    public virtual UdpPlatformSocket CreateBroadcastSocket(UdpEndPoint endpoint) {
+      UdpPlatformSocket socket;
+
+      socket = CreateSocket();
+      socket.Bind(endpoint);
+      socket.Broadcast = true;
+
+      return socket;
+    }
   }
 }
