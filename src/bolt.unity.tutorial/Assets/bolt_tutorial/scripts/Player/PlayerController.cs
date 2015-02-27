@@ -130,9 +130,7 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
 
   public override void SimulateOwner() {
     if ((BoltNetwork.frame % 5) == 0 && (state.Dead == false)) {
-      using (var mod = state.Modify()) {
-        mod.health = (byte)Mathf.Clamp(mod.health + 1, 0, 100);
-      }
+      state.health = (byte)Mathf.Clamp(state.health + 1, 0, 100);
     }
   }
 
@@ -183,15 +181,13 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
         AnimatePlayer(cmd);
 
         // set state pitch
-        using (var mod = state.Modify()) {
-          mod.pitch = cmd.Input.pitch;
-          mod.weapon = cmd.Input.weapon;
-          mod.Aiming = cmd.Input.aiming;
+        state.pitch = cmd.Input.pitch;
+        state.weapon = cmd.Input.weapon;
+        state.Aiming = cmd.Input.aiming;
 
-          // deal with weapons
-          if (cmd.Input.aiming && cmd.Input.fire) {
-            FireWeapon(cmd);
-          }
+        // deal with weapons
+        if (cmd.Input.aiming && cmd.Input.fire) {
+          FireWeapon(cmd);
         }
       }
 
@@ -202,27 +198,25 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
   }
 
   void AnimatePlayer(PlayerCommand cmd) {
-    using (var mod = state.Modify()) {
-      // FWD <> BWD movement
-      if (cmd.Input.forward ^ cmd.Input.backward) {
-        mod.MoveZ = cmd.Input.forward ? 1 : -1;
-      }
-      else {
-        mod.MoveZ = 0;
-      }
+    // FWD <> BWD movement
+    if (cmd.Input.forward ^ cmd.Input.backward) {
+      state.MoveZ = cmd.Input.forward ? 1 : -1;
+    }
+    else {
+      state.MoveZ = 0;
+    }
 
-      // LEFT <> RIGHT movement
-      if (cmd.Input.left ^ cmd.Input.right) {
-        mod.MoveX = cmd.Input.right ? 1 : -1;
-      }
-      else {
-        mod.MoveX = 0;
-      }
+    // LEFT <> RIGHT movement
+    if (cmd.Input.left ^ cmd.Input.right) {
+      state.MoveX = cmd.Input.right ? 1 : -1;
+    }
+    else {
+      state.MoveX = 0;
+    }
 
-      // JUMP
-      if (_motor.jumpStartedThisFrame) {
-        mod.Jump();
-      }
+    // JUMP
+    if (_motor.jumpStartedThisFrame) {
+      state.Jump();
     }
   }
 

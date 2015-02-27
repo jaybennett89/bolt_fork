@@ -27,19 +27,15 @@ public partial class Player : IDisposable {
 
   public void Kill() {
     if (entity) {
-      using (var mod = state.Modify()) {
-        mod.Dead = true;
-        mod.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
-      }
+      state.Dead = true;
+      state.respawnFrame = BoltNetwork.serverFrame + (15 * BoltNetwork.framesPerSecond);
     }
   }
 
   internal void Spawn() {
     if (entity) {
-      using (var mod = state.Modify()) {
-        mod.Dead = false;
-        mod.health = 100;
-      }
+      state.Dead = false;
+      state.health = 100;
 
       // teleport
       entity.transform.position = RandomSpawn();
@@ -58,12 +54,12 @@ public partial class Player : IDisposable {
       if (redPlayers.Count() < bluePlayers.Count()) {
         var player = bluePlayers.First();
         player.Kill();
-        player.state.Modify().team = TEAM_RED;
+        player.state.team = TEAM_RED;
       }
       else {
         var player = redPlayers.First();
         player.Kill();
-        player.state.Modify().team = TEAM_BLUE;
+        player.state.team = TEAM_BLUE;
       }
     }
   }
@@ -74,19 +70,17 @@ public partial class Player : IDisposable {
 
     entity = BoltNetwork.Instantiate(BoltPrefabs.Player, new TestToken(), RandomSpawn(), Quaternion.identity);
 
-    using (var mod = state.Modify()) {
-      mod.name = name;
-      mod.team =
-        redPlayers.Count() >= bluePlayers.Count()
-        ? TEAM_BLUE
-        : TEAM_RED;
+    state.name = name;
+    state.team =
+      redPlayers.Count() >= bluePlayers.Count()
+      ? TEAM_BLUE
+      : TEAM_RED;
 
-      if (isServer) {
-        entity.TakeControl(new TestToken());
-      }
-      else {
-        entity.AssignControl(connection, new TestToken());
-      }
+    if (isServer) {
+      entity.TakeControl(new TestToken());
+    }
+    else {
+      entity.AssignControl(connection, new TestToken());
     }
 
     Spawn();
