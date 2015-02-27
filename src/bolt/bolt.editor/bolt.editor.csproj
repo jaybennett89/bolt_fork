@@ -135,6 +135,7 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Interface.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Platform.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Socket.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltConsoleWriter.cs" />
@@ -261,6 +262,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_masterserver.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\udpkit.wp8\Bin\Release\udpkit_wp8.dll">
+      <Link>Resources\Install\Plugins\WP8\udpkit_wp8.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\udpkit.wp8_shim\bin\Release\udpkit_wp8.dll">
+      <Link>Resources\Install\Plugins\udpkit_wp8.dll</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

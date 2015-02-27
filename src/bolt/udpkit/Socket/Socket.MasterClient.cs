@@ -5,7 +5,7 @@ using System.Text;
 
 namespace UdpKit {
   partial class UdpSocket {
-    sealed class MasterClient : Protocol.ProtocolService {
+    internal sealed class MasterClient : Protocol.ProtocolService {
 
       class NatProbeState {
         public uint Timeout;
@@ -49,6 +49,8 @@ namespace UdpKit {
 
       readonly UdpSocket socket;
       readonly List<NatPunchTarget> natPunchTargets = new List<NatPunchTarget>();
+
+      internal Protocol.GetZeusInfoResult InfoResult;
 
       public bool IsConnected {
         get { return endpoint.IsWan && (state >= State.Connected); }
@@ -162,6 +164,12 @@ namespace UdpKit {
         }
       }
 
+      public void RequestZeusInfo() {
+        if (IsConnected) {
+          Send<Protocol.GetZeusInfo>(endpoint);
+        }
+      }
+
       public void RequestSessionList() {
         if (IsConnected) {
           // forget all sessions from zeus
@@ -220,6 +228,7 @@ namespace UdpKit {
           Client.SetCallback<Protocol.ProbeFeatures>(AckProbeFeatures);
           Client.SetCallback<Protocol.HostRegister>(AckHostRegister);
           Client.SetCallback<Protocol.GetHostList>(AckGetHostList);
+          Client.SetCallback<Protocol.GetZeusInfo>(AckGetZeusInfo);
 
           // setup handlers
           Client.SetHandler<Protocol.ProbeUnsolicited>(OnProbeUnsolicited);
@@ -293,7 +302,10 @@ namespace UdpKit {
         Send<Protocol.ProbeEndPoint>(natProbeState.Probe0);
         Send<Protocol.ProbeEndPoint>(natProbeState.Probe1);
 
+        Send<Protocol.GetZeusInfo>(endpoint);
+
         UdpLog.Info("Connected to master server at {0}, initiating NAT probe", connect.Target);
+
       }
 
       void AckProbeEndPoint(Protocol.ProbeEndPoint probe) {
@@ -369,6 +381,15 @@ namespace UdpKit {
         UpdatePing(obj);
 
         UdpLog.Info("Successfully registered with master server");
+      }
+
+      void AckGetZeusInfo(Protocol.GetZeusInfo info) {
+        if (info.Failed) {
+          UdpLog.Error("Could not get server info from zeus");
+          return;
+        }
+
+        InfoResult = info.Result;
       }
 
       void AckGetHostList(Protocol.GetHostList obj) {

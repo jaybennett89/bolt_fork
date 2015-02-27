@@ -262,6 +262,12 @@ namespace UdpKit {
           SendCommand(COMMAND_ACCEPTED, AcceptTokenWithPrefix);
         }
 
+        if (IsClient) {
+          if (Socket.masterClient != null) {
+            Socket.masterClient.Disconnect();
+          }
+        }
+
         Socket.Raise(UdpEvent.PUBLIC_CONNECTED, this);
       }
     }

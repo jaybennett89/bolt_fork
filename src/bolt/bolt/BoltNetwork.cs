@@ -41,6 +41,14 @@ public static class BoltNetworkInternal {
     BoltNetwork.VerifyIsRunning();
     return BoltCore.Shutdown();
   }
+
+  public static void __Shutdown(bool waitForShutdown) {
+    ManualResetEvent ev = __Shutdown();
+
+    if (waitForShutdown) {
+      ev.WaitOne();
+    }
+  }
 }
 
 /// <summary>
@@ -168,10 +176,14 @@ public static class BoltNetwork {
   public static int maxConnections {
     get {
       if (isRunning) {
+        if (IsSinglePlayer) {
+          return 0;
+        }
+
         return isClient ? 1 : BoltCore._config.serverConnectionLimit;
       }
 
-      return 0;
+      return -1;
     }
   }
 
@@ -359,6 +371,7 @@ public static class BoltNetwork {
   /// }
   /// ```
   /// </example>
+  [Obsolete]
   public static int framesPerSecond {
     get { return BoltCore.framesPerSecond; }
   }

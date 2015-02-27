@@ -11,6 +11,23 @@ namespace Bolt {
       get { return BoltNetwork.isRunning && BoltNetwork.UdpSocket.ConnectedToMaster; }
     }
 
+    public static int Hosts {
+      get { return BoltNetwork.isRunning ? BoltNetwork.UdpSocket.ZeusInfoHosts : 0; }
+    }
+
+    public static int ClientsInZeus {
+      get { return BoltNetwork.isRunning ? BoltNetwork.UdpSocket.ZeusInfoClientsInZeus : 0; }
+    }
+
+    public static int ClientsInGames {
+      get { return BoltNetwork.isRunning ? BoltNetwork.UdpSocket.ZeusInfoClientsInGames : 0; }
+    }
+
+    public static void RequestInfo() {
+      BoltNetwork.VerifyIsRunning();
+      BoltNetwork.UdpSocket.MasterServerRequestInfo();
+    }
+
     public static void Connect(UdpEndPoint endpoint) {
       BoltNetwork.VerifyIsRunning();
 

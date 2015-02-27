@@ -25,4 +25,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.4.2.11")]
+[assembly: AssemblyVersion("0.4.2.12")]

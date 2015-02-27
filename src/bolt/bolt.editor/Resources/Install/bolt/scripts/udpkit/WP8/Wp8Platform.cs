@@ -26,7 +26,20 @@ public class Wp8Platform : UdpKit.UdpPlatform {
   }
 
   public override System.Collections.Generic.List<UdpKit.UdpPlatformInterface> GetNetworkInterfaces() {
-    return new System.Collections.Generic.List<UdpKit.UdpPlatformInterface>();
+    var result = new System.Collections.Generic.List<UdpKit.UdpPlatformInterface>();
+
+    foreach (var addr in UdpKit.Wp8Platform.GetIpAddresses()) {
+      try {
+        var ipv4 = UdpKit.UdpIPv4Address.Parse(addr);
+
+        if (ipv4.IsPrivate) {
+          result.Add(new Wp8Interface(ipv4));
+        }
+      }
+      catch { }
+    }
+
+    return result; 
   }
 
   public override uint GetPrecisionTime() {

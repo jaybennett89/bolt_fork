@@ -53,6 +53,9 @@ namespace UdpKit.Protocol {
 
       RegisterMessageType<Protocol.DirectConnectionLan>();
       RegisterMessageType<Protocol.DirectConnectionWan>();
+
+      RegisterMessageType<Protocol.GetZeusInfo>();
+      RegisterMessageType<Protocol.GetZeusInfoResult>();
     }
 
     public T CreateMessage<T>() where T : Protocol.Message {

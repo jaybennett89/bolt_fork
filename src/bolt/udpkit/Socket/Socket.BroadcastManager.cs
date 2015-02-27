@@ -89,6 +89,5 @@ namespace UdpKit {
         broadcast = new UdpEndPoint();
       }
     }
-
   }
 }

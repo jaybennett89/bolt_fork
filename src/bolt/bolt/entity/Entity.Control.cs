@@ -136,8 +136,10 @@ namespace Bolt {
           CommandQueue.Clear();
 
           // set token
-          proxy.ControlTokenLost = token;
-          proxy.ControlTokenGained = null;
+          if (proxy != null) {
+            proxy.ControlTokenLost = token;
+            proxy.ControlTokenGained = null;
+          }
         }
       }
       else {
