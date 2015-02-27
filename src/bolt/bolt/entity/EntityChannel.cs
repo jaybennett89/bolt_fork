@@ -549,7 +549,7 @@ partial class EntityChannel : BoltChannel {
           // prefab checks (if applicable)
           if (go) {
             if (BoltCore.isServer && !go.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
-              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.remoteEndPoint);
+              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.RemoteEndPoint);
             }
           }
 

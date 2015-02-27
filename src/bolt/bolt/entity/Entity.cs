@@ -70,7 +70,7 @@ namespace Bolt {
           return BoltCore.frame;
         }
 
-        return Source.remoteFrame;
+        return Source.RemoteFrame;
       }
     }
 

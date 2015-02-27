@@ -99,11 +99,6 @@ public class BoltConnection : BoltObject {
     get { return _controllingList; }
   }
 
-  [Obsolete("Use BoltConnection.IsLoadingMap instead")]
-  public bool isLoadingMap {
-    get { return IsLoadingMap; }
-  }
-
   /// <summary>
   /// The estimated frame of the simulation running at the other end of this connection
   /// </summary>
@@ -126,11 +121,6 @@ public class BoltConnection : BoltObject {
   /// </example>
   public int RemoteFrame {
     get { return _remoteFrameEstimated; }
-  }
-
-  [Obsolete("Use BoltConnection.PingNetwork instead")]
-  public int remoteFrame {
-    get { return RemoteFrame; }
   }
 
   /// <summary>
@@ -180,11 +170,6 @@ public class BoltConnection : BoltObject {
     internal set;
   }
 
-  [Obsolete("Use BoltConnection.PingNetwork instead")]
-  public float ping {
-    get { return _udp.NetworkPing; }
-  }
-
   /// <summary>
   /// The round-trip time on the network
   /// </summary>
@@ -201,11 +186,6 @@ public class BoltConnection : BoltObject {
   /// </example>
   public float PingNetwork {
     get { return _udp.NetworkPing; }
-  }
-
-  [Obsolete("Use BoltConnection.PingNetwork instead")]
-  public float pingNetwork {
-    get { return PingNetwork; }
   }
 
   /// <summary>
@@ -227,11 +207,6 @@ public class BoltConnection : BoltObject {
     get { return _remoteFrameActual - _remoteFrameEstimated; }
   }
 
-  [Obsolete("Use BoltConnection.DejitterFrames instead")]
-  public int dejitterFrames {
-    get { return DejitterFrames; }
-  }
-
   /// <summary>
   /// The round-trip time across the network, including processing delays and acks
   /// </summary>
@@ -249,11 +224,6 @@ public class BoltConnection : BoltObject {
   /// </example>
   public float PingAliased {
     get { return _udp.NetworkPing; }
-  }
-
-  [Obsolete("Use BoltConnection.PingAliased instead")]
-  public float pingAliased {
-    get { return _udp.AliasedPing; }
   }
 
   internal UdpConnection udpConnection {
@@ -288,11 +258,6 @@ public class BoltConnection : BoltObject {
     get { return _bitsSecondIn; }
   }
 
-  [Obsolete("Use BoltConnection.BitsPerSecondIn instead")]
-  public int bitsPerSecondIn {
-    get { return BitsPerSecondIn; }
-  }
-
   /// <summary>
   /// How many bits per second we are sending out
   /// </summary>
@@ -311,11 +276,6 @@ public class BoltConnection : BoltObject {
   /// </example>
   public int BitsPerSecondOut {
     get { return _bitsSecondOut; }
-  }
-
-  [Obsolete("Use BoltConnection.BitsPerSecondOut instead")]
-  public int bitsPerSecondOut {
-    get { return BitsPerSecondOut; }
   }
 
   public uint ConnectionId {
@@ -338,11 +298,6 @@ public class BoltConnection : BoltObject {
     get { return udpConnection.RemoteEndPoint; }
   }
 
-  [Obsolete("Use BoltConnection.RemoteEndPoint instead")]
-  public UdpEndPoint remoteEndPoint {
-    get { return RemoteEndPoint; }
-  }
-
   /// <summary>
   /// User assignable object which lets you pair arbitrary data with the connection
   /// </summary>
@@ -358,12 +313,6 @@ public class BoltConnection : BoltObject {
   public object UserData {
     get;
     set;
-  }
-
-  [Obsolete("Use the 'UserData' property instead")]
-  public object userToken {
-    get { return UserData; }
-    set { UserData = value; }
   }
 
   public void SetCanReceiveEntities(bool v) {

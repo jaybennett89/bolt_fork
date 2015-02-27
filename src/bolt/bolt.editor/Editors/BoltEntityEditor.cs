@@ -184,14 +184,14 @@ public class BoltEntityEditor : Editor {
       EditorGUILayout.Toggle("Is Owner", entity.isOwner);
 
       if (entity.source != null) {
-        EditorGUILayout.LabelField("Source", entity.source.remoteEndPoint.ToString());
+        EditorGUILayout.LabelField("Source", entity.source.RemoteEndPoint.ToString());
       }
       else {
         EditorGUILayout.LabelField("Source", "Local");
       }
 
       if (entity.controller != null) {
-        EditorGUILayout.LabelField("Controller", entity.controller.remoteEndPoint.ToString());
+        EditorGUILayout.LabelField("Controller", entity.controller.RemoteEndPoint.ToString());
       }
       else {
         EditorGUILayout.LabelField("Controller", entity.hasControl ? "Local" : "None");

@@ -202,11 +202,6 @@ namespace Bolt {
       EventDispatcher.Enqueue(this);
     }
 
-    [Obsolete("The using(var ev = ...) syntax is deprecated. Use the .Send method directly instead")]
-    void IDisposable.Dispose() {
-      Send();
-    }
-
     internal void DecrementRefs() {
 
     }

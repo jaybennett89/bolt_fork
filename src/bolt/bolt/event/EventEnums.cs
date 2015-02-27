@@ -34,8 +34,5 @@ namespace Bolt {
     AllClients = Event.GLOBAL_ALL_CLIENTS,
     OnlyServer = Event.GLOBAL_ONLY_SERVER,
     OnlySelf = Event.GLOBAL_ONLY_SELF,
-
-    [Obsolete("Use GlobalTargets.OnlyServer")]
-    Server = Event.GLOBAL_ONLY_SERVER,
   }
 }

@@ -101,7 +101,7 @@ internal static class BoltCore {
   }
 
   public static int serverFrame {
-    get { return _mode == BoltNetworkModes.None ? 0 : (isServer ? _frame : server.remoteFrame); }
+    get { return _mode == BoltNetworkModes.None ? 0 : (isServer ? _frame : server.RemoteFrame); }
   }
 
   public static float serverTime {

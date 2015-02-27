@@ -371,7 +371,6 @@ public static class BoltNetwork {
   /// }
   /// ```
   /// </example>
-  [Obsolete]
   public static int framesPerSecond {
     get { return BoltCore.framesPerSecond; }
   }
