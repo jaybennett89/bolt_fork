@@ -60,8 +60,6 @@ Target "Install" (fun _ ->
     mkdir (projectDir + "/Assets/bolt/assemblies/editor")
     mkdir (projectDir + "/Assets/bolt/assemblies/udpkit")
     
-    CopyFile (projectDir + "/Assets/Plugins/WP8/") (buildDir + "/udpkit.wp8.dll")
-
     CopyFile (projectDir + "/Assets/bolt/assemblies/") (buildDir + "/bolt.dll")
     CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.editor.dll")
     CopyFile (projectDir + "/Assets/bolt/assemblies/editor/") (buildDir + "/bolt.compiler.dll")

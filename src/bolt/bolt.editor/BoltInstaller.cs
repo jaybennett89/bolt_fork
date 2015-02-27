@@ -215,9 +215,10 @@ public static class BoltInstaller {
   }
 
   static void InstallPlugins() {
-    Progress("Installing native plugins ... ", 0f);
+    Progress("Installing plugins ... ", 0f);
 
     EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins"));
+    EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins", "WP8"));
     EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins", "iOS"));
     EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "Plugins", "Android"));
 
@@ -238,7 +239,10 @@ public static class BoltInstaller {
     const string PREFABDB_PATH = "Assets/bolt/resources/BoltPrefabDatabase.asset";
 
     if (!AssetDatabase.LoadAssetAtPath(SETTINGS_PATH, typeof(BoltRuntimeSettings))) {
-      AssetDatabase.CreateAsset(BoltRuntimeSettings.CreateInstance<BoltRuntimeSettings>(), SETTINGS_PATH);
+      BoltRuntimeSettings settings = BoltRuntimeSettings.CreateInstance<BoltRuntimeSettings>();
+      settings.masterServerGameId = Guid.NewGuid().ToString().ToUpperInvariant();
+
+      AssetDatabase.CreateAsset(settings, SETTINGS_PATH);
       AssetDatabase.ImportAsset(SETTINGS_PATH, ImportOptions);
     }
 

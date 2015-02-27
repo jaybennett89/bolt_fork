@@ -263,6 +263,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_masterserver.png" />
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\udpkit.wp8\Bin\Release\udpkit_wp8.dll">
+      <Link>Resources\Install\Plugins\WP8\udpkit_wp8.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\udpkit.wp8_shim\bin\Release\udpkit_wp8.dll">
+      <Link>Resources\Install\Plugins\udpkit_wp8.dll</Link>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
