@@ -6,6 +6,7 @@ using System.Threading;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
+using Microsoft.Phone.Net.NetworkInformation;
 #endif
 
 namespace UdpKit {
@@ -24,6 +25,7 @@ namespace UdpKit {
 
     public Wp8Socket(Action<string> logging, int bufferSize)
       : base(bufferSize) {
+
 #if WINDOWS_PHONE || NETFX_CORE
       // logger
       log = logging;
@@ -82,7 +84,7 @@ namespace UdpKit {
 
         packets.Enqueue(packet);
 
-        log(string.Format("RECV: {0}:{1} ({2} bytes)", args.RemoteAddress, args.RemotePort, packet.Size));
+        //log(string.Format("RECV: {0}:{1} ({2} bytes)", args.RemoteAddress, args.RemotePort, packet.Size));
       }
     }
 #endif
@@ -154,11 +156,12 @@ namespace UdpKit {
       if (sendEvent.WaitOne()) {
         SendToAsync(buffer, bytesToSend, host, port);
       }
-
 #endif
+
       return bytesToSend;
     }
 
+#if WINDOWS_PHONE || NETFX_CORE
     async void SendToAsync(byte[] buffer, int bytesToSend, string host, string port) {
       var stream = await dgram.GetOutputStreamAsync(new HostName(host), port);
       var writer = new DataWriter(stream);
@@ -177,7 +180,8 @@ namespace UdpKit {
       sendEvent.Set();
 
       // meep
-      log(string.Format("Sent: {0}:{1}", host, port));
+      // log(string.Format("Sent: {0}:{1}", host, port));
     }
+#endif
   }
 }

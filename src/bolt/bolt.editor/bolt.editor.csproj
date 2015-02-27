@@ -135,6 +135,7 @@
     <Compile Include="PropertyEditors\PropertyEditorStruct.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTransform.cs" />
     <Compile Include="PropertyEditors\PropertyEditorVector.cs" />
+    <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Interface.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Platform.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Socket.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltConsoleWriter.cs" />

@@ -130,10 +130,12 @@ public static class BoltLauncher {
       return UserAssignedPlatform;
     }
 
-#if (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8) && !UNITY_EDITOR
+#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
     return new NativePlatform();
 #elif (UNITY_PS4 || UNITY_PSM) && !UNITY_EDITOR
     return new DotNetPlatform();
+#elif (UNITY_WP8) && !UNITY_EDITOR
+    return new Wp8Platform();
 #else
     return new DotNetPlatform();
 #endif
