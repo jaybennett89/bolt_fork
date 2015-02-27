@@ -62,6 +62,7 @@
     <Compile Include="Protocol\Messages\DirectConnectionWan.cs" />
     <Compile Include="Protocol\Messages\Error.cs" />
     <Compile Include="Protocol\Messages\GetHostList.cs" />
+    <Compile Include="Protocol\Messages\GetZeusInfo.cs" />
     <Compile Include="Protocol\Messages\HostInfo.cs" />
     <Compile Include="Protocol\Messages\PeerConnect.cs" />
     <Compile Include="Protocol\Messages\PeerKeepAlive.cs" />

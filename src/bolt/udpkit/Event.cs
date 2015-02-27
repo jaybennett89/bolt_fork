@@ -83,7 +83,8 @@ namespace UdpKit {
 
     internal const int INTERNAL_MASTERSERVER_CONNECT = 35;
     internal const int INTERNAL_MASTERSERVER_DISCONNECT = 37;
-    internal const int INTERNAL_MASTERSERVER_SESSION_LISTREQUEST = 39;
+    internal const int INTERNAL_MASTERSERVER_SESSIONLISTREQUEST = 39;
+    internal const int INTERNAL_MASTERSERVER_INFOREQUEST = 43;
 
     internal const int PUBLIC_CONNECT_REQUEST = 2;
     internal const int PUBLIC_CONNECT_FAILED = 4;

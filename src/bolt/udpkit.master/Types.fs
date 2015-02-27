@@ -73,6 +73,7 @@ type Peer = {
     | :? Protocol.PeerKeepAlive as keepalive -> x.OnPeerKeepAlive keepalive args
     | :? Protocol.GetHostList as getlist -> x.OnGetHostList getlist args
     | :? Protocol.PunchRequest as request -> x.OnPunchRequest request args
+    | :? Protocol.GetZeusInfo as request -> x.OnGetZeusInfo request args
     | _ ->
       failwithf "Unknown message type %s" (msg.GetType().Name)
 
@@ -189,6 +190,19 @@ type Peer = {
     // mark this peer as being a host
     {x with IsHost=true}
     
+  member private x.OnGetZeusInfo (getlist:Protocol.GetZeusInfo) (recvArgs:SocketData) =
+    let msg = x.Context.Protocol.CreateMessage<Protocol.GetZeusInfoResult>(getlist)
+    msg.Hosts <- x.Game.Hosts.Count
+    msg.ClientsInZeus <- x.Game.Peers.Count - x.Game.Hosts.Count
+
+    for h in x.Game.Hosts.Values do
+      msg.ClientsInGames <- msg.ClientsInGames + h.Session.ConnectionsCurrent
+
+    // send message to remote
+    recvArgs.Reply (msg :> Protocol.Message)
+
+    x
+
   member private x.OnGetHostList (getlist:Protocol.GetHostList) (recvArgs:SocketData) =
     x.AckMessage getlist recvArgs
     UdpLog.Info (sprintf "Found %i Hosts" x.Game.Hosts.Count)

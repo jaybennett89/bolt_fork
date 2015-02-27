@@ -42,7 +42,7 @@ namespace UdpKit {
     readonly UdpPlatformSocket platformSocket;
     readonly UdpPacketPool packetPool;
 
-    MasterClient masterClient;
+    internal MasterClient masterClient;
 
     SessionManager sessionManager;
     BroadcastManager broadcastManager;
@@ -107,6 +107,18 @@ namespace UdpKit {
     public object UserToken {
       get;
       set;
+    }
+
+    internal int ZeusInfoHosts {
+      get { return ConnectedToMaster && masterClient.InfoResult != null ? masterClient.InfoResult.Hosts : 0; }
+    }
+
+    internal int ZeusInfoClientsInZeus {
+      get { return ConnectedToMaster && masterClient.InfoResult != null ? masterClient.InfoResult.ClientsInZeus : 0; }
+    }
+
+    internal int ZeusInfoClientsInGames {
+      get { return ConnectedToMaster && masterClient.InfoResult != null ? masterClient.InfoResult.ClientsInGames : 0; }
     }
 
     internal bool ConnectedToMaster {
@@ -327,8 +339,12 @@ namespace UdpKit {
       Raise(ev);
     }
 
+    public void MasterServerRequestInfo() {
+      Raise(UdpEvent.INTERNAL_MASTERSERVER_INFOREQUEST);
+    }
+
     public void MasterServerRequestSessionList() {
-      Raise(UdpEvent.INTERNAL_MASTERSERVER_SESSION_LISTREQUEST);
+      Raise(UdpEvent.INTERNAL_MASTERSERVER_SESSIONLISTREQUEST);
     }
 
     public void LanBroadcastEnable(UdpIPv4Address localAddresss, UdpIPv4Address broadcastAddress, ushort port) {

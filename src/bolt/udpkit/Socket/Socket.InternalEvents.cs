@@ -75,7 +75,8 @@ namespace UdpKit {
 
           case UdpEvent.INTERNAL_MASTERSERVER_CONNECT: OnEvent_MasterServer_Connect(ev); break;
           case UdpEvent.INTERNAL_MASTERSERVER_DISCONNECT: OnEvent_MasterServer_Disconnect(ev); break;
-          case UdpEvent.INTERNAL_MASTERSERVER_SESSION_LISTREQUEST: OnEvent_MasterServer_Session_ListRequest(ev); break;
+          case UdpEvent.INTERNAL_MASTERSERVER_SESSIONLISTREQUEST: OnEvent_MasterServer_SessionListRequest(ev); break;
+          case UdpEvent.INTERNAL_MASTERSERVER_INFOREQUEST: OnEvent_MasterServer_InfoRequest(ev); break;
 
           case UdpEvent.INTERNAL_STREAM_QUEUE: OnEvent_Stream_Queue(ev); break;
           case UdpEvent.INTERNAL_STREAM_SETBANDWIDTH: OnEvent_Stream_SetBandwidth(ev); break;
@@ -288,8 +289,16 @@ namespace UdpKit {
       }
     }
 
-    void OnEvent_MasterServer_Session_ListRequest(UdpEvent ev) {
-      masterClient.RequestSessionList();
+    void OnEvent_MasterServer_SessionListRequest(UdpEvent ev) {
+      if (masterClient != null) {
+        masterClient.RequestSessionList();
+      }
+    }
+
+    void OnEvent_MasterServer_InfoRequest(UdpEvent ev) {
+      if (masterClient != null) {
+        masterClient.RequestZeusInfo();
+      }
     }
 
     /*
