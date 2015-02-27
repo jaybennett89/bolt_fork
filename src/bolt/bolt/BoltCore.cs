@@ -313,7 +313,12 @@ internal static class BoltCore {
 
       // destroy all entities
       foreach (Bolt.Entity entity in _entities.ToArray()) {
-        DestroyForce(entity);
+        try {
+          DestroyForce(entity);
+        }
+        catch {
+
+        }
       }
 
       _entities.Clear();

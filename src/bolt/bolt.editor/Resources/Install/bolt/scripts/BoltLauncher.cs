@@ -55,6 +55,10 @@ public static class BoltLauncher {
     return BoltNetworkInternal.__Shutdown();
   }
 
+  public static void Shutdown(bool waitForShutdown) {
+    BoltNetworkInternal.__Shutdown(waitForShutdown);
+  }
+
   public static void Shutdown(Action callback) {
     if (callback == null) {
       Shutdown();
