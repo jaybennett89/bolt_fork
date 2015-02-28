@@ -178,10 +178,6 @@ partial class EntityChannel : BoltChannel {
     _prioritized.Clear();
 
     foreach (EntityProxy proxy in _outgoingDict.Values) {
-      if (proxy.Entity.IsFrozen) {
-        continue;
-      }
-
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
           continue;
@@ -191,6 +187,10 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 17;
       }
       else {
+        if (proxy.Entity.IsFrozen) {
+          continue;
+        }
+
         // check update rate of this entity
         if ((packet.Number % proxy.Entity.UpdateRate) != 0) {
           continue;
