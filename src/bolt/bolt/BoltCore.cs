@@ -1005,6 +1005,8 @@ internal static class BoltCore {
   }
 
   static void CreateUdpConfig(BoltConfig config) {
+    var isHost = _mode == BoltNetworkModes.Host;
+
     // setup udpkit configuration
     _udpConfig = new UdpConfig();
     _udpConfig.PacketWindow = 512;
@@ -1025,9 +1027,9 @@ internal static class BoltCore {
     }
 #endif
 
-    _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
-    _udpConfig.AllowIncommingConnections = isServer;
-    _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
+    _udpConfig.ConnectionLimit = isHost ? config.serverConnectionLimit : 0;
+    _udpConfig.AllowIncommingConnections = isHost;
+    _udpConfig.AutoAcceptIncommingConnections = isHost && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
     _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
     _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
   }
