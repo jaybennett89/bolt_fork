@@ -111,6 +111,17 @@ public abstract class BoltWindow : EditorWindow {
   }
 
   protected void OnGUI() {
+    if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyDown) {
+      const EventModifiers MODS = EventModifiers.Control;
+
+      if ((Event.current.modifiers & MODS) == MODS) {
+        Event.current.Use();
+
+        // compile!
+        BoltUserAssemblyCompiler.Run();
+      }
+    }
+
     BoltEditorGUI.Tooltip = "";
 
     LoadProject();
