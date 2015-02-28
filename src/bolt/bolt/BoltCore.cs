@@ -1057,6 +1057,14 @@ internal static class BoltCore {
   }
 
   internal static void BeginStart(ManualResetEvent doneEvent, BoltNetworkModes mode, UdpEndPoint endpoint, UdpPlatform platform, BoltConfig config) {
+    if (BoltNetwork.isRunning) {
+      // make sure we don't wait for this
+      doneEvent.Set();
+
+      // 
+      throw new BoltException("Bolt is already running, you must call BoltLauncher.Shutdown() before starting a new instance of Bolt.");
+    }
+
     _mode = mode;
     _config = config;
     _udpPlatform = platform;
