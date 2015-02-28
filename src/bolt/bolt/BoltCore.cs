@@ -15,8 +15,10 @@ using System.Threading;
 /// </summary>
 public enum BoltNetworkModes {
   None = 0,
+  [Obsolete]
   Server = 1,
   Client = 2,
+  Host = 1,
 }
 
 internal static class BoltCore {
@@ -42,6 +44,7 @@ internal static class BoltCore {
   static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
   static internal Dictionary<UniqueId, BoltEntity> _sceneObjects = new Dictionary<UniqueId, BoltEntity>(UniqueId.EqualityComparer.Instance);
 
+  static internal GameObject _globalControlObject = null;
   static internal GameObject _globalBehaviourObject = null;
   static internal List<STuple<BoltGlobalBehaviourAttribute, Type>> _globalBehaviours = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
 
@@ -860,157 +863,16 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform udpPlatform) {
-    _udpPlatform = udpPlatform;
+    //if (!_globalControlObject) {
+    //  _globalControlObject = new GameObject("BoltControl");
+    //  _globalControlObject.AddComponent<ControlBehaviour>();
 
-    BoltConsole.Clear();
+    //  GameObject.DontDestroyOnLoad(_globalControlObject);
+    //}
 
-    // close any existing socket
-    Shutdown();
+    BeginStart(null, mode, endpoint, udpPlatform, config);
 
-    var isServer = mode == BoltNetworkModes.Server;
-    var isClient = mode == BoltNetworkModes.Client;
-
-    if (isServer) {
-      NetworkIdAllocator.Reset(1U);
-    }
-    else {
-      NetworkIdAllocator.Reset(uint.MaxValue);
-    }
-
-    PrefabDatabase.BuildCache();
-
-    if (BoltRuntimeSettings.instance.showDebugInfo) {
-      DebugInfo.ignoreList = new HashSet<NetworkId>();
-      DebugInfo.Show();
-    }
-
-#if DEBUG
-    if (BoltRuntimeSettings.instance.logUncaughtExceptions) {
-      UE.Application.RegisterLogCallbackThreaded(UnityLogCallback);
-    }
-#endif
-
-
-#if DEBUG
-    // init loggers
-    var fileLog = (config.logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
-    var unityLog = (config.logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
-    var consoleLog = (config.logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
-    var systemOutLog = (config.logTargets & BoltConfigLogTargets.SystemOut) == BoltConfigLogTargets.SystemOut;
-
-    if (unityLog && (BoltRuntimeSettings.instance.logUncaughtExceptions == false)) { BoltLog.Add(new BoltLog.Unity()); }
-    if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
-    if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
-    if (fileLog) {
-      switch (Application.platform) {
-        case RuntimePlatform.OSXEditor:
-        case RuntimePlatform.WindowsEditor:
-        case RuntimePlatform.WindowsPlayer:
-        case RuntimePlatform.OSXPlayer:
-          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Server));
-          break;
-      }
-    }
-#endif
-
-    // set config
-    _config = config;
-    _canReceiveEntities = true;
-
-    // set frametime
-    Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
-
-    // set udpkits log writer
-    UdpLog.SetWriter(UdpLogWriter);
-
-    // :)
-    BoltLog.Debug("Starting at {0} fps ({1} fixed frame delta)", config.framesPerSecond, Time.fixedDeltaTime);
-
-    // create the gflobal 'Bolt' unity object
-    if (_globalBehaviourObject) {
-      GameObject.Destroy(_globalBehaviourObject);
-    }
-
-    _globalBehaviours = BoltNetworkInternal.GetGlobalBehaviourTypes();
-    _globalBehaviourObject = new GameObject("Bolt");
-
-    GameObject.DontDestroyOnLoad(_globalBehaviourObject);
-
-    // verify all handlers are unregistered
-    Assert.True(Factory.IsEmpty);
-
-    // setup autogen and mode
-    _mode = mode;
-
-    BoltNetworkInternal.EnvironmentSetup();
-
-    // setup udpkit configuration
-    _udpConfig = new UdpConfig();
-    _udpConfig.PacketWindow = 512;
-    _udpConfig.ConnectionTimeout = (uint)config.connectionTimeout;
-    _udpConfig.ConnectRequestAttempts = (uint)config.connectionRequestAttempts;
-    _udpConfig.ConnectRequestTimeout = (uint)config.connectionRequestTimeout;
-
-#if DEBUG
-    if (config.useNetworkSimulation) {
-      _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
-      _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
-      _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
-
-      switch (config.simulatedRandomFunction) {
-        case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
-        case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
-      }
-    }
-#endif
-
-    _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
-    _udpConfig.AllowIncommingConnections = isServer;
-    _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
-    _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
-    _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
-
-    // create and start socket
-    _localSceneLoading = SceneLoadState.DefaultLocal();
-
-    Guid gameGuid = new Guid();
-
-    try {
-      gameGuid = new Guid(BoltRuntimeSettings.instance.masterServerGameId);
-    }
-    catch {
-      gameGuid = new Guid();
-      BoltLog.Error("Could not parse game id, you will not be able to connect to the Zeus server");
-    }
-
-    // create udp socket
-    _udpSocket = new UdpSocket(gameGuid, udpPlatform, _udpConfig);
-
-    // init all global behaviours
-    UpdateActiveGlobalBehaviours(-1);
-
-    // have to register channels BEFORE the socket starts
-    BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
-    BoltInternal.GlobalEventListenerBase.BoltStartPendingInvoke();
-
-    // 
-    _udpSocket.Start(endpoint, (isServer ? UdpSocketMode.Host : UdpSocketMode.Client));
-
-    if (BoltRuntimeSettings.instance.masterServerAutoConnect && (gameGuid != Guid.Empty)) {
-      UdpEndPoint zeusEndPoint = new UdpEndPoint();
-
-      try {
-        zeusEndPoint = UdpEndPoint.Parse(BoltRuntimeSettings.instance.masterServerEndPoint);
-      }
-      catch {
-        zeusEndPoint = new UdpEndPoint();
-        BoltLog.Error("Could not parse Zeus server endpoint for automatic connection");
-      }
-
-      if (zeusEndPoint != UdpEndPoint.Any) {
-        Zeus.Connect(zeusEndPoint);
-      }
-    }
+    //_globalControlObject.SendMessage("Start", new ControlCommandStart { Mode = mode, EndPoint = endpoint, Config = config.Clone(), Platform = udpPlatform });
   }
 
 #if DEBUG
@@ -1134,14 +996,6 @@ internal static class BoltCore {
     return _udpSocket.StreamChannelCreate(name, mode, priority);
   }
 
-  //internal static UdpStreamData CreateStreamData(byte[] data) {
-  //  return _udpSocket.StreamDataCreate(data);
-  //}
-
-  //internal static UdpStreamData FindStreamData(UdpDataKey data) {
-  //  return _udpSocket.StreamDataFind(data);
-  //}
-
   internal static void Update() {
     var it = _entities.GetIterator();
 
@@ -1150,4 +1004,118 @@ internal static class BoltCore {
     }
   }
 
+  static void CreateUdpConfig(BoltConfig config) {
+    // setup udpkit configuration
+    _udpConfig = new UdpConfig();
+    _udpConfig.PacketWindow = 512;
+    _udpConfig.ConnectionTimeout = (uint)config.connectionTimeout;
+    _udpConfig.ConnectRequestAttempts = (uint)config.connectionRequestAttempts;
+    _udpConfig.ConnectRequestTimeout = (uint)config.connectionRequestTimeout;
+
+#if DEBUG
+    if (config.useNetworkSimulation) {
+      _udpConfig.SimulatedLoss = Mathf.Clamp01(config.simulatedLoss);
+      _udpConfig.SimulatedPingMin = Mathf.Max(0, (config.simulatedPingMean >> 1) - (config.simulatedPingJitter >> 1));
+      _udpConfig.SimulatedPingMax = Mathf.Max(0, (config.simulatedPingMean >> 1) + (config.simulatedPingJitter >> 1));
+
+      switch (config.simulatedRandomFunction) {
+        case BoltRandomFunction.PerlinNoise: _udpConfig.NoiseFunction = CreatePerlinNoise(); break;
+        case BoltRandomFunction.SystemRandom: _udpConfig.NoiseFunction = CreateRandomNoise(); break;
+      }
+    }
+#endif
+
+    _udpConfig.ConnectionLimit = isServer ? config.serverConnectionLimit : 0;
+    _udpConfig.AllowIncommingConnections = isServer;
+    _udpConfig.AutoAcceptIncommingConnections = isServer && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
+    _udpConfig.PingTimeout = (uint)(localSendRate * 1.5f * frameDeltaTime * 1000f);
+    _udpConfig.PacketDatagramSize = Mathf.Clamp(_config.packetSize, 1024, 4096);
+  }
+
+
+  static void CreateBoltBehaviourObject() {
+    // create the gflobal 'Bolt' unity object
+    if (_globalBehaviourObject) {
+      GameObject.Destroy(_globalBehaviourObject);
+    }
+
+    _globalBehaviours = BoltNetworkInternal.GetGlobalBehaviourTypes();
+    _globalBehaviourObject = new GameObject("BoltBehaviours");
+
+    GameObject.DontDestroyOnLoad(_globalBehaviourObject);
+  }
+
+  static void ResetIdAllocator(BoltNetworkModes mode) {
+    if (mode == BoltNetworkModes.Host) {
+      NetworkIdAllocator.Reset(1U);
+    }
+    else {
+      NetworkIdAllocator.Reset(uint.MaxValue);
+    }
+  }
+
+  internal static void BeginStart(ManualResetEvent doneEvent, BoltNetworkModes mode, UdpEndPoint endpoint, UdpPlatform platform, BoltConfig config) {
+    _mode = mode;
+    _config = config;
+    _udpPlatform = platform;
+    _canReceiveEntities = true;
+
+    // reset id allocator
+    ResetIdAllocator(mode);
+
+    // clear everything in console
+    BoltConsole.Clear();
+
+    // setup debug info display
+    DebugInfo.SetupAndShow();
+
+    // setup logging
+    BoltLog.Setup(mode, config.logTargets);
+
+    // tell user we're starting
+    BoltLog.Debug("Bolt starting with a simulation rate of {0} steps per second", config.framesPerSecond);
+
+    // set frametime
+    Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
+
+    // create prefab cache
+    PrefabDatabase.BuildCache();
+
+    // set udpkits log writer
+    UdpLog.SetWriter(UdpLogWriter);
+
+    // create the gameobject that holds all bolt global behaviours, etc.
+    CreateBoltBehaviourObject();
+
+    // call to generated code so it knows we're starting
+    BoltNetworkInternal.EnvironmentSetup();
+
+    // create updp config
+    CreateUdpConfig(config);
+
+    // setup default local scene load state
+    _localSceneLoading = SceneLoadState.DefaultLocal();
+
+    // create and start socket
+    _udpSocket = new UdpSocket(Zeus.GameGuid, platform, _udpConfig);
+
+    // init all global behaviours
+    UpdateActiveGlobalBehaviours(-1);
+
+    // have to register channels BEFORE the socket starts
+    BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
+    BoltInternal.GlobalEventListenerBase.BoltStartPendingInvoke();
+
+    //  start socket
+    _udpSocket.Start(endpoint, doneEvent, ((mode == BoltNetworkModes.Host) ? UdpSocketMode.Host : UdpSocketMode.Client));
+
+    // should we automatically connect to default zeus?
+    if (BoltRuntimeSettings.instance.masterServerAutoConnect && (Zeus.GameGuid != Guid.Empty)) {
+      Zeus.Connect();
+    }
+  }
+
+  internal static void BeginShutdown() {
+
+  }
 }

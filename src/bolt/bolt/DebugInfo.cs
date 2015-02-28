@@ -308,5 +308,14 @@ namespace Bolt {
       }
 #endif
     }
+
+    internal static void SetupAndShow() {
+      if (BoltRuntimeSettings.instance.showDebugInfo) {
+        ignoreList = new HashSet<NetworkId>();
+
+        // show us!
+        Show();
+      }
+    }
   }
 }

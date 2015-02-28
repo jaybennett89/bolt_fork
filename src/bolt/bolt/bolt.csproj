@@ -69,6 +69,14 @@
     <Compile Include="event\EventFilter.cs" />
     <Compile Include="event\EventListener.cs" />
     <Compile Include="event\Event_Meta.cs" />
+    <Compile Include="hitbox2\Hitbox.cs" />
+    <Compile Include="hitbox2\HitboxBodySnapshot1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HitboxBodySnapshot.tt</DependentUpon>
+    </Compile>
+    <Compile Include="hitbox2\HitboxBodySnapshot_Raycast.cs" />
+    <Compile Include="hitbox2\RaycastHitsCollection.cs" />
     <Compile Include="NetworkValue.cs" />
     <Compile Include="ProtocolToken.cs" />
     <Compile Include="PrefabDatabase.cs" />
@@ -217,6 +225,10 @@
     <Compile Include="event\EventDispatcher.Queue.cs" />
     <Compile Include="state\NetworkState.IEntitySerializer.cs" />
     <Compile Include="state\NetworkState.IState.cs" />
+    <None Include="hitbox2\HitboxBodySnapshot.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>HitboxBodySnapshot1.cs</LastGenOutput>
+    </None>
     <None Include="t4\BitSet.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BitSet.cs</LastGenOutput>

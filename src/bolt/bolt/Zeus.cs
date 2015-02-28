@@ -23,9 +23,39 @@ namespace Bolt {
       get { return BoltNetwork.isRunning ? BoltNetwork.UdpSocket.ZeusInfoClientsInGames : 0; }
     }
 
+    public static Guid GameGuid {
+      get {
+        try {
+          return new Guid(BoltRuntimeSettings.instance.masterServerGameId);
+        }
+        catch {
+          BoltLog.Error("Could not parse game id, you will not be able to connect to the Zeus server");
+        }
+
+        return new Guid();
+      }
+    }
+
     public static void RequestInfo() {
       BoltNetwork.VerifyIsRunning();
       BoltNetwork.UdpSocket.MasterServerRequestInfo();
+    }
+
+    public static void Connect() {
+      BoltNetwork.VerifyIsRunning();
+      UdpEndPoint zeusEndPoint = new UdpEndPoint();
+
+      try {
+        zeusEndPoint = UdpEndPoint.Parse(BoltRuntimeSettings.instance.masterServerEndPoint);
+      }
+      catch {
+        zeusEndPoint = new UdpEndPoint();
+        BoltLog.Error("Could not parse Zeus server endpoint for automatic connection");
+      }
+
+      if (zeusEndPoint != UdpEndPoint.Any) {
+        Zeus.Connect(zeusEndPoint);
+      }
     }
 
     public static void Connect(UdpEndPoint endpoint) {

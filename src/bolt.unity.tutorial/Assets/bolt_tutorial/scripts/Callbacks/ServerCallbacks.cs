@@ -24,6 +24,10 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
   }
 
+  public override void BoltStarted() {
+    BoltLog.Error("STARTED");
+  }
+
   public override void ConnectRequest(UdpKit.UdpEndPoint endpoint, Bolt.IProtocolToken token) {
     BoltNetwork.Accept(endpoint);
   }

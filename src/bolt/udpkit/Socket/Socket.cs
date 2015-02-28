@@ -211,11 +211,12 @@ namespace UdpKit {
     /// Start this socket
     /// </summary>
     /// <param name="endpoint">The endpoint to bind to</param>
-    public void Start(UdpEndPoint endpoint, UdpSocketMode mode) {
+    public void Start(UdpEndPoint endpoint, ManualResetEvent doneEvent, UdpSocketMode mode) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_START;
       ev.EndPoint = endpoint;
       ev.SocketMode = mode;
+      ev.ResetEvent = doneEvent;
 
       Raise(ev);
     }
