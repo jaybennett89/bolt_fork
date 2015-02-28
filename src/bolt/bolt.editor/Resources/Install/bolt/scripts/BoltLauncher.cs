@@ -51,24 +51,8 @@ public static class BoltLauncher {
     Initialize(BoltNetworkModes.Client, endpoint, config);
   }
 
-  public static System.Threading.ManualResetEvent Shutdown() {
-    return BoltNetworkInternal.__Shutdown();
-  }
-
-  public static void Shutdown(bool waitForShutdown) {
-    BoltNetworkInternal.__Shutdown(waitForShutdown);
-  }
-
-  public static void Shutdown(Action callback) {
-    if (callback == null) {
-      Shutdown();
-    }
-    else {
-      GameObject go = new GameObject("BoltShutdownCallback");
-      BoltShutdownPoll poll = go.AddComponent<BoltShutdownPoll>();
-      poll.ShutdownEvent = Shutdown();
-      poll.Callback = callback;
-    }
+  public static void Shutdown() {
+    BoltNetworkInternal.__Shutdown();
   }
 
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
