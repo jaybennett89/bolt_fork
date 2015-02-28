@@ -19,6 +19,7 @@ public enum BoltNetworkModes {
   Server = 1,
   Client = 2,
   Host = 1,
+  Shutdown = 3,
 }
 
 internal static class BoltCore {
@@ -297,62 +298,15 @@ internal static class BoltCore {
     BoltSceneLoader.Enqueue(_localSceneLoading);
   }
 
-  public static ManualResetEvent Shutdown() {
-    if (_udpSocket != null && _mode != BoltNetworkModes.None) {
-      // log that we are shutting down
-      BoltLog.Info("Shutdown");
+  public static void Shutdown() {
+    BoltNetwork.VerifyIsRunning();
 
-      // notify user code
-      BoltInternal.GlobalEventListenerBase.BoltShutdownInvoke();
-
-      // disconnect from zeus
-      Zeus.Disconnect();
-
-      // disable upnp
-      UPnP.Disable(false);
-
-      // 
-      _mode = BoltNetworkModes.None;
-
-      // destroy all entities
-      foreach (Bolt.Entity entity in _entities.ToArray()) {
-        try {
-          DestroyForce(entity);
-        }
-        catch {
-
-        }
-      }
-
-      _entities.Clear();
-      _connections.Clear();
-      _globalEventDispatcher.Clear();
-      _globalBehaviours.Clear();
-
-      if (_globalBehaviourObject) {
-        GameObject.Destroy(_globalBehaviourObject);
-      }
-
-      BoltNetworkInternal.EnvironmentReset();
-
-      // set a specificl writer for this
-      UdpLog.SetWriter((i, m) => UnityEngine.Debug.Log(m));
-
-      // begin closing socket
-      var resetEvent = _udpSocket.Close();
-
-      // clear socket
-      _udpSocket = null;
-
-      Factory.UnregisterAll();
-      BoltLog.RemoveAll();
-      BoltConsole.Clear();
-      DebugInfo.Hide();
-
-      return resetEvent;
+    if (_globalControlObject) {
+      _globalControlObject.SendMessage("QueueShutdown", new ControlCommandShutdown());
     }
-
-    return new ManualResetEvent(true);
+    else {
+      throw new BoltException("Could not find BoltControl object");
+    }
   }
 
   public static UdpSession[] GetSessions() {
@@ -434,13 +388,14 @@ internal static class BoltCore {
 
     while (hasSocket && _udpSocket.Poll(out ev)) {
       switch (ev.EventType) {
-        case UdpEventType.SocketStartupFailed:
-          BoltInternal.GlobalEventListenerBase.BoltStartFailedInvoke();
-          Shutdown();
+        case UdpEventType.SocketStartupDone:
+          BoltInternal.GlobalEventListenerBase.BoltStartDoneInvoke();
+          ev.ResetEvent.Set();
           break;
 
-        case UdpEventType.SocketStartupDone:
-          BoltInternal.GlobalEventListenerBase.BoltStartedInvoke();
+        case UdpEventType.SocketStartupFailed:
+          BoltInternal.GlobalEventListenerBase.BoltStartFailedInvoke();
+          ev.ResetEvent.Set();
           break;
 
         case UdpEventType.Connected:
@@ -863,16 +818,14 @@ internal static class BoltCore {
   }
 
   internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform udpPlatform) {
-    //if (!_globalControlObject) {
-    //  _globalControlObject = new GameObject("BoltControl");
-    //  _globalControlObject.AddComponent<ControlBehaviour>();
+    if (!_globalControlObject) {
+      _globalControlObject = new GameObject("BoltControl");
+      _globalControlObject.AddComponent<ControlBehaviour>();
 
-    //  GameObject.DontDestroyOnLoad(_globalControlObject);
-    //}
+      GameObject.DontDestroyOnLoad(_globalControlObject);
+    }
 
-    BeginStart(null, mode, endpoint, udpPlatform, config);
-
-    //_globalControlObject.SendMessage("Start", new ControlCommandStart { Mode = mode, EndPoint = endpoint, Config = config.Clone(), Platform = udpPlatform });
+    _globalControlObject.SendMessage("QueueStart", new ControlCommandStart { Mode = mode, EndPoint = endpoint, Config = config.Clone(), Platform = udpPlatform });
   }
 
 #if DEBUG
@@ -1056,22 +1009,25 @@ internal static class BoltCore {
     }
   }
 
-  internal static void BeginStart(ManualResetEvent doneEvent, BoltNetworkModes mode, UdpEndPoint endpoint, UdpPlatform platform, BoltConfig config) {
+  internal static void BeginStart(ControlCommandStart cmd) {
     if (BoltNetwork.isRunning) {
+      cmd.State = ControlState.Failed;
+
       // make sure we don't wait for this
-      doneEvent.Set();
+      cmd.FinishedEvent.Set();
 
       // 
       throw new BoltException("Bolt is already running, you must call BoltLauncher.Shutdown() before starting a new instance of Bolt.");
     }
 
-    _mode = mode;
-    _config = config;
-    _udpPlatform = platform;
+    // done!
+    _mode = cmd.Mode;
+    _config = cmd.Config;
+    _udpPlatform = cmd.Platform;
     _canReceiveEntities = true;
 
     // reset id allocator
-    ResetIdAllocator(mode);
+    ResetIdAllocator(_mode);
 
     // clear everything in console
     BoltConsole.Clear();
@@ -1080,13 +1036,13 @@ internal static class BoltCore {
     DebugInfo.SetupAndShow();
 
     // setup logging
-    BoltLog.Setup(mode, config.logTargets);
+    BoltLog.Setup(_mode, _config.logTargets);
 
     // tell user we're starting
-    BoltLog.Debug("Bolt starting with a simulation rate of {0} steps per second", config.framesPerSecond);
+    BoltLog.Debug("Bolt starting with a simulation rate of {0} steps per second", _config.framesPerSecond);
 
     // set frametime
-    Time.fixedDeltaTime = 1f / (float)config.framesPerSecond;
+    Time.fixedDeltaTime = 1f / (float)_config.framesPerSecond;
 
     // create prefab cache
     PrefabDatabase.BuildCache();
@@ -1101,23 +1057,22 @@ internal static class BoltCore {
     BoltNetworkInternal.EnvironmentSetup();
 
     // create updp config
-    CreateUdpConfig(config);
+    CreateUdpConfig(_config);
 
     // setup default local scene load state
     _localSceneLoading = SceneLoadState.DefaultLocal();
 
     // create and start socket
-    _udpSocket = new UdpSocket(Zeus.GameGuid, platform, _udpConfig);
+    _udpSocket = new UdpSocket(Zeus.GameGuid, _udpPlatform, _udpConfig);
 
     // init all global behaviours
     UpdateActiveGlobalBehaviours(-1);
 
-    // have to register channels BEFORE the socket starts
-    BoltInternal.GlobalEventListenerBase.RegisterStreamChannelsInvoke();
-    BoltInternal.GlobalEventListenerBase.BoltStartPendingInvoke();
+    // invoke started
+    BoltInternal.GlobalEventListenerBase.BoltStartBeginInvoke();
 
     //  start socket
-    _udpSocket.Start(endpoint, doneEvent, ((mode == BoltNetworkModes.Host) ? UdpSocketMode.Host : UdpSocketMode.Client));
+    _udpSocket.Start(cmd.EndPoint, cmd.FinishedEvent, ((_mode == BoltNetworkModes.Host) ? UdpSocketMode.Host : UdpSocketMode.Client));
 
     // should we automatically connect to default zeus?
     if (BoltRuntimeSettings.instance.masterServerAutoConnect && (Zeus.GameGuid != Guid.Empty)) {
@@ -1125,7 +1080,59 @@ internal static class BoltCore {
     }
   }
 
-  internal static void BeginShutdown() {
+  internal static void BeginShutdown(ControlCommandShutdown cmd) {
+    if (!BoltNetwork.isRunning) {
+      cmd.State = ControlState.Failed;
+      cmd.FinishedEvent.Set();
 
+      throw new BoltException("Bolt is not running so it can't be shutdown");
+    }
+
+    // notify user code
+    BoltInternal.GlobalEventListenerBase.BoltShutdownBeginInvoke(cmd.Callbacks.Add);
+
+    // disconnect from zeus
+    Zeus.Disconnect();
+
+    // disable upnp
+    UPnP.Disable(false);
+
+    // 
+    _mode = BoltNetworkModes.Shutdown;
+
+    // destroy all entities
+    foreach (Bolt.Entity entity in _entities.ToArray()) {
+      try {
+        DestroyForce(entity);
+      }
+      catch {
+
+      }
+    }
+
+    _entities.Clear();
+    _connections.Clear();
+    _globalEventDispatcher.Clear();
+    _globalBehaviours.Clear();
+
+    if (_globalBehaviourObject) {
+      GameObject.Destroy(_globalBehaviourObject);
+    }
+
+    BoltNetworkInternal.EnvironmentReset();
+
+    // set a specificl writer for this
+    UdpLog.SetWriter((i, m) => UnityEngine.Debug.Log(m));
+
+    // begin closing socket
+    _udpSocket.Close(cmd.FinishedEvent);
+
+    // clear socket
+    _udpSocket = null;
+
+    Factory.UnregisterAll();
+    BoltLog.RemoveAll();
+    BoltConsole.Clear();
+    DebugInfo.Hide();
   }
 }

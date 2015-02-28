@@ -9,7 +9,7 @@ public class Menu : MonoBehaviour {
 
     yield return new WaitForSeconds(2f);
 
-    BoltLauncher.Shutdown(true);
+    BoltLauncher.Shutdown();
 
     yield return null;
 

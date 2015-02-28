@@ -224,14 +224,12 @@ namespace UdpKit {
     /// <summary>
     /// Close this socket
     /// </summary>
-    public ManualResetEvent Close() {
+    public void Close(ManualResetEvent resetEvent) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_CLOSE;
-      ev.ResetEvent = new ManualResetEvent(false);
+      ev.ResetEvent = resetEvent;
 
       Raise(ev);
-
-      return ev.ResetEvent;
     }
 
     public void SendUnconnected(UdpEndPoint endpoint, byte[] data) {

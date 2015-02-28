@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using UdpKit;
 using UnityEngine;
 
 namespace Bolt {
+  public delegate void AddCallback(Action callback);
 
   enum ControlState {
     Pending,
     Started,
+    Failed,
     Finished
   }
 
   abstract class ControlCommand {
-    public ControlState State;
     public int PendingFrames;
-
-    public ManualResetEvent FinishedEvent;
     public int FinishedFrames;
+
+    public ControlState State;
+    public ManualResetEvent FinishedEvent;
 
     public ControlCommand() {
       State = ControlState.Pending;
@@ -29,7 +29,7 @@ namespace Bolt {
     }
 
     public abstract void Run();
-    public abstract void Done(bool othersPending);
+    public abstract void Done();
   }
 
   class ControlCommandStart : ControlCommand {
@@ -40,32 +40,43 @@ namespace Bolt {
     public UdpEndPoint EndPoint;
 
     public override void Run() {
-      BoltCore.BeginStart(FinishedEvent, Mode, EndPoint, Platform, Config);
+      BoltCore.BeginStart(this);
     }
 
-    public override void Done(bool othersPending) {
+    public override void Done() {
 
     }
   }
 
   class ControlCommandShutdown : ControlCommand {
+    public List<Action> Callbacks = new List<Action>();
+
     public override void Run() {
-      BoltCore.BeginShutdown();
+      BoltCore.BeginShutdown(this);
     }
 
-    public override void Done(bool othersPending) {
+    public override void Done() {
+      BoltCore._mode = BoltNetworkModes.None;
 
+      for (int i = 0; i < Callbacks.Count; ++i) {
+        try {
+          Callbacks[i]();
+        }
+        catch (Exception exn) {
+          Debug.LogException(exn);
+        }
+      }
     }
   }
 
   public class ControlBehaviour : MonoBehaviour {
     Queue<ControlCommand> commands = new Queue<ControlCommand>();
 
-    void Start(ControlCommandStart start) {
+    void QueueStart(ControlCommandStart start) {
       commands.Enqueue(start);
     }
 
-    void Shutdown(ControlCommandShutdown shutdown) {
+    void QueueShutdown(ControlCommandShutdown shutdown) {
       commands.Enqueue(shutdown);
     }
 
@@ -79,7 +90,9 @@ namespace Bolt {
               try {
                 cmd.Run();
               }
-              catch { }
+              catch (Exception exn) {
+                Debug.LogException(exn);
+              }
 
               cmd.State = ControlState.Started;
             }
@@ -91,15 +104,21 @@ namespace Bolt {
             }
             break;
 
+          case ControlState.Failed:
+            commands.Clear();
+            break;
+
           case ControlState.Finished:
             if (--cmd.FinishedFrames < 0) {
               // we are done
               commands.Dequeue();
 
               try {
-                cmd.Done(commands.Count > 0);
+                cmd.Done();
               }
-              catch { }
+              catch (Exception exn) {
+                Debug.LogException(exn);
+              }
             }
             break;
         }

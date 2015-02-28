@@ -36,18 +36,8 @@ public static class BoltNetworkInternal {
     BoltCore.Initialize(mode, endpoint, config, platform);
   }
 
-
-  public static ManualResetEvent __Shutdown() {
-    BoltNetwork.VerifyIsRunning();
-    return BoltCore.Shutdown();
-  }
-
-  public static void __Shutdown(bool waitForShutdown) {
-    ManualResetEvent ev = __Shutdown();
-
-    if (waitForShutdown) {
-      ev.WaitOne();
-    }
+  public static void __Shutdown() {
+    BoltCore.Shutdown();
   }
 }
 
@@ -136,6 +126,10 @@ public static class BoltNetwork {
   /// </example>
   public static IEnumerable<BoltEntity> SceneObjects {
     get { return BoltCore._sceneObjects.Values; }
+  }
+
+  public static void RegisterShutdownDoneCallback(Action action) {
+
   }
 
   /// <summary>
@@ -488,7 +482,7 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static bool isRunning {
-    get { return isServer || isClient; }
+    get { return isServer || isClient || (BoltCore._mode == BoltNetworkModes.Shutdown); }
   }
 
   /// <summary>

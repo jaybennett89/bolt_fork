@@ -95,32 +95,30 @@ namespace UdpKit {
 
 
     void OnEventStart(UdpEvent ev) {
-      try {
-        if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
-          // set mode
-          mode = ev.SocketMode;
+      if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
+        // set mode
+        mode = ev.SocketMode;
 
-          try {
-            // try to find the lan interface ip address
-            FindLanInterfaceIP();
-          }
-          catch (Exception exn) {
-            UdpLog.Error(exn.ToString());
-          }
-
-          // tell user we started
-          Raise(UdpEvent.PUBLIC_START_DONE, platformSocket.EndPoint);
+        try {
+          // try to find the lan interface ip address
+          FindLanInterfaceIP();
         }
-        else {
-
-          // tell user we failed
-          Raise(UdpEvent.PUBLIC_START_FAILED);
+        catch (Exception exn) {
+          UdpLog.Error(exn.ToString());
         }
+
+        // tell user we started
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_START_DONE;
+        ev.EndPoint = platformSocket.EndPoint;
+        ev.ResetEvent = ev.ResetEvent;
+
+        Raise(ev);
       }
-      finally {
-        if (ev.ResetEvent != null) {
-          ev.ResetEvent.Set();
-        }
+      else {
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_START_FAILED;
+        ev.ResetEvent = ev.ResetEvent;
       }
     }
 
