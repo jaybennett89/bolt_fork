@@ -20,6 +20,7 @@ namespace Bolt {
   public abstract class Event : NetworkObj_Root, IDisposable {
     internal const byte ENTITY_EVERYONE = 1;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
+    internal const byte ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER = 13;
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
     internal const byte ENTITY_ONLY_CONTROLLER = 7;
     internal const byte ENTITY_ONLY_OWNER = 9;
@@ -146,6 +147,7 @@ namespace Bolt {
           Targets == ENTITY_EVERYONE ||
           Targets == ENTITY_EVERYONE_EXCEPT_OWNER ||
           Targets == ENTITY_EVERYONE_EXCEPT_CONTROLLER ||
+          Targets == ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER ||
           Targets == ENTITY_ONLY_CONTROLLER ||
           Targets == ENTITY_ONLY_SELF ||
           Targets == ENTITY_ONLY_OWNER;

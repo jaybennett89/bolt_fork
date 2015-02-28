@@ -23,6 +23,15 @@ public static class BoltLauncher {
     StartServer(UdpEndPoint.Any);
   }
 
+  public static void StartServer(int port) {
+    if (port >= 0 && port <= ushort.MaxValue) {
+      StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort)port));
+    }
+    else {
+      throw new ArgumentOutOfRangeException(string.Format("'port' must be >= 0 and <= {0}", ushort.MaxValue));
+    }
+  }
+
   public static void StartServer(BoltConfig config) {
     StartServer(UdpEndPoint.Any, config);
   }
@@ -49,6 +58,15 @@ public static class BoltLauncher {
 
   public static void StartClient(UdpEndPoint endpoint, BoltConfig config) {
     Initialize(BoltNetworkModes.Client, endpoint, config);
+  }
+
+  public static void StartClient(int port) {
+    if (port >= 0 && port <= ushort.MaxValue) {
+      StartClient(new UdpEndPoint(UdpIPv4Address.Any, (ushort)port));
+    }
+    else {
+      throw new ArgumentOutOfRangeException(string.Format("'port' must be >= 0 and <= {0}", ushort.MaxValue));
+    }
   }
 
   public static void Shutdown() {

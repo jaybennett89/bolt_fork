@@ -95,6 +95,8 @@ namespace UdpKit {
 
 
     void OnEventStart(UdpEvent ev) {
+      var reset = ev.ResetEvent;
+
       if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
         // set mode
         mode = ev.SocketMode;
@@ -111,14 +113,16 @@ namespace UdpKit {
         ev = new UdpEvent();
         ev.Type = UdpEvent.PUBLIC_START_DONE;
         ev.EndPoint = platformSocket.EndPoint;
-        ev.ResetEvent = ev.ResetEvent;
+        ev.ResetEvent = reset;
 
         Raise(ev);
       }
       else {
         ev = new UdpEvent();
         ev.Type = UdpEvent.PUBLIC_START_FAILED;
-        ev.ResetEvent = ev.ResetEvent;
+        ev.ResetEvent = reset;
+
+        Raise(ev);
       }
     }
 
@@ -257,7 +261,10 @@ namespace UdpKit {
         pendingConnections.Clear();
 
         // signal to user thread that this is done
-        ev.ResetEvent.Set();
+        if (ev.ResetEvent != null) {
+          UdpLog.Debug("RESETEVENT.SET()");
+          ev.ResetEvent.Set();
+        }
       }
     }
 

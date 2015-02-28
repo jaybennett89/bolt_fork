@@ -37,6 +37,10 @@ namespace Bolt {
           Entity_Everyone_Except_Owner(ev);
           break;
 
+        case Event.ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER:
+          Entity_Everyone_Except_Owner_And_Controller(ev);
+          break;
+
         case Event.ENTITY_ONLY_CONTROLLER:
           Entity_Only_Controller(ev);
           break;
@@ -130,6 +134,24 @@ namespace Bolt {
       }
       else {
         BoltLog.Warn("NetworkEvent with NULL target, event will NOT be forwarded or raised");
+      }
+    }
+
+    static void Entity_Everyone_Except_Owner_And_Controller(Event ev) {
+      if (ev.TargetEntity != null) {
+        var it = BoltCore._connections.GetIterator();
+
+        while (it.Next()) {
+          if (ReferenceEquals(it.val, ev.SourceConnection)) {
+            continue;
+          }
+
+          it.val._eventChannel.Queue(ev);
+        }
+
+        if (ev.TargetEntity.IsOwner == false && ev.TargetEntity.HasControl == false) {
+          RaiseLocal(ev);
+        }
       }
     }
 

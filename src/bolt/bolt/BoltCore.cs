@@ -299,8 +299,6 @@ internal static class BoltCore {
   }
 
   public static void Shutdown() {
-    BoltNetwork.VerifyIsRunning();
-
     if (_globalControlObject) {
       _globalControlObject.SendMessage("QueueShutdown", new ControlCommandShutdown());
     }
@@ -1080,6 +1078,56 @@ internal static class BoltCore {
     }
   }
 
+  internal static void ShutdownImmediate() {
+    if (!BoltNetwork.isRunning) {
+      return;
+    }
+
+    // disconnect from zeus
+    Zeus.Disconnect();
+
+    // disable upnp
+    UPnP.Disable(false);
+
+    // 
+    _mode = BoltNetworkModes.None;
+
+    // destroy all entities
+    foreach (Bolt.Entity entity in _entities.ToArray()) {
+      try {
+        DestroyForce(entity);
+      }
+      catch {
+
+      }
+    }
+
+    _entities.Clear();
+    _connections.Clear();
+    _globalEventDispatcher.Clear();
+    _globalBehaviours.Clear();
+
+    if (_globalBehaviourObject) {
+      GameObject.Destroy(_globalBehaviourObject);
+    }
+
+    BoltNetworkInternal.EnvironmentReset();
+
+    // set a specificl writer for this
+    UdpLog.SetWriter((i, m) => UnityEngine.Debug.Log(m));
+
+    // begin closing socket
+    _udpSocket.Close(null);
+
+    // clear socket
+    _udpSocket = null;
+
+    Factory.UnregisterAll();
+    BoltLog.RemoveAll();
+    BoltConsole.Clear();
+    DebugInfo.Hide();
+  }
+
   internal static void BeginShutdown(ControlCommandShutdown cmd) {
     if (!BoltNetwork.isRunning) {
       cmd.State = ControlState.Failed;
@@ -1105,9 +1153,7 @@ internal static class BoltCore {
       try {
         DestroyForce(entity);
       }
-      catch {
-
-      }
+      catch { }
     }
 
     _entities.Clear();
@@ -1116,13 +1162,20 @@ internal static class BoltCore {
     _globalBehaviours.Clear();
 
     if (_globalBehaviourObject) {
+      // disables the immediate shutdown bolt does in the editor and OnApplicationQuit
+      _globalBehaviourObject.GetComponent<BoltPoll>().AllowImmediateShutdown = false;
+
+      // destroy everything!
       GameObject.Destroy(_globalBehaviourObject);
     }
 
+    // reset environment stuff (we can probably remove this)
     BoltNetworkInternal.EnvironmentReset();
 
     // set a specificl writer for this
     UdpLog.SetWriter((i, m) => UnityEngine.Debug.Log(m));
+
+    Debug.Log(_udpSocket);
 
     // begin closing socket
     _udpSocket.Close(cmd.FinishedEvent);

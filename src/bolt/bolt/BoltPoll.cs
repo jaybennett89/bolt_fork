@@ -17,6 +17,8 @@
 /// </example>
 [BoltExecutionOrder(-10000)]
 public class BoltPoll : MonoBehaviour {
+  internal bool AllowImmediateShutdown = true;
+
   protected void Awake() {
     DontDestroyOnLoad(gameObject);
   }
@@ -52,14 +54,20 @@ public class BoltPoll : MonoBehaviour {
   }
 
   protected void OnDisable() {
-    BoltCore.Shutdown();
+    if (Application.isEditor && AllowImmediateShutdown) {
+      BoltCore.ShutdownImmediate();
+    }
   }
 
   protected void OnDestroy() {
-    BoltCore.Shutdown();
+    if (Application.isEditor && AllowImmediateShutdown) {
+      BoltCore.ShutdownImmediate();
+    }
   }
 
   protected void OnApplicationQuit() {
-    BoltCore.Shutdown();
+    if (AllowImmediateShutdown) {
+      BoltCore.ShutdownImmediate();
+    }
   }
 }
