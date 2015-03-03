@@ -978,6 +978,7 @@ internal static class BoltCore {
     }
 #endif
 
+    _udpConfig.MasterServerAutoDisconnect = BoltRuntimeSettings.instance.masterServerAutoDisconnect;
     _udpConfig.ConnectionLimit = isHost ? config.serverConnectionLimit : 0;
     _udpConfig.AllowIncommingConnections = isHost;
     _udpConfig.AutoAcceptIncommingConnections = isHost && (_config.serverConnectionAcceptMode == BoltConnectionAcceptMode.Auto);
