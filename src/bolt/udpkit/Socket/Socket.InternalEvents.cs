@@ -95,18 +95,34 @@ namespace UdpKit {
 
 
     void OnEventStart(UdpEvent ev) {
+      var reset = ev.ResetEvent;
+
       if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
         // set mode
         mode = ev.SocketMode;
 
-        // tell user
-        Raise(UdpEvent.PUBLIC_START_DONE, platformSocket.EndPoint);
+        try {
+          // try to find the lan interface ip address
+          FindLanInterfaceIP();
+        }
+        catch (Exception exn) {
+          UdpLog.Error(exn.ToString());
+        }
 
-        // try to find the lan interface ip address
-        FindLanInterfaceIP();
+        // tell user we started
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_START_DONE;
+        ev.EndPoint = platformSocket.EndPoint;
+        ev.ResetEvent = reset;
+
+        Raise(ev);
       }
       else {
-        Raise(UdpEvent.PUBLIC_START_FAILED);
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_START_FAILED;
+        ev.ResetEvent = reset;
+
+        Raise(ev);
       }
     }
 
@@ -245,7 +261,10 @@ namespace UdpKit {
         pendingConnections.Clear();
 
         // signal to user thread that this is done
-        ev.ResetEvent.Set();
+        if (ev.ResetEvent != null) {
+          UdpLog.Debug("RESETEVENT.SET()");
+          ev.ResetEvent.Set();
+        }
       }
     }
 

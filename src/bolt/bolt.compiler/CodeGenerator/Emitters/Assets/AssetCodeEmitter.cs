@@ -11,22 +11,6 @@ namespace Bolt.Compiler {
     public AssetDecorator Decorator;
     public CodeGenerator Generator { get { return Decorator.Generator; } }
 
-    protected virtual void EmitModifyMethod(CodeTypeDeclaration type, string returnType, string interfaceType, bool newMember) {
-      if (Decorator.EmitLegacyModifyMethod) {
-        type.DeclareMethod(returnType, "Modify", method => {
-          method.DeclareModifyObsolete();
-          method.Statements.Expr("return this");
-
-          if (interfaceType != null) {
-            method.PrivateImplementationType = new CodeTypeReference(interfaceType);
-          }
-
-          if (newMember) {
-            method.Attributes |= MemberAttributes.New;
-          }
-        });
-      }
-    }
 
     protected virtual void EmitInterface() {
       if (Decorator.EmitAsInterface) {
@@ -34,7 +18,6 @@ namespace Bolt.Compiler {
         InterfaceType.TypeAttributes = TypeAttributes.Public | TypeAttributes.Interface;
         InterfaceType.BaseTypes.Add(Decorator.BaseInterface);
 
-        EmitModifyMethod(InterfaceType, Decorator.NameInterface, null, Decorator.ParentInterfaces.Any());
         EmitObjectMembers(InterfaceType, false);
       }
     }
@@ -49,19 +32,6 @@ namespace Bolt.Compiler {
       }
       else {
         ObjectType.TypeAttributes = TypeAttributes.Public;
-      }
-
-      if (Decorator.EmitLegacyModifyMethod) {
-        if (Decorator.EmitAsInterface) {
-          EmitModifyMethod(ObjectType, Decorator.NameInterface, Decorator.NameInterface, false);
-
-          foreach (string parent in Decorator.ParentInterfaces) {
-            EmitModifyMethod(ObjectType, parent, parent, false);
-          }
-        }
-        else {
-          EmitModifyMethod(ObjectType, Decorator.Name, null, false);
-        }
       }
 
       ObjectType.DeclareConstructor(ctor => {

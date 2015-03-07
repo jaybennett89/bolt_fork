@@ -140,6 +140,10 @@ namespace Bolt {
       }
     }
 
+    public override object GetDynamic(NetworkObj obj) {
+      return obj.Storage.Values[obj[this] + POSITION].Transform;
+    }
+
     public override int BitCount(NetworkObj obj) {
       if (Extrapolation.Enabled) {
         return (PositionCompression.BitsRequired * 2) + RotationCompression.BitsRequired;

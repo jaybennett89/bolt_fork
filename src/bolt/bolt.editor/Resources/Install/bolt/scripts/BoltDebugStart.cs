@@ -3,6 +3,9 @@ using UnityEngine;
 using Process = System.Diagnostics.Process;
 
 public partial class BoltDebugStart : BoltInternal.GlobalEventListenerBase {
+  UdpEndPoint _serverEndPoint;
+  UdpEndPoint _clientEndPoint;
+
   void Awake() {
     DontDestroyOnLoad(gameObject);
   }
@@ -20,8 +23,8 @@ end tell'";
     p.Start();
 #endif
 
-    UdpEndPoint _serverEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, (ushort)BoltRuntimeSettings.instance.debugStartPort);
-    UdpEndPoint _clientEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, 0);
+    _serverEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, (ushort)BoltRuntimeSettings.instance.debugStartPort);
+    _clientEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, 0);
 
     BoltConfig cfg;
 
@@ -33,11 +36,9 @@ end tell'";
     if (string.IsNullOrEmpty(BoltRuntimeSettings.instance.debugStartMapName) == false) {
       if (BoltDebugStartSettings.startServer) {
         BoltLauncher.StartServer(_serverEndPoint, cfg);
-        BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
       }
       else if (BoltDebugStartSettings.startClient) {
         BoltLauncher.StartClient(_clientEndPoint, cfg);
-        BoltNetwork.Connect(_serverEndPoint);
       }
 
       BoltDebugStartSettings.PositionWindow();
@@ -48,6 +49,15 @@ end tell'";
 
     if (!BoltNetwork.isClient && !BoltNetwork.isServer) {
       BoltLog.Error("failed to start debug mode");
+    }
+  }
+
+  public override void BoltStartDone() {
+    if (BoltNetwork.isServer) {
+      BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
+    }
+    else {
+      BoltNetwork.Connect(_serverEndPoint);
     }
   }
 

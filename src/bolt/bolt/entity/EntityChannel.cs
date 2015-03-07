@@ -178,10 +178,6 @@ partial class EntityChannel : BoltChannel {
     _prioritized.Clear();
 
     foreach (EntityProxy proxy in _outgoingDict.Values) {
-      if (proxy.Entity.IsFrozen) {
-        continue;
-      }
-
       if (proxy.Flags & ProxyFlags.DESTROY_REQUESTED) {
         if (proxy.Flags & ProxyFlags.DESTROY_PENDING) {
           continue;
@@ -191,6 +187,10 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 17;
       }
       else {
+        if (proxy.Entity.IsFrozen && !proxy.Entity.IsController(connection)) {
+          continue;
+        }
+
         // check update rate of this entity
         if ((packet.Number % proxy.Entity.UpdateRate) != 0) {
           continue;
@@ -549,7 +549,7 @@ partial class EntityChannel : BoltChannel {
           // prefab checks (if applicable)
           if (go) {
             if (BoltCore.isServer && !go.GetComponent<BoltEntity>()._allowInstantiateOnClient) {
-              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.remoteEndPoint);
+              throw new BoltException("Received entity of prefab {0} from client at {1}, but this entity is not allowed to be instantiated from clients", go.name, connection.RemoteEndPoint);
             }
           }
 

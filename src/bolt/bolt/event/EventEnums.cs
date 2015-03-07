@@ -19,6 +19,7 @@ namespace Bolt {
     Everyone = Event.ENTITY_EVERYONE,
     EveryoneExceptController = Event.ENTITY_EVERYONE_EXCEPT_CONTROLLER,
     EveryoneExceptOwner = Event.ENTITY_EVERYONE_EXCEPT_OWNER,
+    EveryoneExceptOwnerAndController = Event.ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER,
     OnlyController = Event.ENTITY_ONLY_CONTROLLER,
     OnlyOwner = Event.ENTITY_ONLY_OWNER,
     OnlySelf = Event.ENTITY_ONLY_SELF,
@@ -34,8 +35,5 @@ namespace Bolt {
     AllClients = Event.GLOBAL_ALL_CLIENTS,
     OnlyServer = Event.GLOBAL_ONLY_SERVER,
     OnlySelf = Event.GLOBAL_ONLY_SELF,
-
-    [Obsolete("Use GlobalTargets.OnlyServer")]
-    Server = Event.GLOBAL_ONLY_SERVER,
   }
 }

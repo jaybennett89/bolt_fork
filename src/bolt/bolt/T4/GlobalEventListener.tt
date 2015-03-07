@@ -6,7 +6,8 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #><#
 
-var shutdown = new Method("BoltShutdown");
+var shutdown = new Method("BoltShutdownBegin");
+shutdown.AddArgument("Bolt.AddCallback", "registerDoneCallback");
 shutdown.XmlDoc =
 @"
   /// <summary>
@@ -23,39 +24,44 @@ shutdown.XmlDoc =
   /// </example>
 ";
 
-var boltStarted = new Method("BoltStarted");
-boltStarted.XmlDoc =
-@"
-  /// <summary>
-  /// Callback triggered when the bolt simulation is starting.
-  /// </summary>
-  /// <example>
-  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
-  /// ```csharp
-  /// public override void BoltStarted() {
-  ///   PrecalcNpcPaths();
-  ///   BoltConsole.Write(""Starting Game..."");
-  /// }
-  /// ```
-  /// </example>
-";
+var boltStartBegin = new Method("BoltStartBegin");
+boltStartBegin.XmlDoc = "";
 
-var boltStartInProgress = new Method("BoltStartPending");
-boltStartInProgress.XmlDoc =
-@"
-  /// <summary>
-  /// Callback triggered when the bolt simulation is starting.
-  /// </summary>
-  /// <example>
-  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
-  /// ```csharp
-  /// public override void BoltStarted() {
-  ///   PrecalcNpcPaths();
-  ///   BoltConsole.Write(""Starting Game..."");
-  /// }
-  /// ```
-  /// </example>
-";
+var boltStartDone = new Method("BoltStartDone");
+boltStartDone.XmlDoc = "";
+
+//boltStartBegin.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when the bolt simulation is starting.
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+//  /// ```csharp
+//  /// public override void BoltStartBegin() {
+//  ///   PrecalcNpcPaths();
+//  ///   BoltConsole.Write(""Starting Game..."");
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+//var boltStartInProgress = new Method("BoltStartPending");
+//boltStartInProgress.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when the bolt simulation is starting.
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+//  /// ```csharp
+//  /// public override void BoltStarted() {
+//  ///   PrecalcNpcPaths();
+//  ///   BoltConsole.Write(""Starting Game..."");
+//  /// }
+//  /// ```
+//  /// </example>
+//";
 
 var boltStartFailed = new Method("BoltStartFailed");
 boltStartFailed.XmlDoc = "";
@@ -85,27 +91,27 @@ streamDataReceived.XmlDoc =
   /// </example>
 ";
 
-var registerStreamChannels = new Method("RegisterStreamChannels");
-registerStreamChannels.Obsolete = true;
-registerStreamChannels.XmlDoc =
-@"
-  /// <summary>
-  /// Registering binary stream channels may only be done in this callback
-  /// </summary>
-  /// <example>
-  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
-  /// 
-  /// ```csharp
-  /// public static UdpKit.UdpChannelName Voice;
-  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
-  /// 
-  /// public override void RegisterStreamChannels() {
-  ///   Voice = BoltNetwork.CreateStreamChannel(""Voice"", UdpKit.UdpChannelMode.Unreliable, 1});
-  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel(""CustomPlayerIcon"", UdpKit.UdpChannelMode.Reliable, 4});
-  /// }
-  /// ```
-  /// </example>
-";
+//var registerStreamChannels = new Method("RegisterStreamChannels");
+//registerStreamChannels.Obsolete = true;
+//registerStreamChannels.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Registering binary stream channels may only be done in this callback
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
+//  /// 
+//  /// ```csharp
+//  /// public static UdpKit.UdpChannelName Voice;
+//  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
+//  /// 
+//  /// public override void RegisterStreamChannels() {
+//  ///   Voice = BoltNetwork.CreateStreamChannel(""Voice"", UdpKit.UdpChannelMode.Unreliable, 1});
+//  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel(""CustomPlayerIcon"", UdpKit.UdpChannelMode.Reliable, 4});
+//  /// }
+//  /// ```
+//  /// </example>
+//";
 
 var portMappingChanged = new Method("PortMappingChanged");
 portMappingChanged.AddArgument("Bolt.INatDevice", "device");
@@ -673,11 +679,10 @@ sessionConnectFailed.XmlDoc = @"";
 
 var methods = new List<Method>();
 methods.Add(shutdown);
-methods.Add(boltStarted);
+methods.Add(boltStartBegin);
+methods.Add(boltStartDone);
 methods.Add(boltStartFailed);
-methods.Add(boltStartInProgress);
 methods.Add(streamDataReceived);
-methods.Add(registerStreamChannels);
 methods.Add(portMappingChanged);
 methods.Add(sceneLoadLocalBegin);
 methods.Add(sceneLoadLocalBegin2);

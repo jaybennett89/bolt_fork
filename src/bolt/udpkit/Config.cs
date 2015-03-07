@@ -2,6 +2,8 @@
 namespace UdpKit {
   [Serializable]
   public class UdpConfig {
+    public bool MasterServerAutoDisconnect = true;
+
     public int PacketWindow = 256;
     public int PacketDatagramSize = 1200;
 

@@ -20,6 +20,11 @@ Plugins.meta
 Debug
 Release
 
+DOCUMENTATION.txt
+DOCUMENTATION.txt.meta
+bolt.meta
+documentation.meta
+
 **/Assets/tutorial*
 
 Bolt_DebugStart_Build

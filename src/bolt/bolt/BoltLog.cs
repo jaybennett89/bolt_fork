@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-
+using UnityEngine;
 using IO = System.IO;
 using SYS = System;
 using UE = UnityEngine;
@@ -476,5 +476,29 @@ public static class BoltLog {
     }
 
     return string.Format(Format(message), args);
+  }
+
+  internal static void Setup(BoltNetworkModes mode, BoltConfigLogTargets logTargets) {
+#if DEBUG
+    // init loggers
+    var fileLog = (logTargets & BoltConfigLogTargets.File) == BoltConfigLogTargets.File;
+    var unityLog = (logTargets & BoltConfigLogTargets.Unity) == BoltConfigLogTargets.Unity;
+    var consoleLog = (logTargets & BoltConfigLogTargets.Console) == BoltConfigLogTargets.Console;
+    var systemOutLog = (logTargets & BoltConfigLogTargets.SystemOut) == BoltConfigLogTargets.SystemOut;
+
+    if (unityLog) { BoltLog.Add(new BoltLog.Unity()); }
+    if (consoleLog) { BoltLog.Add(new BoltLog.Console()); }
+    if (systemOutLog) { BoltLog.Add(new BoltLog.SystemOut()); }
+    if (fileLog) {
+      switch (Application.platform) {
+        case RuntimePlatform.OSXEditor:
+        case RuntimePlatform.WindowsEditor:
+        case RuntimePlatform.WindowsPlayer:
+        case RuntimePlatform.OSXPlayer:
+          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Server));
+          break;
+      }
+    }
+#endif
   }
 }

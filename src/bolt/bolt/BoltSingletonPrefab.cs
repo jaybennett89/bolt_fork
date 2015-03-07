@@ -21,6 +21,7 @@ using UnityEngine;
 [DocumentationAttribute]
 public abstract class BoltSingletonPrefab<T> : MonoBehaviour where T : MonoBehaviour {
   static T _instance;
+  static protected string _resourcePath;
 
   /// <summary>
   /// Returns the singleton instance of this type
@@ -57,7 +58,7 @@ public abstract class BoltSingletonPrefab<T> : MonoBehaviour where T : MonoBehav
   /// }
   /// ```
   /// </example>
-  public static void Instantiate() { 
+  public static void Instantiate() {
     if (!_instance) {
       Object obj = FindObjectOfType(typeof(T));
 
@@ -65,7 +66,7 @@ public abstract class BoltSingletonPrefab<T> : MonoBehaviour where T : MonoBehav
         _instance = (T)obj;
       }
       else {
-        obj = GameObject.Instantiate(Resources.Load(typeof(T).Name, typeof(GameObject)));
+        obj = GameObject.Instantiate(Resources.Load(_resourcePath == null ? typeof(T).Name : _resourcePath, typeof(GameObject)));
 
         if (obj) {
           _instance = ((GameObject)obj).GetComponent<T>();

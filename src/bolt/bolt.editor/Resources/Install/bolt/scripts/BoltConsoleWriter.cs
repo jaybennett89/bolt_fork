@@ -46,7 +46,9 @@ namespace Bolt {
         var outHandlePtr = PInvoke.GetStdHandle(PInvoke.STD_OUTPUT_HANDLE);
 
         // we can then create a filestream from this handle
+#pragma warning disable 0618
         var fileStream = new FileStream(outHandlePtr, FileAccess.Write);
+#pragma warning restore 0618
 
         // and then create a new stream writer (using ASCII) 
         var stdOut = new StreamWriter(fileStream, Encoding.ASCII);

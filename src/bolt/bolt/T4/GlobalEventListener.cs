@@ -19,13 +19,13 @@ partial class GlobalEventListenerBase {
   /// ```
   /// </example>
  
-public virtual void BoltShutdown() {  }
+public virtual void BoltShutdownBegin(Bolt.AddCallback registerDoneCallback) {  }
 
-internal static void BoltShutdownInvoke() { 
-	BoltLog.Debug("Invoking callback BoltShutdown");
+internal static void BoltShutdownBeginInvoke(Bolt.AddCallback registerDoneCallback) { 
+	BoltLog.Debug("Invoking callback BoltShutdownBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.BoltShutdown();
+			cb.BoltShutdownBegin(registerDoneCallback);
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -33,26 +33,31 @@ internal static void BoltShutdownInvoke() {
 }
 
 
-/// <summary>
-  /// Callback triggered when the bolt simulation is starting.
-  /// </summary>
-  /// <example>
-  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
-  /// ```csharp
-  /// public override void BoltStarted() {
-  ///   PrecalcNpcPaths();
-  ///   BoltConsole.Write("Starting Game...");
-  /// }
-  /// ```
-  /// </example>
- 
-public virtual void BoltStarted() {  }
 
-internal static void BoltStartedInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStarted");
+ 
+public virtual void BoltStartBegin() {  }
+
+internal static void BoltStartBeginInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
-			cb.BoltStarted();
+			cb.BoltStartBegin();
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+ 
+public virtual void BoltStartDone() {  }
+
+internal static void BoltStartDoneInvoke() { 
+	BoltLog.Debug("Invoking callback BoltStartDone");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.BoltStartDone();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -69,33 +74,6 @@ internal static void BoltStartFailedInvoke() {
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStartFailed();
-		} catch(System.Exception exn) {
-			BoltLog.Exception(exn);
-		}
-	}
-}
-
-
-/// <summary>
-  /// Callback triggered when the bolt simulation is starting.
-  /// </summary>
-  /// <example>
-  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
-  /// ```csharp
-  /// public override void BoltStarted() {
-  ///   PrecalcNpcPaths();
-  ///   BoltConsole.Write("Starting Game...");
-  /// }
-  /// ```
-  /// </example>
- 
-public virtual void BoltStartPending() {  }
-
-internal static void BoltStartPendingInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStartPending");
-	foreach (GlobalEventListenerBase cb in callbacks) {
-		try {
-			cb.BoltStartPending();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}
@@ -129,37 +107,6 @@ internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStre
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.StreamDataReceived(connection, data);
-		} catch(System.Exception exn) {
-			BoltLog.Exception(exn);
-		}
-	}
-}
-
-
-/// <summary>
-  /// Registering binary stream channels may only be done in this callback
-  /// </summary>
-  /// <example>
-  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
-  /// 
-  /// ```csharp
-  /// public static UdpKit.UdpChannelName Voice;
-  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
-  /// 
-  /// public override void RegisterStreamChannels() {
-  ///   Voice = BoltNetwork.CreateStreamChannel("Voice", UdpKit.UdpChannelMode.Unreliable, 1});
-  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel("CustomPlayerIcon", UdpKit.UdpChannelMode.Reliable, 4});
-  /// }
-  /// ```
-  /// </example>
-[System.Obsolete("This method is obsolete and will be removed in a future version of Bolt")] 
-public virtual void RegisterStreamChannels() {  }
-
-internal static void RegisterStreamChannelsInvoke() { 
-	BoltLog.Debug("Invoking callback RegisterStreamChannels");
-	foreach (GlobalEventListenerBase cb in callbacks) {
-		try {
-			cb.RegisterStreamChannels();
 		} catch(System.Exception exn) {
 			BoltLog.Exception(exn);
 		}

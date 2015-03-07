@@ -211,11 +211,12 @@ namespace UdpKit {
     /// Start this socket
     /// </summary>
     /// <param name="endpoint">The endpoint to bind to</param>
-    public void Start(UdpEndPoint endpoint, UdpSocketMode mode) {
+    public void Start(UdpEndPoint endpoint, ManualResetEvent doneEvent, UdpSocketMode mode) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_START;
       ev.EndPoint = endpoint;
       ev.SocketMode = mode;
+      ev.ResetEvent = doneEvent;
 
       Raise(ev);
     }
@@ -223,14 +224,12 @@ namespace UdpKit {
     /// <summary>
     /// Close this socket
     /// </summary>
-    public ManualResetEvent Close() {
+    public void Close(ManualResetEvent resetEvent) {
       UdpEvent ev = new UdpEvent();
       ev.Type = UdpEvent.INTERNAL_CLOSE;
-      ev.ResetEvent = new ManualResetEvent(false);
+      ev.ResetEvent = resetEvent;
 
       Raise(ev);
-
-      return ev.ResetEvent;
     }
 
     public void SendUnconnected(UdpEndPoint endpoint, byte[] data) {

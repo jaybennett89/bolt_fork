@@ -7,6 +7,6 @@ public static class ExtensionMethods {
       return Player.serverPlayer;
     }
 
-    return (Player)connection.userToken;
+    return (Player)connection.UserData;
   }
 }

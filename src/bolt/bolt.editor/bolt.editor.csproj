@@ -139,7 +139,6 @@
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Platform.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\WP8\Wp8Socket.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltConsoleWriter.cs" />
-    <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltShutdownPoll.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Null\NullPlatform.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\Null\NullSocket.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\udpkit\DotNet\DotNetInterface.cs" />
