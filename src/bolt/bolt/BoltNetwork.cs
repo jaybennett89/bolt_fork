@@ -1136,7 +1136,7 @@ public static class BoltNetwork {
   /// </example>
   public static void Accept(UdpEndPoint endpoint) {
     BoltNetwork.VerifyIsRunning();
-    BoltCore.AcceptConnection(endpoint, null, null, null);
+    BoltCore.AcceptConnection(endpoint, null, null);
   }
 
   /// <summary>
@@ -1158,23 +1158,23 @@ public static class BoltNetwork {
   /// </example>
   public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken) {
     BoltNetwork.VerifyIsRunning();
-    BoltCore.AcceptConnection(endpoint, null, acceptToken, null);
+    BoltCore.AcceptConnection(endpoint, null, acceptToken);
   }
 
-  public static void Accept(UdpEndPoint endpoint, object userToken) {
-    BoltNetwork.VerifyIsRunning();
-    BoltCore.AcceptConnection(endpoint, userToken, null, null);
-  }
+  //public static void Accept(UdpEndPoint endpoint, object userToken) {
+  //  BoltNetwork.VerifyIsRunning();
+  //  BoltCore.AcceptConnection(endpoint, userToken, null, null);
+  //}
 
-  public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken, IProtocolToken connectToken) {
-    BoltNetwork.VerifyIsRunning();
-    BoltCore.AcceptConnection(endpoint, null, acceptToken, connectToken);
-  }
+  //public static void Accept(UdpEndPoint endpoint, IProtocolToken acceptToken, IProtocolToken connectToken) {
+  //  BoltNetwork.VerifyIsRunning();
+  //  BoltCore.AcceptConnection(endpoint, null, acceptToken, connectToken);
+  //}
 
-  public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
-    BoltNetwork.VerifyIsRunning();
-    BoltCore.AcceptConnection(endpoint, userToken, acceptToken, connectToken);
-  }
+  //public static void Accept(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
+  //  BoltNetwork.VerifyIsRunning();
+  //  BoltCore.AcceptConnection(endpoint, userToken, acceptToken, connectToken);
+  //}
 
   /*
    * Refuse
@@ -1203,7 +1203,7 @@ public static class BoltNetwork {
   /// Signal bolt to refuse an incoming connection request
   /// </summary>
   /// <param name="endpoint">The UDP address of incoming client connection</param>
-  /// <param name="acceptToken">A data token from the server</param> 
+  /// <param name="token">A data token from the server</param> 
   /// <example>
   /// *Example:* Refusing an incoming connection and sending back an error message.
   /// 

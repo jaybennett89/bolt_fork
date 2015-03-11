@@ -89,6 +89,15 @@
   <ItemGroup>
     <Compile Include="Collections\Map.cs" />
     <Compile Include="CRC32.cs" />
+    <Compile Include="Events\EventAccept.cs" />
+    <Compile Include="Events\EventBase.cs" />
+    <Compile Include="Events\EventLanBroadcast.cs" />
+    <Compile Include="Events\EventConnect.cs" />
+    <Compile Include="Events\EventDisconnect.cs" />
+    <Compile Include="Events\EventMasterServer.cs" />
+    <Compile Include="Events\EventStart.cs" />
+    <Compile Include="Events\EventStream.cs" />
+    <Compile Include="Events\EventSession.cs" />
     <Compile Include="Platform\PlatformInterface.cs" />
     <Compile Include="Platform\Platform.cs" />
     <Compile Include="Platform\PlatformSocket.cs" />
@@ -119,7 +128,7 @@
     <Compile Include="ByteConverter.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Connection\Connection.cs" />
-    <Compile Include="Event.cs" />
+    <Compile Include="Events\Event.cs" />
     <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Collections\Set.cs" />
     <Compile Include="Socket\Socket.cs" />

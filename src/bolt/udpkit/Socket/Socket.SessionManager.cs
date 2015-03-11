@@ -34,9 +34,9 @@ namespace UdpKit {
         return local.Clone();
       }
 
-      public void SetHostInfo(UdpHostInfoArgs args) {
+      public void SetHostInfo(UdpEventSessionSetHostData args) {
         local._hostName = args.Name;
-        local._hostData = args.Data;
+        local._hostData = args.Token;
         local._hostIsDedicated = args.Dedicated;
 
         if (IsHostWithName && socket.masterClient != null) {

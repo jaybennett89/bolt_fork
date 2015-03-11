@@ -7,7 +7,7 @@ namespace UdpKit.Protocol {
   class Context {
     readonly Guid peerId;
     readonly Guid gameId;
-    readonly Type[] messageTypes = new Type[128];
+    readonly static Type[] messageTypes = new Type[128];
 
     public Guid PeerId {
       get { return peerId; }
@@ -24,7 +24,9 @@ namespace UdpKit.Protocol {
     public Context(Guid game, Guid peer) {
       gameId = game;
       peerId = peer;
+    }
 
+    static Context() {
       RegisterMessageType<Protocol.Ack>();
       RegisterMessageType<Protocol.Error>();
 
@@ -78,7 +80,7 @@ namespace UdpKit.Protocol {
 
     public T CreateMessage<T>(Protocol.Query query) where T : Protocol.Result {
       T result;
-      
+
       result = CreateMessage<T>();
       result.Query = query.MessageId;
 
@@ -125,7 +127,7 @@ namespace UdpKit.Protocol {
       return msg;
     }
 
-    void RegisterMessageType<T>() where T : Protocol.Message {
+    static public void RegisterMessageType<T>() where T : Protocol.Message {
       for (byte i = 1; i < messageTypes.Length; ++i) {
         if (messageTypes[i] == null) {
           messageTypes[i] = typeof(T);

@@ -56,7 +56,7 @@ namespace UdpKit {
         }
 
         // notify user
-        Socket.Raise(UdpEvent.PUBLIC_CONNECT_ATTEMPT, RemoteEndPoint);
+        Socket.Raise(new UdpEventConnectAttempt { EndPoint = RemoteEndPoint, Token = ConnectToken });
 
         // send connect command on the wire
         SendCommand(COMMAND_CONNECT, ConnectToken);
@@ -118,11 +118,8 @@ namespace UdpKit {
     void OnCommandRefused(byte[] buffer, int size) {
       if (IsClient) {
         if (CheckState(UdpConnectionState.Connecting)) {
-          UdpEvent ev = new UdpEvent();
-          ev.Type = UdpEvent.PUBLIC_CONNECT_REFUSED;
-          ev.Connection = this;
-          ev.RefusedToken = UdpUtils.ReadToken(buffer, size, 2);
-          Socket.Raise(ev);
+          // tell user
+          Socket.Raise(new UdpEventConnectRefused { EndPoint = this.RemoteEndPoint, Token = UdpUtils.ReadToken(buffer, size, 2) });
 
           // destroy this connection on next timeout check
           ChangeState(UdpConnectionState.Destroy);

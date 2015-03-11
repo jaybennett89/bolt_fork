@@ -17,7 +17,7 @@ static class BoltEditorUtilsInternal {
   }
 
   public static bool hasPro {
-    get { return UnityEditorInternal.InternalEditorUtility.HasPro(); }
+    get { return true; }
   }
 
   public static string CSharpIdentifier(this string value) {

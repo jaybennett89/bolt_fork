@@ -36,7 +36,10 @@ namespace Bolt {
     }
 
     void IState.AddCallback(string path, PropertyCallback callback) {
-      if (VerifyCallbackPath(path)) {
+#if DEBUG
+      if (VerifyCallbackPath(path))
+#endif
+      {
         List<PropertyCallback> callbacksList;
 
         if (Callbacks.TryGetValue(path, out callbacksList) == false) {
@@ -48,7 +51,10 @@ namespace Bolt {
     }
 
     void IState.AddCallback(string path, PropertyCallbackSimple callback) {
-      if (VerifyCallbackPath(path)) {
+#if DEBUG
+      if (VerifyCallbackPath(path))
+#endif
+      {
         List<PropertyCallbackSimple> callbacksList;
 
         if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
@@ -60,7 +66,10 @@ namespace Bolt {
     }
 
     void IState.RemoveCallback(string path, PropertyCallback callback) {
-      if (VerifyCallbackPath(path)) {
+#if DEBUG
+      if (VerifyCallbackPath(path))
+#endif
+      {
         List<PropertyCallback> callbacksList;
 
         if (Callbacks.TryGetValue(path, out callbacksList) == false) {
@@ -70,7 +79,10 @@ namespace Bolt {
     }
 
     void IState.RemoveCallback(string path, PropertyCallbackSimple callback) {
-      if (VerifyCallbackPath(path)) {
+#if DEBUG
+      if (VerifyCallbackPath(path)) 
+#endif
+      {
         List<PropertyCallbackSimple> callbacksList;
 
         if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {

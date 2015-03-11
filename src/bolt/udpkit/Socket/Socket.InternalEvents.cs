@@ -62,13 +62,10 @@ namespace UdpKit {
           case UdpEvent.INTERNAL_REFUSE: OnEventRefuse(ev); break;
           case UdpEvent.INTERNAL_DISCONNECT: OnEventDisconnect(ev); break;
           case UdpEvent.INTERNAL_CLOSE: OnEventClose(ev); return;
-
           case UdpEvent.INTERNAL_SEND: OnEventSend(ev); break;
-          case UdpEvent.INTERNAL_SEND_UNCONNECTED: OnEventSend_Unconnected(ev); break;
 
           case UdpEvent.INTERNAL_LANBROADCAST_ENABLE: OnEvent_LanBroadcast_Enable(ev); break;
           case UdpEvent.INTERNAL_LANBROADCAST_DISABLE: OnEvent_LanBroadcast_Disable(ev); break;
-          case UdpEvent.INTERNAL_FORGETSESSIONS: OnEvent_ForgetSessions(ev); break;
 
           case UdpEvent.INTERNAL_SESSION_HOST_SETINFO: OnEvent_Session_Host_SetInfo(ev); break;
           case UdpEvent.INTERNAL_SESSION_CONNECT: OnEvent_Session_Connect(ev); break;
@@ -95,11 +92,11 @@ namespace UdpKit {
 
 
     void OnEventStart(UdpEvent ev) {
-      var reset = ev.ResetEvent;
+      var start = ev.As<UdpEventStart>();
 
-      if (CreatePhysicalSocket(ev.EndPoint, UdpSocketState.Running)) {
+      if (CreatePhysicalSocket(start.EndPoint, UdpSocketState.Running)) {
         // set mode
-        mode = ev.SocketMode;
+        mode = start.Mode;
 
         try {
           // try to find the lan interface ip address
@@ -109,20 +106,10 @@ namespace UdpKit {
           UdpLog.Error(exn.ToString());
         }
 
-        // tell user we started
-        ev = new UdpEvent();
-        ev.Type = UdpEvent.PUBLIC_START_DONE;
-        ev.EndPoint = platformSocket.EndPoint;
-        ev.ResetEvent = reset;
-
-        Raise(ev);
+        Raise(new UdpEventStartDone { EndPoint = platformSocket.EndPoint, ResetEvent = start.ResetEvent });
       }
       else {
-        ev = new UdpEvent();
-        ev.Type = UdpEvent.PUBLIC_START_FAILED;
-        ev.ResetEvent = reset;
-
-        Raise(ev);
+        Raise(new UdpEventStartFailed { ResetEvent = start.ResetEvent });
       }
     }
 
@@ -174,7 +161,8 @@ namespace UdpKit {
     }
 
     void OnEventConnect(UdpEvent ev) {
-      ConnectToEndPoint(ev.EndPoint, ev.ConnectToken);
+      var connect = ev.As<UdpEventConnectEndPoint>();
+      ConnectToEndPoint(connect.EndPoint, connect.Token);
     }
 
     void ConnectToEndPoint(UdpEndPoint endpoint, byte[] connectToken) {
@@ -195,48 +183,66 @@ namespace UdpKit {
     }
 
     void OnEventConnectCancel(UdpEvent ev) {
+      var cancel = ev.As<UdpEventConnectEndPointCancel>();
+
       if (CheckState(UdpSocketState.Running)) {
         UdpConnection cn;
 
-        if (connectionLookup.TryGetValue(ev.EndPoint, out cn)) {
+        if (connectionLookup.TryGetValue(cancel.EndPoint, out cn)) {
+
           // if we are connecting, destroy connection
           if (cn.CheckState(UdpConnectionState.Connecting)) {
-            // notify user thread
-            Raise(UdpEvent.PUBLIC_CONNECT_FAILED, ev.EndPoint);
+
+            // tell user this happend
+            Raise(new UdpEventConnectFailed { EndPoint = cn.RemoteEndPoint, Token = cn.ConnectToken });
 
             // destroy this connection
             cn.ChangeState(UdpConnectionState.Destroy);
           }
 
           // if we are connected, disconnect 
-          else if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-            ev.Connection.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
-            ev.Connection.ChangeState(UdpConnectionState.Disconnected);
+          else if (cn.CheckState(UdpConnectionState.Connected)) {
+            cn.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
+            cn.ChangeState(UdpConnectionState.Disconnected);
           }
         }
       }
     }
 
     void OnEventAccept(UdpEvent ev) {
-      if (pendingConnections.Remove(ev.EndPoint)) {
-        AcceptConnection(ev.EndPoint, ev.AcceptArgs.UserObject, ev.AcceptArgs.AcceptToken, ev.ConnectToken);
+      var accept = ev.As<UdpEventAcceptConnect>();
+      var connectToken = default(byte[]);
+
+      if (pendingConnections.TryGetValue(accept.EndPoint, out connectToken)) {
+
+        // remove it
+        pendingConnections.Remove(accept.EndPoint);
+
+
+        AcceptConnection(accept.EndPoint, accept.UserObject, accept.Token, connectToken);
       }
     }
 
     void OnEventRefuse(UdpEvent ev) {
-      if (pendingConnections.Remove(ev.EndPoint)) {
-        SendCommand(ev.EndPoint, UdpConnection.COMMAND_REFUSED, ev.RefusedToken);
+      var refuse = ev.As<UdpEventRefuseConnect>();
+
+      if (pendingConnections.Remove(refuse.EndPoint)) {
+        SendCommand(refuse.EndPoint, UdpConnection.COMMAND_REFUSED, refuse.Token);
       }
     }
 
     void OnEventDisconnect(UdpEvent ev) {
-      if (ev.Connection.CheckState(UdpConnectionState.Connected)) {
-        ev.Connection.SendCommand(UdpConnection.COMMAND_DISCONNECTED, ev.DisconnectToken);
-        ev.Connection.ChangeState(UdpConnectionState.Disconnected);
+      var disconnect = ev.As<UdpEventDisconnect>();
+
+      if (disconnect.Connection.CheckState(UdpConnectionState.Connected)) {
+        disconnect.Connection.SendCommand(UdpConnection.COMMAND_DISCONNECTED, disconnect.Token);
+        disconnect.Connection.ChangeState(UdpConnectionState.Disconnected);
       }
     }
 
     void OnEventClose(UdpEvent ev) {
+      var close = ev.As<UdpEventClose>();
+
       if (CheckState(UdpSocketState.Running)) {
         foreach (var c in connectionLookup.Values) {
           c.SendCommand(UdpConnection.COMMAND_DISCONNECTED);
@@ -261,32 +267,14 @@ namespace UdpKit {
         pendingConnections.Clear();
 
         // signal to user thread that this is done
-        if (ev.ResetEvent != null) {
-          UdpLog.Debug("RESETEVENT.SET()");
-          ev.ResetEvent.Set();
+        if (close.ResetEvent != null) {
+          close.ResetEvent.Set();
         }
       }
     }
 
     void OnEventSend(UdpEvent ev) {
-      ev.Connection.OnPacketSend(ev.Packet);
-    }
-
-    void OnEventSend_Unconnected(UdpEvent ev) {
-      // grab send buffer
-      byte[] sendbuffer = GetSendBuffer();
-
-      // copy into send buffer
-      Buffer.BlockCopy(ev.ByteArray, 0, sendbuffer, 1, ev.ByteArraySize);
-
-      // send this 
-      Send(ev.EndPoint, sendbuffer, ev.ByteArraySize + 1);
-
-      // change event type and send it back to the main thread
-      ev.Type = UdpEvent.PUBLIC_UNCONNECTED_SENT;
-
-      // done!
-      Raise(ev);
+      ((UdpConnection)ev.Object0).OnPacketSend((UdpPacket)ev.Object1);
     }
 
     /*
@@ -299,7 +287,7 @@ namespace UdpKit {
       }
 
       masterClient = new MasterClient(this, new Protocol.ProtocolClient(platformSocket, GameId, PeerId));
-      masterClient.Connect(ev.EndPoint);
+      masterClient.Connect(ev.As<UdpEventMasterServerConnect>().EndPoint);
     }
 
     void OnEvent_MasterServer_Disconnect(UdpEvent ev) {
@@ -325,14 +313,16 @@ namespace UdpKit {
      * */
 
     void OnEvent_Session_Host_SetInfo(UdpEvent ev) {
-      sessionManager.SetHostInfo(ev.HostInfo);
+      sessionManager.SetHostInfo(ev.As<UdpEventSessionSetHostData>());
     }
 
     void OnEvent_Session_Connect(UdpEvent ev) {
-      switch (ev.Session.Source) {
+      var connect = ev.As<UdpEventSessionConnect>();
+
+      switch (connect.Session.Source) {
         case UdpSessionSource.Zeus:
           if (masterClient != null) {
-            masterClient.ConnectToSession(ev.Session, ev.ConnectToken);
+            masterClient.ConnectToSession(connect.Session, connect.Token);
           }
           else {
             UdpLog.Error("No connection to master server found");
@@ -340,7 +330,7 @@ namespace UdpKit {
           break;
 
         case UdpSessionSource.Lan:
-          ConnectToEndPoint(ev.Session.LanEndPoint, ev.ConnectToken);
+          ConnectToEndPoint(connect.Session.LanEndPoint, connect.Token);
           break;
 
         case UdpSessionSource.Steam:
@@ -354,15 +344,11 @@ namespace UdpKit {
      * */
 
     void OnEvent_LanBroadcast_Enable(UdpEvent ev) {
-      broadcastManager.Enable(ev.BroadcastArgs);
+      broadcastManager.Enable(ev.As<UdpEventLanBroadcastEnable>());
     }
 
     void OnEvent_LanBroadcast_Disable(UdpEvent ev) {
       broadcastManager.Disable();
-    }
-
-    void OnEvent_ForgetSessions(UdpEvent ev) {
-      sessionManager.ForgetSessions(ev.SessionSource);
     }
 
     /*
@@ -370,23 +356,26 @@ namespace UdpKit {
      * */
 
     void OnEvent_Stream_SetBandwidth(UdpEvent ev) {
-      ev.Connection.OnStreamSetBandwidth(ev.ChannelRate);
+      var bandwidth = ev.As<UdpEventStreamSetBandwidth>();
+      bandwidth.Connection.OnStreamSetBandwidth(bandwidth.BytesPerSecond);
     }
 
     void OnEvent_Stream_Queue(UdpEvent ev) {
+      var queue = ev.As<UdpEventStreamQueue>();
+
       UdpStreamChannel c;
 
-      if (streamChannels.TryGetValue(ev.StreamOp.Channel, out c) == false) {
-        UdpLog.Error("Unknown {0}", ev.StreamOp.Channel);
+      if (streamChannels.TryGetValue(queue.StreamOp.Channel, out c) == false) {
+        UdpLog.Error("Unknown {0}", queue.StreamOp.Channel);
         return;
       }
 
-      ev.Connection.OnStreamQueue(c, ev.StreamOp);
+      queue.Connection.OnStreamQueue(c, queue.StreamOp);
     }
 
     void OnEvent_Stream_CreateChannel(UdpEvent ev) {
       UdpStreamChannel c = new UdpStreamChannel();
-      c.Config = ev.ChannelConfig;
+      c.Config = ev.As<UdpEventStreamCreateChannel>().ChannelConfig;
 
       if (streamChannels.ContainsKey(c.Name)) {
         UdpLog.Error("Duplicate channel id '{0}', not creating channel '{1}'", c.Name);

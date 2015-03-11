@@ -5,12 +5,7 @@ using System.Text;
 namespace UdpKit {
   partial class UdpConnection {
     public void StreamSetBandwidth(int bytesPerSecond) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_STREAM_SETBANDWIDTH;
-      ev.Connection = this;
-      ev.ChannelRate = bytesPerSecond;
-
-      Socket.Raise(ev);
+      Socket.Raise(new UdpEventStreamSetBandwidth { Connection = this, BytesPerSecond = bytesPerSecond });
     }
 
     internal void OnStreamSetBandwidth(int byteRate) {
@@ -19,12 +14,7 @@ namespace UdpKit {
     }
 
     public void StreamBytes(UdpChannelName channel, byte[] data) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_STREAM_QUEUE;
-      ev.Connection = this;
-      ev.StreamOp = new UdpStreamOp(0, channel, data);
-
-      Socket.Raise(ev);
+      Socket.Raise(new UdpEventStreamQueue { Connection = this, StreamOp = new UdpStreamOp(0, channel, data) });
     }
 
     internal void OnStreamQueue(UdpStreamChannel c, UdpStreamOp op) {
@@ -69,12 +59,7 @@ namespace UdpKit {
       UdpStreamChannel channel;
 
       if (Socket.FindChannel(channelId, out channel)) {
-        ev = new UdpEvent();
-        ev.Type = UdpEvent.PUBLIC_STREAM_DATARECEIVED;
-        ev.Connection = this;
-        ev.StreamData = new UdpStreamData { Channel = channel.Name, Data = data };
-
-        Socket.Raise(ev);
+        Socket.Raise(new UdpEventStreamDataReceived { Connection = this, StreamData = new UdpStreamData { Channel = channel.Name, Data = data } });
       }
     }
 
@@ -154,7 +139,7 @@ namespace UdpKit {
       // order by priority, in reverse, and try to send from each one in order
       channels.Sort((a, b) => b.Priority.CompareTo(a.Priority));
 
-      
+
       // try to send from each one
       foreach (UdpChannelStreamer s in channels) {
         if (s.Priority == 0) {

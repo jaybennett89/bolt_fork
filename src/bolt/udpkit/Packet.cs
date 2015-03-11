@@ -3,10 +3,10 @@ using System.Text;
 
 namespace UdpKit {
   public class UdpPacket : IDisposable {
-    public bool Write;
     internal bool IsPooled = true;
     internal UdpPacketPool Pool;
 
+    public bool Write;
     public int Ptr;
     public int Length;
     public byte[] Data;
