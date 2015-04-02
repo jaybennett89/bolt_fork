@@ -61,5 +61,4 @@ namespace UdpKit {
       get { return UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT; }
     }
   }
-
 }

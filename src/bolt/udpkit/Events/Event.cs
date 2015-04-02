@@ -35,30 +35,6 @@ namespace UdpKit {
     MasterServerNatProbeResult = UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT,
   }
 
-  //class UdpEventAcceptArgs {
-  //  public object UserObject;
-  //}
-
-  //class UdpEventBroadcastArgs {
-  //  public UdpIPv4Address LocalAddress;
-  //  public UdpIPv4Address BroadcastAddress;
-  //  public ushort Port;
-  //}
-
-  //class UdpHostInfoArgs {
-  //  public string Name;
-  //  public byte[] Data;
-  //  public bool Dedicated;
-  //}
-
-  //public class UdpTokenArgs {
-  //  public byte[] ConnectToken;
-  //  public byte[] DisconnectToken;
-  //  public byte[] AcceptToken;
-  //  public byte[] RefuseToken;
-  //}
-
-  [StructLayout(LayoutKind.Explicit)]
   public partial struct UdpEvent {
     internal const int INTERNAL_START = 1;
     internal const int INTERNAL_CONNECT = 3;
@@ -112,160 +88,20 @@ namespace UdpKit {
     internal const int PUBLIC_SESSION_LISTUPDATED = 30;
     internal const int PUBLIC_SESSION_CONNECTFAILED = 36;
 
-    [FieldOffset(0)]
     internal int Type;
-
-    [FieldOffset(4)]
     internal object Object0;
-
-    [FieldOffset(12)]
     internal object Object1;
 
     internal bool IsInternal {
       get { return (Type & 1) == 1; }
     }
 
-    public T As<T>() {
+    internal T As<T>() {
       return (T)Object0;
     }
 
     public UdpEventType EventType {
       get { return (UdpEventType)Type; }
     }
-
-    //internal int ChannelRate {
-    //  get { return integer0; }
-    //  set { integer0 = value; }
-    //}
-
-    //internal int ChannelNameId {
-    //  get { return integer0; }
-    //  set { integer0 = value; }
-    //}
-
-    //internal string ChannelNameString {
-    //  get { return (string)Object0; }
-    //  set {
-    //    UdpAssert.Assert(Object0 == null);
-    //    Object0 = value;
-    //  }
-    //}
-
-    //internal UdpSessionSource SessionSource {
-    //  get { return (UdpSessionSource)integer0; }
-    //  set { integer0 = (int)value; }
-    //}
-
-    //internal UdpSocketMode SocketMode {
-    //  get { return (UdpSocketMode)integer2; }
-    //  set { integer2 = (int)value; }
-    //}
-
-    //internal UdpChannelName ChannelName {
-    //  get { return new UdpChannelName(integer0, (string)Object0); }
-    //  set {
-    //    UdpAssert.Assert(Object0 == null);
-    //    integer0 = value.Id;
-    //    Object0 = value.Name;
-    //  }
-    //}
-
-    //public UdpEventType EventType {
-    //  get { return (UdpEventType)Type; }
-    //}
-
-    //public UdpEndPoint EndPoint {
-    //  get { return endpoint; }
-    //  internal set { endpoint = value; }
-    //}
-
-    //public UdpSendFailReason FailedReason {
-    //  get { return (UdpSendFailReason)integer0; }
-    //  internal set { integer0 = (int)value; }
-    //}
-
-    //public int ByteArraySize {
-    //  get { return integer2; }
-    //  set { integer2 = value; }
-    //}
-
-    ///*
-    // * OBJECT 1
-    // * */
-
-    //public UdpConnection Connection {
-    //  get { return (UdpConnection)Object1; }
-    //  set { UdpAssert.Assert(Object1 == null); Object1 = value; }
-    //}
-
-    //public UdpTokenArgs Tokens {
-    //  get { return (UdpTokenArgs)Object1; }
-    //  set { UdpAssert.Assert(Object1 == null); Object1 = value; }
-    //}
-
-    //public Map<System.Guid, UdpSession> SessionList {
-    //  get { return (Map<System.Guid, UdpSession>)Object1; }
-    //  set { UdpAssert.Assert(Object1 == null); Object1 = value; }
-    //}
-
-    ///* 
-    // * OBJECT 0
-    // * */
-
-    //public NatFeatures NatFeatures {
-    //  get { return (NatFeatures)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //public byte[] ByteArray {
-    //  get { return (byte[])Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //internal UdpEventBroadcastArgs BroadcastArgs {
-    //  get { return (UdpEventBroadcastArgs)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //public ManualResetEvent ResetEvent {
-    //  get { return (ManualResetEvent)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //public UdpSession Session {
-    //  get { return (UdpSession)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //public UdpPacket Packet {
-    //  get { return (UdpPacket)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //public UdpStreamData StreamData {
-    //  get { return (UdpStreamData)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //internal UdpHostInfoArgs HostInfo {
-    //  get { return (UdpHostInfoArgs)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //internal UdpChannelConfig ChannelConfig {
-    //  get { return (UdpChannelConfig)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //internal UdpEventAcceptArgs AcceptArgs {
-    //  get { return (UdpEventAcceptArgs)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
-    //internal UdpStreamOp StreamOp {
-    //  get { return (UdpStreamOp)Object0; }
-    //  set { UdpAssert.Assert(Object0 == null); Object0 = value; }
-    //}
-
   }
 }

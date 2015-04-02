@@ -15,7 +15,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventStartDone : UdpEventBase {
+  class UdpEventStartDone : UdpEventBase {
     public UdpEndPoint EndPoint;
     public ManualResetEvent ResetEvent;
 
@@ -24,7 +24,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventStartFailed : UdpEventBase {
+  class UdpEventStartFailed : UdpEventBase {
     public ManualResetEvent ResetEvent;
 
     public override int Type {

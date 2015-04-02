@@ -13,7 +13,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventConnectRequest : UdpEventBase {
+  class UdpEventConnectRequest : UdpEventBase {
     public byte[] Token;
     public UdpEndPoint EndPoint;
 
@@ -22,7 +22,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventConnectRefused : UdpEventBase {
+  class UdpEventConnectRefused : UdpEventBase {
     public UdpEndPoint EndPoint;
     public byte[] Token;
 
@@ -31,7 +31,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventConnectFailed : UdpEventBase {
+  class UdpEventConnectFailed : UdpEventBase {
     public byte[] Token;
     public UdpEndPoint EndPoint;
 
@@ -40,7 +40,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventConnectAttempt : UdpEventBase {
+  class UdpEventConnectAttempt : UdpEventBase {
     public byte[] Token;
     public UdpEndPoint EndPoint;
 
@@ -49,7 +49,7 @@ namespace UdpKit {
     }
   }
 
-  public class UdpEventConnectEndPointCancel : UdpEventBase {
+  class UdpEventConnectEndPointCancel : UdpEventBase {
     public UdpEndPoint EndPoint;
 
     public override int Type {
