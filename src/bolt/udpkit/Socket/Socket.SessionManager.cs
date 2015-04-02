@@ -96,9 +96,8 @@ namespace UdpKit {
       void RaiseSessionUpdatedEvent() {
         try {
           UdpEvent ev = new UdpEvent();
-
           ev.Type = UdpEvent.PUBLIC_SESSION_LISTUPDATED;
-          ev.SessionList = sessions;
+          ev.Object0 = sessions;
 
           socket.Raise(ev);
         }

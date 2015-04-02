@@ -232,8 +232,8 @@ namespace UdpKit {
 
         ev = new UdpEvent();
         ev.Type = UdpEvent.PUBLIC_STREAM_DATARECEIVED;
-        ev.Connection = Connection;
-        ev.StreamData = new UdpStreamData { Channel = Channel.Name, Data = op.Data };
+        ev.Object0 = Connection;
+        ev.Object1 = new UdpStreamData { Channel = Channel.Name, Data = op.Data };
 
         Connection.Socket.Raise(ev);
       }

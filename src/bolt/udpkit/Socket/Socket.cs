@@ -333,6 +333,15 @@ namespace UdpKit {
       return platform.GetPrecisionTime();
     }
 
+    internal void Raise(int type, UdpConnection c, UdpPacket p) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = type;
+      ev.Object0 = c;
+      ev.Object1 = p;
+
+      Raise(ev);
+    }
+
     internal void Raise(UdpEvent ev) {
       if (ev.IsInternal) {
         lock (eventQueueIn) {

@@ -31,21 +31,21 @@ namespace UdpKit {
       socket.SetHostInfo("TESTHOST", true, null);
 
 
-      while (true) {
-        UdpEvent ev;
+      //while (true) {
+      //  UdpEvent ev;
 
-        while (socket.Poll(out ev)) {
-          UdpLog.Info(ev.EventType.ToString());
+      //  while (socket.Poll(out ev)) {
+      //    UdpLog.Info(ev.EventType.ToString());
 
-          switch (ev.EventType) {
-            case UdpEventType.MasterServerNatProbeResult:
-              UdpLog.Info("UdpEventType.MasterServerNatProbeResult: " + ev.NatFeatures);
-              break;
-          }
-        }
+      //    switch (ev.EventType) {
+      //      case UdpEventType.MasterServerNatProbeResult:
+      //        UdpLog.Info("UdpEventType.MasterServerNatProbeResult: " + ev.NatFeatures);
+      //        break;
+      //    }
+      //  }
 
-        Thread.Sleep(1);
-      }
+      //  Thread.Sleep(1);
+      //}
 
       Console.ReadLine();
     }

@@ -6,7 +6,7 @@ namespace UdpKit {
   partial class UdpConnection {
     internal void OnPacketSend(UdpPacket packet) {
       if (IsConnected == false) {
-        Socket.Raise(this, packet, UdpSendFailReason.NotConnected);
+        Socket.Raise(UdpEvent.PUBLIC_PACKET_LOST, this, packet);
         return;
       }
 
@@ -19,7 +19,8 @@ namespace UdpKit {
         Socket.Send(EndPoint, buffer, PacketPipe.Config.HeaderSize + UdpMath.BytesRequired(packet.Position));
       }
       else {
-        Socket.Raise(this, packet, UdpSendFailReason.PacketWindowFull);
+        // 
+        Socket.Raise(UdpEvent.PUBLIC_PACKET_LOST, this, packet);
 
         // disconnect with this error
         ConnectionError(UdpConnectionError.SendWindowFull);

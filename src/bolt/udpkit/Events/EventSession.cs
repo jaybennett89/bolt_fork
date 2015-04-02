@@ -22,4 +22,21 @@ namespace UdpKit {
       get { return UdpEvent.INTERNAL_SESSION_HOST_SETINFO; }
     }
   }
+
+  class UdpEventSessionConnectFailed : UdpEventBase {
+    public byte[] Token;
+    public UdpSession Session;
+
+    public override int Type {
+      get { return UdpEvent.PUBLIC_SESSION_CONNECTFAILED; }
+    }
+  }
+
+  class UdpEventSessionListUpdated : UdpEventBase {
+    public Map<Guid, UdpSession> SessionList;
+
+    public override int Type {
+      get { return UdpEvent.PUBLIC_SESSION_LISTUPDATED; }
+    }
+  }
 }
