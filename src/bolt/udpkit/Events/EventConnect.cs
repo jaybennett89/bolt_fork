@@ -23,8 +23,8 @@ namespace UdpKit {
   }
 
   class UdpEventConnectRefused : UdpEventBase {
-    public UdpEndPoint EndPoint;
     public byte[] Token;
+    public UdpEndPoint EndPoint;
 
     public override int Type {
       get { return UdpEvent.INTERNAL_REFUSE; }

@@ -5,9 +5,9 @@ using System.Text;
 
 namespace UdpKit {
   class UdpEventAcceptConnect : UdpEventBase {
-    public UdpEndPoint EndPoint;
     public byte[] Token;
     public object UserObject;
+    public UdpEndPoint EndPoint;
 
     public override int Type {
       get { return UdpEvent.INTERNAL_ACCEPT; }
@@ -15,8 +15,8 @@ namespace UdpKit {
   }
 
   class UdpEventRefuseConnect : UdpEventBase {
-    public UdpEndPoint EndPoint;
     public byte[] Token;
+    public UdpEndPoint EndPoint;
 
     public override int Type {
       get { return UdpEvent.INTERNAL_REFUSE; }

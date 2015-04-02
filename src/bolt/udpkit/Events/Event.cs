@@ -2,12 +2,6 @@
 using System.Threading;
 
 namespace UdpKit {
-  public enum UdpSendFailReason {
-    None,
-    NotConnected,
-    PacketWindowFull
-  }
-
   public enum UdpEventType {
     SocketStartupDone = UdpEvent.PUBLIC_START_DONE,
     SocketStartupFailed = UdpEvent.PUBLIC_START_FAILED,
