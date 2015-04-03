@@ -186,10 +186,6 @@ class BoltUserAssemblyCompiler {
 
     string args = CMD_ARGS;
 
-    if (BoltEditorUtilsInternal.hasPro == false) {
-      args += "-define:UNITY_NOT_PRO ";
-    }
-
     if (BoltCore.isDebugMode) {
       args += "-define:DEBUG ";
     }

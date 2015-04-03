@@ -16,10 +16,6 @@ static class BoltEditorUtilsInternal {
     get { return EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPaused; }
   }
 
-  public static bool hasPro {
-    get { return true; }
-  }
-
   public static string CSharpIdentifier(this string value) {
     if (Char.IsDigit(value[0])) {
       value = "_" + value;
