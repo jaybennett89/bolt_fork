@@ -27,7 +27,6 @@ namespace Bolt {
     internal NetworkCommand_Data(NetworkObj_Meta meta)
       : base(meta) {
     }
-
   }
 
   internal abstract class Command_Meta : NetworkObj_Meta {
