@@ -96,7 +96,7 @@ public class BoltConsole : MonoBehaviour {
   float consoleHeight = 0.5f;
 
   [SerializeField]
-  int lineHeight = 11;
+  int lineHeight = 14;
 
   [SerializeField]
   internal bool visible = true;
@@ -105,13 +105,10 @@ public class BoltConsole : MonoBehaviour {
   internal KeyCode toggleKey = KeyCode.Tab;
 
   [SerializeField]
-  float backgroundTransparency = 0.75f;
-
-  [SerializeField]
   int padding = 10;
 
   [SerializeField]
-  int fontSize = 10;
+  int fontSize = 12;
 
   [SerializeField]
   int inset = 10;

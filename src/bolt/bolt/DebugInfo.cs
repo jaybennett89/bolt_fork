@@ -25,7 +25,7 @@ namespace Bolt {
     }
 
     public static void DrawBackground(Rect r) {
-      GUI.color = new Color(0, 0, 0, 0.75f);
+      GUI.color = new Color(0, 0, 0, 0.85f);
       GUI.DrawTexture(r, BackgroundTexture);
       GUI.color = Color.white;
     }
