@@ -183,7 +183,6 @@ public static class BoltNetwork {
 
   public static UdpSocket UdpSocket {
     get {
-      BoltNetwork.VerifyIsRunning();
       return BoltCore._udpSocket;
     }
   }

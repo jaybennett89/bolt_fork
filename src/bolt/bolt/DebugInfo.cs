@@ -43,14 +43,7 @@ namespace Bolt {
       get {
         if (!backgroundTexture) {
           backgroundTexture = new Texture2D(2, 2);
-          backgroundTexture.SetPixels(
-              new Color[] {
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                }
-          );
+          backgroundTexture.SetPixels(new Color[] { Color.white, Color.white, Color.white, Color.white, });
         }
 
         return backgroundTexture;
@@ -202,6 +195,10 @@ namespace Bolt {
         mp.z = 0;
 
         foreach (Entity en in BoltCore._entities) {
+          if (en.IsFrozen) {
+            continue;
+          }
+
           DrawEntity(en.UnityObject);
         }
 
@@ -263,6 +260,7 @@ namespace Bolt {
 #else
               var clips = state.Animator.GetCurrentAnimationClipState(i);
 #endif
+
               foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
@@ -278,7 +276,7 @@ namespace Bolt {
             }
           }
 
-          if (!entity.IsOwner) {
+          if (entity.IsOwner == false) {
             LabelBold("");
             LabelBold("Frame Info");
             LabelField("Buffer Count", state.Frames.count);

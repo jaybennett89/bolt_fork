@@ -65,11 +65,11 @@ namespace Bolt {
         unreliableSend.Add(EventUnreliable.Wrap(ev));
 
         // incr refs!
-        ev.IncrementRefs();
+        //ev.IncrementRefs();
       }
       else {
         if (reliableOrderedSend.TryEnqueue(EventReliable.Wrap(ev))) {
-          ev.IncrementRefs();
+          //ev.IncrementRefs();
         }
         else {
           BoltLog.Warn("The reliable-ordered event queue for {0} is full, disconnecting", connection);
@@ -87,7 +87,7 @@ namespace Bolt {
       EventReliable reliable;
 
       while (reliableOrderedSend.TryRemove(out reliable)) {
-        reliable.NetworkEvent.DecrementRefs();
+        //reliable.NetworkEvent.DecrementRefs();
       }
 
       // clear packet events out 
@@ -112,7 +112,7 @@ namespace Bolt {
         if (r.NetworkEvent.IsEntityEvent) {
           var existsOnRemote = connection._entityChannel.ExistsOnRemote(r.NetworkEvent.TargetEntity);
           if (existsOnRemote == false) {
-            unreliableSend[i].NetworkEvent.DecrementRefs();
+            //unreliableSend[i].NetworkEvent.DecrementRefs();
             unreliableSend.RemoveAt(i);
 
             i -= 1;
@@ -171,7 +171,7 @@ namespace Bolt {
         bool notOverflowing = packet.UdpPacket.Overflowing == false;
 
         if (packOk && notOverMaxBits && notOverflowing) {
-          unreliableSend[i].NetworkEvent.DecrementRefs();
+          //unreliableSend[i].NetworkEvent.DecrementRefs();
           unreliableSend.RemoveAt(i);
         }
         else {
@@ -243,7 +243,7 @@ namespace Bolt {
             case RecvBufferAddResult.OutOfBounds:
             case RecvBufferAddResult.AlreadyExists:
               BoltLog.Debug("FAILED");
-              ev.DecrementRefs();
+              //ev.DecrementRefs();
               break;
           }
         }

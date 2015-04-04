@@ -71,7 +71,6 @@ namespace Bolt {
       Event ev;
 
       ev = (Event)Create(id);
-      ev.IncrementRefs();
 
       return ev;
     }
@@ -80,7 +79,6 @@ namespace Bolt {
       Event ev;
 
       ev = (Event)Create(id);
-      ev.IncrementRefs();
 
       return ev;
     }

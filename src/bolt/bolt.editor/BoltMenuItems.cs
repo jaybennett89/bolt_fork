@@ -2,12 +2,12 @@
 using UnityEngine;
 
 public static class BoltMenuItems {
-  [MenuItem("Assets/Bolt/Compile Assembly")]
+  [MenuItem("Assets/Bolt/Compile Assembly", priority = 1)]
   public static void RunCompiler() {
     BoltUserAssemblyCompiler.Run();
   }
 
-  [MenuItem("Assets/Bolt/Update Prefab Database")]
+  [MenuItem("Assets/Bolt/Update Prefab Database", priority = 2)]
   public static void UpdatePrefabDatabase() {
     if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isPaused || EditorApplication.isUpdating) {
       Debug.LogError("Can't generate prefab database while the editor is playing, paused, updating assets or compiling");
@@ -17,7 +17,7 @@ public static class BoltMenuItems {
     BoltCompiler.UpdatePrefabsDatabase();
   }
 
-  [MenuItem("Assets/Bolt/Generate Scene Object Ids")]
+  [MenuItem("Assets/Bolt/Generate Scene Object Ids", priority = 3)]
   public static void GenerateSceneObjectGuids() {
     if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isPaused || EditorApplication.isUpdating) {
       Debug.LogError("Can't generate scene guids while the editor is playing, paused, updating assets or compiling");
@@ -35,7 +35,7 @@ public static class BoltMenuItems {
     BoltEditor.Internal.EditorHousekeeping.AskToSaveSceneAt(System.DateTime.Now.AddSeconds(1));
   }
 
-  [MenuItem("Edit/Install Bolt")]
+  [MenuItem("Assets/Bolt/Install", priority = 4)]
   public static void Install() {
     if (EditorUtility.DisplayDialog("Install", "Do you want to install Bolt?", "Yes", "No")) {
       BoltInstaller.Run();

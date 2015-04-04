@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <ProductVersion>12.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <UnityPathWin>C:\Program Files (x86)\Unity</UnityPathWin>
+    <UnityPathWin>C:\Program Files\Unity5</UnityPathWin>
     <UnityPathOSX>/Applications/Unity</UnityPathOSX>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU5|AnyCPU'">
