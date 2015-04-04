@@ -7,6 +7,8 @@ using UnityEngine;
 namespace Bolt {
   [Documentation(Ignore = true)]
   public class DebugInfo : MonoBehaviour {
+    Vector2 debugInfoScroll;
+
     static GUIStyle labelStyle;
     static GUIStyle labelStyleBold;
     static Texture2D boltIconTexture;
@@ -23,7 +25,7 @@ namespace Bolt {
     }
 
     public static void DrawBackground(Rect r) {
-      GUI.color = new Color(0, 0, 0, 0.75f);
+      GUI.color = new Color(0, 0, 0, 0.85f);
       GUI.DrawTexture(r, BackgroundTexture);
       GUI.color = Color.white;
     }
@@ -125,14 +127,12 @@ namespace Bolt {
       Enabled = false;
     }
 
-    Vector2 debugInfoScroll;
-
     Color GetColor(int current, int bad) {
       return GetColor(Mathf.Clamp01((float)current / (float)bad));
     }
 
     Color GetColor(float t) {
-      return Color.Lerp(BoltGUI.Green, BoltGUI.Error, t);
+      return Color.Lerp(BoltGUI.Debug, BoltGUI.Error, t);
     }
 
     void DrawEntity(BoltEntity entity) {
@@ -255,13 +255,13 @@ namespace Bolt {
           if (state.Animator != null) {
             for (int i = 0; i < state.Animator.layerCount; ++i) {
               LabelField("  Layer", state.Animator.GetLayerName(i));
-
+              
 #if UNITY5
               var clips = state.Animator.GetCurrentAnimatorClipInfo(i);
 #else
               var clips = state.Animator.GetCurrentAnimationClipState(i);
 #endif
-
+              
               foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
