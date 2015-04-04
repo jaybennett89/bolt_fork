@@ -42,6 +42,8 @@ namespace Bolt {
 
     internal IProtocolToken DetachToken;
     internal IProtocolToken AttachToken;
+    internal IProtocolToken ControlLostToken;
+    internal IProtocolToken ControlGainedToken;
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
@@ -247,28 +249,6 @@ namespace Bolt {
         BoltLog.Exception(exn);
       }
 
-      if (AttachToken != null) {
-        // call out to behaviours
-        foreach (IEntityBehaviour eb in Behaviours) {
-          try {
-            eb.Attached(AttachToken);
-          }
-          catch (Exception exn) {
-            BoltLog.Error("User code threw exception inside Attached callback");
-            BoltLog.Exception(exn);
-          }
-        }
-
-        // call out to user
-        try {
-          BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject, AttachToken);
-        }
-        catch (Exception exn) {
-          BoltLog.Error("User code threw exception inside Attached callback");
-          BoltLog.Exception(exn);
-        }
-      }
-
       // log
       BoltLog.Debug("Attached {0}", this);
     }
@@ -308,29 +288,6 @@ namespace Bolt {
       catch (Exception exn) {
         BoltLog.Error("User code threw exception inside Detach callback");
         BoltLog.Exception(exn);
-      }
-
-      if (DetachToken != null) {
-        // call out to behaviours
-        foreach (IEntityBehaviour eb in Behaviours) {
-          try {
-            eb.Detached(DetachToken);
-            eb.entity = null;
-          }
-          catch (Exception exn) {
-            BoltLog.Error("User code threw exception inside Detach callback");
-            BoltLog.Exception(exn);
-          }
-        }
-
-        // call out to user
-        try {
-          BoltInternal.GlobalEventListenerBase.EntityDetachedInvoke(this.UnityObject, DetachToken);
-        }
-        catch (Exception exn) {
-          BoltLog.Error("User code threw exception inside Detach callback");
-          BoltLog.Exception(exn);
-        }
       }
 
       // clear out attached flag

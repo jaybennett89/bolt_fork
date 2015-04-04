@@ -41,7 +41,7 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
   }
 
   public BoltGlobalBehaviourAttribute()
-    : this(BoltNetworkModes.Server | BoltNetworkModes.Client) {
+    : this(BoltNetworkModes.Host | BoltNetworkModes.Client) {
   }
 
   public BoltGlobalBehaviourAttribute(BoltNetworkModes mode)
@@ -49,7 +49,7 @@ public sealed class BoltGlobalBehaviourAttribute : Attribute {
   }
 
   public BoltGlobalBehaviourAttribute(params string[] scenes)
-    : this(BoltNetworkModes.Server | BoltNetworkModes.Client, scenes) {
+    : this(BoltNetworkModes.Host | BoltNetworkModes.Client, scenes) {
   }
 
   public BoltGlobalBehaviourAttribute(BoltNetworkModes mode, params string[] scenes) {

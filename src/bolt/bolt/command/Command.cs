@@ -27,7 +27,6 @@ namespace Bolt {
     internal NetworkCommand_Data(NetworkObj_Meta meta)
       : base(meta) {
     }
-
   }
 
   internal abstract class Command_Meta : NetworkObj_Meta {
@@ -160,6 +159,14 @@ namespace Bolt {
 
     internal void Free() {
       FreeStorage(storage);
+
+      if (SmoothStorageTo != null) {
+        FreeStorage(SmoothStorageTo);
+      }
+
+      if (SmoothStorageFrom != null) {
+        FreeStorage(SmoothStorageFrom);
+      }
     }
 
     public static implicit operator bool(Command cmd) {

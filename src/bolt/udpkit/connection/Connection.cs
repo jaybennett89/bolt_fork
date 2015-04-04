@@ -49,6 +49,8 @@ namespace UdpKit {
     internal volatile uint ConnectionId;
 
     internal byte[] ConnectToken;
+    internal byte[] DisconnectToken;
+
     internal byte[] AcceptToken;
     internal byte[] AcceptTokenWithPrefix;
 
@@ -130,25 +132,32 @@ namespace UdpKit {
     /// </summary>
     /// <param name="packet">The object to send</param>
     public void Send(UdpPacket packet) {
-      Socket.Raise(UdpEvent.INTERNAL_SEND, this, packet);
+      UdpEvent ev = new UdpEvent();
+      ev.Type = UdpEvent.INTERNAL_SEND;
+      ev.Object0 = this;
+      ev.Object1 = packet;
+
+      Socket.Raise(ev);
     }
 
     /// <summary>
     /// Disconnect this connection forcefully
     /// </summary>
     public void Disconnect(byte[] token) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_DISCONNECT;
-      ev.Connection = this;
-      ev.DisconnectToken = token;
-      Socket.Raise(ev);
+      Socket.Raise(new UdpEventDisconnect { Connection = this, Token = token });
     }
 
     internal void Lost(UdpPipe pipe, object obj) {
       if (obj != null) {
         switch (pipe.Id) {
           case UdpPipe.PIPE_PACKET:
-            Socket.Raise(UdpEvent.PUBLIC_PACKET_LOST, this, (UdpPacket)obj);
+            UdpEvent ev = new UdpEvent();
+            ev.Type = UdpEvent.PUBLIC_PACKET_LOST;
+            ev.Object0 = this;
+            ev.Object1 = obj;
+
+            Socket.Raise(ev);
+
             break;
 
           case UdpPipe.PIPE_STREAM:
@@ -162,7 +171,12 @@ namespace UdpKit {
       if (obj != null) {
         switch (pipe.Id) {
           case UdpPipe.PIPE_PACKET:
-            Socket.Raise(UdpEvent.PUBLIC_PACKET_DELIVERED, this, (UdpPacket)obj);
+            UdpEvent ev = new UdpEvent();
+            ev.Type = UdpEvent.PUBLIC_PACKET_DELIVERED;
+            ev.Object0 = this;
+            ev.Object1 = obj;
+
+            Socket.Raise(ev);
             break;
 
           case UdpPipe.PIPE_STREAM:
@@ -176,7 +190,7 @@ namespace UdpKit {
       switch (Mode) {
         case UdpConnectionMode.Client:
           if (ConnectTimeout < now && !SendCommandConnect()) {
-            Socket.Raise(UdpEvent.PUBLIC_CONNECT_FAILED, EndPoint);
+            Socket.Raise(new UdpEventConnectFailed { EndPoint = EndPoint, Token = ConnectToken });
 
             // destroy this connection on next timeout check
             ChangeState(UdpConnectionState.Destroy);
@@ -266,7 +280,11 @@ namespace UdpKit {
           Socket.masterClient.Disconnect();
         }
 
-        Socket.Raise(UdpEvent.PUBLIC_CONNECTED, this);
+        UdpEvent ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_CONNECTED;
+        ev.Object0 = this;
+
+        Socket.Raise(ev);
       }
     }
 
@@ -276,10 +294,12 @@ namespace UdpKit {
 
         PacketPipe.Disconnected();
 
+        DisconnectToken = token;
+
         UdpEvent ev = new UdpEvent();
         ev.Type = UdpEvent.PUBLIC_DISCONNECTED;
-        ev.Connection = this;
-        ev.DisconnectToken = token;
+        ev.Object0 = this;
+
         Socket.Raise(ev);
       }
     }

@@ -29,6 +29,9 @@ namespace Bolt {
       CommandSequence = 0;
       CommandLastExecuted = null;
 
+      ControlGainedToken = token;
+      ControlLostToken = null;
+
       // call to serializer
       Serializer.OnControlGained();
 
@@ -38,15 +41,6 @@ namespace Bolt {
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         eb.ControlGained();
-      }
-
-      if (token != null) {
-        foreach (IEntityBehaviour eb in Behaviours) {
-          eb.ControlGained(token);
-        }
-
-        // call user event
-        BoltInternal.GlobalEventListenerBase.ControlOfEntityGainedInvoke(UnityObject, token);
       }
     }
 
@@ -72,6 +66,9 @@ namespace Bolt {
       CommandSequence = 0;
       CommandLastExecuted = null;
 
+      ControlLostToken = token;
+      ControlGainedToken = null;
+
       // call to serializer
       Serializer.OnControlLost();
 
@@ -82,16 +79,6 @@ namespace Bolt {
 
       // call user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
-
-      // call to user behaviours
-      if (token != null) {
-        foreach (IEntityBehaviour eb in Behaviours) {
-          eb.ControlLost(token);
-        }
-
-        // call user event
-        BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject, token);
-      }
     }
 
     internal void AssignControl(BoltConnection connection, IProtocolToken token) {

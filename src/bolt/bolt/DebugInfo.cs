@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 
 namespace Bolt {
-
   [Documentation(Ignore = true)]
   public class DebugInfo : MonoBehaviour {
     static GUIStyle labelStyle;
@@ -43,14 +42,7 @@ namespace Bolt {
       get {
         if (!backgroundTexture) {
           backgroundTexture = new Texture2D(2, 2);
-          backgroundTexture.SetPixels(
-              new Color[] {
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                    Color.white,
-                }
-          );
+          backgroundTexture.SetPixels(new Color[] { Color.white, Color.white, Color.white, Color.white, });
         }
 
         return backgroundTexture;
@@ -197,11 +189,14 @@ namespace Bolt {
         }
 
         Vector3 mp;
-
         mp = c.ScreenToViewportPoint(Input.mousePosition);
         mp.z = 0;
 
         foreach (Entity en in BoltCore._entities) {
+          if (en.IsFrozen) {
+            continue;
+          }
+
           DrawEntity(en.UnityObject);
         }
 
@@ -209,16 +204,19 @@ namespace Bolt {
           .Where(x => ignoreList.Contains(x.NetworkId) == false)
           .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
           .Where(x => {
-            Vector3 m = Input.mousePosition;
+            Vector3 m;
+            m = Input.mousePosition;
             m.z = 0;
 
-            Vector3 p = c.WorldToScreenPoint(x.UnityObject.transform.position);
+            Vector3 p;
+            p = c.WorldToScreenPoint(x.UnityObject.transform.position);
             p.z = 0;
 
             return (m - p).sqrMagnitude < (32 * 32);
           })
           .OrderBy(x => {
-            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+            Vector3 vp;
+            vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
             vp.z = 0;
 
             return (mp - vp).sqrMagnitude;
@@ -263,6 +261,7 @@ namespace Bolt {
 #else
               var clips = state.Animator.GetCurrentAnimationClipState(i);
 #endif
+
               foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
@@ -278,7 +277,7 @@ namespace Bolt {
             }
           }
 
-          if (!entity.IsOwner) {
+          if (entity.IsOwner == false) {
             LabelBold("");
             LabelBold("Frame Info");
             LabelField("Buffer Count", state.Frames.count);

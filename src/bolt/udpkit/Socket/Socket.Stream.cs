@@ -53,11 +53,7 @@ namespace UdpKit {
       config.ChannelName.Name = name;
       config.ChannelName.Id = ++channelIdCounter;
 
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_STREAM_CREATECHANNEL;
-      ev.ChannelConfig = config;
-
-      Raise(ev);
+      Raise(new UdpEventStreamCreateChannel { ChannelConfig = config });
 
       return config.ChannelName;
     }

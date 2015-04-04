@@ -15,17 +15,11 @@ namespace Bolt {
     void Attached();
     void Detached();
 
-    void Attached(IProtocolToken token);
-    void Detached(IProtocolToken token);
-
     void SimulateOwner();
     void SimulateController();
 
     void ControlLost();
     void ControlGained();
-
-    void ControlLost(IProtocolToken token);
-    void ControlGained(IProtocolToken token);
 
     void MissingCommand(Bolt.Command previous);
     void ExecuteCommand(Bolt.Command command, bool resetState);

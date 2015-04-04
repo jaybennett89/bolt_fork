@@ -147,12 +147,7 @@ namespace UdpKit {
             // tell the master server about this
             Send<Protocol.ProbeFeatures>(endpoint, m => m.NatFeatures = natFeatures);
 
-            // give user info about nat results
-            UdpEvent ev = new UdpEvent();
-            ev.Type = UdpEvent.PUBLIC_MASTERSERVER_NATPROBE_RESULT;
-            ev.NatFeatures = natFeatures.Clone();
-
-            socket.Raise(ev);
+            socket.Raise(new UdpEventMasterServerNatFeatures { Features = natFeatures.Clone() });
           }
         }
       }
@@ -194,7 +189,7 @@ namespace UdpKit {
         try {
           if (IsConnected) {
             // tell user we are leaving
-            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_DISCONNECTED, endpoint);
+            socket.Raise(new UdpEventMasterServerDisconnected { EndPoint = endpoint });
 
             // tell master server we are leaving
             Send<Protocol.PeerDisconnect>(endpoint);
@@ -203,7 +198,7 @@ namespace UdpKit {
             ClearPunchRequest();
           }
           else {
-            socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_CONNECTFAILED, endpoint);
+            socket.Raise(new UdpEventMasterServerConnectFailed { EndPoint = endpoint });
           }
         }
         finally {
@@ -281,7 +276,7 @@ namespace UdpKit {
       void AckPeerConnect(Protocol.PeerConnect connect) {
         if (connect.Failed) {
           // tell user this happened
-          socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_CONNECTFAILED, endpoint);
+          socket.Raise(new UdpEventMasterServerConnectFailed { EndPoint = endpoint });
 
           // disconnect us
           Disconnect("Could not connect to master server at {0}", connect.Target);
@@ -360,7 +355,7 @@ namespace UdpKit {
         }
 
         // tell user about this
-        socket.Raise(UdpEvent.PUBLIC_MASTERSERVER_CONNECTED, endpoint);
+        socket.Raise(new UdpEventMasterServerConnected { EndPoint = endpoint });
 
         // Update ping
         UpdatePing(features);
@@ -442,38 +437,26 @@ namespace UdpKit {
       }
 
       void OnDirectConnectionLan(Protocol.DirectConnectionLan direct) {
-        UdpEvent ev = new UdpEvent();
-        ev.Type = UdpEvent.INTERNAL_CONNECT;
-        ev.EndPoint = direct.RemoteEndPoint;
-        ev.ConnectToken = natPunchRequest.Token;
-
         ClearPunchRequest();
 
-        socket.OnEventConnect(ev);
+        //
+        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = natPunchRequest.Token });
       }
 
       void OnDirectConnectionWan(Protocol.DirectConnectionWan direct) {
-        UdpEvent ev = new UdpEvent();
-        ev.Type = UdpEvent.INTERNAL_CONNECT;
-        ev.EndPoint = direct.RemoteEndPoint;
-        ev.ConnectToken = natPunchRequest.Token;
-
         ClearPunchRequest();
 
-        socket.OnEventConnect(ev);
+        //
+        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = natPunchRequest.Token });
       }
 
-      void OnPunch(Protocol.Punch obj) {
-        // if we receive a punch message on the client, then we know that we are ready to connect
-        if ((socket.Mode == UdpSocketMode.Client) && (natPunchTargets.Any(x => x.EndPoint == obj.Sender))) {
-          UdpEvent ev = new UdpEvent();
-          ev.Type = UdpEvent.INTERNAL_CONNECT;
-          ev.EndPoint = obj.Sender;
-          ev.ConnectToken = natPunchRequest.Token;
-
+      void OnPunch(Protocol.Punch punch) {
+        if ((socket.Mode == UdpSocketMode.Client) && (natPunchTargets.Any(x => x.EndPoint == punch.Sender))) {
+          //
           ClearPunchRequest();
 
-          socket.OnEventConnect(ev);
+          //
+          socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = punch.Sender, Token = natPunchRequest.Token });
         }
       }
 

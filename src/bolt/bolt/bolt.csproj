@@ -13,41 +13,54 @@
     <FileAlignment>512</FileAlignment>
     <ProductVersion>12.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <UnityPathWin>C:\Program Files (x86)\Unity</UnityPathWin>
+    <UnityPathWin>C:\Program Files\Unity5</UnityPathWin>
     <UnityPathOSX>/Applications/Unity</UnityPathOSX>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_DLL</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <NoWarn>1591,0618</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>BOLT_DLL</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\bolt.XML</DocumentationFile>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU5|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <OutputPath>bin\DebugU5\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_DLL; UNITY5</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BOLT_DLL;UNITY5</DefineConstants>
     <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
     <NoWarn>1591,0618</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseU5|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\ReleaseU5\</OutputPath>
+    <DefineConstants>BOLT_DLL;UNITY5</DefineConstants>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>none</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU4|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\DebugU4\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BOLT_DLL</DefineConstants>
+    <DocumentationFile>bin\Debug\bolt.XML</DocumentationFile>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseU4|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\ReleaseU4\</OutputPath>
+    <DefineConstants>BOLT_DLL</DefineConstants>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>none</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -75,9 +88,7 @@
     <Compile Include="PrefabDatabase.cs" />
     <Compile Include="Documentation.cs" />
     <Compile Include="GlobalEventListener.cs" />
-    <Compile Include="BoltLog.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="BoltLog.cs" />
     <Compile Include="command\Command.cs" />
     <Compile Include="entity\EntityBehaviour.cs" />
     <Compile Include="entity\Entity.Control.cs" />
@@ -249,19 +260,4 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

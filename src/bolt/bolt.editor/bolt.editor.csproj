@@ -13,65 +13,52 @@
     <FileAlignment>512</FileAlignment>
     <ProductVersion>12.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <UnityPathWin>C:\Program Files (x86)\Unity</UnityPathWin>
+    <UnityPathWin>C:\Program Files\Unity5</UnityPathWin>
     <UnityPathOSX>/Applications/Unity</UnityPathOSX>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL; LOG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1591,0618</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>BOLT_EDITOR_DLL</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
-    <NoWarn>1591,0618</NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU5|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\DebugU5\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL; LOG; UNITY5</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL;LOG;UNITY5</DefineConstants>
     <NoWarn>1591,0618</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU5|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseU5|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\DebugU5\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BOLT_SERVER; BOLT_CLIENT; BOLT_EDITOR_DLL</DefineConstants>
+    <OutputPath>bin\ReleaseU5\</OutputPath>
+    <DefineConstants>BOLT_EDITOR_DLL;UNITY5</DefineConstants>
     <NoWarn>1591,0618</NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>none</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugU4|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugU4\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BOLT_EDITOR_DLL;LOG</DefineConstants>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseU4|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ReleaseU4\</OutputPath>
+    <DefineConstants>BOLT_EDITOR_DLL</DefineConstants>
+    <NoWarn>1591,0618</NoWarn>
+    <DebugType>none</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -117,6 +104,7 @@
     <Compile Include="BoltEditorUtilsInternal.cs" />
     <Compile Include="Editors\BoltEntityEditor.cs" />
     <Compile Include="BoltMenuItems.cs" />
+    <Compile Include="Compiler\BoltCompiler.CompileMaps.cs" />
     <Compile Include="Compiler\BoltCompiler.CompileNetwork.cs" />
     <Compile Include="Compiler\BoltCompiler.CompilePrefabs.cs" />
     <Compile Include="Compiler\BoltCompiler.cs" />
@@ -167,9 +155,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compiler\BoltCompiler.CompileMaps.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltPOI.cs" />
     <EmbeddedResource Include="Resources\Install\bolt\scripts\BoltDebugStart.cs" />
@@ -182,36 +167,18 @@
     <EmbeddedResource Include="Resources\Install\bolt\scripts\upnp\BoltUPnP.cs" />
     <EmbeddedResource Include="Resources\Install\Plugins\Android\libudpkit_android.so" />
     <EmbeddedResource Include="Resources\Install\Plugins\iOS\libudpkit_ios.a" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltEntity Gizmo.png" />
     <EmbeddedResource Include="Resources\Install\Gizmos\BoltEntity Icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltShaderPOI.shader" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\IcoSphere.fbx" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\ATTRIBUTION.txt" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\ATTRIBUTION.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\documentation\DOCUMENTATION.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\BoltIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\dark.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\light.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\dark_hover.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_down.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_right.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_arrow_up.png" />
@@ -238,31 +205,18 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_state.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_struct.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_upload.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\backgrounds\light_hover.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_bubble.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_minus_small.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller_only.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ping.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_ping_sim.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_position.png" />
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_rotation.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_owner_only.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_controller_plus.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_masterserver.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="..\udpkit.wp8\Bin\Release\udpkit_wp8.dll">
       <Link>Resources\Install\Plugins\WP8\udpkit_wp8.dll</Link>
@@ -272,15 +226,4 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

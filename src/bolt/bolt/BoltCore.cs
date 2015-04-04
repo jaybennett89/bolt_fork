@@ -1,24 +1,19 @@
 ﻿using Bolt;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UdpKit;
 using UnityEngine;
-using UE = UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
-using System.Text.RegularExpressions;
-using System.Threading;
+using UE = UnityEngine;
 
-/// <summary>
-/// The network mode of this bolt simulation (i.e. client or server)
-/// </summary>
 public enum BoltNetworkModes {
   None = 0,
-  [Obsolete]
+  Host = 1,
+  [Obsolete("Use BoltNetworkModes.Host instead")]
   Server = 1,
   Client = 2,
-  Host = 1,
   Shutdown = 3,
 }
 
@@ -55,11 +50,6 @@ internal static class BoltCore {
 #else
     get { return false; }
 #endif
-  }
-
-  [Obsolete("This property is not used anymore, and is always null")]
-  public static GameObject userObject {
-    get { return null; }
   }
 
   internal static Func<GameObject, Vector3, Quaternion, GameObject> _instantiate =
@@ -133,13 +123,13 @@ internal static class BoltCore {
   }
 
   public static bool isServer {
-    get { return hasSocket && _mode == BoltNetworkModes.Server; }
+    get { return hasSocket && _mode == BoltNetworkModes.Host; }
   }
 
   internal static int localSendRate {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverSendRate;
+        case BoltNetworkModes.Host: return _config.serverSendRate;
         case BoltNetworkModes.Client: return _config.clientSendRate;
         default: return -1;
       }
@@ -149,7 +139,7 @@ internal static class BoltCore {
   internal static int remoteSendRate {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.clientSendRate;
+        case BoltNetworkModes.Host: return _config.clientSendRate;
         case BoltNetworkModes.Client: return _config.serverSendRate;
         default: return -1;
       }
@@ -159,7 +149,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelay {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelay;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelay;
         case BoltNetworkModes.Client: return _config.clientDejitterDelay;
         default: return -1;
       }
@@ -169,7 +159,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelayMin {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelayMin;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelayMin;
         case BoltNetworkModes.Client: return _config.clientDejitterDelayMin;
         default: return -1;
       }
@@ -179,7 +169,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelayMax {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelayMax;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelayMax;
         case BoltNetworkModes.Client: return _config.clientDejitterDelayMax;
         default: return -1;
       }
@@ -387,122 +377,183 @@ internal static class BoltCore {
     while (hasSocket && _udpSocket.Poll(out ev)) {
       switch (ev.EventType) {
         case UdpEventType.SocketStartupDone:
-          BoltInternal.GlobalEventListenerBase.BoltStartDoneInvoke();
-          ev.ResetEvent.Set();
+          Udp_SocketStartupDone(ev.As<UdpEventStartDone>());
           break;
 
         case UdpEventType.SocketStartupFailed:
-          BoltInternal.GlobalEventListenerBase.BoltStartFailedInvoke();
-          ev.ResetEvent.Set();
+          Udp_SocketStartupFailed(ev.As<UdpEventStartFailed>());
           break;
 
         case UdpEventType.Connected:
-          HandleConnected(ev.Connection);
+          Udp_Connected((UdpConnection)ev.Object0);
           break;
 
         case UdpEventType.Disconnected:
-          HandleDisconnected(ev.Connection.GetBoltConnection(), ev.DisconnectToken);
+          Udp_Disconnect((UdpConnection)ev.Object0);
           break;
 
         case UdpEventType.ConnectRequest:
-          HandleConnectRequest(ev.EndPoint, ev.ConnectToken);
+          Udp_ConnectRequest(ev.As<UdpEventConnectRequest>());
           break;
 
         case UdpEventType.ConnectFailed:
-          HandleConnectFailed(ev.EndPoint);
+          Udp_ConnectFailed(ev.As<UdpEventConnectFailed>());
           break;
 
         case UdpEventType.ConnectRefused:
-          HandleConnectRefused(ev.EndPoint, ev.RefusedToken);
+          Udp_ConnectRefused(ev.As<UdpEventConnectRefused>());
           break;
 
         case UdpEventType.ConnectAttempt:
-          BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint);
+          Udp_ConnectAttempt(ev.As<UdpEventConnectAttempt>());
           break;
 
         case UdpEventType.PacketLost:
-          using (var packet = (Packet)ev.Packet.UserToken) {
-            ev.Connection.GetBoltConnection().PacketLost(packet);
-          }
+          Udp_PacketLost(ev);
           break;
 
         case UdpEventType.PacketDelivered:
-          using (var packet = (Packet)ev.Packet.UserToken) {
-            ev.Connection.GetBoltConnection().PacketDelivered(packet);
-          }
+          Udp_PacketDelivered(ev);
           break;
 
         case UdpEventType.PacketReceived:
-          ev.Connection.GetBoltConnection().PacketReceived(ev.Packet);
+          Udp_PacketReceived(ev);
           break;
-
-        case UdpEventType.StreamDataReceived:
-          BoltInternal.GlobalEventListenerBase.StreamDataReceivedInvoke(
-            ev.Connection.GetBoltConnection(),
-            ev.StreamData
-          );
-          break;
-
-        // SESSION
 
         case UdpEventType.SessionListUpdated:
-          // store session list
-          BoltNetwork._sessionList = ev.SessionList;
-
-          // notify user
-          BoltInternal.GlobalEventListenerBase.SessionListUpdatedInvoke(BoltNetwork._sessionList);
+          Udp_SessionListUpdated(ev);
           break;
 
         case UdpEventType.SessionConnectFailed:
-          BoltInternal.GlobalEventListenerBase.SessionConnectFailedInvoke(ev.Session);
+          Udp_SessionConnectFailed(ev.As<UdpEventSessionConnectFailed>());
           break;
 
-        // MASTER SERVER
-
         case UdpEventType.MasterServerConnected:
-          BoltInternal.GlobalEventListenerBase.ZeusConnectedInvoke(ev.EndPoint);
+          Udp_MasterServerConnected(ev.As<UdpEventMasterServerConnected>());
           break;
 
         case UdpEventType.MasterServerDisconnected:
-          BoltInternal.GlobalEventListenerBase.ZeusDisconnectedInvoke(ev.EndPoint);
+          Udp_MasterServerDisconnected(ev.As<UdpEventMasterServerDisconnected>());
           break;
 
         case UdpEventType.MasterServerConnectFailed:
-          BoltInternal.GlobalEventListenerBase.ZeusConnectFailedInvoke(ev.EndPoint);
+          Udp_MasterServerConnectFailed(ev.As<UdpEventMasterServerConnectFailed>());
           break;
 
         case UdpEventType.MasterServerNatProbeResult:
-          BoltInternal.GlobalEventListenerBase.ZeusNatProbeResultInvoke(ev.NatFeatures);
+          Udp_MasterServerNatProbeResult(ev.As<UdpEventMasterServerNatFeatures>());
+          break;
+
+        case UdpEventType.StreamDataReceived:
+          Udp_StreamDataReceived(ev);
           break;
       }
     }
   }
 
-  static void HandleConnectFailed(UdpEndPoint endpoint) {
+  static void Udp_MasterServerNatProbeResult(UdpEventMasterServerNatFeatures ev) {
+    BoltInternal.GlobalEventListenerBase.ZeusNatProbeResultInvoke(ev.Features);
+  }
+
+  static void Udp_MasterServerConnectFailed(UdpEventMasterServerConnectFailed ev) {
+    BoltInternal.GlobalEventListenerBase.ZeusConnectFailedInvoke(ev.EndPoint);
+  }
+
+  static void Udp_MasterServerDisconnected(UdpEventMasterServerDisconnected ev) {
+    BoltInternal.GlobalEventListenerBase.ZeusDisconnectedInvoke(ev.EndPoint);
+  }
+
+  static void Udp_MasterServerConnected(UdpEventMasterServerConnected ev) {
+    BoltInternal.GlobalEventListenerBase.ZeusConnectedInvoke(ev.EndPoint);
+  }
+
+  static void Udp_SessionConnectFailed(UdpEventSessionConnectFailed ev) {
+    BoltInternal.GlobalEventListenerBase.SessionConnectFailedInvoke(ev.Session, ev.Token.ToToken());
+  }
+
+  static void Udp_SessionListUpdated(UdpEvent ev) {
+    // store session list
+    BoltNetwork._sessionList = (Map<Guid, UdpSession>)ev.Object0;
+
+    // notify user
+    BoltInternal.GlobalEventListenerBase.SessionListUpdatedInvoke(BoltNetwork._sessionList);
+  }
+
+  static void Udp_StreamDataReceived(UdpEvent ev) {
+    var c = (UdpConnection)ev.Object0;
+    var s = (UdpStreamData)ev.Object1;
+
+    BoltInternal.GlobalEventListenerBase.StreamDataReceivedInvoke(c.GetBoltConnection(), s);
+  }
+
+  static void Udp_PacketReceived(UdpEvent ev) {
+    var p = (UdpPacket)ev.Object1;
+    var c = (UdpConnection)ev.Object0;
+
+    c.GetBoltConnection().PacketReceived(p);
+  }
+
+  static void Udp_PacketDelivered(UdpEvent ev) {
+    var p = (UdpPacket)ev.Object1;
+    var c = (UdpConnection)ev.Object0;
+
+    using (var packet = (Packet)p.UserToken) {
+      c.GetBoltConnection().PacketDelivered(packet);
+    }
+  }
+
+  static void Udp_PacketLost(UdpEvent ev) {
+    var p = (UdpPacket)ev.Object1;
+    var c = (UdpConnection)ev.Object0;
+
+    using (var packet = (Packet)p.UserToken) {
+      c.GetBoltConnection().PacketLost(packet);
+    }
+  }
+
+  static void Udp_ConnectAttempt(UdpEventConnectAttempt ev) {
+    BoltInternal.GlobalEventListenerBase.ConnectAttemptInvoke(ev.EndPoint, ev.Token.ToToken());
+  }
+
+  static void Udp_SocketStartupFailed(UdpEventStartFailed ev) {
+    // global callback
+    BoltInternal.GlobalEventListenerBase.BoltStartFailedInvoke();
+
+    // reset event
+    ev.ResetEvent.Set();
+  }
+
+  static void Udp_SocketStartupDone(UdpEventStartDone ev) {
+    // global callback
+    BoltInternal.GlobalEventListenerBase.BoltStartDoneInvoke();
+
+    // flag reset event
+    ev.ResetEvent.Set();
+  }
+
+  static void Udp_ConnectFailed(UdpEventConnectFailed ev) {
     try {
-      BoltInternal.GlobalEventListenerBase.ConnectFailedInvoke(endpoint);
+      BoltInternal.GlobalEventListenerBase.ConnectFailedInvoke(ev.EndPoint, ev.Token.ToToken());
     }
     finally {
       Shutdown();
     }
   }
 
-  static void HandleConnectRefused(UdpEndPoint endpoint, byte[] token) {
+  static void Udp_ConnectRefused(UdpEventConnectRefused ev) {
     try {
-      BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint);
-      BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(endpoint, token.ToToken());
+      BoltInternal.GlobalEventListenerBase.ConnectRefusedInvoke(ev.EndPoint, ev.Token.ToToken());
     }
     finally {
       Shutdown();
     }
   }
 
-  static void HandleConnectRequest(UdpEndPoint endpoint, byte[] token) {
-    BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint);
-    BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(endpoint, token.ToToken());
+  static void Udp_ConnectRequest(UdpEventConnectRequest ev) {
+    BoltInternal.GlobalEventListenerBase.ConnectRequestInvoke(ev.EndPoint, ev.Token.ToToken());
   }
 
-  public static void AcceptConnection(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken, IProtocolToken connectToken) {
+  public static void AcceptConnection(UdpEndPoint endpoint, object userToken, IProtocolToken acceptToken) {
     if (!isServer) {
       BoltLog.Error("AcceptConnection can only be called on the server");
       return;
@@ -513,7 +564,7 @@ internal static class BoltCore {
       return;
     }
 
-    _udpSocket.Accept(endpoint, userToken, acceptToken.ToByteArray(), connectToken.ToByteArray());
+    _udpSocket.Accept(endpoint, userToken, acceptToken.ToByteArray());
   }
 
   public static void RefuseConnection(UdpEndPoint endpoint, IProtocolToken token) {
@@ -660,7 +711,7 @@ internal static class BoltCore {
     }
   }
 
-  static void HandleConnected(UdpConnection udp) {
+  static void Udp_Connected(UdpConnection udp) {
     if (isClient) {
       Bolt.NetworkIdAllocator.Assigned(udp.ConnectionId);
 
@@ -684,8 +735,6 @@ internal static class BoltCore {
 
     // generic connected callback
     BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn);
-    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken);
-    BoltInternal.GlobalEventListenerBase.ConnectedInvoke(cn, cn.AcceptToken, cn.ConnectToken);
 
     // spawn entities
     if (_config.scopeMode == ScopeMode.Automatic) {
@@ -695,10 +744,11 @@ internal static class BoltCore {
     }
   }
 
-  static void HandleDisconnected(BoltConnection cn, byte[] token) {
+  static void Udp_Disconnect(UdpConnection udp) {
+    BoltConnection cn = (BoltConnection)udp.UserToken;
+
     // generic disconnected callback
     BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn);
-    BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn, token.ToToken());
 
     if (hasSocket) {
       // cleanup                                                      
@@ -941,7 +991,7 @@ internal static class BoltCore {
 
   internal static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
     if (_udpSocket.State != UdpSocketState.Created) {
-      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.RegisterStreamChannels callback.");
+      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.BoltStartBegin callback.");
     }
 
     return _udpSocket.StreamChannelCreate(name, mode, priority);

@@ -291,7 +291,7 @@ namespace Bolt {
         }
       }
       finally {
-        ev.DecrementRefs();
+        //ev.DecrementRefs();
       }
     }
   }

@@ -51,7 +51,7 @@ namespace UdpKit {
     readonly Queue<UdpEvent> eventQueueOut;
 
     readonly List<UdpConnection> connectionList = new List<UdpConnection>();
-    readonly UdpSet<UdpEndPoint> pendingConnections = new UdpSet<UdpEndPoint>(new UdpEndPoint.Comparer());
+    readonly Dictionary<UdpEndPoint, byte[]> pendingConnections = new Dictionary<UdpEndPoint, byte[]>(new UdpEndPoint.Comparer());
     readonly Dictionary<UdpEndPoint, UdpConnection> connectionLookup = new Dictionary<UdpEndPoint, UdpConnection>(new UdpEndPoint.Comparer());
     readonly Dictionary<UdpChannelName, UdpStreamChannel> streamChannels = new Dictionary<UdpChannelName, UdpStreamChannel>(UdpChannelName.EqualityComparer.Instance);
 
@@ -211,59 +211,27 @@ namespace UdpKit {
     /// Start this socket
     /// </summary>
     /// <param name="endpoint">The endpoint to bind to</param>
-    public void Start(UdpEndPoint endpoint, ManualResetEvent doneEvent, UdpSocketMode mode) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_START;
-      ev.EndPoint = endpoint;
-      ev.SocketMode = mode;
-      ev.ResetEvent = doneEvent;
-
-      Raise(ev);
+    public void Start(UdpEndPoint endpoint, ManualResetEvent resetEvent, UdpSocketMode mode) {
+      Raise(new UdpEventStart { EndPoint = endpoint, Mode = mode, ResetEvent = resetEvent });
     }
 
     /// <summary>
     /// Close this socket
     /// </summary>
     public void Close(ManualResetEvent resetEvent) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_CLOSE;
-      ev.ResetEvent = resetEvent;
-
-      Raise(ev);
+      Raise(new UdpEventClose { ResetEvent = resetEvent });
     }
 
-    public void SendUnconnected(UdpEndPoint endpoint, byte[] data) {
-      SendUnconnected(endpoint, data, data.Length);
-    }
-
-    public void SendUnconnected(UdpEndPoint endpoint, byte[] data, int size) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_SEND_UNCONNECTED;
-      ev.EndPoint = endpoint;
-      ev.ByteArray = data;
-
-      Raise(ev);
-    }
-
-    public void Connect(UdpSession session, byte[] connectToken) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_SESSION_CONNECT;
-      ev.Session = session;
-      ev.ConnectToken = connectToken;
-
-      Raise(ev);
+    public void Connect(UdpSession session, byte[] token) {
+      Raise(new UdpEventSessionConnect { Session = session, Token = token });
     }
 
     /// <summary>
     /// Connect to remote endpoint
     /// </summary>
     /// <param name="endpoint">The endpoint to connect to</param>
-    public void Connect(UdpEndPoint endpoint, byte[] connectToken) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_CONNECT;
-      ev.EndPoint = endpoint;
-      ev.ConnectToken = connectToken;
-      Raise(ev);
+    public void Connect(UdpEndPoint endpoint, byte[] token) {
+      Raise(new UdpEventConnectEndPoint { EndPoint = endpoint, Token = token });
     }
 
     /// <summary>
@@ -271,7 +239,7 @@ namespace UdpKit {
     /// </summary>
     /// <param name="endpoint">The endpoint to cancel connect attempt to</param>
     public void CancelConnect(UdpEndPoint endpoint) {
-      Raise(UdpEvent.INTERNAL_CONNECT_CANCEL, endpoint);
+      Raise(new UdpEventConnectEndPointCancel { EndPoint = endpoint });
     }
 
     /// <summary>
@@ -279,26 +247,17 @@ namespace UdpKit {
     /// </summary>
     /// <param name="endpoint"></param>
     /// <param name="userObject"></param>
-    /// <param name="acceptToken"></param>
-    public void Accept(UdpEndPoint endpoint, object userObject, byte[] acceptToken, byte[] connectToken) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_ACCEPT;
-      ev.EndPoint = endpoint;
-      ev.ConnectToken = connectToken;
-      ev.AcceptArgs = new UdpEventAcceptArgs { AcceptToken = acceptToken, UserObject = userObject };
-      Raise(ev);
+    /// <param name="token"></param>
+    public void Accept(UdpEndPoint endpoint, object userObject, byte[] token) {
+      Raise(new UdpEventAcceptConnect { EndPoint = endpoint, Token = token, UserObject = userObject });
     }
 
     /// <summary>
     /// Refuse a connection request from a remote endpoint
     /// </summary>
     /// <param name="endpoint">The endpoint to refuse</param>
-    public void Refuse(UdpEndPoint endpoint, byte[] refuseToken) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_REFUSE;
-      ev.EndPoint = endpoint;
-      ev.RefusedToken = refuseToken;
-      Raise(ev);
+    public void Refuse(UdpEndPoint endpoint, byte[] token) {
+      Raise(new UdpEventRefuseConnect { EndPoint = endpoint, Token = token });
     }
 
     /// <summary>
@@ -332,87 +291,29 @@ namespace UdpKit {
     }
 
     public void MasterServerConnect(UdpEndPoint endpoint) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_MASTERSERVER_CONNECT;
-      ev.EndPoint = endpoint;
-      Raise(ev);
+      Raise(new UdpEventMasterServerConnect { EndPoint = endpoint });
     }
 
     public void MasterServerRequestInfo() {
-      Raise(UdpEvent.INTERNAL_MASTERSERVER_INFOREQUEST);
+      Raise(new UdpEventMasterServerRequestInfo());
     }
 
     public void MasterServerRequestSessionList() {
-      Raise(UdpEvent.INTERNAL_MASTERSERVER_SESSIONLISTREQUEST);
+      Raise(new UdpEventMasterServerRequestSessionList());
     }
 
     public void LanBroadcastEnable(UdpIPv4Address localAddresss, UdpIPv4Address broadcastAddress, ushort port) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_LANBROADCAST_ENABLE;
-      ev.BroadcastArgs = new UdpEventBroadcastArgs { LocalAddress = localAddresss, BroadcastAddress = broadcastAddress, Port = port };
-      Raise(ev);
+      Raise(new UdpEventLanBroadcastEnable { LocalAddress = localAddresss, BroadcastAddress = broadcastAddress, Port = port });
     }
 
     public void LanBroadcastDisable() {
-      Raise(UdpEvent.INTERNAL_LANBROADCAST_DISABLE);
+      Raise(new UdpEventLanBroadcastDisable());
     }
 
-    public void ForgetSessions(UdpSessionSource source) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_FORGETSESSIONS;
-      ev.SessionSource = source;
-      Raise(ev);
+    public void SetHostInfo(string name, bool dedicated, byte[] token) {
+      Raise(new UdpEventSessionSetHostData { Name = name, Token = token, Dedicated = dedicated });
     }
 
-    public void ForgetSessions() {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_FORGETSESSIONS_ALL;
-      Raise(ev);
-    }
-
-    public void SetHostInfo(string serverName, bool dedicated, byte[] userData) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.INTERNAL_SESSION_HOST_SETINFO;
-      ev.HostInfo = new UdpHostInfoArgs() { Name = serverName, Data = userData, Dedicated = dedicated };
-      Raise(ev);
-    }
-
-    internal void Raise(int eventType) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = eventType;
-      Raise(ev);
-    }
-
-    internal void Raise(int eventType, UdpEndPoint endpoint) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = eventType;
-      ev.EndPoint = endpoint;
-      Raise(ev);
-    }
-
-    internal void Raise(int eventType, UdpConnection connection) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = eventType;
-      ev.Connection = connection;
-      Raise(ev);
-    }
-
-    internal void Raise(int eventType, UdpConnection connection, UdpPacket packet) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = eventType;
-      ev.Connection = connection;
-      ev.Packet = packet;
-      Raise(ev);
-    }
-
-    internal void Raise(UdpConnection connection, UdpPacket packet, UdpSendFailReason reason) {
-      UdpEvent ev = new UdpEvent();
-      ev.Type = UdpEvent.PUBLIC_PACKET_LOST;
-      ev.Connection = connection;
-      ev.Packet = packet;
-      ev.FailedReason = reason;
-      Raise(ev);
-    }
 
     internal bool FindChannel(int id, out UdpStreamChannel channel) {
       return streamChannels.TryGetValue(new UdpChannelName(id), out channel);
@@ -430,6 +331,15 @@ namespace UdpKit {
 
     internal uint GetCurrentTime() {
       return platform.GetPrecisionTime();
+    }
+
+    internal void Raise(int type, UdpConnection c, UdpPacket p) {
+      UdpEvent ev = new UdpEvent();
+      ev.Type = type;
+      ev.Object0 = c;
+      ev.Object1 = p;
+
+      Raise(ev);
     }
 
     internal void Raise(UdpEvent ev) {
@@ -672,27 +582,7 @@ namespace UdpKit {
         case Protocol.Message.MESSAGE_HEADER:
           RecvProtocol(ep, buffer, bytes);
           break;
-
-        case UdpPipe.PIPE_UNCONNECTED:
-          RecvUnconnected(ep, buffer, bytes);
-          break;
       }
-    }
-
-    void RecvUnconnected(UdpEndPoint ep, byte[] recvbuffer, int bytes) {
-      byte[] data = (UnconnectedBufferProvider == null) ? (new byte[bytes - 1]) : UnconnectedBufferProvider(bytes - 1);
-
-      // copy recv buffer into data array (skip first byte)
-      Buffer.BlockCopy(recvbuffer, 1, data, 0, bytes - 1);
-
-      // raise event to main thread
-      UdpEvent ev = new UdpEvent();
-      ev.EndPoint = ep;
-      ev.ByteArray = data;
-      ev.ByteArraySize = bytes - 1;
-      ev.Type = UdpEvent.PUBLIC_UNCONNECTED_RECV;
-
-      Raise(ev);
     }
 
     void RecvStreamUnreliable(UdpEndPoint ep, byte[] buffer, int bytes) {
@@ -736,15 +626,16 @@ namespace UdpKit {
       }
     }
 
-    void AddPendingConnection(UdpEndPoint endpoint, byte[] connectToken) {
-      if (pendingConnections.Add(endpoint)) {
-        UdpEvent ev = new UdpEvent();
-        ev.Type = UdpEvent.PUBLIC_CONNECT_REQUEST;
-        ev.EndPoint = endpoint;
-        ev.ConnectToken = connectToken;
-
-        Raise(ev);
+    void AddPendingConnection(UdpEndPoint endpoint, byte[] token) {
+      if (pendingConnections.ContainsKey(endpoint)) {
+        return;
       }
+
+      // add to pending list
+      pendingConnections.Add(endpoint, token);
+
+      // tell host
+      Raise(new UdpEventConnectRequest { EndPoint = endpoint, Token = token });
     }
 
     UdpConnection CreateConnection(UdpEndPoint endpoint, UdpConnectionMode mode, byte[] connectToken) {

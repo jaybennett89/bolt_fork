@@ -17,7 +17,7 @@ namespace Bolt {
   /// ```
   /// </example>
   [Documentation]
-  public abstract class Event : NetworkObj_Root, IDisposable {
+  public abstract class Event : NetworkObj_Root {
     internal const byte ENTITY_EVERYONE = 1;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER = 3;
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER = 13;
@@ -166,10 +166,6 @@ namespace Bolt {
       }
     }
 
-    internal void IncrementRefs() {
-
-    }
-
     internal bool Pack(BoltConnection connection, UdpPacket packet) {
       for (int i = 0; i < Meta.Properties.Length; ++i) {
         if (Meta.Properties[i].Property.Write(connection, this, storage, packet) == false) {
@@ -202,10 +198,6 @@ namespace Bolt {
     /// </example>
     public void Send() {
       EventDispatcher.Enqueue(this);
-    }
-
-    internal void DecrementRefs() {
-
     }
   }
 }

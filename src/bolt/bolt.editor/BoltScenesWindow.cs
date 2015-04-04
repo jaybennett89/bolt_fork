@@ -219,20 +219,15 @@ end tell'";
 
   void StartEditor() {
     try {
-      if (BoltEditorUtilsInternal.hasPro == false) {
-        LoadAndStartScene();
-      }
-      else {
-        switch (BoltRuntimeSettings.instance.debugEditorMode) {
-          case BoltEditorStartMode.Client:
-          case BoltEditorStartMode.Server:
-            LoadAndStartScene();
-            break;
+      switch (BoltRuntimeSettings.instance.debugEditorMode) {
+        case BoltEditorStartMode.Client:
+        case BoltEditorStartMode.Server:
+          LoadAndStartScene();
+          break;
 
-          case BoltEditorStartMode.None:
-            EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
-            break;
-        }
+        case BoltEditorStartMode.None:
+          EditorPrefs.SetInt(DEBUGSTART_STAGE, STAGE_NONE);
+          break;
       }
     }
     catch {
@@ -380,10 +375,8 @@ end tell'";
     GUILayout.BeginVertical();
     Settings_ServerPort();
 
-    if (BoltEditorUtilsInternal.hasPro) {
-      settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
-      settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
-    }
+    settings.debugEditorMode = (BoltEditorStartMode)EditorGUILayout.EnumPopup("Editor Mode", settings.debugEditorMode);
+    settings.debugClientCount = EditorGUILayout.IntField("Clients", settings.debugClientCount);
 
     GUILayout.EndVertical();
   }
@@ -438,21 +431,19 @@ end tell'";
           }
         }
 
-        if (BoltEditorUtilsInternal.hasPro) {
-          if (GUILayout.Button("Debug Start", EditorStyles.miniButton, GUILayout.Width(100))) {
-            BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+        if (GUILayout.Button("Debug Start", EditorStyles.miniButton, GUILayout.Width(100))) {
+          BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-            if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
-              settings.debugStartMapName = sceneName;
-              settings.debugPlayAsServer = false;
+          if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
+            settings.debugStartMapName = sceneName;
+            settings.debugPlayAsServer = false;
 
-              // save asset
-              EditorUtility.SetDirty(settings);
-              AssetDatabase.SaveAssets();
+            // save asset
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
 
-              // set stage
-              SetStage(STAGE_COMPILE_BOLT);
-            }
+            // set stage
+            SetStage(STAGE_COMPILE_BOLT);
           }
         }
 

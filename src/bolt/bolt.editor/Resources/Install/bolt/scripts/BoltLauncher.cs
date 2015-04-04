@@ -16,7 +16,7 @@ public static class BoltLauncher {
     SetUdpPlatform(new NullPlatform());
 
     // init server
-    Initialize(BoltNetworkModes.Server, UdpEndPoint.Any, config);
+    Initialize(BoltNetworkModes.Host, UdpEndPoint.Any, config);
   }
 
   public static void StartServer() {
@@ -41,7 +41,7 @@ public static class BoltLauncher {
   }
 
   public static void StartServer(UdpEndPoint endpoint, BoltConfig config) {
-    Initialize(BoltNetworkModes.Server, endpoint, config);
+    Initialize(BoltNetworkModes.Host, endpoint, config);
   }
 
   public static void StartClient() {

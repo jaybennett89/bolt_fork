@@ -37,7 +37,7 @@ namespace UdpKit {
         }
       }
 
-      public void Enable(UdpEventBroadcastArgs args) {
+      public void Enable(UdpEventLanBroadcastEnable args) {
         if (socket.platform.SupportsBroadcast == false) {
           UdpLog.Error("Current platform: {0}, does not support broadcasting", socket.platform.GetType().Name);
           return;
