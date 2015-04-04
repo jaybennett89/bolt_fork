@@ -136,15 +136,15 @@ public static class BoltLog {
   /// </summary>
   internal class Console : IWriter {
     void IWriter.Info(string message) {
-      BoltConsole.Write(message, BoltGUI.Sky);
+      BoltConsole.Write(message, BoltGUI.Info);
     }
 
     void IWriter.Debug(string message) {
-      BoltConsole.Write(message, BoltGUI.Green);
+      BoltConsole.Write(message, BoltGUI.Debug);
     }
 
     void IWriter.Warn(string message) {
-      BoltConsole.Write(message, BoltGUI.Orange);
+      BoltConsole.Write(message, BoltGUI.Warn);
     }
 
     void IWriter.Error(string message) {

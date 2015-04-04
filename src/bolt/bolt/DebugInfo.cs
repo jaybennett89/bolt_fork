@@ -7,6 +7,8 @@ using UnityEngine;
 namespace Bolt {
   [Documentation(Ignore = true)]
   public class DebugInfo : MonoBehaviour {
+    Vector2 debugInfoScroll;
+
     static GUIStyle labelStyle;
     static GUIStyle labelStyleBold;
     static Texture2D boltIconTexture;
@@ -125,14 +127,12 @@ namespace Bolt {
       Enabled = false;
     }
 
-    Vector2 debugInfoScroll;
-
     Color GetColor(int current, int bad) {
       return GetColor(Mathf.Clamp01((float)current / (float)bad));
     }
 
     Color GetColor(float t) {
-      return Color.Lerp(BoltGUI.Green, BoltGUI.Error, t);
+      return Color.Lerp(BoltGUI.Debug, BoltGUI.Error, t);
     }
 
     void DrawEntity(BoltEntity entity) {
