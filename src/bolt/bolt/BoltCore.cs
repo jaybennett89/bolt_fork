@@ -1,24 +1,19 @@
 ﻿using Bolt;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UdpKit;
 using UnityEngine;
-using UE = UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
-using System.Text.RegularExpressions;
-using System.Threading;
+using UE = UnityEngine;
 
-/// <summary>
-/// The network mode of this bolt simulation (i.e. client or server)
-/// </summary>
 public enum BoltNetworkModes {
   None = 0,
-  [Obsolete]
+  Host = 1,
+  [Obsolete("Use BoltNetworkModes.Host instead")]
   Server = 1,
   Client = 2,
-  Host = 1,
   Shutdown = 3,
 }
 
@@ -55,11 +50,6 @@ internal static class BoltCore {
 #else
     get { return false; }
 #endif
-  }
-
-  [Obsolete("This property is not used anymore, and is always null")]
-  public static GameObject userObject {
-    get { return null; }
   }
 
   internal static Func<GameObject, Vector3, Quaternion, GameObject> _instantiate =
@@ -1001,7 +991,7 @@ internal static class BoltCore {
 
   internal static UdpChannelName CreateStreamChannel(string name, UdpChannelMode mode, int priority) {
     if (_udpSocket.State != UdpSocketState.Created) {
-      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.RegisterStreamChannels callback.");
+      throw new BoltException("You can only create stream channels in the Bolt.GlobalEventListener.BoltStartBegin callback.");
     }
 
     return _udpSocket.StreamChannelCreate(name, mode, priority);
