@@ -133,13 +133,13 @@ internal static class BoltCore {
   }
 
   public static bool isServer {
-    get { return hasSocket && _mode == BoltNetworkModes.Server; }
+    get { return hasSocket && _mode == BoltNetworkModes.Host; }
   }
 
   internal static int localSendRate {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverSendRate;
+        case BoltNetworkModes.Host: return _config.serverSendRate;
         case BoltNetworkModes.Client: return _config.clientSendRate;
         default: return -1;
       }
@@ -149,7 +149,7 @@ internal static class BoltCore {
   internal static int remoteSendRate {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.clientSendRate;
+        case BoltNetworkModes.Host: return _config.clientSendRate;
         case BoltNetworkModes.Client: return _config.serverSendRate;
         default: return -1;
       }
@@ -159,7 +159,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelay {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelay;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelay;
         case BoltNetworkModes.Client: return _config.clientDejitterDelay;
         default: return -1;
       }
@@ -169,7 +169,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelayMin {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelayMin;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelayMin;
         case BoltNetworkModes.Client: return _config.clientDejitterDelayMin;
         default: return -1;
       }
@@ -179,7 +179,7 @@ internal static class BoltCore {
   internal static int localInterpolationDelayMax {
     get {
       switch (_mode) {
-        case BoltNetworkModes.Server: return _config.serverDejitterDelayMax;
+        case BoltNetworkModes.Host: return _config.serverDejitterDelayMax;
         case BoltNetworkModes.Client: return _config.clientDejitterDelayMax;
         default: return -1;
       }

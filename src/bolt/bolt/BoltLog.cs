@@ -495,7 +495,7 @@ public static class BoltLog {
         case RuntimePlatform.WindowsEditor:
         case RuntimePlatform.WindowsPlayer:
         case RuntimePlatform.OSXPlayer:
-          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Server));
+          BoltLog.Add(new BoltLog.File(mode == BoltNetworkModes.Host));
           break;
       }
     }
