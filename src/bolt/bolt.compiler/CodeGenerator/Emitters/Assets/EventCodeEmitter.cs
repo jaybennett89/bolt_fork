@@ -44,7 +44,6 @@ namespace Bolt.Compiler {
           method.Statements.Expr("evt.Targets = (byte) targets", Decorator.Definition.EntityTargets);
           method.Statements.Expr("evt.TargetEntity = entity.Entity");
           method.Statements.Expr("evt.Reliability = Bolt.ReliabilityModes.Unreliable");
-          method.Statements.Expr("evt.IncrementRefs()");
           method.Statements.Expr("return evt");
         });
       }
@@ -68,7 +67,6 @@ namespace Bolt.Compiler {
           method.Statements.Expr("evt.Targets = targets");
           method.Statements.Expr("evt.TargetConnection = connection");
           method.Statements.Expr("evt.Reliability = reliability");
-          method.Statements.Expr("evt.IncrementRefs()");
           method.Statements.Expr("return evt");
         });
 
