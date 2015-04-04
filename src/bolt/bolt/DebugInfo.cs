@@ -189,7 +189,6 @@ namespace Bolt {
         }
 
         Vector3 mp;
-
         mp = c.ScreenToViewportPoint(Input.mousePosition);
         mp.z = 0;
 
@@ -205,16 +204,19 @@ namespace Bolt {
           .Where(x => ignoreList.Contains(x.NetworkId) == false)
           .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
           .Where(x => {
-            Vector3 m = Input.mousePosition;
+            Vector3 m;
+            m = Input.mousePosition;
             m.z = 0;
 
-            Vector3 p = c.WorldToScreenPoint(x.UnityObject.transform.position);
+            Vector3 p;
+            p = c.WorldToScreenPoint(x.UnityObject.transform.position);
             p.z = 0;
 
             return (m - p).sqrMagnitude < (32 * 32);
           })
           .OrderBy(x => {
-            Vector3 vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+            Vector3 vp;
+            vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
             vp.z = 0;
 
             return (mp - vp).sqrMagnitude;
