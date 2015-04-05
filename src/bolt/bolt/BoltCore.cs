@@ -669,6 +669,22 @@ internal static class BoltCore {
       FreezeProxies();
 
       Bolt.EventDispatcher.DispatchAllEvents();
+
+#if DEBUG
+      var it = _entities.GetIterator();
+      var shouldBeFrozen = false;
+
+      while (it.Next()) {
+        if (it.val.IsFrozen) {
+          shouldBeFrozen = true;
+        }
+        else {
+          if (shouldBeFrozen) {
+            BoltLog.Warn("Non-frozen entity at incorrect slot");
+          }
+        }
+      }
+#endif
     }
   }
 
