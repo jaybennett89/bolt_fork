@@ -49,13 +49,17 @@ namespace Bolt {
     internal IEntityBehaviour[] Behaviours;
     internal Bolt.IPriorityCalculator PriorityCalculator;
 
+    internal bool IsOwner;
+    internal bool IsFrozen;
+
     internal int UpdateRate;
     internal int LastFrameReceived;
+
     internal int AutoFreezeProxyFrames;
     internal bool CanFreeze = true;
-    internal Command CommandLastExecuted = null;
-    internal ushort CommandSequence = 0;
 
+    internal ushort CommandSequence = 0;
+    internal Command CommandLastExecuted = null;
 
     internal EventDispatcher EventDispatcher = new EventDispatcher();
     internal BoltDoubleList<Command> CommandQueue = new BoltDoubleList<Command>();
@@ -99,8 +103,6 @@ namespace Bolt {
       get { return Flags & EntityFlags.ATTACHED; }
     }
 
-    internal bool IsOwner;
-    internal bool IsFrozen;
 
     internal bool IsDummy {
       get { return !IsOwner && !HasPredictedControl; }
