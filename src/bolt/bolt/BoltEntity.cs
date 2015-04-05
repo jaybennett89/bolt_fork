@@ -976,12 +976,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     UE.Gizmos.DrawIcon(transform.position, "BoltEntity Gizmo", true);
   }
 
-  //void Update() {
-  //  if (isAttached && UE.Application.isPlaying) {
-  //    Entity.Render();
-  //  }
-  //}
-
   public static implicit operator UE.GameObject(BoltEntity entity) {
     return entity == null ? null : entity.gameObject;
   }
