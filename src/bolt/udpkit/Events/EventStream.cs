@@ -30,12 +30,12 @@ namespace UdpKit {
     }
   }
 
-  class UdpEventStreamDataReceived : UdpEventBase {
-    public UdpConnection Connection;
-    public UdpStreamData StreamData;
+  //class UdpEventStreamDataReceived : UdpEventBase {
+  //  public UdpConnection Connection;
+  //  public UdpStreamData StreamData;
 
-    public override int Type {
-      get { return UdpEvent.PUBLIC_STREAM_DATARECEIVED; }
-    }
-  }
+  //  public override int Type {
+  //    get { return UdpEvent.PUBLIC_STREAM_DATARECEIVED; }
+  //  }
+  //}
 }

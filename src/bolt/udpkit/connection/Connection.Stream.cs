@@ -29,6 +29,8 @@ namespace UdpKit {
       }
 
       if (s.Channel.Config.Mode == UdpChannelMode.Unreliable) {
+        UdpLog.Info("Sending {0} bytes unreliably to {1}", op.Data.Length, this.RemoteEndPoint);
+
         int maxUnreliableSize = (StreamPipe.Config.DatagramSize - StreamPipe.Config.HeaderSize);
 
         if (op.Data.Length > maxUnreliableSize) {
@@ -55,11 +57,18 @@ namespace UdpKit {
       var channelId = Blit.ReadI32(buffer, ref o);
       var data = Blit.ReadBytesPrefix(buffer, ref o);
 
-      UdpEvent ev;
       UdpStreamChannel channel;
 
       if (Socket.FindChannel(channelId, out channel)) {
-        Socket.Raise(new UdpEventStreamDataReceived { Connection = this, StreamData = new UdpStreamData { Channel = channel.Name, Data = data } });
+
+        UdpEvent ev;
+
+        ev = new UdpEvent();
+        ev.Type = UdpEvent.PUBLIC_STREAM_DATARECEIVED;
+        ev.Object0 = this;
+        ev.Object1 = new UdpStreamData { Channel = channel.Name, Data = data };
+
+        this.Socket.Raise(ev);
       }
     }
 
@@ -74,6 +83,8 @@ namespace UdpKit {
           UdpStreamChannel channel;
 
           if (Socket.FindChannel(channelId, out channel)) {
+            UdpLog.Info("Received {0} bytes unreliably from {1}", bytes, this.RemoteEndPoint);
+
             UdpChannelStreamer s;
 
             if (StreamChannels.TryGetValue(new UdpChannelName(channelId), out s) == false) {

@@ -59,6 +59,11 @@ namespace Bolt {
       get { return (Packed0 != 0) || (Packed1 != 0) || (Object != null); }
     }
 
+    public UnityEngine.Matrix4x4 Matrix4x4 {
+      get { return (UnityEngine.Matrix4x4)Object; }
+      set { Object = value; }
+    }
+
     public System.String String {
       get { return (System.String)Object; }
       set { Object = value; }

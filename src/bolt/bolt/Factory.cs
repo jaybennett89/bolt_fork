@@ -156,8 +156,8 @@ namespace Bolt {
     }
 
     internal static void RegisterTokenClass(Type type) {
-      if (_token2id.Count == 255) {
-        throw new ArgumentException("Can only register 255 different token types");
+      if (_token2id.Count == 254) {
+        throw new ArgumentException("Can only register 254 different token types");
       }
 
       byte id = (byte)(_token2id.Count + 1);

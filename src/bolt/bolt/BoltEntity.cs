@@ -184,6 +184,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _alwaysProxy = false;
 
+  [UE.SerializeField]
+  internal bool _detachOnDisable = true;
+
+  [UE.SerializeField]
+  internal bool _allowFirstReplicationWhenFrozen = false;
+
   internal Entity Entity {
     get {
       if (_entity == null) {
@@ -952,8 +958,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void OnDisable() {
-    if (UE.Application.isPlaying) {
-      OnDestroy();
+    if (_detachOnDisable) {
+      if (UE.Application.isPlaying) {
+        OnDestroy();
+      }
     }
   }
 
@@ -975,12 +983,6 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   void OnDrawGizmos() {
     UE.Gizmos.DrawIcon(transform.position, "BoltEntity Gizmo", true);
   }
-
-  //void Update() {
-  //  if (isAttached && UE.Application.isPlaying) {
-  //    Entity.Render();
-  //  }
-  //}
 
   public static implicit operator UE.GameObject(BoltEntity entity) {
     return entity == null ? null : entity.gameObject;

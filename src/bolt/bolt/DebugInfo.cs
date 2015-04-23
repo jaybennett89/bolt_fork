@@ -157,7 +157,7 @@ namespace Bolt {
       BoltNetworkInternal.DebugDrawer.IsEditor(false);
 
       {
-        Rect r = new Rect(10, Screen.height - 30, Screen.width - 420, 20);
+        Rect r = new Rect(10, Screen.height - 30, Screen.width - 20, 20);
 
         DrawBackground(r);
 
@@ -172,11 +172,21 @@ namespace Bolt {
         string pollTime = PollTime.ToString().PadLeft(3, '0');
         string sendTime = SendTime.ToString().PadLeft(3, '0');
 
+        //GUILayout.Label("Send: " + System.Math.Round(BoltCore.SendTime.TotalMilliseconds, 2));
+        //GUILayout.Label("Auto: " + System.Math.Round(BoltCore.AutoscopeTime.TotalMilliseconds, 2));
+
+        //GUILayout.Label("Poll: " + System.Math.Round(BoltCore.PollNetworkTime.TotalMilliseconds, 2));
+        //GUILayout.Label("Callbacks: " + System.Math.Round(BoltCore.InvokeRemoteSceneCallbacksTime.TotalMilliseconds, 2));
+        //GUILayout.Label("StepLocal: " + System.Math.Round(BoltCore.SimulateLocalAndControlledEntitiesTime.TotalMilliseconds, 2));
+        //GUILayout.Label("Step: " + System.Math.Round(BoltCore.StepNonControlledRemoteEntitiesTime.TotalMilliseconds, 2));
+        //GUILayout.Label("Adjust: " + System.Math.Round(BoltCore.AdjustEstimatedRemoteFramesTime.TotalMilliseconds, 2));
+
         GUILayout.Label(string.Format("Poll {0} ms", pollTime), LabelStyleColor(GetColor(PollTime, 16)));
         GUILayout.Label(string.Format("Send {0} ms", sendTime), LabelStyleColor(GetColor(SendTime, 16)));
         GUILayout.Label(string.Format("Active Entities {0}", BoltCore._entities.Count(x => !x.IsFrozen)), LabelStyle);
         GUILayout.Label(string.Format("Frozen Entities {0}", BoltCore._entities.Count(x => x.IsFrozen)), LabelStyle);
 
+        //
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
       }
@@ -251,6 +261,9 @@ namespace Bolt {
           LabelField("Network Id", entity.NetworkId);
           LabelField("Is Frozen", entity.IsFrozen);
           LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
+          LabelField("Entity Parent", entity.HasParent ? entity.Parent.UnityObject.ToString() : "NULL");
+          LabelField("Transform Parent", entity.UnityObject.transform.parent == null ? "NULL" : entity.UnityObject.transform.parent.GetComponent<BoltEntity>().ToString());
+          LabelField("Has Control", entity.HasControl);
 
           if (state.Animator != null) {
             for (int i = 0; i < state.Animator.layerCount; ++i) {

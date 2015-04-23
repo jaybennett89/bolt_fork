@@ -164,8 +164,8 @@ namespace Bolt {
         var p = obj.Storage.Values[obj[this] + POSITION].Vector3;
         var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
-        var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F3"), p.y.ToString("F3"), p.z.ToString("F3"));
-        var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F3"), r.y.ToString("F3"), r.z.ToString("F3"));
+        var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F2"), p.y.ToString("F2"), p.z.ToString("F2"));
+        var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F2"), r.y.ToString("F2"), r.z.ToString("F2"));
 
         return string.Format("{0} / {1}", pos, rot);
       }
@@ -251,18 +251,47 @@ namespace Bolt {
 
           if (PositionCompression.StrictComparison) {
             positionChanged = NetworkValue.Diff_Strict(oldPosition, obj.Storage.Values[obj[this] + POSITION].Vector3);
-            velocityChanged = NetworkValue.Diff_Strict(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
+
+            if (Extrapolation.Enabled) {
+              velocityChanged = NetworkValue.Diff_Strict(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
+            }
           }
           else {
-            positionChanged = oldPosition != obj.Storage.Values[obj[this] + POSITION].Vector3;
-            velocityChanged = oldVelocity != obj.Storage.Values[obj[this] + VELOCITY].Vector3;
+            positionChanged = NetworkValue.Diff(oldPosition, obj.Storage.Values[obj[this] + POSITION].Vector3);
+
+            if (Extrapolation.Enabled) {
+              velocityChanged = NetworkValue.Diff(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
+            }
+
+            //if (positionChanged) {
+            //  if ((oldPosition - obj.Storage.Values[obj[this] + POSITION].Vector3).magnitude < 0.001f) {
+            //    positionChanged = false;
+            //  }
+            //}
+
+            //if (velocityChanged) {
+            //  if ((oldVelocity - obj.Storage.Values[obj[this] + VELOCITY].Vector3).magnitude < 0.001f) {
+            //    velocityChanged = false;
+            //  }
+            //}
           }
 
           if (RotationCompression.StrictComparison) {
             rotationChanged = NetworkValue.Diff_Strict(oldRotation, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
           }
           else {
-            rotationChanged = oldRotation != obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+            rotationChanged = NetworkValue.Diff(oldRotation, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
+
+            //if (rotationChanged) {
+            //  var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+
+            //  UE.Vector4 oldR = new UE.Vector4(oldRotation.x, oldRotation.y, oldRotation.z, oldRotation.w);
+            //  UE.Vector4 newR = new UE.Vector4(r.x, r.y, r.z, r.w);
+
+            //  if ((oldR - newR).magnitude < 0.001f) {
+            //    rotationChanged = false;
+            //  }
+            //}
           }
 
           if (positionChanged || velocityChanged || rotationChanged) {
@@ -371,6 +400,7 @@ namespace Bolt {
 
     public override void OnParentChanged(NetworkObj obj, Entity newParent, Entity oldParent) {
       var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
+
       if (nt != null && nt.Simulate) {
         if (newParent == null) {
           nt.Simulate.transform.parent = null;
@@ -384,6 +414,10 @@ namespace Bolt {
           nt.Simulate.transform.parent = newParent.UnityObject.transform;
           UpdateTransformValues(obj, oldParent.UnityObject.transform.localToWorldMatrix, newParent.UnityObject.transform.worldToLocalMatrix);
         }
+      }
+
+      if (obj.RootState.Entity.IsOwner) {
+        obj.Storage.PropertyChanged(obj.OffsetProperties + this.OffsetProperties);
       }
     }
 

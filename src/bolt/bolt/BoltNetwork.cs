@@ -559,11 +559,10 @@ public static class BoltNetwork {
       return null;
     }
 
-    var it = BoltCore._entities.GetIterator();
 
-    while (it.Next()) {
-      if (it.val.IsAttached && it.val.UnityObject && it.val.NetworkId.Packed == id.Packed) {
-        return it.val.UnityObject;
+    foreach(var itval in BoltCore._entities) {
+      if (itval.IsAttached && itval.UnityObject && itval.NetworkId.Packed == id.Packed) {
+        return itval.UnityObject;
       }
     }
 
