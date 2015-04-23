@@ -184,6 +184,12 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _alwaysProxy = false;
 
+  [UE.SerializeField]
+  internal bool _detachOnDisable = true;
+
+  [UE.SerializeField]
+  internal bool _allowFirstReplicationWhenFrozen = false;
+
   internal Entity Entity {
     get {
       if (_entity == null) {
@@ -952,8 +958,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   void OnDisable() {
-    if (UE.Application.isPlaying) {
-      OnDestroy();
+    if (_detachOnDisable) {
+      if (UE.Application.isPlaying) {
+        OnDestroy();
+      }
     }
   }
 

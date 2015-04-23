@@ -51,6 +51,7 @@ namespace Bolt {
 
     internal bool IsOwner;
     internal bool IsFrozen;
+    internal bool AllowFirstReplicationWhenFrozen;
 
     internal int UpdateRate;
     internal int LastFrameReceived;
@@ -183,14 +184,15 @@ namespace Bolt {
       if (IsFrozen != freeze) {
         if (IsFrozen) {
           IsFrozen = false;
-          BoltCore._entities.Remove(this);
-          BoltCore._entities.AddFirst(this);
+          BoltCore._entitiesFZ.Remove(this);
+          BoltCore._entitiesOK.AddLast(this);
+          ;
         }
         else {
           if (CanFreeze) {
             IsFrozen = true;
-            BoltCore._entities.Remove(this);
-            BoltCore._entities.AddLast(this);
+            BoltCore._entitiesOK.Remove(this);
+            BoltCore._entitiesFZ.AddLast(this);
           }
         }
       }
@@ -226,7 +228,7 @@ namespace Bolt {
       }
 
       // add to entities list
-      BoltCore._entities.AddLast(this);
+      BoltCore._entitiesOK.AddLast(this);
 
       // mark as attached
       Flags |= EntityFlags.ATTACHED;
@@ -296,7 +298,13 @@ namespace Bolt {
       Flags &= ~EntityFlags.ATTACHED;
 
       // remove from entities list
-      BoltCore._entities.Remove(this);
+      if (BoltCore._entitiesFZ.Contains(this)) {
+        BoltCore._entitiesFZ.Remove(this);
+      }
+
+      if (BoltCore._entitiesOK.Contains(this)) {
+        BoltCore._entitiesOK.Remove(this);
+      }
 
       // clear from unity object
       UnityObject._entity = null;
@@ -578,6 +586,7 @@ namespace Bolt {
       eo.UnityObject = instance.GetComponent<BoltEntity>();
       eo.UpdateRate = eo.UnityObject._updateRate;
       eo.AutoFreezeProxyFrames = eo.UnityObject._autoFreezeProxyFrames;
+      eo.AllowFirstReplicationWhenFrozen = eo.UnityObject._allowFirstReplicationWhenFrozen;
       eo.PrefabId = prefabId;
       eo.Flags = flags;
 

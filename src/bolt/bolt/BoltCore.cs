@@ -34,7 +34,24 @@ internal static class BoltCore {
   static internal BoltConfig _config = null;
   static internal UdpConfig _udpConfig = null;
 
-  static internal BoltDoubleList<Entity> _entities = new BoltDoubleList<Entity>();
+  static internal BoltDoubleList<Entity> _entitiesOK = new BoltDoubleList<Entity>();
+  static internal BoltDoubleList<Entity> _entitiesFZ = new BoltDoubleList<Entity>();
+
+  static internal IEnumerable<Entity> _entities {
+    get {
+      var it = _entitiesOK.GetIterator();
+
+      while (it.Next()) {
+        yield return it.val;
+      }
+
+      it = _entitiesFZ.GetIterator();
+
+      while (it.Next()) {
+        yield return it.val;
+      }
+    }
+  }
 
   static internal BoltDoubleList<BoltConnection> _connections = new BoltDoubleList<BoltConnection>();
   static internal Bolt.EventDispatcher _globalEventDispatcher = new Bolt.EventDispatcher();
@@ -258,11 +275,9 @@ internal static class BoltCore {
       id = new NetworkId(NetworkIdAllocator.LocalConnectionId, id.Entity);
     }
 
-    var it = _entities.GetIterator();
-
-    while (it.Next()) {
-      if (it.val.NetworkId == id) {
-        return it.val;
+    foreach(var itval in _entities) {
+      if (itval.NetworkId == id) {
+        return itval;
       }
     }
 
@@ -480,9 +495,8 @@ internal static class BoltCore {
   }
 
   static void Udp_StreamDataReceived(UdpEvent ev) {
-    var c = (UdpConnection)ev.Object0;
-    var s = (UdpStreamData)ev.Object1;
-
+    var c = ev.Object0 as UdpConnection;
+    var s = ev.Object1 as UdpStreamData;
     BoltInternal.GlobalEventListenerBase.StreamDataReceivedInvoke(c.GetBoltConnection(), s);
   }
 
@@ -581,13 +595,24 @@ internal static class BoltCore {
     _udpSocket.Refuse(endpoint, token.ToByteArray());
   }
 
+  public static TimeSpan SendTime;
+  public static TimeSpan AutoscopeTime;
+
   internal static void Send() {
     if (hasSocket) {
       // auto scope everything
+      Stopwatch sw;
+
+
+      //sw = Stopwatch.StartNew();
       if (BoltCore._config.scopeMode == ScopeMode.Automatic) {
-        var eo = _entities.GetIterator();
+        var eo = _entitiesOK.GetIterator();
 
         while (eo.Next()) {
+          if (eo.val.IsFrozen) {
+            continue;
+          }
+
           var cn = _connections.GetIterator();
 
           while (cn.Next()) {
@@ -596,9 +621,14 @@ internal static class BoltCore {
         }
       }
 
-      BoltPhysics.SnapshotWorld();
+      //AutoscopeTime = sw.Elapsed;
 
-      // switch perf counters
+      //Debug.Log("Autoscope:" + sw.Elapsed);
+
+      //// BoltPhysics.SnapshotWorld();
+
+      //sw = Stopwatch.StartNew();
+      //// switch perf counters
       if ((_frame % framesPerSecond) == 0) {
         var it = _connections.GetIterator();
 
@@ -607,8 +637,12 @@ internal static class BoltCore {
         }
       }
 
+      //Debug.Log("SwitchPerfCounters:" + sw.Elapsed);
+
       // send data on all connections
       {
+        //sw = Stopwatch.StartNew();
+
         var it = _connections.GetIterator();
 
         while (it.Next()) {
@@ -623,6 +657,9 @@ internal static class BoltCore {
             }
           }
         }
+
+        //SendTime = sw.Elapsed;
+        //Debug.Log("Send:" + sw.Elapsed);
       }
     }
   }
@@ -638,58 +675,69 @@ internal static class BoltCore {
     }
   }
 
+  public static TimeSpan PollNetworkTime;
+  public static TimeSpan InvokeRemoteSceneCallbacksTime;
+  public static TimeSpan AdjustEstimatedRemoteFramesTime;
+  public static TimeSpan StepNonControlledRemoteEntitiesTime;
+  public static TimeSpan SimulateLocalAndControlledEntitiesTime;
+  public static TimeSpan DispatchAllEventsTime;
+
   internal static void Poll() {
     if (hasSocket) {
       _frame += 1;
 
+      Stopwatch sw = null;
+
       BoltCore.UpdateUPnP();
 
       // first thing we do is to poll the network
+      //sw = Stopwatch.StartNew();
       BoltCore.PollNetwork();
+      //PollNetworkTime = sw.Elapsed;
 
       // do things!
+      //sw = Stopwatch.StartNew();
       BoltCore.InvokeRemoteSceneCallbacks();
+      //InvokeRemoteSceneCallbacksTime = sw.Elapsed;
 
       // adjust estimated frame numbers for connections
+      //sw = Stopwatch.StartNew();
       BoltCore.AdjustEstimatedRemoteFrames();
+      //AdjustEstimatedRemoteFramesTime = sw.Elapsed;
 
       // step remote events and entities which depends on remote estimated frame numbers
+      //sw = Stopwatch.StartNew();
       BoltCore.StepNonControlledRemoteEntities();
+      //StepNonControlledRemoteEntitiesTime = sw.Elapsed;
 
       // step entities which we in some way are controlling locally
-      var iter = _entities.GetIterator();
+      //sw = Stopwatch.StartNew();
+      var iter = _entitiesOK.GetIterator();
 
       while (iter.Next()) {
-        if (!iter.val.IsFrozen && (iter.val.IsOwner || iter.val.HasPredictedControl)) {
+        if (iter.val.IsFrozen) {
+          continue;
+        }
+
+        if (iter.val.IsOwner || iter.val.HasPredictedControl) {
           iter.val.Simulate();
         }
       }
 
+      //SimulateLocalAndControlledEntitiesTime = sw.Elapsed;
+
       // freeze all proxies
       FreezeProxies();
 
+      //sw = Stopwatch.StartNew();
       Bolt.EventDispatcher.DispatchAllEvents();
+      //DispatchAllEventsTime = sw.Elapsed;
 
-#if DEBUG
-      var it = _entities.GetIterator();
-      var shouldBeFrozen = false;
-
-      while (it.Next()) {
-        if (it.val.IsFrozen) {
-          shouldBeFrozen = true;
-        }
-        else {
-          if (shouldBeFrozen) {
-            BoltLog.Warn("Non-frozen entity at incorrect slot");
-          }
-        }
-      }
-#endif
     }
   }
 
   internal static void FreezeProxies() {
-    var it = _entities.GetIterator();
+    var it = _entitiesOK.GetIterator();
     var freezeList = new List<Entity>();
 
     while (it.Next()) {
@@ -929,11 +977,9 @@ internal static class BoltCore {
   }
 
   internal static void SceneLoadBegin(SceneLoadState state) {
-    var it = _entities.GetIterator();
-
-    while (it.Next()) {
-      if (it.val.IsOwner && (it.val.PersistsOnSceneLoad == false)) {
-        DestroyForce(it.val);
+    foreach(var itval in _entities) {
+      if (itval.IsOwner && (itval.PersistsOnSceneLoad == false)) {
+        DestroyForce(itval);
       }
     }
 
@@ -1014,9 +1060,13 @@ internal static class BoltCore {
   }
 
   internal static void Update() {
-    var it = _entities.GetIterator();
+    var it = _entitiesOK.GetIterator();
 
     while (it.Next()) {
+      if (it.val.IsFrozen) {
+        continue;
+      }
+
       it.val.Render();
     }
   }
@@ -1169,7 +1219,8 @@ internal static class BoltCore {
       }
     }
 
-    _entities.Clear();
+    _entitiesFZ.Clear();
+    _entitiesOK.Clear();
     _connections.Clear();
     _globalEventDispatcher.Clear();
     _globalBehaviours.Clear();
@@ -1223,7 +1274,8 @@ internal static class BoltCore {
       catch { }
     }
 
-    _entities.Clear();
+    _entitiesFZ.Clear();
+    _entitiesOK.Clear();
     _connections.Clear();
     _globalEventDispatcher.Clear();
     _globalBehaviours.Clear();

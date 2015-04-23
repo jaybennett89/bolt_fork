@@ -71,6 +71,7 @@ partial class EntityChannel {
 
           packet.UdpPacket.WriteBool(true);
           packet.UdpPacket.WriteNetworkId(proxy.NetworkId);
+          packet.UdpPacket.WriteEntity(proxy.Entity.Parent);
 
           var it = entity.CommandQueue.GetIterator();
 
@@ -126,6 +127,7 @@ partial class EntityChannel {
         if (packet.UdpPacket.ReadBool() == false) { break; }
 
         NetworkId netId = packet.UdpPacket.ReadNetworkId();
+        Entity parent = packet.UdpPacket.ReadEntity();
         EntityProxy proxy = incommingProxiesByNetworkId[netId];
         Entity entity = proxy.Entity;
 
@@ -151,6 +153,8 @@ partial class EntityChannel {
               }
             }
           }
+
+          entity.SetParentInternal(parent);
 
           if (cmd) {
             cmd.ResultObject.Token = resultToken;

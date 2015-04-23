@@ -188,7 +188,9 @@ partial class EntityChannel : BoltChannel {
       }
       else {
         if (proxy.Entity.IsFrozen && !proxy.Entity.IsController(connection)) {
-          continue;
+          if (proxy.Entity.AllowFirstReplicationWhenFrozen && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
+            continue;
+          }
         }
 
         // check update rate of this entity
@@ -553,7 +555,6 @@ partial class EntityChannel : BoltChannel {
             }
           }
 
-          BoltLog.Warn("Creating instance of {0}", prefabId);
           entity = Entity.CreateFor(prefabId, serializerId, spawnPosition, spawnRotation);
         }
 
@@ -635,6 +636,7 @@ partial class EntityChannel : BoltChannel {
     // remove proxy from entity
     if (proxy.Entity && proxy.Entity.IsAttached) {
       proxy.Entity.Proxies.Remove(proxy);
+      ;
     }
 
     if (proxy.Flags & ProxyFlags.DESTROY_IGNORE) {
