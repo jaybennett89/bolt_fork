@@ -139,6 +139,10 @@ public class BoltEntityEditor : Editor {
     entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Persist Through Load", entity._persistThroughSceneLoads);
     entity._alwaysProxy = EditorGUILayout.Toggle("Always Proxy", entity._alwaysProxy);
 
+    entity._detachOnDisable = EditorGUILayout.Toggle("Detach On Disable", entity._detachOnDisable);
+    entity._allowFirstReplicationWhenFrozen = EditorGUILayout.Toggle("Allow Replication When Frozen", entity._allowFirstReplicationWhenFrozen);
+
+
     if (settings.clientCanInstantiateAll == false) {
       entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Client Can Instantiate", entity._allowInstantiateOnClient);
     }

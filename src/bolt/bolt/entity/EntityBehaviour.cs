@@ -136,25 +136,6 @@ namespace Bolt {
     public virtual void Attached() { }
 
     /// <summary>
-    /// Invoked when Bolt is aware of this entity and all internal state has been setup
-    /// </summary>
-    /// <param name="token">A data token of max size 512 bytes</param>
-    /// <example>
-    /// *Example:* Using the ```IProtocolToken``` parameter to send a data token such as ```PlayerLoadout``` containing setup data.
-    /// 
-    /// ```csharp
-    /// public override void Attached(IProtocolToken token) {
-    ///   PlayerLoadout loadout = (PlayerLoadout)token;
-    ///   ConfigurePlayer(loadout.weaponID, loadout.charMeshID);
-    /// 
-    ///   state.AddCallback("name", NameChanged);
-    ///   state.AddCallback("team", TeamChanged);
-    /// }
-    /// ```
-    /// </example>      
-    public virtual void Attached(IProtocolToken token) { }
-
-    /// <summary>
     /// Invoked when this entity is removed from Bolt's awareness
     /// </summary>
     /// <example>
@@ -167,24 +148,6 @@ namespace Bolt {
     /// ``` 
     /// </example>
     public virtual void Detached() { }
-
-    /// <summary>
-    /// Invoked when this entity is removed from Bolt's awareness
-    /// </summary>
-    /// <param name="token">A data token of max size 512 bytes</param>
-    /// <example>
-    /// *Example:* Using the ```IProtocolToken``` to send a detailed ```DeathRecap``` containing information such as the killer and a description.
-    /// 
-    /// ```csharp
-    /// public override void Detached(IProtocolToken token) {
-    ///   DeathRecap recap = (DeathRecap)token;
-    ///   DeathMessage.Show(recap.killer, recap.description);  
-    /// 
-    ///   MiniMap.instance.RemoveKnownPlayer(this.gameObject);
-    /// {
-    /// ``` 
-    /// </example>
-    public virtual void Detached(IProtocolToken token) { }
 
     /// <summary>
     /// Invoked each simulation step on the owner
@@ -258,25 +221,6 @@ namespace Bolt {
     public virtual void ControlGained() { }
 
     /// <summary>
-    /// Invoked when you gain control of this entity
-    /// </summary>
-    /// <param name="token">A data token of max size 512 bytes</param> 
-    /// <example>
-    /// *Example:* Using the ```IProtocolToken``` parameter to send a data token such as ```ControlToken``` containing setup data.
-    /// 
-    /// ```csharp
-    /// public override void ControlGained(IProtocolToken token) {
-    ///   ControlToken ctrlToken = (ControlToken)token;
-    ///   SetNameplate(ctrlToken.playerName);  
-    /// 
-    ///   GameCamera.instance.AddFollowTarget(this.transform);
-    ///   MiniMap.instance.ControlGained(this.entity);
-    /// }
-    /// ```
-    /// </example>
-    public virtual void ControlGained(IProtocolToken token) { }
-
-    /// <summary>
     /// Invoked when you lost control of this entity
     /// </summary>
     /// <example>
@@ -290,25 +234,6 @@ namespace Bolt {
     /// ```
     /// </example>  
     public virtual void ControlLost() { }
-
-    /// <summary>
-    /// Invoked when you lost control of this entity
-    /// </summary>
-    /// <param name="token">A data token of max size 512 bytes</param>
-    /// <example>
-    /// *Example:* Using the ```IProtocolToken``` parameter to send a data token such as a ```ServerMessage``` containing an error message.
-    /// 
-    /// ```csharp
-    /// public override void ControlLost(IProtocolToken token) {
-    ///   ServerMessage msg = (ServerMessage)token;
-    ///   Message.Show(msg.errorCode, msg.text);  
-    /// 
-    ///   GameCamera.instance.RemoveFollowTarget();
-    ///   MiniMap.instance.ControlLost(this.entity);
-    /// }
-    /// ```
-    /// </example>  
-    public virtual void ControlLost(IProtocolToken token) { }
 
     /// <summary>
     /// Invoked on the owner when a remote connection is controlling this entity but we have not received any command for the current simulation frame.
