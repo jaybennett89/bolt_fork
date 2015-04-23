@@ -246,6 +246,22 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return Entity.Source; }
   }
 
+  public IProtocolToken attachToken {
+    get { return Entity.AttachToken; }
+  }
+
+  public IProtocolToken detachToken {
+    get { return Entity.DetachToken; }
+  }
+
+  public IProtocolToken controlGainedToken {
+    get { return Entity.ControlGainedToken; }
+  }
+
+  public IProtocolToken controlLostToken {
+    get { return Entity.ControlLostToken; }
+  }
+
   /// <summary>
   /// The unique id of this entity
   /// </summary>
