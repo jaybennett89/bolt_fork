@@ -138,6 +138,9 @@ public class BoltRuntimeSettings : ScriptableObject {
   [SerializeField]
   public bool masterServerAutoDisconnect = true;
 
+  [SerializeField]
+  public bool showBoltEntityHints = true;
+
   /// <summary>
   /// Get a memberwise copy of the current bolt config
   /// </summary>

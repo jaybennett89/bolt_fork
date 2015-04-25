@@ -167,7 +167,13 @@ namespace Bolt {
         var pos = string.Format("X:{0} Y:{1} Z:{2}", p.x.ToString("F2"), p.y.ToString("F2"), p.z.ToString("F2"));
         var rot = string.Format("X:{0} Y:{1} Z:{2}", r.x.ToString("F2"), r.y.ToString("F2"), r.z.ToString("F2"));
 
-        return string.Format("{0} / {1}", pos, rot);
+        var render = "";
+
+        if (nt.Render) {
+          render = string.Format("(R: {0})", nt.Render.gameObject.name);
+        }
+
+        return string.Format("{0} / {1}{2}", pos, rot, render);
       }
 
       return "NOT ASSIGNED";

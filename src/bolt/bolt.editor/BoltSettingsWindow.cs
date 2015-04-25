@@ -244,6 +244,10 @@ public class BoltSettingsWindow : EditorWindow {
       settings.showHelpButtons = EditorGUILayout.Toggle(settings.showHelpButtons);
     });
 
+    BoltEditorGUI.WithLabel("Show Entity Settings Hints", () => {
+      settings.showBoltEntityHints = EditorGUILayout.Toggle(settings.showBoltEntityHints);
+    });
+
     BoltEditorGUI.WithLabel("Log Targets", () => {
       settings._config.logTargets = (BoltConfigLogTargets)EditorGUILayout.EnumMaskField(settings._config.logTargets);
     });
