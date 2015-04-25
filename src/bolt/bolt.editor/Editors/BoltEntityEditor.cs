@@ -28,7 +28,61 @@ public class BoltEntityEditor : Editor {
         .ToArray();
   }
 
+  void HelpBox(string text) {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    if (settings.showBoltEntityHints) {
+      EditorGUILayout.HelpBox(text, MessageType.Info);
+    }
+  }
+
   public override void OnInspectorGUI() {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
+    GUIStyle s = new GUIStyle(EditorStyles.boldLabel);
+    s.normal.textColor = new Color(0xf2 / 255f, 0xad / 255f, 0f);
+    
+    BoltEntity entity = (BoltEntity)target;
+
+    GUILayout.BeginHorizontal();
+    GUI.DrawTexture(GUILayoutUtility.GetRect(128, 128, 64, 64, GUILayout.ExpandHeight(false), GUILayout.ExpandWidth(false)), Resources.Load("BoltLogo") as Texture2D);
+    GUILayout.EndHorizontal();
+
+    GUILayout.Label("Prefab & State", s);
+
+    DrawPrefabInfo(entity);
+    EditState(entity);
+
+    GUILayout.Label("Settings", s);
+
+    entity._updateRate = EditorGUILayout.IntField("Replication Rate", entity._updateRate);
+    HelpBox("Controls how often this entity should be considered for replication. 1 = Every packet, 2 = Every other packet, etc.");
+
+    entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Persistent", entity._persistThroughSceneLoads);
+    HelpBox("If enabled Bolt will not destroy this object when a new scene is loaded through BoltNetwork.LoadScene().");
+
+    entity._alwaysProxy = EditorGUILayout.Toggle("Always Replicate", entity._alwaysProxy);
+    HelpBox("If enabled Bolt will always replicate this entity and its state, even when operations that normally would block replication is taking place (example: loading a scene).");
+
+    entity._allowFirstReplicationWhenFrozen = EditorGUILayout.Toggle("Proxy When Frozen", entity._allowFirstReplicationWhenFrozen);
+    HelpBox("If enabled Bolt will allow this entity to perform its first replication even if its frozen.");
+
+    entity._detachOnDisable = EditorGUILayout.Toggle("Detach On Disable", entity._detachOnDisable);
+    HelpBox("If enabled this entity will be detached from the network when its disabled.");
+
+    entity._autoFreezeProxyFrames = EditorGUILayout.IntField("Auto Freeze Frames", entity._autoFreezeProxyFrames);
+    HelpBox("If larger than 0, this entity will be automatically frozen by Bolt for non-owners if it has not received a network update for the amount of frames specified.");
+
+    entity._clientPredicted = EditorGUILayout.Toggle("Controller Predicted Movement", entity._clientPredicted);
+    HelpBox("If enabled this tells Bolt that this entity is using commands for moving and that they are applied on both the owner and controller.");
+
+    if (settings.clientCanInstantiateAll == false) {
+      entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Allow Client Instantiate", entity._allowInstantiateOnClient);
+      HelpBox("If enabled this prefab can be instantiated by clients, this option can be globally enabled/disabled by changing the 'Instantiate Mode' setting in the 'Window/Bolt/Settings' window");
+    }
+  }
+
+  public  void OnInspectorGUI2() {
     GUILayout.Space(4);
 
     BoltEditorGUI.Help("Entity Settings", "http://wiki.boltengine.com/wiki/38");
@@ -49,7 +103,9 @@ public class BoltEntityEditor : Editor {
 
     BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
+#if DEBUG
     EditorGUILayout.LabelField("Prefab Type", prefabType.ToString());
+#endif
 
     // Prefab Id
     switch (prefabType) {
@@ -92,7 +148,7 @@ public class BoltEntityEditor : Editor {
         break;
     }
 
-    EditSerializer(entity);
+    EditState(entity);
     EditProperties(entity);
     EditSceneProperties(entity, prefabType);
 
@@ -111,7 +167,57 @@ public class BoltEntityEditor : Editor {
     }
   }
 
-  void EditSerializer(BoltEntity entity) {
+  void DrawPrefabInfo(BoltEntity entity) {
+    PrefabType prefabType = PrefabUtility.GetPrefabType(entity.gameObject);
+
+#if DEBUG
+    EditorGUILayout.LabelField("Type", prefabType.ToString());
+#endif
+
+    switch (prefabType) {
+      case PrefabType.Prefab:
+      case PrefabType.PrefabInstance:
+        EditorGUILayout.LabelField("Id", entity._prefabId.ToString());
+
+        if (entity._prefabId < 0) {
+          EditorGUILayout.HelpBox("Prefab id not set, run the 'Assets/Bolt Engine/Compile Assembly' menu option to correct", MessageType.Error);
+        }
+
+        if (prefabType == PrefabType.Prefab) {
+          if (Bolt.PrefabDatabase.Contains(entity) == false) {
+            EditorGUILayout.HelpBox("Prefab lookup not valid, run the 'Assets/Bolt Engine/Compile Assembly' menu option to correct", MessageType.Error);
+          }
+        }
+        break;
+
+      case PrefabType.None:
+        if (entity._prefabId != 0) {
+          // force 0 prefab id
+          entity._prefabId = 0;
+
+          // set dirty
+          EditorUtility.SetDirty(this);
+        }
+
+        BoltEditorGUI.Disabled(() => {
+          EditorGUILayout.IntField("Prefab Id", entity._prefabId);
+        });
+
+        break;
+
+      case PrefabType.DisconnectedPrefabInstance:
+        entity._prefabId = EditorGUILayout.IntField("Prefab Id", entity._prefabId);
+
+        if (entity._prefabId < 0) {
+          EditorGUILayout.HelpBox("Prefab Id not set", MessageType.Error);
+        }
+        break;
+    }
+  }
+
+  void EditState(BoltEntity entity) {
+    BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+
     int selectedIndex;
 
     selectedIndex = Math.Max(0, Array.IndexOf(serializerIds, entity.serializerGuid) + 1);
@@ -119,11 +225,12 @@ public class BoltEntityEditor : Editor {
 
     if (selectedIndex == 0) {
       entity.serializerGuid = Bolt.UniqueId.None;
-      EditorGUILayout.HelpBox("You must assign a serializer to this prefab before using it", MessageType.Error);
+      EditorGUILayout.HelpBox("You must assign a state to this prefab before using it", MessageType.Error);
     }
     else {
       entity.serializerGuid = serializerIds[selectedIndex - 1];
     }
+
   }
 
 
@@ -132,15 +239,15 @@ public class BoltEntityEditor : Editor {
 
     // Update Rate
     entity._updateRate = EditorGUILayout.IntField("Update Rate", entity._updateRate);
-    entity._autoFreezeProxyFrames = EditorGUILayout.IntField("Auto Freeze Frames", entity._autoFreezeProxyFrames);
-
-    // Bool Settings
-    entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);
     entity._persistThroughSceneLoads = EditorGUILayout.Toggle("Persist Through Load", entity._persistThroughSceneLoads);
     entity._alwaysProxy = EditorGUILayout.Toggle("Always Proxy", entity._alwaysProxy);
-
     entity._detachOnDisable = EditorGUILayout.Toggle("Detach On Disable", entity._detachOnDisable);
     entity._allowFirstReplicationWhenFrozen = EditorGUILayout.Toggle("Allow Replication When Frozen", entity._allowFirstReplicationWhenFrozen);
+
+    entity._autoFreezeProxyFrames = EditorGUILayout.IntField("Auto Freeze Frames", entity._autoFreezeProxyFrames);
+
+    entity._clientPredicted = EditorGUILayout.Toggle("Controller Prediction", entity._clientPredicted);
+    // Bool Settings
 
 
     if (settings.clientCanInstantiateAll == false) {
