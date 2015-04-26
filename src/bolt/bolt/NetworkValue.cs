@@ -29,6 +29,9 @@ namespace Bolt {
     public System.Single Float3;
 
     [FieldOffset(0)]
+    public System.Guid Guid;
+
+    [FieldOffset(0)]
     public Bolt.NetworkId NetworkId;
 
     [FieldOffset(0)]
@@ -100,6 +103,7 @@ namespace Bolt {
 
     public static bool Diff(Boolean a, Boolean b) { return a != b; }
     public static bool Diff(Int32 a, Int32 b) { return a != b; }
+    public static bool Diff(Guid a, Guid b) { return a != b; }
     public static bool Diff(Single a, Single b) { return a != b; }
     public static bool Diff(NetworkId a, NetworkId b) { return a != b; }
     public static bool Diff(PrefabId a, PrefabId b) { return a != b; }
