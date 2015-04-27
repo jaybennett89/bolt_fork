@@ -69,8 +69,8 @@ public class PlayerController : Bolt.EntityEventListener<IPlayerState> {
     }
   }
 
-  public override void Attached(Bolt.IProtocolToken token) {
-    BoltLog.Info("Attached-Token: {0}", token);
+  public override void Attached() {
+    //BoltLog.Info("Attached-Token: {0}", token);
 
     if (entity.isOwner) {
       state.tokenTest = new TestToken() { Number = 1337 };

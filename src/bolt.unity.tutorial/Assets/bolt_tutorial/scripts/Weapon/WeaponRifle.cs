@@ -55,8 +55,8 @@ public class WeaponRifle : WeaponBase {
     }
 
     GameObject go = (GameObject)GameObject.Instantiate(shellPrefab, shellEjector.position, shellEjector.rotation);
-    go.rigidbody.AddRelativeForce(0, 0, 2, ForceMode.VelocityChange);
-    go.rigidbody.AddTorque(new Vector3(Random.Range(-32f, +32f), Random.Range(-32f, +32f), Random.Range(-32f, +32f)), ForceMode.VelocityChange);
+    go.GetComponent<Rigidbody>().AddRelativeForce(0, 0, 2, ForceMode.VelocityChange);
+    go.GetComponent<Rigidbody>().AddTorque(new Vector3(Random.Range(-32f, +32f), Random.Range(-32f, +32f), Random.Range(-32f, +32f)), ForceMode.VelocityChange);
 
     // show flash
     muzzleFlash.gameObject.SetActive(true);

@@ -28,7 +28,7 @@ public class WeaponBazooka : WeaponBase {
     GameObject shellGo = GameObject.Instantiate(shellFakePrefab, muzzleFlash.position, Quaternion.LookRotation(fireDirection)) as GameObject;
 
     // launch it
-    shellGo.rigidbody.AddRelativeForce(new Vector3(0, 0, shellForce), ForceMode.VelocityChange);
+    shellGo.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0, shellForce), ForceMode.VelocityChange);
     shellGo.GetComponentInChildren<ParticleSystem>().Emit(20);
   }
 }

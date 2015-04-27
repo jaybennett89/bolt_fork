@@ -24,8 +24,8 @@ public class PlayerCallbacks : Bolt.GlobalEventListener {
     BoltLog.Info("SceneLoadRemoteDone-Token: {0}", token);
   }
 
-  public override void ControlOfEntityGained(BoltEntity arg, Bolt.IProtocolToken token) {
-    BoltLog.Info("ControlGained-Token: {0}", token);
+  public override void ControlOfEntityGained(BoltEntity arg) {
+   // BoltLog.Info("ControlGained-Token: {0}", token);
 
     // add audio listener to our character
     arg.gameObject.AddComponent<AudioListener>();

@@ -41,7 +41,7 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
   Transform dummyTarget;
 
   public new Camera camera {
-    get { return cam.camera; }
+    get { return cam.GetComponent<Camera>(); }
   }
 
   public System.Func<int> getHealth;
@@ -73,7 +73,7 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
       }
 
       Screen.lockCursor = true;
-      Screen.showCursor = false;
+      Cursor.visible = false;
 
       if (_aiming) {
         if (a == false) {

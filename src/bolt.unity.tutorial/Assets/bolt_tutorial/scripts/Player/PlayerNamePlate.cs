@@ -14,13 +14,13 @@ public class PlayerNamePlate : Bolt.EntityBehaviour<IPlayerState> {
 
   void TeamChanged() {
     switch (state.team) {
-      case Player.TEAM_RED: text.renderer.material.color = Color.red; break;
-      case Player.TEAM_BLUE: text.renderer.material.color = Color.blue; break;
+      case Player.TEAM_RED: text.GetComponent<Renderer>().material.color = Color.red; break;
+      case Player.TEAM_BLUE: text.GetComponent<Renderer>().material.color = Color.blue; break;
     }
   }
 
   void Update() {
-    text.renderer.enabled = !entity.hasControl;
+    text.GetComponent<Renderer>().enabled = !entity.hasControl;
 
     if (!entity.hasControl) {
       try {
