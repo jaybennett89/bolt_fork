@@ -8,24 +8,24 @@ public class GameUI : BoltSingletonPrefab<GameUI> {
   }
 
   void Start() {
-    if (!camera) {
+    if (!GetComponent<Camera>()) {
       gameObject.AddComponent<Camera>();
     }
 
-    camera.isOrthoGraphic = true;
-    camera.cullingMask = 1 << LayerMask.NameToLayer("GUI");
-    camera.nearClipPlane = 0;
-    camera.farClipPlane = 500f;
-    camera.useOcclusionCulling = false;
-    camera.depth = 1;
-    camera.clearFlags = CameraClearFlags.Depth;
+    GetComponent<Camera>().orthographic = true;
+    GetComponent<Camera>().cullingMask = 1 << LayerMask.NameToLayer("GUI");
+    GetComponent<Camera>().nearClipPlane = 0;
+    GetComponent<Camera>().farClipPlane = 500f;
+    GetComponent<Camera>().useOcclusionCulling = false;
+    GetComponent<Camera>().depth = 1;
+    GetComponent<Camera>().clearFlags = CameraClearFlags.Depth;
 
     transform.position = new Vector3(0, 0, -250f);
   }
 
   void Update() {
-    if (camera) {
-      camera.orthographicSize = Screen.height / 2;
+    if (GetComponent<Camera>()) {
+      GetComponent<Camera>().orthographicSize = Screen.height / 2;
     }
   }
 }
