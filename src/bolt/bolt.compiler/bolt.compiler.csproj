@@ -60,6 +60,7 @@
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorColor.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorEntity.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorFloat.cs" />
+    <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorGuid.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorInteger.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorPrefabId.cs" />
     <Compile Include="CodeGenerator\Decorators\Property\PropertyDecoratorProtocolToken.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterColor.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterEntity.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterFloat.cs" />
+    <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterGuid.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterInteger.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterPrefabId.cs" />
     <Compile Include="CodeGenerator\Emitters\Property\PropertyCodeEmitterProtocolToken.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="Property\Type\PropertyTypeEntity.cs" />
     <Compile Include="Property\Type\PropertyTypeFloat.cs" />
     <Compile Include="Property\Type\PropertyType.cs" />
+    <Compile Include="Property\Type\PropertyTypeGuid.cs" />
     <Compile Include="Property\Type\PropertyTypeInteger.cs" />
     <Compile Include="Property\Type\PropertyTypePrefabId.cs" />
     <Compile Include="Property\Type\PropertyTypeProcotolToken.cs" />

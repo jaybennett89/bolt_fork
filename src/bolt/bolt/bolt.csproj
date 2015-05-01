@@ -129,6 +129,7 @@
     <Compile Include="state\Properties\Color.cs" />
     <Compile Include="state\Properties\Entity.cs" />
     <Compile Include="state\Properties\Float.cs" />
+    <Compile Include="state\Properties\Guid.cs" />
     <Compile Include="state\Properties\Integer.cs" />
     <Compile Include="state\NetworkProperty.cs" />
     <Compile Include="state\NetworkTransform.cs" />

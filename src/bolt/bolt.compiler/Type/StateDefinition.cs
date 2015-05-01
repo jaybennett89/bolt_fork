@@ -52,6 +52,7 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypePrefabId);
       yield return typeof(PropertyTypeNetworkId);
       yield return typeof(PropertyTypeProcotolToken);
+      yield return typeof(PropertyTypeGuid);
     }
   }
 }
