@@ -49,10 +49,12 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypeVector);
       yield return typeof(PropertyTypeQuaternion);
       yield return typeof(PropertyTypeColor);
+      yield return typeof(PropertyTypeColor32);
       yield return typeof(PropertyTypePrefabId);
       yield return typeof(PropertyTypeNetworkId);
       yield return typeof(PropertyTypeProcotolToken);
       yield return typeof(PropertyTypeGuid);
+      yield return typeof(PropertyTypeMatrix4x4);
     }
   }
 }

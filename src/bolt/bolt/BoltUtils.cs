@@ -334,7 +334,7 @@ public static class BoltUtils {
     return stream.ReadInt(32);
   }
 
-  public static void WriteMatrix4x4(this UdpPacket stream, ref Matrix4x4 m) {
+  public static void WriteMatrix4x4(this UdpPacket stream, Matrix4x4 m) {
     stream.WriteFloat(m.m00);
     stream.WriteFloat(m.m01);
     stream.WriteFloat(m.m02);
