@@ -741,7 +741,7 @@ internal static class BoltCore {
     var freezeList = new List<Entity>();
 
     while (it.Next()) {
-      if (!it.val.IsOwner && !it.val.HasControl && (it.val.AutoFreezeProxyFrames > 0) && (it.val.LastFrameReceived + it.val.AutoFreezeProxyFrames < BoltNetwork.frame)) {
+      if ((it.val.AutoFreezeProxyFrames > 0) && !it.val.IsOwner && !it.val.HasControl && (it.val.LastFrameReceived + it.val.AutoFreezeProxyFrames < BoltNetwork.frame)) {
         freezeList.Add(it.val);
       }
     }
