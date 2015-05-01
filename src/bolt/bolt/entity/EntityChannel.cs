@@ -187,7 +187,7 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 17;
       }
       else {
-        if (proxy.Entity.IsFrozen && !proxy.Entity.IsController(connection)) {
+        if (proxy.Entity.IsFrozen) {
           if (proxy.Entity.AllowFirstReplicationWhenFrozen && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
             continue;
           }
@@ -225,7 +225,7 @@ partial class EntityChannel : BoltChannel {
               continue;
             }
 
-            proxy.Priority = proxy.Priority + proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
+            proxy.Priority = proxy.Entity.PriorityCalculator.CalculateStatePriority(connection, proxy.Skipped);
             proxy.Priority = Mathf.Clamp(proxy.Priority, 0, Mathf.Min(1 << 16, BoltCore._config.maxEntityPriority));
           }
           else {
