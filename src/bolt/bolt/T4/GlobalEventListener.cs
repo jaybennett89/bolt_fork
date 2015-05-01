@@ -603,6 +603,38 @@ internal static void EntityReceivedInvoke(BoltEntity entity) {
 
 
  
+public virtual void EntityFrozen(BoltEntity entity) {  }
+
+internal static void EntityFrozenInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback EntityFrozen");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.EntityFrozen(entity);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+ 
+public virtual void EntityThawed(BoltEntity entity) {  }
+
+internal static void EntityThawedInvoke(BoltEntity entity) { 
+	BoltLog.Debug("Invoking callback EntityThawed");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.EntityThawed(entity);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+
+
+ 
 public virtual void ZeusConnectFailed(UdpEndPoint endpoint) {  }
 
 internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) { 
