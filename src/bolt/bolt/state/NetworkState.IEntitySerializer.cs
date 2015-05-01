@@ -105,7 +105,6 @@ namespace Bolt {
     }
 
     void IEntitySerializer.DebugInfo() {
-#if DEBUG
       if (BoltNetworkInternal.DebugDrawer != null) {
         BoltNetworkInternal.DebugDrawer.LabelBold("");
         BoltNetworkInternal.DebugDrawer.LabelBold("State Info");
@@ -137,7 +136,6 @@ namespace Bolt {
           }
         }
       }
-#endif
     }
 
     string FixArrayIndices(string path, int[] indices) {
@@ -307,7 +305,6 @@ namespace Bolt {
         var propertyIndex = packet.ReadInt(Meta.PropertyIdBits);
         var propertyInfo = Meta.Properties[propertyIndex];
 
-#if DEBUG
         if (!Entity.IsOwner) {
           EntityProxy proxy;
 
@@ -315,7 +312,6 @@ namespace Bolt {
             proxy.PropertyPriority[propertyIndex].PropertyUpdated = frame;
           }
         }
-#endif
 
         // make sure this is the correct one
         Assert.True(propertyIndex == Objects[propertyInfo.OffsetObjects].OffsetProperties + propertyInfo.Property.OffsetProperties);
