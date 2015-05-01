@@ -62,6 +62,8 @@ namespace Bolt {
     }
 
     UE.Vector3 GetLocalPosition(UE.Transform t) {
+      //return t.localPosition;
+
       if (PositionMask == 7) {
         return t.localPosition;
       }
@@ -82,6 +84,9 @@ namespace Bolt {
     }
 
     void SetLocalPosition(UE.Transform t, UE.Vector3 p) {
+      //t.localPosition = p;
+      //return;
+
       if (PositionMask == 7) {
         t.localPosition = p;
       }
@@ -100,6 +105,9 @@ namespace Bolt {
     }
 
     void SetLocalRotation(UE.Transform t, UE.Quaternion q) {
+      //t.localRotation = q;
+      //return;
+
       if (RotationMask == 0 || RotationMask == 7) {
         t.localRotation = q;
       }
@@ -121,6 +129,8 @@ namespace Bolt {
     }
 
     UE.Quaternion GetLocalRotation(UE.Transform t) {
+      //return t.localRotation;
+
       if (RotationMask == 0 || RotationMask == 7) {
         return t.localRotation;
       }
@@ -224,18 +234,22 @@ namespace Bolt {
     }
 
     public override void OnRender(NetworkObj obj) {
-      var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
-      if (nt != null && nt.Render) {
-        if (PositionEnabled) {
-          var p = nt.RenderDoubleBufferPosition.Previous;
-          var c = nt.RenderDoubleBufferPosition.Current;
-          nt.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
-        }
+      //if (obj.RootState.Entity.IsOwner) {
+      //  return;
+      //}
 
-        if (RotationEnabled) {
-          nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
-        }
-      }
+      //var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
+      //if (nt != null && nt.Simulate) {
+      //  if (PositionEnabled) {
+      //    var p = nt.RenderDoubleBufferPosition.Previous;
+      //    var c = nt.RenderDoubleBufferPosition.Current;
+      //    nt.Simulate.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
+      //  }
+
+      //  if (RotationEnabled) {
+      //    //nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
+      //  }
+      //}
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
@@ -269,17 +283,17 @@ namespace Bolt {
               velocityChanged = NetworkValue.Diff(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
             }
 
-            //if (positionChanged) {
-            //  if ((oldPosition - obj.Storage.Values[obj[this] + POSITION].Vector3).magnitude < 0.001f) {
-            //    positionChanged = false;
-            //  }
-            //}
+            if (positionChanged) {
+              if ((oldPosition - obj.Storage.Values[obj[this] + POSITION].Vector3).magnitude < 0.001f) {
+                positionChanged = false;
+              }
+            }
 
-            //if (velocityChanged) {
-            //  if ((oldVelocity - obj.Storage.Values[obj[this] + VELOCITY].Vector3).magnitude < 0.001f) {
-            //    velocityChanged = false;
-            //  }
-            //}
+            if (velocityChanged) {
+              if ((oldVelocity - obj.Storage.Values[obj[this] + VELOCITY].Vector3).magnitude < 0.001f) {
+                velocityChanged = false;
+              }
+            }
           }
 
           if (RotationCompression.StrictComparison) {
@@ -288,16 +302,16 @@ namespace Bolt {
           else {
             rotationChanged = NetworkValue.Diff(oldRotation, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
 
-            //if (rotationChanged) {
-            //  var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+            if (rotationChanged) {
+              var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
-            //  UE.Vector4 oldR = new UE.Vector4(oldRotation.x, oldRotation.y, oldRotation.z, oldRotation.w);
-            //  UE.Vector4 newR = new UE.Vector4(r.x, r.y, r.z, r.w);
+              UE.Vector4 oldR = new UE.Vector4(oldRotation.x, oldRotation.y, oldRotation.z, oldRotation.w);
+              UE.Vector4 newR = new UE.Vector4(r.x, r.y, r.z, r.w);
 
-            //  if ((oldR - newR).magnitude < 0.001f) {
-            //    rotationChanged = false;
-            //  }
-            //}
+              if ((oldR - newR).magnitude < 0.001f) {
+                rotationChanged = false;
+              }
+            }
           }
 
           if (positionChanged || velocityChanged || rotationChanged) {
