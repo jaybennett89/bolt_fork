@@ -176,13 +176,13 @@ namespace Bolt.Compiler {
 
       if (s != null) {
         if (s.SmoothingAlgorithm != SmoothingAlgorithms.None) {
-          statements.Add(expr.Call("Settings_Interpolation", s.SnapMagnitude.Literal()));
+          statements.Add(expr.Call("Settings_Interpolation", s.SnapMagnitude.Literal(), true.Literal()));
         }
       }
 
       if (c != null) {
         if (c.SmoothCorrection) {
-          statements.Add(expr.Call("Settings_Interpolation", c.SnapMagnitude.Literal()));
+          statements.Add(expr.Call("Settings_Interpolation", c.SnapMagnitude.Literal(), false.Literal()));
         }
       }
     }

@@ -39,8 +39,8 @@ namespace Bolt {
       OffsetProperties = properties;
     }
 
-    public void Settings_Interpolation(float snapMagnitude) {
-      Interpolation.Enabled = true;
+    public void Settings_Interpolation(float snapMagnitude, bool enabled) {
+      Interpolation.Enabled = enabled;
       Interpolation.SnapMagnitude = snapMagnitude;
     }
 
