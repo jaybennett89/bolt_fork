@@ -15,6 +15,10 @@ namespace Bolt.Compiler {
           return 2;
         }
 
+        if (Definition.CommandAssetSettings != null && Definition.CommandAssetSettings.SmoothCorrection) {
+          return 2;
+        }
+
         return base.RequiredStorage;
       }
     }
