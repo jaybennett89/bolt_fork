@@ -601,8 +601,7 @@ internal static class BoltCore {
   internal static void Send() {
     if (hasSocket) {
       // auto scope everything
-      Stopwatch sw;
-
+      // Stopwatch sw;
 
       //sw = Stopwatch.StartNew();
       if (BoltCore._config.scopeMode == ScopeMode.Automatic) {
@@ -625,7 +624,7 @@ internal static class BoltCore {
 
       //Debug.Log("Autoscope:" + sw.Elapsed);
 
-      //// BoltPhysics.SnapshotWorld();
+      BoltPhysics.SnapshotWorld();
 
       //sw = Stopwatch.StartNew();
       //// switch perf counters
@@ -686,7 +685,7 @@ internal static class BoltCore {
     if (hasSocket) {
       _frame += 1;
 
-      Stopwatch sw = null;
+      //Stopwatch sw = null;
 
       BoltCore.UpdateUPnP();
 
