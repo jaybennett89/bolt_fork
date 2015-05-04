@@ -808,7 +808,10 @@ internal static class BoltCore {
   }
 
   static void Udp_Disconnect(UdpConnection udp) {
-    BoltConnection cn = (BoltConnection)udp.UserToken;
+    BoltConnection cn;
+    
+    cn = (BoltConnection)udp.UserToken;
+    cn.DisconnectToken = udp.DisconnectToken.ToToken();
 
     // generic disconnected callback
     BoltInternal.GlobalEventListenerBase.DisconnectedInvoke(cn);
