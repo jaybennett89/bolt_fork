@@ -123,30 +123,12 @@ public class BoltConnection : BoltObject {
     get { return _remoteFrameEstimated; }
   }
 
-  /// <summary>
-  /// A data token that was passed by the client when initiating a connection
-  /// </summary>
-  /// <example>
-  /// *Example:* Using the ```UserInfo``` token to get a fingerprint that identifies the client's local computer.
-  /// 
-  /// ```csharp
-  /// void StorePlayerScore(BoltConnection connection, ScoreData score) {
-  ///   Guid fingerprint;  
-  /// 
-  ///   UserInfo userInfo = (UserInfo)ConnectToken;
-  ///   if(userInfo.fingerprint != null) {
-  ///     fingerprint = userInfo.fingerprint;  
-  ///   }
-  ///   else {
-  ///     fingerprint = Guid.NewGuid();
-  ///     userInfo.fingerprint = fingerprint;
-  ///   }
-  ///   
-  ///   database.PersistScore(userInfo.name, fingerprint, score);
-  /// }
-  /// ```
-  /// </example>
   public IProtocolToken ConnectToken {
+    get;
+    internal set;
+  }
+
+  public IProtocolToken DisconnectToken {
     get;
     internal set;
   }

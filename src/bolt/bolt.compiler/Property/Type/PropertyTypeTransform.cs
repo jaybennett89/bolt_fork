@@ -16,6 +16,9 @@ namespace Bolt.Compiler {
     [ProtoMember(10)]
     public ExtrapolationVelocityModes ExtrapolationVelocityMode = ExtrapolationVelocityModes.CalculateFromPosition;
 
+    [ProtoMember(24)]
+    public TransformSpaces Space = TransformSpaces.Local;
+
     [ProtoMember(8, OverwriteList = true)]
     public FloatCompression[] PositionCompression = new FloatCompression[3] {
       new FloatCompression { MinValue = -1024, MaxValue = +1024, Accuracy = 0.01f },

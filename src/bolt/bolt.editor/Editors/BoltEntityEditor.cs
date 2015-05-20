@@ -172,6 +172,7 @@ public class BoltEntityEditor : Editor {
 
 #if DEBUG
     EditorGUILayout.LabelField("Type", prefabType.ToString());
+    EditorGUILayout.LabelField("Scene Id", entity.sceneGuid.ToString());
 #endif
 
     switch (prefabType) {

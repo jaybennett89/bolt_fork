@@ -29,6 +29,9 @@ namespace Bolt {
     public System.Single Float3;
 
     [FieldOffset(0)]
+    public System.Guid Guid;
+
+    [FieldOffset(0)]
     public Bolt.NetworkId NetworkId;
 
     [FieldOffset(0)]
@@ -51,6 +54,9 @@ namespace Bolt {
 
     [FieldOffset(0)]
     public UnityEngine.Color Color;
+
+    [FieldOffset(0)]
+    public UnityEngine.Color32 Color32;
 
     [FieldOffset(16)]
     public System.Object Object;
@@ -100,6 +106,7 @@ namespace Bolt {
 
     public static bool Diff(Boolean a, Boolean b) { return a != b; }
     public static bool Diff(Int32 a, Int32 b) { return a != b; }
+    public static bool Diff(Guid a, Guid b) { return a != b; }
     public static bool Diff(Single a, Single b) { return a != b; }
     public static bool Diff(NetworkId a, NetworkId b) { return a != b; }
     public static bool Diff(PrefabId a, PrefabId b) { return a != b; }
@@ -110,6 +117,8 @@ namespace Bolt {
     public static bool Diff(UnityEngine.Vector3 a, UnityEngine.Vector3 b) { return a != b; }
     public static bool Diff(UnityEngine.Quaternion a, UnityEngine.Quaternion b) { return a != b; }
     public static bool Diff(UnityEngine.Color a, UnityEngine.Color b) { return a != b; }
+    public static bool Diff(UnityEngine.Color32 a, UnityEngine.Color32 b) { return a.r != b.r || a.b != b.b || a.g != b.g || a.a != b.a; }
+    public static bool Diff(UnityEngine.Matrix4x4 a, UnityEngine.Matrix4x4 b) { return a != b; }
 
     public static bool Diff_Strict(UnityEngine.Vector2 a, UnityEngine.Vector2 b) {
       return a.x != b.x || a.y != b.y;

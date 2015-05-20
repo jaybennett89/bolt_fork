@@ -655,6 +655,15 @@ entityReceived.XmlDoc =
   /// </example>
 ";
 
+
+var entityFrozen = new Method("EntityFrozen");
+entityFrozen.AddArgument("BoltEntity", "entity");
+entityFrozen.XmlDoc = "";
+
+var entityThawed = new Method("EntityThawed");
+entityThawed.AddArgument("BoltEntity", "entity"); 
+entityThawed.XmlDoc = "";
+
 var masterServerConnectFailed = new Method("ZeusConnectFailed");
 masterServerConnectFailed.AddArgument("UdpEndPoint", "endpoint");
 masterServerConnectFailed.XmlDoc = @"";
@@ -713,6 +722,8 @@ methods.Add(entityAttached);
 methods.Add(entityDetached);
 //methods.Add(entityDetached2);
 methods.Add(entityReceived);
+methods.Add(entityFrozen);
+methods.Add(entityThawed);
 
 methods.Add(masterServerConnectFailed);
 methods.Add(masterServerConnected);

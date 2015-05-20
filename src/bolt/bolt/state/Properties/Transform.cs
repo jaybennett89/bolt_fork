@@ -14,9 +14,15 @@ namespace Bolt {
     Boolean PositionEnabled = false;
     Boolean RotationEnabled = false;
 
+    TransformSpaces Space;
+
     PropertyExtrapolationSettings Extrapolation;
     PropertyQuaternionCompression RotationCompression;
     PropertyVectorCompressionSettings PositionCompression;
+
+    public void Settings_Space(TransformSpaces space) {
+      Space = space;
+    }
 
     public void Settings_Vector(PropertyFloatCompressionSettings x, PropertyFloatCompressionSettings y, PropertyFloatCompressionSettings z, bool strict) {
       PositionEnabled = true;
@@ -61,12 +67,17 @@ namespace Bolt {
       get { return true; }
     }
 
-    UE.Vector3 GetLocalPosition(UE.Transform t) {
+    UE.Vector3 GetPosition(UE.Transform t) {
       if (PositionMask == 7) {
-        return t.localPosition;
+        if (Space == TransformSpaces.World) {
+          return t.position;
+        }
+        else {
+          return t.localPosition;
+        }
       }
       else {
-        UE.Vector3 p = t.localPosition;
+        UE.Vector3 p = Space == TransformSpaces.World ? t.position : t.localPosition;
 
         switch (PositionMask) {
           case 6: p.x = 0; break;
@@ -81,31 +92,56 @@ namespace Bolt {
       }
     }
 
-    void SetLocalPosition(UE.Transform t, UE.Vector3 p) {
+    void SetPosition(UE.Transform t, UE.Vector3 p) {
       if (PositionMask == 7) {
-        t.localPosition = p;
+        if (Space == TransformSpaces.World) {
+          t.position = p;
+        }
+        else {
+          t.localPosition = p;
+        }
       }
       else {
-        UE.Vector3 c = t.localPosition;
+        if (Space == TransformSpaces.World) {
+          UE.Vector3 c = t.position;
 
-        switch (PositionMask) {
-          case 6: t.localPosition = new UE.Vector3(c.x, p.y, p.z); break;
-          case 5: t.localPosition = new UE.Vector3(p.x, c.y, p.z); break;
-          case 4: t.localPosition = new UE.Vector3(c.x, c.y, p.z); break;
-          case 3: t.localPosition = new UE.Vector3(p.x, p.y, c.z); break;
-          case 2: t.localPosition = new UE.Vector3(c.x, p.y, c.z); break;
-          case 1: t.localPosition = new UE.Vector3(p.x, c.y, c.z); break;
+          switch (PositionMask) {
+            case 6: t.position = new UE.Vector3(c.x, p.y, p.z); break;
+            case 5: t.position = new UE.Vector3(p.x, c.y, p.z); break;
+            case 4: t.position = new UE.Vector3(c.x, c.y, p.z); break;
+            case 3: t.position = new UE.Vector3(p.x, p.y, c.z); break;
+            case 2: t.position = new UE.Vector3(c.x, p.y, c.z); break;
+            case 1: t.position = new UE.Vector3(p.x, c.y, c.z); break;
+          }
+        }
+        else {
+          UE.Vector3 c = t.localPosition;
+
+          switch (PositionMask) {
+            case 6: t.localPosition = new UE.Vector3(c.x, p.y, p.z); break;
+            case 5: t.localPosition = new UE.Vector3(p.x, c.y, p.z); break;
+            case 4: t.localPosition = new UE.Vector3(c.x, c.y, p.z); break;
+            case 3: t.localPosition = new UE.Vector3(p.x, p.y, c.z); break;
+            case 2: t.localPosition = new UE.Vector3(c.x, p.y, c.z); break;
+            case 1: t.localPosition = new UE.Vector3(p.x, c.y, c.z); break;
+          }
         }
       }
     }
 
-    void SetLocalRotation(UE.Transform t, UE.Quaternion q) {
+    void SetRotation(UE.Transform t, UE.Quaternion q) {
       if (RotationMask == 0 || RotationMask == 7) {
-        t.localRotation = q;
+        if (Space == TransformSpaces.World) {
+          t.rotation = q;
+        }
+        else {
+          t.localRotation = q;
+        }
+
       }
       else {
         UE.Vector3 r = q.eulerAngles;
-        UE.Vector3 c = t.localRotation.eulerAngles;
+        UE.Vector3 c = Space == TransformSpaces.World ? t.rotation.eulerAngles : t.localRotation.eulerAngles;
 
         switch (RotationMask) {
           case 6: c.y = r.y; c.z = r.z; break;
@@ -116,16 +152,21 @@ namespace Bolt {
           case 1: c.x = r.x; break;
         }
 
-        t.localRotation = UE.Quaternion.Euler(c);
+        if (Space == TransformSpaces.World) {
+          t.rotation = UE.Quaternion.Euler(c);
+        }
+        else {
+          t.localRotation = UE.Quaternion.Euler(c);
+        }
       }
     }
 
-    UE.Quaternion GetLocalRotation(UE.Transform t) {
+    UE.Quaternion GetRotation(UE.Transform t) {
       if (RotationMask == 0 || RotationMask == 7) {
-        return t.localRotation;
+        return Space == TransformSpaces.World ? t.rotation : t.localRotation;
       }
       else {
-        UE.Vector3 r = t.localRotation.eulerAngles;
+        UE.Vector3 r = Space == TransformSpaces.World ? t.rotation.eulerAngles : t.localRotation.eulerAngles;
 
         switch (RotationMask) {
           case 6: r.x = 0; break;
@@ -224,18 +265,22 @@ namespace Bolt {
     }
 
     public override void OnRender(NetworkObj obj) {
-      var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
-      if (nt != null && nt.Render) {
-        if (PositionEnabled) {
-          var p = nt.RenderDoubleBufferPosition.Previous;
-          var c = nt.RenderDoubleBufferPosition.Current;
-          nt.Render.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
-        }
+      //if (obj.RootState.Entity.IsOwner) {
+      //  return;
+      //}
 
-        if (RotationEnabled) {
-          nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
-        }
-      }
+      //var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
+      //if (nt != null && nt.Simulate) {
+      //  if (PositionEnabled) {
+      //    var p = nt.RenderDoubleBufferPosition.Previous;
+      //    var c = nt.RenderDoubleBufferPosition.Current;
+      //    nt.Simulate.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
+      //  }
+
+      //  if (RotationEnabled) {
+      //    //nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
+      //  }
+      //}
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
@@ -247,9 +292,9 @@ namespace Bolt {
           var oldVelocity = obj.Storage.Values[obj[this] + VELOCITY].Vector3;
           var oldRotation = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
-          obj.Storage.Values[obj[this] + POSITION].Vector3 = GetLocalPosition(nt.Simulate);
+          obj.Storage.Values[obj[this] + POSITION].Vector3 = GetPosition(nt.Simulate);
           obj.Storage.Values[obj[this] + VELOCITY].Vector3 = CalculateVelocity(nt, oldPosition);
-          obj.Storage.Values[obj[this] + ROTATION].Quaternion = GetLocalRotation(nt.Simulate);
+          obj.Storage.Values[obj[this] + ROTATION].Quaternion = GetRotation(nt.Simulate);
 
           var positionChanged = false;
           var velocityChanged = false;
@@ -269,17 +314,17 @@ namespace Bolt {
               velocityChanged = NetworkValue.Diff(oldVelocity, obj.Storage.Values[obj[this] + VELOCITY].Vector3);
             }
 
-            //if (positionChanged) {
-            //  if ((oldPosition - obj.Storage.Values[obj[this] + POSITION].Vector3).magnitude < 0.001f) {
-            //    positionChanged = false;
-            //  }
-            //}
+            if (positionChanged) {
+              if ((oldPosition - obj.Storage.Values[obj[this] + POSITION].Vector3).magnitude < 0.001f) {
+                positionChanged = false;
+              }
+            }
 
-            //if (velocityChanged) {
-            //  if ((oldVelocity - obj.Storage.Values[obj[this] + VELOCITY].Vector3).magnitude < 0.001f) {
-            //    velocityChanged = false;
-            //  }
-            //}
+            if (velocityChanged) {
+              if ((oldVelocity - obj.Storage.Values[obj[this] + VELOCITY].Vector3).magnitude < 0.001f) {
+                velocityChanged = false;
+              }
+            }
           }
 
           if (RotationCompression.StrictComparison) {
@@ -288,16 +333,16 @@ namespace Bolt {
           else {
             rotationChanged = NetworkValue.Diff(oldRotation, obj.Storage.Values[obj[this] + ROTATION].Quaternion);
 
-            //if (rotationChanged) {
-            //  var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
+            if (rotationChanged) {
+              var r = obj.Storage.Values[obj[this] + ROTATION].Quaternion;
 
-            //  UE.Vector4 oldR = new UE.Vector4(oldRotation.x, oldRotation.y, oldRotation.z, oldRotation.w);
-            //  UE.Vector4 newR = new UE.Vector4(r.x, r.y, r.z, r.w);
+              UE.Vector4 oldR = new UE.Vector4(oldRotation.x, oldRotation.y, oldRotation.z, oldRotation.w);
+              UE.Vector4 newR = new UE.Vector4(r.x, r.y, r.z, r.w);
 
-            //  if ((oldR - newR).magnitude < 0.001f) {
-            //    rotationChanged = false;
-            //  }
-            //}
+              if ((oldR - newR).magnitude < 0.001f) {
+                rotationChanged = false;
+              }
+            }
           }
 
           if (positionChanged || velocityChanged || rotationChanged) {
@@ -331,7 +376,7 @@ namespace Bolt {
         if (Extrapolation.Enabled) {
           if (PositionEnabled) {
             pos = Math.ExtrapolateVector(
-              /* currentPosition */   GetLocalPosition(nt.Simulate),
+              /* currentPosition */   GetPosition(nt.Simulate),
               /* receivedPosition */  obj.Storage.Values[obj[this] + POSITION].Vector3,
               /* receivedVelocity */  obj.Storage.Values[obj[this] + VELOCITY].Vector3,
               /* receivedFrame */     obj.RootState.Frames.first.Frame,
@@ -346,7 +391,7 @@ namespace Bolt {
 
           if (RotationEnabled) {
             rot = Math.ExtrapolateQuaternion(
-              /* currentRotation */   GetLocalRotation(nt.Simulate),
+              /* currentRotation */   GetRotation(nt.Simulate),
               /* receivedRotation */  obj.Storage.Values[obj[this] + ROTATION].Quaternion,
               /* receivedFrame */     obj.RootState.Frames.first.Frame,
               /* entityFrame */       obj.RootState.Entity.Frame,
@@ -391,7 +436,7 @@ namespace Bolt {
         }
 
         if (PositionEnabled) {
-          SetLocalPosition(nt.Simulate, pos);
+          SetPosition(nt.Simulate, pos);
 
           if (snapped) {
             nt.RenderDoubleBufferPosition = nt.RenderDoubleBufferPosition.Shift(nt.Simulate.position).Shift(nt.Simulate.position);
@@ -399,7 +444,7 @@ namespace Bolt {
         }
 
         if (RotationEnabled) {
-          SetLocalRotation(nt.Simulate, rot);
+          SetRotation(nt.Simulate, rot);
         }
       }
     }
@@ -430,7 +475,7 @@ namespace Bolt {
     UE.Vector3 CalculateVelocity(NetworkTransform nt, UE.Vector3 position) {
       switch (Extrapolation.VelocityMode) {
         case ExtrapolationVelocityModes.CalculateFromPosition:
-          return (GetLocalPosition(nt.Simulate) - position) * BoltCore._config.framesPerSecond;
+          return (GetPosition(nt.Simulate) - position) * BoltCore._config.framesPerSecond;
 
         case ExtrapolationVelocityModes.CopyFromRigidbody:
           return nt.Simulate.GetComponent<UE.Rigidbody>().velocity;
@@ -443,7 +488,7 @@ namespace Bolt {
 
         default:
           BoltLog.Error("Unknown velocity extrapolation mode {0}", Extrapolation.VelocityMode);
-          return (GetLocalPosition(nt.Simulate) - position) * BoltCore._config.framesPerSecond;
+          return (GetPosition(nt.Simulate) - position) * BoltCore._config.framesPerSecond;
       }
     }
 

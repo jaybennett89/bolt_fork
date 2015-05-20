@@ -127,14 +127,17 @@
     <Compile Include="state\NetworkState.cs" />
     <Compile Include="state\NetworkObj.cs" />
     <Compile Include="state\Properties\Color.cs" />
+    <Compile Include="state\Properties\Color32.cs" />
     <Compile Include="state\Properties\Entity.cs" />
     <Compile Include="state\Properties\Float.cs" />
+    <Compile Include="state\Properties\Guid.cs" />
     <Compile Include="state\Properties\Integer.cs" />
     <Compile Include="state\NetworkProperty.cs" />
     <Compile Include="state\NetworkTransform.cs" />
     <Compile Include="state\NetworkTrigger.cs" />
     <Compile Include="state\Priority.cs" />
     <Compile Include="state\Properties\Bool.cs" />
+    <Compile Include="state\Properties\Matrix4x4.cs" />
     <Compile Include="state\Properties\NetworkId.cs" />
     <Compile Include="state\Properties\PrefabId.cs" />
     <Compile Include="state\Properties\ProtocolToken.cs" />

@@ -9,6 +9,7 @@ namespace Bolt {
   public class DebugInfo : MonoBehaviour {
     Vector2 debugInfoScroll;
 
+    static Entity locked;
     static GUIStyle labelStyle;
     static GUIStyle labelStyleBold;
     static Texture2D boltIconTexture;
@@ -190,7 +191,6 @@ namespace Bolt {
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
       }
-#if DEBUG
       {
         Camera c = Camera.main;
 
@@ -198,43 +198,62 @@ namespace Bolt {
           return;
         }
 
-        Vector3 mp;
-        mp = c.ScreenToViewportPoint(Input.mousePosition);
-        mp.z = 0;
+        //Vector3 mp;
+        //mp = c.ScreenToViewportPoint(Input.mousePosition);
+        //mp.z = 0;
 
-        foreach (Entity en in BoltCore._entities) {
-          if (en.IsFrozen) {
-            continue;
-          }
-
+        foreach (Entity en in BoltCore._entitiesOK) {
           DrawEntity(en.UnityObject);
         }
 
-        Entity entity = BoltCore._entities
-          .Where(x => ignoreList.Contains(x.NetworkId) == false)
-          .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
-          .Where(x => {
-            Vector3 m;
-            m = Input.mousePosition;
-            m.z = 0;
+        //Entity hover = BoltCore._entitiesOK
+        //  .Where(x => ignoreList.Contains(x.NetworkId) == false)
+        //  .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
 
-            Vector3 p;
-            p = c.WorldToScreenPoint(x.UnityObject.transform.position);
-            p.z = 0;
+        //  //.Where(x => {
+        //  //  Vector3 m;
+        //  //  m = Input.mousePosition;
+        //  //  m.z = 0;
+        //  //  Vector3 p;
+        //  //  p = c.WorldToScreenPoint(x.UnityObject.transform.position);
+        //  //  p.z = 0;
+        //  //  return (m - p).sqrMagnitude < (32 * 32);
+        //  //})
 
-            return (m - p).sqrMagnitude < (32 * 32);
-          })
-          .OrderBy(x => {
-            Vector3 vp;
-            vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
-            vp.z = 0;
+        //  .OrderBy(x => {
+        //    Vector3 center = new Vector3(0.5f, 0.5f, 0f);
 
-            return (mp - vp).sqrMagnitude;
-          })
-          .FirstOrDefault();
+        //    Vector3 vp;
+        //    vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+        //    vp.z = 0;
 
-        if (entity && mp.ViewPointIsOnScreen()) {
+        //    return (center - vp).sqrMagnitude;
+        //  })
+        //  .FirstOrDefault();
 
+        //if (Input.GetKeyDown(KeyCode.Home)) {
+        //  locked = hover;
+        //}
+
+        //Entity entity = locked ? locked : hover;
+
+        if (Input.GetKeyDown(KeyCode.Home)) {
+          locked = BoltCore._entities
+            .Where(x => ignoreList.Contains(x.NetworkId) == false)
+            .Where(x => c.WorldToViewportPoint(x.UnityObject.transform.position).ViewPointIsOnScreen())
+            .OrderBy(x => {
+              Vector3 center = new Vector3(0.5f, 0.5f, 0f);
+
+              Vector3 vp;
+              vp = c.WorldToViewportPoint(x.UnityObject.transform.position);
+              vp.z = 0;
+
+              return (center - vp).sqrMagnitude;
+            })
+            .FirstOrDefault();
+        }
+        
+        if (locked) {
           Rect r = new Rect(Screen.width - 410, 10, 400, Screen.height - 20);
 
           DrawBackground(r);
@@ -250,47 +269,49 @@ namespace Bolt {
           debugInfoScroll = GUILayout.BeginScrollView(debugInfoScroll, false, false, GUIStyle.none, GUIStyle.none);
           GUILayout.BeginVertical();
 
-          var state = (NetworkState)entity.Serializer;
+          var state = (NetworkState)locked.Serializer;
 
           if (Input.GetKeyDown(KeyCode.L)) {
-            BoltNetworkInternal.DebugDrawer.SelectGameObject(entity.UnityObject.gameObject);
+            BoltNetworkInternal.DebugDrawer.SelectGameObject(locked.UnityObject.gameObject);
           }
 
           LabelBold("Entity Info");
-          LabelField("Name", entity.UnityObject.gameObject.name);
-          LabelField("Network Id", entity.NetworkId);
-          LabelField("Is Frozen", entity.IsFrozen);
+          LabelField("Name", locked.UnityObject.gameObject.name);
+          LabelField("Network Id", locked.NetworkId);
+          LabelField("Is Frozen", locked.IsFrozen);
           LabelField("Animator", state.Animator == null ? "NULL" : state.Animator.gameObject.name);
-          LabelField("Entity Parent", entity.HasParent ? entity.Parent.UnityObject.ToString() : "NULL");
-          LabelField("Transform Parent", entity.UnityObject.transform.parent == null ? "NULL" : entity.UnityObject.transform.parent.GetComponent<BoltEntity>().ToString());
-          LabelField("Has Control", entity.HasControl);
+          LabelField("Entity Parent", locked.HasParent ? locked.Parent.UnityObject.ToString() : "NULL");
+
+          //LabelField("Transform Parent", entity.UnityObject.transform.parent == null ? "NULL" : entity.UnityObject.transform.parent.GetComponent<BoltEntity>().ToString());
+
+          LabelField("Has Control", locked.HasControl);
 
           if (state.Animator != null) {
             for (int i = 0; i < state.Animator.layerCount; ++i) {
               LabelField("  Layer", state.Animator.GetLayerName(i));
-              
+
 #if UNITY5
               var clips = state.Animator.GetCurrentAnimatorClipInfo(i);
 #else
               var clips = state.Animator.GetCurrentAnimationClipState(i);
 #endif
-              
+
               foreach (var clip in clips) {
                 LabelField("    Clip", string.Format("{0} (weight: {1})", clip.clip.name, clip.weight));
               }
             }
           }
 
-          if (entity.IsOwner) {
+          if (locked.IsOwner) {
             LabelBold("");
             LabelBold("Connection Priorities");
 
             foreach (BoltConnection cn in BoltNetwork.connections) {
-              LabelField("Connection#" + cn.udpConnection.ConnectionId, cn._entityChannel.GetPriority(entity).ToString());
+              LabelField("Connection#" + cn.udpConnection.ConnectionId, cn._entityChannel.GetPriority(locked).ToString());
             }
           }
 
-          if (entity.IsOwner == false) {
+          if (locked.IsOwner == false) {
             LabelBold("");
             LabelBold("Frame Info");
             LabelField("Buffer Count", state.Frames.count);
@@ -300,10 +321,10 @@ namespace Bolt {
 
           LabelBold("");
           LabelBold("World Info");
-          LabelField("Position", entity.UnityObject.transform.position);
-          LabelField("Distance From Camera", (c.transform.position - entity.UnityObject.transform.position).magnitude);
+          LabelField("Position", locked.UnityObject.transform.position);
+          LabelField("Distance From Camera", (c.transform.position - locked.UnityObject.transform.position).magnitude);
 
-          entity.Serializer.DebugInfo();
+          locked.Serializer.DebugInfo();
 
           GUILayout.EndVertical();
           GUILayout.EndScrollView();
@@ -318,7 +339,6 @@ namespace Bolt {
           debugInfoScroll.y = Mathf.Min(debugInfoScroll.y + 10, 2000);
         }
       }
-#endif
     }
 
     internal static void SetupAndShow() {

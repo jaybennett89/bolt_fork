@@ -16,9 +16,6 @@ namespace Bolt {
 
     public int PropertyIndex;
     public int PropertyPriority;
-
-#if DEBUG
     public int PropertyUpdated;
-#endif
   }
 }

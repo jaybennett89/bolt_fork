@@ -186,13 +186,14 @@ namespace Bolt {
           IsFrozen = false;
           BoltCore._entitiesFZ.Remove(this);
           BoltCore._entitiesOK.AddLast(this);
-          ;
+          BoltInternal.GlobalEventListenerBase.EntityThawedInvoke(this.UnityObject);
         }
         else {
           if (CanFreeze) {
             IsFrozen = true;
             BoltCore._entitiesOK.Remove(this);
             BoltCore._entitiesFZ.AddLast(this);
+            BoltInternal.GlobalEventListenerBase.EntityFrozenInvoke(this.UnityObject);
           }
         }
       }
@@ -388,6 +389,14 @@ namespace Bolt {
         foreach (IEntityBehaviour eb in Behaviours) {
           eb.SimulateOwner();
         }
+      }
+      else {
+        //if (BoltNetwork.isClient) {
+        //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+        //  if (diff > 600) {
+        //    Freeze(true);
+        //  }
+        //}
       }
 
       if (HasControl) {
