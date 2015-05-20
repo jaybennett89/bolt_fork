@@ -10,6 +10,8 @@ namespace Bolt.Compiler {
     public override void AddSettings(CodeExpression expr, CodeStatementCollection stmts) {
       var pt = Decorator.PropertyType;
 
+      stmts.Call(expr, "Settings_Space", "Bolt.TransformSpaces.{0}".Expr(Decorator.PropertyType.Space));
+
       EmitVectorSettings(expr, stmts, pt.PositionCompression, pt.PositionSelection, pt.PositionStrictCompare);
       EmitQuaternionSettings(expr, stmts, pt.RotationCompression, pt.RotationCompressionQuaternion, pt.RotationSelection, pt.RotationStrictCompare);
 

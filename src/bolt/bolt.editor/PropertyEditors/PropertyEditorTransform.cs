@@ -8,6 +8,10 @@ using System.Linq;
 public class PropertyEditorTransform : PropertyEditor<PropertyTypeTransform> {
 
   protected override void Edit(bool array) {
+    BoltEditorGUI.WithLabel("Space", () => {
+      PropertyType.Space = (TransformSpaces)EditorGUILayout.EnumPopup(PropertyType.Space);
+    });
+
     BoltEditorGUI.EditSmoothingAlgorithm(Asset, Definition);
 
     BoltEditorGUI.Header("Position", "mc_position");

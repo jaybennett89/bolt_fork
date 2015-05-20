@@ -58,6 +58,7 @@ namespace Bolt.Compiler {
       yield return typeof(PropertyTypeNetworkId);
       yield return typeof(PropertyTypeGuid);
       yield return typeof(PropertyTypeMatrix4x4);
+      yield return typeof(PropertyTypeProcotolToken);
     }
   }
 }
