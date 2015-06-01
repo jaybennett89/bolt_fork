@@ -25,6 +25,10 @@ namespace Bolt {
     void ExecuteCommand(Bolt.Command command, bool resetState);
   }
 
+  public interface IEntityReplicationFilter {
+    bool AllowReplicationTo(BoltConnection connection);
+  }
+
   /// <summary>
   /// Interface which can be implemented on a behaviour attached to an entity which lets you provide
   /// custom priority calculations for state and events.

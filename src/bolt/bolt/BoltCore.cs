@@ -1150,7 +1150,9 @@ internal static class BoltCore {
     BoltConsole.Clear();
 
     // setup debug info display
-    DebugInfo.SetupAndShow();
+    if (BoltRuntimeSettings.instance.showDebugInfo) {
+      DebugInfo.SetupAndShow();
+    }
 
     // setup logging
     BoltLog.Setup(_mode, _config.logTargets);

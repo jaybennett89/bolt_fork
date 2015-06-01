@@ -24,6 +24,7 @@ namespace Bolt.Compiler {
         yield return typeof(PropertyTypeQuaternion);
         yield return typeof(PropertyTypePrefabId);
         yield return typeof(PropertyTypeTransform);
+        yield return typeof(PropertyTypeProcotolToken);
       }
     }
 

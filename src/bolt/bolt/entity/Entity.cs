@@ -23,7 +23,7 @@ namespace Bolt {
     public CommandCallbackModes Mode;
   }
 
-  partial class Entity : IBoltListNode, IPriorityCalculator {
+  partial class Entity : IBoltListNode, IPriorityCalculator, IEntityReplicationFilter {
     bool _canQueueCommands = false;
     bool _canQueueCallbacks = false;
 
@@ -47,7 +47,9 @@ namespace Bolt {
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
+
     internal Bolt.IPriorityCalculator PriorityCalculator;
+    internal Bolt.IEntityReplicationFilter ReplicationFilter;
 
     internal bool IsOwner;
     internal bool IsFrozen;
@@ -347,6 +349,17 @@ namespace Bolt {
         BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
       }
 
+      // find replication filter
+      ReplicationFilter = UnityObject.GetComponentInChildren(typeof(IEntityReplicationFilter)) as IEntityReplicationFilter;
+
+      // use the default priority calculator if none is available
+      if (ReplicationFilter == null) {
+        ReplicationFilter = this;
+      }
+      else {
+        BoltLog.Debug("Using Priority Calculator {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
+      }
+
       // assign usertokens
       UnityObject._entity = this;
 
@@ -391,12 +404,12 @@ namespace Bolt {
         }
       }
       else {
-        //if (BoltNetwork.isClient) {
-        //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-        //  if (diff > 600) {
-        //    Freeze(true);
-        //  }
-        //}
+        if (BoltNetwork.isClient) {
+          var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+          if (diff > 600) {
+            Freeze(true);
+          }
+        }
       }
 
       if (HasControl) {
@@ -646,6 +659,10 @@ namespace Bolt {
       }
 
       return 1;
+    }
+
+    bool IEntityReplicationFilter.AllowReplicationTo(BoltConnection connection) {
+      return true;
     }
   }
 }
