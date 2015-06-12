@@ -45,7 +45,7 @@ class BoltHitboxBodySnapshot : BoltObject, IDisposable {
 
     if (_body._proximity) {
       if (_body._proximity.OverlapSphere(ref _wtl, center, radius)) {
-        hits.AddHit(_body, _body._proximity, float.NegativeInfinity);
+        hits.AddHit(_body, _body._proximity, (center - _ltw.MultiplyPoint(Vector3.zero)).magnitude);
       } else {
         return;
       }
@@ -55,7 +55,7 @@ class BoltHitboxBodySnapshot : BoltObject, IDisposable {
       BoltHitbox hitbox = _body._hitboxes[i];
 
       if (hitbox.OverlapSphere(ref _hbwtl[i], center, radius)) {
-        hits.AddHit(_body, hitbox, float.NegativeInfinity);
+        hits.AddHit(_body, hitbox, (center - _hbltw[i].MultiplyPoint(Vector3.zero)).magnitude);
       }
     }
   }

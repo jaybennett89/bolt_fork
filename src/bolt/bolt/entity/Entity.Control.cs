@@ -40,7 +40,9 @@ namespace Bolt {
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
-        eb.ControlGained();
+        if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          eb.ControlGained();
+        }
       }
     }
 
@@ -74,7 +76,9 @@ namespace Bolt {
 
       // call to user behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
-        eb.ControlLost();
+        if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          eb.ControlLost();
+        }
       }
 
       // call user event

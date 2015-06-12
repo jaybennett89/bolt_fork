@@ -239,7 +239,9 @@ namespace Bolt {
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         try {
-          eb.Attached();
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.Attached();
+          }
         }
         catch (Exception exn) {
           BoltLog.Error("User code threw exception inside Attached callback");
@@ -257,7 +259,7 @@ namespace Bolt {
       }
 
       // log
-      BoltLog.Debug("Attached {0}", this);
+      BoltLog.Debug("Attached {0} (Token: {1})", this, AttachToken);
     }
 
     internal void Detach() {
@@ -279,8 +281,10 @@ namespace Bolt {
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         try {
-          eb.Detached();
-          eb.entity = null;
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.Detached();
+            eb.entity = null;
+          }
         }
         catch (Exception exn) {
           BoltLog.Error("User code threw exception inside Detach callback");
@@ -368,7 +372,9 @@ namespace Bolt {
 
       // call to behaviours (this happens BEFORE attached)
       foreach (IEntityBehaviour eb in Behaviours) {
-        eb.Initialized();
+        if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          eb.Initialized();
+        }
       }
     }
 
@@ -400,16 +406,19 @@ namespace Bolt {
 
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {
-          eb.SimulateOwner();
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.SimulateOwner();
+          }
         }
       }
       else {
-        if (BoltNetwork.isClient) {
-          var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-          if (diff > 600) {
-            Freeze(true);
-          }
-        }
+        //if (BoltNetwork.isClient) {
+        //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+        //  if (diff > 600) {
+        //    Debug.Log("FREEZE:" + UnityObject);
+        //    Freeze(true);
+        //  }
+        //}
       }
 
       if (HasControl) {
@@ -434,7 +443,9 @@ namespace Bolt {
           _canQueueCommands = true;
 
           foreach (IEntityBehaviour eb in Behaviours) {
-            eb.SimulateController();
+            if (ReferenceEquals(eb.entity, this.UnityObject)) {
+              eb.SimulateController();
+            }
           }
         }
         finally {
@@ -477,7 +488,9 @@ namespace Bolt {
             Command cmd = CommandQueue.lastOrDefault;
 
             for (int i = 0; i < Behaviours.Length; ++i) {
-              Behaviours[i].MissingCommand(cmd);
+              if (ReferenceEquals(Behaviours[i].entity, this.UnityObject)) {
+                Behaviours[i].MissingCommand(cmd);
+              }
             }
           }
         }
@@ -546,7 +559,9 @@ namespace Bolt {
         _canQueueCallbacks = cmd.IsFirstExecution;
 
         foreach (IEntityBehaviour eb in Behaviours) {
-          eb.ExecuteCommand(cmd, resetState);
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.ExecuteCommand(cmd, resetState);
+          }
         }
       }
       finally {

@@ -954,7 +954,7 @@ public static class BoltNetwork {
   public static void Destroy(GameObject gameObject, IProtocolToken token) {
     BoltNetwork.VerifyIsRunning();
     BoltEntity entity = gameObject.GetComponent<BoltEntity>();
-
+    //test
     if (entity) {
       BoltCore.Destroy(entity, token);
     }

@@ -452,6 +452,21 @@ public static class BoltUtils {
     return v;
   }
 
+  public static void WriteBoltEntity(this UdpPacket packet, BoltEntity entity) {
+    WriteEntity(packet, entity == null ? null : entity.Entity);
+  }
+
+  public static BoltEntity ReadBoltEntity(this UdpPacket packet) {
+    Entity entity = ReadEntity(packet);
+    
+    if(entity) {
+      return entity.UnityObject;
+    }
+
+    return null;
+  }
+
+
   internal static void WriteEntity(this UdpPacket packet, Entity entity) {
     if (packet.WriteBool((entity != null) && entity.IsAttached)) {
       packet.WriteNetworkId(entity.NetworkId);

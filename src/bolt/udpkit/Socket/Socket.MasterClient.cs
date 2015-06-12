@@ -437,17 +437,25 @@ namespace UdpKit {
       }
 
       void OnDirectConnectionLan(Protocol.DirectConnectionLan direct) {
+        //
+        var r = natPunchRequest;
+
+        //
         ClearPunchRequest();
 
         //
-        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = natPunchRequest.Token });
+        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = r.Token });
       }
 
       void OnDirectConnectionWan(Protocol.DirectConnectionWan direct) {
+        //
+        var r = natPunchRequest;
+
+        //
         ClearPunchRequest();
 
         //
-        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = natPunchRequest.Token });
+        socket.OnEventConnect(new UdpEventConnectEndPoint { EndPoint = direct.RemoteEndPoint, Token = r.Token });
       }
 
       void OnPunch(Protocol.Punch punch) {

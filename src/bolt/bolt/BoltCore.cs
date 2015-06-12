@@ -248,7 +248,7 @@ internal static class BoltCore {
 
   internal static GameObject Attach(GameObject gameObject, EntityFlags flags, IProtocolToken attachToken) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags, null);
+    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags, attachToken);
   }
 
   internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags, IProtocolToken attachToken) {

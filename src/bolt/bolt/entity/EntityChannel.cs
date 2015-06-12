@@ -528,6 +528,7 @@ partial class EntityChannel : BoltChannel {
 
       if (createRequested) {
         attachToken = packet.UdpPacket.ReadToken();
+
         prefabId = packet.UdpPacket.ReadPrefabId();
         serializerId = packet.UdpPacket.ReadTypeId();
         spawnPosition = packet.UdpPacket.ReadVector3();
