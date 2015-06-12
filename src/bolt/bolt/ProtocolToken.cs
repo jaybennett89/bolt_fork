@@ -7,7 +7,7 @@ namespace Bolt {
     void Write(UdpPacket packet);
   }
 
-  static class ProtocolTokenUtils {
+  public static class ProtocolTokenUtils {
     static byte[] tempBytes;
     static UdpPacket tempPacket;
 

@@ -248,7 +248,7 @@ internal static class BoltCore {
 
   internal static GameObject Attach(GameObject gameObject, EntityFlags flags, IProtocolToken attachToken) {
     BoltEntity be = gameObject.GetComponent<BoltEntity>();
-    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags, null);
+    return Attach(gameObject, Factory.GetFactory(be.serializerGuid).TypeId, flags, attachToken);
   }
 
   internal static GameObject Attach(GameObject gameObject, TypeId serializerId, EntityFlags flags, IProtocolToken attachToken) {
@@ -1150,7 +1150,9 @@ internal static class BoltCore {
     BoltConsole.Clear();
 
     // setup debug info display
-    DebugInfo.SetupAndShow();
+    if (BoltRuntimeSettings.instance.showDebugInfo) {
+      DebugInfo.SetupAndShow();
+    }
 
     // setup logging
     BoltLog.Setup(_mode, _config.logTargets);

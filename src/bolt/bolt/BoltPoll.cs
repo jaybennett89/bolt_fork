@@ -20,6 +20,7 @@ public class BoltPoll : MonoBehaviour {
   internal bool AllowImmediateShutdown = true;
 
   protected void Awake() {
+    Application.runInBackground  = true;
     DontDestroyOnLoad(gameObject);
   }
 

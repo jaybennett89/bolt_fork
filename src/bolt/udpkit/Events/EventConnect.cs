@@ -27,7 +27,7 @@ namespace UdpKit {
     public UdpEndPoint EndPoint;
 
     public override int Type {
-      get { return UdpEvent.INTERNAL_REFUSE; }
+      get { return UdpEvent.PUBLIC_CONNECT_REFUSED; }
     }
   }
 

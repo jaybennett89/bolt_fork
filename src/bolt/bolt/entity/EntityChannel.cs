@@ -188,9 +188,9 @@ partial class EntityChannel : BoltChannel {
       }
       else {
         if (proxy.Entity.IsFrozen) {
-          if (proxy.Entity.AllowFirstReplicationWhenFrozen && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
+          //if (proxy.Entity.AllowFirstReplicationWhenFrozen && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
             continue;
-          }
+          //}
         }
 
         // check update rate of this entity
@@ -212,7 +212,12 @@ partial class EntityChannel : BoltChannel {
         }
 
         if (proxy.Flags & ProxyFlags.FORCE_SYNC) {
-          proxy.Priority = 1 << 20;
+          if (proxy.Entity.ReplicationFilter.AllowReplicationTo(connection)) {
+            proxy.Priority = 1 << 20;
+          }
+          else {
+            continue;
+          }
         }
         else {
           if (proxy.Flags & ProxyFlags.CREATE_DONE) {
@@ -229,7 +234,12 @@ partial class EntityChannel : BoltChannel {
             proxy.Priority = Mathf.Clamp(proxy.Priority, 0, Mathf.Min(1 << 16, BoltCore._config.maxEntityPriority));
           }
           else {
-            proxy.Priority = 1 << 18;
+            if (proxy.Entity.ReplicationFilter.AllowReplicationTo(connection)) {
+              proxy.Priority = 1 << 18;
+            }
+            else {
+              continue;
+            }
           }
         }
       }
@@ -518,6 +528,7 @@ partial class EntityChannel : BoltChannel {
 
       if (createRequested) {
         attachToken = packet.UdpPacket.ReadToken();
+
         prefabId = packet.UdpPacket.ReadPrefabId();
         serializerId = packet.UdpPacket.ReadTypeId();
         spawnPosition = packet.UdpPacket.ReadVector3();

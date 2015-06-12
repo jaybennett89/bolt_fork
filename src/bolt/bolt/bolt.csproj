@@ -108,6 +108,7 @@
     <Compile Include="state\Arrays\Float.cs" />
     <Compile Include="state\Arrays\Integer.cs" />
     <Compile Include="state\Arrays\PrefabId.cs" />
+    <Compile Include="state\Arrays\ProtocolToken.cs" />
     <Compile Include="state\Arrays\Quaternion.cs" />
     <Compile Include="state\Arrays\String.cs" />
     <Compile Include="state\Arrays\Transform.cs" />

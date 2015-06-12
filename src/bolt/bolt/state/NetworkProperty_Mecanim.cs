@@ -81,6 +81,8 @@ namespace Bolt {
     protected virtual void PushMecanimValue(NetworkState state) { }
 
     void PullMecanimLayer(NetworkState state) {
+      //UnityEngine.Debug.Log(state.RootState.Entity.UnityObject.name + ":" + state.Animator.runtimeAnimatorController.name + ":"  + MecanimLayer);
+
       float newValue = state.Animator.GetLayerWeight(MecanimLayer);
       float oldValue = state.Storage.Values[state[this]].Float0;
 

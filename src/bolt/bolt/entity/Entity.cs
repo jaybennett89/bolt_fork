@@ -23,7 +23,7 @@ namespace Bolt {
     public CommandCallbackModes Mode;
   }
 
-  partial class Entity : IBoltListNode, IPriorityCalculator {
+  partial class Entity : IBoltListNode, IPriorityCalculator, IEntityReplicationFilter {
     bool _canQueueCommands = false;
     bool _canQueueCallbacks = false;
 
@@ -47,7 +47,9 @@ namespace Bolt {
 
     internal IEntitySerializer Serializer;
     internal IEntityBehaviour[] Behaviours;
+
     internal Bolt.IPriorityCalculator PriorityCalculator;
+    internal Bolt.IEntityReplicationFilter ReplicationFilter;
 
     internal bool IsOwner;
     internal bool IsFrozen;
@@ -237,7 +239,9 @@ namespace Bolt {
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         try {
-          eb.Attached();
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.Attached();
+          }
         }
         catch (Exception exn) {
           BoltLog.Error("User code threw exception inside Attached callback");
@@ -255,7 +259,7 @@ namespace Bolt {
       }
 
       // log
-      BoltLog.Debug("Attached {0}", this);
+      BoltLog.Debug("Attached {0} (Token: {1})", this, AttachToken);
     }
 
     internal void Detach() {
@@ -277,8 +281,10 @@ namespace Bolt {
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         try {
-          eb.Detached();
-          eb.entity = null;
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.Detached();
+            eb.entity = null;
+          }
         }
         catch (Exception exn) {
           BoltLog.Error("User code threw exception inside Detach callback");
@@ -347,6 +353,17 @@ namespace Bolt {
         BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
       }
 
+      // find replication filter
+      ReplicationFilter = UnityObject.GetComponentInChildren(typeof(IEntityReplicationFilter)) as IEntityReplicationFilter;
+
+      // use the default priority calculator if none is available
+      if (ReplicationFilter == null) {
+        ReplicationFilter = this;
+      }
+      else {
+        BoltLog.Debug("Using Priority Calculator {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
+      }
+
       // assign usertokens
       UnityObject._entity = this;
 
@@ -355,7 +372,9 @@ namespace Bolt {
 
       // call to behaviours (this happens BEFORE attached)
       foreach (IEntityBehaviour eb in Behaviours) {
-        eb.Initialized();
+        if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          eb.Initialized();
+        }
       }
     }
 
@@ -387,13 +406,16 @@ namespace Bolt {
 
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {
-          eb.SimulateOwner();
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.SimulateOwner();
+          }
         }
       }
       else {
         //if (BoltNetwork.isClient) {
         //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
         //  if (diff > 600) {
+        //    Debug.Log("FREEZE:" + UnityObject);
         //    Freeze(true);
         //  }
         //}
@@ -421,7 +443,9 @@ namespace Bolt {
           _canQueueCommands = true;
 
           foreach (IEntityBehaviour eb in Behaviours) {
-            eb.SimulateController();
+            if (ReferenceEquals(eb.entity, this.UnityObject)) {
+              eb.SimulateController();
+            }
           }
         }
         finally {
@@ -464,7 +488,9 @@ namespace Bolt {
             Command cmd = CommandQueue.lastOrDefault;
 
             for (int i = 0; i < Behaviours.Length; ++i) {
-              Behaviours[i].MissingCommand(cmd);
+              if (ReferenceEquals(Behaviours[i].entity, this.UnityObject)) {
+                Behaviours[i].MissingCommand(cmd);
+              }
             }
           }
         }
@@ -533,7 +559,9 @@ namespace Bolt {
         _canQueueCallbacks = cmd.IsFirstExecution;
 
         foreach (IEntityBehaviour eb in Behaviours) {
-          eb.ExecuteCommand(cmd, resetState);
+          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            eb.ExecuteCommand(cmd, resetState);
+          }
         }
       }
       finally {
@@ -646,6 +674,10 @@ namespace Bolt {
       }
 
       return 1;
+    }
+
+    bool IEntityReplicationFilter.AllowReplicationTo(BoltConnection connection) {
+      return true;
     }
   }
 }
