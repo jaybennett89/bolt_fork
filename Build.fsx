@@ -45,26 +45,13 @@ Target "Build" (fun _ ->
         Targets = ["Build"]
         Properties = 
         [
-          "Configuration", if isdebug then "DebugWP8" else "ReleaseWP8"
-          "UnityPathWin", unityDir
-          "UnityPathOSX", unityDir
-        ]
-    }
-  ) "src\\bolt\\bolt.sln"
-
-  build (fun d ->
-    { d with
-        Verbosity = Some(Quiet)
-        Targets = ["Build"]
-        Properties = 
-        [
           "Configuration", configuration
           "OutputPath", buildDir
           "UnityPathWin", unityDir
           "UnityPathOSX", unityDir
         ]
     }
-  ) "src\\bolt\\bolt.sln"
+  ) "src\\bolt.sln"
 )
 
 Target "Install" (fun _ ->

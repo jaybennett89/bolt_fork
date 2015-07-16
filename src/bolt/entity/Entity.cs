@@ -53,6 +53,7 @@ namespace Bolt {
 
     internal bool IsOwner;
     internal bool IsFrozen;
+    internal bool AutoRemoveChildEntities;
     internal bool AllowFirstReplicationWhenFrozen;
 
     internal int UpdateRate;
@@ -266,6 +267,14 @@ namespace Bolt {
       Assert.NotNull(UnityObject);
       Assert.True(IsAttached);
       Assert.True(NetworkId.Packed != 0UL);
+
+      if (AutoRemoveChildEntities) {
+        foreach (BoltEntity child in UnityObject.GetComponentsInChildren(typeof(BoltEntity), true)) {
+          if (child.isAttached && (ReferenceEquals(child._entity, this) == false)) {
+            child.transform.parent = null;
+          }
+        }
+      }
 
       if (Controller) {
         RevokeControl(null);
@@ -646,6 +655,7 @@ namespace Bolt {
       eo.UpdateRate = eo.UnityObject._updateRate;
       eo.AutoFreezeProxyFrames = eo.UnityObject._autoFreezeProxyFrames;
       eo.AllowFirstReplicationWhenFrozen = eo.UnityObject._allowFirstReplicationWhenFrozen;
+      eo.AutoRemoveChildEntities = eo.UnityObject._autoRemoveChildEntities;
       eo.PrefabId = prefabId;
       eo.Flags = flags;
 
@@ -660,7 +670,6 @@ namespace Bolt {
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
-
 
       // done
       return eo;

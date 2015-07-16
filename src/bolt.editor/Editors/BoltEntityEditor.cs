@@ -76,6 +76,9 @@ public class BoltEntityEditor : Editor {
     entity._clientPredicted = EditorGUILayout.Toggle("Controller Predicted Movement", entity._clientPredicted);
     HelpBox("If enabled this tells Bolt that this entity is using commands for moving and that they are applied on both the owner and controller.");
 
+    entity._autoRemoveChildEntities = EditorGUILayout.Toggle("Remove Parent On Detach", entity._autoRemoveChildEntities);
+    HelpBox("If enabled this tells Bolt to search the entire transform hierarchy of the entity being detached for nested entities and set their transform.parent to null.");
+
     if (settings.clientCanInstantiateAll == false) {
       entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Allow Client Instantiate", entity._allowInstantiateOnClient);
       HelpBox("If enabled this prefab can be instantiated by clients, this option can be globally enabled/disabled by changing the 'Instantiate Mode' setting in the 'Window/Bolt/Settings' window");
