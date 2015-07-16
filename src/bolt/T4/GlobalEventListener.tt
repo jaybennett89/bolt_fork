@@ -1,0 +1,803 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #> 
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #><#
+
+var shutdown = new Method("BoltShutdownBegin");
+shutdown.AddArgument("Bolt.AddCallback", "registerDoneCallback");
+shutdown.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when the bolt simulation is shutting down.
+  /// </summary>
+  /// <example>
+  /// *Example:* Logging a message in the bolt console when the server has shut down unexpectedly.
+  /// 
+  /// ```csharp
+  /// public override void BoltShutdown() {
+  ///   BoltConsole.Write(""Warning: Server Shutting Down..."");
+  /// }
+  /// ```
+  /// </example>
+";
+
+var boltStartBegin = new Method("BoltStartBegin");
+boltStartBegin.XmlDoc = "";
+
+var boltStartDone = new Method("BoltStartDone");
+boltStartDone.XmlDoc = "";
+
+//boltStartBegin.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when the bolt simulation is starting.
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+//  /// ```csharp
+//  /// public override void BoltStartBegin() {
+//  ///   PrecalcNpcPaths();
+//  ///   BoltConsole.Write(""Starting Game..."");
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+//var boltStartInProgress = new Method("BoltStartPending");
+//boltStartInProgress.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when the bolt simulation is starting.
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Logging a meessage when the bolt simulation is starting and initializing some NPC data.
+//  /// ```csharp
+//  /// public override void BoltStarted() {
+//  ///   PrecalcNpcPaths();
+//  ///   BoltConsole.Write(""Starting Game..."");
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var boltStartFailed = new Method("BoltStartFailed");
+boltStartFailed.XmlDoc = "";
+
+var streamDataReceived = new Method("StreamDataReceived");
+streamDataReceived.AddArgument("BoltConnection", "connection");
+streamDataReceived.AddArgument("UdpStreamData", "data");
+streamDataReceived.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when binary stream data is received 
+  /// </summary>
+  /// <param name=""connection"">The sender connection</param>
+  /// <param name=""data"">The binary stream data</param>
+  /// <example>
+  /// *Example:* Receiving a custom player icon.
+  /// 
+  /// ```csharp
+  /// public override void StreamDataReceived(BoltConnection connnection, UdpStreamData data) { 
+  ///   Texture2D icon = new Texture2D(4, 4);
+  ///   icon.LoadImage(data.Data);
+  ///   
+  ///   PlayerData playerData = (PlayerData)connection.userToken;
+  ///   playerData.SetIcon(icon);
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var registerStreamChannels = new Method("RegisterStreamChannels");
+//registerStreamChannels.Obsolete = true;
+//registerStreamChannels.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Registering binary stream channels may only be done in this callback
+//  /// </summary>
+//  /// <example>
+//  /// *Example:* Creating an unreliable stream channel for voice and a reliable stream channel for sending custom player icons.
+//  /// 
+//  /// ```csharp
+//  /// public static UdpKit.UdpChannelName Voice;
+//  /// public static UdpKit.UdpChannelName CustomPlayerIcon;
+//  /// 
+//  /// public override void RegisterStreamChannels() {
+//  ///   Voice = BoltNetwork.CreateStreamChannel(""Voice"", UdpKit.UdpChannelMode.Unreliable, 1});
+//  ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel(""CustomPlayerIcon"", UdpKit.UdpChannelMode.Reliable, 4});
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var portMappingChanged = new Method("PortMappingChanged");
+portMappingChanged.AddArgument("Bolt.INatDevice", "device");
+portMappingChanged.AddArgument("Bolt.IPortMapping", "portMapping");
+portMappingChanged.XmlDoc =
+@"
+  /// <summary>
+  /// Callback when network router port mapping has been changed
+  /// </summary>
+  /// <param name=""device"">The current network routing device</param>
+  /// <param name=""portMapping"">The new port mapping</param>
+";
+
+var sceneLoadLocalBegin = new Method("SceneLoadLocalBegin");
+sceneLoadLocalBegin.AddArgument("string", "map");
+sceneLoadLocalBegin.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered before the new local scene is loaded
+  /// </summary>
+  /// <param name=""map"">Name of scene being loaded</param>
+  /// <example>
+  /// *Example:* Showing a splash screen when clients are loading the game scene.
+  /// 
+  /// ```csharp
+  /// public override void SceneLoadLocalBegin(string map) {
+  ///   if(BoltNetwork.isClient && map.Equals(""GameScene"") {
+  ///     SplashScreen.Show(SplashScreens.GameLoad);
+  ///   }
+  /// }
+  /// ```
+  /// </example>
+";
+
+var sceneLoadLocalBegin2 = new Method("SceneLoadLocalBegin");
+sceneLoadLocalBegin2.AddArgument("string", "scene");
+sceneLoadLocalBegin2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadLocalBegin2.XmlDoc = "";
+
+var sceneLoadLocalDone = new Method("SceneLoadLocalDone");
+sceneLoadLocalDone.AddArgument("string", "map");
+sceneLoadLocalDone.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered before the new local scene has been completely loaded
+  /// </summary>
+  /// <param name=""map"">Name of scene that has loaded</param>
+  /// <example>
+  /// *Example:* Hiding a splash screen that was shown during loading.
+  /// 
+  /// ```csharp
+  /// public override void sceneLoadLocalDone(string map) {
+  ///   if(BoltNetwork.isClient && map.Equals(""GameScene"") {
+  ///     SplashScreen.Hide();
+  ///   }
+  /// }
+  /// ```
+  /// </example>
+";
+
+var sceneLoadLocalDone2 = new Method("SceneLoadLocalDone");
+sceneLoadLocalDone2.AddArgument("string", "scene");
+sceneLoadLocalDone2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadLocalDone2.XmlDoc = "";
+
+var sceneLoadRemoteDone = new Method("SceneLoadRemoteDone");
+sceneLoadRemoteDone.AddArgument("BoltConnection", "connection");
+sceneLoadRemoteDone.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a remote connection has completely loaded the current scene
+  /// </summary>
+  /// <param name=""connection"">The remote connection</param>
+  /// <example>
+  /// *Example:* Instantiating and configuring a player entity on the server and then assigning control to the client.
+  /// 
+  /// ```csharp
+  /// public override void SceneLoadRemoteDone(BoltConnection connection) {
+  ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
+  ///   player.transform.position = spawnPoint.transform.position;
+  ///   
+  ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
+  ///   Configure(player, initData);
+  ///   
+  ///   player.AssignControl(connection);
+  /// }
+  /// ```
+  /// </example>
+";
+
+var sceneLoadRemoteDone2 = new Method("SceneLoadRemoteDone");
+sceneLoadRemoteDone2.AddArgument("BoltConnection", "connection");
+sceneLoadRemoteDone2.AddArgument("Bolt.IProtocolToken", "token");
+sceneLoadRemoteDone2.XmlDoc = "";
+
+var connected = new Method("Connected");
+connected.AddArgument("BoltConnection", "connection");
+connected.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a client has become connected to this instance
+  /// </summary>
+  /// <param name=""connection"">Endpoint of the connected client</param>
+  /// <example>
+  /// *Example:* Instantiating and configuring a player entity when a client connects to the server.
+  /// 
+  /// ```csharp
+  /// public override void Connected(BoltConnection connection) {
+  ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
+  ///   player.transform.position = spawnPoint.transform.position;
+  ///   
+  ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
+  ///   Configure(player, initData);
+  ///   
+  ///   player.AssignControl(connection);
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var connected2 = new Method("Connected");
+//connected2.AddArgument("BoltConnection", "connection");
+//connected2.AddArgument("Bolt.IProtocolToken", "acceptToken");
+//connected2.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when a client has become connected to this instance
+//  /// </summary>
+//  /// <param name=""connection"">Endpoint of the connected client</param>
+//  /// <param name=""acceptToken"">The data token the server sent to the accept call</param>
+//  /// <example>
+//  /// *Example:* Using a protocol token with the Connected callback to pass a spawnpoint position to to new player.
+//  /// 
+//  /// ```csharp
+//  /// public override void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken) {
+//  ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
+//  ///   
+//  ///   var spawnpoint = (SpawnPoint)acceptToken;
+//  ///   player.transform.position = spawnpoint.position;
+//  ///   
+//  ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
+//  ///   Configure(player, initData);
+//  ///   
+//  ///   player.AssignControl(connection);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+//
+//var connected3 = new Method("Connected");
+//connected3.AddArgument("BoltConnection", "connection");
+//connected3.AddArgument("Bolt.IProtocolToken", "acceptToken");
+//connected3.AddArgument("Bolt.IProtocolToken", "connectToken");
+//connected3.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when a client has become connected to this instance
+//  /// </summary>
+//  /// <param name=""connection"">Endpoint of the connected client</param>
+//  /// <param name=""acceptToken"">The data token the server sent to the accept call</param>
+//  /// <param name=""connectToken"">The data token the client sent to it's connect call</param>
+//  /// <example>
+//  /// *Example:* A connection method using both server and client token data to spawn and configure a player.
+//  /// 
+//  /// ```csharp
+//  /// public override void Connected(BoltConnection connection, Bolt.IProtocolToken acceptToken, Bolt.IProtocolToken connectToken) {
+//  ///   var player = BoltNetwork.Instantiate(BoltPrefabs.Player);
+//  ///   
+//  ///   var spawnpoint = (SpawnPoint)acceptToken;
+//  ///   player.transform.position = spawnpoint.Position;
+//  ///   
+//  ///   var userInfo = (UserInfo)connectToken;
+//  ///    
+//  ///   var initData = prototype.GetNewPlayer(GameLogic.PlayableClass.Mercenary);
+//  ///   Configure(player, userInfo.Name, initData);
+//  ///   
+//  ///   player.AssignControl(connection);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var connectFailed = new Method("ConnectFailed");
+connectFailed.AddArgument("UdpEndPoint", "endpoint");
+connectFailed.AddArgument("Bolt.IProtocolToken", "token");
+connectFailed.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a connection to remote server has failed
+  /// </summary>
+  /// <param name=""endpoint"">The remote address</param>
+  /// <example>
+  /// *Example:* Logging an error message when the remote connection has failed.
+  /// 
+  /// ```csharp
+  /// public override void ConnectFailed(UdpEndPoint endpoint) {
+  ///   BoltConsole.Write(string.Format(""Connection To ({0}:{1}) has failed"", endpoint.Address.ToString(), endpoint.ToString()));
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var connectRequest = new Method("ConnectRequest");
+//connectRequest.AddArgument("UdpEndPoint", "endpoint");
+//connectRequest.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when this instance receives an incoming client connection
+//  /// </summary>
+//  /// <param name=""endpoint"">The incoming client endpoint</param>
+//  /// <example>
+//  /// Accepting an incoming connection.
+//  /// 
+//  /// ```csharp
+//  /// public override void ConnectRequest(UdpEndPoint endpoint) {
+//  ///   BoltNetwork.Accept(remoteEndPoint);
+//  /// }
+//  /// ```
+//  /// </example> 
+//";
+
+var connectRequest2 = new Method("ConnectRequest");
+connectRequest2.AddArgument("UdpEndPoint", "endpoint");
+connectRequest2.AddArgument("Bolt.IProtocolToken", "token");
+connectRequest2.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when this instance receives an incoming client connection
+  /// </summary>
+  /// <param name=""endpoint"">The incoming client endpoint</param>
+  /// <param name=""token"">A data token sent from the incoming client</param>
+  /// <example>
+  /// *Example:* Accepting an incoming connection with user credentials in the data token.
+  /// 
+  /// ```csharp
+  /// public override void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {
+  ///   UserCredentials creds = (UserCredentials)token);
+  ///   if(Authenticate(creds.username, creds.password)) {
+  ///     BoltNetwork.Accept(connection.remoteEndPoint);
+  ///   }
+  /// }
+  /// ```
+  /// </example> 
+";
+
+//var connectRefused = new Method("ConnectRefused");
+//connectRefused.AddArgument("UdpEndPoint ", "endpoint");
+//connectRefused.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when the connection to a remote server has been refused.
+//  /// </summary>
+//  /// <param name=""endpoint"">The remote server endpoint</param>
+//  /// <example>
+//  /// *Example:* Logging an error message when the remote connection has been refused.
+//  /// 
+//  /// ```csharp
+//  /// public override void ConnectRefused(UdpEndPoint endpoint) {
+//  ///   BoltConsole.Write(string.Format(""Connection To ({0}:{1}) has been refused"", endpoint.Address.ToString(), endpoint.Port.ToString()));
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var connectRefused2 = new Method("ConnectRefused");
+connectRefused2.AddArgument("UdpEndPoint ", "endpoint");
+connectRefused2.AddArgument("Bolt.IProtocolToken ", "token");
+connectRefused2.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when the connection to a remote server has been refused.
+  /// </summary>
+  /// <param name=""endpoint"">The remote server endpoint</param>
+  /// <param name=""token"">Data token sent by refusing server</param>
+  /// <example>
+  /// *Example:* Logging an error message when the remote connection has been refused using an error message token from the server.
+  /// 
+  /// ```csharp
+  /// public override void ConnectRefused(UdpEndPoint endpoint, Bolt.IProtocolToken token) {
+  ///   ServerMessage.message = (ServerMessage)token;
+  ///   BoltConsole.Write(string.Format(""Connection To ({0}:{1}) has been refused. Reason was {3}"", 
+  ///     endpoint.Address.ToString(), endpoint.ToString(), serverMessage.errorDescription));
+  /// }
+  /// ```
+  /// </example> 
+";
+
+var connectAttempt = new Method("ConnectAttempt");
+connectAttempt.AddArgument("UdpEndPoint", "endpoint");
+connectAttempt.AddArgument("Bolt.IProtocolToken", "token");
+connectAttempt.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when trying to connect to a remote endpoint
+  /// </summary>
+  /// <param name=""endpoint"">The remote server address</param>
+  /// <example>
+  /// *Example:* Logging a message when initializing a connection to server.
+  /// 
+  /// ```csharp
+  /// public override void ConnectAttempt((UdpEndPoint endpoint) {
+  ///   BoltConsole.Write(string.Format(""To Remote Server At ({0}:{1})"", endpoint.Address, endpoint.Port);
+  /// }
+  /// ```
+  /// </example>
+";
+
+var disconnected = new Method("Disconnected");
+disconnected.AddArgument("BoltConnection", "connection");
+disconnected.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when disconnected from remote server
+  /// </summary>
+  /// <param name=""connection"">The remote server endpoint</param>
+  /// <example>
+  /// *Example:* Logging a disconnect message and returning to the main menu scene.
+  /// 
+  /// ```csharp
+  /// public override void Disconnected(BoltConnection connection) {
+  ///   BoltConsole.Write(""Returning to main menu..."");
+  ///   Application.LoadLevel(""MainMenu"");
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var disconnected2 = new Method("Disconnected");
+//disconnected2.AddArgument("BoltConnection", "connection");
+//disconnected2.AddArgument("Bolt.IProtocolToken", "token");
+//disconnected2.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when disconnected from remote server
+//  /// </summary>
+//  /// <param name=""connection"">The remote server endpoint</param>
+//  /// <param name=""token"">Data token sent by disconnecting server</param>
+//  /// <example>
+//  /// *Example:* Logging a disconnect message from the server and returning to the log in menu
+//  /// 
+//  /// ```csharp
+//  /// public override void Disconnected(BoltConnection connection, Bolt.IProtocolToken token) {
+//  ///   ServerMessage msg = (ServerMessage)token;  /// 
+//  ///   BoltConsole.Write(msg.description);
+//  ///   Application.LoadLevel(""Login"");
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+
+var controlOfEntityLost = new Method("ControlOfEntityLost");
+controlOfEntityLost.AddArgument("BoltEntity", "entity");
+controlOfEntityLost.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when this instance of bolt loses control of a bolt entity
+  /// </summary>
+  /// <param name=""entity"">The controlled entity</param>
+  /// <example>
+  /// *Example:* Setting up game components to no longer control an entity.
+  /// 
+  /// ```csharp
+  /// public override void ControlOfEntityLost(BoltEntity entity) {
+  ///   GameInput.instance.RemoveControlledEntity(entity);
+  ///   MiniMap.instance.RemoveControlledEntity(entity);
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var controlOfEntityLost2 = new Method("ControlOfEntityLost");
+//controlOfEntityLost2.AddArgument("BoltEntity", "entity");
+//controlOfEntityLost2.AddArgument("Bolt.IProtocolToken", "token");
+//controlOfEntityLost2.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when this instance of bolt loses control of a bolt entity
+//  /// </summary>
+//  /// <param name=""entity"">The controlled entity</param>
+//  /// <example>
+//  /// *Example:* Setting up game components to no longer control an entity.
+//  /// 
+//  /// ```csharp
+//  /// public override void ControlOfEntityLost(BoltEntity entity) {
+//  ///   GameInput.instance.RemoveControlledEntity(entity);
+//  ///   MiniMap.instance.RemoveControlledEntity(entity);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var controlOfEntityGained = new Method("ControlOfEntityGained");
+controlOfEntityGained.AddArgument("BoltEntity", "entity");
+controlOfEntityGained.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when this instance of bolt receieves control of a bolt entity
+  /// </summary>
+  /// <param name=""entity"">The controlled entity</param>
+  /// <example>
+  /// *Example:* Setting up the game minimap and other components to use a specific entity as the player's controlled entity.
+  /// 
+  /// ```csharp
+  /// public override void ControlOfEntityGained(BoltEntity entity) {
+  ///   GameInput.instance.SetControlledEntity(entity);
+  ///   MiniMap.instance.SetControlledEntity(entity);
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var controlOfEntityGained2 = new Method("ControlOfEntityGained");
+//controlOfEntityGained2.AddArgument("BoltEntity", "entity");
+//controlOfEntityGained2.AddArgument("Bolt.IProtocolToken", "token");
+//controlOfEntityGained2.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when this instance of bolt receieves control of a bolt entity
+//  /// </summary>
+//  /// <param name=""entity"">The controlled entity</param>
+//  /// <param name=""token"">Data token sent by the owner</param>
+//  /// <example>
+//  /// *Example:* Setting up the game minimap and other components to use a specific entity as the player's controlled entity and using a data token to 
+//  /// transmit the correct team color.
+//  /// 
+//  /// ```csharp
+//  /// public override void ControlOfEntityGained(BoltEntity entity, IProtocolToken token) {
+//  ///   GameInput.instance.SetControlledEntity(entity);
+//  ///   
+//  ///   PlayerInfo info = (PlayerInfo)token;  
+//  ///   MiniMap.instance.SetControlledEntity(entity, info.teamColor);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var entityAttached = new Method("EntityAttached");
+entityAttached.AddArgument("BoltEntity", "entity");
+entityAttached.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a new entity is attached to the bolt simulation
+  /// </summary>
+  /// <param name=""entity"">The attached entity</param>
+  /// <example>
+  /// *Example:* Setting up the game minimap to show a newly attached entity.
+  /// 
+  /// ```csharp
+  /// public override void EntityAttached(BoltEntity entity) {
+  ///   MiniMap.instance.SetKnownEntity(entity);
+  /// }
+  /// ```
+  /// </example> 
+";
+
+//var entityAttached2 = new Method("EntityAttached");
+//entityAttached2.AddArgument("BoltEntity", "entity");
+//entityAttached2.AddArgument("Bolt.IProtocolToken", "token");
+//entityAttached2.XmlDoc =
+//@"
+//
+//  /// <summary>
+//  /// Callback triggered when a new entity is attached to the bolt simulation
+//  /// </summary>
+//  /// <param name=""entity"">The attached entity</param>
+//  /// <param name=""token"">Data token sent by the owner</param>
+//  /// <example>
+//  /// *Example:* Initializing a newly attached entity with loadout data for weapon, armor, and abilities.
+//  /// 
+//  /// ```csharp
+//  /// public override void EntityAttached(BoltEntity entity, Bolt.IProtocolToken token) {
+//  ///   MiniMap.instance.SetKnownEntity(entity);
+//  ///   
+//  ///   EntityLoadout loadout = (EntityLoadout)token;
+//  ///   ConfigureEntity(entity, loadout.weaponId, loadout.armorId, loadout.abilities);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var entityDetached = new Method("EntityDetached");
+entityDetached.AddArgument("BoltEntity", "entity");
+entityDetached.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a new entity is detached from the bolt simulation
+  /// </summary>
+  /// <param name=""entity"">The detached entity</param>
+  /// <example>
+  /// *Example:* Removing the newly detached entity from the game minimap.
+  /// 
+  /// ```csharp
+  /// public override void EntityDetached(BoltEntity entity) {
+  ///   MiniMap.instance.RemoveKnownEntity(entity);
+  /// }
+  /// ```
+  /// </example>
+";
+
+//var entityDetached2 = new Method("EntityDetached");
+//entityDetached2.AddArgument("BoltEntity", "entity");
+//entityDetached2.AddArgument("Bolt.IProtocolToken", "token");
+//entityDetached2.XmlDoc =
+//@"
+//  /// <summary>
+//  /// Callback triggered when a new entity is detached from the bolt simulation
+//  /// </summary>
+//  /// <param name=""entity"">The detached entity</param>
+//  /// <param name=""token"">Data token sent by the owner</param>
+//  /// <example>
+//  /// *Example:* Cleaning up a newly detached entity and writing a detailed description of its death to a game console.
+//  /// ```csharp
+//  /// public override void EntityDetached(BoltEntity entity, Bolt.IProtocolToken token) {
+//  ///   MiniMap.instance.RemoveKnownEntity(entity);
+//  ///   
+//  ///   DeathRecap recap = (DeathRecap)token;
+//  ///   BoltConsole.Write(string.Format(""Killed By {0} - {1} Damage"", recap.KillerName, recap.Damage);
+//  /// }
+//  /// ```
+//  /// </example>
+//";
+
+var entityReceived = new Method("EntityReceived");
+entityReceived.AddArgument("BoltEntity", "entity");
+entityReceived.XmlDoc =
+@"
+  /// <summary>
+  /// Callback triggered when a bolt entity is recieved from the network
+  /// </summary>
+  /// <param name=""entity"">The recieved bolt entity</param>
+  /// <example>
+  /// *Example:* Loggging connections from remote players in the client bolt console
+  /// 
+  /// ```csharp
+  /// public override void EntityReceived(BoltEntity entity) {
+  ///   string name = entity.GetState&ltPlayerState&gt().Name; 
+  ///   BoltConsole.Write(string.Format(""{0} Has Connected"", name));
+  /// }
+  /// ```
+  /// </example>
+";
+
+
+var entityFrozen = new Method("EntityFrozen");
+entityFrozen.AddArgument("BoltEntity", "entity");
+entityFrozen.XmlDoc = "";
+
+var entityThawed = new Method("EntityThawed");
+entityThawed.AddArgument("BoltEntity", "entity"); 
+entityThawed.XmlDoc = "";
+
+var masterServerConnectFailed = new Method("ZeusConnectFailed");
+masterServerConnectFailed.AddArgument("UdpEndPoint", "endpoint");
+masterServerConnectFailed.XmlDoc = @"";
+
+var masterServerConnected = new Method("ZeusConnected");
+masterServerConnected.AddArgument("UdpEndPoint", "endpoint");
+masterServerConnected.XmlDoc = @"";
+
+var masterServerDisconnected = new Method("ZeusDisconnected");
+masterServerDisconnected.AddArgument("UdpEndPoint", "endpoint");
+masterServerDisconnected.XmlDoc = @"";
+
+var masterServerNatProbeResult = new Method("ZeusNatProbeResult");
+masterServerNatProbeResult.AddArgument("UdpKit.NatFeatures", "features");
+masterServerNatProbeResult.XmlDoc = @"";
+
+var sessionListUpdated = new Method("SessionListUpdated");
+sessionListUpdated.AddArgument("Map<System.Guid, UdpSession>", "sessionList");
+sessionListUpdated.XmlDoc = @"";
+
+var sessionConnectFailed = new Method("SessionConnectFailed");
+sessionConnectFailed.AddArgument("UdpSession", "session");
+sessionConnectFailed.AddArgument("Bolt.IProtocolToken", "token");
+sessionConnectFailed.XmlDoc = @"";
+
+var methods = new List<Method>();
+methods.Add(shutdown);
+methods.Add(boltStartBegin);
+methods.Add(boltStartDone);
+methods.Add(boltStartFailed);
+methods.Add(streamDataReceived);
+methods.Add(portMappingChanged);
+methods.Add(sceneLoadLocalBegin);
+methods.Add(sceneLoadLocalBegin2);
+methods.Add(sceneLoadLocalDone);
+methods.Add(sceneLoadLocalDone2);
+methods.Add(sceneLoadRemoteDone);
+methods.Add(sceneLoadRemoteDone2);
+methods.Add(connected);
+//methods.Add(connected2);
+//methods.Add(connected3);
+methods.Add(connectFailed);
+//methods.Add(connectRequest);
+methods.Add(connectRequest2);
+//methods.Add(connectRefused);
+methods.Add(connectRefused2);
+methods.Add(connectAttempt);
+methods.Add(disconnected);
+//methods.Add(disconnected2);
+methods.Add(controlOfEntityLost);
+//methods.Add(controlOfEntityLost2);
+methods.Add(controlOfEntityGained);
+//methods.Add(controlOfEntityGained2);
+methods.Add(entityAttached);
+//methods.Add(entityAttached2);
+methods.Add(entityDetached);
+//methods.Add(entityDetached2);
+methods.Add(entityReceived);
+methods.Add(entityFrozen);
+methods.Add(entityThawed);
+
+methods.Add(masterServerConnectFailed);
+methods.Add(masterServerConnected);
+methods.Add(masterServerDisconnected);
+methods.Add(masterServerNatProbeResult);
+
+methods.Add(sessionListUpdated);
+methods.Add(sessionConnectFailed);
+
+#>
+
+using UdpKit;
+using UnityEngine;
+
+namespace BoltInternal {
+partial class GlobalEventListenerBase {
+<#
+foreach(var m in methods) {
+#>
+
+<#= m.XmlDoc.Trim() #>
+<# if(m.Obsolete) { #>[System.Obsolete("This method is obsolete and will be removed in a future version of Bolt")]<# } #> 
+public virtual void <#= m.Name #>(<#= m.GetSignature() #>) {  }
+
+internal static void <#= m.Name #>Invoke(<#= m.GetSignature() #>) { 
+	//BoltLog.Debug("Invoking callback <#= m.Name #>");
+	foreach (GlobalEventListenerBase cb in callbacks) {
+		try {
+			cb.<#= m.Name #>(<#= m.GetArguments() #>);
+		} catch(System.Exception exn) {
+			BoltLog.Exception(exn);
+		}
+	}
+}
+
+<#
+}
+#>
+}
+}
+
+<#+
+
+class Argument {
+	public string Name;
+	public string Type;
+
+	public Argument(string name, string type) {
+		Name = name;
+		Type = type;
+	}
+}
+
+class Method {
+	public string Name;
+	public string XmlDoc;
+  public bool Obsolete;
+	public List<Argument> Arguments = new List<Argument>();
+
+	public Method(string name) {
+		Name = name;
+	}
+
+	public void AddArgument(string type, string name) {
+		Arguments.Add(new Argument(name, type));
+	}
+
+	public string GetSignature() {
+		return String.Join(", ", Arguments.Select(x => x.Type + " " + x.Name).ToArray());
+	}
+
+	public string GetArguments() {
+		return String.Join(", ", Arguments.Select(x => x.Name).ToArray());
+	}
+}
+
+#>
