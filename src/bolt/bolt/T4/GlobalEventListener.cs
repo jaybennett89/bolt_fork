@@ -22,7 +22,7 @@ partial class GlobalEventListenerBase {
 public virtual void BoltShutdownBegin(Bolt.AddCallback registerDoneCallback) {  }
 
 internal static void BoltShutdownBeginInvoke(Bolt.AddCallback registerDoneCallback) { 
-	BoltLog.Debug("Invoking callback BoltShutdownBegin");
+	//BoltLog.Debug("Invoking callback BoltShutdownBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltShutdownBegin(registerDoneCallback);
@@ -38,7 +38,7 @@ internal static void BoltShutdownBeginInvoke(Bolt.AddCallback registerDoneCallba
 public virtual void BoltStartBegin() {  }
 
 internal static void BoltStartBeginInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStartBegin");
+	//BoltLog.Debug("Invoking callback BoltStartBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStartBegin();
@@ -54,7 +54,7 @@ internal static void BoltStartBeginInvoke() {
 public virtual void BoltStartDone() {  }
 
 internal static void BoltStartDoneInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStartDone");
+	//BoltLog.Debug("Invoking callback BoltStartDone");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStartDone();
@@ -70,7 +70,7 @@ internal static void BoltStartDoneInvoke() {
 public virtual void BoltStartFailed() {  }
 
 internal static void BoltStartFailedInvoke() { 
-	BoltLog.Debug("Invoking callback BoltStartFailed");
+	//BoltLog.Debug("Invoking callback BoltStartFailed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.BoltStartFailed();
@@ -103,7 +103,7 @@ internal static void BoltStartFailedInvoke() {
 public virtual void StreamDataReceived(BoltConnection connection, UdpStreamData data) {  }
 
 internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStreamData data) { 
-	BoltLog.Debug("Invoking callback StreamDataReceived");
+	//BoltLog.Debug("Invoking callback StreamDataReceived");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.StreamDataReceived(connection, data);
@@ -123,7 +123,7 @@ internal static void StreamDataReceivedInvoke(BoltConnection connection, UdpStre
 public virtual void PortMappingChanged(Bolt.INatDevice device, Bolt.IPortMapping portMapping) {  }
 
 internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPortMapping portMapping) { 
-	BoltLog.Debug("Invoking callback PortMappingChanged");
+	//BoltLog.Debug("Invoking callback PortMappingChanged");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.PortMappingChanged(device, portMapping);
@@ -153,7 +153,7 @@ internal static void PortMappingChangedInvoke(Bolt.INatDevice device, Bolt.IPort
 public virtual void SceneLoadLocalBegin(string map) {  }
 
 internal static void SceneLoadLocalBeginInvoke(string map) { 
-	BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
+	//BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalBegin(map);
@@ -169,7 +169,7 @@ internal static void SceneLoadLocalBeginInvoke(string map) {
 public virtual void SceneLoadLocalBegin(string scene, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadLocalBeginInvoke(string scene, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
+	//BoltLog.Debug("Invoking callback SceneLoadLocalBegin");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalBegin(scene, token);
@@ -199,7 +199,7 @@ internal static void SceneLoadLocalBeginInvoke(string scene, Bolt.IProtocolToken
 public virtual void SceneLoadLocalDone(string map) {  }
 
 internal static void SceneLoadLocalDoneInvoke(string map) { 
-	BoltLog.Debug("Invoking callback SceneLoadLocalDone");
+	//BoltLog.Debug("Invoking callback SceneLoadLocalDone");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalDone(map);
@@ -215,7 +215,7 @@ internal static void SceneLoadLocalDoneInvoke(string map) {
 public virtual void SceneLoadLocalDone(string scene, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadLocalDoneInvoke(string scene, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback SceneLoadLocalDone");
+	//BoltLog.Debug("Invoking callback SceneLoadLocalDone");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadLocalDone(scene, token);
@@ -249,7 +249,7 @@ internal static void SceneLoadLocalDoneInvoke(string scene, Bolt.IProtocolToken 
 public virtual void SceneLoadRemoteDone(BoltConnection connection) {  }
 
 internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) { 
-	BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
+	//BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadRemoteDone(connection);
@@ -265,7 +265,7 @@ internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection) {
 public virtual void SceneLoadRemoteDone(BoltConnection connection, Bolt.IProtocolToken token) {  }
 
 internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
+	//BoltLog.Debug("Invoking callback SceneLoadRemoteDone");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SceneLoadRemoteDone(connection, token);
@@ -299,7 +299,7 @@ internal static void SceneLoadRemoteDoneInvoke(BoltConnection connection, Bolt.I
 public virtual void Connected(BoltConnection connection) {  }
 
 internal static void ConnectedInvoke(BoltConnection connection) { 
-	BoltLog.Debug("Invoking callback Connected");
+	//BoltLog.Debug("Invoking callback Connected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Connected(connection);
@@ -327,7 +327,7 @@ internal static void ConnectedInvoke(BoltConnection connection) {
 public virtual void ConnectFailed(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
 internal static void ConnectFailedInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback ConnectFailed");
+	//BoltLog.Debug("Invoking callback ConnectFailed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectFailed(endpoint, token);
@@ -359,7 +359,7 @@ internal static void ConnectFailedInvoke(UdpEndPoint endpoint, Bolt.IProtocolTok
 public virtual void ConnectRequest(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
 internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback ConnectRequest");
+	//BoltLog.Debug("Invoking callback ConnectRequest");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRequest(endpoint, token);
@@ -390,7 +390,7 @@ internal static void ConnectRequestInvoke(UdpEndPoint endpoint, Bolt.IProtocolTo
 public virtual void ConnectRefused(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) {  }
 
 internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint, Bolt.IProtocolToken  token) { 
-	BoltLog.Debug("Invoking callback ConnectRefused");
+	//BoltLog.Debug("Invoking callback ConnectRefused");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectRefused(endpoint, token);
@@ -418,7 +418,7 @@ internal static void ConnectRefusedInvoke(UdpEndPoint  endpoint, Bolt.IProtocolT
 public virtual void ConnectAttempt(UdpEndPoint endpoint, Bolt.IProtocolToken token) {  }
 
 internal static void ConnectAttemptInvoke(UdpEndPoint endpoint, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback ConnectAttempt");
+	//BoltLog.Debug("Invoking callback ConnectAttempt");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ConnectAttempt(endpoint, token);
@@ -447,7 +447,7 @@ internal static void ConnectAttemptInvoke(UdpEndPoint endpoint, Bolt.IProtocolTo
 public virtual void Disconnected(BoltConnection connection) {  }
 
 internal static void DisconnectedInvoke(BoltConnection connection) { 
-	BoltLog.Debug("Invoking callback Disconnected");
+	//BoltLog.Debug("Invoking callback Disconnected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.Disconnected(connection);
@@ -476,7 +476,7 @@ internal static void DisconnectedInvoke(BoltConnection connection) {
 public virtual void ControlOfEntityLost(BoltEntity entity) {  }
 
 internal static void ControlOfEntityLostInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback ControlOfEntityLost");
+	//BoltLog.Debug("Invoking callback ControlOfEntityLost");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ControlOfEntityLost(entity);
@@ -505,7 +505,7 @@ internal static void ControlOfEntityLostInvoke(BoltEntity entity) {
 public virtual void ControlOfEntityGained(BoltEntity entity) {  }
 
 internal static void ControlOfEntityGainedInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback ControlOfEntityGained");
+	//BoltLog.Debug("Invoking callback ControlOfEntityGained");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ControlOfEntityGained(entity);
@@ -533,7 +533,7 @@ internal static void ControlOfEntityGainedInvoke(BoltEntity entity) {
 public virtual void EntityAttached(BoltEntity entity) {  }
 
 internal static void EntityAttachedInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback EntityAttached");
+	//BoltLog.Debug("Invoking callback EntityAttached");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityAttached(entity);
@@ -561,7 +561,7 @@ internal static void EntityAttachedInvoke(BoltEntity entity) {
 public virtual void EntityDetached(BoltEntity entity) {  }
 
 internal static void EntityDetachedInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback EntityDetached");
+	//BoltLog.Debug("Invoking callback EntityDetached");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityDetached(entity);
@@ -590,7 +590,7 @@ internal static void EntityDetachedInvoke(BoltEntity entity) {
 public virtual void EntityReceived(BoltEntity entity) {  }
 
 internal static void EntityReceivedInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback EntityReceived");
+	//BoltLog.Debug("Invoking callback EntityReceived");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityReceived(entity);
@@ -606,7 +606,7 @@ internal static void EntityReceivedInvoke(BoltEntity entity) {
 public virtual void EntityFrozen(BoltEntity entity) {  }
 
 internal static void EntityFrozenInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback EntityFrozen");
+	//BoltLog.Debug("Invoking callback EntityFrozen");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityFrozen(entity);
@@ -622,7 +622,7 @@ internal static void EntityFrozenInvoke(BoltEntity entity) {
 public virtual void EntityThawed(BoltEntity entity) {  }
 
 internal static void EntityThawedInvoke(BoltEntity entity) { 
-	BoltLog.Debug("Invoking callback EntityThawed");
+	//BoltLog.Debug("Invoking callback EntityThawed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.EntityThawed(entity);
@@ -638,7 +638,7 @@ internal static void EntityThawedInvoke(BoltEntity entity) {
 public virtual void ZeusConnectFailed(UdpEndPoint endpoint) {  }
 
 internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback ZeusConnectFailed");
+	//BoltLog.Debug("Invoking callback ZeusConnectFailed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ZeusConnectFailed(endpoint);
@@ -654,7 +654,7 @@ internal static void ZeusConnectFailedInvoke(UdpEndPoint endpoint) {
 public virtual void ZeusConnected(UdpEndPoint endpoint) {  }
 
 internal static void ZeusConnectedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback ZeusConnected");
+	//BoltLog.Debug("Invoking callback ZeusConnected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ZeusConnected(endpoint);
@@ -670,7 +670,7 @@ internal static void ZeusConnectedInvoke(UdpEndPoint endpoint) {
 public virtual void ZeusDisconnected(UdpEndPoint endpoint) {  }
 
 internal static void ZeusDisconnectedInvoke(UdpEndPoint endpoint) { 
-	BoltLog.Debug("Invoking callback ZeusDisconnected");
+	//BoltLog.Debug("Invoking callback ZeusDisconnected");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ZeusDisconnected(endpoint);
@@ -686,7 +686,7 @@ internal static void ZeusDisconnectedInvoke(UdpEndPoint endpoint) {
 public virtual void ZeusNatProbeResult(UdpKit.NatFeatures features) {  }
 
 internal static void ZeusNatProbeResultInvoke(UdpKit.NatFeatures features) { 
-	BoltLog.Debug("Invoking callback ZeusNatProbeResult");
+	//BoltLog.Debug("Invoking callback ZeusNatProbeResult");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.ZeusNatProbeResult(features);
@@ -702,7 +702,7 @@ internal static void ZeusNatProbeResultInvoke(UdpKit.NatFeatures features) {
 public virtual void SessionListUpdated(Map<System.Guid, UdpSession> sessionList) {  }
 
 internal static void SessionListUpdatedInvoke(Map<System.Guid, UdpSession> sessionList) { 
-	BoltLog.Debug("Invoking callback SessionListUpdated");
+	//BoltLog.Debug("Invoking callback SessionListUpdated");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SessionListUpdated(sessionList);
@@ -718,7 +718,7 @@ internal static void SessionListUpdatedInvoke(Map<System.Guid, UdpSession> sessi
 public virtual void SessionConnectFailed(UdpSession session, Bolt.IProtocolToken token) {  }
 
 internal static void SessionConnectFailedInvoke(UdpSession session, Bolt.IProtocolToken token) { 
-	BoltLog.Debug("Invoking callback SessionConnectFailed");
+	//BoltLog.Debug("Invoking callback SessionConnectFailed");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.SessionConnectFailed(session, token);

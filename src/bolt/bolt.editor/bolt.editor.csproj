@@ -66,6 +66,14 @@
       <HintPath>..\..\assemblies\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="udpkit, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\assemblies\udpkit.dll</HintPath>
+    </Reference>
+    <Reference Include="udpkit.common, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\assemblies\udpkit.common.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
@@ -145,14 +153,6 @@
       <Project>{0F60EF6D-5C08-4E8F-8872-7549F604C58F}</Project>
       <Name>bolt</Name>
     </ProjectReference>
-    <ProjectReference Include="..\udpkit.common\udpkit.common.csproj">
-      <Project>{bece3789-7e78-437c-9423-594705f5fa49}</Project>
-      <Name>udpkit.common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\udpkit\udpkit.csproj">
-      <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
-      <Name>udpkit</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Install\bolt\scripts\aoi\BoltAOI.cs" />
@@ -218,11 +218,13 @@
     <EmbeddedResource Include="Resources\Install\bolt\resources\icons\mc_masterserver.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\udpkit.wp8\Bin\Release\udpkit_wp8.dll">
+    <EmbeddedResource Include="..\..\assemblies\udpkit_wp8.dll">
       <Link>Resources\Install\Plugins\WP8\udpkit_wp8.dll</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\udpkit.wp8_shim\bin\Release\udpkit_wp8.dll">
-      <Link>Resources\Install\Plugins\udpkit_wp8.dll</Link>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\assemblies\udpkit_wp8_shim.dll">
+      <Link>Resources\Install\Plugins\udpkit_wp8_shim.dll</Link>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -64,6 +64,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="udpkit, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\assemblies\udpkit.dll</HintPath>
+    </Reference>
+    <Reference Include="udpkit.common, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\assemblies\udpkit.common.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
@@ -252,16 +260,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\udpkit.common\udpkit.common.csproj">
-      <Project>{bece3789-7e78-437c-9423-594705f5fa49}</Project>
-      <Name>udpkit.common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\udpkit\udpkit.csproj">
-      <Project>{66a5f183-3065-4a77-a109-779d7984990f}</Project>
-      <Name>udpkit</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

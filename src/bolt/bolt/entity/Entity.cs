@@ -342,8 +342,20 @@ namespace Bolt {
       // make this a bit faster
       Behaviours = UnityObject.GetComponentsInChildren(typeof(IEntityBehaviour)).Select(x => x as IEntityBehaviour).Where(x => x != null).ToArray();
 
+      // assign usertokens
+      UnityObject._entity = this;
+
       // try to find a priority calculator
-      PriorityCalculator = UnityObject.GetComponentInChildren(typeof(IPriorityCalculator)) as IPriorityCalculator;
+      var calculators = UnityObject.GetComponentsInChildren(typeof(IPriorityCalculator), true);
+
+      foreach (IPriorityCalculator calculator in calculators) {
+        var parent = ((MonoBehaviour)(object)calculator).GetComponentInParent<BoltEntity>();
+
+        if (parent && ReferenceEquals(parent._entity, this)) {
+          PriorityCalculator = calculator;
+          break;
+        }
+      }
 
       // use the default priority calculator if none is available
       if (PriorityCalculator == null) {
@@ -354,18 +366,24 @@ namespace Bolt {
       }
 
       // find replication filter
-      ReplicationFilter = UnityObject.GetComponentInChildren(typeof(IEntityReplicationFilter)) as IEntityReplicationFilter;
+      var filters = UnityObject.GetComponentsInChildren(typeof(IEntityReplicationFilter), true);
 
-      // use the default priority calculator if none is available
+      foreach (IEntityReplicationFilter filter in filters) {
+        var parent = ((MonoBehaviour)(object)filter).GetComponentInParent<BoltEntity>();
+
+        if (parent && ReferenceEquals(parent._entity, this)) {
+          ReplicationFilter = filter;
+          break;
+        }
+      }
+
+      // use the default replication filter if none is available
       if (ReplicationFilter == null) {
         ReplicationFilter = this;
       }
       else {
-        BoltLog.Debug("Using Priority Calculator {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
+        BoltLog.Debug("Using Replication Filter {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
       }
-
-      // assign usertokens
-      UnityObject._entity = this;
 
       // call into serializer
       Serializer.OnInitialized();
@@ -406,20 +424,24 @@ namespace Bolt {
 
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {
-          if (ReferenceEquals(eb.entity, this.UnityObject)) {
-            eb.SimulateOwner();
+          try {
+            if (eb != null && ((MonoBehaviour)(object)eb) && ReferenceEquals(eb.entity, this.UnityObject)) {
+              eb.SimulateOwner();
+            }
+          }
+          catch (Exception exn) {
+            Debug.LogException(exn);
           }
         }
       }
-      else {
-        //if (BoltNetwork.isClient) {
-        //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-        //  if (diff > 600) {
-        //    Debug.Log("FREEZE:" + UnityObject);
-        //    Freeze(true);
-        //  }
-        //}
-      }
+      //else {
+      //  if (BoltNetwork.isClient) {
+      //    var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+      //    if (diff > 600) {
+      //      Freeze(true);
+      //    }
+      //  }
+      //}
 
       if (HasControl) {
         Assert.Null(Controller);

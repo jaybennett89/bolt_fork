@@ -19,10 +19,10 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyDescription("Networking middleware for Unity3D")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Bolt Engine AB")]
 [assembly: AssemblyProduct("Bolt")]
-[assembly: AssemblyCopyright("Copyright © Bolt Engine AB 2012 - 2015")]
+[assembly: AssemblyCompany("Exit Games Gmbh")]
+[assembly: AssemblyCopyright("Copyright © Exit Games Gmbh")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.4.3.1")]
+[assembly: AssemblyVersion("0.4.3.3")]

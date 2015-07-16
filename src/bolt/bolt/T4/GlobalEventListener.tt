@@ -749,7 +749,7 @@ foreach(var m in methods) {
 public virtual void <#= m.Name #>(<#= m.GetSignature() #>) {  }
 
 internal static void <#= m.Name #>Invoke(<#= m.GetSignature() #>) { 
-	BoltLog.Debug("Invoking callback <#= m.Name #>");
+	//BoltLog.Debug("Invoking callback <#= m.Name #>");
 	foreach (GlobalEventListenerBase cb in callbacks) {
 		try {
 			cb.<#= m.Name #>(<#= m.GetArguments() #>);

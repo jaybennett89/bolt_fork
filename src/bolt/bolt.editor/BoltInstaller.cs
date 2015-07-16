@@ -324,6 +324,11 @@ public static class BoltInstaller {
 
   static void InstallAsset(string resource) {
     var data = BoltEditorUtilsInternal.GetResourceBytes(resource);
+
+    if (resource.Contains("_shim")) {
+      resource = resource.Replace("_shim", "");
+    }
+
     var file = ResourceToFilePath(resource);
     var asset = ResourceToAssetPath(resource);
 

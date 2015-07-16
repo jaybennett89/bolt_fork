@@ -82,7 +82,12 @@ public class BoltScenesWindow : EditorWindow {
         return BuildTarget.StandaloneOSXIntel;
       }
 
-      return BuildTarget.StandaloneWindows;
+      if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64) {
+        return BuildTarget.StandaloneWindows64;
+      }
+      else {
+        return BuildTarget.StandaloneWindows;
+      }
     }
   }
 

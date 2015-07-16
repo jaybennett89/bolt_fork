@@ -132,7 +132,6 @@ namespace Bolt {
       // sort on priority (descending)
       unreliableSend.Sort(EventUnreliable.PriorityComparer.Instance);
 
-      int maxBits = BoltCore._config.packetMaxEventSize * 8;
       int ptrStart = packet.UdpPacket.Ptr;
 
       // pack reliable events into packet
@@ -142,14 +141,13 @@ namespace Bolt {
         int ptr = packet.UdpPacket.Ptr;
 
         bool packOk = PackEvent(reliable.NetworkEvent, packet.UdpPacket, reliable.Sequence);
-        bool notOverMaxBits = (packet.UdpPacket.Ptr - ptrStart) <= maxBits;
         bool notOverflowing = packet.UdpPacket.Overflowing == false;
 
         if (packOk == false) {
           BoltLog.Error("Reliable failed to pack, this means all other reliable events will stall");
         }
 
-        if (packOk && notOverMaxBits && notOverflowing) {
+        if (packOk && notOverflowing) {
           packet.ReliableEvents.Add(reliable);
         }
         else {
@@ -167,10 +165,9 @@ namespace Bolt {
         int ptr = packet.UdpPacket.Ptr;
 
         bool packOk = PackEvent(unreliableSend[i].NetworkEvent, packet.UdpPacket, 0);
-        bool notOverMaxBits = (packet.UdpPacket.Ptr - ptrStart) <= maxBits;
         bool notOverflowing = packet.UdpPacket.Overflowing == false;
 
-        if (packOk && notOverMaxBits && notOverflowing) {
+        if (packOk && notOverflowing) {
           //unreliableSend[i].NetworkEvent.DecrementRefs();
           unreliableSend.RemoveAt(i);
         }

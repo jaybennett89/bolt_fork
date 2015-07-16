@@ -731,7 +731,6 @@ internal static class BoltCore {
       //sw = Stopwatch.StartNew();
       Bolt.EventDispatcher.DispatchAllEvents();
       //DispatchAllEventsTime = sw.Elapsed;
-
     }
   }
 

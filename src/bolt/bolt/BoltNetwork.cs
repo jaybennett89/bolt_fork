@@ -78,6 +78,13 @@ public static class BoltNetworkInternal {
 [Documentation]
 public static class BoltNetwork {
 
+  public static void PreLoadPrefabDatabase() {
+    Resources.LoadAsync<PrefabDatabase>("BoltPrefabDatabase");
+  }
+
+  //public static Action<bool> OnPoll;
+  //public static Action<bool> OnSend;
+
   [Conditional("DEBUG")]
   internal static void VerifyIsRunning() {
     if (BoltNetwork.isRunning == false) {

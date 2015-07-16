@@ -72,7 +72,7 @@ namespace Bolt {
       {
         List<PropertyCallback> callbacksList;
 
-        if (Callbacks.TryGetValue(path, out callbacksList) == false) {
+        if (Callbacks.TryGetValue(path, out callbacksList) == true) {
           callbacksList.Remove(callback);
         }
       }
@@ -85,7 +85,7 @@ namespace Bolt {
       {
         List<PropertyCallbackSimple> callbacksList;
 
-        if (CallbacksSimple.TryGetValue(path, out callbacksList) == false) {
+        if (CallbacksSimple.TryGetValue(path, out callbacksList) == true) {
           callbacksList.Remove(callback);
         }
       }

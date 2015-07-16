@@ -80,6 +80,11 @@ public class BoltEntityEditor : Editor {
       entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Allow Client Instantiate", entity._allowInstantiateOnClient);
       HelpBox("If enabled this prefab can be instantiated by clients, this option can be globally enabled/disabled by changing the 'Instantiate Mode' setting in the 'Window/Bolt/Settings' window");
     }
+
+    if (BoltNetwork.isRunning) {
+      EditorGUILayout.LabelField("Network Id", entity.ToString());
+      EditorGUILayout.LabelField("Network Source", entity.source == null ? "NULL" : entity.source.RemoteEndPoint.ToString());
+    }
   }
 
   public  void OnInspectorGUI2() {

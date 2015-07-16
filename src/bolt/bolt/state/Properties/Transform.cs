@@ -265,22 +265,22 @@ namespace Bolt {
     }
 
     public override void OnRender(NetworkObj obj) {
-      //if (obj.RootState.Entity.IsOwner) {
-      //  return;
-      //}
+      if (obj.RootState.Entity.IsOwner) {
+        return;
+      }
 
-      //var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
-      //if (nt != null && nt.Simulate) {
-      //  if (PositionEnabled) {
-      //    var p = nt.RenderDoubleBufferPosition.Previous;
-      //    var c = nt.RenderDoubleBufferPosition.Current;
-      //    nt.Simulate.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
-      //  }
+      var nt = obj.Storage.Values[obj[this] + POSITION].Transform;
+      if (nt != null && nt.Simulate) {
+        if (PositionEnabled) {
+          var p = nt.RenderDoubleBufferPosition.Previous;
+          var c = nt.RenderDoubleBufferPosition.Current;
+          nt.Simulate.position = UE.Vector3.Lerp(p, c, BoltCore.frameAlpha);
+        }
 
-      //  if (RotationEnabled) {
-      //    //nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
-      //  }
-      //}
+        if (RotationEnabled) {
+          //nt.Render.rotation = nt.RenderDoubleBufferRotation.Current;
+        }
+      }
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {

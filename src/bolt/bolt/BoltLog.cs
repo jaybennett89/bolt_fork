@@ -225,9 +225,7 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -238,44 +236,32 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(object message) {
     Info(Format(message));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(string message, object arg0) {
     Info(Format(message, arg0));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(string message, object arg0, object arg1) {
     Info(Format(message, arg0, arg1));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(string message, object arg0, object arg1, object arg2) {
     Info(Format(message, arg0, arg1, arg2));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Info(string message, params object[] args) {
     Info(Format(message, args));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -286,37 +272,27 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(object message) {
     Debug(Format(message));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(string message, object arg0) {
     Debug(Format(message, arg0));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(string message, object arg0, object arg1) {
     Debug(Format(message, arg0, arg1));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(string message, object arg0, object arg1, object arg2) {
     Debug(Format(message, arg0, arg1, arg2));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   internal static void Debug(string message, params object[] args) {
     Debug(Format(message, args));
   }
@@ -327,9 +303,7 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -340,37 +314,27 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(object message) {
     Warn(Format(message));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(string message, object arg0) {
     Warn(Format(message, arg0));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(string message, object arg0, object arg1) {
     Warn(Format(message, arg0, arg1));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(string message, object arg0, object arg1, object arg2) {
     Warn(Format(message, arg0, arg1, arg2));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Warn(string message, params object[] args) {
     Warn(Format(message, FixNulls(args)));
   }
@@ -389,9 +353,7 @@ public static class BoltLog {
     return args;
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(string message) {
     lock (_lock) {
       VerifyOneWriter();
@@ -402,44 +364,32 @@ public static class BoltLog {
     }
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(object message) {
     Error(Format(message));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(string message, object arg0) {
     Error(Format(message, arg0));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(string message, object arg0, object arg1) {
     Error(Format(message, arg0, arg1));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(string message, object arg0, object arg1, object arg2) {
     Error(Format(message, arg0, arg1, arg2));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Error(string message, params object[] args) {
     Error(Format(message, args));
   }
 
-#if !DEBUG && !LOG
-  [Conditional("_DISABLE_LOG_")]
-#endif
+  [Conditional("DEBUG")]
   public static void Exception(Exception exception) {
     lock (_lock) {
       for (int i = 0; i < _writers.Count; ++i) {

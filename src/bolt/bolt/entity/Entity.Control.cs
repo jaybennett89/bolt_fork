@@ -13,6 +13,9 @@ namespace Bolt {
 
           // take control locally
           TakeControlInternal(token);
+
+          // de-freeze
+          Freeze(false);
         }
       }
       else {
@@ -44,12 +47,17 @@ namespace Bolt {
           eb.ControlGained();
         }
       }
+
+      Freeze(false);
     }
 
     internal void ReleaseControl(IProtocolToken token) {
       if (IsOwner) {
         if (HasControl) {
           ReleaseControlInternal(token);
+
+          // un-freeze
+          Freeze(false);
         }
         else {
           BoltLog.Warn("You are not controlling {0}", this);
@@ -83,6 +91,9 @@ namespace Bolt {
 
       // call user event
       BoltInternal.GlobalEventListenerBase.ControlOfEntityLostInvoke(UnityObject);
+
+      // de-freeze
+      Freeze(false);
     }
 
     internal void AssignControl(BoltConnection connection, IProtocolToken token) {
@@ -105,6 +116,8 @@ namespace Bolt {
         // set token 
         proxy.ControlTokenLost = null;
         proxy.ControlTokenGained = token;
+
+        Freeze(false);
       }
       else {
         BoltLog.Error("You can not assign control of {0}, you are not the owner", this);
@@ -131,6 +144,8 @@ namespace Bolt {
             proxy.ControlTokenLost = token;
             proxy.ControlTokenGained = null;
           }
+
+          Freeze(false);
         }
       }
       else {

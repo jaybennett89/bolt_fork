@@ -187,10 +187,8 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 17;
       }
       else {
-        if (proxy.Entity.IsFrozen) {
-          //if (proxy.Entity.AllowFirstReplicationWhenFrozen && !(proxy.Flags & ProxyFlags.CREATE_DONE)) {
-            continue;
-          //}
+        if ((proxy.Flags & ProxyFlags.CREATE_DONE) && proxy.Entity.IsFrozen) {
+          continue;
         }
 
         // check update rate of this entity
@@ -234,11 +232,13 @@ partial class EntityChannel : BoltChannel {
             proxy.Priority = Mathf.Clamp(proxy.Priority, 0, Mathf.Min(1 << 16, BoltCore._config.maxEntityPriority));
           }
           else {
-            if (proxy.Entity.ReplicationFilter.AllowReplicationTo(connection)) {
-              proxy.Priority = 1 << 18;
-            }
-            else {
-              continue;
+            if ((proxy.Entity.IsFrozen == false) || proxy.Entity.AllowFirstReplicationWhenFrozen) {
+              if (proxy.Entity.ReplicationFilter.AllowReplicationTo(connection)) {
+                proxy.Priority = 1 << 18;
+              }
+              else {
+                continue;
+              }
             }
           }
         }
