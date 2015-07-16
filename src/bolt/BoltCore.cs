@@ -21,6 +21,7 @@ internal static class BoltCore {
   internal static UdpSocket _udpSocket;
   internal static UdpPlatform _udpPlatform;
 
+  static internal string _autoloadScene = "";
   static internal Stopwatch _timer = new Stopwatch();
   static internal SceneLoadState _localSceneLoading;
 
@@ -543,6 +544,11 @@ internal static class BoltCore {
 
     // flag reset event
     ev.ResetEvent.Set();
+
+    // auto load scene
+    if (_autoloadScene != null) {
+      BoltNetwork.LoadScene(_autoloadScene);
+    }
   }
 
   static void Udp_ConnectFailed(UdpEventConnectFailed ev) {
@@ -930,7 +936,9 @@ internal static class BoltCore {
     }
   }
 
-  internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform udpPlatform) {
+  internal static void Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform udpPlatform, string autoloadscene) {
+    _autoloadScene = autoloadscene;
+
     if (!_globalControlObject) {
       _globalControlObject = new GameObject("BoltControl");
       _globalControlObject.AddComponent<ControlBehaviour>();
