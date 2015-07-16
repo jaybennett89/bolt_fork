@@ -64,13 +64,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="udpkit, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\assemblies\udpkit.dll</HintPath>
+    <Reference Include="udpkit">
+      <HintPath>..\assemblies\udpkit.dll</HintPath>
     </Reference>
-    <Reference Include="udpkit.common, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\assemblies\udpkit.common.dll</HintPath>
+    <Reference Include="udpkit.common">
+      <HintPath>..\assemblies\udpkit.common.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
