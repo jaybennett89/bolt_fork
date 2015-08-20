@@ -53,6 +53,7 @@ namespace Bolt {
 
     internal bool IsOwner;
     internal bool IsFrozen;
+    internal bool AutoRemoveChildEntities;
     internal bool AllowFirstReplicationWhenFrozen;
 
     internal int UpdateRate;
@@ -267,6 +268,14 @@ namespace Bolt {
       Assert.True(IsAttached);
       Assert.True(NetworkId.Packed != 0UL);
 
+      if (AutoRemoveChildEntities) {
+        foreach (BoltEntity child in UnityObject.GetComponentsInChildren(typeof(BoltEntity), true)) {
+          if (child.isAttached && (ReferenceEquals(child._entity, this) == false)) {
+            child.transform.parent = null;
+          }
+        }
+      }
+
       if (Controller) {
         RevokeControl(null);
       }
@@ -361,9 +370,6 @@ namespace Bolt {
       if (PriorityCalculator == null) {
         PriorityCalculator = this;
       }
-      else {
-        BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
-      }
 
       // find replication filter
       var filters = UnityObject.GetComponentsInChildren(typeof(IEntityReplicationFilter), true);
@@ -380,9 +386,6 @@ namespace Bolt {
       // use the default replication filter if none is available
       if (ReplicationFilter == null) {
         ReplicationFilter = this;
-      }
-      else {
-        BoltLog.Debug("Using Replication Filter {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
       }
 
       // call into serializer
@@ -434,14 +437,14 @@ namespace Bolt {
           }
         }
       }
-      //else {
-      //  if (BoltNetwork.isClient) {
-      //    var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-      //    if (diff > 600) {
-      //      Freeze(true);
-      //    }
-      //  }
-      //}
+      else {
+        if (BoltNetwork.isClient) {
+          var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+          if (diff > 600) {
+            Freeze(true);
+          }
+        }
+      }
 
       if (HasControl) {
         Assert.Null(Controller);
@@ -646,6 +649,7 @@ namespace Bolt {
       eo.UpdateRate = eo.UnityObject._updateRate;
       eo.AutoFreezeProxyFrames = eo.UnityObject._autoFreezeProxyFrames;
       eo.AllowFirstReplicationWhenFrozen = eo.UnityObject._allowFirstReplicationWhenFrozen;
+      eo.AutoRemoveChildEntities = eo.UnityObject._autoRemoveChildEntities;
       eo.PrefabId = prefabId;
       eo.Flags = flags;
 
@@ -660,7 +664,6 @@ namespace Bolt {
       // create serializer
       eo.Serializer = Factory.NewSerializer(serializerId);
       eo.Serializer.OnCreated(eo);
-
 
       // done
       return eo;

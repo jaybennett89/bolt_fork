@@ -14,8 +14,13 @@ namespace Bolt {
       return Storage.Values[index].String;
     }
 
-    protected override void SetValue(int index, String value) {
-      Storage.Values[index].String = value;
+    protected override bool SetValue(int index, String value) {
+      if (Storage.Values[index].String != value) {
+        Storage.Values[index].String = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

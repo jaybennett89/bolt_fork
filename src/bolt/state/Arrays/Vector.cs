@@ -14,8 +14,13 @@ namespace Bolt {
       return Storage.Values[index].Vector3;
     }
 
-    protected override void SetValue(int index, Vector3 value) {
-      Storage.Values[index].Vector3 = value;
+    protected override bool SetValue(int index, Vector3 value) {
+      if (Storage.Values[index].Vector3 != value) {
+        Storage.Values[index].Vector3 = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

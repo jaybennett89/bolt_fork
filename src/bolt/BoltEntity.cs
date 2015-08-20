@@ -190,6 +190,9 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   [UE.SerializeField]
   internal bool _allowFirstReplicationWhenFrozen = false;
 
+  [UE.SerializeField]
+  internal bool _autoRemoveChildEntities = false;
+
   internal Entity Entity {
     get {
       if (_entity == null) {

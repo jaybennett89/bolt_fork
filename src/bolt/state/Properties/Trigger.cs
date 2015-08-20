@@ -61,6 +61,10 @@
     }
 
     void MecanimPull(NetworkObj obj, NetworkStorage storage) {
+      if (obj.RootState.Animator == null) {
+        return;
+      }
+
       if (obj.RootState.Animator.GetBool(PropertyName) && (obj.RootState.Animator.IsInTransition(MecanimLayer) == false)) {
         // update send trigger
         storage.Values[obj[this]].TriggerSend.Update(BoltCore.frame, true);

@@ -14,8 +14,13 @@ namespace Bolt {
       return Storage.Values[index].PrefabId;
     }
 
-    protected override void SetValue(int index, PrefabId value) {
-      Storage.Values[index].PrefabId = value;
+    protected override bool SetValue(int index, PrefabId value) {
+      if (Storage.Values[index].PrefabId != value) {
+        Storage.Values[index].PrefabId = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

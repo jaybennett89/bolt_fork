@@ -14,8 +14,13 @@ namespace Bolt {
       return Storage.Values[index].Quaternion;
     }
 
-    protected override void SetValue(int index, Quaternion value) {
-      Storage.Values[index].Quaternion = value;
+    protected override bool SetValue(int index, Quaternion value) {
+      if (Storage.Values[index].Quaternion != value) {
+        Storage.Values[index].Quaternion = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

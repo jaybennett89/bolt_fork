@@ -36,12 +36,24 @@ public static class BoltLauncher {
     StartServer(UdpEndPoint.Any, config);
   }
 
+  public static void StartServer(BoltConfig config, string scene) {
+    StartServer(UdpEndPoint.Any, config, scene);
+  }
+
   public static void StartServer(UdpEndPoint endpoint) {
     StartServer(endpoint, BoltRuntimeSettings.instance.GetConfigCopy());
   }
 
+  public static void StartServer(UdpEndPoint endpoint, string scene) {
+    StartServer(endpoint, BoltRuntimeSettings.instance.GetConfigCopy(), scene);
+  }
+
   public static void StartServer(UdpEndPoint endpoint, BoltConfig config) {
     Initialize(BoltNetworkModes.Host, endpoint, config);
+  }
+
+  public static void StartServer(UdpEndPoint endpoint, BoltConfig config, string scene) {
+    Initialize(BoltNetworkModes.Host, endpoint, config, scene);
   }
 
   public static void StartClient() {
@@ -74,6 +86,10 @@ public static class BoltLauncher {
   }
 
   static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config) {
+    Initialize(modes, endpoint, config, null);
+  }
+
+  static void Initialize(BoltNetworkModes modes, UdpEndPoint endpoint, BoltConfig config, string scene) {
     BoltNetworkInternal.DebugDrawer = new BoltInternal.UnityDebugDrawer();
 
 #if UNITY_PRO_LICENSE
@@ -91,7 +107,7 @@ public static class BoltLauncher {
     BoltNetworkInternal.GetGlobalBehaviourTypes = GetGlobalBehaviourTypes;
     BoltNetworkInternal.EnvironmentSetup = BoltInternal.BoltNetworkInternal_User.EnvironmentSetup;
     BoltNetworkInternal.EnvironmentReset = BoltInternal.BoltNetworkInternal_User.EnvironmentReset;
-    BoltNetworkInternal.__Initialize(modes, endpoint, config, CreateUdpPlatform());
+    BoltNetworkInternal.__Initialize(modes, endpoint, config, CreateUdpPlatform(), scene);
   }
 
   static int GetSceneIndex(string name) {

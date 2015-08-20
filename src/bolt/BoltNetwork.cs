@@ -32,8 +32,8 @@ public static class BoltNetworkInternal {
   public static Func<string, int> GetSceneIndex;
   public static Func<List<STuple<BoltGlobalBehaviourAttribute, Type>>> GetGlobalBehaviourTypes;
 
-  public static void __Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform platform) {
-    BoltCore.Initialize(mode, endpoint, config, platform);
+  public static void __Initialize(BoltNetworkModes mode, UdpEndPoint endpoint, BoltConfig config, UdpPlatform platform, string autoloadScene) {
+    BoltCore.Initialize(mode, endpoint, config, platform, autoloadScene);
   }
 
   public static void __Shutdown() {
