@@ -392,6 +392,8 @@ public static class BoltLog {
   [Conditional("DEBUG")]
   public static void Exception(Exception exception) {
     lock (_lock) {
+      UnityEngine.Debug.LogException(exception);
+
       for (int i = 0; i < _writers.Count; ++i) {
         _writers[i].Error(exception.GetType() + ": " + exception.Message);
         _writers[i].Error(exception.StackTrace);

@@ -85,8 +85,7 @@ public class BoltEntityEditor : Editor {
     }
 
     if (BoltNetwork.isRunning) {
-      EditorGUILayout.LabelField("Network Id", entity.ToString());
-      EditorGUILayout.LabelField("Network Source", entity.source == null ? "NULL" : entity.source.RemoteEndPoint.ToString());
+      RuntimeInfoGUI(entity);
     }
   }
 

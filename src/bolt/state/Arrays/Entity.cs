@@ -17,13 +17,15 @@ namespace Bolt {
       return BoltNetwork.FindEntity(Storage.Values[index].NetworkId);
     }
 
-    protected override void SetValue(int index, BoltEntity value) {
-      if (value == null) {
-        Storage.Values[index].NetworkId = new NetworkId();
+    protected override bool SetValue(int index, BoltEntity value) {
+      NetworkId newValue = value == null ? new NetworkId() : value.Entity.NetworkId;
+
+      if (Storage.Values[index].NetworkId != newValue) {
+        Storage.Values[index].NetworkId = newValue;
+        return true;
       }
-      else {
-        Storage.Values[index].NetworkId = value.Entity.NetworkId;
-      }
+
+      return false;
     }
   }
 }

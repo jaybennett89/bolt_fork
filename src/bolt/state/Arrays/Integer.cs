@@ -14,8 +14,13 @@ namespace Bolt {
       return Storage.Values[index].Int0;
     }
 
-    protected override void SetValue(int index, Int32 value) {
-      Storage.Values[index].Int0 = value;
+    protected override bool SetValue(int index, Int32 value) {
+      if (Storage.Values[index].Int0 != value) {
+        Storage.Values[index].Int0 = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

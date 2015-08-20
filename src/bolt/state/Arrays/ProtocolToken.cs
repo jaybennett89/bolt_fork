@@ -17,8 +17,13 @@ namespace Bolt {
       return Storage.Values[index].ProtocolToken;
     }
 
-    protected override void SetValue(int index, Bolt.IProtocolToken value) {
-      Storage.Values[index].ProtocolToken = value;
+    protected override bool SetValue(int index, Bolt.IProtocolToken value) {
+      if (ReferenceEquals(Storage.Values[index].ProtocolToken, value) == false) {
+        Storage.Values[index].ProtocolToken = value;
+        return true;
+      }
+
+      return false;
     }
   }
 }

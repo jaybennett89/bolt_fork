@@ -38,6 +38,10 @@ namespace Bolt {
     }
 
     protected override void PullMecanimValue(NetworkState state) {
+      if (state.Animator == null) {
+        return;
+      }
+
       bool newValue = state.Animator.GetBool(PropertyName);
       bool oldValue = state.Storage.Values[state[this]].Bool;
 

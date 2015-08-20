@@ -33,15 +33,14 @@ namespace Bolt {
           throw new IndexOutOfRangeException();
         }
 
-        SetValue(this.OffsetStorage + (index * _stride), value);
-
-        // set changed
-        Storage.PropertyChanged(this.OffsetProperties + index);
+        if (SetValue(this.OffsetStorage + (index * _stride), value)) {
+          Storage.PropertyChanged(this.OffsetProperties + index);
+        }
       }
     }
 
     protected abstract T GetValue(int index);
-    protected abstract void SetValue(int index, T value);
+    protected abstract bool SetValue(int index, T value);
 
     public IEnumerator<T> GetEnumerator() {
       for (int i = 0; i < _length; ++i) {

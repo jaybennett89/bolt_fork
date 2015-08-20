@@ -18,7 +18,7 @@ namespace Bolt {
       return Storage.Values[index].Transform;
     }
 
-    protected override void SetValue(int index, NetworkTransform value) {
+    protected override bool SetValue(int index, NetworkTransform value) {
       throw new NotSupportedException();
     }
   }

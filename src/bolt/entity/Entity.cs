@@ -370,9 +370,6 @@ namespace Bolt {
       if (PriorityCalculator == null) {
         PriorityCalculator = this;
       }
-      else {
-        BoltLog.Debug("Using Priority Calculator {0} for {1}", PriorityCalculator.GetType(), UnityObject.gameObject.name);
-      }
 
       // find replication filter
       var filters = UnityObject.GetComponentsInChildren(typeof(IEntityReplicationFilter), true);
@@ -389,9 +386,6 @@ namespace Bolt {
       // use the default replication filter if none is available
       if (ReplicationFilter == null) {
         ReplicationFilter = this;
-      }
-      else {
-        BoltLog.Debug("Using Replication Filter {0} for {1}", ReplicationFilter.GetType(), UnityObject.gameObject.name);
       }
 
       // call into serializer
@@ -443,14 +437,14 @@ namespace Bolt {
           }
         }
       }
-      //else {
-      //  if (BoltNetwork.isClient) {
-      //    var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-      //    if (diff > 600) {
-      //      Freeze(true);
-      //    }
-      //  }
-      //}
+      else {
+        if (BoltNetwork.isClient) {
+          var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+          if (diff > 600) {
+            Freeze(true);
+          }
+        }
+      }
 
       if (HasControl) {
         Assert.Null(Controller);

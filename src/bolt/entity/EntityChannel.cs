@@ -187,7 +187,7 @@ partial class EntityChannel : BoltChannel {
         proxy.Priority = 1 << 17;
       }
       else {
-        if ((proxy.Flags & ProxyFlags.CREATE_DONE) && proxy.Entity.IsFrozen) {
+        if (proxy.Entity.IsFrozen) {
           continue;
         }
 
