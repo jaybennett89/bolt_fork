@@ -438,12 +438,12 @@ namespace Bolt {
         }
       }
       else {
-        if (BoltNetwork.isClient) {
-          var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
-          if (diff > 600) {
-            Freeze(true);
-          }
-        }
+        //if (BoltNetwork.isClient) {
+        //  var diff = BoltNetwork.serverFrame - (Serializer as NetworkState).Frames.last.Frame;
+        //  if (diff > 600) {
+        //    Freeze(true);
+        //  }
+        //}
       }
 
       if (HasControl) {

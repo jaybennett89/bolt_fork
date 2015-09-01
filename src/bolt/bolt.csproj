@@ -65,14 +65,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="udpkit">
-      <HintPath>..\..\..\udpkit\build\udpkit.dll</HintPath>
+      <HintPath>..\assemblies\udpkit.dll</HintPath>
     </Reference>
     <Reference Include="udpkit.common">
-      <HintPath>..\..\..\udpkit\build\udpkit.common.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+      <HintPath>..\assemblies\udpkit.common.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine" Condition=" '$(OS)' != 'Unix' ">
       <SpecificVersion>False</SpecificVersion>
