@@ -29,11 +29,11 @@ namespace Bolt {
     }
 
     public void Pack(UdpPacket stream, int value) {
-      stream.WriteInt(value);
+      stream.WriteInt_Shifted(value, _bits, _shift);
     }
 
     public int Read(UdpPacket stream) {
-      return stream.ReadInt(); //+-_shift;
+      return stream.ReadInt_Shifted(_bits, _shift); //+-_shift;
     }
   }
 
