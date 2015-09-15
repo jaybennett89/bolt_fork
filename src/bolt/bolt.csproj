@@ -70,9 +70,8 @@
     <Reference Include="udpkit.common">
       <HintPath>..\assemblies\udpkit.common.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine" Condition=" '$(OS)' != 'Unix' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(UnityPathWin)\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>D:\ffg\assemblies\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

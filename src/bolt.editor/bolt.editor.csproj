@@ -71,21 +71,19 @@
     <Reference Include="udpkit.common">
       <HintPath>..\assemblies\udpkit.common.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor" Condition=" '$(OS)' == 'Unix' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor" Condition=" ('$(OS)' != 'Unix') ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(UnityPathWin)\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine" Condition=" '$(OS)' == 'Unix' ">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(UnityPathOSX)/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+    <Reference Include="UnityEditor">
+      <HintPath>..\..\..\..\..\..\Program Files\Unity520f3\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine" Condition=" ('$(OS)' != 'Unix') ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(UnityPathWin)\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\Program Files\Unity520f3\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
