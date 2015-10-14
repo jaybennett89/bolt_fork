@@ -92,22 +92,87 @@ namespace Bolt {
     }
 
     void IState.SetDynamic(string property, object value) {
+      var hash = property.GetHashCode();
+
       for (int i = 0; i < Meta.Properties.Length; ++i) {
-        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyName == property)) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyNameHash == hash) && (Meta.Properties[i].Property.PropertyName == property)) {
           Meta.Properties[i].Property.SetDynamic(this, value);
           return;
         }
       }
+
+      throw new ArgumentException(string.Format("unknown property {0}", property));
     }
 
     object IState.GetDynamic(string property) {
+      var hash = property.GetHashCode();
+
       for (int i = 0; i < Meta.Properties.Length; ++i) {
-        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyName == property)) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyNameHash == hash) && (Meta.Properties[i].Property.PropertyName == property)) {
           return Meta.Properties[i].Property.GetDynamic(this);
         }
       }
 
-      throw new ArgumentException(string.Format("Unknown property {0}", property));
+      throw new ArgumentException(string.Format("unknown property {0}", property));
+    }
+
+    void IState.SetTransforms(NetworkTransform transform, UE.Transform simulate) {
+      (this as IState).SetTransforms(transform, simulate, null);
+    }
+
+    void IState.SetTransforms(NetworkTransform transform, UE.Transform simulate, UE.Transform render) {
+      transform.SetTransformsInternal(simulate, render);
+
+      if (Entity.AttachIsRunning && simulate) {
+        Assert.Same(transform, this.Storage.Values[transform.PropertyIndex].Transform);
+
+        this.Storage.Values[transform.PropertyIndex].Vector3 = simulate.position;
+        this.Storage.Values[transform.PropertyIndex + 1].Quaternion = simulate.rotation;
+      }
+    }
+
+    void IState.ForceTransform(NetworkTransform transform, UE.Vector3 position) {
+      (this as IState).ForceTransform(transform, position, UE.Quaternion.identity);
+    }
+
+    void IState.ForceTransform(NetworkTransform transform, UE.Vector3 position, UE.Quaternion rotation) {
+      if (Entity.IsOwner) {
+        return;
+      }
+
+      var it = this.Frames.GetIterator();
+
+      while (it.Next()) {
+        it.val.Values[transform.PropertyIndex].Vector3 = position;
+        it.val.Values[transform.PropertyIndex + 1].Quaternion = rotation;
+      }
+    }
+
+    Boolean IState.TrySetDynamic(String property, Object value) {
+      var hash = property.GetHashCode();
+
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyNameHash == hash) && (Meta.Properties[i].Property.PropertyName == property)) {
+          Meta.Properties[i].Property.SetDynamic(this, value);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    Boolean IState.TryGetDynamic(String property, out Object value) {
+      var hash = property.GetHashCode();
+
+      for (int i = 0; i < Meta.Properties.Length; ++i) {
+        if ((Meta.Properties[i].OffsetObjects == 0) && (Meta.Properties[i].Property.PropertyNameHash == hash) && (Meta.Properties[i].Property.PropertyName == property)) {
+          value = Meta.Properties[i].Property.GetDynamic(this);
+          return true;
+        }
+      }
+
+      value = null;
+      return false;
     }
 
     void IDisposable.Dispose() {

@@ -389,14 +389,15 @@ public static class BoltLog {
     Error(Format(message, args));
   }
 
-  [Conditional("DEBUG")]
   public static void Exception(Exception exception) {
     lock (_lock) {
       UnityEngine.Debug.LogException(exception);
 
       for (int i = 0; i < _writers.Count; ++i) {
-        _writers[i].Error(exception.GetType() + ": " + exception.Message);
-        _writers[i].Error(exception.StackTrace);
+        if (!(_writers[i] is Unity)) {
+          _writers[i].Error(exception.GetType() + ": " + exception.Message);
+          _writers[i].Error(exception.StackTrace);
+        }
       }
     }
   }

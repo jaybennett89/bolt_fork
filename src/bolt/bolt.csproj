@@ -78,6 +78,7 @@
     <Compile Include="..\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BoltEntityExtensions.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="entity\EntityLookup.cs" />

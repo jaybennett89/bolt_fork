@@ -23,6 +23,7 @@ namespace Bolt {
     internal const byte ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER = 13;
     internal const byte ENTITY_EVERYONE_EXCEPT_CONTROLLER = 5;
     internal const byte ENTITY_ONLY_CONTROLLER = 7;
+    internal const byte ENTITY_ONLY_CONTROLLER_AND_OWNER = 15;
     internal const byte ENTITY_ONLY_OWNER = 9;
     internal const byte ENTITY_ONLY_SELF = 11;
 
@@ -150,6 +151,7 @@ namespace Bolt {
           Targets == ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER ||
           Targets == ENTITY_ONLY_CONTROLLER ||
           Targets == ENTITY_ONLY_SELF ||
+          Targets == ENTITY_ONLY_CONTROLLER_AND_OWNER ||
           Targets == ENTITY_ONLY_OWNER;
       }
     }

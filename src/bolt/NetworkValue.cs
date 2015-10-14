@@ -58,6 +58,9 @@ namespace Bolt {
     [FieldOffset(0)]
     public UnityEngine.Color32 Color32;
 
+    [FieldOffset(12)]
+    internal Boolean HasCopiedFromTransform;
+
     [FieldOffset(16)]
     public System.Object Object;
 

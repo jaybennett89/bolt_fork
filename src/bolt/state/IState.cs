@@ -73,5 +73,14 @@ namespace Bolt {
     /// <param name="property">The property name to get</param>
     /// <returns></returns>
     object GetDynamic(string property);
+
+    bool TrySetDynamic(string property, object value);
+    bool TryGetDynamic(string property, out object value);
+
+    void SetTransforms(NetworkTransform transform, UnityEngine.Transform simulate);
+    void SetTransforms(NetworkTransform transform, UnityEngine.Transform simulate, UnityEngine.Transform render);
+
+    void ForceTransform(NetworkTransform transform, UnityEngine.Vector3 position);
+    void ForceTransform(NetworkTransform transform, UnityEngine.Vector3 position, UnityEngine.Quaternion rotation);
   }
 }

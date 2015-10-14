@@ -31,6 +31,7 @@ namespace Bolt {
     internal NetworkId NetworkId;
     internal PrefabId PrefabId;
     internal EntityFlags Flags;
+    internal bool AttachIsRunning;
 
     internal UE.Vector3 SpawnPosition;
     internal UE.Quaternion SpawnRotation;
@@ -223,44 +224,52 @@ namespace Bolt {
       Assert.False(IsAttached);
       Assert.True((NetworkId.Packed == 0UL) || (Source != null));
 
-      // mark as don't destroy on load
-      UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
+      try {
+        AttachIsRunning = true;
 
-      // assign network id
-      if (Source == null) {
-        NetworkId = NetworkIdAllocator.Allocate();
-      }
+        // mark as don't destroy on load
+        UE.GameObject.DontDestroyOnLoad(UnityObject.gameObject);
 
-      // add to entities list
-      BoltCore._entitiesOK.AddLast(this);
+        // assign network id
+        if (Source == null) {
+          NetworkId = NetworkIdAllocator.Allocate();
+        }
 
-      // mark as attached
-      Flags |= EntityFlags.ATTACHED;
+        // add to entities list
+        BoltCore._entitiesOK.AddLast(this);
 
-      // call out to behaviours
-      foreach (IEntityBehaviour eb in Behaviours) {
-        try {
-          if (ReferenceEquals(eb.entity, this.UnityObject)) {
-            eb.Attached();
+        // mark as attached
+        Flags |= EntityFlags.ATTACHED;
+
+        // call out to behaviours
+        foreach (IEntityBehaviour eb in Behaviours) {
+          try {
+            if (ReferenceEquals(eb.entity, this.UnityObject)) {
+              eb.Attached();
+            }
           }
+          catch (Exception exn) {
+            BoltLog.Error("User code threw exception inside Attached callback");
+            BoltLog.Exception(exn);
+          }
+        }
+
+        // call out to user
+        try {
+          BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
         }
         catch (Exception exn) {
           BoltLog.Error("User code threw exception inside Attached callback");
           BoltLog.Exception(exn);
         }
-      }
 
-      // call out to user
-      try {
-        BoltInternal.GlobalEventListenerBase.EntityAttachedInvoke(this.UnityObject);
-      }
-      catch (Exception exn) {
-        BoltLog.Error("User code threw exception inside Attached callback");
-        BoltLog.Exception(exn);
-      }
+        // log
+        BoltLog.Debug("Attached {0} (Token: {1})", this, AttachToken);
 
-      // log
-      BoltLog.Debug("Attached {0} (Token: {1})", this, AttachToken);
+      }
+      finally {
+        AttachIsRunning = false;
+      }
     }
 
     internal void Detach() {
@@ -669,7 +678,7 @@ namespace Bolt {
       return eo;
     }
 
-    public static implicit operator bool(Entity entity) {
+    public static implicit operator bool (Entity entity) {
       return entity != null;
     }
 

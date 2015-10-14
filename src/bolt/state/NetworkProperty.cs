@@ -8,6 +8,7 @@ namespace Bolt {
     public Int32 OffsetProperties;
 
     public int PropertyFilters;
+    public int PropertyNameHash;
     public String PropertyName;
     public Int32 PropertyPriority;
     public NetworkObj_Meta PropertyMeta;
@@ -27,6 +28,7 @@ namespace Bolt {
 
     public void Settings_Property(string name, int priority, int filters) {
       PropertyName = name;
+      PropertyNameHash = name.GetHashCode();
       PropertyFilters = filters;
       PropertyPriority = UE.Mathf.Clamp(priority, 1, 100);
 

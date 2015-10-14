@@ -21,6 +21,7 @@ namespace Bolt {
     EveryoneExceptOwner = Event.ENTITY_EVERYONE_EXCEPT_OWNER,
     EveryoneExceptOwnerAndController = Event.ENTITY_EVERYONE_EXCEPT_OWNER_AND_CONTROLLER,
     OnlyController = Event.ENTITY_ONLY_CONTROLLER,
+    OnlyControllerAndOwner = Event.ENTITY_ONLY_CONTROLLER_AND_OWNER,
     OnlyOwner = Event.ENTITY_ONLY_OWNER,
     OnlySelf = Event.ENTITY_ONLY_SELF,
   }

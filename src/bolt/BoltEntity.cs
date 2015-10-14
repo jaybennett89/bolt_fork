@@ -328,6 +328,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return (_entity != null) && _entity.IsAttached; }
   }
 
+  public bool isControlled {
+    get { return hasControl || controller != null; }
+  }
+
   /// <summary>
   /// If this entity is currently paused
   /// </summary>

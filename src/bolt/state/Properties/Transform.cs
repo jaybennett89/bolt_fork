@@ -195,6 +195,7 @@ namespace Bolt {
 
     public override void OnInit(NetworkObj obj) {
       obj.Storage.Values[obj[this] + POSITION].Transform = new NetworkTransform();
+      obj.Storage.Values[obj[this] + POSITION].Transform.PropertyIndex = obj[this] + POSITION;
       obj.Storage.Values[obj[this] + ROTATION].Quaternion = UE.Quaternion.identity;
     }
 

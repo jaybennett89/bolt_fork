@@ -567,7 +567,7 @@ public static class BoltNetwork {
     }
 
 
-    foreach(var itval in BoltCore._entities) {
+    foreach (var itval in BoltCore._entities) {
       if (itval.IsAttached && itval.UnityObject && itval.NetworkId.Packed == id.Packed) {
         return itval.UnityObject;
       }
@@ -936,7 +936,6 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Destroy(GameObject gameObject) {
-    BoltNetwork.VerifyIsRunning();
     Destroy(gameObject, null);
   }
 
@@ -959,14 +958,26 @@ public static class BoltNetwork {
   /// ```
   /// </example>
   public static void Destroy(GameObject gameObject, IProtocolToken token) {
-    BoltNetwork.VerifyIsRunning();
-    BoltEntity entity = gameObject.GetComponent<BoltEntity>();
-    //test
-    if (entity) {
-      BoltCore.Destroy(entity, token);
+    if (isRunning) {
+      BoltEntity entity = gameObject.GetComponent<BoltEntity>();
+
+      if (entity) {
+        BoltCore.Destroy(entity, token);
+      }
+      else {
+        if (token != null) {
+          UnityEngine.Debug.LogWarning("Passing protocol token to destroy call for gameobject without bolt entity, token will be ignored");
+        }
+
+        UnityEngine.Object.Destroy(gameObject);
+      }
     }
     else {
-      BoltLog.Error("Can only destroy gameobjects with an BoltEntity component through BoltNetwork.Destroy");
+      if (token != null) {
+        UnityEngine.Debug.LogWarning("Passing protocol token to destroy call for gameobject when bolt is not running, token will be ignored");
+      }
+
+      UnityEngine.Object.Destroy(gameObject);
     }
   }
 

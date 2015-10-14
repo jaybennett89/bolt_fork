@@ -45,6 +45,10 @@ namespace Bolt {
           Entity_Only_Controller(ev);
           break;
 
+        case Event.ENTITY_ONLY_CONTROLLER_AND_OWNER:
+          Entity_Only_Controller_And_Owner(ev);
+          break;
+
         case Event.ENTITY_ONLY_OWNER:
           Entity_Only_Owner(ev);
           break;
@@ -76,6 +80,52 @@ namespace Bolt {
         case Event.GLOBAL_ONLY_SELF:
           Global_Only_Self(ev);
           break;
+      }
+    }
+
+    private static void Entity_Only_Controller_And_Owner(Event ev) {
+      if (ev.TargetEntity) {
+        if (ev.TargetEntity.HasControl) {
+          RaiseLocal(ev);
+
+          if (ev.TargetEntity.IsOwner) {
+
+            // if we're also owner, free this
+            ev.FreeStorage();
+          }
+          else {
+
+            // check so this was not received from source, and if it wasn't then send it to it
+            if (ev.SourceConnection != ev.TargetEntity.Source) {
+              ev.TargetEntity.Source._eventChannel.Queue(ev);
+            }
+
+          }
+        }
+        else {
+          if (ev.TargetEntity.IsOwner) {
+            // raise this locally for owner
+            RaiseLocal(ev);
+
+            if (ev.TargetEntity.Controller != null) {
+
+              // check so we didn't receive this from owner
+              if (ev.SourceConnection != ev.TargetEntity.Controller) {
+                ev.TargetEntity.Controller._eventChannel.Queue(ev);
+              }
+
+            }
+            else {
+              BoltLog.Warn("NetworkEvent sent to controller but no controller exists, event will NOT be raised");
+            }
+          }
+          else {
+            ev.TargetEntity.Source._eventChannel.Queue(ev);
+          }
+        }
+      }
+      else {
+        BoltLog.Warn("NetworkEvent with NULL target, event will NOT be forwarded or raised");
       }
     }
 

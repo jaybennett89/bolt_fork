@@ -297,7 +297,22 @@ namespace Bolt {
             pi.Property.OnFrameCloned(Objects[pi.OffsetObjects], storage);
           }
 
+
           Frames.AddLast(storage);
+        }
+      }
+
+      // fixes bug #224
+      if (Entity.HasControl && !Entity.HasPredictedControl && !Entity.IsOwner) {
+        for (int i = 0; i < Meta.Properties.Length; ++i) {
+          var pi = Meta.Properties[i];
+          if (pi.Property.ToController == false) {
+            // calculate property index
+            int index = Objects[pi.OffsetObjects][pi.Property];
+
+            // copy value from latest frame
+            storage.Values[index] = Frames.first.Values[index];
+          }
         }
       }
 
