@@ -130,7 +130,7 @@ public class BoltRuntimeSettings : ScriptableObject {
   public string masterServerGameId = "";
 
   [SerializeField]
-  public string masterServerEndPoint = "79.99.6.136:24000";
+  public string masterServerEndPoint = "159.8.0.207:24000";
 
   [SerializeField]
   public bool masterServerAutoConnect = false;

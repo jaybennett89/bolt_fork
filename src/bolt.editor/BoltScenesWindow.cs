@@ -408,10 +408,7 @@ end tell'";
         EditorGUI.BeginDisabledGroup(isCurrent);
 
         if (GUILayout.Button("Edit", EditorStyles.miniButton, GUILayout.Width(50))) {
-          if (EditorApplication.SaveCurrentSceneIfUserWantsTo()) {
-            EditorApplication.SaveScene();
-          }
-
+          EditorApplication.SaveScene();
           EditorApplication.OpenScene(scene.path);
         }
 

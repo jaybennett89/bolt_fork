@@ -122,17 +122,22 @@ public class BoltEditorWindow : BoltWindow {
       pdef = CreateProperty(new PropertyStateSettings());
       pdef.PropertyType = type;
       pdef.Name = p.name;
+      pdef.ReplicationMode = replicationMode;
       pdef.StateAssetSettings.MecanimMode = MecanimMode.Parameter;
-      pdef.StateAssetSettings.MecanimDirection = MecanimDirection.UsingAnimatorMethods;
+      pdef.StateAssetSettings.MecanimDirection = mecanimDirection;
 
       Debug.Log(string.Format("Imported Mecanim Parameter: {0}", pdef.Name));
 
       def.Properties.Add(pdef);
-    } else if (pdef.PropertyType.GetType() != type.GetType()) {
+    }
+    else if (pdef.PropertyType.GetType() != type.GetType()) {
       pdef.PropertyType = type;
       Debug.Log(string.Format("Updated Mecanim Parameter: {0}", pdef.Name));
     }
   }
+
+  ReplicationMode replicationMode;
+  MecanimDirection mecanimDirection;
 
   void EditState(StateDefinition def) {
     BoltEditorGUI.WithLabel("Inheritance", () => {
@@ -150,6 +155,11 @@ public class BoltEditorWindow : BoltWindow {
     });
 
     EditorGUI.EndDisabledGroup();
+
+    BoltEditorGUI.WithLabel("Import Mecanim Modes", () => {
+      replicationMode = (ReplicationMode)EditorGUILayout.EnumPopup("Replication Mode", replicationMode);
+      mecanimDirection = (MecanimDirection)EditorGUILayout.EnumPopup("Mecanim Mode", mecanimDirection);
+    });
 
     BoltEditorGUI.WithLabel("Import Mecanim Parameters", () => {
       mecanimController = EditorGUILayout.ObjectField(mecanimController, typeof(RuntimeAnimatorController)) as RuntimeAnimatorController;

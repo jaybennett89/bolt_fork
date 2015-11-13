@@ -9,6 +9,7 @@ namespace Bolt {
   /// Interface for unity behaviours that want to access Bolt methods
   /// </summary>
   public interface IEntityBehaviour {
+    bool invoke { get; }
     BoltEntity entity { get; set; }
     void Initialized();
 

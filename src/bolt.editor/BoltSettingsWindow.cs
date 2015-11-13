@@ -203,7 +203,7 @@ public class BoltSettingsWindow : EditorWindow {
     EditorGUILayout.BeginVertical();
 
     if (BoltCore.isDebugMode == false) {
-      EditorGUILayout.HelpBox("Bolt is compiled in release mode, these settings have no effectr", MessageType.Warning);
+      EditorGUILayout.HelpBox("Bolt is compiled in release mode, these settings have no effect", MessageType.Warning);
     }
 
     EditorGUI.BeginDisabledGroup(BoltCore.isDebugMode == false);

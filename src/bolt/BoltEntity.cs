@@ -332,6 +332,10 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
     get { return hasControl || controller != null; }
   }
 
+  public bool isControllerOrOwner {
+    get { return hasControl || isOwner; }
+  }
+
   /// <summary>
   /// If this entity is currently paused
   /// </summary>

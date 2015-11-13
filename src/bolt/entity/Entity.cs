@@ -244,7 +244,7 @@ namespace Bolt {
         // call out to behaviours
         foreach (IEntityBehaviour eb in Behaviours) {
           try {
-            if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            if (eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
               eb.Attached();
             }
           }
@@ -299,7 +299,7 @@ namespace Bolt {
       // call out to behaviours
       foreach (IEntityBehaviour eb in Behaviours) {
         try {
-          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          if (eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
             eb.Detached();
             eb.entity = null;
           }
@@ -402,7 +402,7 @@ namespace Bolt {
 
       // call to behaviours (this happens BEFORE attached)
       foreach (IEntityBehaviour eb in Behaviours) {
-        if (ReferenceEquals(eb.entity, this.UnityObject)) {
+        if (eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
           eb.Initialized();
         }
       }
@@ -437,7 +437,7 @@ namespace Bolt {
       if (IsOwner) {
         foreach (IEntityBehaviour eb in Behaviours) {
           try {
-            if (eb != null && ((MonoBehaviour)(object)eb) && ReferenceEquals(eb.entity, this.UnityObject)) {
+            if (eb != null && ((MonoBehaviour)(object)eb) && eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
               eb.SimulateOwner();
             }
           }
@@ -477,7 +477,7 @@ namespace Bolt {
           _canQueueCommands = true;
 
           foreach (IEntityBehaviour eb in Behaviours) {
-            if (ReferenceEquals(eb.entity, this.UnityObject)) {
+            if (eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
               eb.SimulateController();
             }
           }
@@ -593,7 +593,7 @@ namespace Bolt {
         _canQueueCallbacks = cmd.IsFirstExecution;
 
         foreach (IEntityBehaviour eb in Behaviours) {
-          if (ReferenceEquals(eb.entity, this.UnityObject)) {
+          if (eb.invoke && ReferenceEquals(eb.entity, this.UnityObject)) {
             eb.ExecuteCommand(cmd, resetState);
           }
         }

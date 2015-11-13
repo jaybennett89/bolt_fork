@@ -70,6 +70,9 @@ public class BoltEntityEditor : Editor {
     entity._detachOnDisable = EditorGUILayout.Toggle("Detach On Disable", entity._detachOnDisable);
     HelpBox("If enabled this entity will be detached from the network when its disabled.");
 
+    entity._sceneObjectAutoAttach = EditorGUILayout.Toggle("Auto Attach On Load", entity._sceneObjectAutoAttach);
+    HelpBox("If enabled this to automatically attach scene entities on map load.");
+
     entity._autoFreezeProxyFrames = EditorGUILayout.IntField("Auto Freeze Frames", entity._autoFreezeProxyFrames);
     HelpBox("If larger than 0, this entity will be automatically frozen by Bolt for non-owners if it has not received a network update for the amount of frames specified.");
 
@@ -78,6 +81,9 @@ public class BoltEntityEditor : Editor {
 
     entity._autoRemoveChildEntities = EditorGUILayout.Toggle("Remove Parent On Detach", entity._autoRemoveChildEntities);
     HelpBox("If enabled this tells Bolt to search the entire transform hierarchy of the entity being detached for nested entities and set their transform.parent to null.");
+
+    EditorGUILayout.LabelField("Scene ID", entity._sceneGuid);
+    HelpBox("The scene id of this entity");
 
     if (settings.clientCanInstantiateAll == false) {
       entity._allowInstantiateOnClient = EditorGUILayout.Toggle("Allow Client Instantiate", entity._allowInstantiateOnClient);
