@@ -291,42 +291,6 @@ namespace Bolt {
     /// ```
     /// </example>
     public virtual void ExecuteCommand(Bolt.Command command, bool resetState) { }
-
-    void IEntityBehaviour.Initialized() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.Attached() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.Detached() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.SimulateOwner() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.SimulateController() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.ControlLost() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.ControlGained() {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.MissingCommand(Command previous) {
-      throw new NotImplementedException();
-    }
-
-    void IEntityBehaviour.ExecuteCommand(Command command, Boolean resetState) {
-      throw new NotImplementedException();
-    }
   }
 
   /// <summary>
