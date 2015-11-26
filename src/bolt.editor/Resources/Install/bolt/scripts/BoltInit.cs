@@ -3,92 +3,124 @@ using System.Collections;
 using System;
 using UdpKit;
 
-public class BoltInit : MonoBehaviour {
-  enum State {
-    SelectMode,
-    SelectMap,
-    EnterServerIp,
-    StartServer,
-    StartClient,
-    Started,
-  }
-
-  State state;
-
-  string map;
-  string serverAddress = "127.0.0.1";
-
-  int serverPort = 25000;
-
-  void Awake() {
-    serverPort = BoltRuntimeSettings.instance.debugStartPort;
-  }
-
-  void OnGUI() {
-    Rect tex = new Rect(10, 10, 140, 75);
-    Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
-
-    GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
-    GUILayout.BeginArea(area);
-
-    switch (state) {
-      case State.SelectMode: State_SelectMode(); break;
-      case State.SelectMap: State_SelectMap(); break;
-      case State.EnterServerIp: State_EnterServerIp(); break;
-      case State.StartClient: State_StartClient(); break;
-      case State.StartServer: State_StartServer(); break;
+public class BoltInit : Bolt.GlobalEventListener
+{
+    enum State
+    {
+        SelectMode,
+        SelectMap,
+        EnterServerIp,
+        StartServer,
+        StartClient,
+        Started,
     }
 
-    GUILayout.EndArea();
-  }
+    State state;
 
-  private void State_EnterServerIp() {
-    GUILayout.BeginHorizontal();
+    string map;
+    string serverAddress = "127.0.0.1";
+    bool client = false;
 
-    GUILayout.Label("Server IP: ");
-    serverAddress = GUILayout.TextField(serverAddress);
+    int serverPort = 25000;
 
-    if (GUILayout.Button("Connect")) {
-      state = State.StartClient;
+    void Awake()
+    {
+        serverPort = BoltRuntimeSettings.instance.debugStartPort;
     }
 
-    GUILayout.EndHorizontal();
-  }
+    void OnGUI()
+    {
+        Rect tex = new Rect(10, 10, 140, 75);
+        Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
 
+        GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
+        GUILayout.BeginArea(area);
 
-  void State_SelectMode() {
-    if (ExpandButton("Server")) {
-      state = State.SelectMap;
-    }
-    if (ExpandButton("Client")) {
-      state = State.EnterServerIp;
-    }
-  }
-
-  void State_SelectMap() {
-    foreach (string value in BoltScenes.AllScenes) {
-      if (Application.loadedLevelName != value) {
-        if (ExpandButton(value)) {
-          map = value;
-          state = State.StartServer;
+        switch (state)
+        {
+            case State.SelectMode: State_SelectMode(); break;
+            case State.SelectMap: State_SelectMap(); break;
+            case State.EnterServerIp: State_EnterServerIp(); break;
+            case State.StartClient: State_StartClient(); break;
+            case State.StartServer: State_StartServer(); break;
         }
-      }
+
+        GUILayout.EndArea();
     }
-  }
 
-  void State_StartServer() {
-    BoltLauncher.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort)serverPort));
-    BoltNetwork.LoadScene(map);
-    state = State.Started;
-  }
+    private void State_EnterServerIp()
+    {
+        GUILayout.BeginHorizontal();
 
-  void State_StartClient() {
-    BoltLauncher.StartClient(UdpEndPoint.Any);
-    BoltNetwork.Connect(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort)serverPort));
-    state = State.Started;
-  }
+        GUILayout.Label("Server IP: ");
+        serverAddress = GUILayout.TextField(serverAddress);
 
-  bool ExpandButton(string text) {
-    return GUILayout.Button(text, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-  }
+        if (GUILayout.Button("Connect"))
+        {
+            state = State.StartClient;
+        }
+
+        GUILayout.EndHorizontal();
+    }
+
+
+    void State_SelectMode()
+    {
+        if (ExpandButton("Server"))
+        {
+            state = State.SelectMap;
+        }
+        if (ExpandButton("Client"))
+        {
+            state = State.EnterServerIp;
+        }
+    }
+
+    void State_SelectMap()
+    {
+        foreach (string value in BoltScenes.AllScenes)
+        {
+            if (Application.loadedLevelName != value)
+            {
+                if (ExpandButton(value))
+                {
+                    map = value;
+                    state = State.StartServer;
+                }
+            }
+        }
+    }
+
+    void State_StartServer()
+    {
+        BoltLauncher.StartServer(new UdpEndPoint(UdpIPv4Address.Any, (ushort)serverPort));
+
+        state = State.Started;
+    }
+
+    void State_StartClient()
+    {
+        client = true;
+        BoltLauncher.StartClient(UdpEndPoint.Any);
+        state = State.Started;
+    }
+
+    bool ExpandButton(string text)
+    {
+        return GUILayout.Button(text, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+    }
+    public override void BoltStartDone()
+    {
+        if (client)
+        {
+            BoltNetwork.Connect(new UdpEndPoint(UdpIPv4Address.Parse(serverAddress), (ushort)serverPort));
+
+        }
+        else
+        {
+            BoltNetwork.LoadScene(map);
+
+        }
+    }
+
 }
