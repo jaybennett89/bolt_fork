@@ -1,4 +1,4 @@
-﻿﻿#if !UNITY_WEBPLAYER && (UNITY_EDITOR || UNITY_STANDALONE || UNITY_PS4 || UNITY_PSM)
+﻿﻿#if !UNITY_WEBPLAYER && (UNITY_EDITOR || UNITY_STANDALONE || UNITY_PS4 || UNITY_PSM || UNITY_WSA)
 using System.Collections;
 using System.Net.NetworkInformation;
 using UdpKit;

@@ -1,4 +1,4 @@
-﻿﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PS4 || UNITY_PSM
+﻿﻿#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_PS4 || UNITY_PSM || UNITY_WSA
 using System.Collections;
 using UdpKit;
 using System.Linq;

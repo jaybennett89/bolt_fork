@@ -119,13 +119,22 @@ public static class BoltLauncher {
   }
 
   static public List<STuple<BoltGlobalBehaviourAttribute, Type>> GetGlobalBehaviourTypes() {
-    Assembly asm = Assembly.GetExecutingAssembly();
+#if UNITY_WSA
+        Assembly asm = typeof(BoltLauncher).GetTypeInfo().Assembly;
+#else
+        Assembly asm = Assembly.GetExecutingAssembly();
+#endif
+
     List<STuple<BoltGlobalBehaviourAttribute, Type>> result = new List<STuple<BoltGlobalBehaviourAttribute, Type>>();
 
     try {
       foreach (Type type in asm.GetTypes()) {
         if (typeof(MonoBehaviour).IsAssignableFrom(type)) {
+#if UNITY_WSA
+          var attrs = (BoltGlobalBehaviourAttribute[])type.GetTypeInfo().GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
+#else
           var attrs = (BoltGlobalBehaviourAttribute[])type.GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
+#endif
           if (attrs.Length == 1) {
             result.Add(new STuple<BoltGlobalBehaviourAttribute, Type>(attrs[0], type));
           }
