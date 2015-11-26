@@ -5,7 +5,7 @@ using UdpKit;
 using UnityEngine;
 
 namespace Bolt {
-  public delegate void AddCallback(Action callback);
+  public delegate void AddCallback(Action callbackAction);
 
   enum ControlState {
     Pending,
