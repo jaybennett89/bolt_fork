@@ -9,7 +9,7 @@ open System.Text.RegularExpressions
 open System.Collections.Generic
 
 // define our xml type provider
-type XML = FSharp.Data.XmlProvider<"..\\..\\..\\build\\bolt.XML">
+type XML = FSharp.Data.XmlProvider<"..\\bolt\\bin\Debug\\bolt.XML">
 
 let remove regex name =
   Regex.Replace(name, regex, "")
@@ -148,10 +148,10 @@ let main argv =
     (!sb).AppendLine() |> ignore
 
   // load xml doc comments
-  let xml = XML.Parse(System.IO.File.ReadAllText("..\\..\\..\\..\\..\\build\\bolt.XML"))
+  let xml = XML.Parse(System.IO.File.ReadAllText("..\\..\\..\\..\\build\\bolt.XML"))
 
   // load dll through cecil
-  let dll = Mono.Cecil.AssemblyDefinition.ReadAssembly("..\\..\\..\\..\\..\\build\\bolt.dll")
+  let dll = Mono.Cecil.AssemblyDefinition.ReadAssembly("..\\..\\..\\..\\build\\bolt.dll")
 
   // list of all types with doc comments
   let types = new List<DocType>()
@@ -301,6 +301,6 @@ let main argv =
       h5 (sprintf "<a name=\"%s\"></a> public %s %s(%s)" m.NameLink (typeName m.Cecil.Value.ReturnType) m.Name m.Signature)
       printSummary m.Xml
 
-  File.WriteAllText("..\\..\\..\\..\\..\\build\\bolt.md", (!sb).ToString());
+  File.WriteAllText("..\\..\\..\\..\\build\\bolt.md", (!sb).ToString());
   
   0
