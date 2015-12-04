@@ -22,7 +22,7 @@ let rec findFiles pattern dirs =
   }
 
 let ndkPath = environVar "ndkbuild"
-let configuration = getBuildParam "configuration"
+let configuration = getBuildParamOrDefault "configuration" "DebugU5"
 let isdebug = configuration.Contains("Debug")
 
 let rootDir = currentDirectory
