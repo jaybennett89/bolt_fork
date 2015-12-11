@@ -15,12 +15,10 @@ class BoltSceneLoader : MonoBehaviour {
 
   void Update() {
     if (_loadOps.count > 0) {
-      if (BoltNetworkInternal.UsingUnityPro) {
+      //if (BoltNetworkInternal.UsingUnityPro) {
+      //  LoadAsync();
+      //}
         LoadAsync();
-      }
-      else {
-        Load();
-      }
     }
     else {
       if (_delay > 0) {
