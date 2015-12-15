@@ -10,10 +10,24 @@ namespace Bolt {
       public UE.MonoBehaviour Behaviour;
     }
 
+    struct CallbackWrapper {
+      public Object Original;
+      public Action<Event> Wrapper;
+    }
+
     List<EventListener> _targets = new List<EventListener>();
+    Dictionary<Type, List<CallbackWrapper>> _callbacks = new Dictionary<Type, List<CallbackWrapper>>();
 
     void Raise(Event ev) {
       IEventFactory factory = Factory.GetEventFactory(ev.Meta.TypeId);
+
+      List<CallbackWrapper> callbacks;
+
+      if (_callbacks.TryGetValue(ev.GetType(), out callbacks)) {
+        for (int i = 0; i < callbacks.Count; ++i) {
+          callbacks[i].Wrapper(ev);
+        }
+      }
 
       for (int i = 0; i < _targets.Count; ++i) {
         EventListener mb = _targets[i];
@@ -55,6 +69,36 @@ namespace Bolt {
       }
     }
 
+    public void Add<T>(Action<T> callback) where T : Event {
+      List<CallbackWrapper> callbacks;
+
+      if (_callbacks.TryGetValue(typeof(T), out callbacks) == false) {
+        _callbacks.Add(typeof(T), callbacks = new List<CallbackWrapper>());
+      }
+
+      CallbackWrapper wrapper;
+      wrapper.Original = callback;
+      wrapper.Wrapper = ev => callback((T)ev);
+
+      callbacks.Add(wrapper);
+    }
+
+    public void Remove<T>(Action<T> callback) where T : Event {
+      List<CallbackWrapper> callbacks;
+
+      if (_callbacks.TryGetValue(typeof(T), out callbacks) == false) {
+        for (int i = 0; i < callbacks.Count; ++i) {
+          var org = (Action<T>)callbacks[i].Original;
+          if (org == callback) {
+            callbacks.RemoveAt(i);
+            return;
+          }
+        }
+      }
+
+      BoltLog.Warn("Could not find delegate registered as callback");
+    }
+
     public void Add(UE.MonoBehaviour behaviour) {
 
       for (int i = 0; i < _targets.Count; ++i) {
@@ -80,6 +124,8 @@ namespace Bolt {
     }
 
     public void Clear() {
+      _callbacks = new Dictionary<Type, List<CallbackWrapper>>();
+
       for (int i = 0; i < _targets.Count; ++i) {
         var mb = _targets[i].Behaviour as BoltInternal.GlobalEventListenerBase;
         if (mb != null) {
