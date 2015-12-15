@@ -1246,6 +1246,14 @@ public static class BoltNetwork {
   }
 
   /// <summary>
+  /// Manually add a global event callback
+  /// </summary>
+  public static void AddGlobalEventCallback<T>(Action<T> callback) where T : Bolt.Event {
+    BoltNetwork.VerifyIsRunning();
+    BoltCore._globalEventDispatcher.Add<T>(callback);
+  }
+
+  /// <summary>
   /// Manually remove a global event listener
   /// </summary>
   /// <param name="mb">The monobehaviour to be removed</param>
@@ -1254,6 +1262,13 @@ public static class BoltNetwork {
     BoltCore._globalEventDispatcher.Remove(mb);
   }
 
+  /// <summary>
+  /// Manually remove a global event callback
+  /// </summary>
+  public static void RemoveGlobalEventCallback<T>(Action<T> callback) where T : Bolt.Event {
+    BoltNetwork.VerifyIsRunning();
+    BoltCore._globalEventDispatcher.Remove<T>(callback);
+  }
 
   /// <summary>
   /// Load a scene based on name, only possible on the Server

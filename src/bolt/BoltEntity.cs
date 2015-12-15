@@ -796,11 +796,25 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   }
 
   /// <summary>
+  /// Add a event callback to this entity.
+  /// </summary>
+  public void AddEventCallback<T>(Action<T> callback) where T : Bolt.Event {
+    Entity.EventDispatcher.Add<T>(callback);
+  }
+
+  /// <summary>
   /// Remove an event listern from this entity
   /// </summary>
   /// <param name="behaviour">The behaviour to remove</param>
   public void RemoveEventListener(UE.MonoBehaviour behaviour) {
     Entity.RemoveEventListener(behaviour);
+  }
+
+  /// <summary>
+  /// Remove a event callback to this entity.
+  /// </summary>
+  public void RemoveEventCallback<T>(Action<T> callback) where T : Bolt.Event {
+    Entity.EventDispatcher.Remove<T>(callback);
   }
 
   /// <summary>
