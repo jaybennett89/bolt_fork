@@ -1,0 +1,6 @@
+How to build Bolt
+Windows 8 or Windows 10
+Visual Studio with F# module
+Unity 5 Installed
+Make an empty unity project at C:\ called BoltBuild
+.\FAKE\tools\Fake.exe Build.fsx -ev "project C:\BoltBuild" -ev "configuration DebugU5" -ev "unity 'C:\Program Files\Unity 5'" %*
