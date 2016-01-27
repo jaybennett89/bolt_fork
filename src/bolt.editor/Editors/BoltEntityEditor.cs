@@ -98,7 +98,7 @@ public class BoltEntityEditor : Editor {
   public  void OnInspectorGUI2() {
     GUILayout.Space(4);
 
-    BoltEditorGUI.Help("Entity Settings", "http://wiki.boltengine.com/wiki/38");
+    BoltEditorGUI.Help("Entity Settings", "https://doc.photonengine.com/en/bolt/current/in-depth/entity-settings");
 
     GUILayout.Space(4);
 
