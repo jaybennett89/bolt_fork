@@ -538,7 +538,7 @@ public class BoltEditorWindow : BoltWindow {
         BoltEditorGUI.WithLabel("Replication", () => {
           p.Priority = BoltEditorGUI.EditPriority(p.Priority, p.PropertyType.HasPriority);
           p.ReplicationMode = (ReplicationMode)EditorGUILayout.EnumPopup(p.ReplicationMode);
-          BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/31");
+          BoltEditorGUI.Help("http://doc.photonengine.com/en/bolt/current/in-depth/replication-modes");
         });
       }
 
@@ -587,7 +587,7 @@ public class BoltEditorWindow : BoltWindow {
             EditorGUI.EndDisabledGroup();
           }
 
-          BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/41");
+          BoltEditorGUI.Help("https://doc.photonengine.com/en/bolt/current/getting-started/bolt-105-animations");
 
           EditorGUILayout.EndHorizontal();
         });
