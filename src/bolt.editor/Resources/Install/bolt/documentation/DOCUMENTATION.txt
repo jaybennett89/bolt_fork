@@ -1,15 +1,13 @@
 DOCUMENTATION
 
-All of our documentation is now available on the Bolt Wiki: 
-http://wiki.boltengine.com/
-
-This lets us keep the documentation up-to-date as fast as possible, 
-plus we can accept community contributions.
+All of our documentation is now available here:
+http://doc.photonengine.com/en/bolt/current/setup/overview
 
 SUPPORT
 
-Forum: http://forum.boltengine.com/
+Forum: http://forum.photonengine.com/categories/bolt-engine
 Jabbr Live Chat: https://jabbr.net/#/rooms/bolt
+Email: support@boltengine.com
 
 VIDEOS
 
