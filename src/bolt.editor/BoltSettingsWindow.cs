@@ -72,7 +72,7 @@ public class BoltSettingsWindow : EditorWindow {
         Save();
       }
 
-      BoltEditorGUI.Help("http://wiki.boltengine.com/wiki/42");
+      BoltEditorGUI.Help("https://doc.photonengine.com/en/bolt/current/in-depth/freeze-idle-setscope");
     });
 
     BoltEditorGUI.WithLabel("Instantiate Mode", () => {
