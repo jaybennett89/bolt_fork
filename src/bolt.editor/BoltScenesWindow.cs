@@ -244,9 +244,10 @@ end tell'";
   void StopEditor() {
     if (EditorApplication.isPlaying == false && EditorApplication.isPlayingOrWillChangePlaymode == false) {
       // reload scene
-      if (EditorPrefs.HasKey(DEBUGSTART_RESTORESCENE)) {
-        EditorApplication.OpenScene(EditorPrefs.GetString(DEBUGSTART_RESTORESCENE));
-        EditorPrefs.DeleteKey(DEBUGSTART_RESTORESCENE);
+		if (EditorPrefs.HasKey(DEBUGSTART_RESTORESCENE)) {
+			if(DEBUGSTART_RESTORESCENE != "BOLT_DEBUGSTART_RESTORESCENE")
+				EditorApplication.OpenScene(EditorPrefs.GetString(DEBUGSTART_RESTORESCENE));
+			EditorPrefs.DeleteKey(DEBUGSTART_RESTORESCENE);
       }
 
       // kill players
@@ -408,6 +409,7 @@ end tell'";
         EditorGUI.BeginDisabledGroup(isCurrent);
 
         if (GUILayout.Button("Edit", EditorStyles.miniButton, GUILayout.Width(50))) {
+		  //if(EditorApplication.currentScene != "")
           EditorApplication.SaveScene();
           EditorApplication.OpenScene(scene.path);
         }
