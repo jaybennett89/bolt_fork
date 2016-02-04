@@ -245,7 +245,7 @@ end tell'";
     if (EditorApplication.isPlaying == false && EditorApplication.isPlayingOrWillChangePlaymode == false) {
       // reload scene
 		if (EditorPrefs.HasKey(DEBUGSTART_RESTORESCENE)) {
-			if(DEBUGSTART_RESTORESCENE != "BOLT_DEBUGSTART_RESTORESCENE")
+			if(EditorPrefs.GetString(DEBUGSTART_RESTORESCENE) != "")
 				EditorApplication.OpenScene(EditorPrefs.GetString(DEBUGSTART_RESTORESCENE));
 			EditorPrefs.DeleteKey(DEBUGSTART_RESTORESCENE);
       }
