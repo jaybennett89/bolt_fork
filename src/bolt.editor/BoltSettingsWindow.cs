@@ -170,8 +170,8 @@ public class BoltSettingsWindow : EditorWindow {
   }
 
   void SwitchAsset(string a, string b) {
-    File.Move(a, b);
-
+    File.Copy(a, b, true);
+	File.Delete(a);
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
     AssetDatabase.ImportAsset(BoltEditorUtilsInternal.MakeAssetPath(b));
     AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
