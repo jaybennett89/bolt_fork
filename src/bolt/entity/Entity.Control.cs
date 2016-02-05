@@ -9,7 +9,7 @@ namespace Bolt {
         }
         else {
           // revoke any existing control
-          RevokeControl(null);
+          RevokeControl(token);
 
           // take control locally
           TakeControlInternal(token);
@@ -99,7 +99,7 @@ namespace Bolt {
     internal void AssignControl(BoltConnection connection, IProtocolToken token) {
       if (IsOwner) {
         if (HasControl) {
-          ReleaseControl(null);
+          ReleaseControl(token);
         }
 
         EntityProxy proxy;
