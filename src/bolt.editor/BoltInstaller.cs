@@ -66,6 +66,30 @@ public static class BoltInstaller {
 
       EnsureDirectoryExists(BoltEditorUtilsInternal.MakePath(Application.dataPath, "bolt", "resources"));
 
+	  
+	  /*
+	  File.Create(path);
+		TextWriter tw = new StreamWriter(path, false);
+		tw.WriteLine(Assembly.GetName().Version.ToString());
+		//Assembly.GetExecutingAssembly().GetName().Version
+		tw.Close();
+		*/
+
+	  
+	  string path = @"Assets/installVersion.txt";
+	  if (!File.Exists(path))
+	  {
+		StreamWriter sw = System.IO.File.CreateText(path);
+		sw.Close();
+		System.IO.File.WriteAllText(path, Assembly.GetName().Version.ToString());
+	  }
+	  else if (File.Exists(path))
+	  {
+        TextWriter tw = new StreamWriter(path, false);
+        tw.WriteLine(Assembly.GetName().Version.ToString());
+        tw.Close(); 
+	  }
+	  
       InstallLogo();
       InstallIcons();
       InstallDocumentation();

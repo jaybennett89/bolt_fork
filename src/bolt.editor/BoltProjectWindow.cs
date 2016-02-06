@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using System.IO;
 
 public class BoltProjectWindow : BoltWindow {
   [MenuItem("Window/Bolt/Assets", priority = -100)]
@@ -18,6 +19,9 @@ public class BoltProjectWindow : BoltWindow {
     w.Show();
   }
 
+  float timeVersionCheck;
+  string path = @"Assets/installVersion.txt";
+  bool currentVersionInstalled = false;
   Vector2 scroll;
   string addGroup = null;
   AssetDefinition addGroupTo = null;
@@ -50,6 +54,28 @@ public class BoltProjectWindow : BoltWindow {
   new void Update() {
     base.Update();
 
+	if(EditorApplication.timeSinceStartup > (timeVersionCheck + 5))
+	{
+		timeVersionCheck = (float)EditorApplication.timeSinceStartup;
+	  if (File.Exists(path))
+	  {
+		  try
+        {   
+            using (StreamReader sr = new StreamReader(path))
+            {
+	       
+                String line = sr.ReadToEnd();
+                currentVersionInstalled = (line.Trim() ==  Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("The file could not be read:");
+            Console.WriteLine(e.Message);
+        }
+	  }
+	  else currentVersionInstalled = false;
+	}
     if (HasProject) {
       if (string.IsNullOrEmpty(selectedAssetGuid) == false && Selected == null) {
         try {
@@ -65,6 +91,8 @@ public class BoltProjectWindow : BoltWindow {
   new void OnGUI() {
     base.OnGUI();
 
+	
+	
     GUILayout.BeginArea(new Rect(0, 0, position.width, position.height - 22));
     scroll = GUILayout.BeginScrollView(scroll, false, false);
 
@@ -114,7 +142,15 @@ public class BoltProjectWindow : BoltWindow {
 
     EditorGUILayout.EndHorizontal();
 
-    if (HasProject) {
+	
+	if(currentVersionInstalled == false)
+	{
+		GUILayout.Label("Please install Bolt", EditorStyles.boldLabel);		
+		GUILayout.Label("(Click Assets button at the top left of Unity,", EditorStyles.boldLabel);	
+		GUILayout.Label("select Bolt, then Install)", EditorStyles.boldLabel);	
+	}
+	
+    if (HasProject && currentVersionInstalled == true) {
       Header("States", "mc_state");
       DisplayAssetList(Project.States.Cast<AssetDefinition>());
 
