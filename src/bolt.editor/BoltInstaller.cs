@@ -76,7 +76,7 @@ public static class BoltInstaller {
 		*/
 
 	  
-	  string path = @"Assets/installVersion.txt";
+	  string path = @"Assets/bolt/installVersion.txt";
 	  if (!File.Exists(path))
 	  {
 		StreamWriter sw = System.IO.File.CreateText(path);

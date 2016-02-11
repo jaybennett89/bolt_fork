@@ -20,7 +20,7 @@ public class BoltProjectWindow : BoltWindow {
   }
 
   float timeVersionCheck;
-  string path = @"Assets/installVersion.txt";
+  string path = @"Assets/bolt/installVersion.txt";
   bool currentVersionInstalled = false;
   Vector2 scroll;
   string addGroup = null;
