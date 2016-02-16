@@ -127,7 +127,7 @@ namespace Bolt {
     ///   bool repeated = true;
     ///   
     ///   for(int i = 0; i < CHAT_REPEAT_LIMIT; i++) {
-    ///     if(!chatEvt.BinnaryData.SequenceEqual(previousChatEvts.GoBack(i).BinaryData) {
+    ///     if(!chatEvt.BinaryData.SequenceEqual(previousChatEvts.GoBack(i).BinaryData) {
     ///       repeated = false;
     ///       break;
     ///     }

@@ -11,7 +11,7 @@ namespace Bolt {
     public int MecanimLayer;
 
     public override bool WantsOnSimulateAfter {
-      get { return true; }
+      get { return MecanimMode != MecanimMode.Disabled; }
     }
 
     public void Settings_Mecanim(MecanimMode mode, MecanimDirection direction, float damping, int layer) {
@@ -22,9 +22,10 @@ namespace Bolt {
     }
 
     public override void OnSimulateAfter(NetworkObj obj) {
-      NetworkState state = (NetworkState)obj.Root;
+     
 
       if (MecanimMode != MecanimMode.Disabled) {
+		   NetworkState state = (NetworkState)obj.Root;
         if (state.Animators.Count > 0) {
           if (MecanimMode == MecanimMode.LayerWeight) {
             if (ShouldPullDataFromMecanim(state)) {
