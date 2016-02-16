@@ -498,7 +498,7 @@ public static class BoltNetwork {
   /// *Example:* Showing an FPS and ping counter when in debug mode.
   /// 
   /// ```csharp
-  /// public override void BoltStarted() {
+  /// public override void BoltStartDone() {
   ///   if(BoltNetwork.isDebugMode) {
   ///     PingView.instance.Show();
   ///     FPSCounter.instance.Show();
@@ -585,7 +585,7 @@ public static class BoltNetwork {
   /// *Example* Registering two token types on startup.
   /// 
   /// ```csharp
-  /// public override void BoltStarted() {
+  /// public override void BoltStartDone() {
   ///   BoltNetwork.RegisterTokenClass&ltUserToken&gt();
   ///   BoltNetwork.RegisterTokenClass&ltServerMessage&gt();
   /// }
@@ -656,7 +656,7 @@ public static class BoltNetwork {
   /// *Example:* Setting the ```NullEventFilter``` on startup.
   /// 
   /// ```csharp
-  /// public override void BoltStarted() {
+  /// public override void BoltStartDone() {
   ///   SetEventFilter(new NullEventFilter());
   /// }
   /// ```
@@ -678,7 +678,7 @@ public static class BoltNetwork {
   /// *Example:* Setting bolt to use a custom prefab pooling implementation.
   /// 
   /// ```csharp
-  /// public override void BoltStarted() {
+  /// public override void BoltStartDone() {
   ///   SetPrefabPool(new YourPrefabPool());
   /// }
   /// ```

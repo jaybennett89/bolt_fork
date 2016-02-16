@@ -363,7 +363,7 @@ public class BoltEntity : UE.MonoBehaviour, IBoltListNode {
   /// *Example:* Configuring the state of initial buildings and minions during startup.
   /// 
   /// ```csharp
-  /// public override void BoltStarted() {
+  /// public override void BoltStartDone() {
   ///   foreach(BoltEntity entity in BoltNetwork.entities) {
   ///     if(entity.isSceneObject) {
   ///       if(entity.StateIs&ltIStructure&gt()) {
