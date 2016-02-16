@@ -237,7 +237,7 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="properties"></a>
 Properties</h2></td></tr>
-<tr class="memitem:a58bf1875cb131f65391436cc9ce4eb8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_bolt_1_1_prefab_id.html">PrefabId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bolt_entity.html#a58bf1875cb131f65391436cc9ce4eb8c">prefabId</a><code> [get]</code></td></tr>
+<tr class="memitem:a58bf1875cb131f65391436cc9ce4eb8c"><td class="memItemLeft" align="right" valign="top">PrefabId&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bolt_entity.html#a58bf1875cb131f65391436cc9ce4eb8c">prefabId</a><code> [get]</code></td></tr>
 <tr class="memdesc:a58bf1875cb131f65391436cc9ce4eb8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The prefabId used to instantiate this entity  <a href="#a58bf1875cb131f65391436cc9ce4eb8c">More...</a><br /></td></tr>
 <tr class="separator:a58bf1875cb131f65391436cc9ce4eb8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0065955c86d6e61cc54735385430a340"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_bolt_connection.html">BoltConnection</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bolt_entity.html#a0065955c86d6e61cc54735385430a340">source</a><code> [get]</code></td></tr>
@@ -1333,7 +1333,7 @@ Properties</h2></td></tr>
 
 <p>This is a scene object placed in the scene in the Unity editor </p>
 <p><em>Example:</em> Configuring the state of initial buildings and minions during startup.</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;public override void BoltStarted() {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;  foreach(BoltEntity entity in BoltNetwork.entities) {</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;    if(entity.isSceneObject) {</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;      if(entity.StateIs&amp;ltIStructure&amp;gt()) {</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;        StructureFactory.Configure(entity);</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;      }</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;      else if(entity.StateIs&amp;ltIMinion&amp;gt()) {</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;        MinionFactory.Configure(entity);</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;      }</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    }</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  }</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;}</div></div><!-- fragment --> 
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;public override void BoltStartDone() {</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;  foreach(BoltEntity entity in BoltNetwork.entities) {</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;    if(entity.isSceneObject) {</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;      if(entity.StateIs&amp;ltIStructure&amp;gt()) {</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;        StructureFactory.Configure(entity);</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;      }</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;      else if(entity.StateIs&amp;ltIMinion&amp;gt()) {</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;        MinionFactory.Configure(entity);</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;      }</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    }</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  }</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;}</div></div><!-- fragment --> 
 </div>
 </div>
 <a class="anchor" id="a5105658a40acd4b67c7f71fe9c5b7101"></a>
@@ -1389,7 +1389,7 @@ Properties</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_bolt_1_1_prefab_id.html">PrefabId</a> BoltEntity.prefabId</td>
+          <td class="memname">PrefabId BoltEntity.prefabId</td>
         </tr>
       </table>
   </td>

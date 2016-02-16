@@ -1,12 +1,12 @@
 C:/Users/callu/Desktop/bolt/src/bolt/entity/EntityBehaviour.cs:294: warning: reached end of file while inside a ``` block!
 The command that should end the block seems to be missing!
 
-C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1371: warning: The following parameters of BoltNetwork.Connect(UdpEndPoint endpoint, IProtocolToken token) are not documented:
+C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1387: warning: The following parameters of BoltNetwork.Connect(UdpEndPoint endpoint, IProtocolToken token) are not documented:
   parameter 'token'
-C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:960: warning: The following parameters of BoltNetwork.Destroy(GameObject gameObject, IProtocolToken token) are not documented:
+C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:976: warning: The following parameters of BoltNetwork.Destroy(GameObject gameObject, IProtocolToken token) are not documented:
   parameter 'token'
-C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1377: warning: argument 'userData' of command @param is not found in the argument list of BoltNetwork::SetHostInfo(string serverName, IProtocolToken token)
-C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1392: warning: The following parameters of BoltNetwork.SetHostInfo(string serverName, IProtocolToken token) are not documented:
+C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1393: warning: argument 'userData' of command @param is not found in the argument list of BoltNetwork::SetHostInfo(string serverName, IProtocolToken token)
+C:/Users/callu/Desktop/bolt/src/bolt/BoltNetwork.cs:1408: warning: The following parameters of BoltNetwork.SetHostInfo(string serverName, IProtocolToken token) are not documented:
   parameter 'token'
 C:/Users/callu/Desktop/bolt/src/bolt/entity/EntityInterfaces.cs:39: warning: argument 'mask' of command @param is not found in the argument list of Bolt.IPriorityCalculator::CalculateStatePriority(BoltConnection connection, int skipped)
 C:/Users/callu/Desktop/bolt/src/bolt/T4/GlobalEventListener.cs:418: warning: The following parameters of BoltInternal.GlobalEventListenerBase.ConnectAttempt(UdpEndPoint endpoint, Bolt.IProtocolToken token) are not documented:

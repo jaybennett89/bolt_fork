@@ -1,10 +1,6 @@
 var searchData=
 [
   ['binarydata',['BinaryData',['../class_bolt_1_1_event.html#a2bebbc081bcb0a2bd5511faf85a2dd02',1,'Bolt::Event']]],
-  ['bits',['bits',['../struct_bolt_1_1_entity_flags.html#a7fde88110858449dc548b0fe9469d57b',1,'Bolt.EntityFlags.bits()'],['../struct_bolt_1_1_instantiate_flags.html#a989ba6651e27e3a192e74b07ccad68ba',1,'Bolt.InstantiateFlags.bits()'],['../struct_bolt_1_1_proxy_flags.html#a826d99250f18a69796eef1e615d2ca31',1,'Bolt.ProxyFlags.bits()'],['../struct_bolt_1_1_command_flags.html#a58f1a0559afd55c8fbac981d3507f1ed',1,'Bolt.CommandFlags.bits()']]],
-  ['bitset',['BitSet',['../class_bolt_1_1_bit_set.html',1,'Bolt']]],
-  ['bitset',['BitSet',['../class_bolt_1_1_bit_set.html#af0dc6223da937202a61c79b100d3ab0d',1,'Bolt.BitSet.BitSet(ulong bits0, ulong bits1, ulong bits2, ulong bits3, ulong bits4, ulong bits5, ulong bits6, ulong bits7, ulong bits8, ulong bits9, ulong bits10, ulong bits11, ulong bits12, ulong bits13, ulong bits14, ulong bits15)'],['../class_bolt_1_1_bit_set.html#a0fa5132e632ffd172f3c615d882b2444',1,'Bolt.BitSet.BitSet()']]],
-  ['bitset_5flongs',['BITSET_LONGS',['../class_bolt_1_1_bit_set.html#ae4ed11ef72fc41d19a67edee4f6b15ef',1,'Bolt::BitSet']]],
   ['bitspersecondin',['BitsPerSecondIn',['../class_bolt_connection.html#a3401fe574b2cd41f2da9030cd1ef8403',1,'BoltConnection']]],
   ['bitspersecondout',['BitsPerSecondOut',['../class_bolt_connection.html#a9a2ada1455496163b3b1ab075beabd74',1,'BoltConnection']]],
   ['body',['body',['../struct_bolt_physics_hit.html#ada55272c8b870acb87b3288e433a6c5b',1,'BoltPhysicsHit']]],

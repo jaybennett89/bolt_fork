@@ -17,10 +17,9 @@ var searchData=
   ['alwaysproxy',['alwaysProxy',['../class_bolt_entity_settings_modifier.html#a1e7c349f83e36200e388add91b74dd81',1,'BoltEntitySettingsModifier']]],
   ['animator',['Animator',['../interface_bolt_1_1_i_state.html#a2bf72ebc3b17d4863366233a8751300b',1,'Bolt::IState']]],
   ['arrayindices',['ArrayIndices',['../struct_bolt_1_1_array_indices.html',1,'Bolt']]],
-  ['assign_5fcontrol',['ASSIGN_CONTROL',['../struct_bolt_1_1_instantiate_flags.html#a489d2c0e093f91b03635cddc345926da',1,'Bolt::InstantiateFlags']]],
   ['assigncontrol',['AssignControl',['../class_bolt_entity.html#ab285efd9c3782d139e49f686c96c7ad0',1,'BoltEntity.AssignControl(BoltConnection connection)'],['../class_bolt_entity.html#ac8f18751f42e822b19ee9c436689d28c',1,'BoltEntity.AssignControl(BoltConnection connection, IProtocolToken token)']]],
   ['attach',['Attach',['../class_bolt_network.html#ad664241fffe5c29f11069f15b9291fc7',1,'BoltNetwork.Attach(GameObject gameObject)'],['../class_bolt_network.html#ab07430bd4ec4dcbf5eed36b5b8b3f7ae',1,'BoltNetwork.Attach(GameObject gameObject, IProtocolToken token)']]],
-  ['attached',['ATTACHED',['../struct_bolt_1_1_entity_flags.html#acc02a101a7c63dd0a108361928cb975a',1,'Bolt.EntityFlags.ATTACHED()'],['../interface_bolt_1_1_i_entity_behaviour.html#afdfe50ecf76cad1fd74f99cc9dcf29ec',1,'Bolt.IEntityBehaviour.Attached()'],['../class_bolt_1_1_entity_behaviour.html#a0853fa8f55362844ac592c6352d13e02',1,'Bolt.EntityBehaviour.Attached()']]],
+  ['attached',['Attached',['../interface_bolt_1_1_i_entity_behaviour.html#afdfe50ecf76cad1fd74f99cc9dcf29ec',1,'Bolt.IEntityBehaviour.Attached()'],['../class_bolt_1_1_entity_behaviour.html#a0853fa8f55362844ac592c6352d13e02',1,'Bolt.EntityBehaviour.Attached()']]],
   ['attachtoken',['attachToken',['../class_bolt_entity.html#a22ac2160fa8d3126fb103196ac0ba859',1,'BoltEntity']]],
   ['autofreezeproxyframes',['autoFreezeProxyFrames',['../class_bolt_entity_settings_modifier.html#a3e9500293902bfaa1e3938bc04cb3c98',1,'BoltEntitySettingsModifier']]],
   ['automatic',['Automatic',['../namespace_bolt.html#a1f0a49942013573b4fa9e17fd17701fda086247a9b57fde6eefee2a0c4752242d',1,'Bolt']]]

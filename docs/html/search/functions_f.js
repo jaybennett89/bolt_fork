@@ -1,8 +1,6 @@
 var searchData=
 [
   ['raycastall',['RaycastAll',['../class_bolt_network.html#a2c223f7d286089edeadfa1991ef0d92d',1,'BoltNetwork.RaycastAll(Ray ray)'],['../class_bolt_network.html#aedf9edd20804619094b1268fb35fd5f4',1,'BoltNetwork.RaycastAll(Ray ray, int frame)']]],
-  ['readprefabid',['ReadPrefabId',['../class_id_extensions.html#ac1a59527dbd9b8a5463cfca8aa842d51',1,'IdExtensions']]],
-  ['readtypeid',['ReadTypeId',['../class_id_extensions.html#ae4f1f68b711791daa1c31a5d6a37f9f7',1,'IdExtensions']]],
   ['refuse',['Refuse',['../class_bolt_network.html#a852e979bd13a2ff18026f279db02d489',1,'BoltNetwork.Refuse(UdpEndPoint endpoint)'],['../class_bolt_network.html#afe3d923091acb60f1cd45ec45e055960',1,'BoltNetwork.Refuse(UdpEndPoint endpoint, IProtocolToken token)']]],
   ['registershutdowndonecallback',['RegisterShutdownDoneCallback',['../class_bolt_network.html#aa677ae4cf2d29d82983bd1d1e3e2ecfe',1,'BoltNetwork']]],
   ['registertokenclass_3c_20t_20_3e',['RegisterTokenClass&lt; T &gt;',['../class_bolt_network.html#ac36c7eb0fa600f9b449c11aba8cfda33',1,'BoltNetwork']]],

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['overridetimescale',['overrideTimeScale',['../class_bolt_runtime_settings.html#a03688a89152adafc24865f4561d19e16',1,'BoltRuntimeSettings']]]
+  ['packetmaxeventsize',['packetMaxEventSize',['../class_bolt_config.html#a27b736b4308f77266380e14020754571',1,'BoltConfig']]],
+  ['packetsize',['packetSize',['../class_bolt_config.html#ae52f7d6d6a052a5188dc12406a8c72b3',1,'BoltConfig']]]
 ];

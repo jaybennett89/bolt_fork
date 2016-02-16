@@ -21,6 +21,5 @@ var searchData=
   ['issceneobject',['isSceneObject',['../class_bolt_entity.html#a46f6cca5935ab9855ef41a13fadedba9',1,'BoltEntity']]],
   ['isserver',['isServer',['../class_bolt_network.html#ae9a288a7c08c312cb6afbdc113559445',1,'BoltNetwork']]],
   ['isserverornotrunning',['isServerOrNotRunning',['../class_bolt_network.html#a5a47e2d3a60d99be27c0451a9a25fe06',1,'BoltNetwork']]],
-  ['issingleplayer',['IsSinglePlayer',['../class_bolt_network.html#a63f59d8622ff78cf1c531bcbb8df19ac',1,'BoltNetwork']]],
-  ['iszero',['IsZero',['../class_bolt_1_1_bit_set.html#a9c00fd2bea95931590df5cebc7def2b1',1,'Bolt.BitSet.IsZero()'],['../struct_bolt_1_1_entity_flags.html#a7080834d4017a4fb57eab5f82325ab76',1,'Bolt.EntityFlags.IsZero()'],['../struct_bolt_1_1_instantiate_flags.html#ac9964f9f5484347ba196f9ae9c5b7ad6',1,'Bolt.InstantiateFlags.IsZero()'],['../struct_bolt_1_1_proxy_flags.html#a1c8d13eb42946e3c556fae0372eb93dd',1,'Bolt.ProxyFlags.IsZero()'],['../struct_bolt_1_1_command_flags.html#a794b26a58993d332d6c54019958e718b',1,'Bolt.CommandFlags.IsZero()']]]
+  ['issingleplayer',['IsSinglePlayer',['../class_bolt_network.html#a63f59d8622ff78cf1c531bcbb8df19ac',1,'BoltNetwork']]]
 ];

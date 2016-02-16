@@ -11,9 +11,6 @@ var searchData=
   ['defaultprefabpool',['DefaultPrefabPool',['../class_bolt_1_1_default_prefab_pool.html',1,'Bolt']]],
   ['dejitterframes',['DejitterFrames',['../class_bolt_connection.html#ae32c090332d970319f85733a41fa9aed',1,'BoltConnection']]],
   ['destroy',['Destroy',['../interface_bolt_1_1_i_prefab_pool.html#a345a8fc546eb4dcc85a4b96420ba1bfd',1,'Bolt.IPrefabPool.Destroy()'],['../class_bolt_network.html#aabba5a2b0e37a6a70d70f33937aa6b6c',1,'BoltNetwork.Destroy(GameObject gameObject)'],['../class_bolt_network.html#a22f702062505081aaae35077169cb23b',1,'BoltNetwork.Destroy(GameObject gameObject, IProtocolToken token)']]],
-  ['destroy_5fignore',['DESTROY_IGNORE',['../struct_bolt_1_1_proxy_flags.html#a3a2acd576217ef03c8606b1e01fc9ebe',1,'Bolt::ProxyFlags']]],
-  ['destroy_5fpending',['DESTROY_PENDING',['../struct_bolt_1_1_proxy_flags.html#a8424918e50096470c8ca2dc9b32ac9cc',1,'Bolt::ProxyFlags']]],
-  ['destroy_5frequested',['DESTROY_REQUESTED',['../struct_bolt_1_1_proxy_flags.html#acb9dfcaf182709f5eb3cb5aee0bcde4e',1,'Bolt::ProxyFlags']]],
   ['destroydelayed',['DestroyDelayed',['../class_bolt_entity.html#aab1423fe32e2f7efee6606affa349437',1,'BoltEntity']]],
   ['detach',['Detach',['../class_bolt_network.html#ad551c3ff36cd483ca6b887f66fc2c639',1,'BoltNetwork.Detach(GameObject gameObject)'],['../class_bolt_network.html#af24f35c93137dab772cfcce096b00fc5',1,'BoltNetwork.Detach(GameObject gameObject, IProtocolToken token)']]],
   ['detached',['Detached',['../interface_bolt_1_1_i_entity_behaviour.html#a27d42f888fca78d6587e8268f13adc5d',1,'Bolt.IEntityBehaviour.Detached()'],['../class_bolt_1_1_entity_behaviour.html#a5874818e746d684460e709869ad52967',1,'Bolt.EntityBehaviour.Detached()']]],
@@ -26,6 +23,6 @@ var searchData=
   ['disconnect',['Disconnect',['../class_bolt_connection.html#ad42f464562d189d44d8c71a028253b57',1,'BoltConnection.Disconnect()'],['../class_bolt_connection.html#a7a35d9fa8639d543914637e7c4477ea4',1,'BoltConnection.Disconnect(IProtocolToken token)']]],
   ['disconnected',['Disconnected',['../class_bolt_internal_1_1_global_event_listener_base.html#a916849a6bd259fff455a321865b18aa8',1,'BoltInternal::GlobalEventListenerBase']]],
   ['disconnecttoken',['DisconnectToken',['../class_bolt_connection.html#ac60a7dce61eee05c52c59ea93c8f163f',1,'BoltConnection']]],
-  ['dispose',['DISPOSE',['../struct_bolt_1_1_command_flags.html#a926f3e2a8d5978899fa490c0fea5a362',1,'Bolt.CommandFlags.DISPOSE()'],['../class_bolt_physics_hits.html#acb91cdcfeb4cce36f44bf9a0a896dec5',1,'BoltPhysicsHits.Dispose()']]],
+  ['dispose',['Dispose',['../class_bolt_physics_hits.html#acb91cdcfeb4cce36f44bf9a0a896dec5',1,'BoltPhysicsHits']]],
   ['distance',['distance',['../struct_bolt_physics_hit.html#a1521be3c3e685bc810a1ac2e7e3c1571',1,'BoltPhysicsHit']]]
 ];

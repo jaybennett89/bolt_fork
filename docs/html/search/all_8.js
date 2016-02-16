@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['has_5fcontrol',['HAS_CONTROL',['../struct_bolt_1_1_entity_flags.html#a01650540bd33516ccc581536d1cee695',1,'Bolt::EntityFlags']]],
-  ['has_5fexecuted',['HAS_EXECUTED',['../struct_bolt_1_1_command_flags.html#ad00e24cc2feaf7ec6d05fdfaa1147808',1,'Bolt::CommandFlags']]],
   ['hascontrol',['hasControl',['../class_bolt_entity.html#add432b1c068a1f45f6c001ea7f9b70b6',1,'BoltEntity']]],
   ['hascontrolof',['HasControlOf',['../class_bolt_connection.html#acd35209c2f1d4dfc59e532704492a657',1,'BoltConnection']]],
   ['hascontrolwithprediction',['hasControlWithPrediction',['../class_bolt_entity.html#a4fa0e7ddb52744891426092fecc70439',1,'BoltEntity']]],

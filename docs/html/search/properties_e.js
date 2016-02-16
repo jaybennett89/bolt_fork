@@ -9,7 +9,7 @@ var searchData=
   ['scopemode',['scopeMode',['../class_bolt_network.html#ac58811c9c82dfdbcb382c7086738bab8',1,'BoltNetwork']]],
   ['serializerid',['serializerId',['../class_bolt_entity_settings_modifier.html#a601e4c1113403b5c2f2002a61a511c68',1,'BoltEntitySettingsModifier']]],
   ['server',['server',['../class_bolt_network.html#a10b58a05340f254b0641f4c4adae9904',1,'BoltNetwork']]],
-  ['serverframe',['serverFrame',['../class_bolt_network.html#a2400d566b2ad36932bc41fffa87ad771',1,'BoltNetwork.serverFrame()'],['../class_bolt_1_1_command.html#a38d5690a51330ea62bd525d8beeb8279',1,'Bolt.Command.ServerFrame()']]],
+  ['serverframe',['ServerFrame',['../class_bolt_1_1_command.html#a38d5690a51330ea62bd525d8beeb8279',1,'Bolt.Command.ServerFrame()'],['../class_bolt_network.html#a2400d566b2ad36932bc41fffa87ad771',1,'BoltNetwork.serverFrame()']]],
   ['servertime',['serverTime',['../class_bolt_network.html#ae108400e676c508ff1fd1296b898c5de',1,'BoltNetwork']]],
   ['sessionlist',['SessionList',['../class_bolt_network.html#a240457049b86f77d43f51713b145a323',1,'BoltNetwork']]],
   ['source',['source',['../class_bolt_entity.html#a0065955c86d6e61cc54735385430a340',1,'BoltEntity']]],

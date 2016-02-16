@@ -78,6 +78,22 @@ public static class BoltNetworkInternal {
 [Documentation]
 public static class BoltNetwork {
 
+
+
+
+  /// <summary>
+  /// Async load Bolt Entity prefabs
+  /// </summary>
+  /// <example>
+  /// *Example:* Preloading assets in the background before Bolt starts.
+  /// 
+  /// ```csharp
+  /// void loadInBackground() {
+  ///   BoltNetwork.PreLoadPrefabDatabase();
+  ///   Resources.LoadAsync<myTerrain>("Terrain");
+  /// }
+  /// ```
+  /// </example>
   public static void PreLoadPrefabDatabase() {
     Resources.LoadAsync<PrefabDatabase>("BoltPrefabDatabase");
   }
@@ -433,7 +449,7 @@ public static class BoltNetwork {
   /// public static UdpKit.UdpChannelName Voice;
   /// public static UdpKit.UdpChannelName CustomPlayerIcon;
   /// 
-  /// public override void RegisterStreamChannels() {
+  /// public override void BoltStartBegin() {
   ///   Voice = BoltNetwork.CreateStreamChannel("Voice", UdpKit.UdpChannelMode.Unreliable, 1});
   ///   CustomPlayerIcon = BoltNetwork.CreateStreamChannel("CustomPlayerIcon", UdpKit.UdpChannelMode.Reliable, 4});
   /// }

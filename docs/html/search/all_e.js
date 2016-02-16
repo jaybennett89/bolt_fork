@@ -2,7 +2,6 @@ var searchData=
 [
   ['packetmaxeventsize',['packetMaxEventSize',['../class_bolt_config.html#a27b736b4308f77266380e14020754571',1,'BoltConfig']]],
   ['packetsize',['packetSize',['../class_bolt_config.html#ae52f7d6d6a052a5188dc12406a8c72b3',1,'BoltConfig']]],
-  ['persist_5fon_5fload',['PERSIST_ON_LOAD',['../struct_bolt_1_1_entity_flags.html#ab23e0c18f0a78ec69a14506b523426fc',1,'Bolt::EntityFlags']]],
   ['persistbetweenstartupandshutdown',['PersistBetweenStartupAndShutdown',['../class_bolt_internal_1_1_global_event_listener_base.html#af082a91e959e610279268bd0c8af571b',1,'BoltInternal::GlobalEventListenerBase']]],
   ['persistsonsceneload',['persistsOnSceneLoad',['../class_bolt_entity.html#a3b15fd683f42368bcfe4c8e15c838cf9',1,'BoltEntity']]],
   ['persistthroughsceneloads',['persistThroughSceneLoads',['../class_bolt_entity_settings_modifier.html#a50ea2dc435861ec5436dfd143bec30c5',1,'BoltEntitySettingsModifier']]],
@@ -11,10 +10,7 @@ var searchData=
   ['portmappingchanged',['PortMappingChanged',['../class_bolt_internal_1_1_global_event_listener_base.html#aeca474f75dfe6f5af6343ca0812335f9',1,'BoltInternal::GlobalEventListenerBase']]],
   ['ports',['Ports',['../interface_bolt_1_1_i_nat_device.html#a75a9777a08c9cc9481d685a86136cd49',1,'Bolt::INatDevice']]],
   ['prefabid',['prefabId',['../class_bolt_entity_settings_modifier.html#a0d8828e2f1b474bcb2a7cccf69e43dae',1,'BoltEntitySettingsModifier.prefabId()'],['../class_bolt_entity.html#a58bf1875cb131f65391436cc9ce4eb8c',1,'BoltEntity.prefabId()']]],
-  ['prefabid',['PrefabId',['../struct_bolt_1_1_prefab_id.html',1,'Bolt']]],
   ['preloadprefabdatabase',['PreLoadPrefabDatabase',['../class_bolt_network.html#aad4476a153458431dcaf16e0aecb9af1',1,'BoltNetwork']]],
   ['proximity',['proximity',['../class_bolt_hitbox_body.html#aaa51b459ee46e042ac7d094741041b7d',1,'BoltHitboxBody']]],
-  ['proxyflags',['ProxyFlags',['../struct_bolt_1_1_proxy_flags.html',1,'Bolt']]],
-  ['proxyflags',['ProxyFlags',['../struct_bolt_1_1_proxy_flags.html#aed00b549dfb77843b47f471df23ab142',1,'Bolt::ProxyFlags']]],
   ['publicaddress',['PublicAddress',['../interface_bolt_1_1_i_nat_device.html#a54336e223a5eadfe1d30351779d95c68',1,'Bolt::INatDevice']]]
 ];

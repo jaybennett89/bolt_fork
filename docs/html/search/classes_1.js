@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['bitset',['BitSet',['../class_bolt_1_1_bit_set.html',1,'Bolt']]],
   ['boltconfig',['BoltConfig',['../class_bolt_config.html',1,'']]],
   ['boltconnection',['BoltConnection',['../class_bolt_connection.html',1,'']]],
   ['boltconsole',['BoltConsole',['../class_bolt_console.html',1,'']]],
