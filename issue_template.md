@@ -9,10 +9,11 @@ Tell us what should happen
 
 
 ###Actual behavior
-Tell us what happens insteead
+Tell us what happens instead
 
 
 ###Configuration
 Unity Version:
 Bolt Version
 Operating System:
+Network Configuration:
