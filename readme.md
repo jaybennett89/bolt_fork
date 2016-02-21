@@ -1,4 +1,4 @@
-# ![Bolt Engine](https://github.com/tonybilby/bolt/blob/master/z-bolt-logo.png "Bolt Engine")
+# ![Bolt Engine](https://github.com/BoltEngine/bolt/raw/master/z-bolt-logo.png "Bolt Engine")
 
 # EULA (End User License Agreement)
 End User License Agreement
