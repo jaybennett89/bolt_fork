@@ -41,6 +41,25 @@ internal static class BoltPhysics {
 #endif
   }
 
+  internal static Vector3 PositionAtFrame(BoltHitboxBody hitbox, int frame) {
+      var it = _worldSnapshots.GetIterator();
+
+      while (it.Next())
+      {
+          if (it.val._frame == frame)
+          {
+              return PositionAtFrame(hitbox, it.val);
+          }
+      }
+
+      if (_worldSnapshots.count > 0)
+      {
+          return PositionAtFrame(hitbox, _worldSnapshots.last);
+      }
+
+      return hitbox._proximity._center;
+  }
+
   internal static BoltPhysicsHits Raycast(Ray ray) {
     if (_worldSnapshots.count > 0) {
       return Raycast(ray, _worldSnapshots.last);
@@ -83,6 +102,18 @@ internal static class BoltPhysics {
     }
 
     return BoltPhysicsHits._pool.Acquire();
+  }
+
+  static Vector3 PositionAtFrame(BoltHitboxBody hitbox, BoltHitboxWorldSnapshot sn) {
+    var it = sn._bodySnapshots.GetIterator();
+
+    while (it.Next()) {
+      if (it.val.HitboxBody == hitbox) {
+          return it.val.GetPosition();
+      }
+    }
+
+    return hitbox._proximity._center;
   }
 
   static BoltPhysicsHits Raycast(Ray ray, BoltHitboxWorldSnapshot sn) {

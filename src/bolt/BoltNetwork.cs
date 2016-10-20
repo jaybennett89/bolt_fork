@@ -1027,6 +1027,11 @@ public static class BoltNetwork {
     BoltCore.Detach(gameObject.GetComponent<BoltEntity>(), token);
   }
 
+  public static Vector3 PositionAtFrame(BoltHitboxBody hitbox, int frame) {
+    BoltNetwork.VerifyIsRunning();
+    return BoltPhysics.PositionAtFrame(hitbox, frame);
+  }
+
   /// <summary>
   /// Perform a raycast against Bolt hitboxes
   /// </summary>

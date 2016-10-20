@@ -11,6 +11,8 @@ class BoltHitboxBodySnapshot : BoltObject, IDisposable {
   Matrix4x4[] _hbwtl = new Matrix4x4[32];
   Matrix4x4[] _hbltw = new Matrix4x4[32];
 
+  public BoltHitboxBody HitboxBody { get { return _body;  } }
+
   public void Snapshot (BoltHitboxBody body) {
     _body = body;
     _count = Mathf.Min(body._hitboxes.Length, _hbwtl.Length);
@@ -38,6 +40,23 @@ class BoltHitboxBodySnapshot : BoltObject, IDisposable {
     _pool.Release(this);
   }
 
+  public Vector3 GetPosition()
+  {
+      if (!_body) { return Vector3.zero; }
+
+      if (_body._proximity)
+      {
+          return _ltw.MultiplyPoint(Vector3.zero);
+      }
+
+      for (int i = 0; i < _body._hitboxes.Length; ++i)
+      {
+          BoltHitbox hitbox = _body._hitboxes[i];
+          return _hbwtl[i].MultiplyPoint(Vector3.zero);
+      }
+
+      return Vector3.zero;
+  }
   public void OverlapSphere (Vector3 center, float radius, BoltPhysicsHits hits) {
     if (!_body) {
       return;
