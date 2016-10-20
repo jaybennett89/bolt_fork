@@ -22,7 +22,8 @@ let rec findFiles pattern dirs =
   }
 
 let ndkPath = environVar "ndkbuild"
-let buildMode = getBuildParamOrDefault "build" "Debug"
+let configuration = getBuildParamOrDefault "configuration" "DebugU5"
+let isdebug = configuration.Contains("Debug")
 
 let rootDir = currentDirectory
 let projectDir = getBuildParamOrDefault "project" ""
@@ -44,13 +45,13 @@ Target "Build" (fun _ ->
         Targets = ["Build"]
         Properties = 
         [
-          "Configuration", buildMode
+          "Configuration", configuration
           "OutputPath", buildDir
           "UnityPathWin", unityDir
           "UnityPathOSX", unityDir
         ]
     }
-  ) "src\\bolt\\bolt.sln"
+  ) "src\\bolt.sln"
 )
 
 Target "Install" (fun _ ->
@@ -72,7 +73,7 @@ Target "Install" (fun _ ->
 )
 
 Target "InstallDebug" (fun _ ->
-  if buildMode = "Debug" then
+  if configuration = "Debug" then
     if not isMacOS then
       let pdb2mdbPath = unityDir + @"\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe";
 
@@ -100,6 +101,6 @@ Target "InstallDebug" (fun _ ->
 ("Clean")
   ==> ("Build")
   ==> ("Install")
-  ==> ("InstallDebug")
-
-Run "InstallDebug"
+  =?> ("InstallDebug", configuration = "Debug")
+  
+Run "Install"
