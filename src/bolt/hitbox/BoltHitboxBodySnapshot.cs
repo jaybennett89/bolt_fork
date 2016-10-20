@@ -52,7 +52,7 @@ class BoltHitboxBodySnapshot : BoltObject, IDisposable {
       for (int i = 0; i < _body._hitboxes.Length; ++i)
       {
           BoltHitbox hitbox = _body._hitboxes[i];
-          return _hbwtl[i].MultiplyPoint(Vector3.zero);
+          return _hbltw[i].MultiplyPoint(Vector3.zero);
       }
 
       return Vector3.zero;
